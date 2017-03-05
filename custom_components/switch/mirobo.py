@@ -63,7 +63,7 @@ class MiroboSwitch(SwitchDevice):
     @property
     def is_on(self):
         """Return true if switch is on."""
-        return self._state
+        return self._state == 5 # magic magic
 
     @property
     def vacuum(self):
