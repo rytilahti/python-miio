@@ -21,7 +21,14 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 
 Please make sure you have libffi and openssl headers installed, you can do this on Debian-based systems (like Rasperry Pi) with ```apt-get install libffi-dev libssl-dev```.
 
-The easiest way to install the package is to use pip: ```pip install python-mirobo```
+The easiest way to install the package is to use pip: ```pip3 install python-mirobo``` . [Using virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/) is recommended.
+
+In case you get an error similar like ```ImportError: No module named 'packaging'``` during the installation,
+you need to upgrade pip and setuptools:
+
+```
+$ pip3 install -U pip setuptools
+```
 
 # Getting started
 
