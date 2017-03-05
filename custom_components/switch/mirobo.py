@@ -87,7 +87,10 @@ class MiroboSwitch(SwitchDevice):
         try:
             state = self.vacuum.status()
             _LOGGER.info("got state from robo: %s" % state)
-            self._state_attrs = state[0]
-            self._state = state[0]['state'] == 5
+
+            self._state_attrs = {'status': state.state, 'error': state.error,
+                                 'battery': state.battery, 'fan': state.fanspeed,
+                                 'cleaning time': str(state.clean_time), 'cleaned area': state.clean_area}
+            self._state = state.state_code
         except Exception as ex:
             _LOGGER.error("Got exception while fetching the state: %s" % ex)
