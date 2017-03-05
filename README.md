@@ -19,7 +19,7 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 
 # Installation
 
-Please make sure you have libffi headers installed, you can do this on Debian-based systems (like Rasperry Pi) with ```apt-get install libffi-dev```.
+Please make sure you have libffi and openssl headers installed, you can do this on Debian-based systems (like Rasperry Pi) with ```apt-get install libffi-dev libssl-dev```.
 
 The easiest way to install the package is to use pip: ```pip install python-mirobo```
 
