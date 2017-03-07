@@ -1,13 +1,18 @@
-import mirobo
+# -*- coding: UTF-8 -*-
 import logging
 import click
-import datetime
 import pretty_cron
 import ast
+import sys
+
+if sys.version_info < (3,4):
+    print("To use this script you need python 3.4 or newer! got %s" % sys.version_info)
+    sys.exit(1)
+
+import mirobo
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(mirobo.Vacuum)
-
 
 @click.group(invoke_without_command=True)
 @click.option('--ip', envvar="MIROBO_IP", required=True)
