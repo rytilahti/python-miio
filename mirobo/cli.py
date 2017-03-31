@@ -15,8 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(mirobo.Vacuum)
 
 @click.group(invoke_without_command=True)
-@click.option('--ip', envvar="MIROBO_IP", required=True)
-@click.option('--token', envvar="MIROBO_TOKEN", required=True)
+@click.option('--ip', envvar="MIROBO_IP", required=False)
+@click.option('--token', envvar="MIROBO_TOKEN", required=False)
 @click.option('-d', '--debug', default=False, count=True)
 @click.pass_context
 def cli(ctx, ip, token, debug):
@@ -31,7 +31,12 @@ def cli(ctx, ip, token, debug):
     if ctx.invoked_subcommand == "discover":
         return
 
-    vac = mirobo.Vacuum(ip, token)
+    if ip is None or token is None:
+        click.echo("You have to give ip and token!")
+        sys.exit(-1)
+
+    vac = mirobo.Vacuum(ip, token, debug)
+    _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
     ctx.obj = vac
 
