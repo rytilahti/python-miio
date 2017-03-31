@@ -30,14 +30,17 @@ class VacuumStatus:
     def state(self):
         states = {
             1: 'Unknown 1',
-            2: 'Unknown (unplugged charger?)',
-            3: 'Unknown 3',
+            2: 'Charger disconnected',
+            3: 'Idle?',
+            4: 'Unknown 4',
             5: 'Cleaning',
             6: 'Returning home',
+            7: 'Unknown 7',
             8: 'Charging',
+            9: 'Unknown 9',
             10: 'Paused',
             11: 'Spot cleaning',
-            12: 'Unknown 12, error?!'
+            12: 'Error'
         }
         return states[int(self.state_code)]
 
