@@ -8,10 +8,11 @@ _LOGGER = logging.getLogger(__name__)
 
 class Vacuum:
     """Main class representing the vacuum."""
-    def __init__(self, ip, token):
+    def __init__(self, ip, token, debug):
         self.ip = ip
         self.port = 54321
         self.token = bytes.fromhex(token)
+        self.debug = debug
 
         # TODO this is a mess, find a nicer way to provide token to construct
         Utils.token = self.token
@@ -27,14 +28,15 @@ class Vacuum:
     @classmethod
     def discover(self):
         """Scan for devices in the network."""
-        _LOGGER.info("Sending discovery packet to broadcast address..")
+        timeout = 5
+        _LOGGER.info("Sending discovery packet to broadcast address with timeout of %ss..", timeout)
         # magic, length 32
         helobytes = bytes.fromhex(
             '21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.settimeout(5)
+        s.settimeout(timeout)
         s.sendto(helobytes, ('<broadcast>', 54321))
         while True:
             try:
@@ -44,7 +46,9 @@ class Vacuum:
                 _LOGGER.info("  IP %s: %s - token: %s" % (addr[0],
                                                           m.header.value.devtype,
                                                           codecs.encode(m.checksum, 'hex')))
-
+            except socket.timeout:
+                _LOGGER.info("Discovery done")
+                return #  ignore timeouts on discover
             except Exception as ex:
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
@@ -66,6 +70,8 @@ class Vacuum:
         msg = {'data': {'value': cmd}, 'header': {'value': header}, 'checksum': 0}
         m = Message.build(msg)
         _LOGGER.debug("%s:%s >>: %s" % (self.ip, self.port, cmd))
+        if self.debug > 1:
+            _LOGGER.debug("send (timeout %s): %s", self._timeout, Message.parse(m))
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(self._timeout)
@@ -78,6 +84,8 @@ class Vacuum:
         try:
             data, addr = s.recvfrom(1024)
             m = Message.parse(data)
+            if self.debug > 1:
+                _LOGGER.debug("recv: %s" % m)
             _LOGGER.debug("%s:%s (ts: %s) << %s" % (self.ip, self.port,
                                                     m.header.value.ts,
                                                     m.data.value))
