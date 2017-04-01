@@ -8,7 +8,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class Vacuum:
     """Main class representing the vacuum."""
-    def __init__(self, ip, token, debug):
+    def __init__(self, ip, token, debug=0):
         self.ip = ip
         self.port = 54321
         self.token = bytes.fromhex(token)
@@ -48,7 +48,7 @@ class Vacuum:
                                                           codecs.encode(m.checksum, 'hex')))
             except socket.timeout:
                 _LOGGER.info("Discovery done")
-                return #  ignore timeouts on discover
+                return  # ignore timeouts on discover
             except Exception as ex:
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
