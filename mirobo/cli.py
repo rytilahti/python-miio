@@ -143,7 +143,7 @@ def fanspeed(vac, speed):
     """Query and adjust the fan speed."""
     if speed:
         click.echo("Setting fan speed to %s" % speed)
-        print(vac.set_fan_speed(speed))
+        vac.set_fan_speed(speed)
     else:
         click.echo("Current fan speed: %s" % vac.fan_speed())
 

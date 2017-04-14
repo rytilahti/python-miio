@@ -117,7 +117,7 @@ class EncryptionAdapter(Adapter):
         try:
             decrypted = Utils.decrypt(obj).rstrip(b"\x00")
         except Exception as ex:
-            _LOGGER.warning("Unable to decrypt, returning raw bytes.")
+            _LOGGER.debug("Unable to decrypt, returning raw bytes.")
             return obj
 
         try:
