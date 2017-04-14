@@ -61,13 +61,13 @@ def status(vac):
         click.echo(click.style("Error: %s !" % res.error,
                                bold=True, fg='red'))
     click.echo(click.style("State: %s" % res.state, bold=True))
-    click.echo("Battery: %s" % res.battery)
-    click.echo("Fanspeed: %s" % res.fanspeed)
+    click.echo("Battery: %s %%" % res.battery)
+    click.echo("Fanspeed: %s %%" % res.fanspeed)
     click.echo("Cleaning since: %s" % res.clean_time)
     click.echo("Cleaned area: %s m²" % res.clean_area)
     click.echo("DND enabled: %s" % res.dnd)
-    click.echo("Map present: %s" % res.map)
-    click.echo("in_cleaning: %s" % res.in_cleaning)
+    #click.echo("Map present: %s" % res.map)
+    #click.echo("in_cleaning: %s" % res.in_cleaning)
 
 
 @cli.command()
@@ -75,7 +75,10 @@ def status(vac):
 def consumables(vac):
     """Return consumables status."""
     res = vac.consumable_status()
-    click.echo(res)
+    click.echo("Main brush:   %s (left %s)" % (res.main_brush, res.main_brush_left))
+    click.echo("Side brush:   %s (left %s)" % (res.side_brush, res.side_brush_left))
+    click.echo("Filter:       %s (left %s)" % (res.filter, res.filter_left))
+    click.echo("Sensor dirty: %s" % res.sensor_dirty)
 
 @cli.command()
 @pass_dev
@@ -127,7 +130,7 @@ def dnd(vac, cmd, start_hr, start_min, end_hr, end_min):
     elif cmd == "on":
         click.echo("Enabling DND %s:%s to %s:%s" % (start_hr, start_min,
                                                     end_hr, end_min))
-        print(vac.set_dnd(start_hr, start_min, end_hr, end_min))
+        click.echo(vac.set_dnd(start_hr, start_min, end_hr, end_min))
     else:
         x = vac.dnd_status()[0]
         click.echo("DND %02i:%02i to %02i:%02i (enabled: %s)" % (
@@ -188,7 +191,7 @@ def find(vac, stop):
 @cli.command()
 @pass_dev
 def map(vac):
-    """Get the map."""
+    """Returns the map token."""
     click.echo(vac.map())
 
 
@@ -198,6 +201,8 @@ def cleaning_history(vac):
     """Query the cleaning history."""
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
+    click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration, res.total_area))
+    click.echo()
     for idx, id_ in enumerate(res.ids):
         for e in vac.clean_details(id_):
             color = "green" if e.complete else "yellow"
@@ -206,6 +211,7 @@ def cleaning_history(vac):
                                     e.complete, e.unknown), bold=True, fg=color))
             click.echo("  Area cleaned: %s m²" % e.area)
             click.echo("  Duration: (%s)" % e.duration)
+            click.echo()
 
 @cli.command()
 @click.argument('cmd', required=True)
