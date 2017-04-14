@@ -5,14 +5,16 @@ import pretty_cron
 import ast
 import sys
 
-if sys.version_info < (3,4):
-    print("To use this script you need python 3.4 or newer! got %s" % sys.version_info)
+if sys.version_info < (3, 4):
+    print("To use this script you need python 3.4 or newer, got %s" %
+          sys.version_info)
     sys.exit(1)
 
-import mirobo
+import mirobo  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(mirobo.Vacuum)
+
 
 @click.group(invoke_without_command=True)
 @click.option('--ip', envvar="MIROBO_IP", required=False)
@@ -43,6 +45,7 @@ def cli(ctx, ip, token, debug):
     if ctx.invoked_subcommand is None:
         ctx.invoke(status)
 
+
 @cli.command()
 def discover():
     """Search for robots in the network."""
@@ -66,8 +69,8 @@ def status(vac):
     click.echo("Cleaning since: %s" % res.clean_time)
     click.echo("Cleaned area: %s m²" % res.clean_area)
     click.echo("DND enabled: %s" % res.dnd)
-    #click.echo("Map present: %s" % res.map)
-    #click.echo("in_cleaning: %s" % res.in_cleaning)
+    # click.echo("Map present: %s" % res.map)
+    # click.echo("in_cleaning: %s" % res.in_cleaning)
 
 
 @cli.command()
@@ -75,10 +78,14 @@ def status(vac):
 def consumables(vac):
     """Return consumables status."""
     res = vac.consumable_status()
-    click.echo("Main brush:   %s (left %s)" % (res.main_brush, res.main_brush_left))
-    click.echo("Side brush:   %s (left %s)" % (res.side_brush, res.side_brush_left))
-    click.echo("Filter:       %s (left %s)" % (res.filter, res.filter_left))
+    click.echo("Main brush:   %s (left %s)" % (res.main_brush,
+                                               res.main_brush_left))
+    click.echo("Side brush:   %s (left %s)" % (res.side_brush,
+                                               res.side_brush_left))
+    click.echo("Filter:       %s (left %s)" % (res.filter,
+                                               res.filter_left))
     click.echo("Sensor dirty: %s" % res.sensor_dirty)
+
 
 @cli.command()
 @pass_dev
@@ -201,17 +208,20 @@ def cleaning_history(vac):
     """Query the cleaning history."""
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
-    click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration, res.total_area))
+    click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration,
+                                                  res.total_area))
     click.echo()
     for idx, id_ in enumerate(res.ids):
         for e in vac.clean_details(id_):
             color = "green" if e.complete else "yellow"
-            click.echo(click.style("Clean #%s: %s-%s (complete: %s, unknown: %s)" %
-                                   (idx, e.start, e.end,
-                                    e.complete, e.unknown), bold=True, fg=color))
+            click.echo(click.style(
+                "Clean #%s: %s-%s (complete: %s, unknown: %s)" % (
+                    idx, e.start, e.end, e.complete, e.unknown),
+                bold=True, fg=color))
             click.echo("  Area cleaned: %s m²" % e.area)
             click.echo("  Duration: (%s)" % e.duration)
             click.echo()
+
 
 @cli.command()
 @click.argument('cmd', required=True)
@@ -224,6 +234,7 @@ def raw_command(vac, cmd, parameters):
         params = ast.literal_eval(parameters)
     click.echo("Sending cmd %s with params %s" % (cmd, params))
     click.echo(vac.raw_command(cmd, params))
+
 
 if __name__ == "__main__":
     cli()

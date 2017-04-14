@@ -14,18 +14,16 @@ REQUIREMENTS = ['python-mirobo']
 
 # pylint: disable=unused-argument
 def setup_platform(hass, config, add_devices_callback, discovery_info=None):
-    """Setup the demo switches."""
+    """Setup the vacuum from config."""
     host = config.get(CONF_HOST)
     name = config.get(CONF_NAME)
     token = config.get('token')
 
-    add_devices_callback([
-        MiroboSwitch(name, host, token)
-    ])
+    add_devices_callback([MiroboSwitch(name, host, token)])
 
 
 class MiroboSwitch(SwitchDevice):
-    """Representation of a demo switch."""
+    """Representation of a Xiaomi Vacuum."""
 
     def __init__(self, name, host, token):
         """Initialize the Demo switch."""
@@ -35,6 +33,8 @@ class MiroboSwitch(SwitchDevice):
         self._vacuum = None
         self._state = None
         self._state = None
+        self._state_attrs = {}
+        self._is_on = False
 
     @property
     def should_poll(self):
@@ -63,7 +63,7 @@ class MiroboSwitch(SwitchDevice):
     @property
     def is_on(self):
         """Return true if switch is on."""
-        return self._state == 5 # magic magic
+        return self._is_on
 
     @property
     def vacuum(self):
@@ -76,21 +76,22 @@ class MiroboSwitch(SwitchDevice):
 
     def turn_on(self, **kwargs):
         """Turn the switch on."""
-        self._vacuum.start()
+        self.vacuum.start()
 
     def turn_off(self, **kwargs):
         """Turn the device off."""
-        self._vacuum.stop()
-        self._vacuum.home()
+        self.vacuum.stop()
+        self.vacuum.home()
 
     def update(self):
         try:
             state = self.vacuum.status()
             _LOGGER.info("got state from robo: %s" % state)
 
-            self._state_attrs = {'status': state.state, 'error': state.error,
-                                 'battery': state.battery, 'fan': state.fanspeed,
-                                 'cleaning time': str(state.clean_time), 'cleaned area': state.clean_area}
+            self._state_attrs = {'Status': state.state, 'Error': state.error,
+                                 'Battery': state.battery, 'Fan': state.fanspeed,
+                                 'Cleaning time': str(state.clean_time), 'Cleaned area': state.clean_area}
             self._state = state.state_code
+            self._is_on = state.is_on
         except Exception as ex:
             _LOGGER.error("Got exception while fetching the state: %s" % ex)

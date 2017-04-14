@@ -6,7 +6,10 @@ import calendar
 
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
                        Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
-                       Default, Probe, Pointer, Pass, Enum)
+                       Default, Pointer, Pass, Enum)
+
+# for debugging parsing
+# from construct import Probe
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -62,8 +65,8 @@ class Utils:
         padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
 
         unpadder = padding.PKCS7(128).unpadder()
-        unpadded_plaintext = unpadder.update(padded_plaintext) \
-                             + unpadder.finalize()
+        unpadded_plaintext = unpadder.update(padded_plaintext)
+        unpadded_plaintext += unpadder.finalize()
         return unpadded_plaintext
 
     @staticmethod
@@ -137,13 +140,15 @@ Message = Struct(
         Const(Int16ub, 0x2131),
         "length" / Rebuild(Int16ub, Utils.get_length),
         "unknown" / Default(Int32ub, 0x00000000),
-        "devtype" / Enum(Default(Int16ub, 0x02f2), default=Pass, **xiaomi_devices),
+        "devtype" / Enum(Default(Int16ub, 0x02f2),
+                         default=Pass, **xiaomi_devices),
         "serial" / Default(Int16ub, 0xa40d),
         "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.utcnow()))
     )),
-    "checksum" / IfThenElse(Utils.is_hello,
-                            Bytes(16),
-                            Checksum(Bytes(16),
-                                     Utils.md5,
-                                     Utils.checksum_field_bytes)),
+    "checksum" / IfThenElse(
+        Utils.is_hello,
+        Bytes(16),
+        Checksum(Bytes(16),
+                 Utils.md5,
+                 Utils.checksum_field_bytes)),
 )

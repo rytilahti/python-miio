@@ -2,9 +2,11 @@ import logging
 import socket
 import datetime
 import codecs
-from mirobo import Message, Utils, VacuumStatus, ConsumableStatus, CleaningSummary, CleaningDetails, Timer
+from mirobo import (Message, Utils, VacuumStatus, ConsumableStatus,
+                    CleaningSummary, CleaningDetails, Timer)
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class Vacuum:
     """Main class representing the vacuum."""
@@ -48,7 +50,7 @@ class Vacuum:
         if is_broadcast:
             addr = '<broadcast>'
             is_broadcast = True
-            _LOGGER.info("Sending discovery packet to %s with timeout of %ss..",
+            _LOGGER.info("Sending discovery to %s with timeout of %ss..",
                          addr, timeout)
         # magic, length 32
         helobytes = bytes.fromhex(
@@ -68,9 +70,10 @@ class Vacuum:
                     return m
 
                 if addr[0] not in seen_addrs:
-                    _LOGGER.info("  IP %s: %s - token: %s" % (addr[0],
-                                                              m.header.value.devtype,
-                                                              codecs.encode(m.checksum, 'hex')))
+                    _LOGGER.info("  IP %s: %s - token: %s" % (
+                        addr[0],
+                        m.header.value.devtype,
+                        codecs.encode(m.checksum, 'hex')))
                     seen_addrs.append(addr[0])
             except socket.timeout:
                 if is_broadcast:
@@ -97,11 +100,14 @@ class Vacuum:
                   'devtype': self._devtype, 'serial': self._serial,
                   'ts': datetime.datetime.utcnow()}
 
-        msg = {'data': {'value': cmd}, 'header': {'value': header}, 'checksum': 0}
+        msg = {'data': {'value': cmd},
+               'header': {'value': header},
+               'checksum': 0}
         m = Message.build(msg)
         _LOGGER.debug("%s:%s >>: %s" % (self.ip, self.port, cmd))
         if self.debug > 1:
-            _LOGGER.debug("send (timeout %s): %s", self._timeout, Message.parse(m))
+            _LOGGER.debug("send (timeout %s): %s",
+                          self._timeout, Message.parse(m))
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(self._timeout)
@@ -188,7 +194,8 @@ class Vacuum:
         return self.send("get_dnd_timer")
 
     def set_dnd(self, start_hr, start_min, end_hr, end_min):
-        return self.send("set_dnd_timer", [start_hr, start_min, end_hr, end_min])
+        return self.send("set_dnd_timer",
+                         [start_hr, start_min, end_hr, end_min])
 
     def disable_dnd(self):
         return self.send("close_dnd_timer", [""])
