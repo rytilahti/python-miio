@@ -20,6 +20,7 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 # Installation
 
 Please make sure you have libffi and openssl headers installed, you can do this on Debian-based systems (like Rasperry Pi) with ```apt-get install libffi-dev libssl-dev```.
+Also do note that the setuptools version is too old for installing some requirements, so before trying to install this package you should update the setuptools with ```pip3 install -U setuptools```.
 
 The easiest way to install the package is to use pip: ```pip3 install python-mirobo``` . [Using virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/) is recommended.
 
@@ -141,7 +142,6 @@ Requesting return to home: 0
 ```
 $ mirobo fanspeed 30
 Setting fan speed to 30
-0
 ```
 
 ## State of consumables

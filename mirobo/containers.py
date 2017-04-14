@@ -187,6 +187,10 @@ class ConsumableStatus:
         return pretty_seconds(self.data["sensor_dirty_time"])
 
     def __str__(self):
+        # main = 300h
+        # side = 200h
+        # filter = 150h
+        # sensor = no idea
         return "main: %s, side: %s, filter: %s, sensor dirty: %s" % (
             self.main_brush, self.side_brush, self.filter, self.sensor_dirty)
 
