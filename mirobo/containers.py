@@ -118,6 +118,14 @@ class CleaningSummary:
         self.data = data
 
     @property
+    def total_duration(self):
+        return pretty_seconds(self.data[0])
+
+    @property
+    def total_area(self):
+        return pretty_area(self.data[1])
+
+    @property
     def count(self):
         return self.data[2]
 
@@ -126,7 +134,11 @@ class CleaningSummary:
         return self.data[3]
 
     def __str__(self):
-        return "[SUMMARY: %s times, ids: %s]" % (self.count, self.ids)
+        return "[SUMMARY: %s times, total time: %s, total area: %s, ids: %s]" % (
+            self.count,
+            self.total_duration,
+            self.total_area_cleaned,
+            self.ids)
 
 
 class CleaningDetails:
@@ -169,18 +181,33 @@ class ConsumableStatus:
         # 'side_brush_work_time': 32454,
         #  'main_brush_work_time': 32454}]}
         self.data = data
+        self.main_brush_total = datetime.timedelta(hours=300)
+        self.side_brush_total = datetime.timedelta(hours=200)
+        self.filter_total = datetime.timedelta(hours=150)
 
     @property
     def main_brush(self):
         return pretty_seconds(self.data["main_brush_work_time"])
 
     @property
+    def main_brush_left(self):
+        return self.main_brush_total - self.main_brush
+
+    @property
     def side_brush(self):
         return pretty_seconds(self.data["side_brush_work_time"])
 
     @property
+    def side_brush_left(self):
+        return self.side_brush_total - self.side_brush
+
+    @property
     def filter(self):
         return pretty_seconds(self.data["filter_work_time"])
+
+    @property
+    def filter_left(self):
+        return self.filter_total - self.filter
 
     @property
     def sensor_dirty(self):
