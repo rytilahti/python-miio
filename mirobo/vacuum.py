@@ -152,7 +152,7 @@ class Vacuum:
 
     def map(self):
         # returns ['retry'] without internet
-        return "get_map_v1"
+        return self.send("get_map_v1")
 
     def clean_history(self):
         return CleaningSummary(self.send("get_clean_summary"))
