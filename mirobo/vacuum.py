@@ -137,6 +137,7 @@ class Vacuum:
             return m.data.value["result"]
         except Exception as ex:
             _LOGGER.error("got error when receiving: %s" % ex)
+            self.__enter__()
             raise
 
     def start(self):
