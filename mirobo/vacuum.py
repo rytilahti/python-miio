@@ -1,6 +1,7 @@
 import logging
 import socket
 import datetime
+import time
 import codecs
 from mirobo import (Message, Utils, VacuumStatus, ConsumableStatus,
                     CleaningSummary, CleaningDetails, Timer)
@@ -22,6 +23,8 @@ class Vacuum:
         self.__id = 0
         self._devtype = None
         self._serial = None
+        self._ts = None
+        self._ts_server = int(time.mktime(datetime.datetime.utcnow().timetuple()))
 
     def __enter__(self):
         """Does a discover to fetch the devtype and serial."""
@@ -29,6 +32,8 @@ class Vacuum:
         if m is not None:
             self._devtype = m.header.value.devtype
             self._serial = m.header.value.serial
+            self._ts = m.header.value.ts
+            self._ts_server = int(time.mktime(datetime.datetime.utcnow().timetuple()))
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
 
@@ -85,7 +90,8 @@ class Vacuum:
 
     def send(self, command, parameters=None):
         """Build and send the given command."""
-        if self._devtype is None or self._serial is None:
+        delta_ts = int(time.mktime(datetime.datetime.utcnow().timetuple())) - self._ts_server
+        if self._devtype is None or self._serial is None or (delta_ts > 120):
             self.__enter__()  # when called outside of cm, initialize.
 
         cmd = {
@@ -96,9 +102,10 @@ class Vacuum:
         if parameters:
             cmd["params"] = parameters
 
+        self._ts += datetime.timedelta(seconds = delta_ts)
         header = {'length': 0, 'unknown': 0x00000000,
                   'devtype': self._devtype, 'serial': self._serial,
-                  'ts': datetime.datetime.utcnow()}
+                  'ts': self._ts}
 
         msg = {'data': {'value': cmd},
                'header': {'value': header},
@@ -125,6 +132,8 @@ class Vacuum:
             _LOGGER.debug("%s:%s (ts: %s) << %s" % (self.ip, self.port,
                                                     m.header.value.ts,
                                                     m.data.value))
+            self._ts = m.header.value.ts
+            self._ts_server = int(time.mktime(datetime.datetime.utcnow().timetuple()))
             return m.data.value["result"]
         except Exception as ex:
             _LOGGER.error("got error when receiving: %s" % ex)
