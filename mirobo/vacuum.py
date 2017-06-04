@@ -93,6 +93,7 @@ class Vacuum:
         delta_ts = int(time.mktime(datetime.datetime.utcnow().timetuple())) - self._ts_server
         if self._devtype is None or self._serial is None or (delta_ts > 120):
             self.__enter__()  # when called outside of cm, initialize.
+            delta_ts = int(time.mktime(datetime.datetime.utcnow().timetuple())) - self._ts_server
 
         cmd = {
             "id": self._id,
