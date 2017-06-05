@@ -6,6 +6,12 @@ and report new missing functionality.
 
 Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewtopic.php?f=23&t=4898) who figured out the encryption to make this possible.
 
+### Adding support for other devices
+
+Although this library (and tool) currently only supports the vacuum cleaner, some other Xiaomi products use the same [underlying communication protocol](https://github.com/OpenMiHome/mihome-binary-protocol), so *patches for supporting other Xiaomi devices using the same protocol are welcome!*
+
+The [miio javascript library](https://github.com/aholstenson/miio) contains some hints on devices which could be supported, however, the Xiaomi Smart Home gateway ([Home Assistant component](https://github.com/lazcad/homeassistant) already work in progress) as well as Yeelight bulbs ([python-yeelight](https://gitlab.com/stavros/python-yeelight/) supports them when the developer mode is activated) are currently not in the scope.
+
 # Features
 
 * Basic functionality, including starting, stopping, pausing, locating.
@@ -34,7 +40,7 @@ $ pip3 install -U pip setuptools
 # Getting started
 
 To be able to communicate with the vacuum one needs to have its IP address as well as an encryption token.
-This token is only attainable before the device has been connected over the app to your local wifi.
+This token is only attainable before the device has been connected over the app to your local wifi (or alternatively, if you have paired your *rooted* mobile device with the vacuum, you can follow [these instructions](https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md)).
 
 In order to fetch the token, reset the robot, connect to its the network its announcing (rockrobo-XXXX)
 and run the following command:
@@ -92,20 +98,6 @@ mirobo raw_command set_dnd_timer '[22,0,6,0]'
 
 If you find a new command please let us know by creating a pull request or an issue, if you
 do not want to implement it yourself!
-
-# Home Assistant support
-
-There is also a very rudimentary component for Home Assistant. In its current state it is more of a placeholder,
-therefore you should know how to install it if you want to use it. Later on when the interface gets cleaned up
-usage instructions will be added here.
-
-An example configuration:
-```
-- platform: mirobo
-  name: 'name of the robot'
-  host: 192.168.1.2
-  token: your-token-here
-```
 
 # Usage examples
 
@@ -190,4 +182,21 @@ Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
   Area cleaned: 32.16 m²
   Duration: (0:23:54)
 
+```
+
+
+# Home Assistant support
+
+*The component has been [submitted for inclusion in Home Assistant directly](https://github.com/home-assistant/home-assistant/pull/7913). This part is here just for historical reference.*
+
+There is also a very rudimentary component for Home Assistant. In its current state it is more of a placeholder,
+therefore you should know how to install it if you want to use it. Later on when the interface gets cleaned up
+usage instructions will be added here.
+
+An example configuration:
+```
+- platform: mirobo
+  name: 'name of the robot'
+  host: 192.168.1.2
+  token: your-token-here
 ```
