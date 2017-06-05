@@ -8,6 +8,10 @@ from mirobo import (Message, Utils, VacuumStatus, ConsumableStatus,
 _LOGGER = logging.getLogger(__name__)
 
 
+class VacuumException(Exception):
+    pass
+
+
 class Vacuum:
     """Main class representing the vacuum."""
     def __init__(self, ip, token, debug=0):
@@ -114,8 +118,9 @@ class Vacuum:
 
         try:
             s.sendto(m, (self.ip, self.port))
-        except Exception as ex:
+        except OSError as ex:
             _LOGGER.error("failed to send msg: %s" % ex)
+            raise VacuumException from ex
 
         try:
             data, addr = s.recvfrom(1024)
@@ -126,9 +131,9 @@ class Vacuum:
                                                     m.header.value.ts,
                                                     m.data.value))
             return m.data.value["result"]
-        except Exception as ex:
-            _LOGGER.error("got error when receiving: %s" % ex)
-            raise
+        except OSError as ex:
+            _LOGGER.error("got error when receiving: %s", ex)
+            raise VacuumException from ex
 
     def start(self):
         return self.send("app_start")
