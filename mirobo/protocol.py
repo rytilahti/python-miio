@@ -3,6 +3,7 @@ import hashlib
 import json
 import logging
 import calendar
+from pprint import pprint as pp
 
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
                        Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
@@ -28,8 +29,6 @@ xiaomi_devices = {y: x for x, y in xiaomi_devices.items()}
 
 class Utils:
     """ This class is adapted from the original xpn.py code by gst666 """
-    # TODO nicer way to handle tokens
-    token = ""
 
     @staticmethod
     def md5(data):
@@ -38,14 +37,14 @@ class Utils:
         return checksum.digest()
 
     @staticmethod
-    def key_iv():
-        key = Utils.md5(Utils.token)
-        iv = Utils.md5(key + Utils.token)
+    def key_iv(token):
+        key = Utils.md5(token)
+        iv = Utils.md5(key + token)
         return key, iv
 
     @staticmethod
-    def encrypt(plaintext):
-        key, iv = Utils.key_iv()
+    def encrypt(plaintext, token):
+        key, iv = Utils.key_iv(token)
         padder = padding.PKCS7(128).padder()
 
         padded_plaintext = padder.update(plaintext) + padder.finalize()
@@ -56,8 +55,8 @@ class Utils:
         return encryptor.update(padded_plaintext) + encryptor.finalize()
 
     @staticmethod
-    def decrypt(ciphertext):
-        key, iv = Utils.key_iv()
+    def decrypt(ciphertext, token):
+        key, iv = Utils.key_iv(token)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
                         backend=default_backend())
 
@@ -73,11 +72,12 @@ class Utils:
     def checksum_field_bytes(ctx):
         """Gatherd bytes for checksum calculation"""
         # print("CHECKSUM: %s" % ctx["header"])
-        if Utils.token is None:
-            raise Exception("you have to define token")
+        #if Utils.token is None:
+        #    raise Exception("you have to define token")
         # print("CTX: %s" % ctx)
         x = bytearray(ctx["header"].data)
-        x += Utils.token
+        #pp(ctx)
+        x += ctx["_"]["token"]
         if "data" in ctx:
             x += ctx["data"].data
             # print("DATA: %s" % ctx["data"])
@@ -114,11 +114,13 @@ class TimeAdapter(Adapter):
 class EncryptionAdapter(Adapter):
     """Adapter to handle communication encryption."""
     def _encode(self, obj, context):
-        return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00')
+        #pp(context)
+        return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00', context['_']['token'])
 
     def _decode(self, obj, context):
         try:
-            decrypted = Utils.decrypt(obj).rstrip(b"\x00")
+            #pp(context)
+            decrypted = Utils.decrypt(obj, context['_']['token']).rstrip(b"\x00")
         except Exception as ex:
             _LOGGER.debug("Unable to decrypt, returning raw bytes.")
             return obj
