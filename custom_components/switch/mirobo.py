@@ -25,6 +25,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 REQUIREMENTS = ['python-mirobo==0.0.7']
 
+
 # pylint: disable=unused-argument
 def setup_platform(hass, config, add_devices_callback, discovery_info=None):
     """Setup the vacuum from config."""
@@ -80,7 +81,8 @@ class MiroboSwitch(SwitchDevice):
         """Property accessor for vacuum object."""
         if not self._vacuum:
             from mirobo import Vacuum
-            _LOGGER.info("initializing with host %s token %s" % (self.host, self.token))
+            _LOGGER.info("initializing with host %s token %s",
+                         self.host, self.token)
             self._vacuum = Vacuum(self.host, self.token)
 
         return self._vacuum
@@ -106,7 +108,7 @@ class MiroboSwitch(SwitchDevice):
         """Fetch state from the device."""
         try:
             state = self.vacuum.status()
-            _LOGGER.debug("got state from the vacuum: %s" % state)
+            _LOGGER.debug("got state from the vacuum: %s", state)
 
             self._state_attrs = {
                 'Status': state.state, 'Error': state.error,
@@ -117,4 +119,4 @@ class MiroboSwitch(SwitchDevice):
             self._state = state.state_code
             self._is_on = state.is_on
         except Exception as ex:
-            _LOGGER.error("Got exception while fetching the state: %s" % ex)
+            _LOGGER.error("Got exception while fetching the state: %s", ex)
