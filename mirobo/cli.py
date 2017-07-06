@@ -20,8 +20,9 @@ pass_dev = click.make_pass_decorator(mirobo.Vacuum)
 @click.option('--ip', envvar="MIROBO_IP", required=False)
 @click.option('--token', envvar="MIROBO_TOKEN", required=False)
 @click.option('-d', '--debug', default=False, count=True)
+@click.option('--id-file', type=click.File('r+', lazy=False), default='/tmp/python-mirobo.seq')
 @click.pass_context
-def cli(ctx, ip, token, debug):
+def cli(ctx, ip, token, debug, id_file):
     """A tool to command Xiaomi Vacuum robot."""
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -37,14 +38,32 @@ def cli(ctx, ip, token, debug):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    vac = mirobo.Vacuum(ip, token, debug)
+    start_id = 0
+    try:
+        start_id = int(id_file.read())
+        _LOGGER.debug("Read stored message id: %s" % start_id)
+    except ValueError:
+        pass
+
+    vac = mirobo.Vacuum(ip, token, start_id, debug)
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
     ctx.obj = vac
 
     if ctx.invoked_subcommand is None:
         ctx.invoke(status)
+        cleanup(vac, id_file=id_file)
 
+
+@cli.resultcallback()
+@pass_dev
+def cleanup(vac, **kwargs):
+    id_file = kwargs['id_file']
+    _LOGGER.debug("Writing %s to %s" % (vac.raw_id, id_file))
+
+    id_file.seek(0)
+    id_file.truncate()
+    id_file.write(str(vac.raw_id))
 
 @cli.command()
 def discover():
@@ -215,8 +234,8 @@ def cleaning_history(vac):
         for e in vac.clean_details(id_):
             color = "green" if e.complete else "yellow"
             click.echo(click.style(
-                "Clean #%s: %s-%s (complete: %s, unknown: %s)" % (
-                    idx, e.start, e.end, e.complete, e.unknown),
+                "Clean #%s: %s-%s (complete: %s, error: %s)" % (
+                    idx, e.start, e.end, e.complete, e.error),
                 bold=True, fg=color))
             click.echo("  Area cleaned: %s m²" % e.area)
             click.echo("  Duration: (%s)" % e.duration)

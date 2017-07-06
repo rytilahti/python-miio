@@ -108,7 +108,7 @@ class TimeAdapter(Adapter):
         return calendar.timegm(obj.timetuple())
 
     def _decode(self, obj, context):
-        return datetime.datetime.fromtimestamp(obj)
+        return datetime.datetime.utcfromtimestamp(obj)
 
 
 class EncryptionAdapter(Adapter):

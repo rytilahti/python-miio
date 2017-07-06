@@ -19,6 +19,7 @@ class Device:
         self.debug = debug
 
         self._timeout = 5
+        self._device_ts = 0
         self.__id = start_id
         self._devtype = None
         self._serial = None
@@ -29,6 +30,10 @@ class Device:
         if m is not None:
             self._devtype = m.header.value.devtype
             self._serial = m.header.value.serial
+            self._device_ts = m.header.value.ts
+            _LOGGER.debug("Discovered %s %s with ts: %s" % (self._devtype,
+                                                            self._serial,
+                                                            self._device_ts))
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
 
@@ -90,9 +95,10 @@ class Device:
         if parameters:
             cmd["params"] = parameters
 
+        send_ts = self._device_ts + datetime.timedelta(seconds=1)
         header = {'length': 0, 'unknown': 0x00000000,
                   'devtype': self._devtype, 'serial': self._serial,
-                  'ts': datetime.datetime.utcnow()}
+                  'ts': send_ts}
 
         msg = {'data': {'value': cmd},
                'header': {'value': header},
@@ -116,11 +122,15 @@ class Device:
         try:
             data, addr = s.recvfrom(1024)
             m = Message.parse(data, ctx)
+            self._device_ts = m.header.value.ts
             if self.debug > 1:
                 _LOGGER.debug("recv: %s" % m)
-            _LOGGER.debug("%s:%s (ts: %s) << %s" % (self.ip, self.port,
-                                                    m.header.value.ts,
-                                                    m.data.value))
+
+            self.__id = m.data.value["id"]
+            _LOGGER.debug("%s:%s (ts: %s, id: %s) << %s" % (self.ip, self.port,
+                                                            m.header.value.ts,
+                                                            m.data.value["id"],
+                                                            m.data.value))
             return m.data.value["result"]
         except OSError as ex:
             _LOGGER.error("got error when receiving: %s", ex)
@@ -132,4 +142,8 @@ class Device:
         self.__id += 1
         if self.__id >= 9999:
             self.__id = 0
+        return self.__id
+
+    @property
+    def raw_id(self):
         return self.__id
