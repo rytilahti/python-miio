@@ -12,14 +12,14 @@ class DeviceException(Exception):
 
 
 class Device:
-    def __init__(self, ip, token, debug=0):
+    def __init__(self, ip, token, start_id=0, debug=0):
         self.ip = ip
         self.port = 54321
         self.token = bytes.fromhex(token)
         self.debug = debug
 
         self._timeout = 5
-        self.__id = 0
+        self.__id = start_id
         self._devtype = None
         self._serial = None
 
@@ -130,4 +130,6 @@ class Device:
     def _id(self):
         """Returns running id."""
         self.__id += 1
+        if self.__id >= 9999:
+            self.__id = 0
         return self.__id
