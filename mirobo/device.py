@@ -36,6 +36,7 @@ class Device:
                                                             self._device_ts))
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
+            raise DeviceException("Unable to discover a device at address %s" % self.ip)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
