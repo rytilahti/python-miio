@@ -17,10 +17,11 @@ pass_dev = click.make_pass_decorator(mirobo.Vacuum)
 
 
 @click.group(invoke_without_command=True)
-@click.option('--ip', envvar="MIROBO_IP", required=False)
-@click.option('--token', envvar="MIROBO_TOKEN", required=False)
+@click.option('--ip', envvar="MIROBO_IP")
+@click.option('--token', envvar="MIROBO_TOKEN")
 @click.option('-d', '--debug', default=False, count=True)
-@click.option('--id-file', type=click.File('r+', lazy=False), default='/tmp/python-mirobo.seq')
+@click.option('--id-file', type=click.File('w+', lazy=False),
+              default='/tmp/python-mirobo.seq')
 @click.pass_context
 def cli(ctx, ip, token, debug, id_file):
     """A tool to command Xiaomi Vacuum robot."""
@@ -64,6 +65,7 @@ def cleanup(vac, **kwargs):
     id_file.seek(0)
     id_file.truncate()
     id_file.write(str(vac.raw_id))
+
 
 @cli.command()
 def discover():
