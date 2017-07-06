@@ -68,7 +68,7 @@ def status(vac):
     click.echo("Fanspeed: %s %%" % res.fanspeed)
     click.echo("Cleaning since: %s" % res.clean_time)
     click.echo("Cleaned area: %s m²" % res.clean_area)
-    click.echo("DND enabled: %s" % res.dnd)
+    # click.echo("DND enabled: %s" % res.dnd)
     # click.echo("Map present: %s" % res.map)
     # click.echo("in_cleaning: %s" % res.in_cleaning)
 
