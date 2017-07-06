@@ -41,7 +41,9 @@ class VacuumStatus:
             9: 'Unknown 9',
             10: 'Paused',
             11: 'Spot cleaning',
-            12: 'Error'
+            12: 'Error',
+            13: 'Unknown 13',
+            14: 'Updating',
         }
         return states[int(self.state_code)]
 
