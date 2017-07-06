@@ -14,6 +14,30 @@ def pretty_time(x):
     return datetime.datetime.fromtimestamp(x)
 
 
+error_codes = {  # from vacuum_cleaner-EN.pdf
+    0: "No error",
+    1: "Laser distance sensor error",
+    2: "Collision sensor error",
+    3: "Wheels on top of void, move robot",
+    4: "Clean hovering sensors, move robot",
+    5: "Clean main brush",
+    6: "Clean side brush",
+    7: "Main wheel stuck?",
+    8: "Device stuck, clean area",
+    9: "Dust collector missing",
+    10: "Clean filter",
+    11: "Stuck in magnetic barrier",
+    12: "Low battery",
+    13: "Charging fault",
+    14: "Battery fault",
+    15: "Wall sensors dirty, wipe them",
+    16: "Place me on flat surface",
+    17: "Side brushes problem, reboot me",
+    18: "Suction fan problem",
+    19: "Unpowered charging station",
+}
+
+
 class VacuumStatus:
     """Container for status reports from the vacuum."""
     def __init__(self, data):
@@ -53,28 +77,6 @@ class VacuumStatus:
 
     @property
     def error(self):
-        error_codes = {  # from vacuum_cleaner-EN.pdf
-            0: "No error",
-            1: "Laser distance sensor error",
-            2: "Collision sensor error",
-            3: "Wheels on top of void, move robot",
-            4: "Clean hovering sensors, move robot",
-            5: "Clean main brush",
-            6: "Clean side brush",
-            7: "Main wheel stuck?",
-            8: "Device stuck, clean area",
-            9: "Dust collector missing",
-            10: "Clean filter",
-            11: "Stuck in magnetic barrier",
-            12: "Low battery",
-            13: "Charging fault",
-            14: "Battery fault",
-            15: "Wall sensors dirty, wipe them",
-            16: "Place me on flat surface",
-            17: "Side brushes problem, reboot me",
-            18: "Suction fan problem",
-            19: "Unpowered charging station",
-        }
         return error_codes[self.error_code]
 
     @property
@@ -175,8 +177,8 @@ class CleaningDetails:
         return pretty_area(self.data[3])
 
     @property
-    def unknown(self):
-        return self.data[4]
+    def error(self):
+        return error_codes[self.data[4]]
 
     @property
     def complete(self):
