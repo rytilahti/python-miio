@@ -20,10 +20,10 @@ pass_dev = click.make_pass_decorator(mirobo.Vacuum)
 @click.option('--ip', envvar="MIROBO_IP")
 @click.option('--token', envvar="MIROBO_TOKEN")
 @click.option('-d', '--debug', default=False, count=True)
-@click.option('--id-file', type=click.File('w+', lazy=False),
+@click.option('--id-file', type=click.Path(dir_okay=False, writable=True),
               default='/tmp/python-mirobo.seq')
 @click.pass_context
-def cli(ctx, ip, token, debug, id_file):
+def cli(ctx, ip: str, token: str, debug: int, id_file: click.Path):
     """A tool to command Xiaomi Vacuum robot."""
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -41,9 +41,11 @@ def cli(ctx, ip, token, debug, id_file):
 
     start_id = 0
     try:
-        start_id = int(id_file.read())
-        _LOGGER.debug("Read stored message id: %s" % start_id)
-    except ValueError:
+        with open(id_file, 'r') as f:
+            start_id = int(f.read())
+            _LOGGER.debug("Read stored message id: %s" % start_id)
+    except (FileNotFoundError, ValueError) as ex:
+        _LOGGER.error("Unable to read the stored msgid: %s" % ex)
         pass
 
     vac = mirobo.Vacuum(ip, token, start_id, debug)
@@ -58,13 +60,11 @@ def cli(ctx, ip, token, debug, id_file):
 
 @cli.resultcallback()
 @pass_dev
-def cleanup(vac, **kwargs):
+def cleanup(vac: mirobo.Vacuum, **kwargs):
     id_file = kwargs['id_file']
     _LOGGER.debug("Writing %s to %s" % (vac.raw_id, id_file))
-
-    id_file.seek(0)
-    id_file.truncate()
-    id_file.write(str(vac.raw_id))
+    with open(id_file, 'w') as f:
+        f.write(str(vac.raw_id))
 
 
 @cli.command()
@@ -75,7 +75,7 @@ def discover():
 
 @cli.command()
 @pass_dev
-def status(vac):
+def status(vac: mirobo.Vacuum):
     """Returns the state information."""
     res = vac.status()
     if not res:
@@ -96,7 +96,7 @@ def status(vac):
 
 @cli.command()
 @pass_dev
-def consumables(vac):
+def consumables(vac: mirobo.Vacuum):
     """Return consumables status."""
     res = vac.consumable_status()
     click.echo("Main brush:   %s (left %s)" % (res.main_brush,
@@ -110,35 +110,35 @@ def consumables(vac):
 
 @cli.command()
 @pass_dev
-def start(vac):
+def start(vac: mirobo.Vacuum):
     """Start cleaning."""
     click.echo("Starting cleaning: %s" % vac.start())
 
 
 @cli.command()
 @pass_dev
-def spot(vac):
+def spot(vac: mirobo.Vacuum):
     """Start spot cleaning."""
     click.echo("Starting spot cleaning: %s" % vac.spot())
 
 
 @cli.command()
 @pass_dev
-def pause(vac):
+def pause(vac: mirobo.Vacuum):
     """Pause cleaning."""
     click.echo("Pausing: %s" % vac.pause())
 
 
 @cli.command()
 @pass_dev
-def stop(vac):
+def stop(vac: mirobo.Vacuum):
     """Stop cleaning."""
     click.echo("Stop cleaning: %s" % vac.stop())
 
 
 @cli.command()
 @pass_dev
-def home(vac):
+def home(vac: mirobo.Vacuum):
     """Return home."""
     click.echo("Requesting return to home: %s" % vac.home())
 
@@ -150,7 +150,9 @@ def home(vac):
 @click.argument('end_hr', required=False)
 @click.argument('end_min', required=False)
 @pass_dev
-def dnd(vac, cmd, start_hr, start_min, end_hr, end_min):
+def dnd(vac: mirobo.Vacuum, cmd: str,
+        start_hr: int, start_min: int,
+        end_hr: int, end_min: int):
     """Query and adjust do-not-disturb mode."""
     if cmd == "off":
         click.echo("Disabling DND..")
@@ -170,7 +172,7 @@ def dnd(vac, cmd, start_hr, start_min, end_hr, end_min):
 @cli.command()
 @click.argument('speed', type=int, required=False)
 @pass_dev
-def fanspeed(vac, speed):
+def fanspeed(vac: mirobo.Vacuum, speed):
     """Query and adjust the fan speed."""
     if speed:
         click.echo("Setting fan speed to %s" % speed)
@@ -182,7 +184,7 @@ def fanspeed(vac, speed):
 @cli.command()
 @click.argument('timer', required=False, default=None)
 @pass_dev
-def timer(vac, timer):
+def timer(vac: mirobo.Vacuum, timer):
     """Schedule vacuuming, times in GMT."""
     if timer:
         raise NotImplementedError()
@@ -206,7 +208,7 @@ def timer(vac, timer):
 @cli.command()
 @click.argument('stop', required=False)
 @pass_dev
-def find(vac, stop):
+def find(vac: mirobo.Vacuum, stop):
     """Finds the robot."""
     if stop:
         click.echo("Stopping find calls..")
@@ -218,14 +220,14 @@ def find(vac, stop):
 
 @cli.command()
 @pass_dev
-def map(vac):
+def map(vac: mirobo.Vacuum):
     """Returns the map token."""
     click.echo(vac.map())
 
 
 @cli.command()
 @pass_dev
-def cleaning_history(vac):
+def cleaning_history(vac: mirobo.Vacuum):
     """Query the cleaning history."""
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
@@ -248,7 +250,7 @@ def cleaning_history(vac):
 @click.argument('cmd', required=True)
 @click.argument('parameters', required=False)
 @pass_dev
-def raw_command(vac, cmd, parameters):
+def raw_command(vac: mirobo.Vacuum, cmd, parameters):
     """Run a raw command."""
     params = []
     if parameters:
