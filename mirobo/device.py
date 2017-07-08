@@ -14,7 +14,8 @@ class DeviceException(Exception):
 
 
 class Device:
-    def __init__(self, ip: str, token: str, start_id: int=0, debug: int=0) -> None:
+    def __init__(self, ip: str, token: str,
+                 start_id: int=0, debug: int=0) -> None:
         self.ip = ip
         self.port = 54321
         self.token = bytes.fromhex(token)
@@ -63,7 +64,7 @@ class Device:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(timeout)
-        for i in range(3):
+        for _i in range(3):
             s.sendto(helobytes, (addr, 54321))
         while True:
             try:
