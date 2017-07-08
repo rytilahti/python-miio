@@ -3,9 +3,10 @@ import datetime
 import socket
 import logging
 
-from mirobo import Utils, Message
+from mirobo import Message
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class DeviceException(Exception):
     pass
@@ -36,13 +37,13 @@ class Device:
                                                             self._device_ts))
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
-            raise DeviceException("Unable to discover a device at address %s" % self.ip)
+            raise DeviceException("Unable to discover the device %s" % self.ip)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
     @staticmethod
-    def discover(addr=None):
+    def discover(addr: str=None):
         """Scan for devices in the network."""
         timeout = 5
         is_broadcast = addr is None
@@ -83,7 +84,7 @@ class Device:
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
 
-    def send(self, command, parameters=None):
+    def send(self, command: str, parameters=None):
         """Build and send the given command."""
         if self._devtype is None or self._serial is None:
             self.__enter__()  # when called outside of cm, initialize.
@@ -138,7 +139,7 @@ class Device:
             raise DeviceException from ex
 
     @property
-    def _id(self):
+    def _id(self) -> int:
         """Returns running id."""
         self.__id += 1
         if self.__id >= 9999:
@@ -146,5 +147,5 @@ class Device:
         return self.__id
 
     @property
-    def raw_id(self):
+    def raw_id(self) -> int:
         return self.__id

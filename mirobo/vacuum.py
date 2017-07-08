@@ -1,13 +1,16 @@
 import logging
+from typing import List
 
 from . import (VacuumStatus, ConsumableStatus,
-                    CleaningSummary, CleaningDetails, Timer)
+               CleaningSummary, CleaningDetails, Timer)
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class VacuumException(DeviceException):
     pass
+
 
 class Vacuum(Device):
     """Main class representing the vacuum."""
@@ -28,24 +31,24 @@ class Vacuum(Device):
         self.send("app_stop")
         return self.send("app_charge")
 
-    def status(self):
+    def status(self) -> VacuumStatus:
         return VacuumStatus(self.send("get_status")[0])
 
     def log_upload_status(self):
         # {"result": [{"log_upload_status": 7}], "id": 1}
         return self.send("get_log_upload_status")
 
-    def consumable_status(self):
+    def consumable_status(self) -> ConsumableStatus:
         return ConsumableStatus(self.send("get_consumable")[0])
 
     def map(self):
         # returns ['retry'] without internet
         return self.send("get_map_v1")
 
-    def clean_history(self):
+    def clean_history(self) -> CleaningSummary:
         return CleaningSummary(self.send("get_clean_summary"))
 
-    def clean_details(self, id_):
+    def clean_details(self, id_: int) -> List[CleaningDetails]:
         details = self.send("get_clean_record", [id_])
 
         res = list()
@@ -57,7 +60,7 @@ class Vacuum(Device):
     def find(self):
         return self.send("find_me", [""])
 
-    def timer(self):
+    def timer(self) -> List[Timer]:
         timers = list()
         for rec in self.send("get_timer", [""]):
             timers.append(Timer(rec))
@@ -75,14 +78,15 @@ class Vacuum(Device):
         #  'start_hour': 22, 'end_hour': 8}], 'id': 1}
         return self.send("get_dnd_timer")
 
-    def set_dnd(self, start_hr, start_min, end_hr, end_min):
+    def set_dnd(self, start_hr: int, start_min: int,
+                end_hr: int, end_min: int):
         return self.send("set_dnd_timer",
                          [start_hr, start_min, end_hr, end_min])
 
     def disable_dnd(self):
         return self.send("close_dnd_timer", [""])
 
-    def set_fan_speed(self, speed):
+    def set_fan_speed(self, speed: int):
         # speed = [38, 60 or 77]
         return self.send("set_custom_mode", [speed])
 

@@ -3,7 +3,7 @@ import hashlib
 import json
 import logging
 import calendar
-from pprint import pprint as pp
+from pprint import pprint as pp  # noqa: F401
 
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
                        Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
@@ -19,12 +19,12 @@ from cryptography.hazmat.primitives import padding
 _LOGGER = logging.getLogger(__name__)
 
 # Map of device ids
-xiaomi_devices = {0x02f2: "Xiaomi Mi Robot Vacuum",
-                  0x00c4: "Xiaomi Smart Mi Air Purifier",
-                  0x031a: "Xiaomi Smart home gateway",
-                  0x0330: "Yeelight color bulb"
-                  }
-xiaomi_devices = {y: x for x, y in xiaomi_devices.items()}
+xiaomi_devices_reverse = {0x02f2: "Xiaomi Mi Robot Vacuum",
+                          0x00c4: "Xiaomi Smart Mi Air Purifier",
+                          0x031a: "Xiaomi Smart home gateway",
+                          0x0330: "Yeelight color bulb"
+                          }
+xiaomi_devices = {y: x for x, y in xiaomi_devices_reverse.items()}
 
 
 class Utils:
@@ -70,13 +70,8 @@ class Utils:
 
     @staticmethod
     def checksum_field_bytes(ctx):
-        """Gatherd bytes for checksum calculation"""
-        # print("CHECKSUM: %s" % ctx["header"])
-        #if Utils.token is None:
-        #    raise Exception("you have to define token")
-        # print("CTX: %s" % ctx)
+        """Gather bytes for checksum calculation"""
         x = bytearray(ctx["header"].data)
-        #pp(ctx)
         x += ctx["_"]["token"]
         if "data" in ctx:
             x += ctx["data"].data
@@ -114,13 +109,15 @@ class TimeAdapter(Adapter):
 class EncryptionAdapter(Adapter):
     """Adapter to handle communication encryption."""
     def _encode(self, obj, context):
-        #pp(context)
-        return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00', context['_']['token'])
+        # pp(context)
+        return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00',
+                             context['_']['token'])
 
     def _decode(self, obj, context):
         try:
-            #pp(context)
-            decrypted = Utils.decrypt(obj, context['_']['token']).rstrip(b"\x00")
+            # pp(context)
+            decrypted = Utils.decrypt(obj, context['_']['token'])
+            decrypted = decrypted.rstrip(b"\x00")
         except Exception as ex:
             _LOGGER.debug("Unable to decrypt, returning raw bytes.")
             return obj
