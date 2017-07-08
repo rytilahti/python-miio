@@ -3,6 +3,7 @@ import hashlib
 import json
 import logging
 import calendar
+from typing import Any, Dict, Tuple
 from pprint import pprint as pp  # noqa: F401
 
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
@@ -31,19 +32,19 @@ class Utils:
     """ This class is adapted from the original xpn.py code by gst666 """
 
     @staticmethod
-    def md5(data):
+    def md5(data: bytes) -> bytes:
         checksum = hashlib.md5()
         checksum.update(data)
         return checksum.digest()
 
     @staticmethod
-    def key_iv(token):
+    def key_iv(token: bytes) -> Tuple[bytes, bytes]:
         key = Utils.md5(token)
         iv = Utils.md5(key + token)
         return key, iv
 
     @staticmethod
-    def encrypt(plaintext, token):
+    def encrypt(plaintext: bytes, token: bytes) -> bytes:
         key, iv = Utils.key_iv(token)
         padder = padding.PKCS7(128).padder()
 
@@ -55,7 +56,7 @@ class Utils:
         return encryptor.update(padded_plaintext) + encryptor.finalize()
 
     @staticmethod
-    def decrypt(ciphertext, token):
+    def decrypt(ciphertext: bytes, token: bytes) -> bytes:
         key, iv = Utils.key_iv(token)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
                         backend=default_backend())
@@ -69,7 +70,7 @@ class Utils:
         return unpadded_plaintext
 
     @staticmethod
-    def checksum_field_bytes(ctx):
+    def checksum_field_bytes(ctx: Dict[str, Any]) -> bytearray:
         """Gather bytes for checksum calculation"""
         x = bytearray(ctx["header"].data)
         x += ctx["_"]["token"]
@@ -80,13 +81,13 @@ class Utils:
         return x
 
     @staticmethod
-    def get_length(x):
+    def get_length(x) -> int:
         """Return total packet length."""
-        datalen = x._.data.length
+        datalen = x._.data.length  # type: int
         return datalen + 32
 
     @staticmethod
-    def is_hello(x):
+    def is_hello(x) -> bool:
         """Return if packet is a hello packet."""
         # not very nice, but we know that hellos are 32b of length
         if 'length' in x:
@@ -94,7 +95,7 @@ class Utils:
         else:
             val = x.header.value['length']
 
-        return val == 32
+        return bool(val == 32)
 
 
 class TimeAdapter(Adapter):

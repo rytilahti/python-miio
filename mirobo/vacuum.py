@@ -1,8 +1,8 @@
 import logging
 from typing import List
 
-from . import (VacuumStatus, ConsumableStatus,
-               CleaningSummary, CleaningDetails, Timer)
+from .containers import (VacuumStatus, ConsumableStatus,
+                         CleaningSummary, CleaningDetails, Timer)
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)

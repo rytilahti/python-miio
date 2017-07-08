@@ -2,8 +2,9 @@ import codecs
 import datetime
 import socket
 import logging
+from typing import Any, List
 
-from mirobo import Message
+from .protocol import Message
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -13,19 +14,19 @@ class DeviceException(Exception):
 
 
 class Device:
-    def __init__(self, ip, token, start_id=0, debug=0):
+    def __init__(self, ip: str, token: str, start_id: int=0, debug: int=0) -> None:
         self.ip = ip
         self.port = 54321
         self.token = bytes.fromhex(token)
         self.debug = debug
 
         self._timeout = 5
-        self._device_ts = 0
+        self._device_ts = None  # type: datetime.datetime
         self.__id = start_id
         self._devtype = None
         self._serial = None
 
-    def __enter__(self):
+    def __enter__(self) -> 'Device':
         """Does a discover to fetch the devtype and serial."""
         m = Device.discover(self.ip)
         if m is not None:
@@ -39,15 +40,17 @@ class Device:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         pass
 
     @staticmethod
-    def discover(addr: str=None):
+    def discover(addr: str=None) -> Any:
         """Scan for devices in the network."""
         timeout = 5
         is_broadcast = addr is None
-        seen_addrs = []
+        seen_addrs = []  # type: List[str]
         if is_broadcast:
             addr = '<broadcast>'
             is_broadcast = True
@@ -65,7 +68,7 @@ class Device:
         while True:
             try:
                 data, addr = s.recvfrom(1024)
-                m = Message.parse(data)
+                m = Message.parse(data)  # type: Message
                 # _LOGGER.debug("Got a response: %s" % m)
                 if not is_broadcast:
                     return m
@@ -84,7 +87,7 @@ class Device:
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
 
-    def send(self, command: str, parameters=None):
+    def send(self, command: str, parameters: Any=None) -> Any:
         """Build and send the given command."""
         if self._devtype is None or self._serial is None:
             self.__enter__()  # when called outside of cm, initialize.

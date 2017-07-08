@@ -4,6 +4,7 @@ import click
 import pretty_cron
 import ast
 import sys
+from typing import Any
 
 if sys.version_info < (3, 4):
     print("To use this script you need python 3.4 or newer, got %s" %
@@ -23,7 +24,7 @@ pass_dev = click.make_pass_decorator(mirobo.Vacuum)
 @click.option('--id-file', type=click.Path(dir_okay=False, writable=True),
               default='/tmp/python-mirobo.seq')
 @click.pass_context
-def cli(ctx, ip: str, token: str, debug: int, id_file: click.Path):
+def cli(ctx, ip: str, token: str, debug: int, id_file: str):
     """A tool to command Xiaomi Vacuum robot."""
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -206,16 +207,11 @@ def timer(vac: mirobo.Vacuum, timer):
 
 
 @cli.command()
-@click.argument('stop', required=False)
 @pass_dev
-def find(vac: mirobo.Vacuum, stop):
+def find(vac: mirobo.Vacuum):
     """Finds the robot."""
-    if stop:
-        click.echo("Stopping find calls..")
-        click.echo(vac.find_stop())
-    else:
-        click.echo("Sending find the robot calls.")
-        click.echo(vac.find())
+    click.echo("Sending find the robot calls.")
+    click.echo(vac.find())
 
 
 @cli.command()
@@ -252,7 +248,7 @@ def cleaning_history(vac: mirobo.Vacuum):
 @pass_dev
 def raw_command(vac: mirobo.Vacuum, cmd, parameters):
     """Run a raw command."""
-    params = []
+    params = []  # type: Any
     if parameters:
         params = ast.literal_eval(parameters)
     click.echo("Sending cmd %s with params %s" % (cmd, params))
