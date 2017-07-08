@@ -57,11 +57,11 @@ class VacuumStatus:
         states = {
             1: 'Unknown 1',
             2: 'Charger disconnected',
-            3: 'Idle?',
+            3: 'Idle',
             4: 'Unknown 4',
             5: 'Cleaning',
             6: 'Returning home',
-            7: 'Unknown 7',
+            7: 'Manual mode',
             8: 'Charging',
             9: 'Unknown 9',
             10: 'Paused',

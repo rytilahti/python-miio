@@ -4,6 +4,7 @@ import click
 import pretty_cron
 import ast
 import sys
+import json
 from typing import Any
 
 if sys.version_info < (3, 4):
@@ -40,16 +41,19 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    start_id = 0
+    start_id = manual_seq = 0
     try:
         with open(id_file, 'r') as f:
-            start_id = int(f.read())
-            _LOGGER.debug("Read stored message id: %s" % start_id)
-    except (FileNotFoundError, ValueError) as ex:
+            x = json.load(f)
+            start_id = x.get("seq", 0)
+            manual_seq = x.get("manual_seq", 0)
+            _LOGGER.debug("Read stored sequence ids: %s" % x)
+    except (FileNotFoundError, TypeError) as ex:
         _LOGGER.error("Unable to read the stored msgid: %s" % ex)
         pass
 
     vac = mirobo.Vacuum(ip, token, start_id, debug)
+    vac.manual_seqnum = manual_seq
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
     ctx.obj = vac
@@ -63,9 +67,12 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 @pass_dev
 def cleanup(vac: mirobo.Vacuum, **kwargs):
     id_file = kwargs['id_file']
-    _LOGGER.debug("Writing %s to %s" % (vac.raw_id, id_file))
+    seqs = {'seq': vac.raw_id, 'manual_seq': vac.manual_seqnum}
+    _LOGGER.debug("Writing %s to %s" % (seqs, id_file))
     with open(id_file, 'w') as f:
-        f.write(str(vac.raw_id))
+        json.dump(seqs, f)
+    #with open(id_file, 'w') as f:
+    #    f.write(str(vac.raw_id))
 
 
 @cli.command()
@@ -144,6 +151,82 @@ def home(vac: mirobo.Vacuum):
     click.echo("Requesting return to home: %s" % vac.home())
 
 
+@cli.group()
+@pass_dev
+#@click.argument('command', required=False)
+def manual(vac: mirobo.Vacuum):
+    """Control the robot manually."""
+    command = ''
+    if command == 'start':
+        click.echo("Starting manual control")
+        return vac.manual_start()
+    if command == 'stop':
+        click.echo("Stopping manual control")
+        return vac.manual_stop()
+    #if not vac.manual_mode and command :
+
+@manual.command()
+@pass_dev
+def start(vac: mirobo.Vacuum):
+    """Activate the manual mode."""
+    click.echo("Activating manual controls")
+    return vac.manual_start()
+
+
+@manual.command()
+@pass_dev
+def stop(vac: mirobo.Vacuum):
+    """Deactivate the manual mode."""
+    click.echo("Deactivating manual controls")
+    return vac.manual_stop()
+
+
+@manual.command()
+@pass_dev
+@click.argument('degrees', type=int)
+def left(vac: mirobo.Vacuum, degrees: int):
+    """Turn to left."""
+    click.echo("Turning %s degrees left" % degrees)
+    return vac.manual_control(degrees, 0)
+
+
+@manual.command()
+@pass_dev
+@click.argument('degrees', type=int)
+def right(vac: mirobo.Vacuum, degrees: int):
+    """Turn to right."""
+    click.echo("Turning right")
+    return vac.manual_control(-degrees, 0)
+
+
+@manual.command()
+@click.argument('amount', type=float)
+@pass_dev
+def forward(vac: mirobo.Vacuum, amount: float):
+    """Run forwards."""
+    click.echo("Moving forwards")
+    return vac.manual_control(0, amount)
+
+
+@manual.command()
+@click.argument('amount', type=float)
+@pass_dev
+def backward(vac: mirobo.Vacuum, amount:float):
+    """Run backwards."""
+    click.echo("Moving backwards")
+    return vac.manual_control(0, -amount)
+
+
+@manual.command()
+@pass_dev
+@click.argument('rotation', type=float)
+@click.argument('velocity', type=float)
+@click.argument('duration', type=int)
+def move(vac: mirobo.Vacuum, rotation: float, velocity: float, duration: int):
+    """Pass raw manual values"""
+    return vac.manual_control(rotation, velocity, duration)
+
+
 @cli.command()
 @click.argument('cmd', required=False)
 @click.argument('start_hr', required=False)
@@ -209,7 +292,7 @@ def timer(vac: mirobo.Vacuum, timer):
 @cli.command()
 @pass_dev
 def find(vac: mirobo.Vacuum):
-    """Finds the robot."""
+    """Find the robot."""
     click.echo("Sending find the robot calls.")
     click.echo(vac.find())
 
