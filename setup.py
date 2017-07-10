@@ -25,7 +25,7 @@ setup(
 
     packages=["mirobo"],
 
-    install_requires=['construct', 'click', 'cryptography', 'pretty_cron'],
+    install_requires=['construct', 'click', 'cryptography', 'pretty_cron', 'typing'],
     entry_points={
         'console_scripts': [
             'mirobo=mirobo.cli:cli',
