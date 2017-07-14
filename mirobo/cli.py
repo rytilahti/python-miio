@@ -229,10 +229,10 @@ def move(vac: mirobo.Vacuum, rotation: float, velocity: float, duration: int):
 
 @cli.command()
 @click.argument('cmd', required=False)
-@click.argument('start_hr', required=False)
-@click.argument('start_min', required=False)
-@click.argument('end_hr', required=False)
-@click.argument('end_min', required=False)
+@click.argument('start_hr', type=int, required=False)
+@click.argument('start_min', type=int, required=False)
+@click.argument('end_hr', type=int, required=False)
+@click.argument('end_min', type=int, required=False)
 @pass_dev
 def dnd(vac: mirobo.Vacuum, cmd: str,
         start_hr: int, start_min: int,
