@@ -5,6 +5,7 @@ import pretty_cron
 import ast
 import sys
 import json
+import ipaddress
 from typing import Any
 
 if sys.version_info < (3, 4):
@@ -18,9 +19,24 @@ _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(mirobo.Vacuum)
 
 
+def validate_ip(ctx, param, value):
+    try:
+        ipaddress.ip_address(value)
+        return value
+    except ValueError as ex:
+        raise click.BadParameter("Invalid IP: %s" % ex)
+
+
+def validate_token(ctx, param, value):
+    token_len = len(value)
+    if token_len != 32:
+        raise click.BadParameter("Token length != 32 chars: %s" % token_len)
+    return value
+
+
 @click.group(invoke_without_command=True)
-@click.option('--ip', envvar="MIROBO_IP")
-@click.option('--token', envvar="MIROBO_TOKEN")
+@click.option('--ip', envvar="MIROBO_IP", callback=validate_ip)
+@click.option('--token', envvar="MIROBO_TOKEN", callback=validate_token)
 @click.option('-d', '--debug', default=False, count=True)
 @click.option('--id-file', type=click.Path(dir_okay=False, writable=True),
               default='/tmp/python-mirobo.seq')
