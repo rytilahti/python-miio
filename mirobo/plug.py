@@ -22,9 +22,9 @@ class Plug(Device):
 
     def status(self):
         """Retrieve properties."""
-        status =  self.send(
+        status = self.send(
             "get_prop",
-            [ PROPERTY_POWER, PROPERTY_TEMPERATURE, PROPERTY_CURRENT ]
+            [PROPERTY_POWER, PROPERTY_TEMPERATURE, PROPERTY_CURRENT]
         )
         return {
             PROPERTY_POWER: status[0],
