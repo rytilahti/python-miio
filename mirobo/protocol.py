@@ -20,7 +20,8 @@ from cryptography.hazmat.primitives import padding
 _LOGGER = logging.getLogger(__name__)
 
 # Map of device ids
-xiaomi_devices_reverse = {0x02f2: "Xiaomi Mi Robot Vacuum",
+xiaomi_devices_reverse = {0x02c1: "Xiaomi Mi Smart WiFi Socket",
+                          0x02f2: "Xiaomi Mi Robot Vacuum",
                           0x00c4: "Xiaomi Smart Mi Air Purifier",
                           0x031a: "Xiaomi Smart home gateway",
                           0x0330: "Yeelight color bulb"
