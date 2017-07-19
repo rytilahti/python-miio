@@ -1,6 +1,7 @@
 from .device import Device
 from .containers import PlugStatus
 
+
 class Plug(Device):
     """Main class representing the smart wifi socket / plug."""
 
