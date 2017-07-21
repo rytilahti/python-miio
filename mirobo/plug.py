@@ -5,11 +5,11 @@ from .containers import PlugStatus
 class Plug(Device):
     """Main class representing the smart wifi socket / plug."""
 
-    def start(self):
+    def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    def stop(self):
+    def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
