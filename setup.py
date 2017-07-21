@@ -28,7 +28,8 @@ setup(
     install_requires=['construct', 'click', 'cryptography', 'pretty_cron', 'typing'],
     entry_points={
         'console_scripts': [
-            'mirobo=mirobo.cli:cli',
+            'mirobo=mirobo.vacuum_cli:cli',
+            'miplug=mirobo.plug_cli:cli',
         ],
     },
 )
