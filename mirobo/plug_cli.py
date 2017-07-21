@@ -1,12 +1,9 @@
 # -*- coding: UTF-8 -*-
 import logging
 import click
-import pretty_cron
 import ast
 import sys
-import json
 import ipaddress
-from typing import Any
 
 if sys.version_info < (3, 4):
     print("To use this script you need python 3.4 or newer, got %s" %
