@@ -62,7 +62,7 @@ class PlugStatus:
 
     def __str__(self) -> str:
         s = "<PlugStatus power=%s, temperature=%s, current=%s>" % \
-            (self.state,
+            (self.power,
              self.temperature,
              self.current)
         return s
