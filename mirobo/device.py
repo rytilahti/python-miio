@@ -27,13 +27,15 @@ class Device:
         self._devtype = None
         self._serial = None
 
-    def __enter__(self) -> 'Device':
+    def do_discover(self):
         """Does a discover to fetch the devtype and serial."""
         m = Device.discover(self.ip)
         if m is not None:
             self._devtype = m.header.value.devtype
             self._serial = m.header.value.serial
             self._device_ts = m.header.value.ts
+            if self.debug > 1:
+                _LOGGER.debug(m)
             _LOGGER.debug("Discovered %s %s with ts: %s" % (self._devtype,
                                                             self._serial,
                                                             self._device_ts))
@@ -41,10 +43,7 @@ class Device:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
 
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        pass
+        return m
 
     @staticmethod
     def discover(addr: str=None) -> Any:
@@ -88,10 +87,9 @@ class Device:
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
 
-    def send(self, command: str, parameters: Any=None) -> Any:
+    def send(self, command: str, parameters: Any=None, retry_count=3) -> Any:
         """Build and send the given command."""
-        if self._devtype is None or self._serial is None:
-            self.__enter__()  # when called outside of cm, initialize.
+        self.do_discover()
 
         cmd = {
             "id": self._id,
@@ -139,7 +137,11 @@ class Device:
                                                             m.data.value))
             return m.data.value["result"]
         except OSError as ex:
-            _LOGGER.error("got error when receiving: %s", ex)
+            _LOGGER.error("Got error when receiving: %s", ex)
+            if retry_count > 0:
+                _LOGGER.warning("Retrying with incremented id, retries left: %s" % retry_count)
+                self.__id += 100
+                return self.send(command, parameters, retry_count-1)
             raise DeviceException from ex
 
     @property
