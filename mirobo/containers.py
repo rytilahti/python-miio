@@ -141,6 +141,10 @@ class VacuumStatus:
     def is_on(self) -> bool:
         return self.state_code == 5
 
+    @property
+    def got_error(self) -> bool:
+        return self.state_code == 12
+
     def __str__(self) -> str:
         s = "<VacuumStatus state=%s, error=%s " % (self.state, self.error)
         s += "bat=%s%%, fan=%s%% " % (self.battery, self.fanspeed)
