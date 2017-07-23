@@ -38,12 +38,6 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     19: "Unpowered charging station",
 }
 
-brightness_levels = {
-    0: "bright",
-    1: "dim",
-    2: "off"
-}
-
 
 class AirPurifierStatus:
     """Container for status reports from the air purifier."""
@@ -77,7 +71,8 @@ class AirPurifierStatus:
 
     @property
     def mode(self) -> str:
-        return self.data["mode"]  # auto, silent, favorite, medium, high, strong, idle
+        # auto, silent, favorite, medium, high, strong, idle
+        return self.data["mode"]
 
     @property
     def led(self) -> bool:
@@ -85,6 +80,11 @@ class AirPurifierStatus:
 
     @property
     def led_b(self) -> str:
+        brightness_levels = {
+            0: "bright",
+            1: "dim",
+            2: "off"
+        }
         return brightness_levels[self.data["led_b"]]
 
     @property
@@ -133,15 +133,18 @@ class AirPurifierStatus:
         return self.data["motor1_speed"]
 
     def __str__(self) -> str:
-        s = "<AirPurifierStatus power=%s, aqi=%s " % (self.power, self.aqi)
-        s += "temperature=%s%%, humidity=%s%% " % (self.temperature, self.humidity)
-        s += "mode=%s%%, led=%s%% , led_b=%s%% " % (self.mode, self.led, self.led_b)
-        s += "buzzer=%s%%, child_lock=%s%% " % (self.buzzer, self.child_lock)
-        s += "limit_hum=%s%%, trans_level=%s%% " % (self.limit_hum, self.trans_level)
-        s += "bright=%s%%, favorite_level=%s%% " % (self.bright, self.favorite_level)
-        s += "filter_life_remaining=%s%%, act_det=%s%% " % (self.filter_life_remaining, self.act_det)
-        s += "filter_hours_used=%s%%, use_time=%s%% " % (self.filter_hours_used, self.use_time)
-        s += "motor_speed=%s%%>" % self.motor_speed
+        s = "<AirPurifierStatus power=%s, aqi=%s temperature=%s%%, " \
+            "humidity=%s%% mode=%s%%, led=%s%% , led_b=%s%% buzzer=%s%%, " \
+            "child_lock=%s%%, limit_hum=%s%%, trans_level=%s%%, " \
+            "bright=%s%%, favorite_level=%s%%, filter_life_remaining=%s%%, " \
+            "act_det=%s%%, filter_hours_used=%s%%, use_time=%s%%, " \
+            "motor_speed=%s%%>" % \
+            (self.power, self.aqi, self.temperature,
+             self.humidity, self.mode, self.led, self.led_b, self.buzzer,
+             self.child_lock, self.limit_hum, self.trans_level,
+             self.bright, self.favorite_level, self.filter_life_remaining,
+             self.act_det, self.filter_hours_used, self.use_time,
+             self.motor_speed)
         return s
 
 
