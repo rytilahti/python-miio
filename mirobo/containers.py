@@ -39,6 +39,39 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 }
 
 
+class StripStatus:
+    """Container for status reports from the strip."""
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.data = data
+
+    @property
+    def power(self) -> str:
+        return self.data["power"]
+
+    @property
+    def is_on(self) -> bool:
+        return self.power == "on"
+
+    @property
+    def temperature(self) -> float:
+        return self.data["temperature"]
+
+    @property
+    def current(self) -> float:
+        return self.data["current"]
+
+    @property
+    def mode(self) -> float:
+        return self.data["mode"]
+
+    def __str__(self) -> str:
+        s = "<StripStatus power=%s, temperature=%s, " \
+            "current=%s mode=%s>" % \
+            (self.power, self.temperature,
+             self.current, self.mode)
+        return s
+
+
 class PlugStatus:
     """Container for status reports from the plug."""
     def __init__(self, data: Dict[str, Any]) -> None:
