@@ -1,4 +1,5 @@
 from .device import Device
+from typing import Any, Dict
 
 
 class AirPurifier(Device):
