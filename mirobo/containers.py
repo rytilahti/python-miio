@@ -38,6 +38,112 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     19: "Unpowered charging station",
 }
 
+brightness_levels = {
+    0: "bright",
+    1: "dim",
+    2: "off"
+}
+
+
+class AirPurifierStatus:
+    """Container for status reports from the air purifier."""
+    def __init__(self, data: Dict[str, Any]) -> None:
+        # ['power', 'aqi', 'humidity', 'temp_dec',
+        #  'mode', 'led', 'led_b', 'buzzer', 'child_lock',
+        #  'limit_hum', 'trans_level', 'bright',
+        #  'favorite_level', 'filter1_life', 'act_det',
+        #  'f1_hour_used', 'use_time', 'motor1_speed']
+        self.data = data
+
+    @property
+    def power(self) -> str:
+        return self.data["power"]
+
+    @property
+    def is_on(self) -> bool:
+        return self.power == "on"
+
+    @property
+    def aqi(self) -> int:
+        return self.data["aqi"]
+
+    @property
+    def humidity(self) -> int:
+        return self.data["humidity"]
+
+    @property
+    def temperature(self) -> float:
+        return self.data["temp_dec"] / 10.0
+
+    @property
+    def mode(self) -> str:
+        return self.data["mode"]  # auto, silent, favorite, medium, high, strong, idle
+
+    @property
+    def led(self) -> bool:
+        return self.data["led"] == "on"
+
+    @property
+    def led_b(self) -> str:
+        return brightness_levels[self.data["led_b"]]
+
+    @property
+    def buzzer(self) -> bool:
+        return self.data["buzzer"] == "on"
+
+    @property
+    def child_lock(self) -> str:
+        return self.data["child_lock"]
+
+    @property
+    def limit_hum(self) -> str:
+        return self.data["limit_hum"]
+
+    @property
+    def trans_level(self) -> str:
+        return self.data["trans_level"]
+
+    @property
+    def bright(self) -> int:
+        return self.data["bright"]
+
+    @property
+    def favorite_level(self) -> str:
+        # Favorite level used when the mode is `favorite`. Between 0 and 16.
+        return self.data["favorite_level"]
+
+    @property
+    def filter_life_remaining(self) -> int:
+        return self.data["filter1_life"]
+
+    @property
+    def act_det(self) -> bool:
+        return self.data["act_det"] == "on"
+
+    @property
+    def filter_hours_used(self) -> int:
+        return self.data["f1_hour_used"]
+
+    @property
+    def use_time(self) -> int:
+        return self.data["use_time"]
+
+    @property
+    def motor_speed(self) -> int:
+        return self.data["motor1_speed"]
+
+    def __str__(self) -> str:
+        s = "<AirPurifierStatus power=%s, aqi=%s " % (self.power, self.aqi)
+        s += "temperature=%s%%, humidity=%s%% " % (self.temperature, self.humidity)
+        s += "mode=%s%%, led=%s%% , led_b=%s%% " % (self.mode, self.led, self.led_b)
+        s += "buzzer=%s%%, child_lock=%s%% " % (self.buzzer, self.child_lock)
+        s += "limit_hum=%s%%, trans_level=%s%% " % (self.limit_hum, self.trans_level)
+        s += "bright=%s%%, favorite_level=%s%% " % (self.bright, self.favorite_level)
+        s += "filter_life_remaining=%s%%, act_det=%s%% " % (self.filter_life_remaining, self.act_det)
+        s += "filter_hours_used=%s%%, use_time=%s%% " % (self.filter_hours_used, self.use_time)
+        s += "motor_speed=%s%%>" % self.motor_speed
+        return s
+
 
 class PlugStatus:
     """Container for status reports from the plug."""
