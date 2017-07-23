@@ -284,7 +284,7 @@ class Timer:
     @property
     def ts(self) -> datetime:
         """Pretty id presentation as time."""
-        return pretty_time(int(self.data[0] / 1000))
+        return pretty_time(int(self.data[0]) / 1000)
 
     @property
     def enabled(self) -> bool:
