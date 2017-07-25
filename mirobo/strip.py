@@ -39,7 +39,8 @@ class StripStatus:
     """Container for status reports from the strip."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # {'power': 'on', 'temperature': 48.11, 'current': 0.06, 'mode': 'green'}
+        # {'power': 'on', 'temperature': 48.11,
+        # 'current': 0.06, 'mode': 'green'}
         self.data = data
 
     @property
