@@ -13,6 +13,12 @@ class OperationMode(enum.Enum):
     Idle = 'idle'
 
 
+class LedBrightness(enum.Enum):
+    Bright = 0
+    Dim = 1
+    Off = 2
+
+
 class AirPurifier(Device):
     """Main class representing the air purifier."""
 
@@ -45,15 +51,14 @@ class AirPurifier(Device):
         # should be  between 0 and 16.
         return self.send("favorite_level", [level])  # 0 ... 16
 
-    def set_led_brightness(self, brightness: int):
+    def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
 
         # bright: 0, dim: 1, off: 2
-        return self.send("set_led_b", [brightness])
+        return self.send("set_led_b", [brightness.value])
 
     def set_led(self, led: bool):
         """Turn led on/off."""
-
         if led:
             return self.send("set_led", ['on'])
         else:
@@ -61,7 +66,6 @@ class AirPurifier(Device):
 
     def set_buzzer(self, buzzer: bool):
         """Set buzzer."""
-
         if buzzer:
             return self.send("set_mode", ["on"])
         else:
@@ -113,13 +117,8 @@ class AirPurifierStatus:
         return self.data["led"] == "on"
 
     @property
-    def led_b(self) -> str:
-        brightness_levels = {
-            0: "bright",
-            1: "dim",
-            2: "off"
-        }
-        return brightness_levels[self.data["led_b"]]
+    def led_b(self) -> LedBrightness:
+        return LedBrightness(self.data["led_b"])
 
     @property
     def buzzer(self) -> bool:
