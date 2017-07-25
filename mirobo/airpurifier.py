@@ -117,7 +117,7 @@ class AirPurifierStatus:
         return self.data["led"] == "on"
 
     @property
-    def led_b(self) -> LedBrightness:
+    def led_brightness(self) -> LedBrightness:
         return LedBrightness(self.data["led_b"])
 
     @property
@@ -129,7 +129,7 @@ class AirPurifierStatus:
         return self.data["child_lock"]
 
     @property
-    def limit_hum(self) -> str:
+    def humidity_limit(self) -> str:
         return self.data["limit_hum"]
 
     @property
@@ -167,14 +167,16 @@ class AirPurifierStatus:
 
     def __str__(self) -> str:
         s = "<AirPurifierStatus power=%s, aqi=%s temperature=%s%%, " \
-            "humidity=%s%% mode=%s%%, led=%s%% , led_b=%s%% buzzer=%s%%, " \
-            "child_lock=%s%%, limit_hum=%s%%, trans_level=%s%%, " \
+            "humidity=%s%% mode=%s%%, led=%s%%, " \
+            "led_brightness=%s%% buzzer=%s%%, " \
+            "child_lock=%s%%, humidity_limit=%s%%, trans_level=%s%%, " \
             "bright=%s%%, favorite_level=%s%%, filter_life_remaining=%s%%, " \
             "act_det=%s%%, filter_hours_used=%s%%, use_time=%s%%, " \
             "motor_speed=%s%%>" % \
             (self.power, self.aqi, self.temperature,
-             self.humidity, self.mode, self.led, self.led_b, self.buzzer,
-             self.child_lock, self.limit_hum, self.trans_level,
+             self.humidity, self.mode, self.led,
+             self.led_brightness, self.buzzer,
+             self.child_lock, self.humidity_limit, self.trans_level,
              self.bright, self.favorite_level, self.filter_life_remaining,
              self.act_det, self.filter_hours_used, self.use_time,
              self.motor_speed)
