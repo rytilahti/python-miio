@@ -3,6 +3,11 @@ from typing import Any, Dict
 import enum
 
 
+class PowerMode(enum.Enum):
+    Eco = 'green'
+    Normal = 'normal'
+
+
 class Strip(Device):
     """Main class representing the smart strip."""
 
@@ -33,8 +38,8 @@ class Strip(Device):
 class StripStatus:
     """Container for status reports from the strip."""
 
-    # {'power': 'on', 'temperature': 48.11, 'current': 0.06, 'mode': 'green'}
     def __init__(self, data: Dict[str, Any]) -> None:
+        # {'power': 'on', 'temperature': 48.11, 'current': 0.06, 'mode': 'green'}
         self.data = data
 
     @property
@@ -63,8 +68,3 @@ class StripStatus:
             (self.power, self.temperature,
              self.current, self.mode)
         return s
-
-
-class PowerMode(enum.Enum):
-    Eco = 'green'
-    Normal = 'normal'
