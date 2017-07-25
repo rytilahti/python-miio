@@ -7,11 +7,11 @@ def pretty_area(x: float) -> float:
     return int(x) / 1000000
 
 
-def pretty_seconds(x: int) -> timedelta:
+def pretty_seconds(x: float) -> timedelta:
     return timedelta(seconds=x)
 
 
-def pretty_time(x: int) -> datetime:
+def pretty_time(x: float) -> datetime:
     return datetime.fromtimestamp(x)
 
 
