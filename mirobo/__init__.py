@@ -4,4 +4,5 @@ from mirobo.containers import VacuumStatus, ConsumableStatus, CleaningDetails, C
 from mirobo.vacuum import Vacuum, VacuumException
 from mirobo.plug import Plug
 from mirobo.airpurifier import AirPurifier
+from mirobo.strip import Strip
 from mirobo.device import Device, DeviceException
