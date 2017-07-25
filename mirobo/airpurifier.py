@@ -3,6 +3,16 @@ from typing import Any, Dict
 import enum
 
 
+class OperationMode(enum.Enum):
+    Auto = 'auto'
+    Silent = 'silent'
+    Favorite = 'favorite'
+    Medium = 'medium'
+    High = 'high'
+    Strong = 'strong'
+    Idle = 'idle'
+
+
 class AirPurifier(Device):
     """Main class representing the air purifier."""
 
@@ -170,13 +180,3 @@ class AirPurifierStatus:
              self.act_det, self.filter_hours_used, self.use_time,
              self.motor_speed)
         return s
-
-
-class OperationMode(enum.Enum):
-    Auto = 'auto'
-    Silent = 'silent'
-    Favorite = 'favorite'
-    Medium = 'medium'
-    High = 'high'
-    Strong = 'strong'
-    Idle = 'idle'
