@@ -1,5 +1,6 @@
 from .device import Device
 from typing import Any, Dict
+import enum
 
 
 class AirPurifier(Device):
@@ -21,11 +22,11 @@ class AirPurifier(Device):
         )
         return AirPurifierStatus(dict(zip(properties, values)))
 
-    def set_mode(self, mode: str):
+    def set_mode(self, mode: OperationMode):
         """Set mode."""
 
         # auto, silent, favorite, medium, high, strong, idle
-        return self.send("set_mode", [mode])
+        return self.send("set_mode", [mode.value])
 
     def set_favorite_level(self, level: int):
         """Set favorite level."""
@@ -94,9 +95,8 @@ class AirPurifierStatus:
         return self.data["temp_dec"] / 10.0
 
     @property
-    def mode(self) -> str:
-        # auto, silent, favorite, medium, high, strong, idle
-        return self.data["mode"]
+    def mode(self) -> OperationMode:
+        return OperationMode(self.data["mode"])
 
     @property
     def led(self) -> bool:
@@ -170,3 +170,13 @@ class AirPurifierStatus:
              self.act_det, self.filter_hours_used, self.use_time,
              self.motor_speed)
         return s
+
+
+class OperationMode(enum.Enum):
+    Auto = 'auto'
+    Silent = 'silent'
+    Favorite = 'favorite'
+    Medium = 'medium'
+    High = 'high'
+    Strong = 'strong'
+    Idle = 'idle'
