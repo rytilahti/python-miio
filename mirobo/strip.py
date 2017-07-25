@@ -1,6 +1,6 @@
 from .device import Device
 from typing import Any, Dict
-
+import enum
 
 class Strip(Device):
     """Main class representing the smart strip."""
@@ -22,15 +22,17 @@ class Strip(Device):
         )
         return StripStatus(dict(zip(properties, values)))
 
-    def set_power_mode(self, mode: str):
+    def set_power_mode(self, mode: PowerMode):
         """Set mode."""
 
         # green, normal
-        return self.send("set_power_mode", [mode])
+        return self.send("set_power_mode", [mode.value])
 
 
 class StripStatus:
     """Container for status reports from the strip."""
+
+    # {'power': 'on', 'temperature': 48.11, 'current': 0.06, 'mode': 'green'}
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
 
@@ -51,8 +53,8 @@ class StripStatus:
         return self.data["current"]
 
     @property
-    def mode(self) -> float:
-        return self.data["mode"]
+    def mode(self) -> PowerMode:
+        return PowerMode(self.data["mode"])
 
     def __str__(self) -> str:
         s = "<StripStatus power=%s, temperature=%s, " \
@@ -60,3 +62,8 @@ class StripStatus:
             (self.power, self.temperature,
              self.current, self.mode)
         return s
+
+
+class PowerMode(enum.Enum):
+    Eco = 'green'
+    Normal = 'normal'
