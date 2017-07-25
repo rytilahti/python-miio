@@ -2,6 +2,7 @@ from .device import Device
 from typing import Any, Dict
 import enum
 
+
 class Strip(Device):
     """Main class representing the smart strip."""
 
