@@ -120,7 +120,8 @@ class AirPurifierStatus:
 
     @property
     def led_brightness(self) -> LedBrightness:
-        return LedBrightness(self.data["led_b"])
+        if self.data["led_b"] is not None:
+            return LedBrightness(self.data["led_b"])
 
     @property
     def buzzer(self) -> bool:
