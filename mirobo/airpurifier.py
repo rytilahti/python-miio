@@ -81,11 +81,12 @@ class AirPurifier(Device):
 class AirPurifierStatus:
     """Container for status reports from the air purifier."""
     def __init__(self, data: Dict[str, Any]) -> None:
-        # ['power', 'aqi', 'humidity', 'temp_dec',
-        #  'mode', 'led', 'led_b', 'buzzer', 'child_lock',
-        #  'limit_hum', 'trans_level', 'bright',
-        #  'favorite_level', 'filter1_life', 'act_det',
-        #  'f1_hour_used', 'use_time', 'motor1_speed']
+        # Response of a Air Purifier Pro:
+        # ['power': 'on, 'aqi': 41, 'humidity': 62, 'temp_dec': 293,
+        #  'mode': 'auto', 'led': 'on', 'led_b': null, 'buzzer': null, 'child_lock': 'off',
+        #  'limit_hum': null, 'trans_level': null, 'bright': 161,
+        #  'favorite_level': 17, 'filter1_life': 77, 'act_det': null,
+        #  'f1_hour_used': 771, 'use_time': null, 'motor1_speed': null]
         self.data = data
 
     @property
@@ -125,11 +126,11 @@ class AirPurifierStatus:
         return self.data["buzzer"] == "on"
 
     @property
-    def child_lock(self) -> str:
-        return self.data["child_lock"]
+    def child_lock(self) -> bool:
+        return self.data["child_lock"] == "on"
 
     @property
-    def humidity_limit(self) -> str:
+    def humidity_limit(self) -> int:
         return self.data["limit_hum"]
 
     @property
@@ -141,7 +142,7 @@ class AirPurifierStatus:
         return self.data["bright"]
 
     @property
-    def favorite_level(self) -> str:
+    def favorite_level(self) -> int:
         # Favorite level used when the mode is `favorite`. Between 0 and 16.
         return self.data["favorite_level"]
 
