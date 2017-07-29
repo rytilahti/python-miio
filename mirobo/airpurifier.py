@@ -7,9 +7,6 @@ class OperationMode(enum.Enum):
     Auto = 'auto'
     Silent = 'silent'
     Favorite = 'favorite'
-    Medium = 'medium'
-    High = 'high'
-    Strong = 'strong'
     Idle = 'idle'
 
 
@@ -41,7 +38,7 @@ class AirPurifier(Device):
     def set_mode(self, mode: OperationMode):
         """Set mode."""
 
-        # auto, silent, favorite, medium, high, strong, idle
+        # auto, silent, favorite, idle
         return self.send("set_mode", [mode.value])
 
     def set_favorite_level(self, level: int):
