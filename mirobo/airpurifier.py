@@ -79,12 +79,12 @@ class AirPurifierStatus:
     """Container for status reports from the air purifier."""
     def __init__(self, data: Dict[str, Any]) -> None:
         # Response of a Air Purifier Pro:
-        # ['power': 'on, 'aqi': 41, 'humidity': 62, 'temp_dec': 293,
+        # ['power': 'off', 'aqi': 41, 'humidity': 62, 'temp_dec': 293,
         #  'mode': 'auto', 'led': 'on', 'led_b': null, 'buzzer': null,
         #  'child_lock': 'off', 'limit_hum': null, 'trans_level': null,
-        #  'bright': 161, 'favorite_level': 17, 'filter1_life': 77,
-        #  'act_det': null, 'f1_hour_used': 771, 'use_time': null,
-        #  'motor1_speed': null]
+        #  'bright': 71, 'favorite_level': 17, 'filter1_life': 77,
+        #  'act_det': null, 'f1_hour_used': 771, 'use_time': 2776200,
+        #  'motor1_speed': 0]
         self.data = data
 
     @property
@@ -117,7 +117,8 @@ class AirPurifierStatus:
 
     @property
     def led_brightness(self) -> LedBrightness:
-        return LedBrightness(self.data["led_b"])
+        if self.data["led_b"] is not None:
+            return LedBrightness(self.data["led_b"])
 
     @property
     def buzzer(self) -> bool:
