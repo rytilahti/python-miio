@@ -1,6 +1,6 @@
 from .device import Device
 from typing import Any, Dict
-import enum
+
 
 class PhilipsEyecare(Device):
     """Main class representing Xiaomi Philips Eyecare Smart Lamp 2."""
@@ -28,7 +28,7 @@ class PhilipsEyecare(Device):
     def set_user_scene(self, num: int):
         """Set eyecare user scene."""
         return self.send("set_user_scene", [num])
-    
+
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
         return self.send("delay_off", [minutes])
@@ -63,14 +63,15 @@ class PhilipsEyecare(Device):
 
     def status(self):
         """Retrieve properties."""
-        properties = ['power', 'bright', 'notifystatus', 
-            'ambstatus', 'ambvalue', 'eyecare', 'scene_num', 
-            'bls', 'dvalue',]
+        properties = ['power', 'bright', 'notifystatus', 'ambstatus',
+                      'ambvalue', 'eyecare', 'scene_num', 'bls',
+                      'dvalue', ]
         values = self.send(
             "get_prop",
             properties
         )
         return PhilipsEyecareStatus(dict(zip(properties, values)))
+
 
 class PhilipsEyecareStatus:
     """Container for status reports from Xiaomi Philips Eyecare Smart Lamp 2"""
@@ -108,7 +109,7 @@ class PhilipsEyecareStatus:
     @property
     def eyecare(self) -> str:
         return self.data["eyecare"]
-    
+
     @property
     def scene_num(self) -> str:
         return self.data["scene_num"]
@@ -120,7 +121,6 @@ class PhilipsEyecareStatus:
     @property
     def dvalue(self) -> int:
         return self.data["dvalue"]
-
 
     def __str__(self) -> str:
         s = "<PhilipsEyecareStatus power=%s, bright=%s, " \
