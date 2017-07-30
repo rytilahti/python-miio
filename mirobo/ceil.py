@@ -1,6 +1,7 @@
 from .device import Device
 from typing import Any, Dict
 
+
 class Ceil(Device):
     """Main class representing Xiaomi Philips LED Ceiling Lamp."""
 
