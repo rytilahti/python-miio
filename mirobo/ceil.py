@@ -4,8 +4,8 @@ from typing import Any, Dict
 class Ceil(Device):
     """Main class representing Xiaomi Philips LED Ceiling Lamp."""
 
-    #TODO: - Auto On/Off Not Supported
-    #      - Adjust Scens with Wall Switch Not Supported
+    # TODO: - Auto On/Off Not Supported
+    #       - Adjust Scens with Wall Switch Not Supported
 
     def on(self):
         """Power on."""
@@ -22,7 +22,7 @@ class Ceil(Device):
     def set_cct(self, level: int):
         """Set Correlated Color Temperature."""
         return self.send("set_cct", [level])
-    
+
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
         return self.send("delay_off", [seconds])
@@ -50,12 +50,13 @@ class Ceil(Device):
     def status(self):
         """Retrieve properties."""
         properties = ['power', 'bright', 'snm', 'dv', 'cct'
-            'sw', 'bl', 'mb', 'ac', 'ms', ]
+                      'sw', 'bl', 'mb', 'ac', 'ms', ]
         values = self.send(
             "get_prop",
             properties
         )
         return CeilStatus(dict(zip(properties, values)))
+
 
 class CeilStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp"""
@@ -105,6 +106,6 @@ class CeilStatus:
     def __str__(self) -> str:
         s = "<CeilStatus power=%s, bright=%s, snm=%s, dv=%s, cctsw=%s " \
             "bl=%s, mb=%s, ac=%s, >" % \
-            (self.power, self.bright, self.snm, self.dv, self.cctsw, 
+            (self.power, self.bright, self.snm, self.dv, self.cctsw,
              self.bl, self.mb, self.ac)
         return s

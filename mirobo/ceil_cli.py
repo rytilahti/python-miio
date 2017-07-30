@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 import logging
 import click
-import ast
 import sys
 import ipaddress
 
@@ -15,11 +14,13 @@ import mirobo  # noqa: E402
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(mirobo.Ceil)
 
+
 def validate_bright(ctx, param, value):
     value = int(value)
     if value < 1 or value > 100:
         raise click.BadParameter('Should be a positive int between 1-100.')
     return value
+
 
 def validate_seconds(ctx, param, value):
     value = int(value)
@@ -27,11 +28,13 @@ def validate_seconds(ctx, param, value):
         raise click.BadParameter('Should be a positive int between 1-21600.')
     return value
 
+
 def validate_scene(ctx, param, value):
     value = int(value)
     if value < 1 or value > 4:
         raise click.BadParameter('Should be a positive int between 1-4.')
     return value
+
 
 def validate_ip(ctx, param, value):
     try:
@@ -39,6 +42,7 @@ def validate_ip(ctx, param, value):
         return value
     except ValueError as ex:
         raise click.BadParameter("Invalid IP: %s" % ex)
+
 
 def validate_token(ctx, param, value):
     token_len = len(value)
@@ -77,10 +81,12 @@ def cli(ctx, ip: str, token: str, debug: int):
     if ctx.invoked_subcommand is None:
         ctx.invoke(status)
 
+
 @cli.command()
 def discover():
     """Search for plugs in the network."""
     mirobo.Ceil.discover()
+
 
 @cli.command()
 @pass_dev
@@ -98,6 +104,7 @@ def status(dev: mirobo.Ceil):
     click.echo("Smart Midnight Light: %s" % res.bl)
     click.echo("Auto On/Off When Mi Band is nearby: %s" % res.mb)
     click.echo("Auto CCT: %s" % res.ac)
+
 
 @cli.command()
 @pass_dev
@@ -136,6 +143,7 @@ def delay_off(dev: mirobo.Ceil, seconds):
     """Set delay off in seconds."""
     click.echo("Delay off: %s" % dev.delay_off(seconds))
 
+
 @cli.command()
 @click.argument('scene', callback=validate_scene, required=True,)
 @pass_dev
@@ -163,6 +171,7 @@ def sml_off(dev: mirobo.Ceil):
 def acct_on(dev: mirobo.Ceil):
     """Auto CCT on."""
     click.echo("Auto CCT On: %s" % dev.ac_on())
+
 
 @cli.command()
 @pass_dev
