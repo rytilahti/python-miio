@@ -24,7 +24,8 @@ xiaomi_devices_reverse = {0x02c1: "Xiaomi Mi Smart WiFi Socket",
                           0x02f2: "Xiaomi Mi Robot Vacuum",
                           0x00c4: "Xiaomi Smart Mi Air Purifier",
                           0x031a: "Xiaomi Smart home gateway",
-                          0x0330: "Yeelight color bulb"
+                          0x0330: "Yeelight color bulb",
+                          0x0374: "Xiaomi Philips LED Ceiling Lamp"
                           }
 xiaomi_devices = {y: x for x, y in xiaomi_devices_reverse.items()}
 
