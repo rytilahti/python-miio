@@ -6,6 +6,7 @@ import ast
 import sys
 import json
 import ipaddress
+from pprint import pformat as pf
 from typing import Any
 
 if sys.version_info < (3, 4):
@@ -40,6 +41,7 @@ def validate_token(ctx, param, value):
 @click.option('-d', '--debug', default=False, count=True)
 @click.option('--id-file', type=click.Path(dir_okay=False, writable=True),
               default='/tmp/python-mirobo.seq')
+@click.version_option()
 @click.pass_context
 def cli(ctx, ip: str, token: str, debug: int, id_file: str):
     """A tool to command Xiaomi Vacuum robot."""
@@ -322,6 +324,15 @@ def map(vac: mirobo.Vacuum):
 
 @cli.command()
 @pass_dev
+def info(vac: mirobo.Vacuum):
+    """Returns info"""
+    res = vac.info()
+
+    click.echo(res)
+    _LOGGER.debug("Full response: %s" % pf(res.raw))
+
+@cli.command()
+@pass_dev
 def cleaning_history(vac: mirobo.Vacuum):
     """Query the cleaning history."""
     res = vac.clean_history()
@@ -340,6 +351,29 @@ def cleaning_history(vac: mirobo.Vacuum):
             click.echo("  Duration: (%s)" % e.duration)
             click.echo()
 
+
+@cli.command()
+@pass_dev
+def sound(vac: mirobo.Vacuum):
+    """Query sound settings."""
+    click.echo(vac.sound_info())
+
+@cli.command()
+@pass_dev
+def serial_number(vac: mirobo.Vacuum):
+    """Query serial number."""
+    click.echo("Serial#: %s" % vac.serial_number())
+
+@cli.command()
+@click.argument('tz', required=False)
+@pass_dev
+def timezone(vac: mirobo.Vacuum, tz=None):
+    """Query or set the timezone."""
+    if tz is not None:
+        click.echo("Setting timezone to: %s" % tz)
+        click.echo(vac.set_timezone(tz))
+    else:
+        click.echo("Timezone: %s" % vac.timezone())
 
 @cli.command()
 @click.argument('cmd', required=True)

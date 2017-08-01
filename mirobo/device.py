@@ -13,6 +13,29 @@ class DeviceException(Exception):
     pass
 
 
+class DeviceInfo:
+    def __init__(self, data):
+        self.data = data
+
+    def __repr__(self):
+        return "%s v%s (%s) @ %s - token: %s" % (self.data["model"],
+                                                 self.data["fw_ver"],
+                                                 self.data["mac"],
+                                                 self.netif["localIp"],
+                                                 self.data["token"])
+    @property
+    def netif(self):
+        return self.data["netif"]
+
+    @property
+    def ap(self):
+        return self.data["ap"]
+
+    @property
+    def raw(self):
+        return self.data
+
+
 class Device:
     def __init__(self, ip: str, token: str,
                  start_id: int=0, debug: int=0) -> None:
@@ -143,6 +166,9 @@ class Device:
                 self.__id += 100
                 return self.send(command, parameters, retry_count-1)
             raise DeviceException from ex
+
+    def info(self):
+        return DeviceInfo(self.send("miIO.info", []))
 
     @property
     def _id(self) -> int:
