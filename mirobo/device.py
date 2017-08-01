@@ -96,7 +96,7 @@ class Device:
             "method": command,
         }
 
-        if parameters:
+        if parameters is not None:
             cmd["params"] = parameters
 
         send_ts = self._device_ts + datetime.timedelta(seconds=1)
