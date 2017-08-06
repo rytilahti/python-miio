@@ -21,6 +21,8 @@ pass_dev = click.make_pass_decorator(mirobo.Vacuum)
 
 
 def validate_ip(ctx, param, value):
+    if value is None:
+        return value
     try:
         ipaddress.ip_address(value)
         return value
@@ -29,6 +31,8 @@ def validate_ip(ctx, param, value):
 
 
 def validate_token(ctx, param, value):
+    if value is None:
+        return value
     token_len = len(value)
     if token_len != 32:
         raise click.BadParameter("Token length != 32 chars: %s" % token_len)
