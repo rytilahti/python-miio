@@ -128,7 +128,6 @@ class EncryptionAdapter(Adapter):
             jsoned = json.loads(decrypted.decode('utf-8'))
         except:
             _LOGGER.error("unable to parse json, was: %s", decrypted)
-            jsoned = b'{}'
             raise
 
         return jsoned
