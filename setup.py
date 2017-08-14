@@ -31,6 +31,7 @@ setup(
             'mirobo=mirobo.vacuum_cli:cli',
             'miplug=mirobo.plug_cli:cli',
             'miceil=mirobo.ceil_cli:cli',
+            'mieye=mirobo.philips_eyecare_cli:cli'
         ],
     },
 )

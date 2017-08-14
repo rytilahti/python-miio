@@ -3,8 +3,8 @@ import math
 import time
 from typing import List
 
-from .containers import (VacuumStatus, ConsumableStatus,
-                         CleaningSummary, CleaningDetails, Timer)
+from .vacuumcontainers import (VacuumStatus, ConsumableStatus,
+                               CleaningSummary, CleaningDetails, Timer)
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -86,6 +86,10 @@ class Vacuum(Device):
         """Return status of the vacuum."""
         return VacuumStatus(self.send("get_status")[0])
 
+    def enable_log_upload(self):
+        raise NotImplementedError("unknown parameters")
+        return self.send("enable_log_upload")
+
     def log_upload_status(self):
         # {"result": [{"log_upload_status": 7}], "id": 1}
         return self.send("get_log_upload_status")
@@ -93,6 +97,11 @@ class Vacuum(Device):
     def consumable_status(self) -> ConsumableStatus:
         """Return information about consumables."""
         return ConsumableStatus(self.send("get_consumable")[0])
+
+    def consumable_reset(self):
+        """Reset consumable information."""
+        raise NotImplementedError()
+        self.send("reset_consumable", ["unknown"])
 
     def map(self):
         """Return map token."""
@@ -129,6 +138,7 @@ class Vacuum(Device):
         # how to create timers/change values?
         # ['ts', 'on'] to enable
         raise NotImplementedError()
+        return self.send("set_timer", [["ts",["cron_line",["start_clean",""]]]])
         return self.send("upd_timer", ["ts", "on"])
 
     def dnd_status(self):
@@ -155,6 +165,22 @@ class Vacuum(Device):
     def fan_speed(self):
         """Return fan speed."""
         return self.send("get_custom_mode")[0]
+
+    def sound_info(self):
+        """Get voice settings."""
+        return self.send("get_current_sound")
+
+    def serial_number(self):
+        """Get serial number."""
+        return self.send("get_serial_number")[0]["serial_number"]
+
+    def timezone(self):
+        """Get the timezone."""
+        return self.send("get_timezone")[0]
+
+    def set_timezone(self, new_zone):
+        """Set the timezone."""
+        return self.send("set_timezone", [new_zone])[0] == 'ok'
 
     def raw_command(self, cmd, params):
         """Send a raw command to the robot."""
