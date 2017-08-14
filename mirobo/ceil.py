@@ -53,6 +53,7 @@ class CeilStatus:
              self.bl, self.mb, self.ac)
         return s
 
+
 class Ceil(Device):
     """Main class representing Xiaomi Philips LED Ceiling Lamp."""
 
@@ -108,4 +109,3 @@ class Ceil(Device):
             properties
         )
         return CeilStatus(dict(zip(properties, values)))
-
