@@ -5,9 +5,10 @@ class CeilStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp"""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # ['power', 'bright', 'snm', 'dv', 'cctsw', 'bl', 'mb', 'ac', 'ms']
-        # ['off', 0, 4, 0, [[0, 3], [0, 2], [0, 1]], 1, 1, 1]
-        # NOTE: ms doesn't return any value
+        # ['power', 'bright', 'snm', 'dv', 'cctsw', 'bl', 'mb', 'ac', 'ms'
+        #  'sw', 'cct']
+        # ['off', 0, 4, 0, [[0, 3], [0, 2], [0, 1]], 1, 1, 1, 1, 99]
+        # NOTE: Only 8 properties can be requested at the same time
         self.data = data
 
     @property
@@ -31,26 +32,22 @@ class CeilStatus:
         return self.data["dv"]
 
     @property
-    def cctsw(self) -> tuple:
-        return self.data["cctsw"]
+    def cct(self) -> int:
+        return self.data["cct"]
 
     @property
     def bl(self) -> int:
         return self.data["bl"]
 
     @property
-    def mb(self) -> int:
-        return self.data["mb"]
-
-    @property
     def ac(self) -> int:
         return self.data["ac"]
 
     def __str__(self) -> str:
-        s = "<CeilStatus power=%s, bright=%s, snm=%s, dv=%s, cctsw=%s " \
-            "bl=%s, mb=%s, ac=%s, >" % \
-            (self.power, self.bright, self.snm, self.dv, self.cctsw,
-             self.bl, self.mb, self.ac)
+        s = "<CeilStatus power=%s, bright=%s, cct=%s, snm=%s, dv=%s, " \
+            "bl=%s, ac=%, >" % \
+            (self.power, self.bright, self.cct, self.snm, self.dv,
+             self.bl, self.ac)
         return s
 
 
@@ -102,8 +99,7 @@ class Ceil(Device):
 
     def status(self) -> CeilStatus:
         """Retrieve properties."""
-        properties = ['power', 'bright', 'snm', 'dv', 'cct'
-                      'sw', 'bl', 'mb', 'ac', 'ms', ]
+        properties = ['power', 'bright', 'cct', 'snm', 'dv', 'bl', 'ac', ]
         values = self.send(
             "get_prop",
             properties

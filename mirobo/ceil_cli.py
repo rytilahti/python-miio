@@ -98,11 +98,10 @@ def status(dev: mirobo.Ceil):
 
     click.echo(click.style("Power: %s" % res.power, bold=True))
     click.echo("Brightness: %s" % res.bright)
+    click.echo("CCT: %s" % res.cct)
     click.echo("Scene Number: %s" % res.snm)
     click.echo("dv: %s" % res.dv)
-    click.echo("Scenes with Wall Switch: %s" % res.cctsw)
     click.echo("Smart Midnight Light: %s" % res.bl)
-    click.echo("Auto On/Off When Mi Band is nearby: %s" % res.mb)
     click.echo("Auto CCT: %s" % res.ac)
 
 
