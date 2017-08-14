@@ -190,5 +190,4 @@ Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
 
 # Home Assistant support
 
-See [Xiaomi Mi Robot Vacuum](https://home-assistant.io/components/switch.xiaomi_vacuum/).
-
+See [Xiaomi Mi Robot Vacuum](https://home-assistant.io/components/vacuum.xiaomi/).
