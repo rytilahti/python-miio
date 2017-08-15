@@ -15,7 +15,7 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Smart Power Strip (WiFi, 6 Ports)
 * Xiaomi Philips Eyecare Smart Lamp 2
 * Xiaomi Philips LED Ceiling Lamp
-* Xiaomi Philips LED Ball
+* Xiaomi Philips LED Ball Lamp
 
 ### Adding support for other devices
 
