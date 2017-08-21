@@ -37,11 +37,14 @@ class DeviceInfo:
 
 
 class Device:
-    def __init__(self, ip: str, token: str,
+    def __init__(self, ip: str = None, token: str = None,
                  start_id: int=0, debug: int=0) -> None:
         self.ip = ip
         self.port = 54321
-        self.token = bytes.fromhex(token)
+        if token is None:
+            token = 32 * '0'
+        if token is not None:
+            self.token = bytes.fromhex(token)
         self.debug = debug
 
         self._timeout = 5
@@ -59,9 +62,11 @@ class Device:
             self._device_ts = m.header.value.ts
             if self.debug > 1:
                 _LOGGER.debug(m)
-            _LOGGER.debug("Discovered %s %s with ts: %s" % (self._devtype,
-                                                            self._serial,
-                                                            self._device_ts))
+            _LOGGER.debug("Discovered %s %s with ts: %s, token: %s" % (
+                self._devtype,
+                self._serial,
+                self._device_ts,
+                codecs.encode(m.checksum, 'hex')))
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
@@ -92,7 +97,7 @@ class Device:
             try:
                 data, addr = s.recvfrom(1024)
                 m = Message.parse(data)  # type: Message
-                # _LOGGER.debug("Got a response: %s" % m)
+                _LOGGER.debug("Got a response: %s" % m)
                 if not is_broadcast:
                     return m
 
@@ -166,6 +171,10 @@ class Device:
                 self.__id += 100
                 return self.send(command, parameters, retry_count-1)
             raise DeviceException from ex
+
+    def raw_command(self, cmd, params):
+        """Send a raw command to the robot."""
+        return self.send(cmd, params)
 
     def info(self):
         return DeviceInfo(self.send("miIO.info", []))

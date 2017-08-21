@@ -17,7 +17,7 @@ if sys.version_info < (3, 4):
 import mirobo  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
-pass_dev = click.make_pass_decorator(mirobo.Vacuum)
+pass_dev = click.make_pass_decorator(mirobo.Device, ensure=True)
 
 
 def validate_ip(ctx, param, value):
@@ -57,6 +57,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 
     # if we are scanning, we do not try to connect.
     if ctx.invoked_subcommand == "discover":
+        ctx.obj = "discover"
         return
 
     if ip is None or token is None:
@@ -75,6 +76,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         pass
 
     vac = mirobo.Vacuum(ip, token, start_id, debug)
+
     vac.manual_seqnum = manual_seq
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
@@ -88,19 +90,23 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 @cli.resultcallback()
 @pass_dev
 def cleanup(vac: mirobo.Vacuum, **kwargs):
+    if vac.ip is None:  # dummy Device for discovery, skip teardown
+        return
     id_file = kwargs['id_file']
     seqs = {'seq': vac.raw_id, 'manual_seq': vac.manual_seqnum}
     _LOGGER.debug("Writing %s to %s" % (seqs, id_file))
     with open(id_file, 'w') as f:
         json.dump(seqs, f)
-    #with open(id_file, 'w') as f:
-    #    f.write(str(vac.raw_id))
 
 
 @cli.command()
-def discover():
+@click.option('--handshake', type=bool, default=False)
+def discover(handshake):
     """Search for robots in the network."""
-    mirobo.Vacuum.discover()
+    if handshake:
+        mirobo.Vacuum.discover()
+    else:
+        mirobo.Discovery.discover_mdns()
 
 
 @cli.command()
