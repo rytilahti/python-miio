@@ -6,6 +6,17 @@ and report new missing functionality.
 
 Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewtopic.php?f=23&t=4898) who figured out the encryption to make this possible.
 
+### Supported devices
+
+* Xiaomi Mi Robot Vacuum
+* Xiaomi Mi Air Purifier 2
+* Xiaomi Mi Smart WiFi Socket
+* Xiaomi Mi Smart Socket Plug (1 Socket, 1 USB Port)
+* Xiaomi Smart Power Strip (WiFi, 6 Ports)
+* Xiaomi Philips Eyecare Smart Lamp 2
+* Xiaomi Philips LED Ceiling Lamp
+* Xiaomi Philips LED Ball Lamp
+
 ### Adding support for other devices
 
 Although this library (and tool) currently only supports the vacuum cleaner, some other Xiaomi products use the same [underlying communication protocol](https://github.com/OpenMiHome/mihome-binary-protocol) ([another source for vacuum-specific documentation](https://github.com/marcelrv/XiaomiRobotVacuumProtocol)), so *patches for supporting other Xiaomi devices using the same protocol are welcome!*
