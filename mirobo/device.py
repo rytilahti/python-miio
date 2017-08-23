@@ -163,7 +163,10 @@ class Device:
                                                             m.header.value.ts,
                                                             m.data.value["id"],
                                                             m.data.value))
-            return m.data.value["result"]
+            try:
+                return m.data.value["result"]
+            except KeyError:
+                return m.data.value
         except OSError as ex:
             _LOGGER.error("Got error when receiving: %s", ex)
             if retry_count > 0:
