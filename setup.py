@@ -25,7 +25,7 @@ setup(
 
     packages=["mirobo"],
 
-    install_requires=['construct', 'click', 'cryptography', 'pretty_cron', 'typing'],
+    install_requires=['construct', 'click', 'cryptography', 'pretty_cron', 'typing', 'zeroconf'],
     entry_points={
         'console_scripts': [
             'mirobo=mirobo.vacuum_cli:cli',
