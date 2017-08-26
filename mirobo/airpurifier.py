@@ -25,8 +25,7 @@ class AirPurifier(Device):
         # A few more properties:
         properties = ['power', 'aqi', 'humidity', 'temp_dec',
                       'mode', 'led', 'led_b', 'buzzer', 'child_lock',
-                      'limit_hum', 'trans_level', 'bright',
-                      'favorite_level', 'filter1_life', 'act_det',
+                      'bright', 'favorite_level', 'filter1_life',
                       'f1_hour_used', 'use_time', 'motor1_speed']
 
         values = self.send(
@@ -75,12 +74,6 @@ class AirPurifier(Device):
             return self.send("set_buzzer", ["on"])
         else:
             return self.send("set_buzzer", ["off"])
-
-    def set_humidity_limit(self, limit: int):
-        """Set humidity limit."""
-
-        # 40, 50, 60, 70 or 80
-        return self.send("set_limit_hum", [limit])
 
 
 class AirPurifierStatus:
@@ -153,29 +146,17 @@ class AirPurifierStatus:
         return self.data["child_lock"] == "on"
 
     @property
-    def humidity_limit(self) -> int:
-        return self.data["limit_hum"]
-
-    @property
-    def trans_level(self) -> str:
-        return self.data["trans_level"]
-
-    @property
     def bright(self) -> int:
         return self.data["bright"]
 
     @property
     def favorite_level(self) -> int:
-        # Favorite level used when the mode is `favorite`. Between 0 and 16.
+        # Favorite level used when the mode is `favorite`.
         return self.data["favorite_level"]
 
     @property
     def filter_life_remaining(self) -> int:
         return self.data["filter1_life"]
-
-    @property
-    def act_det(self) -> bool:
-        return self.data["act_det"] == "on"
 
     @property
     def filter_hours_used(self) -> int:
@@ -191,17 +172,13 @@ class AirPurifierStatus:
 
     def __str__(self) -> str:
         s = "<AirPurifierStatus power=%s, aqi=%s temperature=%s, " \
-            "humidity=%s%% mode=%s, led=%s, " \
-            "led_brightness=%s buzzer=%s, " \
-            "child_lock=%s, humidity_limit=%s, trans_level=%s, " \
-            "bright=%s, favorite_level=%s, filter_life_remaining=%s, " \
-            "act_det=%s, filter_hours_used=%s, use_time=%s, " \
-            "motor_speed=%s>" % \
-            (self.power, self.aqi, self.temperature,
-             self.humidity, self.mode, self.led,
-             self.led_brightness, self.buzzer,
-             self.child_lock, self.humidity_limit, self.trans_level,
+            "humidity=%s%%, mode=%s, led=%s, led_brightness=%s, buzzer=%s, " \
+            "child_lock=%s, bright=%s, favorite_level=%s, " \
+            "filter_life_remaining=%s, filter_hours_used=%s, " \
+            "use_time=%s, motor_speed=%s>" % \
+            (self.power, self.aqi, self.temperature, self.humidity, self.mode,
+             self.led, self.led_brightness, self.buzzer, self.child_lock,
              self.bright, self.favorite_level, self.filter_life_remaining,
-             self.act_det, self.filter_hours_used, self.use_time,
+             self.filter_hours_used, self.use_time,
              self.motor_speed)
         return s
