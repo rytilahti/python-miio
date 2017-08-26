@@ -62,11 +62,11 @@ class AirPurifier(Device):
             return self.send("set_led", ['off'])
 
     def set_buzzer(self, buzzer: bool):
-        """Set buzzer."""
+        """Set buzzer on/off."""
         if buzzer:
-            return self.send("set_mode", ["on"])
+            return self.send("set_buzzer", ["on"])
         else:
-            return self.send("set_mode", ["off"])
+            return self.send("set_buzzer", ["off"])
 
     def set_humidity_limit(self, limit: int):
         """Set humidity limit."""
@@ -78,13 +78,28 @@ class AirPurifier(Device):
 class AirPurifierStatus:
     """Container for status reports from the air purifier."""
     def __init__(self, data: Dict[str, Any]) -> None:
-        # Response of a Air Purifier Pro:
-        # ['power': 'off', 'aqi': 41, 'humidity': 62, 'temp_dec': 293,
-        #  'mode': 'auto', 'led': 'on', 'led_b': null, 'buzzer': null,
-        #  'child_lock': 'off', 'limit_hum': null, 'trans_level': null,
-        #  'bright': 71, 'favorite_level': 17, 'filter1_life': 77,
-        #  'act_det': null, 'f1_hour_used': 771, 'use_time': 2776200,
-        #  'motor1_speed': 0]
+        """
+        Response of a Air Purifier Pro:
+
+        ['power': 'off', 'aqi': 41, 'humidity': 62, 'temp_dec': 293,
+         'mode': 'auto', 'led': 'on', 'led_b': null, 'buzzer': null,
+         'child_lock': 'off', 'limit_hum': null, 'trans_level': null,
+         'bright': 71, 'favorite_level': 17, 'filter1_life': 77,
+         'act_det': null, 'f1_hour_used': 771, 'use_time': 2776200,
+         'motor1_speed': 0]
+
+        Response of a Air Purifier 2:
+
+        ['power': 'off', 'aqi': 141, 'humidity': 64, 'temp_dec': 236,
+         'mode': 'auto', 'led': 'on', 'led_b': 1, 'buzzer': 'on',
+         'child_lock': 'off', 'limit_hum': null, 'trans_level': null,
+         'bright': null, 'favorite_level': 10, 'filter1_life': 80,
+         'act_det': null, 'f1_hour_used': 680 ]
+
+        use_time and motor1_speed is missing because a request is limitted
+        to 16 properties.
+        """
+
         self.data = data
 
     @property
@@ -105,7 +120,8 @@ class AirPurifierStatus:
 
     @property
     def temperature(self) -> float:
-        return self.data["temp_dec"] / 10.0
+        if self.data["temp_dec"] is not None:
+            return self.data["temp_dec"] / 10.0
 
     @property
     def mode(self) -> OperationMode:
@@ -166,13 +182,13 @@ class AirPurifierStatus:
         return self.data["motor1_speed"]
 
     def __str__(self) -> str:
-        s = "<AirPurifierStatus power=%s, aqi=%s temperature=%s%%, " \
-            "humidity=%s%% mode=%s%%, led=%s%%, " \
-            "led_brightness=%s%% buzzer=%s%%, " \
-            "child_lock=%s%%, humidity_limit=%s%%, trans_level=%s%%, " \
-            "bright=%s%%, favorite_level=%s%%, filter_life_remaining=%s%%, " \
-            "act_det=%s%%, filter_hours_used=%s%%, use_time=%s%%, " \
-            "motor_speed=%s%%>" % \
+        s = "<AirPurifierStatus power=%s, aqi=%s temperature=%s, " \
+            "humidity=%s%% mode=%s, led=%s, " \
+            "led_brightness=%s buzzer=%s, " \
+            "child_lock=%s, humidity_limit=%s, trans_level=%s, " \
+            "bright=%s, favorite_level=%s, filter_life_remaining=%s, " \
+            "act_det=%s, filter_hours_used=%s, use_time=%s, " \
+            "motor_speed=%s>" % \
             (self.power, self.aqi, self.temperature,
              self.humidity, self.mode, self.led,
              self.led_brightness, self.buzzer,
