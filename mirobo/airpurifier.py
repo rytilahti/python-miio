@@ -35,6 +35,14 @@ class AirPurifier(Device):
         )
         return AirPurifierStatus(dict(zip(properties, values)))
 
+    def on(self):
+        """Power on."""
+        return self.send("set_power", ["on"])
+
+    def off(self):
+        """Power off."""
+        return self.send("set_power", ["off"])
+
     def set_mode(self, mode: OperationMode):
         """Set mode."""
 
