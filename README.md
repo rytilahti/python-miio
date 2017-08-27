@@ -53,6 +53,8 @@ $ pip3 install -U pip setuptools
 
 # Getting started
 
+*Important* For the Mi Robot Vacuum Cleaner with firmware 3.3.9_003077 or higher follow these steps to get the token: https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token_mirobot_new.md
+
 To be able to communicate with the vacuum one needs to have its IP address as well as an encryption token.
 This token is only attainable before the device has been connected over the app to your local wifi (or alternatively, if you have paired your *rooted* mobile device with the vacuum, you can follow [these instructions](https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md)).
 
