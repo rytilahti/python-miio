@@ -2,3 +2,4 @@ click
 cryptography
 pretty_cron
 construct
+zeroconf
