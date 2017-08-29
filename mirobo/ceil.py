@@ -126,5 +126,4 @@ class Ceil(Device):
                     "count (%s) of received values.",
                     properties_count, values_count)
 
-        print(values)
         return CeilStatus(dict(zip(properties, values)))
