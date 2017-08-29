@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(mirobo.Ceil)
 
 
-def validate_bright(ctx, param, value):
+def validate_percentage(ctx, param, value):
     value = int(value)
     if value < 1 or value > 100:
         raise click.BadParameter('Should be a positive int between 1-100.')
@@ -97,9 +97,9 @@ def status(dev: mirobo.Ceil):
         return  # bail out
 
     click.echo(click.style("Power: %s" % res.power, bold=True))
-    click.echo("Brightness: %s" % res.bright)
-    click.echo("CCT: %s" % res.cct)
-    click.echo("Scene Number: %s" % res.snm)
+    click.echo("Brightness: %s" % res.brightness)
+    click.echo("Correlated color temperatur: %s" % res.color_temperature)
+    click.echo("Scene: %s" % res.scene)
     click.echo("dv: %s" % res.dv)
     click.echo("Smart Midnight Light: %s" % res.bl)
     click.echo("Auto CCT: %s" % res.ac)
@@ -120,19 +120,20 @@ def off(dev: mirobo.Ceil):
 
 
 @cli.command()
-@click.argument('level', callback=validate_bright, required=True,)
+@click.argument('level', callback=validate_percentage, required=True,)
 @pass_dev
-def set_bright(dev: mirobo.Ceil, level):
+def set_brightness(dev: mirobo.Ceil, level):
     """Set brightness level."""
-    click.echo("Brightness: %s" % dev.set_bright(level))
+    click.echo("Brightness: %s" % dev.set_brightness(level))
 
 
 @cli.command()
-@click.argument('level', callback=validate_bright, required=True,)
+@click.argument('level', callback=validate_percentage, required=True,)
 @pass_dev
-def set_cct(dev: mirobo.Ceil, level):
+def set_color_temperature(dev: mirobo.Ceil, level):
     """Set CCT level."""
-    click.echo("CCT level: %s" % dev.set_cct(level))
+    click.echo("Correlated color temperatur level: %s" %
+               dev.set_color_temperature(level))
 
 
 @cli.command()
