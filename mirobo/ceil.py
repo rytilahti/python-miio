@@ -111,19 +111,19 @@ class Ceil(Device):
         )
         properties_count = len(properties)
         values_count = len(values)
-
-
         if properties_count != values_count:
             if properties_count == values_count+2:
-                _LOGGER.info("The values of two properties are missing. "
-                    "Assumption: A Xiaomi Philips Light LED Ball is "
-                    "used which doesn't provide the property bl and ac.",
+                _LOGGER.info(
+                    "The values of two properties are missing. Assumption: A "
+                    "Xiaomi Philips Light LED Ball is used which doesn't "
+                    "provide the property bl and ac.",
                     properties_count, values_count)
 
                 values.extend((None, None))
             else:
-                _LOGGER.error("Count (%s) of requested properties does not "
-                    "match the count (%s) of received values.",
+                _LOGGER.error(
+                    "Count (%s) of requested properties does not match the "
+                    "count (%s) of received values.",
                     properties_count, values_count)
 
         print(values)
