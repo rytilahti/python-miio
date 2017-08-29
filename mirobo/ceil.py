@@ -48,7 +48,7 @@ class CeilStatus:
 
     def __str__(self) -> str:
         s = "<CeilStatus power=%s, brightness=%s, " \
-            "correlated_color_temperature=%s, scene=%s, dv=%s, " \
+            "color_temperature=%s, scene=%s, dv=%s, " \
             "bl=%s, ac=%, >" % \
             (self.power, self.brightness,
              self.color_temperature, self.scene, self.dv,
