@@ -98,10 +98,10 @@ def status(dev: mirobo.Ceil):
 
     click.echo(click.style("Power: %s" % res.power, bold=True))
     click.echo("Brightness: %s" % res.brightness)
-    click.echo("Correlated color temperatur: %s" % res.color_temperature)
+    click.echo("Color temperature: %s" % res.color_temperature)
     click.echo("Scene: %s" % res.scene)
     click.echo("dv: %s" % res.dv)
-    click.echo("Smart Midnight Light: %s" % res.bl)
+    click.echo("Smart Night Light: %s" % res.bl)
     click.echo("Auto CCT: %s" % res.ac)
 
 
@@ -154,30 +154,30 @@ def set_scene(dev: mirobo.Ceil, scene):
 
 @cli.command()
 @pass_dev
-def sml_on(dev: mirobo.Ceil):
-    """Smart Midnight Light on."""
-    click.echo("Smart Midnight Light On: %s" % dev.bl_on())
+def smart_night_light_on(dev: mirobo.Ceil):
+    """Smart Night Light on."""
+    click.echo("Smart Night Light On: %s" % dev.smart_night_light_on())
 
 
 @cli.command()
 @pass_dev
-def sml_off(dev: mirobo.Ceil):
-    """Smart Midnight Light off."""
-    click.echo("Smart Midnight Light Off: %s" % dev.bl_off())
+def smart_night_light_off(dev: mirobo.Ceil):
+    """Smart Night Light off."""
+    click.echo("Smart Night Light Off: %s" % dev.smart_night_light_off())
 
 
 @cli.command()
 @pass_dev
-def acct_on(dev: mirobo.Ceil):
+def automatic_color_temperature_on(dev: mirobo.Ceil):
     """Auto CCT on."""
-    click.echo("Auto CCT On: %s" % dev.ac_on())
+    click.echo("Auto CCT On: %s" % dev.automatic_color_temperature_on())
 
 
 @cli.command()
 @pass_dev
-def acct_off(dev: mirobo.Ceil):
+def automatic_color_temperature_off(dev: mirobo.Ceil):
     """Auto CCT on."""
-    click.echo("Auto CCT Off: %s" % dev.ac_off())
+    click.echo("Auto CCT Off: %s" % dev.automatic_color_temperature_off())
 
 
 if __name__ == "__main__":

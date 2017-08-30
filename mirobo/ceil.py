@@ -1,6 +1,7 @@
 import logging
 from .device import Device
 from typing import Any, Dict
+from collections import defaultdict
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class CeilStatus:
         return self.data["cct"]
 
     @property
-    def bl(self) -> int:
+    def smart_night_light(self) -> int:
         return self.data["bl"]
 
     @property
@@ -86,20 +87,20 @@ class Ceil(Device):
         """Set scene number."""
         return self.send("apply_fixed_scene", [num])
 
-    def bl_on(self):
-        """Smart Midnight Light On."""
+    def smart_night_light_on(self):
+        """Smart Night Light On."""
         return self.send("enable_bl", [1])
 
-    def bl_off(self):
-        """Smart Midnight Light off."""
+    def smart_night_light_off(self):
+        """Smart Night Light off."""
         return self.send("enable_bl", [0])
 
-    def ac_on(self):
-        """Auto CCT On."""
+    def automatic_color_temperature_on(self):
+        """Automatic color temperature on."""
         return self.send("enable_ac", [1])
 
-    def ac_off(self):
-        """Auto CCT Off."""
+    def automatic_color_temperature_off(self):
+        """Automatic color temperature off."""
         return self.send("enable_ac", [0])
 
     def status(self) -> CeilStatus:
@@ -109,21 +110,13 @@ class Ceil(Device):
             "get_prop",
             properties
         )
+
         properties_count = len(properties)
         values_count = len(values)
         if properties_count != values_count:
-            if properties_count == values_count+2:
-                _LOGGER.info(
-                    "The values of two properties are missing. Assumption: A "
-                    "Xiaomi Philips Light LED Ball is used which doesn't "
-                    "provide the property bl and ac.",
-                    properties_count, values_count)
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
 
-                values.extend((None, None))
-            else:
-                _LOGGER.error(
-                    "Count (%s) of requested properties does not match the "
-                    "count (%s) of received values.",
-                    properties_count, values_count)
-
-        return CeilStatus(dict(zip(properties, values)))
+        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
