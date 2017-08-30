@@ -44,16 +44,16 @@ class CeilStatus:
         return self.data["bl"]
 
     @property
-    def ac(self) -> int:
+    def automatic_color_temperature(self) -> int:
         return self.data["ac"]
 
     def __str__(self) -> str:
         s = "<CeilStatus power=%s, brightness=%s, " \
             "color_temperature=%s, scene=%s, dv=%s, " \
-            "bl=%s, ac=%, >" % \
+            "smart_night_light=%s, automatic_color_temperature=%, >" % \
             (self.power, self.brightness,
              self.color_temperature, self.scene, self.dv,
-             self.bl, self.ac)
+             self.smart_night_light, self.automatic_color_temperature)
         return s
 
 

@@ -101,8 +101,8 @@ def status(dev: mirobo.Ceil):
     click.echo("Color temperature: %s" % res.color_temperature)
     click.echo("Scene: %s" % res.scene)
     click.echo("dv: %s" % res.dv)
-    click.echo("Smart Night Light: %s" % res.bl)
-    click.echo("Auto CCT: %s" % res.ac)
+    click.echo("Smart Night Light: %s" % res.smart_night_light)
+    click.echo("Auto CCT: %s" % res.automatic_color_temperature)
 
 
 @cli.command()
