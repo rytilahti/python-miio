@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(mirobo.Ceil)
 
 
-def validate_bright(ctx, param, value):
+def validate_percentage(ctx, param, value):
     value = int(value)
     if value < 1 or value > 100:
         raise click.BadParameter('Should be a positive int between 1-100.')
@@ -97,12 +97,12 @@ def status(dev: mirobo.Ceil):
         return  # bail out
 
     click.echo(click.style("Power: %s" % res.power, bold=True))
-    click.echo("Brightness: %s" % res.bright)
-    click.echo("CCT: %s" % res.cct)
-    click.echo("Scene Number: %s" % res.snm)
+    click.echo("Brightness: %s" % res.brightness)
+    click.echo("Color temperature: %s" % res.color_temperature)
+    click.echo("Scene: %s" % res.scene)
     click.echo("dv: %s" % res.dv)
-    click.echo("Smart Midnight Light: %s" % res.bl)
-    click.echo("Auto CCT: %s" % res.ac)
+    click.echo("Smart Night Light: %s" % res.smart_night_light)
+    click.echo("Auto CCT: %s" % res.automatic_color_temperature)
 
 
 @cli.command()
@@ -120,19 +120,20 @@ def off(dev: mirobo.Ceil):
 
 
 @cli.command()
-@click.argument('level', callback=validate_bright, required=True,)
+@click.argument('level', callback=validate_percentage, required=True,)
 @pass_dev
-def set_bright(dev: mirobo.Ceil, level):
+def set_brightness(dev: mirobo.Ceil, level):
     """Set brightness level."""
-    click.echo("Brightness: %s" % dev.set_bright(level))
+    click.echo("Brightness: %s" % dev.set_brightness(level))
 
 
 @cli.command()
-@click.argument('level', callback=validate_bright, required=True,)
+@click.argument('level', callback=validate_percentage, required=True,)
 @pass_dev
-def set_cct(dev: mirobo.Ceil, level):
+def set_color_temperature(dev: mirobo.Ceil, level):
     """Set CCT level."""
-    click.echo("CCT level: %s" % dev.set_cct(level))
+    click.echo("Correlated color temperatur level: %s" %
+               dev.set_color_temperature(level))
 
 
 @cli.command()
@@ -153,30 +154,30 @@ def set_scene(dev: mirobo.Ceil, scene):
 
 @cli.command()
 @pass_dev
-def sml_on(dev: mirobo.Ceil):
-    """Smart Midnight Light on."""
-    click.echo("Smart Midnight Light On: %s" % dev.bl_on())
+def smart_night_light_on(dev: mirobo.Ceil):
+    """Smart Night Light on."""
+    click.echo("Smart Night Light On: %s" % dev.smart_night_light_on())
 
 
 @cli.command()
 @pass_dev
-def sml_off(dev: mirobo.Ceil):
-    """Smart Midnight Light off."""
-    click.echo("Smart Midnight Light Off: %s" % dev.bl_off())
+def smart_night_light_off(dev: mirobo.Ceil):
+    """Smart Night Light off."""
+    click.echo("Smart Night Light Off: %s" % dev.smart_night_light_off())
 
 
 @cli.command()
 @pass_dev
-def acct_on(dev: mirobo.Ceil):
+def automatic_color_temperature_on(dev: mirobo.Ceil):
     """Auto CCT on."""
-    click.echo("Auto CCT On: %s" % dev.ac_on())
+    click.echo("Auto CCT On: %s" % dev.automatic_color_temperature_on())
 
 
 @cli.command()
 @pass_dev
-def acct_off(dev: mirobo.Ceil):
+def automatic_color_temperature_off(dev: mirobo.Ceil):
     """Auto CCT on."""
-    click.echo("Auto CCT Off: %s" % dev.ac_off())
+    click.echo("Auto CCT Off: %s" % dev.automatic_color_temperature_off())
 
 
 if __name__ == "__main__":

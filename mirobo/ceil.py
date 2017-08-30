@@ -1,5 +1,9 @@
+import logging
 from .device import Device
 from typing import Any, Dict
+from collections import defaultdict
+
+_LOGGER = logging.getLogger(__name__)
 
 class CeilStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp"""
@@ -20,11 +24,11 @@ class CeilStatus:
         return self.power == "on"
 
     @property
-    def bright(self) -> int:
+    def brightness(self) -> int:
         return self.data["bright"]
 
     @property
-    def snm(self) -> int:
+    def scene(self) -> int:
         return self.data["snm"]
 
     @property
@@ -32,22 +36,24 @@ class CeilStatus:
         return self.data["dv"]
 
     @property
-    def cct(self) -> int:
+    def color_temperature(self) -> int:
         return self.data["cct"]
 
     @property
-    def bl(self) -> int:
+    def smart_night_light(self) -> int:
         return self.data["bl"]
 
     @property
-    def ac(self) -> int:
+    def automatic_color_temperature(self) -> int:
         return self.data["ac"]
 
     def __str__(self) -> str:
-        s = "<CeilStatus power=%s, bright=%s, cct=%s, snm=%s, dv=%s, " \
-            "bl=%s, ac=%, >" % \
-            (self.power, self.bright, self.cct, self.snm, self.dv,
-             self.bl, self.ac)
+        s = "<CeilStatus power=%s, brightness=%s, " \
+            "color_temperature=%s, scene=%s, dv=%s, " \
+            "smart_night_light=%s, automatic_color_temperature=%, >" % \
+            (self.power, self.brightness,
+             self.color_temperature, self.scene, self.dv,
+             self.smart_night_light, self.automatic_color_temperature)
         return s
 
 
@@ -65,11 +71,11 @@ class Ceil(Device):
         """Power off."""
         return self.send("set_power", ["off"])
 
-    def set_bright(self, level: int):
+    def set_brightness(self, level: int):
         """Set brightness level."""
         return self.send("set_bright", [level])
 
-    def set_cct(self, level: int):
+    def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         return self.send("set_cct", [level])
 
@@ -81,20 +87,20 @@ class Ceil(Device):
         """Set scene number."""
         return self.send("apply_fixed_scene", [num])
 
-    def bl_on(self):
-        """Smart Midnight Light On."""
+    def smart_night_light_on(self):
+        """Smart Night Light On."""
         return self.send("enable_bl", [1])
 
-    def bl_off(self):
-        """Smart Midnight Light off."""
+    def smart_night_light_off(self):
+        """Smart Night Light off."""
         return self.send("enable_bl", [0])
 
-    def ac_on(self):
-        """Auto CCT On."""
+    def automatic_color_temperature_on(self):
+        """Automatic color temperature on."""
         return self.send("enable_ac", [1])
 
-    def ac_off(self):
-        """Auto CCT Off."""
+    def automatic_color_temperature_off(self):
+        """Automatic color temperature off."""
         return self.send("enable_ac", [0])
 
     def status(self) -> CeilStatus:
@@ -104,4 +110,13 @@ class Ceil(Device):
             "get_prop",
             properties
         )
-        return CeilStatus(dict(zip(properties, values)))
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
