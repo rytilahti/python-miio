@@ -16,6 +16,7 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Philips Eyecare Smart Lamp 2
 * Xiaomi Philips LED Ceiling Lamp
 * Xiaomi Philips LED Ball Lamp
+* Xiaomi Mi Smart Fan
 
 ### Adding support for other devices
 
