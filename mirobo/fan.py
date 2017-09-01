@@ -110,8 +110,6 @@ class Fan(Device):
 
     def status(self):
         """Retrieve properties."""
-
-        # A few more properties:
         properties = ['temp_dec', 'humidity', 'angle', 'speed',
                       'poweroff_time', 'power', 'ac_power', 'battery',
                       'angle_enable', 'speed_level', 'natural_level',
@@ -121,6 +119,15 @@ class Fan(Device):
             "get_prop",
             properties
         )
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.error(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
         return FanStatus(dict(zip(properties, values)))
 
     def on(self):
