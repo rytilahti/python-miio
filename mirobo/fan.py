@@ -1,6 +1,9 @@
+import logging
 from .device import Device
 from typing import Any, Dict
 import enum
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class LedBrightness(enum.Enum):
