@@ -44,7 +44,8 @@ class AirPurifier(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return AirPurifierStatus(defaultdict(lambda: None, zip(properties, values)))
+        return AirPurifierStatus(
+            defaultdict(lambda: None, zip(properties, values)))
 
     def on(self):
         """Power on."""
@@ -90,6 +91,7 @@ class AirPurifier(Device):
 
 class AirPurifierStatus:
     """Container for status reports from the air purifier."""
+
     def __init__(self, data: Dict[str, Any]) -> None:
         """
         Response of a Air Purifier Pro:
