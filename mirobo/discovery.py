@@ -4,7 +4,7 @@ import ipaddress
 import inspect
 import codecs
 from mirobo import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
-                    PhilipsEyecare)
+                    PhilipsEyecare, ChuangmiIr)
 from typing import Union, Callable, Dict
 
 _LOGGER = logging.getLogger(__name__)
@@ -60,6 +60,7 @@ class Discovery:
         "zhimi-airpurifier-v2": AirPurifier,
         "zhimi-airpurifier-v3": AirPurifier,
         "zhimi-airpurifier-v6": AirPurifier,
+        "chuangmi-ir-v2": ChuangmiIr,
         # "zhimi-humidifier-v1": Humidifier,
         # "yunmi-waterpuri-v2": WaterPurifier,
         # It looks like philips devices cannot be discovered via mdns
