@@ -8,5 +8,6 @@ from mirobo.airpurifier import AirPurifier
 from mirobo.strip import Strip
 from mirobo.ceil import Ceil
 from mirobo.philips_eyecare import PhilipsEyecare
+from mirobo.chuangmi_ir import ChuangmiIr
 from mirobo.device import Device, DeviceException
 from mirobo.discovery import Discovery
