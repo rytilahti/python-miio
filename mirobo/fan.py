@@ -72,7 +72,7 @@ class FanStatus:
         return self.data["speed_level"]
 
     @property
-    def angle_enable(self) -> bool:
+    def oscillate(self) -> bool:
         return self.data["angle_enable"] == "on"
 
     @property
@@ -98,11 +98,11 @@ class FanStatus:
     def __str__(self) -> str:
         s = "<FanStatus power=%s, temperature=%s, humidity=%s, led=%s, " \
             "led_brightness=%s buzzer=%s, child_lock=%s, natural_level=%s, " \
-            "speed_level=%s, angle_enable=%s, battery=%s, ac_power=%s, " \
+            "speed_level=%s, oscillate=%s, battery=%s, ac_power=%s, " \
             "poweroff_time=%s, speed=%s, angle=%s" % \
             (self.power, self.temperature, self.humidity, self.led,
              self.led_brightness, self.buzzer, self.child_lock,
-             self.natural_level, self.speed_level, self.angle_enable,
+             self.natural_level, self.speed_level, self.oscillate,
              self.battery, self.ac_power, self.poweroff_time,
              self.speed_level, self.angle)
         return s
@@ -143,13 +143,15 @@ class Fan(Device):
 
     def set_natural_level(self, level: int):
         """Set natural level."""
-        return self.send("set_natural_level", [level])
+        level = max(0, min(level, 100))
+        return self.send("set_natural_level", [level])  # 0...100
 
     def set_speed_level(self, level: int):
         """Set speed level."""
-        return self.send("set_speed_level", [level])
+        level = max(0, min(level, 100))
+        return self.send("set_speed_level", [level])  # 0...100
 
-    def set_move(self, direction: MoveDirection):
+    def set_direction(self, direction: MoveDirection):
         """Set move direction."""
         return self.send("set_move", [direction.value])
 
@@ -167,8 +169,6 @@ class Fan(Device):
 
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
-
-        # bright: 0, dim: 1, off: 2
         return self.send("set_led_b", [brightness.value])
 
     def led_on(self):
