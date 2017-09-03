@@ -20,14 +20,17 @@ class PlugStatus:
         return self.data["temperature"]
 
     @property
-    def current(self) -> float:
-        return self.data["current"]
+    def load_power(self) -> float:
+        if self.data["current"] is not None:
+            # The constant of 110V is used intentionally. The current was
+            # calculated with a wrong reference voltage already.
+            return self.data["current"] * 110
 
     def __str__(self) -> str:
-        s = "<PlugStatus power=%s, temperature=%s, current=%s>" % \
+        s = "<PlugStatus power=%s, temperature=%s, load_power=%s>" % \
             (self.power,
              self.temperature,
-             self.current)
+             self.load_power)
         return s
 
 
