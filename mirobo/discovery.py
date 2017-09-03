@@ -3,7 +3,6 @@ import zeroconf
 import ipaddress
 import inspect
 import codecs
-from typing import Union, Callable
 from mirobo import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
                     PhilipsEyecare, )
 
