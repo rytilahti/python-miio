@@ -4,7 +4,7 @@ import ipaddress
 import inspect
 import codecs
 from typing import Any, List, Union, Callable
-from mirobo import Message, Device, Vacuum
+from mirobo import Message, Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil, PhilipsEyecare
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,9 +48,9 @@ class Discovery:
         "rockrobo-vacuum-v1": Vacuum,
         "chuangmi-plug-m1": Plug,
         "chuangmi-plug-v2": Plug,
+        "chuangmi-plug-v1": PlugV1,
         "qmi-powerstrip-v1": Strip,
         "zimi.powerstrip.v2": Strip,
-        "chuangmi-plug-v1": PlugV1,
         "zhimi-airpurifier-m1": AirPurifier,
         "zhimi-airpurifier-v1": AirPurifier,
         "zhimi-airpurifier-v2": AirPurifier,
