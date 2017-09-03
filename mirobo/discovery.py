@@ -56,8 +56,8 @@ class Discovery:
         "zhimi-airpurifier-v2": AirPurifier,
         "zhimi-airpurifier-v3": AirPurifier,
         "zhimi-airpurifier-v6": AirPurifier,
-        #"zhimi-humidifier-v1": Humidifier,
-        #"yunmi-waterpuri-v2": WaterPurifier,
+        # "zhimi-humidifier-v1": Humidifier,
+        # "yunmi-waterpuri-v2": WaterPurifier,
         # It looks like philips devices cannot be discovered via mdns
         "philips-light-bulb": Ceil,
         "philips-light-ceil": Ceil,
