@@ -1,6 +1,9 @@
+import logging
 from .device import Device
 from typing import Any, Dict
 import enum
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class OperationMode(enum.Enum):
@@ -22,7 +25,6 @@ class AirPurifier(Device):
     def status(self):
         """Retrieve properties."""
 
-        # A few more properties:
         properties = ['power', 'aqi', 'humidity', 'temp_dec',
                       'mode', 'led', 'led_b', 'buzzer', 'child_lock',
                       'bright', 'favorite_level', 'filter1_life',
@@ -32,7 +34,16 @@ class AirPurifier(Device):
             "get_prop",
             properties
         )
-        return AirPurifierStatus(dict(zip(properties, values)))
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
 
     def on(self):
         """Power on."""
@@ -98,7 +109,7 @@ class AirPurifierStatus:
          'act_det': null, 'f1_hour_used': 680 ]
 
         use_time and motor1_speed is missing because a request is limitted
-        to 16 properties.
+        to 16 properties. We request 15 properties at the moment.
         """
 
         self.data = data
