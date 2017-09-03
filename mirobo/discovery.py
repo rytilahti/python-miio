@@ -46,6 +46,22 @@ class Listener:
 class Discovery:
     _mdns_device_map = {
         "rockrobo-vacuum-v1": Vacuum,
+        "chuangmi-plug-m1": Plug,
+        "chuangmi-plug-v2": Plug,
+        "qmi-powerstrip-v1": Strip,
+        "zimi.powerstrip.v2": Strip,
+        "chuangmi-plug-v1": PlugV1,
+        "zhimi-airpurifier-m1": AirPurifier,
+        "zhimi-airpurifier-v1": AirPurifier,
+        "zhimi-airpurifier-v2": AirPurifier,
+        "zhimi-airpurifier-v3": AirPurifier,
+        "zhimi-airpurifier-v6": AirPurifier,
+        #"zhimi-humidifier-v1": Humidifier,
+        #"yunmi-waterpuri-v2": WaterPurifier,
+        # It looks like philips devices cannot be discovered via mdns
+        "philips-light-bulb": Ceil,
+        "philips-light-ceil": Ceil,
+        "philips-light-sread1": PhilipsEyecare,
         "yeelink-light-": lambda x: other_package_info(x, "python-yeelight package"),
         "lumi-gateway-": lambda x: other_package_info(x, "https://github.com/Danielhiversen/PyXiaomiGateway")
     } # type: Dict[str, Union[Callable, Device]]
