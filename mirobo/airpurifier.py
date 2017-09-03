@@ -1,7 +1,8 @@
 import logging
-from .device import Device
-from typing import Any, Dict
 import enum
+from typing import Any, Dict
+from collections import defaultdict
+from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class AirPurifier(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
+        return AirPurifierStatus(defaultdict(lambda: None, zip(properties, values)))
 
     def on(self):
         """Power on."""
