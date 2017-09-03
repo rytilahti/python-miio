@@ -25,6 +25,7 @@ class PlugStatus:
             # The constant of 110V is used intentionally. The current was
             # calculated with a wrong reference voltage already.
             return self.data["current"] * 110
+        return None
 
     def __str__(self) -> str:
         s = "<PlugStatus power=%s, temperature=%s, load_power=%s>" % \

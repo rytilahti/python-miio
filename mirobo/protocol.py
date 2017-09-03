@@ -35,6 +35,13 @@ class Utils:
     """ This class is adapted from the original xpn.py code by gst666 """
 
     @staticmethod
+    def verify_token(token: bytes):
+        if not isinstance(token, bytes):
+            raise TypeError("Token must be bytes")
+        if len(token) != 32:
+            raise ValueError("Token must be of length 32")
+
+    @staticmethod
     def md5(data: bytes) -> bytes:
         checksum = hashlib.md5()
         checksum.update(data)
@@ -48,6 +55,9 @@ class Utils:
 
     @staticmethod
     def encrypt(plaintext: bytes, token: bytes) -> bytes:
+        if not isinstance(plaintext, bytes):
+            raise TypeError("plaintext requires bytes")
+        Utils.verify_token(token)
         key, iv = Utils.key_iv(token)
         padder = padding.PKCS7(128).padder()
 
@@ -60,6 +70,9 @@ class Utils:
 
     @staticmethod
     def decrypt(ciphertext: bytes, token: bytes) -> bytes:
+        if not isinstance(ciphertext, bytes):
+            raise TypeError("ciphertext requires bytes")
+        Utils.verify_token(token)
         key, iv = Utils.key_iv(token)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
                         backend=default_backend())

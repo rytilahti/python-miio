@@ -46,6 +46,7 @@ class YeelightStatus:
     def color_temp(self) -> int:
         if self.color_mode == YeelightMode.ColorTemperature:
             return int(self.data["ct"])
+        return None
 
     @property
     def name(self) -> str:

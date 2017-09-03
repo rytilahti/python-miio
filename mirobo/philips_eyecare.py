@@ -129,6 +129,5 @@ class PhilipsEyecareStatus:
             "dvalue=%s >" % \
             (self.power, self.bright,
              self.notifystatus, self.ambstatus, self.ambvalue,
-             self.eyecare, self.scene_num,
-             self.bls)
+             self.eyecare, self.scene_num, self.bls, self.dvalue)
         return s

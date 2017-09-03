@@ -4,13 +4,17 @@ import ipaddress
 import inspect
 import codecs
 from mirobo import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
-                    PhilipsEyecare, )
+                    PhilipsEyecare)
+from typing import Union, Callable, Dict
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def other_package_info(info, desc):
-    return "%s @ %s, check %s" % (info.name, ipaddress.ip_address(info.address), desc)
+    return "%s @ %s, check %s" % (
+        info.name,
+        ipaddress.ip_address(info.address),
+        desc)
 
 
 class Listener:
