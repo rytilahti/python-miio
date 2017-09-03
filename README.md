@@ -16,10 +16,7 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Philips Eyecare Smart Lamp 2
 * Xiaomi Philips LED Ceiling Lamp
 * Xiaomi Philips LED Ball Lamp
-<<<<<<< HEAD
 * Xiaomi Universal IR Remote Controller (Chuangmi IR)
-=======
->>>>>>> 1fd41384d2c892589f6a4b8894d28d1b1bfca899
 * Xiaomi Mi Smart Fan
 
 ### Adding support for other devices
