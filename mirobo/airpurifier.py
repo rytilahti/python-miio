@@ -137,6 +137,7 @@ class AirPurifierStatus:
     def temperature(self) -> float:
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
+        return None
 
     @property
     def mode(self) -> OperationMode:
@@ -150,6 +151,7 @@ class AirPurifierStatus:
     def led_brightness(self) -> LedBrightness:
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
+        return None
 
     @property
     def buzzer(self) -> bool:

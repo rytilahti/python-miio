@@ -250,7 +250,7 @@ def backward(vac: mirobo.Vacuum, amount:float):
 @click.argument('rotation', type=float)
 @click.argument('velocity', type=float)
 @click.argument('duration', type=int)
-def move(vac: mirobo.Vacuum, rotation: float, velocity: float, duration: int):
+def move(vac: mirobo.Vacuum, rotation: int, velocity: float, duration: int):
     """Pass raw manual values"""
     return vac.manual_control(rotation, velocity, duration)
 

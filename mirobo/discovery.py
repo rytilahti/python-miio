@@ -3,14 +3,17 @@ import zeroconf
 import ipaddress
 import inspect
 import codecs
-from typing import Any, List, Union, Callable
-from mirobo import Message, Device, Vacuum
+from typing import Union, Callable, Dict
+from mirobo import Device, Vacuum
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def other_package_info(info, desc):
-    return "%s @ %s, check %s" % (info.name, ipaddress.ip_address(info.address), desc)
+    return "%s @ %s, check %s" % (
+        info.name,
+        ipaddress.ip_address(info.address),
+        desc)
 
 
 class Listener:

@@ -23,6 +23,7 @@ class DeviceInfo:
                                                  self.data["mac"],
                                                  self.netif["localIp"],
                                                  self.data["token"])
+
     @property
     def netif(self):
         return self.data["netif"]
@@ -170,7 +171,8 @@ class Device:
         except OSError as ex:
             _LOGGER.error("Got error when receiving: %s", ex)
             if retry_count > 0:
-                _LOGGER.warning("Retrying with incremented id, retries left: %s" % retry_count)
+                _LOGGER.warning("Retrying with incremented id, "
+                                "retries left: %s" % retry_count)
                 self.__id += 100
                 return self.send(command, parameters, retry_count-1)
             raise DeviceException from ex
