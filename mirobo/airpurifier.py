@@ -57,8 +57,6 @@ class AirPurifier(Device):
 
     def set_mode(self, mode: OperationMode):
         """Set mode."""
-
-        # auto, silent, favorite, idle
         return self.send("set_mode", [mode.value])
 
     def set_favorite_level(self, level: int):
@@ -70,8 +68,6 @@ class AirPurifier(Device):
 
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
-
-        # bright: 0, dim: 1, off: 2
         return self.send("set_led_b", [brightness.value])
 
     def set_led(self, led: bool):
