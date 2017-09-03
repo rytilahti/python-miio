@@ -8,7 +8,10 @@ from mirobo.airpurifier import AirPurifier
 from mirobo.strip import Strip
 from mirobo.ceil import Ceil
 from mirobo.philips_eyecare import PhilipsEyecare
+<<<<<<< HEAD
 from mirobo.chuangmi_ir import ChuangmiIr
+=======
+>>>>>>> 1fd41384d2c892589f6a4b8894d28d1b1bfca899
 from mirobo.fan import Fan
 from mirobo.device import Device, DeviceException
 from mirobo.discovery import Discovery
