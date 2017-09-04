@@ -5,7 +5,7 @@ from .. import Message, Utils
 class TestProtocol(TestCase):
     def test_non_bytes_payload(self):
         payload = "hello world"
-        valid_token = 32 * b'0'
+        valid_token = 16 * b'0'
         with self.assertRaises(TypeError):
             Utils.encrypt(payload, valid_token)
         with self.assertRaises(TypeError):
@@ -13,7 +13,7 @@ class TestProtocol(TestCase):
 
     def test_encrypt(self):
         payload = b"hello world"
-        token = 32 * b'0'
+        token = 16 * b'0'
 
         encrypted = Utils.encrypt(payload, token)
         decrypted = Utils.decrypt(encrypted, token)
@@ -22,7 +22,7 @@ class TestProtocol(TestCase):
     def test_invalid_token(self):
         payload = b"hello world"
         wrong_type = 1234
-        wrong_length = 31 * b'0'
+        wrong_length = 15 * b'0'
         with self.assertRaises(TypeError):
             Utils.encrypt(payload, wrong_type)
         with self.assertRaises(TypeError):

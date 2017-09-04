@@ -38,7 +38,7 @@ class Utils:
     def verify_token(token: bytes):
         if not isinstance(token, bytes):
             raise TypeError("Token must be bytes")
-        if len(token) != 32:
+        if len(token) != 16:
             raise ValueError("Token must be of length 32")
 
     @staticmethod
