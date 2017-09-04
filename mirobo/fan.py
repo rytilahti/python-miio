@@ -45,6 +45,8 @@ class FanStatus:
     def temperature(self) -> float:
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
+        else:
+            return None
 
     @property
     def led(self) -> bool:
@@ -54,6 +56,8 @@ class FanStatus:
     def led_brightness(self) -> LedBrightness:
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
+        else:
+            return None
 
     @property
     def buzzer(self) -> bool:
