@@ -1,12 +1,12 @@
 # Python-mirobo
 
-This project is an on-going effort to allow controlling locally available Xiaomi Vacuum cleaner robot with Python.
-It is currently as its very early stages with lots of things being not implemented, so feel free to create pull requests
-and report new missing functionality.
+This project was started to allow controlling locally available Xiaomi Vacuum cleaner robot with Python (hence the name),
+however, thanks to contributors it has been extended to allow controlling other Xiaomi devices using the same protocol.
 
 Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewtopic.php?f=23&t=4898) who figured out the encryption to make this possible.
+[Information about the  underlying communication protocol](https://github.com/OpenMiHome/mihome-binary-protocol) ([another source for vacuum-specific documentation](https://github.com/marcelrv/XiaomiRobotVacuumProtocol))
 
-### Supported devices
+## Supported devices
 
 * Xiaomi Mi Robot Vacuum
 * Xiaomi Mi Air Purifier 2
@@ -18,26 +18,13 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Philips LED Ball Lamp
 * Xiaomi Universal IR Remote Controller (Chuangmi IR)
 * Xiaomi Mi Smart Fan
+* Yeelight light bulbs (only a very rudimentary support, use [python-yeelight](https://gitlab.com/stavros/python-yeelight/) and for a more complete support)
 
-### Adding support for other devices
+*Feel free to crete pull requests to add support for new devices as well as to report missing functionalities in the currently supported devices.*
 
-Although this library (and tool) currently only supports the vacuum cleaner, some other Xiaomi products use the same [underlying communication protocol](https://github.com/OpenMiHome/mihome-binary-protocol) ([another source for vacuum-specific documentation](https://github.com/marcelrv/XiaomiRobotVacuumProtocol)), so *patches for supporting other Xiaomi devices using the same protocol are welcome!*
+## Adding support for other devices
 
-The [miio javascript library](https://github.com/aholstenson/miio) contains some hints on devices which could be supported, however, the Xiaomi Smart Home gateway ([Home Assistant component](https://github.com/lazcad/homeassistant) already work in progress) as well as Yeelight bulbs ([python-yeelight](https://gitlab.com/stavros/python-yeelight/) supports them when the developer mode is activated) are currently not in the scope.
-
-# Features
-
-* Basic functionality, including starting, stopping, pausing, locating.
-* Controlling the fan speed.
-* Fetching schedule, status, state of consumables.
-* Setting and querying the timezone.
-
-Use `mirobo --help` for more information about supported commands.
-
-## Not yet implemented
-
-* Setting the clock
-* Setting schedules
+The [miio javascript library](https://github.com/aholstenson/miio) contains some hints on devices which could be supported, however, the Xiaomi Smart Home gateway ([Home Assistant component](https://github.com/lazcad/homeassistant) already work in progress) as well as Yeelight bulbs are currently not in the scope of this proejct.
 
 # Installation
 
@@ -55,16 +42,26 @@ $ pip3 install -U pip setuptools
 
 # Getting started
 
-*Important* For the Mi Robot Vacuum Cleaner with firmware 3.3.9_003077 or higher follow these steps to get the token: https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token_mirobot_new.md
+As long as the device is in the same network, `mirobo discover` can be used to check for its support status.
 
-To be able to communicate with the vacuum one needs to have its IP address as well as an encryption token.
-This token is only attainable before the device has been connected over the app to your local wifi (or alternatively, if you have paired your *rooted* mobile device with the vacuum, you can follow [these instructions](https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md)).
+To be able to communicate with supported devices its IP address and an encryption token must be known.
+The token can be obtained either by extracting it from the database of the Mi Home application,
+or by using the automatic discovery.
 
-In order to fetch the token, reset the robot, connect to its the network its announcing (rockrobo-XXXX)
+## Finding the token
+
+*Important* For the Mi Robot Vacuum Cleaner with firmware 3.3.9_003077 or higher follow these steps to get the token: https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token_mirobot_new.md ([another source](https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md)).
+
+This will also work for all other devices as long as the device has been bound with the Mi Home mobile application, and is therefore preferable way to attain the token.
+
+### Automatic discovery (does not work on all devices and firmware versions)
+
+The automatic discovery works only before the device has been connected over the app to your local wifi.
+In order to fetch the token, reset the device, connect to its the network its announcing (e.g. rockrobo-XXXX for the vacuum)
 and run the following command:
 
 ```
-mirobo discover
+mirobo discover --handshake 1
 ```
 
 which should return something similar to this:
@@ -74,8 +71,23 @@ INFO:mirobo.vacuum:  IP 192.168.8.1: Xiaomi Mi Robot Vacuum - token: b'fffffffff
 ```
 
 If the value is as shown above, the vacuum has already been connected and it needs a reset.
+Otherwise the token can be copied over and used for controlling.
 
-# Usage
+
+# Controlling the vacuum cleaner
+
+Following features of the vacuum cleaner are currently supported:
+
+* Basic functionality, including starting, stopping, pausing, locating.
+* Controlling the fan speed.
+* Fetching schedule, status, state of consumables. *Reseting consumable state and setting schedules is not currently implemented, patches welcome!*
+* Setting and querying the timezone.
+* Manual control of the robot.
+
+Use `mirobo --help` for more information about supported commands.
+
+
+## Usage
 
 To simplify the use, instead of passing the IP and the token as a parameter for the tool,
 you can simply set the following environment variables.
@@ -91,7 +103,7 @@ you should be presented a status report from the vacuum.
 Use ```mirobo --help``` to see available commands and description about what they do.
 ```--debug``` option can be used to let it show raw JSON data being communicated.
 
-## DND functionality
+### DND functionality
 
 To disable:
 ```
@@ -117,9 +129,9 @@ mirobo raw_command set_dnd_timer '[22,0,6,0]'
 If you find a new command please let us know by creating a pull request or an issue, if you
 do not want to implement it yourself!
 
-# Usage examples
+## Usage examples
 
-## Status reporting
+### Status reporting
 
 ```
 $ mirobo
@@ -133,35 +145,35 @@ Map present: 1
 in_cleaning: 0
 ```
 
-## Start cleaning
+### Start cleaning
 
 ```
 $ mirobo start
 Starting cleaning: 0
 ```
 
-## Return home
+### Return home
 
 ```
 $ mirobo home
 Requesting return to home: 0
 ```
 
-## Setting the fanspeed
+### Setting the fanspeed
 
 ```
 $ mirobo fanspeed 30
 Setting fan speed to 30
 ```
 
-## State of consumables
+### State of consumables
 
 ```
 $ mirobo consumables
 main: 9:24:48, side: 9:24:48, filter: 9:24:48, sensor dirty: 1:27:12
 ```
 
-## Schedule information
+### Schedule information
 
 ```
 $ mirobo timer
@@ -188,7 +200,7 @@ Timer #6, id 1488667697356 (ts: 2017-03-04 23:48:17.355999)
   At 08:48 on the 5th of March
 ```
 
-## Cleaning history
+### Cleaning history
 
 ```
 $ mirobo cleaning_history
@@ -203,6 +215,6 @@ Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
 ```
 
 
-# Home Assistant support
+## Home Assistant support
 
 See [Xiaomi Mi Robot Vacuum](https://home-assistant.io/components/vacuum.xiaomi/).
