@@ -1,5 +1,9 @@
-from .device import Device
+import logging
 from typing import Dict, Any, Optional
+from collections import defaultdict
+from .device import Device
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PlugStatus:
@@ -53,4 +57,14 @@ class Plug(Device):
             "get_prop",
             properties
         )
-        return PlugStatus(dict(zip(properties, values)))
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return PlugStatus(
+            defaultdict(lambda: None, zip(properties, values)))

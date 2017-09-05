@@ -32,7 +32,8 @@ class Listener:
                     dev.token = m.checksum
                     _LOGGER.info(
                         "Found supported '%s' at %s:%s (%s) token: %s" %
-                        (v.__name__, addr, info.port, name, dev.token))
+                        (v.__name__, addr, info.port, name,
+                         codecs.encode(dev.token, 'hex')))
                     return dev
                 elif callable(v):
                     _LOGGER.info(v(info))
