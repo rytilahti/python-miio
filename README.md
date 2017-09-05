@@ -20,7 +20,7 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Mi Smart Fan
 * Yeelight light bulbs (only a very rudimentary support, use [python-yeelight](https://gitlab.com/stavros/python-yeelight/) for a more complete support)
 
-*Feel free to create pull requests to add support for new devices as well as to report missing functionalities in the currently supported devices.*
+*Feel free to create a pull request to add support for new devices as well as additional features for supported devices.*
 
 ## Adding support for other devices
 
@@ -80,7 +80,7 @@ Following features of the vacuum cleaner are currently supported:
 
 * Basic functionality, including starting, stopping, pausing, locating.
 * Controlling the fan speed.
-* Fetching schedule, status, state of consumables. *Reseting consumable state and setting schedules is not currently implemented, patches welcome!*
+* Fetching schedule, status, state of consumables. *Resetting consumable state and setting schedules is not currently implemented, patches welcome!*
 * Setting and querying the timezone.
 * Manual control of the robot.
 
@@ -97,7 +97,7 @@ export MIROBO_IP=192.168.1.2
 export MIROBO_TOKEN=476e6b70343055483230644c53707a12
 ```
 
-After that verify that the connection is working by running the command withour parameters,
+After that verify that the connection is working by running the command without parameters,
 you should be presented a status report from the vacuum.
 
 Use ```mirobo --help``` to see available commands and description about what they do.
@@ -127,7 +127,7 @@ mirobo raw_command set_dnd_timer '[22,0,6,0]'
 ```
 
 If you find a new command please let us know by creating a pull request or an issue, if you
-do not want to implement it yourself!
+do not want to implement it on your own!
 
 ## Usage examples
 
