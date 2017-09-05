@@ -5,6 +5,7 @@ from collections import defaultdict
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class CeilStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp"""
 
@@ -50,10 +51,10 @@ class CeilStatus:
     def __str__(self) -> str:
         s = "<CeilStatus power=%s, brightness=%s, " \
             "color_temperature=%s, scene=%s, dv=%s, " \
-            "smart_night_light=%s, automatic_color_temperature=%s>" % (
-            self.power, self.brightness,
-            self.color_temperature, self.scene, self.dv,
-            self.smart_night_light, self.automatic_color_temperature)
+            "smart_night_light=%s, automatic_color_temperature=%s>" % \
+            (self.power, self.brightness,
+             self.color_temperature, self.scene, self.dv,
+             self.smart_night_light, self.automatic_color_temperature)
         return s
 
 

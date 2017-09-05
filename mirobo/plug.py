@@ -1,5 +1,5 @@
 from .device import Device
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 class PlugStatus:
@@ -20,7 +20,7 @@ class PlugStatus:
         return self.data["temperature"]
 
     @property
-    def load_power(self) -> float:
+    def load_power(self) -> Optional[float]:
         if self.data["current"] is not None:
             # The constant of 110V is used intentionally. The current was
             # calculated with a wrong reference voltage already.

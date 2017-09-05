@@ -1,5 +1,5 @@
 from unittest import TestCase
-from .. import Message, Utils
+from .. import Utils
 
 
 class TestProtocol(TestCase):

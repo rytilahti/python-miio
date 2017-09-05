@@ -132,7 +132,7 @@ def set_brightness(dev: mirobo.Ceil, level):
 @pass_dev
 def set_color_temperature(dev: mirobo.Ceil, level):
     """Set CCT level."""
-    click.echo("Correlated color temperatur level: %s" %
+    click.echo("Color temperature level: %s" %
                dev.set_color_temperature(level))
 
 

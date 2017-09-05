@@ -1,6 +1,6 @@
 import logging
 import enum
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from collections import defaultdict
 from .device import Device
 
@@ -134,7 +134,7 @@ class AirPurifierStatus:
         return self.data["humidity"]
 
     @property
-    def temperature(self) -> float:
+    def temperature(self) -> Optional[float]:
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
         return None
@@ -148,7 +148,7 @@ class AirPurifierStatus:
         return self.data["led"] == "on"
 
     @property
-    def led_brightness(self) -> LedBrightness:
+    def led_brightness(self) -> Optional[LedBrightness]:
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
         return None
