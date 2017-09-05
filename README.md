@@ -57,7 +57,7 @@ This will also work for all other devices as long as the device has been bound w
 ### Automatic discovery (does not work on all devices and firmware versions)
 
 The automatic discovery works only before the device has been connected over the app to your local wifi.
-In order to fetch the token, reset the device, connect to its the network its announcing (e.g. rockrobo-XXXX for the vacuum)
+In order to fetch the token, reset the device, connect to the network it's announcing (e.g. rockrobo-XXXX for the vacuum)
 and run the following command:
 
 ```
