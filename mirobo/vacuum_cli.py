@@ -9,6 +9,7 @@ import ipaddress
 from pprint import pformat as pf
 from typing import Any
 
+
 if sys.version_info < (3, 4):
     print("To use this script you need python 3.4 or newer, got %s" %
           sys.version_info)
@@ -181,7 +182,7 @@ def home(vac: mirobo.Vacuum):
 
 @cli.group()
 @pass_dev
-#@click.argument('command', required=False)
+# @click.argument('command', required=False)
 def manual(vac: mirobo.Vacuum):
     """Control the robot manually."""
     command = ''
@@ -191,7 +192,8 @@ def manual(vac: mirobo.Vacuum):
     if command == 'stop':
         click.echo("Stopping manual control")
         return vac.manual_stop()
-    #if not vac.manual_mode and command :
+    # if not vac.manual_mode and command :
+
 
 @manual.command()
 @pass_dev
@@ -239,7 +241,7 @@ def forward(vac: mirobo.Vacuum, amount: float):
 @manual.command()
 @click.argument('amount', type=float)
 @pass_dev
-def backward(vac: mirobo.Vacuum, amount:float):
+def backward(vac: mirobo.Vacuum, amount: float):
     """Run backwards."""
     click.echo("Moving backwards")
     return vac.manual_control(0, -amount)
@@ -341,6 +343,7 @@ def info(vac: mirobo.Vacuum):
     click.echo(res)
     _LOGGER.debug("Full response: %s" % pf(res.raw))
 
+
 @cli.command()
 @pass_dev
 def cleaning_history(vac: mirobo.Vacuum):
@@ -368,11 +371,13 @@ def sound(vac: mirobo.Vacuum):
     """Query sound settings."""
     click.echo(vac.sound_info())
 
+
 @cli.command()
 @pass_dev
 def serial_number(vac: mirobo.Vacuum):
     """Query serial number."""
     click.echo("Serial#: %s" % vac.serial_number())
+
 
 @cli.command()
 @click.argument('tz', required=False)
@@ -384,6 +389,7 @@ def timezone(vac: mirobo.Vacuum, tz=None):
         click.echo(vac.set_timezone(tz))
     else:
         click.echo("Timezone: %s" % vac.timezone())
+
 
 @cli.command()
 @click.argument('cmd', required=True)

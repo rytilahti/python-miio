@@ -17,7 +17,8 @@ class VacuumException(DeviceException):
 class Vacuum(Device):
     """Main class representing the vacuum."""
 
-    def __init__(self, ip: str, token: str, start_id: int = 0, debug: int = 0) -> None:
+    def __init__(self, ip: str, token: str, start_id: int = 0,
+                 debug: int = 0) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
 
@@ -52,8 +53,10 @@ class Vacuum(Device):
         self.manual_seqnum = 0
         return self.send("app_rc_end")
 
-    def manual_control_once(self, rotation: int, velocity: float, duration: int=1500):
-        """Starts the remote control mode and executes the action once before deactivating the mode."""
+    def manual_control_once(
+            self, rotation: int, velocity: float, duration: int=1500):
+        """Starts the remote control mode and executes
+        the action once before deactivating the mode."""
         number_of_tries = 3
         self.manual_start()
         while number_of_tries > 0:
@@ -66,13 +69,15 @@ class Vacuum(Device):
             time.sleep(2)
             number_of_tries -= 1
 
-    def manual_control(self, rotation: int, velocity: float, duration: int=1500):
+    def manual_control(self, rotation: int, velocity: float,
+                       duration: int=1500):
         """Give a command over manual control interface."""
         if rotation <= -180 or rotation >= 180:
-            raise DeviceException("Given rotation is invalid, should be ]-3.1,3.1[, was %s" % rotation)
+            raise DeviceException("Given rotation is invalid, should "
+                                  "be ]-3.1,3.1[, was %s" % rotation)
         if velocity <= -0.3 or velocity >= 0.3:
-            raise DeviceException("Given velocity is invalid, should be ]-0.3, 0.3[, was: %s" % velocity)
-
+            raise DeviceException("Given velocity is invalid, should "
+                                  "be ]-0.3, 0.3[, was: %s" % velocity)
 
         self.manual_seqnum += 1
         params = {"omega": round(math.radians(rotation), 1),
@@ -138,7 +143,8 @@ class Vacuum(Device):
         # how to create timers/change values?
         # ['ts', 'on'] to enable
         raise NotImplementedError()
-        return self.send("set_timer", [["ts",["cron_line",["start_clean",""]]]])
+        return self.send(
+            "set_timer", [["ts", ["cron_line", ["start_clean", ""]]]])
         return self.send("upd_timer", ["ts", "on"])
 
     def dnd_status(self):

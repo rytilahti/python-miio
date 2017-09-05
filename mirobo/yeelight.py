@@ -1,11 +1,13 @@
 from .device import Device
-from typing import Tuple
+from typing import Tuple, Optional
 from enum import IntEnum
+
 
 class YeelightMode(IntEnum):
     RGB = 1
     ColorTemperature = 2
     HSV = 3
+
 
 class YeelightStatus:
     def __init__(self, data):
@@ -20,30 +22,27 @@ class YeelightStatus:
         return int(self.data["bright"])
 
     @property
-    def rgb(self) -> Tuple[int, int, int]:
-        rgb = self.data["rgb"]
-        blue = rgb & 0xff
-        green = (rgb >> 8) & 0xff
-        red = (rgb >> 16) & 0xff
-        return red, green, blue
+    def rgb(self) -> Optional[Tuple[int, int, int]]:
+        if self.color_mode == YeelightMode.RGB:
+            rgb = self.data["rgb"]
+            blue = rgb & 0xff
+            green = (rgb >> 8) & 0xff
+            red = (rgb >> 16) & 0xff
+            return red, green, blue
+        return None
 
     @property
     def color_mode(self) -> YeelightMode:
         return YeelightMode(int(self.data["color_mode"]))
 
     @property
-    def hsv(self):
+    def hsv(self) -> Optional[Tuple[int, int, int]]:
         if self.color_mode == YeelightMode.HSV:
             return self.data["hue"], self.data["sat"], self.data["bright"]
+        return None
 
     @property
-    def rgb(self):
-        if self.color_mode == YeelightMode.RGB:
-            val = self.data["rgb"]
-            raise NotImplementedError()
-
-    @property
-    def color_temp(self) -> int:
+    def color_temp(self) -> Optional[int]:
         if self.color_mode == YeelightMode.ColorTemperature:
             return int(self.data["ct"])
         return None
@@ -53,15 +52,17 @@ class YeelightStatus:
         return self.data["name"]
 
     def __repr__(self):
-        return "<Yeelight on=%s mode=%s bright=%s color_temp=%s rgb=%s hsv=%s name=%s>" % (
-            self.is_on,
-            self.color_mode,
-            self.bright,
-            self.color_temp,
-            self.rgb,
-            self.hsv,
-            self.name
-        )
+        s = "<Yeelight on=%s mode=%s bright=%s color_temp=%s " \
+            "rgb=%s hsv=%s name=%s>" % \
+            (self.is_on,
+             self.color_mode,
+             self.bright,
+             self.color_temp,
+             self.rgb,
+             self.hsv,
+             self.name)
+        return s
+
 
 class Yeelight(Device):
     """A rudimentary support for Yeelight bulbs.
