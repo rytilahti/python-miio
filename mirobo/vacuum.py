@@ -17,7 +17,7 @@ class VacuumException(DeviceException):
 class Vacuum(Device):
     """Main class representing the vacuum."""
 
-    def __init__(self, ip: str, token: str, start_id: int = 0,
+    def __init__(self, ip: str, token: str = None, start_id: int = 0,
                  debug: int = 0) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
