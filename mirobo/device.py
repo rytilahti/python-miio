@@ -2,7 +2,7 @@ import codecs
 import datetime
 import socket
 import logging
-from typing import Any, List  # noqa: F401
+from typing import Any, List, Optional  # noqa: F401
 
 from .protocol import Message
 
@@ -14,30 +14,36 @@ class DeviceException(Exception):
 
 
 class DeviceInfo:
+    """Presentation of miIO device information."""
     def __init__(self, data):
         self.data = data
 
     def __repr__(self):
-        return "%s v%s (%s) @ %s - token: %s" % (self.data["model"],
-                                                 self.data["fw_ver"],
-                                                 self.data["mac"],
-                                                 self.netif["localIp"],
-                                                 self.data["token"])
+        return "%s v%s (%s) @ %s - token: %s" % (
+            self.data["model"],
+            self.data["fw_ver"],
+            self.data["mac"],
+            self.network_interface["localIp"],
+            self.data["token"])
 
     @property
-    def netif(self):
+    def network_interface(self):
+        """Return information about network configuration."""
         return self.data["netif"]
 
     @property
-    def ap(self):
+    def accesspoint(self):
+        """Return information about connected wlan accesspoint."""
         return self.data["ap"]
 
     @property
     def raw(self):
+        """Return raw data returned by the device."""
         return self.data
 
 
 class Device:
+    """Base class for all device implementations."""
     def __init__(self, ip: str = None, token: str = None,
                  start_id: int=0, debug: int=0) -> None:
         self.ip = ip
@@ -54,8 +60,8 @@ class Device:
         self._devtype = None
         self._serial = None
 
-    def do_discover(self):
-        """Does a discover to fetch the devtype and serial."""
+    def do_discover(self) -> Optional[Message]:
+        """Does a discover to fetch the device type and serial."""
         m = Device.discover(self.ip)
         if m is not None:
             self._devtype = m.header.value.devtype
@@ -92,7 +98,7 @@ class Device:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(timeout)
-        for _i in range(3):
+        for _ in range(3):
             s.sendto(helobytes, (addr, 54321))
         while True:
             try:
@@ -157,7 +163,7 @@ class Device:
             m = Message.parse(data, ctx)
             self._device_ts = m.header.value.ts
             if self.debug > 1:
-                _LOGGER.debug("recv: %s", m)
+                _LOGGER.debug("recv from %s: %s", addr[0], m)
 
             self.__id = m.data.value["id"]
             _LOGGER.debug("%s:%s (ts: %s, id: %s) << %s",
@@ -182,12 +188,13 @@ class Device:
         """Send a raw command to the robot."""
         return self.send(cmd, params)
 
-    def info(self):
+    def info(self) -> DeviceInfo:
+        """Get miIO information from the device."""
         return DeviceInfo(self.send("miIO.info", []))
 
     @property
     def _id(self) -> int:
-        """Returns running id."""
+        """Increment and return the sequence id."""
         self.__id += 1
         if self.__id >= 9999:
             self.__id = 0
@@ -195,4 +202,5 @@ class Device:
 
     @property
     def raw_id(self) -> int:
+        """Return the sequence id."""
         return self.__id
