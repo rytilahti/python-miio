@@ -2,7 +2,7 @@ import codecs
 import datetime
 import socket
 import logging
-from typing import Any, List  # noqa: F401
+from typing import Any, List, Optional  # noqa: F401
 
 from .protocol import Message
 
@@ -25,12 +25,18 @@ class DeviceInfo:
                                                  self.data["token"])
 
     @property
-    def netif(self):
+    def netif(self) -> str:
         return self.data["netif"]
 
     @property
-    def ap(self):
+    def ap(self) -> str:
         return self.data["ap"]
+
+    @property
+    def model(self) -> Optional[str]:
+        if self.data["model"] is not None:
+            return self.data["model"]
+        return None
 
     @property
     def raw(self):
@@ -184,6 +190,9 @@ class Device:
 
     def info(self):
         return DeviceInfo(self.send("miIO.info", []))
+
+    def model(self):
+        return self.info().model
 
     @property
     def _id(self) -> int:
