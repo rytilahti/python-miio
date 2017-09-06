@@ -16,6 +16,26 @@ class DeviceException(Exception):
 class DeviceInfo:
     """Presentation of miIO device information."""
     def __init__(self, data):
+        """
+        Response of a Xiaomi Smart WiFi Plug
+
+        {'ap': {'bssid': 'FF:FF:FF:FF:FF:FF', 'rssi': -68, 'ssid': 'network'},
+         'cfg_time': 0,
+         'fw_ver': '1.2.4_16',
+         'hw_ver': 'MW300',
+         'life': 24,
+         'mac': '28:FF:FF:FF:FF:FF',
+         'mmfree': 30312,
+         'model': 'chuangmi.plug.m1',
+         'netif': {'gw': '192.168.xxx.x',
+                   'localIp': '192.168.xxx.x',
+                   'mask': '255.255.255.0'},
+         'ot': 'otu',
+         'ott_stat': [0, 0, 0, 0],
+         'otu_stat': [320, 267, 3, 0, 3, 742],
+         'token': '2b00042f7481c7b056c4b410d28f33cf',
+         'wifi_fw_ver': 'SD878x-14.76.36.p84-702.1.0-WM'}
+        """
         self.data = data
 
     def __repr__(self):
@@ -35,6 +55,12 @@ class DeviceInfo:
     def accesspoint(self):
         """Return information about connected wlan accesspoint."""
         return self.data["ap"]
+
+    @property
+    def model(self) -> Optional[str]:
+        if self.data["model"] is not None:
+            return self.data["model"]
+        return None
 
     @property
     def raw(self):
