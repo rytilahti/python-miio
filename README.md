@@ -1,5 +1,10 @@
 # Python-mirobo
 
+[![PyPI version](https://badge.fury.io/py/python-mirobo.svg)](https://badge.fury.io/py/python-mirobo)
+[![Build Status](https://travis-ci.org/rytilahti/python-mirobo.svg?branch=0.2.0)](https://travis-ci.org/rytilahti/python-mirobo)
+[![Code Health](https://landscape.io/github/rytilahti/python-mirobo/master/landscape.svg?style=flat)](https://landscape.io/github/rytilahti/python-mirobo/master)
+[![Coverage Status](https://coveralls.io/repos/github/rytilahti/python-mirobo/badge.svg?branch=master)](https://coveralls.io/github/rytilahti/python-mirobo?branch=master)
+
 This project was started to allow controlling locally available Xiaomi Vacuum cleaner robot with Python (hence the name),
 however, thanks to contributors it has been extended to allow controlling other Xiaomi devices using the same protocol.
 
