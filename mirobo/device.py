@@ -15,6 +15,26 @@ class DeviceException(Exception):
 
 class DeviceInfo:
     def __init__(self, data):
+        """
+        Response of a Xiaomi Smart WiFi Plug
+
+        {'ap': {'bssid': 'FF:FF:FF:FF:FF:FF', 'rssi': -68, 'ssid': 'network'},
+         'cfg_time': 0,
+         'fw_ver': '1.2.4_16',
+         'hw_ver': 'MW300',
+         'life': 24,
+         'mac': '28:FF:FF:FF:FF:FF',
+         'mmfree': 30312,
+         'model': 'chuangmi.plug.m1',
+         'netif': {'gw': '192.168.xxx.x',
+                   'localIp': '192.168.xxx.x',
+                   'mask': '255.255.255.0'},
+         'ot': 'otu',
+         'ott_stat': [0, 0, 0, 0],
+         'otu_stat': [320, 267, 3, 0, 3, 742],
+         'token': '2b00042f7481c7b056c4b410d28f33cf',
+         'wifi_fw_ver': 'SD878x-14.76.36.p84-702.1.0-WM'}
+        """
         self.data = data
 
     def __repr__(self):
@@ -25,11 +45,11 @@ class DeviceInfo:
                                                  self.data["token"])
 
     @property
-    def netif(self) -> str:
+    def netif(self):
         return self.data["netif"]
 
     @property
-    def ap(self) -> str:
+    def ap(self):
         return self.data["ap"]
 
     @property
@@ -190,9 +210,6 @@ class Device:
 
     def info(self):
         return DeviceInfo(self.send("miIO.info", []))
-
-    def model(self):
-        return self.info().model
 
     @property
     def _id(self) -> int:
