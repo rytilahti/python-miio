@@ -18,7 +18,7 @@ class YeelightStatus:
         return self.data["power"] == "on"
 
     @property
-    def bright(self) -> int:
+    def brightness(self) -> int:
         return int(self.data["bright"])
 
     @property
@@ -52,11 +52,11 @@ class YeelightStatus:
         return self.data["name"]
 
     def __repr__(self):
-        s = "<Yeelight on=%s mode=%s bright=%s color_temp=%s " \
+        s = "<Yeelight on=%s mode=%s brightness=%s color_temp=%s " \
             "rgb=%s hsv=%s name=%s>" % \
             (self.is_on,
              self.color_mode,
-             self.bright,
+             self.brightness,
              self.color_temp,
              self.rgb,
              self.hsv,
@@ -86,7 +86,7 @@ class Yeelight(Device):
         """Power off."""
         return self.send("set_power", ["off"])
 
-    def set_bright(self, bright):
+    def set_brightness(self, bright):
         return self.send("set_bright", [bright])
 
     def set_color_temp(self, ct):
