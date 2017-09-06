@@ -328,17 +328,17 @@ def find(vac: mirobo.Vacuum):
 @cli.command()
 @pass_dev
 def map(vac: mirobo.Vacuum):
-    """Returns the map token."""
+    """Return the map token."""
     click.echo(vac.map())
 
 
 @cli.command()
 @pass_dev
 def info(vac: mirobo.Vacuum):
-    """Returns info"""
+    """Return device information."""
     res = vac.info()
 
-    click.echo(res)
+    click.echo("%s" % res)
     _LOGGER.debug("Full response: %s", pf(res.raw))
 
 
