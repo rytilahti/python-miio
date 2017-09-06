@@ -60,8 +60,9 @@ class Device:
         self._devtype = None
         self._serial = None
 
-    def do_discover(self) -> Optional[Message]:
-        """Does a discover to fetch the device type and serial."""
+    def do_discover(self) -> Message:
+        """Does a discover to fetch the device type and serial.
+        Raises a DeviceException if the device could not be discovered."""
         m = Device.discover(self.ip)
         if m is not None:
             self._devtype = m.header.value.devtype
