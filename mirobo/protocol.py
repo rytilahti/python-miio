@@ -135,7 +135,7 @@ class EncryptionAdapter(Adapter):
             # pp(context)
             decrypted = Utils.decrypt(obj, context['_']['token'])
             decrypted = decrypted.rstrip(b"\x00")
-        except Exception as ex:
+        except Exception:
             _LOGGER.debug("Unable to decrypt, returning raw bytes.")
             return obj
 

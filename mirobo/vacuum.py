@@ -93,7 +93,7 @@ class Vacuum(Device):
 
     def enable_log_upload(self):
         raise NotImplementedError("unknown parameters")
-        return self.send("enable_log_upload")
+        # return self.send("enable_log_upload")
 
     def log_upload_status(self):
         # {"result": [{"log_upload_status": 7}], "id": 1}
@@ -105,8 +105,8 @@ class Vacuum(Device):
 
     def consumable_reset(self):
         """Reset consumable information."""
-        raise NotImplementedError()
-        self.send("reset_consumable", ["unknown"])
+        raise NotImplementedError("unknown parameters")
+        # self.send("reset_consumable", ["unknown"])
 
     def map(self):
         """Return map token."""
@@ -143,9 +143,9 @@ class Vacuum(Device):
         # how to create timers/change values?
         # ['ts', 'on'] to enable
         raise NotImplementedError()
-        return self.send(
-            "set_timer", [["ts", ["cron_line", ["start_clean", ""]]]])
-        return self.send("upd_timer", ["ts", "on"])
+        # return self.send(
+        #     "set_timer", [["ts", ["cron_line", ["start_clean", ""]]]])
+        # return self.send("upd_timer", ["ts", "on"])
 
     def dnd_status(self):
         """Returns do-not-disturb status."""

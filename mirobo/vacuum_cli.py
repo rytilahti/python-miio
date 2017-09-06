@@ -7,7 +7,7 @@ import sys
 import json
 import ipaddress
 from pprint import pformat as pf
-from typing import Any
+from typing import Any  # noqa: F401
 
 
 if sys.version_info < (3, 4):
@@ -71,10 +71,9 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
             x = json.load(f)
             start_id = x.get("seq", 0)
             manual_seq = x.get("manual_seq", 0)
-            _LOGGER.debug("Read stored sequence ids: %s" % x)
+            _LOGGER.debug("Read stored sequence ids: %s", x)
     except (FileNotFoundError, TypeError) as ex:
-        _LOGGER.error("Unable to read the stored msgid: %s" % ex)
-        pass
+        _LOGGER.error("Unable to read the stored msgid: %s", ex)
 
     vac = mirobo.Vacuum(ip, token, start_id, debug)
 
@@ -95,7 +94,7 @@ def cleanup(vac: mirobo.Vacuum, **kwargs):
         return
     id_file = kwargs['id_file']
     seqs = {'seq': vac.raw_id, 'manual_seq': vac.manual_seqnum}
-    _LOGGER.debug("Writing %s to %s" % (seqs, id_file))
+    _LOGGER.debug("Writing %s to %s", seqs, id_file)
     with open(id_file, 'w') as f:
         json.dump(seqs, f)
 
@@ -195,7 +194,7 @@ def manual(vac: mirobo.Vacuum):
     # if not vac.manual_mode and command :
 
 
-@manual.command()
+@manual.command()  # noqa: F811  # redefinition of start
 @pass_dev
 def start(vac: mirobo.Vacuum):
     """Activate the manual mode."""
@@ -203,7 +202,7 @@ def start(vac: mirobo.Vacuum):
     return vac.manual_start()
 
 
-@manual.command()
+@manual.command()  # noqa: F811  # redefinition of stop
 @pass_dev
 def stop(vac: mirobo.Vacuum):
     """Deactivate the manual mode."""
@@ -303,7 +302,6 @@ def timer(vac: mirobo.Vacuum, timer):
     if timer:
         raise NotImplementedError()
         # vac.set_timer(x)
-        pass
     else:
         timers = vac.timer()
         for idx, timer in enumerate(timers):
@@ -341,7 +339,7 @@ def info(vac: mirobo.Vacuum):
     res = vac.info()
 
     click.echo(res)
-    _LOGGER.debug("Full response: %s" % pf(res.raw))
+    _LOGGER.debug("Full response: %s", pf(res.raw))
 
 
 @cli.command()

@@ -5,7 +5,7 @@ import inspect
 import codecs
 from mirobo import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
                     PhilipsEyecare, ChuangmiIr)
-from typing import Union, Callable, Dict
+from typing import Union, Callable, Dict  # noqa: F401
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,18 +31,20 @@ class Listener:
                     m = dev.do_discover()
                     dev.token = m.checksum
                     _LOGGER.info(
-                        "Found supported '%s' at %s:%s (%s) token: %s" %
-                        (v.__name__, addr, info.port, name,
-                         codecs.encode(dev.token, 'hex')))
+                        "Found supported '%s' at %s:%s (%s) token: %s",
+                        v.__name__,
+                        addr, info.port,
+                        name,
+                        codecs.encode(dev.token, 'hex'))
                     return dev
                 elif callable(v):
                     _LOGGER.info(v(info))
                     dev = Device(ip=addr)
-                    _LOGGER.info("token: %s" % codecs.encode(
+                    _LOGGER.info("token: %s", codecs.encode(
                         dev.do_discover().checksum, 'hex'))
                     return None
         _LOGGER.warning("Found unsupported device %s at %s, "
-                        "please report to developers" % (name, addr))
+                        "please report to developers", name, addr)
         return None
 
     def add_service(self, zeroconf, type, name):

@@ -2,7 +2,7 @@ import codecs
 import datetime
 import socket
 import logging
-from typing import Any, List
+from typing import Any, List  # noqa: F401
 
 from .protocol import Message
 
@@ -63,11 +63,11 @@ class Device:
             self._device_ts = m.header.value.ts
             if self.debug > 1:
                 _LOGGER.debug(m)
-            _LOGGER.debug("Discovered %s %s with ts: %s, token: %s" % (
-                self._devtype,
-                self._serial,
-                self._device_ts,
-                codecs.encode(m.checksum, 'hex')))
+            _LOGGER.debug("Discovered %s %s with ts: %s, token: %s",
+                          self._devtype,
+                          self._serial,
+                          self._device_ts,
+                          codecs.encode(m.checksum, 'hex'))
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
@@ -98,15 +98,15 @@ class Device:
             try:
                 data, addr = s.recvfrom(1024)
                 m = Message.parse(data)  # type: Message
-                _LOGGER.debug("Got a response: %s" % m)
+                _LOGGER.debug("Got a response: %s", m)
                 if not is_broadcast:
                     return m
 
                 if addr[0] not in seen_addrs:
-                    _LOGGER.info("  IP %s: %s - token: %s" % (
-                        addr[0],
-                        m.header.value.devtype,
-                        codecs.encode(m.checksum, 'hex')))
+                    _LOGGER.info("  IP %s: %s - token: %s",
+                                 addr[0],
+                                 m.header.value.devtype,
+                                 codecs.encode(m.checksum, 'hex'))
                     seen_addrs.append(addr[0])
             except socket.timeout:
                 if is_broadcast:
@@ -138,7 +138,7 @@ class Device:
                'checksum': 0}
         ctx = {'token': self.token}
         m = Message.build(msg, ctx)
-        _LOGGER.debug("%s:%s >>: %s" % (self.ip, self.port, cmd))
+        _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, cmd)
         if self.debug > 1:
             _LOGGER.debug("send (timeout %s): %s",
                           self._timeout, Message.parse(m, ctx))
@@ -149,7 +149,7 @@ class Device:
         try:
             s.sendto(m, (self.ip, self.port))
         except OSError as ex:
-            _LOGGER.error("failed to send msg: %s" % ex)
+            _LOGGER.error("failed to send msg: %s", ex)
             raise DeviceException from ex
 
         try:
@@ -157,13 +157,14 @@ class Device:
             m = Message.parse(data, ctx)
             self._device_ts = m.header.value.ts
             if self.debug > 1:
-                _LOGGER.debug("recv: %s" % m)
+                _LOGGER.debug("recv: %s", m)
 
             self.__id = m.data.value["id"]
-            _LOGGER.debug("%s:%s (ts: %s, id: %s) << %s" % (self.ip, self.port,
-                                                            m.header.value.ts,
-                                                            m.data.value["id"],
-                                                            m.data.value))
+            _LOGGER.debug("%s:%s (ts: %s, id: %s) << %s",
+                          self.ip, self.port,
+                          m.header.value.ts,
+                          m.data.value["id"],
+                          m.data.value)
             try:
                 return m.data.value["result"]
             except KeyError:
@@ -172,9 +173,9 @@ class Device:
             _LOGGER.error("Got error when receiving: %s", ex)
             if retry_count > 0:
                 _LOGGER.warning("Retrying with incremented id, "
-                                "retries left: %s" % retry_count)
+                                "retries left: %s", retry_count)
                 self.__id += 100
-                return self.send(command, parameters, retry_count-1)
+                return self.send(command, parameters, retry_count - 1)
             raise DeviceException from ex
 
     def raw_command(self, cmd, params):
