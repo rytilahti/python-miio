@@ -97,14 +97,15 @@ def status(dev: mirobo.PhilipsEyecare):
         return  # bail out
 
     click.echo(click.style("Power: %s" % res.power, bold=True))
-    click.echo("Brightness: %s" % res.bright)
-    click.echo("Eye Fatigue Reminder: %s" % res.notifystatus)
-    click.echo("Ambient Light: %s" % res.ambstatus)
-    click.echo("Ambient Light Brightness: %s" % res.ambvalue)
+    click.echo("Brightness: %s" % res.brightness)
+    click.echo("Eye Fatigue Reminder: %s" % res.reminder)
+    click.echo("Ambient Light: %s" % res.ambient)
+    click.echo("Ambient Light Brightness: %s" % res.ambient_brightness)
     click.echo("Eyecare Mode: %s" % res.eyecare)
-    click.echo("Eyecare Scene: %s" % res.scene_num)
-    click.echo("Night Light: %s " % res.bls)
-    click.echo("Delay Off: %s minutes" % res.dvalue)
+    click.echo("Eyecare Scene: %s" % res.scene)
+    click.echo("Night Light: %s " % res.smart_night_light)
+    click.echo("Countdown of the delayed turn off: %s minutes"
+               % res.delay_off_countdown)
 
 
 @cli.command()
@@ -126,7 +127,7 @@ def off(dev: mirobo.PhilipsEyecare):
 @pass_dev
 def set_bright(dev: mirobo.PhilipsEyecare, level):
     """Set brightness level."""
-    click.echo("Brightness: %s" % dev.set_bright(level))
+    click.echo("Brightness: %s" % dev.set_brightness(level))
 
 
 @cli.command()
@@ -134,7 +135,7 @@ def set_bright(dev: mirobo.PhilipsEyecare, level):
 @pass_dev
 def set_scene(dev: mirobo.PhilipsEyecare, scene):
     """Set eyecare scene number."""
-    click.echo("Eyecare Scene: %s" % dev.set_user_scene(scene))
+    click.echo("Eyecare Scene: %s" % dev.set_scene(scene))
 
 
 @cli.command()
@@ -149,42 +150,42 @@ def delay_off(dev: mirobo.PhilipsEyecare, minutes):
 @pass_dev
 def bl_on(dev: mirobo.PhilipsEyecare):
     """Night Light on."""
-    click.echo("Night Light On: %s" % dev.bl_on())
+    click.echo("Night Light On: %s" % dev.smart_night_light_on())
 
 
 @cli.command()
 @pass_dev
 def bl_off(dev: mirobo.PhilipsEyecare):
     """Night Light off."""
-    click.echo("Night Light off: %s" % dev.bl_off())
+    click.echo("Night Light off: %s" % dev.smart_night_light_off())
 
 
 @cli.command()
 @pass_dev
 def notify_on(dev: mirobo.PhilipsEyecare):
     """Eye Fatigue Reminder On."""
-    click.echo("Eye Fatigue Reminder On: %s" % dev.notify_user_on())
+    click.echo("Eye Fatigue Reminder On: %s" % dev.reminder_on())
 
 
 @cli.command()
 @pass_dev
 def notify_off(dev: mirobo.PhilipsEyecare):
     """Eye Fatigue Reminder off."""
-    click.echo("Eye Fatigue Reminder Off: %s" % dev.notify_user_off())
+    click.echo("Eye Fatigue Reminder Off: %s" % dev.reminder_off())
 
 
 @cli.command()
 @pass_dev
 def ambient_on(dev: mirobo.PhilipsEyecare):
     """Ambient Light on."""
-    click.echo("Ambient Light On: %s" % dev.amb_on())
+    click.echo("Ambient Light On: %s" % dev.ambient_on())
 
 
 @cli.command()
 @pass_dev
 def ambient_off(dev: mirobo.PhilipsEyecare):
     """Ambient Light off."""
-    click.echo("Ambient Light Off: %s" % dev.amb_off())
+    click.echo("Ambient Light Off: %s" % dev.ambient_off())
 
 
 @cli.command()
@@ -192,7 +193,8 @@ def ambient_off(dev: mirobo.PhilipsEyecare):
 @pass_dev
 def set_amb_bright(dev: mirobo.PhilipsEyecare, level):
     """Set Ambient Light brightness level."""
-    click.echo("Ambient Light Brightness: %s" % dev.set_amb_bright(level))
+    click.echo("Ambient Light Brightness: %s" %
+               dev.set_ambient_brightness(level))
 
 
 if __name__ == "__main__":

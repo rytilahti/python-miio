@@ -158,7 +158,7 @@ class AirPurifierStatus:
         return self.data["child_lock"] == "on"
 
     @property
-    def bright(self) -> int:
+    def brightness(self) -> int:
         return self.data["bright"]
 
     @property
@@ -185,12 +185,12 @@ class AirPurifierStatus:
     def __str__(self) -> str:
         s = "<AirPurifierStatus power=%s, aqi=%s temperature=%s, " \
             "humidity=%s%%, mode=%s, led=%s, led_brightness=%s, buzzer=%s, " \
-            "child_lock=%s, bright=%s, favorite_level=%s, " \
+            "child_lock=%s, brightness=%s, favorite_level=%s, " \
             "filter_life_remaining=%s, filter_hours_used=%s, " \
             "use_time=%s, motor_speed=%s>" % \
             (self.power, self.aqi, self.temperature, self.humidity, self.mode,
              self.led, self.led_brightness, self.buzzer, self.child_lock,
-             self.bright, self.favorite_level, self.filter_life_remaining,
+             self.brightness, self.favorite_level, self.filter_life_remaining,
              self.filter_hours_used, self.use_time,
              self.motor_speed)
         return s
