@@ -24,7 +24,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v3": AirPurifier,
     "zhimi-airpurifier-v6": AirPurifier,
     "chuangmi-ir-v2": ChuangmiIr,
-    # "zhimi-humidifier-v1": Humidifier,
+    "zhimi-humidifier-v1": AirHumidifier,
     # "yunmi-waterpuri-v2": WaterPurifier,
     # It looks like philips devices cannot be discovered via mdns
     "philips-light-bulb": Ceil,
