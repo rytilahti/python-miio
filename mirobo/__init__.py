@@ -6,6 +6,7 @@ from mirobo.vacuum import Vacuum, VacuumException
 from mirobo.plug import Plug
 from mirobo.plug_v1 import PlugV1
 from mirobo.airpurifier import AirPurifier
+from mirobo.airhumidifier import AirHumidifier
 from mirobo.strip import Strip
 from mirobo.ceil import Ceil
 from mirobo.philips_eyecare import PhilipsEyecare
