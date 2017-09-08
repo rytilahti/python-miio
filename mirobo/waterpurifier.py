@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from collections import defaultdict
 from .device import Device
 
