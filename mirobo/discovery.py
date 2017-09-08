@@ -4,7 +4,7 @@ import ipaddress
 import inspect
 import codecs
 from . import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
-               PhilipsEyecare, ChuangmiIr, AirHumidifier)
+               PhilipsEyecare, ChuangmiIr, AirHumidifier, WaterPurifier)
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 
