@@ -63,6 +63,18 @@ class DeviceInfo:
         return None
 
     @property
+    def firmware_version(self) -> Optional[str]:
+        if self.data["fw_ver"] is not None:
+            return self.data["fw_ver"]
+        return None
+
+    @property
+    def hardware_version(self) -> Optional[str]:
+        if self.data["hw_ver"] is not None:
+            return self.data["hw_ver"]
+        return None
+
+    @property
     def raw(self):
         """Return raw data returned by the device."""
         return self.data
