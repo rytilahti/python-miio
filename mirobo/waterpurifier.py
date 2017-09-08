@@ -1,5 +1,4 @@
 import logging
-import enum
 from typing import Any, Dict, Optional
 from collections import defaultdict
 from .device import Device
@@ -28,7 +27,7 @@ class WaterPurifier(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return AirPurifierStatus(
+        return WaterPurifierStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
     def on(self):
