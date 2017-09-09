@@ -14,7 +14,7 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 ## Supported devices
 
 * Xiaomi Mi Robot Vacuum
-* Xiaomi Mi Air Purifier 2
+* Xiaomi Mi Air Purifier Pro & Air Purifier 2
 * Xiaomi Mi Smart WiFi Socket
 * Xiaomi Mi Smart Socket Plug (1 Socket, 1 USB Port)
 * Xiaomi Smart Power Strip (WiFi, 6 Ports)
@@ -23,6 +23,8 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Philips LED Ball Lamp
 * Xiaomi Universal IR Remote Controller (Chuangmi IR)
 * Xiaomi Mi Smart Fan
+* Xiaomi Mi Air Humidifer
+* Xiaomi Mi Water Purifier (Basic support: Turn on & off)
 * Yeelight light bulbs (only a very rudimentary support, use [python-yeelight](https://gitlab.com/stavros/python-yeelight/) for a more complete support)
 
 *Feel free to create a pull request to add support for new devices as well as additional features for supported devices.*

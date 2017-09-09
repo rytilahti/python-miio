@@ -4,7 +4,7 @@ import ipaddress
 import inspect
 import codecs
 from . import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
-               PhilipsEyecare, ChuangmiIr, AirHumidifier)
+               PhilipsEyecare, ChuangmiIr, AirHumidifier, WaterPurifier)
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 
@@ -26,7 +26,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v6": AirPurifier,
     "chuangmi-ir-v2": ChuangmiIr,
     "zhimi-humidifier-v1": AirHumidifier,
-    # "yunmi-waterpuri-v2": WaterPurifier,
+    "yunmi-waterpuri-v2": WaterPurifier,
     # It looks like philips devices cannot be discovered via mdns
     "philips-light-bulb": Ceil,
     "philips-light-ceil": Ceil,
