@@ -72,7 +72,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
             start_id = x.get("seq", 0)
             manual_seq = x.get("manual_seq", 0)
             _LOGGER.debug("Read stored sequence ids: %s", x)
-    except (FileNotFoundError, TypeError) as ex:
+    except (FileNotFoundError, TypeError, ValueError) as ex:
         _LOGGER.error("Unable to read the stored msgid: %s", ex)
 
     vac = mirobo.Vacuum(ip, token, start_id, debug)
