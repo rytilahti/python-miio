@@ -2,13 +2,14 @@ import click
 import tarfile
 import tempfile
 import sqlite3
-import binascii
 from Crypto.Cipher import AES
 from pprint import pformat as pf
+
 
 def dump_raw(dev):
     raw = {k: dev[k] for k in dev.keys()}
     click.echo(pf(raw))
+
 
 def decrypt_ztoken(ztoken):
     if len(ztoken) <= 32:
@@ -46,11 +47,13 @@ def read_android(conn):
         token = dev['token']
         click.echo("%s (%s) at %s. token: %s (mac: %s, ssid: %s)" % (name, model, ip, token, mac, ssid))
 
+
 def write(db, fp):
     fp.open()
     db.seek(0)  # go to the beginning
     click.echo("Saving db to %s" % fp)
     fp.write(db.read())
+
 
 def read_tokens(db):
     conn = sqlite3.connect(db)
