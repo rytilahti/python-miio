@@ -142,14 +142,16 @@ class Vacuum(Device):
     def add_timer(self, cron, command, parameters):
         import time
         ts = int(round(time.time() * 1000))
-        return self.send("set_timer", [[str(ts), [cron, [command, parameters]]]])
+        return self.send("set_timer", [
+            [str(ts), [cron, [command, parameters]]]
+        ])
 
     def delete_timer(self, timer_id: int):
         return self.send("del_timer", [str(timer_id)])
 
     def update_timer(self, timer_id: int, mode):
         if mode != "on" and mode != "off":
-            raise DeviceException("update_timer needs to be either 'on' or 'off")
+            raise DeviceException("'on' or 'off are only allowed")
         return self.send("upd_timer", [str(timer_id), mode])
 
     def dnd_status(self):
