@@ -207,6 +207,22 @@ Timer #6, id 1488667697356 (ts: 2017-03-04 23:48:17.355999)
   At 08:48 on the 5th of March
 ```
 
+Adding a new timer
+```
+$ mirobo timer add --cron '* * * * *'
+```
+
+Activating/deactivating an existing timer,
+use `mirobo timer` to get the required id.
+```
+$ mirobo timer update <id> [--off|--on]
+```
+
+Deleting a timer
+```
+$ mirobo timer delete <id>
+```
+
 ### Cleaning history
 
 ```
