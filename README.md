@@ -61,6 +61,44 @@ or by using the automatic discovery.
 
 This will also work for all other devices as long as the device has been bound with the Mi Home mobile application, and is therefore preferable way to attain the token.
 
+### miio-extract-tokens
+
+The package provides a command line tool to extract tokens from Android backups and SQlite databases. Please follow the above-mentioned procedure to retrieve the tar file (Android) or a SQlite database (Android & Apple). Encrypted tokens as recently introduced on iOS devices will be automatically decrypted.
+
+*Please feel free to submit pull requests to simplify this procedure even more!*
+
+```
+$ miio-extract-tokens backup.tar
+Opened backup/backup.tar
+Extracting to /tmp/tmpvbregact
+Reading tokens from Android DB
+Gateway
+        Model: lumi.gateway.v3
+        IP address: 192.168.XXX.XXX
+        Token: 91c52a27eff00b954XXX
+        MAC: 28:6C:07:XX:XX:XX
+room1
+        Model: yeelink.light.color1
+        IP address: 192.168.XXX.XXX
+        Token: 4679442a069f09883XXX
+        MAC: F0:B4:29:XX:XX:XX
+room2
+        Model: yeelink.light.color1
+        IP address: 192.168.XXX.XXX
+        Token: 7433ab14222af5792XXX
+        MAC: 28:6C:07:XX:XX:XX
+Flower Care
+        Model: hhcc.plantmonitor.v1
+        IP address: 134.XXX.XXX.XXX
+        Token: 124f90d87b4b90673XXX
+        MAC: C4:7C:8D:XX:XX:XX
+Mi Robot Vacuum
+        Model: rockrobo.vacuum.v1
+        IP address: 192.168.XXX.XXX
+        Token: 476e6b70343055483XXX
+        MAC: 28:6C:07:XX:XX:XX
+```
+
 ### Automatic discovery (does not work on all devices and firmware versions)
 
 The automatic discovery works only before the device has been connected over the app to your local wifi.
