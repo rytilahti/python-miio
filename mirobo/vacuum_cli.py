@@ -344,7 +344,7 @@ def update(vac: mirobo.Vacuum, timer_id, enable, disable):
     elif disable and not enable:
         vac.update_timer(timer_id, TimerState.Off)
     else:
-        click.echo("Only 'on' and 'off' are valid for timer")
+        click.echo("You need to specify either --enable or --disable")
 
 
 @cli.command()

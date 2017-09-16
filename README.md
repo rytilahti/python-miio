@@ -215,7 +215,7 @@ $ mirobo timer add --cron '* * * * *'
 Activating/deactivating an existing timer,
 use `mirobo timer` to get the required id.
 ```
-$ mirobo timer update <id> [--off|--on]
+$ mirobo timer update <id> [--enable|--disable]
 ```
 
 Deleting a timer
