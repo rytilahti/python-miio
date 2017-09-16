@@ -294,27 +294,57 @@ def fanspeed(vac: mirobo.Vacuum, speed):
         click.echo("Current fan speed: %s" % vac.fan_speed())
 
 
-@cli.command()
-@click.argument('timer', required=False, default=None)
+@cli.group(invoke_without_command=True)
 @pass_dev
-def timer(vac: mirobo.Vacuum, timer):
-    """Schedule vacuuming, times in GMT."""
-    if timer:
-        raise NotImplementedError()
-        # vac.set_timer(x)
+@click.pass_context
+def timer(ctx, vac: mirobo.Vacuum):
+    """List and modify existing timers."""
+    if ctx.invoked_subcommand is not None:
+        return
+    timers = vac.timer()
+    click.echo("Timezone: %s\n" % vac.timezone())
+    for idx, timer in enumerate(timers):
+        color = "green" if timer.enabled else "yellow"
+        click.echo(click.style("Timer #%s, id %s (ts: %s)" % (
+            idx, timer.id, timer.ts), bold=True, fg=color))
+        click.echo("  %s" % timer.cron)
+        min, hr, x, y, days = timer.cron.split(' ')
+        cron = "%s %s %s %s %s" % (min, hr, x, y, days)
+        click.echo("  %s" % pretty_cron.prettify_cron(cron))
+
+
+@timer.command()
+@click.option('--cron')
+@click.option('--command', default='', required=False)
+@click.option('--params', default='', required=False)
+@pass_dev
+def add(vac: mirobo.Vacuum, cron, command, params):
+    """Add a timer."""
+    click.echo(vac.add_timer(cron, command, params))
+
+
+@timer.command()
+@click.argument('timer_id', type=int, required=True)
+@pass_dev
+def delete(vac: mirobo.Vacuum, timer_id):
+    """Delete a timer."""
+    click.echo(vac.delete_timer(timer_id))
+
+
+@timer.command()
+@click.argument('timer_id', type=int, required=True)
+@click.option('--enable', is_flag=True)
+@click.option('--disable', is_flag=True)
+@pass_dev
+def update(vac: mirobo.Vacuum, timer_id, enable, disable):
+    """Enable/disable a timer."""
+    from mirobo.vacuum import TimerState
+    if enable and not disable:
+        vac.update_timer(timer_id, TimerState.On)
+    elif disable and not enable:
+        vac.update_timer(timer_id, TimerState.Off)
     else:
-        timers = vac.timer()
-        for idx, timer in enumerate(timers):
-            color = "green" if timer.enabled else "yellow"
-            #  Note ts == ID for changes
-            click.echo(click.style("Timer #%s, id %s (ts: %s)" % (
-                idx, timer.id, timer.ts), bold=True, fg=color))
-            print("  %s" % timer.cron)
-            min, hr, x, y, days = timer.cron.split(' ')
-            # hr is in gmt+8 (chinese time), TODO convert to local
-            hr = (int(hr) - 8) % 24
-            cron = "%s %s %s %s %s" % (min, hr, x, y, days)
-            click.echo("  %s" % pretty_cron.prettify_cron(cron))
+        click.echo("You need to specify either --enable or --disable")
 
 
 @cli.command()

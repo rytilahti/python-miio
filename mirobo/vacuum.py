@@ -2,6 +2,7 @@ import logging
 import math
 import time
 from typing import List
+import enum
 
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus,
                                CleaningSummary, CleaningDetails, Timer)
@@ -13,6 +14,10 @@ _LOGGER = logging.getLogger(__name__)
 class VacuumException(DeviceException):
     pass
 
+
+class TimerState(enum.Enum):
+    On = "on"
+    Off = "off"
 
 class Vacuum(Device):
     """Main class representing the vacuum."""
@@ -139,13 +144,22 @@ class Vacuum(Device):
 
         return timers
 
-    def set_timer(self, details):
-        # how to create timers/change values?
-        # ['ts', 'on'] to enable
-        raise NotImplementedError()
-        # return self.send(
-        #     "set_timer", [["ts", ["cron_line", ["start_clean", ""]]]])
-        # return self.send("upd_timer", ["ts", "on"])
+    def add_timer(self, cron: str, command: str, parameters: str):
+        """Add a timer."""
+        import time
+        ts = int(round(time.time() * 1000))
+        return self.send("set_timer", [
+            [str(ts), [cron, [command, parameters]]]
+        ])
+
+    def delete_timer(self, timer_id: int):
+        """Delete a timer."""
+        return self.send("del_timer", [str(timer_id)])
+
+    def update_timer(self, timer_id: int, mode: TimerState):
+        if mode != TimerState.On and mode != TimerState.Off:
+            raise DeviceException("Only 'On' or 'Off' are  allowed")
+        return self.send("upd_timer", [str(timer_id), mode.value])
 
     def dnd_status(self):
         """Returns do-not-disturb status."""
