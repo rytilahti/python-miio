@@ -63,10 +63,7 @@ This will also work for all other devices as long as the device has been bound w
 
 ### miio-extract-tokens
 
-The package installs also a tool to simplify the extraction of tokens.
-In order to use this you have to follow the above-mentioned procedure to get a tar file (Android) or a SQlite database (Android & Apple),
-from which the tokens can be automatically extracted using the tool.
-Encrypted tokens (as used recently on Apple devices) are also automatically decrypted when needed.
+The package provides a command line tool to extract tokens from Android backups and SQlite databases. Please follow the above-mentioned procedure to retrieve the tar file (Android) or a SQlite database (Android & Apple). Encrypted tokens as recently introduced on iOS devices will be automatically decrypted.
 
 *Please feel free to submit pull requests to simplify this procedure even more!*
 
