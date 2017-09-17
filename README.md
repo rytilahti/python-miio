@@ -125,7 +125,8 @@ Following features of the vacuum cleaner are currently supported:
 
 * Basic functionality, including starting, stopping, pausing, locating.
 * Controlling the fan speed.
-* Fetching schedule, status, state of consumables. *Resetting consumable state and setting schedules is not currently implemented, patches welcome!*
+* Fetching status and state of consumables. *Resetting consumable state is not currently implemented, patches welcome!*
+* Fetching and setting the schedules.
 * Setting and querying the timezone.
 * Manual control of the robot.
 
