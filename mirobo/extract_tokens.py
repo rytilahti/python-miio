@@ -1,10 +1,14 @@
+import logging
 import click
-import tarfile
 import tempfile
 import sqlite3
 from Crypto.Cipher import AES
 from pprint import pformat as pf
 import attr
+
+logging.basicConfig(level=logging.INFO)
+_LOGGER = logging.getLogger(__name__)
+
 
 @attr.s
 class DeviceConfig:
@@ -22,7 +26,7 @@ class BackupDatabaseReader:
     @staticmethod
     def dump_raw(dev):
         raw = {k: dev[k] for k in dev.keys()}
-        click.echo(pf(raw))
+        _LOGGER.info(pf(raw))
 
     @staticmethod
     def decrypt_ztoken(ztoken):
@@ -37,7 +41,7 @@ class BackupDatabaseReader:
         return token.decode()
 
     def read_apple(self):
-        click.echo("Reading tokens from Apple DB")
+        _LOGGER.info("Reading tokens from Apple DB")
         c = self.conn.execute("SELECT * FROM ZDEVICE WHERE ZTOKEN IS NOT '';")
         for dev in c.fetchall():
             if self.dump_raw:
@@ -52,7 +56,7 @@ class BackupDatabaseReader:
             yield config
 
     def read_android(self):
-        click.echo("Reading tokens from Android DB")
+        _LOGGER.info("Reading tokens from Android DB")
         c = self.conn.execute("SELECT * FROM devicerecord WHERE token IS NOT '';")
         for dev in c.fetchall():
             if self.dump_raw:
@@ -63,12 +67,13 @@ class BackupDatabaseReader:
             name = dev['name']
             token = dev['token']
 
-            config = DeviceConfig(name=name, ip=ip, mac=mac, model=model, token=token)
+            config = DeviceConfig(name=name, ip=ip, mac=mac,
+                                  model=model, token=token)
             yield config
 
     def read_tokens(self, db):
         self.db = db
-        print("reading database from %s" % db)
+        _LOGGER.info("Reading database from %s" % db)
         self.conn = sqlite3.connect(db)
 
         self.conn.row_factory = sqlite3.Row
@@ -82,19 +87,24 @@ class BackupDatabaseReader:
             elif is_apple:
                 yield from self.read_apple()
             else:
-                click.echo("Error, unknown database type!")
+                _LOGGER.error("Error, unknown database type!")
 
 
 @click.command()
 @click.argument('backup')
-@click.option('--write-to-disk', type=click.File('wb'), help='writes sqlite3 db to a file for debugging')
-@click.option('--password', type=str, help='password if the android database is encrypted')
-@click.option('--dump-all', is_flag=True, default=False, help='dump devices without ip addresses')
+@click.option('--write-to-disk', type=click.File('wb'),
+              help='writes sqlite3 db to a file for debugging')
+@click.option('--password', type=str,
+              help='password if the android database is encrypted')
+@click.option('--dump-all', is_flag=True, default=False,
+              help='dump devices without ip addresses')
 @click.option('--dump-raw', is_flag=True, help='dumps raw rows')
 def main(backup, write_to_disk, password, dump_all, dump_raw):
     """Reads device information out from an sqlite3 DB.
-     If the given file is an .ab file, it will be extracted
-     and the database automatically located (Android backups).
+     If the given file is an Android backup (.ab), the database
+     will be extracted automatically.
+     If the given file is an iOS backup, the tokens will be
+     extracted (and decrypted if needed) automatically.
     """
 
     reader = BackupDatabaseReader(dump_raw)
@@ -106,7 +116,7 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
             try:
                 db = tar.extractfile(DBFILE)
             except KeyError as ex:
-                click.echo("Unable to extract the device database file %s: %s" % (DBFILE, ex))
+                click.echo("Unable to extract the database file %s: %s" % (DBFILE, ex))
                 return
             if write_to_disk:
                 file = write_to_disk
@@ -122,7 +132,12 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
 
     for dev in devices:
         if dev.ip or dump_all:
-            click.echo("%s\n\tModel: %s\n\tIP address: %s\n\tToken: %s\n\tMAC: %s" % (dev.name, dev.model, dev.ip, dev.token, dev.mac))
+            click.echo("%s\n"
+                       "\tModel: %s\n"
+                       "\tIP address: %s\n"
+                       "\tToken: %s\n"
+                       "\tMAC: %s" % (dev.name, dev.model,
+                                      dev.ip, dev.token, dev.mac))
 
 
 if __name__ == "__main__":
