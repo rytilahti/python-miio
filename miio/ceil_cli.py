@@ -9,10 +9,10 @@ if sys.version_info < (3, 4):
           sys.version_info)
     sys.exit(1)
 
-import mirobo  # noqa: E402
+import miio  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
-pass_dev = click.make_pass_decorator(mirobo.Ceil)
+pass_dev = click.make_pass_decorator(miio.Ceil)
 
 
 def validate_percentage(ctx, param, value):
@@ -73,7 +73,7 @@ def cli(ctx, ip: str, token: str, debug: int):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    dev = mirobo.Ceil(ip, token, debug)
+    dev = miio.Ceil(ip, token, debug)
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
     ctx.obj = dev
@@ -85,12 +85,12 @@ def cli(ctx, ip: str, token: str, debug: int):
 @cli.command()
 def discover():
     """Search for plugs in the network."""
-    mirobo.Ceil.discover()
+    miio.Ceil.discover()
 
 
 @cli.command()
 @pass_dev
-def status(dev: mirobo.Ceil):
+def status(dev: miio.Ceil):
     """Returns the state information."""
     res = dev.status()
     if not res:
@@ -108,14 +108,14 @@ def status(dev: mirobo.Ceil):
 
 @cli.command()
 @pass_dev
-def on(dev: mirobo.Ceil):
+def on(dev: miio.Ceil):
     """Power on."""
     click.echo("Power on: %s" % dev.on())
 
 
 @cli.command()
 @pass_dev
-def off(dev: mirobo.Ceil):
+def off(dev: miio.Ceil):
     """Power off."""
     click.echo("Power off: %s" % dev.off())
 
@@ -123,7 +123,7 @@ def off(dev: mirobo.Ceil):
 @cli.command()
 @click.argument('level', callback=validate_percentage, required=True,)
 @pass_dev
-def set_brightness(dev: mirobo.Ceil, level):
+def set_brightness(dev: miio.Ceil, level):
     """Set brightness level."""
     click.echo("Brightness: %s" % dev.set_brightness(level))
 
@@ -131,7 +131,7 @@ def set_brightness(dev: mirobo.Ceil, level):
 @cli.command()
 @click.argument('level', callback=validate_percentage, required=True,)
 @pass_dev
-def set_color_temperature(dev: mirobo.Ceil, level):
+def set_color_temperature(dev: miio.Ceil, level):
     """Set CCT level."""
     click.echo("Color temperature level: %s" %
                dev.set_color_temperature(level))
@@ -140,7 +140,7 @@ def set_color_temperature(dev: mirobo.Ceil, level):
 @cli.command()
 @click.argument('seconds', callback=validate_seconds, required=True,)
 @pass_dev
-def delay_off(dev: mirobo.Ceil, seconds):
+def delay_off(dev: miio.Ceil, seconds):
     """Set delay off in seconds."""
     click.echo("Delay off: %s" % dev.delay_off(seconds))
 
@@ -148,35 +148,35 @@ def delay_off(dev: mirobo.Ceil, seconds):
 @cli.command()
 @click.argument('scene', callback=validate_scene, required=True,)
 @pass_dev
-def set_scene(dev: mirobo.Ceil, scene):
+def set_scene(dev: miio.Ceil, scene):
     """Set scene number."""
     click.echo("Eyecare Scene: %s" % dev.set_scene(scene))
 
 
 @cli.command()
 @pass_dev
-def smart_night_light_on(dev: mirobo.Ceil):
+def smart_night_light_on(dev: miio.Ceil):
     """Smart Night Light on."""
     click.echo("Smart Night Light On: %s" % dev.smart_night_light_on())
 
 
 @cli.command()
 @pass_dev
-def smart_night_light_off(dev: mirobo.Ceil):
+def smart_night_light_off(dev: miio.Ceil):
     """Smart Night Light off."""
     click.echo("Smart Night Light Off: %s" % dev.smart_night_light_off())
 
 
 @cli.command()
 @pass_dev
-def automatic_color_temperature_on(dev: mirobo.Ceil):
+def automatic_color_temperature_on(dev: miio.Ceil):
     """Auto CCT on."""
     click.echo("Auto CCT On: %s" % dev.automatic_color_temperature_on())
 
 
 @cli.command()
 @pass_dev
-def automatic_color_temperature_off(dev: mirobo.Ceil):
+def automatic_color_temperature_off(dev: miio.Ceil):
     """Auto CCT on."""
     click.echo("Auto CCT Off: %s" % dev.automatic_color_temperature_off())
 

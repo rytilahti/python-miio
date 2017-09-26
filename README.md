@@ -1,12 +1,16 @@
-# Python-mirobo
+# Python-miio
 
-[![PyPI version](https://badge.fury.io/py/python-mirobo.svg)](https://badge.fury.io/py/python-mirobo)
-[![Build Status](https://travis-ci.org/rytilahti/python-mirobo.svg?branch=0.2.0)](https://travis-ci.org/rytilahti/python-mirobo)
-[![Code Health](https://landscape.io/github/rytilahti/python-mirobo/master/landscape.svg?style=flat)](https://landscape.io/github/rytilahti/python-mirobo/master)
-[![Coverage Status](https://coveralls.io/repos/github/rytilahti/python-mirobo/badge.svg?branch=master)](https://coveralls.io/github/rytilahti/python-mirobo?branch=master)
+[![PyPI version](https://badge.fury.io/py/python-miio.svg)](https://badge.fury.io/py/python-miio)
+[![Build Status](https://travis-ci.org/rytilahti/python-miio.svg?branch=0.2.0)](https://travis-ci.org/rytilahti/python-miio)
+[![Code Health](https://landscape.io/github/rytilahti/python-miio/master/landscape.svg?style=flat)](https://landscape.io/github/rytilahti/python-miio/master)
+[![Coverage Status](https://coveralls.io/repos/github/rytilahti/python-miio/badge.svg?branch=master)](https://coveralls.io/github/rytilahti/python-miio?branch=master)
 
-This project was started to allow controlling locally available Xiaomi Vacuum cleaner robot with Python (hence the name),
+This project was started to allow controlling locally available Xiaomi Vacuum cleaner robot with Python (hence the old name, *python-mirobo*),
 however, thanks to contributors it has been extended to allow controlling other Xiaomi devices using the same protocol.
+
+**The project has now been renamed to *python-miio*. The *mirobo* python package (as well as the console tool with the same name) are still available,
+ although users of the library are encouraged to start using the *miio* name in their tools.
+ The console tools (and the API) are expected to stay backwards-compatible for the near future.**
 
 Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewtopic.php?f=23&t=4898) who figured out the encryption to make this possible.
 [Information about the underlying communication protocol](https://github.com/OpenMiHome/mihome-binary-protocol) ([another source for vacuum-specific documentation](https://github.com/marcelrv/XiaomiRobotVacuumProtocol))
@@ -38,7 +42,7 @@ The [miio javascript library](https://github.com/aholstenson/miio) contains some
 Please make sure you have libffi and openssl headers installed, you can do this on Debian-based systems (like Rasperry Pi) with ```apt-get install libffi-dev libssl-dev```.
 Also do note that the setuptools version is too old for installing some requirements, so before trying to install this package you should update the setuptools with ```pip3 install -U setuptools```.
 
-The easiest way to install the package is to use pip: ```pip3 install python-mirobo``` . [Using virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/) is recommended.
+The easiest way to install the package is to use pip: ```pip3 install python-miio``` . [Using virtualenv](http://docs.python-guide.org/en/latest/dev/virtualenvs/) is recommended.
 
 In case you get an error similar like ```ImportError: No module named 'packaging'``` during the installation,
 you need to upgrade pip and setuptools:
@@ -279,4 +283,7 @@ Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
 
 ## Home Assistant support
 
-See [Xiaomi Mi Robot Vacuum](https://home-assistant.io/components/vacuum.xiaomi/).
+* [Xiaomi Mi Robot Vacuum](https://home-assistant.io/components/vacuum.xiaomi_miio/)
+* [Xiaomi Philips Light](https://home-assistant.io/components/light.xiaomi_miio/)
+* [Xiaomi Mi Air Purifier](https://github.com/syssi/xiaomi_airpurifier)
+* [Xiaomi WiFi Plug](https://github.com/syssi/xiaomiplug)
