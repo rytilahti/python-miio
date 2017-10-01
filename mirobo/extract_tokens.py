@@ -5,6 +5,7 @@ import sqlite3
 from Crypto.Cipher import AES
 from pprint import pformat as pf
 import attr
+from .android_backup import AndroidBackup
 
 logging.basicConfig(level=logging.INFO)
 _LOGGER = logging.getLogger(__name__)
@@ -108,7 +109,6 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
     """
 
     reader = BackupDatabaseReader(dump_raw)
-    from android_backup import AndroidBackup
     if backup.endswith(".ab"):
         DBFILE = "apps/com.xiaomi.smarthome/db/miio2.db"
         with AndroidBackup(backup) as f:
