@@ -15,3 +15,4 @@ from mirobo.chuangmi_ir import ChuangmiIr
 from mirobo.fan import Fan
 from mirobo.device import Device, DeviceException
 from mirobo.discovery import Discovery
+from mirobo.wifispeaker import WifiSpeaker

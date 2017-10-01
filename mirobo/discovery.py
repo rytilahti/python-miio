@@ -4,7 +4,8 @@ import ipaddress
 import inspect
 import codecs
 from . import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
-               PhilipsEyecare, ChuangmiIr, AirHumidifier, WaterPurifier)
+               PhilipsEyecare, ChuangmiIr, AirHumidifier, WaterPurifier,
+               WifiSpeaker)
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 
@@ -31,6 +32,7 @@ DEVICE_MAP = {
     "philips-light-bulb": Ceil,
     "philips-light-ceil": Ceil,
     "philips-light-sread1": PhilipsEyecare,
+    "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "yeelink-light-": lambda x: other_package_info(
         x, "python-yeelight package"),
     "lumi-gateway-": lambda x: other_package_info(
