@@ -63,11 +63,11 @@ class WifiSpeaker(Device):
         # is this a toggle?
         return self.send("power")
 
-    def volume_up(self):
-        return self.send("vol_up")
+    def volume_up(self, amount: int = 5):
+        return self.send("vol_up", [amount])
 
-    def volume_down(self):
-        return self.send("vol_down")
+    def volume_down(self, amount: int = 5):
+        return self.send("vol_down", [amount])
 
     def track_previous(self):
         return self.send("previous_track")
