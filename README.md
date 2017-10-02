@@ -67,13 +67,13 @@ This will also work for all other devices as long as the device has been bound w
 
 ### miio-extract-tokens
 
-The package provides a command line tool to extract tokens from Android backups and SQlite databases. Please follow the above-mentioned procedure to retrieve the tar file (Android) or a SQlite database (Android & Apple). Encrypted tokens as recently introduced on iOS devices will be automatically decrypted.
+The package provides a command line tool to extract tokens from Android backups and SQlite databases. Please follow the above-mentioned procedure to retrieve a backup (Android) or a SQlite database (Android & Apple). Encrypted tokens as recently introduced on iOS devices will be automatically decrypted. For decrypting encrypted Android backups the password has to be given to the command with `--password <password>`.
 
 *Please feel free to submit pull requests to simplify this procedure even more!*
 
 ```
-$ miio-extract-tokens backup.tar
-Opened backup/backup.tar
+$ miio-extract-tokens backup.ab
+Opened backup/backup.ab
 Extracting to /tmp/tmpvbregact
 Reading tokens from Android DB
 Gateway
