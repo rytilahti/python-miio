@@ -15,10 +15,10 @@ if sys.version_info < (3, 4):
           sys.version_info)
     sys.exit(1)
 
-import mirobo  # noqa: E402
+import miio  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
-pass_dev = click.make_pass_decorator(mirobo.Device, ensure=True)
+pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
 
 
 def validate_ip(ctx, param, value):
@@ -75,7 +75,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
     except (FileNotFoundError, TypeError, ValueError) as ex:
         _LOGGER.error("Unable to read the stored msgid: %s", ex)
 
-    vac = mirobo.Vacuum(ip, token, start_id, debug)
+    vac = miio.Vacuum(ip, token, start_id, debug)
 
     vac.manual_seqnum = manual_seq
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
@@ -89,7 +89,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 
 @cli.resultcallback()
 @pass_dev
-def cleanup(vac: mirobo.Vacuum, **kwargs):
+def cleanup(vac: miio.Vacuum, **kwargs):
     if vac.ip is None:  # dummy Device for discovery, skip teardown
         return
     id_file = kwargs['id_file']
@@ -104,14 +104,14 @@ def cleanup(vac: mirobo.Vacuum, **kwargs):
 def discover(handshake):
     """Search for robots in the network."""
     if handshake:
-        mirobo.Vacuum.discover()
+        miio.Vacuum.discover()
     else:
-        mirobo.Discovery.discover_mdns()
+        miio.Discovery.discover_mdns()
 
 
 @cli.command()
 @pass_dev
-def status(vac: mirobo.Vacuum):
+def status(vac: miio.Vacuum):
     """Returns the state information."""
     res = vac.status()
     if not res:
@@ -132,7 +132,7 @@ def status(vac: mirobo.Vacuum):
 
 @cli.command()
 @pass_dev
-def consumables(vac: mirobo.Vacuum):
+def consumables(vac: miio.Vacuum):
     """Return consumables status."""
     res = vac.consumable_status()
     click.echo("Main brush:   %s (left %s)" % (res.main_brush,
@@ -146,35 +146,35 @@ def consumables(vac: mirobo.Vacuum):
 
 @cli.command()
 @pass_dev
-def start(vac: mirobo.Vacuum):
+def start(vac: miio.Vacuum):
     """Start cleaning."""
     click.echo("Starting cleaning: %s" % vac.start())
 
 
 @cli.command()
 @pass_dev
-def spot(vac: mirobo.Vacuum):
+def spot(vac: miio.Vacuum):
     """Start spot cleaning."""
     click.echo("Starting spot cleaning: %s" % vac.spot())
 
 
 @cli.command()
 @pass_dev
-def pause(vac: mirobo.Vacuum):
+def pause(vac: miio.Vacuum):
     """Pause cleaning."""
     click.echo("Pausing: %s" % vac.pause())
 
 
 @cli.command()
 @pass_dev
-def stop(vac: mirobo.Vacuum):
+def stop(vac: miio.Vacuum):
     """Stop cleaning."""
     click.echo("Stop cleaning: %s" % vac.stop())
 
 
 @cli.command()
 @pass_dev
-def home(vac: mirobo.Vacuum):
+def home(vac: miio.Vacuum):
     """Return home."""
     click.echo("Requesting return to home: %s" % vac.home())
 
@@ -182,7 +182,7 @@ def home(vac: mirobo.Vacuum):
 @cli.group()
 @pass_dev
 # @click.argument('command', required=False)
-def manual(vac: mirobo.Vacuum):
+def manual(vac: miio.Vacuum):
     """Control the robot manually."""
     command = ''
     if command == 'start':
@@ -196,7 +196,7 @@ def manual(vac: mirobo.Vacuum):
 
 @manual.command()  # noqa: F811  # redefinition of start
 @pass_dev
-def start(vac: mirobo.Vacuum):
+def start(vac: miio.Vacuum):
     """Activate the manual mode."""
     click.echo("Activating manual controls")
     return vac.manual_start()
@@ -204,7 +204,7 @@ def start(vac: mirobo.Vacuum):
 
 @manual.command()  # noqa: F811  # redefinition of stop
 @pass_dev
-def stop(vac: mirobo.Vacuum):
+def stop(vac: miio.Vacuum):
     """Deactivate the manual mode."""
     click.echo("Deactivating manual controls")
     return vac.manual_stop()
@@ -213,7 +213,7 @@ def stop(vac: mirobo.Vacuum):
 @manual.command()
 @pass_dev
 @click.argument('degrees', type=int)
-def left(vac: mirobo.Vacuum, degrees: int):
+def left(vac: miio.Vacuum, degrees: int):
     """Turn to left."""
     click.echo("Turning %s degrees left" % degrees)
     return vac.manual_control(degrees, 0)
@@ -222,7 +222,7 @@ def left(vac: mirobo.Vacuum, degrees: int):
 @manual.command()
 @pass_dev
 @click.argument('degrees', type=int)
-def right(vac: mirobo.Vacuum, degrees: int):
+def right(vac: miio.Vacuum, degrees: int):
     """Turn to right."""
     click.echo("Turning right")
     return vac.manual_control(-degrees, 0)
@@ -231,7 +231,7 @@ def right(vac: mirobo.Vacuum, degrees: int):
 @manual.command()
 @click.argument('amount', type=float)
 @pass_dev
-def forward(vac: mirobo.Vacuum, amount: float):
+def forward(vac: miio.Vacuum, amount: float):
     """Run forwards."""
     click.echo("Moving forwards")
     return vac.manual_control(0, amount)
@@ -240,7 +240,7 @@ def forward(vac: mirobo.Vacuum, amount: float):
 @manual.command()
 @click.argument('amount', type=float)
 @pass_dev
-def backward(vac: mirobo.Vacuum, amount: float):
+def backward(vac: miio.Vacuum, amount: float):
     """Run backwards."""
     click.echo("Moving backwards")
     return vac.manual_control(0, -amount)
@@ -251,7 +251,7 @@ def backward(vac: mirobo.Vacuum, amount: float):
 @click.argument('rotation', type=float)
 @click.argument('velocity', type=float)
 @click.argument('duration', type=int)
-def move(vac: mirobo.Vacuum, rotation: int, velocity: float, duration: int):
+def move(vac: miio.Vacuum, rotation: int, velocity: float, duration: int):
     """Pass raw manual values"""
     return vac.manual_control(rotation, velocity, duration)
 
@@ -263,7 +263,7 @@ def move(vac: mirobo.Vacuum, rotation: int, velocity: float, duration: int):
 @click.argument('end_hr', type=int, required=False)
 @click.argument('end_min', type=int, required=False)
 @pass_dev
-def dnd(vac: mirobo.Vacuum, cmd: str,
+def dnd(vac: miio.Vacuum, cmd: str,
         start_hr: int, start_min: int,
         end_hr: int, end_min: int):
     """Query and adjust do-not-disturb mode."""
@@ -285,7 +285,7 @@ def dnd(vac: mirobo.Vacuum, cmd: str,
 @cli.command()
 @click.argument('speed', type=int, required=False)
 @pass_dev
-def fanspeed(vac: mirobo.Vacuum, speed):
+def fanspeed(vac: miio.Vacuum, speed):
     """Query and adjust the fan speed."""
     if speed:
         click.echo("Setting fan speed to %s" % speed)
@@ -297,7 +297,7 @@ def fanspeed(vac: mirobo.Vacuum, speed):
 @cli.group(invoke_without_command=True)
 @pass_dev
 @click.pass_context
-def timer(ctx, vac: mirobo.Vacuum):
+def timer(ctx, vac: miio.Vacuum):
     """List and modify existing timers."""
     if ctx.invoked_subcommand is not None:
         return
@@ -318,7 +318,7 @@ def timer(ctx, vac: mirobo.Vacuum):
 @click.option('--command', default='', required=False)
 @click.option('--params', default='', required=False)
 @pass_dev
-def add(vac: mirobo.Vacuum, cron, command, params):
+def add(vac: miio.Vacuum, cron, command, params):
     """Add a timer."""
     click.echo(vac.add_timer(cron, command, params))
 
@@ -326,7 +326,7 @@ def add(vac: mirobo.Vacuum, cron, command, params):
 @timer.command()
 @click.argument('timer_id', type=int, required=True)
 @pass_dev
-def delete(vac: mirobo.Vacuum, timer_id):
+def delete(vac: miio.Vacuum, timer_id):
     """Delete a timer."""
     click.echo(vac.delete_timer(timer_id))
 
@@ -336,9 +336,9 @@ def delete(vac: mirobo.Vacuum, timer_id):
 @click.option('--enable', is_flag=True)
 @click.option('--disable', is_flag=True)
 @pass_dev
-def update(vac: mirobo.Vacuum, timer_id, enable, disable):
+def update(vac: miio.Vacuum, timer_id, enable, disable):
     """Enable/disable a timer."""
-    from mirobo.vacuum import TimerState
+    from miio.vacuum import TimerState
     if enable and not disable:
         vac.update_timer(timer_id, TimerState.On)
     elif disable and not enable:
@@ -349,7 +349,7 @@ def update(vac: mirobo.Vacuum, timer_id, enable, disable):
 
 @cli.command()
 @pass_dev
-def find(vac: mirobo.Vacuum):
+def find(vac: miio.Vacuum):
     """Find the robot."""
     click.echo("Sending find the robot calls.")
     click.echo(vac.find())
@@ -357,14 +357,14 @@ def find(vac: mirobo.Vacuum):
 
 @cli.command()
 @pass_dev
-def map(vac: mirobo.Vacuum):
+def map(vac: miio.Vacuum):
     """Return the map token."""
     click.echo(vac.map())
 
 
 @cli.command()
 @pass_dev
-def info(vac: mirobo.Vacuum):
+def info(vac: miio.Vacuum):
     """Return device information."""
     res = vac.info()
 
@@ -374,7 +374,7 @@ def info(vac: mirobo.Vacuum):
 
 @cli.command()
 @pass_dev
-def cleaning_history(vac: mirobo.Vacuum):
+def cleaning_history(vac: miio.Vacuum):
     """Query the cleaning history."""
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
@@ -395,14 +395,14 @@ def cleaning_history(vac: mirobo.Vacuum):
 
 @cli.command()
 @pass_dev
-def sound(vac: mirobo.Vacuum):
+def sound(vac: miio.Vacuum):
     """Query sound settings."""
     click.echo(vac.sound_info())
 
 
 @cli.command()
 @pass_dev
-def serial_number(vac: mirobo.Vacuum):
+def serial_number(vac: miio.Vacuum):
     """Query serial number."""
     click.echo("Serial#: %s" % vac.serial_number())
 
@@ -410,7 +410,7 @@ def serial_number(vac: mirobo.Vacuum):
 @cli.command()
 @click.argument('tz', required=False)
 @pass_dev
-def timezone(vac: mirobo.Vacuum, tz=None):
+def timezone(vac: miio.Vacuum, tz=None):
     """Query or set the timezone."""
     if tz is not None:
         click.echo("Setting timezone to: %s" % tz)
@@ -423,7 +423,7 @@ def timezone(vac: mirobo.Vacuum, tz=None):
 @click.argument('cmd', required=True)
 @click.argument('parameters', required=False)
 @pass_dev
-def raw_command(vac: mirobo.Vacuum, cmd, parameters):
+def raw_command(vac: miio.Vacuum, cmd, parameters):
     """Run a raw command."""
     params = []  # type: Any
     if parameters:

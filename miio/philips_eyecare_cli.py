@@ -9,10 +9,10 @@ if sys.version_info < (3, 4):
           sys.version_info)
     sys.exit(1)
 
-import mirobo  # noqa: E402
+import miio  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
-pass_dev = click.make_pass_decorator(mirobo.PhilipsEyecare)
+pass_dev = click.make_pass_decorator(miio.PhilipsEyecare)
 
 
 def validate_bright(ctx, param, value):
@@ -73,7 +73,7 @@ def cli(ctx, ip: str, token: str, debug: int):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    dev = mirobo.PhilipsEyecare(ip, token, debug)
+    dev = miio.PhilipsEyecare(ip, token, debug)
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
     ctx.obj = dev
@@ -85,12 +85,12 @@ def cli(ctx, ip: str, token: str, debug: int):
 @cli.command()
 def discover():
     """Search for plugs in the network."""
-    mirobo.PhilipsEyecare.discover()
+    miio.PhilipsEyecare.discover()
 
 
 @cli.command()
 @pass_dev
-def status(dev: mirobo.PhilipsEyecare):
+def status(dev: miio.PhilipsEyecare):
     """Returns the state information."""
     res = dev.status()
     if not res:
@@ -110,14 +110,14 @@ def status(dev: mirobo.PhilipsEyecare):
 
 @cli.command()
 @pass_dev
-def on(dev: mirobo.PhilipsEyecare):
+def on(dev: miio.PhilipsEyecare):
     """Power on."""
     click.echo("Power on: %s" % dev.on())
 
 
 @cli.command()
 @pass_dev
-def off(dev: mirobo.PhilipsEyecare):
+def off(dev: miio.PhilipsEyecare):
     """Power off."""
     click.echo("Power off: %s" % dev.off())
 
@@ -125,7 +125,7 @@ def off(dev: mirobo.PhilipsEyecare):
 @cli.command()
 @click.argument('level', callback=validate_bright, required=True,)
 @pass_dev
-def set_bright(dev: mirobo.PhilipsEyecare, level):
+def set_bright(dev: miio.PhilipsEyecare, level):
     """Set brightness level."""
     click.echo("Brightness: %s" % dev.set_brightness(level))
 
@@ -133,7 +133,7 @@ def set_bright(dev: mirobo.PhilipsEyecare, level):
 @cli.command()
 @click.argument('scene', callback=validate_scene, required=True,)
 @pass_dev
-def set_scene(dev: mirobo.PhilipsEyecare, scene):
+def set_scene(dev: miio.PhilipsEyecare, scene):
     """Set eyecare scene number."""
     click.echo("Eyecare Scene: %s" % dev.set_scene(scene))
 
@@ -141,49 +141,49 @@ def set_scene(dev: mirobo.PhilipsEyecare, scene):
 @cli.command()
 @click.argument('minutes', callback=validate_minutes, required=True,)
 @pass_dev
-def delay_off(dev: mirobo.PhilipsEyecare, minutes):
+def delay_off(dev: miio.PhilipsEyecare, minutes):
     """Set delay off in minutes."""
     click.echo("Delay off: %s" % dev.delay_off(minutes))
 
 
 @cli.command()
 @pass_dev
-def bl_on(dev: mirobo.PhilipsEyecare):
+def bl_on(dev: miio.PhilipsEyecare):
     """Night Light on."""
     click.echo("Night Light On: %s" % dev.smart_night_light_on())
 
 
 @cli.command()
 @pass_dev
-def bl_off(dev: mirobo.PhilipsEyecare):
+def bl_off(dev: miio.PhilipsEyecare):
     """Night Light off."""
     click.echo("Night Light off: %s" % dev.smart_night_light_off())
 
 
 @cli.command()
 @pass_dev
-def notify_on(dev: mirobo.PhilipsEyecare):
+def notify_on(dev: miio.PhilipsEyecare):
     """Eye Fatigue Reminder On."""
     click.echo("Eye Fatigue Reminder On: %s" % dev.reminder_on())
 
 
 @cli.command()
 @pass_dev
-def notify_off(dev: mirobo.PhilipsEyecare):
+def notify_off(dev: miio.PhilipsEyecare):
     """Eye Fatigue Reminder off."""
     click.echo("Eye Fatigue Reminder Off: %s" % dev.reminder_off())
 
 
 @cli.command()
 @pass_dev
-def ambient_on(dev: mirobo.PhilipsEyecare):
+def ambient_on(dev: miio.PhilipsEyecare):
     """Ambient Light on."""
     click.echo("Ambient Light On: %s" % dev.ambient_on())
 
 
 @cli.command()
 @pass_dev
-def ambient_off(dev: mirobo.PhilipsEyecare):
+def ambient_off(dev: miio.PhilipsEyecare):
     """Ambient Light off."""
     click.echo("Ambient Light Off: %s" % dev.ambient_off())
 
@@ -191,7 +191,7 @@ def ambient_off(dev: mirobo.PhilipsEyecare):
 @cli.command()
 @click.argument('level', callback=validate_bright, required=True,)
 @pass_dev
-def set_amb_bright(dev: mirobo.PhilipsEyecare, level):
+def set_amb_bright(dev: miio.PhilipsEyecare, level):
     """Set Ambient Light brightness level."""
     click.echo("Ambient Light Brightness: %s" %
                dev.set_ambient_brightness(level))

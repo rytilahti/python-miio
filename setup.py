@@ -1,13 +1,13 @@
 from setuptools import setup
 
-with open('mirobo/version.py') as f: exec(f.read())
+with open('miio/version.py') as f: exec(f.read())
 
 setup(
-    name='python-mirobo',
+    name='python-miio',
 
     version=__version__,
-    description='Python library for interfacing with Xiaomi Vacuum cleaner robot',
-    url='https://github.com/rytilahti/python-mirobo',
+    description='Python library for interfacing with Xiaomi smart appliances',
+    url='https://github.com/rytilahti/python-miio',
 
     author='Teemu Rytilahti',
     author_email='tpr@iki.fi',
@@ -21,18 +21,18 @@ setup(
         'Programming Language :: Python :: 3',
     ],
 
-    keywords='xiaomi vacuum',
+    keywords='xiaomi miio vacuum',
 
-    packages=["mirobo"],
+    packages=["miio", "mirobo"],
 
     install_requires=['construct', 'click', 'cryptography', 'pretty_cron', 'typing', 'zeroconf'],
     entry_points={
         'console_scripts': [
-            'mirobo=mirobo.vacuum_cli:cli',
-            'miplug=mirobo.plug_cli:cli',
-            'miceil=mirobo.ceil_cli:cli',
-            'mieye=mirobo.philips_eyecare_cli:cli',
-            'miio-extract-tokens=mirobo.extract_tokens:main'
+            'mirobo=miio.vacuum_cli:cli',
+            'miplug=miio.plug_cli:cli',
+            'miceil=miio.ceil_cli:cli',
+            'mieye=miio.philips_eyecare_cli:cli',
+            'miio-extract-tokens=miio.extract_tokens:main'
         ],
     },
 )

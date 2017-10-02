@@ -11,10 +11,10 @@ if sys.version_info < (3, 4):
           sys.version_info)
     sys.exit(1)
 
-import mirobo  # noqa: E402
+import miio  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
-pass_dev = click.make_pass_decorator(mirobo.Plug)
+pass_dev = click.make_pass_decorator(miio.Plug)
 
 
 def validate_ip(ctx, param, value):
@@ -53,7 +53,7 @@ def cli(ctx, ip: str, token: str, debug: int):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    dev = mirobo.Plug(ip, token, debug)
+    dev = miio.Plug(ip, token, debug)
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
     ctx.obj = dev
@@ -65,12 +65,12 @@ def cli(ctx, ip: str, token: str, debug: int):
 @cli.command()
 def discover():
     """Search for plugs in the network."""
-    mirobo.Plug.discover()
+    miio.Plug.discover()
 
 
 @cli.command()
 @pass_dev
-def status(dev: mirobo.Plug):
+def status(dev: miio.Plug):
     """Returns the state information."""
     res = dev.status()
     if not res:
@@ -83,14 +83,14 @@ def status(dev: mirobo.Plug):
 
 @cli.command()
 @pass_dev
-def on(dev: mirobo.Plug):
+def on(dev: miio.Plug):
     """Power on."""
     click.echo("Power on: %s" % dev.on())
 
 
 @cli.command()
 @pass_dev
-def off(dev: mirobo.Plug):
+def off(dev: miio.Plug):
     """Power off."""
     click.echo("Power off: %s" % dev.off())
 
@@ -99,7 +99,7 @@ def off(dev: mirobo.Plug):
 @click.argument('cmd', required=True)
 @click.argument('parameters', required=False)
 @pass_dev
-def raw_command(dev: mirobo.Plug, cmd, parameters):
+def raw_command(dev: miio.Plug, cmd, parameters):
     """Run a raw command."""
     params = []  # type: Any
     if parameters:
