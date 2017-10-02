@@ -12,6 +12,8 @@ class YeelightMode(IntEnum):
 
 class YeelightStatus:
     def __init__(self, data):
+        # ['power', 'bright', 'ct',   'rgb',      'hue', 'sat', 'color_mode', 'name', 'lan_ctrl', 'save_state']
+        # ['on',    '100',    '3584', '16711680', '359', '100', '2',          'name', '1',        '1']
         self.data = data
 
     @property
