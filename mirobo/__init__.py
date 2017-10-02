@@ -13,5 +13,6 @@ from mirobo.ceil import Ceil
 from mirobo.philips_eyecare import PhilipsEyecare
 from mirobo.chuangmi_ir import ChuangmiIr
 from mirobo.fan import Fan
+from mirobo.wifispeaker import WifiSpeaker
 from mirobo.device import Device, DeviceException
 from mirobo.discovery import Discovery
