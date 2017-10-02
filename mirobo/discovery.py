@@ -5,7 +5,7 @@ import inspect
 import codecs
 from . import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
                PhilipsEyecare, ChuangmiIr, AirHumidifier, WaterPurifier,
-               WifiSpeaker)
+               WifiSpeaker, Yeelight)
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 
@@ -33,8 +33,7 @@ DEVICE_MAP = {
     "philips-light-ceil": Ceil,
     "philips-light-sread1": PhilipsEyecare,
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
-    "yeelink-light-": lambda x: other_package_info(
-        x, "python-yeelight package"),
+    "yeelink-light-": Yeelight,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]

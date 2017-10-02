@@ -1,6 +1,7 @@
 from .device import Device
 from typing import Tuple, Optional
 from enum import IntEnum
+import warnings
 
 
 class YeelightMode(IntEnum):
@@ -11,18 +12,23 @@ class YeelightMode(IntEnum):
 
 class YeelightStatus:
     def __init__(self, data):
+        # ['power', 'bright', 'ct',   'rgb',      'hue', 'sat', 'color_mode', 'name', 'lan_ctrl', 'save_state']
+        # ['on',    '100',    '3584', '16711680', '359', '100', '2',          'name', '1',        '1']
         self.data = data
 
     @property
     def is_on(self) -> bool:
+        """Return whether the bulb is on or off."""
         return self.data["power"] == "on"
 
     @property
     def brightness(self) -> int:
+        """Return current brightness."""
         return int(self.data["bright"])
 
     @property
     def rgb(self) -> Optional[Tuple[int, int, int]]:
+        """Return color in RGB if RGB mode is active."""
         if self.color_mode == YeelightMode.RGB:
             rgb = self.data["rgb"]
             blue = rgb & 0xff
@@ -33,33 +39,49 @@ class YeelightStatus:
 
     @property
     def color_mode(self) -> YeelightMode:
+        """Return current color mode."""
         return YeelightMode(int(self.data["color_mode"]))
 
     @property
     def hsv(self) -> Optional[Tuple[int, int, int]]:
+        """Return current color in HSV if HSV mode is active."""
         if self.color_mode == YeelightMode.HSV:
             return self.data["hue"], self.data["sat"], self.data["bright"]
         return None
 
     @property
     def color_temp(self) -> Optional[int]:
+        """Return current color temperature, if applicable."""
         if self.color_mode == YeelightMode.ColorTemperature:
             return int(self.data["ct"])
         return None
 
     @property
+    def developer_mode(self) -> bool:
+        """Return whether the developer mode is active."""
+        return bool(int(self.data["lan_ctrl"]))
+
+    @property
+    def save_state_on_change(self) -> bool:
+        """Return whether the bulb state is saved on change."""
+        return bool(int(self.data["save_state"]))
+
+    @property
     def name(self) -> str:
+        """Return the internal name of the bulb."""
         return self.data["name"]
 
     def __repr__(self):
         s = "<Yeelight on=%s mode=%s brightness=%s color_temp=%s " \
-            "rgb=%s hsv=%s name=%s>" % \
+            "rgb=%s hsv=%s dev=%s save_state=%s name=%s>" % \
             (self.is_on,
              self.color_mode,
              self.brightness,
              self.color_temp,
              self.rgb,
              self.hsv,
+             self.developer_mode,
+             self.save_state_on_change,
              self.name)
         return s
 
@@ -78,6 +100,11 @@ class Yeelight(Device):
 
     SUPPORTED = ['yeelink-light-color1', 'yeelink-light-mono1']
 
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Please consider using python-yeelight "
+                      "for more complete support.", stacklevel=2)
+        super().__init__(*args, **kwargs)
+
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
@@ -87,27 +114,45 @@ class Yeelight(Device):
         return self.send("set_power", ["off"])
 
     def set_brightness(self, bright):
+        """Set brightness."""
         return self.send("set_bright", [bright])
 
     def set_color_temp(self, ct):
+        """Set color temp in kelvin."""
         return self.send("set_ct_abx", [ct, "smooth", 500])
 
     def set_rgb(self, rgb):
+        """Set color in encoded RGB."""
         return self.send("set_rgb", [rgb])
 
     def set_hsv(self, hsv):
+        """Set color in HSV."""
         return self.send("set_hsv", [hsv])
 
+    def set_developer_mode(self, enable: bool) -> bool:
+        """Enable or disable the developer mode."""
+        return self.send("set_ps", ["cfg_lan_ctrl", str(int(enable))])
+
+    def set_save_state_on_change(self, enable: bool) -> bool:
+        """Enable or disable saving the state on changes."""
+        return self.send("set_ps", ["cfg_save_state"], str(int(enable)))
+
+    def set_name(self, name: str) -> bool:
+        """Set an internal name for the bulb."""
+        return self.send("set_name", [name])
+
     def toggle(self):
-        """Toggles bulb state."""
+        """Toggle bulb state."""
         return self.send("toggle")
 
     def set_default(self):
-        """Sets current state as default."""
+        """Set current state as default."""
         return self.send("set_default")
 
     def set_scene(self, scene, *vals):
-        return self.send("set_scene", [scene, *vals])
+        """Set the scene."""
+        raise NotImplementedError("Setting the scene is not implemented yet.")
+        # return self.send("set_scene", [scene, *vals])
 
     def status(self):
         """Retrieve properties."""
@@ -119,7 +164,9 @@ class Yeelight(Device):
             "hue",
             "sat",
             "color_mode",
-            "name"
+            "name",
+            "lan_ctrl",
+            "save_state"
         ]
 
         values = self.send(
