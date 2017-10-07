@@ -1,6 +1,6 @@
 # flake8: noqa
 from miio.protocol import Message, Utils
-from miio.vacuumcontainers import (VacuumStatus, ConsumableStatus,
+from miio.vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                    CleaningDetails, CleaningSummary, Timer)
 from miio.vacuum import Vacuum, VacuumException
 from miio.plug import Plug
