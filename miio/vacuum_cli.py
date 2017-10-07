@@ -275,11 +275,9 @@ def dnd(vac: miio.Vacuum, cmd: str,
                                                     end_hr, end_min))
         click.echo(vac.set_dnd(start_hr, start_min, end_hr, end_min))
     else:
-        x = vac.dnd_status()[0]
-        click.echo("DND %02i:%02i to %02i:%02i (enabled: %s)" % (
-            x['start_hour'], x['start_minute'],
-            x['end_hour'], x['end_minute'],
-            x['enabled']))
+        x = vac.dnd_status()
+        click.echo(click.style("Between %s and %s (enabled: %s)" % (
+            x.start, x.end, x.enabled), bold=x.enabled))
 
 
 @cli.command()

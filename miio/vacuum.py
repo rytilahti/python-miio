@@ -4,7 +4,7 @@ import time
 from typing import List
 import enum
 
-from .vacuumcontainers import (VacuumStatus, ConsumableStatus,
+from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                CleaningSummary, CleaningDetails, Timer)
 from .device import Device, DeviceException
 
@@ -165,7 +165,7 @@ class Vacuum(Device):
         """Returns do-not-disturb status."""
         # {'result': [{'enabled': 1, 'start_minute': 0, 'end_minute': 0,
         #  'start_hour': 22, 'end_hour': 8}], 'id': 1}
-        return self.send("get_dnd_timer")
+        return DNDStatus(self.send("get_dnd_timer")[0])
 
     def set_dnd(self, start_hr: int, start_min: int,
                 end_hr: int, end_min: int):
