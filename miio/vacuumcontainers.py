@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*#
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from typing import Any, Dict, List
 import warnings
 import functools
@@ -324,6 +324,33 @@ class ConsumableStatus:
     def __repr__(self) -> str:
         return "<ConsumableStatus main: %s, side: %s, filter: %s, sensor dirty: %s>" % (  # noqa: E501
             self.main_brush, self.side_brush, self.filter, self.sensor_dirty)
+
+
+class DNDStatus:
+    def __init__(self, data: Dict[str, Any]):
+        # {'end_minute': 0, 'enabled': 1, 'start_minute': 0,
+        #  'start_hour': 22, 'end_hour': 8}
+        self.data = data
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.data["enabled"])
+
+    @property
+    def start(self) -> time:
+        return time(hour=self.data["start_hour"],
+                    minute=self.data["start_minute"])
+
+    @property
+    def end(self) -> time:
+        return time(hour=self.data["end_hour"],
+                    minute=self.data["end_minute"])
+
+    def __repr__(self):
+        return "<DNDStatus enabled: %s - between %s and %s>" % (
+            self.enabled,
+            self.start,
+            self.end)
 
 
 class Timer:
