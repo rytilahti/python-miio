@@ -29,6 +29,8 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Mi Smart Fan
 * Xiaomi Mi Air Humidifer
 * Xiaomi Mi Water Purifier (Basic support: Turn on & off)
+* Xiaomi PM2.5 Air Quality Monitor
+* Xiaomi Smart Wifi Speaker (*untested and incomplete, please [feel free to help improve the support](https://github.com/rytilahti/python-miio/issues/69)*)
 * Yeelight light bulbs (only a very rudimentary support, use [python-yeelight](https://gitlab.com/stavros/python-yeelight/) for a more complete support)
 
 *Feel free to create a pull request to add support for new devices as well as additional features for supported devices.*
