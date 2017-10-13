@@ -97,9 +97,6 @@ class Yeelight(Device):
     (https://yeelight.readthedocs.io/en/latest/),
     which however requires enabling the developer mode on the bulbs.
     """
-
-    SUPPORTED = ['yeelink-light-color1', 'yeelink-light-mono1']
-
     def __init__(self, *args, **kwargs):
         warnings.warn("Please consider using python-yeelight "
                       "for more complete support.", stacklevel=2)
@@ -107,6 +104,16 @@ class Yeelight(Device):
 
     def on(self):
         """Power on."""
+        """
+        set_power ["on|off", "smooth", time_in_ms, mode]
+        where mode:
+        0: last mode
+        1: normal mode
+        2: rgb mode
+        3: hsv mode
+        4: color flow
+        5: moonlight
+        """
         return self.send("set_power", ["on"])
 
     def off(self):
@@ -175,3 +182,6 @@ class Yeelight(Device):
         )
 
         return YeelightStatus(dict(zip(properties, values)))
+
+    def __str__(self):
+        return "<Yeelight at %s: %s>" % (self.ip, self.token)
