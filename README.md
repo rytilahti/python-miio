@@ -6,7 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/rytilahti/python-miio/badge.svg?branch=master)](https://coveralls.io/github/rytilahti/python-miio?branch=master)
 
 This project was started to allow controlling locally available Xiaomi Vacuum cleaner robot with Python (hence the old name, *python-mirobo*),
-however, thanks to contributors it has been extended to allow controlling other Xiaomi devices using the same protocol.
+however, thanks to contributors it has been extended to allow controlling other Xiaomi devices using the same protocol called miIO.
 
 **The project has now been renamed to *python-miio*. The *mirobo* python package (as well as the console tool with the same name) are still available,
  although users of the library are encouraged to start using the *miio* name in their tools.
@@ -25,9 +25,9 @@ Thanks for the nice people over [ioBroker forum](http://forum.iobroker.net/viewt
 * Xiaomi Philips Eyecare Smart Lamp 2
 * Xiaomi Philips LED Ceiling Lamp
 * Xiaomi Philips LED Ball Lamp
-* Xiaomi Universal IR Remote Controller (Chuangmi IR)
+* Xiaomi Universal IR Remote Controller (Chuang Mi IR)
 * Xiaomi Mi Smart Fan
-* Xiaomi Mi Air Humidifer
+* Xiaomi Mi Air Humidifier
 * Xiaomi Mi Water Purifier (Basic support: Turn on & off)
 * Xiaomi PM2.5 Air Quality Monitor
 * Xiaomi Smart Wifi Speaker (*untested and incomplete, please [feel free to help improve the support](https://github.com/rytilahti/python-miio/issues/69)*)
@@ -289,3 +289,4 @@ Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
 * [Xiaomi Philips Light](https://home-assistant.io/components/light.xiaomi_miio/)
 * [Xiaomi Mi Air Purifier](https://github.com/syssi/xiaomi_airpurifier)
 * [Xiaomi WiFi Plug](https://github.com/syssi/xiaomiplug)
+* [Xiaomi Universal IR Remote Controller](https://github.com/syssi/chuangmi_ir)
