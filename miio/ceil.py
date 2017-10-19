@@ -7,7 +7,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class CeilStatus:
-    """Container for status reports from Xiaomi Philips LED Ceiling Lamp"""
+    """Container for status reports from Xiaomi Philips LED Ceiling Lamp."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         # ['power', 'bright', 'snm', 'dv', 'cctsw', 'bl', 'mb', 'ac', 'ms'
@@ -18,34 +18,42 @@ class CeilStatus:
 
     @property
     def power(self) -> str:
+        """Power state."""
         return self.data["power"]
 
     @property
     def is_on(self) -> bool:
+        """True if the device is turned on."""
         return self.power == "on"
 
     @property
     def brightness(self) -> int:
+        """Current brightness."""
         return self.data["bright"]
 
     @property
     def scene(self) -> int:
+        """Current scene. FIXME what is this?"""
         return self.data["snm"]
 
     @property
     def delay_off_countdown(self) -> int:
+        """Countdown until turning off."""
         return self.data["dv"]
 
     @property
     def color_temperature(self) -> int:
+        """Current color temperature."""
         return self.data["cct"]
 
     @property
     def smart_night_light(self) -> int:
+        """Smart night mode state."""
         return self.data["bl"]
 
     @property
     def automatic_color_temperature(self) -> int:
+        """Automatic color temperature state."""
         return self.data["ac"]
 
     def __str__(self) -> str:

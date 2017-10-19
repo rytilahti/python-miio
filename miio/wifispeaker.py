@@ -6,6 +6,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class WifiSpeakerStatus:
+    """Container of a speaker state.
+    This contains information such as the name of the device,
+    and what is currently being played by it."""
     def __init__(self, data):
         # {"DeviceName": "Mi Internet Speaker", "channel_title\": "XXX",
         #  "current_state": "PLAYING", "hardware_version": "S602",
@@ -72,6 +75,7 @@ class WifiSpeakerStatus:
 
 
 class WifiSpeaker(Device):
+    """Device class for Xiaomi Smart Wifi Speaker."""
     def __init__(self, *args, **kwargs):
         warnings.warn("Please help to complete this by providing more "
                       "information about possible values for `state`, "

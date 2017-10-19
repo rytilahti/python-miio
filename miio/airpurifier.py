@@ -50,71 +50,87 @@ class AirPurifierStatus:
 
     @property
     def power(self) -> str:
+        """Power state."""
         return self.data["power"]
 
     @property
     def is_on(self) -> bool:
+        """Return True if device is on."""
         return self.power == "on"
 
     @property
     def aqi(self) -> int:
+        """Air quality index."""
         return self.data["aqi"]
 
     @property
     def humidity(self) -> int:
+        """Current humidity."""
         return self.data["humidity"]
 
     @property
     def temperature(self) -> Optional[float]:
+        """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
         return None
 
     @property
     def mode(self) -> OperationMode:
+        """Current operation mode."""
         return OperationMode(self.data["mode"])
 
     @property
     def led(self) -> bool:
+        """Return True if LED is on."""
         return self.data["led"] == "on"
 
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
+        """Brightness of the LED."""
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
         return None
 
     @property
     def buzzer(self) -> bool:
+        """Return True if buzzer is on."""
         return self.data["buzzer"] == "on"
 
     @property
     def child_lock(self) -> bool:
+        """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
     def brightness(self) -> int:
+        """Return brightness."""
         return self.data["bright"]
 
     @property
     def favorite_level(self) -> int:
+        """Return favorite level, which is used if the mode is ``favorite``."""
         # Favorite level used when the mode is `favorite`.
         return self.data["favorite_level"]
 
     @property
     def filter_life_remaining(self) -> int:
+        """Time until the filter should be changed."""
         return self.data["filter1_life"]
 
     @property
     def filter_hours_used(self) -> int:
+        """How long the filter has been in use."""
         return self.data["f1_hour_used"]
 
     @property
     def use_time(self) -> int:
+        """How long the device has been active FIXME"""
         return self.data["use_time"]
 
     @property
     def motor_speed(self) -> int:
+        """Speed of the motor."""
         return self.data["motor1_speed"]
 
     def __str__(self) -> str:

@@ -17,42 +17,52 @@ class PhilipsEyecareStatus:
 
     @property
     def power(self) -> str:
+        """Power state."""
         return self.data["power"]
 
     @property
     def is_on(self) -> bool:
+        """True if the device is turned on."""
         return self.power == "on"
 
     @property
     def brightness(self) -> int:
+        """Current brightness."""
         return self.data["bright"]
 
     @property
     def reminder(self) -> bool:
+        """True if reminder is on. FIXME be more descriptive"""
         return self.data["notifystatus"] == "on"
 
     @property
     def ambient(self) -> bool:
+        """True if ambient is on. FIXME be more descriptive."""
         return self.data["ambstatus"] == "on"
 
     @property
     def ambient_brightness(self) -> int:
+        """Ambient brightness level."""
         return self.data["ambvalue"]
 
     @property
     def eyecare(self) -> bool:
+        """True if eyecare is on."""
         return self.data["eyecare"] == "on"
 
     @property
     def scene(self) -> int:
+        """Current scene."""
         return self.data["scene_num"]
 
     @property
     def smart_night_light(self) -> bool:
+        """True if smart night light is on."""
         return self.data["bls"] == "on"
 
     @property
     def delay_off_countdown(self) -> int:
+        """Current delay off counter."""
         return self.data["dvalue"]
 
     def __str__(self) -> str:

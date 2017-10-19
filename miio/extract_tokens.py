@@ -13,6 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @attr.s
 class DeviceConfig:
+    """A presentation of a device including its name, model, ip etc."""
     name = attr.ib()
     mac = attr.ib()
     ip = attr.ib()
@@ -21,16 +22,28 @@ class DeviceConfig:
 
 
 class BackupDatabaseReader:
+    """Main class for reading backup files.
+    The main usage is following:
+
+    .. code-block:: python
+
+        r = BackupDatabaseReader()
+        devices = r.read_tokens("/tmp/database.sqlite")
+        for dev in devices:
+            print("Got %s with token %s" % (dev.ip, dev.token)
+    """
     def __init__(self, dump_raw=False):
         self.dump_raw = dump_raw
 
     @staticmethod
     def dump_raw(dev):
+        """Dump whole database."""
         raw = {k: dev[k] for k in dev.keys()}
         _LOGGER.info(pf(raw))
 
     @staticmethod
     def decrypt_ztoken(ztoken):
+        """Decrypt the given ztoken, used by apple."""
         if len(ztoken) <= 32:
             return ztoken
 
@@ -41,7 +54,8 @@ class BackupDatabaseReader:
 
         return token.decode()
 
-    def read_apple(self):
+    def read_apple(self) -> Iterator[DeviceConfig]:
+        """Read Apple-specific database file."""
         _LOGGER.info("Reading tokens from Apple DB")
         c = self.conn.execute("SELECT * FROM ZDEVICE WHERE ZTOKEN IS NOT '';")
         for dev in c.fetchall():
@@ -56,7 +70,8 @@ class BackupDatabaseReader:
             config = DeviceConfig(name=name, mac=mac, ip=ip, model=model, token=token)
             yield config
 
-    def read_android(self):
+    def read_android(self) -> Iterator[DeviceConfig]:
+        """Read Android-specific database file."""
         _LOGGER.info("Reading tokens from Android DB")
         c = self.conn.execute("SELECT * FROM devicerecord WHERE token IS NOT '';")
         for dev in c.fetchall():
@@ -72,7 +87,10 @@ class BackupDatabaseReader:
                                   model=model, token=token)
             yield config
 
-    def read_tokens(self, db):
+    def read_tokens(self, db) -> Iterator[DeviceConfig]:
+        """Read device information out from a given database file.
+
+        :param str db: Database file"""
         self.db = db
         _LOGGER.info("Reading database from %s" % db)
         self.conn = sqlite3.connect(db)
