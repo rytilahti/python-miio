@@ -29,7 +29,7 @@ DEVICE_MAP = {
     "zhimi-humidifier-v1": AirHumidifier,
     "yunmi-waterpuri-v2": WaterPurifier,
     # It looks like philips devices cannot be discovered via mdns
-    "philips-light-bulb": Ceil,
+    "philips-light-bulb": PhilipsBulb,
     "philips-light-ceil": Ceil,
     "philips-light-sread1": PhilipsEyecare,
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
