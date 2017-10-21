@@ -4,6 +4,10 @@ from enum import IntEnum
 import warnings
 
 
+class YeelightException(Exception):
+    pass
+
+
 class YeelightMode(IntEnum):
     RGB = 1
     ColorTemperature = 2
@@ -145,10 +149,14 @@ class Yeelight(Device):
 
     def set_brightness(self, bright):
         """Set brightness."""
+        if bright < 0 or bright > 100:
+            raise YeelightException("Invalid brightness: %s" % bright)
         return self.send("set_bright", [bright])
 
     def set_color_temp(self, ct):
         """Set color temp in kelvin."""
+        if ct > 6500 or ct < 1700:
+            raise YeelightException("Invalid color temperature: %s" % ct)
         return self.send("set_ct_abx", [ct, "smooth", 500])
 
     def set_rgb(self, rgb):
@@ -165,7 +173,7 @@ class Yeelight(Device):
 
     def set_save_state_on_change(self, enable: bool) -> bool:
         """Enable or disable saving the state on changes."""
-        return self.send("set_ps", ["cfg_save_state"], str(int(enable)))
+        return self.send("set_ps", ["cfg_save_state", str(int(enable))])
 
     def set_name(self, name: str) -> bool:
         """Set an internal name for the bulb."""
