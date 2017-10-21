@@ -82,16 +82,17 @@ class PhilipsEyecare(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return PhilipsEyecareStatus(defaultdict(lambda: None, zip(properties, values)))
+        return PhilipsEyecareStatus(
+            defaultdict(lambda: None, zip(properties, values)))
 
 
 class PhilipsEyecareStatus:
     """Container for status reports from Xiaomi Philips Eyecare Smart Lamp 2"""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # ["power","bright","notifystatus","ambstatus","ambvalue","eyecare",
-        #    "scene_num","bls","dvalue"]}
-        # ["off",5,"off","off",41,"on",3,"on",0]
+        # ['power': 'off', 'bright': 5, 'notifystatus': 'off',
+        #  'ambstatus': 'off': 'ambvalue': 41, 'eyecare': 'on',
+        #  'scene_num': 3, 'bls': 'on', 'dvalue': 0]
         self.data = data
 
     @property
@@ -123,7 +124,7 @@ class PhilipsEyecareStatus:
         return self.data["eyecare"] == "on"
 
     @property
-    def scene(self) -> str:
+    def scene(self) -> int:
         return self.data["scene_num"]
 
     @property
