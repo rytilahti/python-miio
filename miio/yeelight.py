@@ -97,10 +97,33 @@ class Yeelight(Device):
     (https://yeelight.readthedocs.io/en/latest/),
     which however requires enabling the developer mode on the bulbs.
     """
+
     def __init__(self, *args, **kwargs):
         warnings.warn("Please consider using python-yeelight "
                       "for more complete support.", stacklevel=2)
         super().__init__(*args, **kwargs)
+
+    def status(self) -> YeelightStatus:
+        """Retrieve properties."""
+        properties = [
+            "power",
+            "bright",
+            "ct",
+            "rgb",
+            "hue",
+            "sat",
+            "color_mode",
+            "name",
+            "lan_ctrl",
+            "save_state"
+        ]
+
+        values = self.send(
+            "get_prop",
+            properties
+        )
+
+        return YeelightStatus(dict(zip(properties, values)))
 
     def on(self):
         """Power on."""
@@ -160,28 +183,6 @@ class Yeelight(Device):
         """Set the scene."""
         raise NotImplementedError("Setting the scene is not implemented yet.")
         # return self.send("set_scene", [scene, *vals])
-
-    def status(self):
-        """Retrieve properties."""
-        properties = [
-            "power",
-            "bright",
-            "ct",
-            "rgb",
-            "hue",
-            "sat",
-            "color_mode",
-            "name",
-            "lan_ctrl",
-            "save_state"
-        ]
-
-        values = self.send(
-            "get_prop",
-            properties
-        )
-
-        return YeelightStatus(dict(zip(properties, values)))
 
     def __str__(self):
         return "<Yeelight at %s: %s>" % (self.ip, self.token)

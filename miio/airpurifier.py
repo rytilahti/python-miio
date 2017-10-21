@@ -20,71 +20,6 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class AirPurifier(Device):
-    """Main class representing the air purifier."""
-
-    def status(self):
-        """Retrieve properties."""
-
-        properties = ['power', 'aqi', 'humidity', 'temp_dec',
-                      'mode', 'led', 'led_b', 'buzzer', 'child_lock',
-                      'bright', 'favorite_level', 'filter1_life',
-                      'f1_hour_used', 'use_time', 'motor1_speed']
-
-        values = self.send(
-            "get_prop",
-            properties
-        )
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count, values_count)
-
-        return AirPurifierStatus(
-            defaultdict(lambda: None, zip(properties, values)))
-
-    def on(self):
-        """Power on."""
-        return self.send("set_power", ["on"])
-
-    def off(self):
-        """Power off."""
-        return self.send("set_power", ["off"])
-
-    def set_mode(self, mode: OperationMode):
-        """Set mode."""
-        return self.send("set_mode", [mode.value])
-
-    def set_favorite_level(self, level: int):
-        """Set favorite level."""
-
-        # Set the favorite level used when the mode is `favorite`,
-        # should be  between 0 and 17.
-        return self.send("set_favorite_level", [level])  # 0 ... 17
-
-    def set_led_brightness(self, brightness: LedBrightness):
-        """Set led brightness."""
-        return self.send("set_led_b", [brightness.value])
-
-    def set_led(self, led: bool):
-        """Turn led on/off."""
-        if led:
-            return self.send("set_led", ['on'])
-        else:
-            return self.send("set_led", ['off'])
-
-    def set_buzzer(self, buzzer: bool):
-        """Set buzzer on/off."""
-        if buzzer:
-            return self.send("set_buzzer", ["on"])
-        else:
-            return self.send("set_buzzer", ["off"])
-
-
 class AirPurifierStatus:
     """Container for status reports from the air purifier."""
 
@@ -194,3 +129,68 @@ class AirPurifierStatus:
              self.filter_hours_used, self.use_time,
              self.motor_speed)
         return s
+
+
+class AirPurifier(Device):
+    """Main class representing the air purifier."""
+
+    def status(self) -> AirPurifierStatus:
+        """Retrieve properties."""
+
+        properties = ['power', 'aqi', 'humidity', 'temp_dec',
+                      'mode', 'led', 'led_b', 'buzzer', 'child_lock',
+                      'bright', 'favorite_level', 'filter1_life',
+                      'f1_hour_used', 'use_time', 'motor1_speed']
+
+        values = self.send(
+            "get_prop",
+            properties
+        )
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return AirPurifierStatus(
+            defaultdict(lambda: None, zip(properties, values)))
+
+    def on(self):
+        """Power on."""
+        return self.send("set_power", ["on"])
+
+    def off(self):
+        """Power off."""
+        return self.send("set_power", ["off"])
+
+    def set_mode(self, mode: OperationMode):
+        """Set mode."""
+        return self.send("set_mode", [mode.value])
+
+    def set_favorite_level(self, level: int):
+        """Set favorite level."""
+
+        # Set the favorite level used when the mode is `favorite`,
+        # should be  between 0 and 17.
+        return self.send("set_favorite_level", [level])  # 0 ... 17
+
+    def set_led_brightness(self, brightness: LedBrightness):
+        """Set led brightness."""
+        return self.send("set_led_b", [brightness.value])
+
+    def set_led(self, led: bool):
+        """Turn led on/off."""
+        if led:
+            return self.send("set_led", ['on'])
+        else:
+            return self.send("set_led", ['off'])
+
+    def set_buzzer(self, buzzer: bool):
+        """Set buzzer on/off."""
+        if buzzer:
+            return self.send("set_buzzer", ["on"])
+        else:
+            return self.send("set_buzzer", ["off"])

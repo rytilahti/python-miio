@@ -6,10 +6,28 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
+class WaterPurifierStatus:
+    """Container for status reports from the water purifier."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.data = data
+
+    @property
+    def power(self) -> str:
+        return self.data["power"]
+
+    @property
+    def is_on(self) -> bool:
+        return self.power == "on"
+
+    def __str__(self) -> str:
+        return "<WaterPurifierStatus power=%s>" % self.power
+
+
 class WaterPurifier(Device):
     """Main class representing the waiter purifier."""
 
-    def status(self):
+    def status(self) -> WaterPurifierStatus:
         """Retrieve properties."""
 
         properties = ['power']
@@ -37,21 +55,3 @@ class WaterPurifier(Device):
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
-
-
-class WaterPurifierStatus:
-    """Container for status reports from the water purifier."""
-
-    def __init__(self, data: Dict[str, Any]) -> None:
-        self.data = data
-
-    @property
-    def power(self) -> str:
-        return self.data["power"]
-
-    @property
-    def is_on(self) -> bool:
-        return self.power == "on"
-
-    def __str__(self) -> str:
-        return "<WaterPurifierStatus power=%s>" % self.power

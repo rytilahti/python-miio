@@ -69,7 +69,7 @@ class WifiSpeaker(Device):
                       "`play_mode` and `transport_channel`.", stacklevel=2)
         super().__init__(*args, **kwargs)
 
-    def status(self):
+    def status(self) -> WifiSpeakerStatus:
         """Return device status."""
         return WifiSpeakerStatus(self.send("get_prop", ["umi"]))
 
