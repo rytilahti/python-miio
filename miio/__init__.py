@@ -8,7 +8,7 @@ from miio.plug_v1 import PlugV1
 from miio.airpurifier import AirPurifier
 from miio.airhumidifier import AirHumidifier
 from miio.waterpurifier import WaterPurifier
-from miio.strip import Strip
+from miio.powerstrip import PowerStrip
 from miio.ceil import Ceil
 from miio.philips_bulb import PhilipsBulb
 from miio.philips_eyecare import PhilipsEyecare

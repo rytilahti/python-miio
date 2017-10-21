@@ -12,8 +12,8 @@ class PowerMode(enum.Enum):
     Normal = 'normal'
 
 
-class StripStatus:
-    """Container for status reports from the strip."""
+class PowerStripStatus:
+    """Container for status reports from the power strip."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         # Device model: qmi.powerstrip.v1, zimi.powerstrip.v2
@@ -47,7 +47,7 @@ class StripStatus:
         return PowerMode(self.data["mode"])
 
     def __str__(self) -> str:
-        s = "<StripStatus power=%s, temperature=%s, " \
+        s = "<PowerStripStatus power=%s, temperature=%s, " \
             "load_power=%s mode=%s>" % \
             (self.power,
              self.temperature,
@@ -56,10 +56,10 @@ class StripStatus:
         return s
 
 
-class Strip(Device):
-    """Main class representing the smart strip."""
+class PowerStrip(Device):
+    """Main class representing the smart power strip."""
 
-    def status(self) -> StripStatus:
+    def status(self) -> PowerStripStatus:
         """Retrieve properties."""
         properties = ['power', 'temperature', 'current', 'mode']
         values = self.send(
@@ -75,7 +75,7 @@ class Strip(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return StripStatus(
+        return PowerStripStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
     def on(self):
