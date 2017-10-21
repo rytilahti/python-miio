@@ -65,7 +65,7 @@ class PhilipsEyecare(Device):
         """Set Ambient Light brightness level."""
         return self.send("set_amb_bright", [level])
 
-    def status(self):
+    def status(self) -> PhilipsEyecareStatus:
         """Retrieve properties."""
         properties = ['power', 'bright', 'notifystatus', 'ambstatus',
                       'ambvalue', 'eyecare', 'scene_num', 'bls',
