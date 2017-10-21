@@ -45,7 +45,7 @@ class PhilipsBulbStatus:
         return s
 
 
-class Bulb(Device):
+class PhilipsBulb(Device):
     """Main class representing Xiaomi Philips LED Ball Lamp."""
 
     def on(self):
@@ -88,4 +88,4 @@ class Bulb(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
+        return PhilipsBulbStatus(defaultdict(lambda: None, zip(properties, values)))
