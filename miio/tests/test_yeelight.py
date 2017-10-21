@@ -63,7 +63,6 @@ class TestYeelight(TestCase):
         self.device._reset_state()
         status = self.device.status()  # type: YeelightStatus
         assert status.name == self.device.start_state["name"]
-
         assert status.is_on is False
         assert status.brightness == 100
         assert status.color_temp == 3584
@@ -152,7 +151,6 @@ class TestYeelight(TestCase):
         def save_state():
             return self.device.status().save_state_on_change
 
-        save_state = lambda: self.device.status().save_state_on_change
         orig_state = save_state()
         self.device.set_save_state_on_change(not orig_state)
         new_state = save_state()
