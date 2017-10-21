@@ -10,6 +10,7 @@ from miio.airhumidifier import AirHumidifier
 from miio.waterpurifier import WaterPurifier
 from miio.strip import Strip
 from miio.ceil import Ceil
+from miio.philips_bulb import PhilipsBulb
 from miio.philips_eyecare import PhilipsEyecare
 from miio.chuangmi_ir import ChuangmiIr
 from miio.fan import Fan
