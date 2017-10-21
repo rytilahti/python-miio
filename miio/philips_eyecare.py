@@ -1,5 +1,9 @@
+import logging
 from .device import Device
 from typing import Any, Dict
+from collections import defaultdict
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class PhilipsEyecare(Device):
@@ -70,7 +74,15 @@ class PhilipsEyecare(Device):
             "get_prop",
             properties
         )
-        return PhilipsEyecareStatus(dict(zip(properties, values)))
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return PhilipsEyecareStatus(defaultdict(lambda: None, zip(properties, values)))
 
 
 class PhilipsEyecareStatus:
