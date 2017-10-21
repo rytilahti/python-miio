@@ -116,10 +116,10 @@ miio\.protocol module
     :show-inheritance:
     :undoc-members:
 
-miio\.strip module
-------------------
+miio\.powerstrip module
+-----------------------
 
-.. automodule:: miio.strip
+.. automodule:: miio.powerstrip
     :members:
     :show-inheritance:
     :undoc-members:

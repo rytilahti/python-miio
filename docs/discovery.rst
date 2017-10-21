@@ -1,61 +1,159 @@
 Getting started
----------------
+***************
+
+Installation
+============
+
+The easiest way to install the package is to use pip:
+``pip3 install python-miio`` . `Using
+virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`__
+is recommended.
 
 
-Automatic token discovery
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Please make sure you have ``libffi`` and ``openssl`` headers installed, you can
+do this on Debian-based systems (like Rasperry Pi) with
+
+.. code-block:: bash
+
+    apt-get install libffi-dev libssl-dev
+
+Depending on your installation, the setuptools version may be too old
+for some dependencies so before reporting an issue please try to update
+the setuptools package with
+
+.. code-block:: bash
+
+    pip3 install -U setuptools
+
+In case you get an error similar like
+``ImportError: No module named 'packaging'`` during the installation,
+you need to upgrade pip and setuptools:
+
+.. code-block:: bash
+
+    pip3 install -U pip setuptools
+
+Device discovery
+================
+Devices already connected on the same network where the command-line tool is run
+are automatically detected when ``mirobo discover`` is invoked.
+
+To be able to communicate with devices their IP address and a device-specific encryption token must be known.
+If the discovery returned a token with characters other than ``0``\ s or ``f``\ s,
+that is likely a valid token for the given device and can be used directly.
+In case that is not the case, the token needs to be found out other ways, e.g. by :ref:`extracting from backups <creating_backup>`
+of the Mi Home application.
 
 .. IMPORTANT::
 
     For some devices (e.g. the vacuum cleaner) the automatic discovery works only before the device has been connected over the app to your local wifi.
-    This does not work starting from firmware version 3.3.9\_003077 onwards, in which case the procedure shown in creating_backup_ has to be used.
+    This does not work starting from firmware version 3.3.9\_003077 onwards, in which case the procedure shown in :ref:`creating_backup` has to be used
+    to obtain the token.
 
-In order to use automatic token discovery, the device on which `python-miio` is run has to be connected over wifi to the device.
-This involves usually reseting to device so that it will offer its initial setup network (e.g. rockrobo-XXXX in case of the vacuum).
-The following command will execute the discovery process using the miIO protocol, which sometimes yields usable tokens.
+.. NOTE::
 
-::
+    Some devices also do not announce themselves via mDNS (e.g. Philips' bulbs,
+    and the vacuum when not connected to the Internet),
+    but are nevertheless discoverable by using a miIO discovery.
+    See :ref:`handshake_discovery` for more information about the topic.
 
-    mirobo discover --handshake 1
+.. _handshake_discovery:
 
-which should return something similar to this:
+Discovery by a handshake
+------------------------
 
-::
+The devices supporting miIO protocol answer to a broadcasted handshake packet,
+which also sometime contain the required token.
 
-    INFO:mirobo.vacuum:  IP 192.168.8.1: Xiaomi Mi Robot Vacuum - token: b'ffffffffffffffffffffffffffffffff'
+Executing ``mirobo discover`` with ``--handshake 1`` option will send the handshake packet,
+which may yield an usable token.
 
-If the value is as shown above, the vacuum has already been connected
-and it needs a reset. Otherwise the token can be copied over and used
-for controlling.
+.. code-block:: bash
+
+    $ mirobo discover --handshake 1
+    INFO:miio.device:  IP 192.168.8.1: Xiaomi Mi Robot Vacuum - token: b'ffffffffffffffffffffffffffffffff'
 
 
 .. NOTE::
-    For the Mi Robot Vacuum Cleaner with firmware 3.3.9\_003077
-    or higher follow these steps to get the token:
-    https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain\_token\_mirobot\_new.md
-    (`another source <https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md>`__).
+    This method can also be useful for devices not yet connected to any network.
+    In those cases the device trying to do the discovery has to connect to the
+    network advertised by the corresponding device (e.g. rockrobo-XXXX for vacuum)
 
-    This will also work for all other devices as long as the device has been bound with the Mi Home mobile application,
-    and is therefore preferable way to attain the token.
+
+Tokens full of ``0``\ s or ``f``\ s (as above) are either already paired
+with the mobile app or will not yield a token through this method.
+In those cases the procedure shown next in :ref`creating_backup` has to be used.
 
 .. _creating_backup:
 
+Tokens from backups
+===================
+
+If you are reading this, the automatic extraction of tokens did not apparently work.
+There is another way to get the tokens which works by extracting them from a database of the Mi Home app.
+For this to work the devices have to be added to the mobile app before the database (or backup) is extracted.
+
 Creating a backup
-~~~~~~~~~~~~~~~~~
+-----------------
 
-asdf
+The first step to do this is to extract either a database file or a backup from the Mi Home app.
+A procedure to do that will be described next.
 
-Extracting tokens from backups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You may also find instructions in the following links useful:
 
-The package provides a command line tool ``miio-extract-tokens``` to extract tokens from Android backups and SQlite databases.
-Please follow the above-mentioned procedure to retrieve a backup (Android) or a SQlite database (Android & Apple).
+- https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain\_token\_mirobot\_new.md
+- https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md
+
+Android
+~~~~~~~
+
+To do a backup of an Android app you need to have the developer mode active.
+
+.. TODO::
+    Add a link how to enable the developer mode.
+    This part of documentation needs your help!
+    Please consider submitting a pull request to update this.
+
+After you have connected your device to your computer,
+and installed the Android developer tools,
+you can use ``adb`` tool to create a backup.
+
+.. code-block:: bash
+
+    adb backup -noapk com.xiaomi.smarthome -f backup.ab
+
+.. NOTE::
+    Depending on your Android you may need to insert a password
+    and/or accept the backup, so check your phone at this point!
+
+If everything went fine and you got a ``backup.ab`` file please continue to :ref:`token_extraction`.
+
+Apple
+~~~~~
+
+.. TODO::
+    This part of documentation needs your help!
+    Please consider submitting a pull request to update this.
+
+asdfdsf
+
+.. _token_extraction:
+
+
+Extracting tokens
+-----------------
+
+Now having extract either a backup or a database from the application,
+the ``miio-extract-tokens`` can be used to extract the tokens from it.
+
+At the moment extracting tokens from a backup (Android) or from an extracted database (Android, Apple) are supported.
+
 Encrypted tokens as recently introduced on iOS devices will be automatically decrypted.
 For decrypting encrypted Android backups the password has to be given to the command with ``--password <password>``.
 
 *Please feel free to submit pull requests to simplify this procedure!*
 
-::
+.. code-block:: bash
 
     $ miio-extract-tokens backup.ab
     Opened backup/backup.ab
@@ -87,3 +185,16 @@ For decrypting encrypted Android backups the password has to be given to the com
             Token: 476e6b70343055483XXX
             MAC: 28:6C:07:XX:XX:XX
 
+
+Environment variables for command-line tools
+============================================
+
+To simplify the use, instead of passing the IP and the token as a
+parameter for the tool, you can simply set the following environment variables.
+The following works for `mirobo`, see the documentation of other tools
+in their documentation.
+
+.. code-block:: bash
+
+    export MIROBO_IP=192.168.1.2
+    export MIROBO_TOKEN=476e6b70343055483230644c53707a12

@@ -11,39 +11,7 @@ Following features of the vacuum cleaner are currently supported:
 -  Setting and querying the timezone.
 -  Manual control of the robot. **Patches for a nicer API are very welcome.**
 
-Use ``mirobo --help`` for help on available commands and their parameters.
-
-:py:class:`API <miio.Vacuum>`
-
-DND functionality
-~~~~~~~~~~~~~~~~~
-
-To disable:
-
-::
-
-    mirobo dnd off
-
-To enable (dnd 22:00-0600):
-
-::
-
-    mirobo dnd on 22 0 6 0
-
-It is also possible to run raw commands for testing:
-
-::
-
-    mirobo raw_command app_start
-
-or with parameters (same as above dnd on):
-
-::
-
-    mirobo raw_command set_dnd_timer '[22,0,6,0]'
-
-If you find a new command please let us know by creating a pull request
-or an issue, if you do not want to implement it on your own!
+Use :ref:`mirobo --help <HelpOutput>` for help on available commands and their parameters.
 
 Usage examples
 --------------
@@ -155,3 +123,45 @@ Cleaning history
     Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
       Area cleaned: 32.16 m²
       Duration: (0:23:54)
+
+
+DND functionality
+~~~~~~~~~~~~~~~~~
+
+To disable:
+
+::
+
+    mirobo dnd off
+
+To enable (dnd 22:00-0600):
+
+::
+
+    mirobo dnd on 22 0 6 0
+
+It is also possible to run raw commands for testing:
+
+::
+
+    mirobo raw_command app_start
+
+or with parameters (same as above dnd on):
+
+::
+
+    mirobo raw_command set_dnd_timer '[22,0,6,0]'
+
+If you find a new command please let us know by creating a pull request
+or an issue, if you do not want to implement it on your own!
+
+.. _HelpOutput:
+
+`mirobo --help`
+~~~~~~~~~~~~~~~
+
+.. click:: miio.vacuum_cli:cli
+   :prog: mirobo
+   :show-nested:
+
+:py:class:`API <miio.Vacuum>`

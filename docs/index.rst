@@ -5,29 +5,20 @@
 
 .. include:: ../README.rst
 
-Installation
-============
 
-Please make sure you have libffi and openssl headers installed, you can
-do this on Debian-based systems (like Rasperry Pi) with
-``apt-get install libffi-dev libssl-dev``. Also do note that the
-setuptools version is too old for installing some requirements, so
-before trying to install this package you should update the setuptools
-with ``pip3 install -U setuptools``.
+History
+-------
+This project was started to allow controlling locally available Xiaomi
+Vacuum cleaner robot with Python (hence the old name ``python-mirobo``),
+however, thanks to contributors it has been extended to allow
+controlling other Xiaomi devices using the same protocol `miIO protocol <https://github.com/OpenMiHome/mihome-binary-protocol>`__.
+(`another source for vacuum-specific
+documentation <https://github.com/marcelrv/XiaomiRobotVacuumProtocol>`__)
 
-The easiest way to install the package is to use pip:
-``pip3 install python-miio`` . `Using
-virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`__
-is recommended.
-
-In case you get an error similar like
-``ImportError: No module named 'packaging'`` during the installation,
-you need to upgrade pip and setuptools:
-
-::
-
-    $ pip3 install -U pip setuptools
-
+First and foremost thanks for the nice people over `ioBroker
+forum <http://forum.iobroker.net/viewtopic.php?f=23&t=4898>`__ who
+figured out the encryption to make this library possible.
+Furthermore thanks goes to contributors of this project who have helped to extend this to cover not only the vacuum cleaner.
 
 .. toctree::
     :maxdepth: 2
@@ -35,5 +26,9 @@ you need to upgrade pip and setuptools:
 
     Home <self>
     discovery
+    new_devices
     vacuum
+    plug
+    ceil
+    eyecare
     API <miio>
