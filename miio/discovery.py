@@ -3,7 +3,7 @@ import zeroconf
 import ipaddress
 import inspect
 import codecs
-from . import (Device, Vacuum, Plug, PlugV1, Strip, AirPurifier, Ceil,
+from . import (Device, Vacuum, Plug, PlugV1, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
                WaterPurifier, WifiSpeaker, Yeelight)
 from typing import Union, Callable, Dict, Optional  # noqa: F401
@@ -17,8 +17,8 @@ DEVICE_MAP = {
     "chuangmi-plug-m1": Plug,
     "chuangmi-plug-v2": Plug,
     "chuangmi-plug-v1": PlugV1,
-    "qmi-powerstrip-v1": Strip,
-    "zimi-powerstrip-v2": Strip,
+    "qmi-powerstrip-v1": PowerStrip,
+    "zimi-powerstrip-v2": PowerStrip,
     "zhimi-airpurifier-m1": AirPurifier,
     "zhimi-airpurifier-m2": AirPurifier,
     "zhimi-airpurifier-v1": AirPurifier,
