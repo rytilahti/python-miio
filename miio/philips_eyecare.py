@@ -70,6 +70,26 @@ class PhilipsEyecareStatus:
 class PhilipsEyecare(Device):
     """Main class representing Xiaomi Philips Eyecare Smart Lamp 2."""
 
+    def status(self) -> PhilipsEyecareStatus:
+        """Retrieve properties."""
+        properties = ['power', 'bright', 'notifystatus', 'ambstatus',
+                      'ambvalue', 'eyecare', 'scene_num', 'bls',
+                      'dvalue', ]
+        values = self.send(
+            "get_prop",
+            properties
+        )
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return PhilipsEyecareStatus(
+            defaultdict(lambda: None, zip(properties, values)))
+
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
@@ -125,23 +145,3 @@ class PhilipsEyecare(Device):
     def set_ambient_brightness(self, level: int):
         """Set Ambient Light brightness level."""
         return self.send("set_amb_bright", [level])
-
-    def status(self) -> PhilipsEyecareStatus:
-        """Retrieve properties."""
-        properties = ['power', 'bright', 'notifystatus', 'ambstatus',
-                      'ambvalue', 'eyecare', 'scene_num', 'bls',
-                      'dvalue', ]
-        values = self.send(
-            "get_prop",
-            properties
-        )
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count, values_count)
-
-        return PhilipsEyecareStatus(
-            defaultdict(lambda: None, zip(properties, values)))
