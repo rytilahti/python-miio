@@ -32,10 +32,7 @@ class AirQualityMonitorStatus:
 
 
 class AirQualityMonitor(Device):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def status(self):
+    def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
         properties = ['power', 'aqi', 'battery', 'usb_state']

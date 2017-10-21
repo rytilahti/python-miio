@@ -113,7 +113,7 @@ class FanStatus:
 class Fan(Device):
     """Main class representing the Xiaomi Smart Fan."""
 
-    def status(self):
+    def status(self) -> FanStatus:
         """Retrieve properties."""
         properties = ['temp_dec', 'humidity', 'angle', 'speed',
                       'poweroff_time', 'power', 'ac_power', 'battery',

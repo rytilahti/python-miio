@@ -59,15 +59,7 @@ class StripStatus:
 class Strip(Device):
     """Main class representing the smart strip."""
 
-    def on(self):
-        """Power on."""
-        return self.send("set_power", ["on"])
-
-    def off(self):
-        """Power off."""
-        return self.send("set_power", ["off"])
-
-    def status(self):
+    def status(self) -> StripStatus:
         """Retrieve properties."""
         properties = ['power', 'temperature', 'current', 'mode']
         values = self.send(
@@ -85,6 +77,14 @@ class Strip(Device):
 
         return StripStatus(
             defaultdict(lambda: None, zip(properties, values)))
+
+    def on(self):
+        """Power on."""
+        return self.send("set_power", ["on"])
+
+    def off(self):
+        """Power off."""
+        return self.send("set_power", ["off"])
 
     def set_power_mode(self, mode: PowerMode):
         """Set mode."""

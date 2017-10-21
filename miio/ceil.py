@@ -64,6 +64,24 @@ class Ceil(Device):
     # TODO: - Auto On/Off Not Supported
     #       - Adjust Scenes with Wall Switch Not Supported
 
+    def status(self) -> CeilStatus:
+        """Retrieve properties."""
+        properties = ['power', 'bright', 'cct', 'snm', 'dv', 'bl', 'ac', ]
+        values = self.send(
+            "get_prop",
+            properties
+        )
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
+
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
@@ -103,21 +121,3 @@ class Ceil(Device):
     def automatic_color_temperature_off(self):
         """Automatic color temperature off."""
         return self.send("enable_ac", [0])
-
-    def status(self) -> CeilStatus:
-        """Retrieve properties."""
-        properties = ['power', 'bright', 'cct', 'snm', 'dv', 'bl', 'ac', ]
-        values = self.send(
-            "get_prop",
-            properties
-        )
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count, values_count)
-
-        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))

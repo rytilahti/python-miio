@@ -1,38 +1,14 @@
+import logging
+from typing import Dict, Any
+from collections import defaultdict
 from .device import Device
-from typing import Any, Dict
 
-
-class PlugV1(Device):
-    """Main class representing the chuangmi plug v1."""
-
-    def on(self):
-        """Power on."""
-        return self.send("set_on", [])
-
-    def off(self):
-        """Power off."""
-        return self.send("set_off", [])
-
-    def usb_on(self):
-        """Power on."""
-        return self.send("set_usb_on", [])
-
-    def usb_off(self):
-        """Power off."""
-        return self.send("set_usb_off", [])
-
-    def status(self):
-        """Retrieve properties."""
-        properties = ['on', 'usb_on']
-        values = self.send(
-            "get_prop",
-            properties
-        )
-        return PlugV1Status(dict(zip(properties, values)))
+_LOGGER = logging.getLogger(__name__)
 
 
 class PlugV1Status:
     """Container for status reports from the plug."""
+
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
 
@@ -53,3 +29,42 @@ class PlugV1Status:
             (self.power,
              self.usb_power)
         return s
+
+
+class PlugV1(Device):
+    """Main class representing the chuangmi plug v1."""
+
+    def status(self) -> PlugV1Status:
+        """Retrieve properties."""
+        properties = ['on', 'usb_on']
+        values = self.send(
+            "get_prop",
+            properties
+        )
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return PlugV1Status(
+            defaultdict(lambda: None, zip(properties, values)))
+
+    def on(self):
+        """Power on."""
+        return self.send("set_on", [])
+
+    def off(self):
+        """Power off."""
+        return self.send("set_off", [])
+
+    def usb_on(self):
+        """Power on."""
+        return self.send("set_usb_on", [])
+
+    def usb_off(self):
+        """Power off."""
+        return self.send("set_usb_off", [])

@@ -19,10 +19,60 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
+class AirHumidifierStatus:
+    """Container for status reports from the air humidifier."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.data = data
+
+    @property
+    def power(self) -> str:
+        return self.data["power"]
+
+    @property
+    def is_on(self) -> bool:
+        return self.power == "on"
+
+    @property
+    def mode(self) -> OperationMode:
+        return OperationMode(self.data["mode"])
+
+    @property
+    def temperature(self) -> Optional[float]:
+        if self.data["temp_dec"] is not None:
+            return self.data["temp_dec"] / 10.0
+        return None
+
+    @property
+    def humidity(self) -> int:
+        return self.data["humidity"]
+
+    @property
+    def buzzer(self) -> bool:
+        return self.data["buzzer"] == "on"
+
+    @property
+    def led(self) -> bool:
+        return self.data["led"] == "on"
+
+    @property
+    def led_brightness(self) -> Optional[LedBrightness]:
+        if self.data["led_b"] is not None:
+            return LedBrightness(self.data["led_b"])
+        return None
+
+    def __str__(self) -> str:
+        s = "<AirHumidiferStatus power=%s, mode=%s, temperature=%s, " \
+            "humidity=%s%%, led=%s, led_brightness=%s, buzzer=%s>" % \
+            (self.power, self.mode, self.temperature,
+             self.humidity, self.led, self.led_brightness, self.buzzer)
+        return s
+
+
 class AirHumidifier(Device):
     """Main class representing the air humidifier."""
 
-    def status(self):
+    def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
 
         properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
@@ -73,53 +123,3 @@ class AirHumidifier(Device):
             return self.send("set_buzzer", ["on"])
         else:
             return self.send("set_buzzer", ["off"])
-
-
-class AirHumidifierStatus:
-    """Container for status reports from the air humidifier."""
-
-    def __init__(self, data: Dict[str, Any]) -> None:
-        self.data = data
-
-    @property
-    def power(self) -> str:
-        return self.data["power"]
-
-    @property
-    def is_on(self) -> bool:
-        return self.power == "on"
-
-    @property
-    def mode(self) -> OperationMode:
-        return OperationMode(self.data["mode"])
-
-    @property
-    def temperature(self) -> Optional[float]:
-        if self.data["temp_dec"] is not None:
-            return self.data["temp_dec"] / 10.0
-        return None
-
-    @property
-    def humidity(self) -> int:
-        return self.data["humidity"]
-
-    @property
-    def buzzer(self) -> bool:
-        return self.data["buzzer"] == "on"
-
-    @property
-    def led(self) -> bool:
-        return self.data["led"] == "on"
-
-    @property
-    def led_brightness(self) -> Optional[LedBrightness]:
-        if self.data["led_b"] is not None:
-            return LedBrightness(self.data["led_b"])
-        return None
-
-    def __str__(self) -> str:
-        s = "<AirHumidiferStatus power=%s, mode=%s, temperature=%s, " \
-            "humidity=%s%%, led=%s, led_brightness=%s, buzzer=%s>" % \
-            (self.power, self.mode, self.temperature,
-             self.humidity, self.led, self.led_brightness, self.buzzer)
-        return s
