@@ -5,7 +5,7 @@ import sqlite3
 from Crypto.Cipher import AES
 from pprint import pformat as pf
 import attr
-from .android_backup import AndroidBackup
+from android_backup import AndroidBackup
 
 logging.basicConfig(level=logging.INFO)
 _LOGGER = logging.getLogger(__name__)
