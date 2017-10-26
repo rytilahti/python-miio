@@ -111,7 +111,7 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
     reader = BackupDatabaseReader(dump_raw)
     if backup.endswith(".ab"):
         DBFILE = "apps/com.xiaomi.smarthome/db/miio2.db"
-        with AndroidBackup(backup) as f:
+        with AndroidBackup(backup, stream=False) as f:
             tar = f.read_data(password)
             try:
                 db = tar.extractfile(DBFILE)
