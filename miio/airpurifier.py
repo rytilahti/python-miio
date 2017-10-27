@@ -174,8 +174,8 @@ class AirPurifier(Device):
         """Set favorite level."""
 
         # Set the favorite level used when the mode is `favorite`,
-        # should be  between 0 and 17.
-        return self.send("set_favorite_level", [level])  # 0 ... 17
+        # should be  between 0 and 16.
+        return self.send("set_level_favorite", [level])  # 0 ... 16
 
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
