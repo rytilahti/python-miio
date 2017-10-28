@@ -211,6 +211,17 @@ $ mirobo home
 Requesting return to home: 0
 ```
 
+### Configure wifi settings (WPA2)
+
+```
+$ mirobo configure_wifi "My SSID" "My Wifi password"
+Configuring wifi to SSID: My SSID
+OK
+```
+
+It may take a few minutes before the robot responds to commands after it connected to the
+wifi network, especially if you block its internet access.
+
 ### Setting the fanspeed
 
 ```
