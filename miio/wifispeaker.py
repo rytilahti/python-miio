@@ -28,6 +28,11 @@ class WifiSpeakerStatus:
     def state(self) -> str:
         """State of the device, e.g. PLAYING."""
         # note: this can be enumized when all values are known
+        class PlayState:
+            Playing = "PLAYING"
+            Stopped = "STOPPED"
+            Paused = "PAUSED_PLAYBACK"
+
         return self.data["current_state"]
 
     @property
@@ -59,6 +64,10 @@ class WifiSpeakerStatus:
     def transport_channel(self) -> str:
         """Transport channel, e.g. PLAYLIST"""
         # note: this can be enumized when all values are known
+        class TransportChannel:
+            Playlist = "PLAYLIST"
+            OneTime = "ONETIME"
+
         return self.data["transport_channel"]
 
 
