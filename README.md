@@ -222,6 +222,9 @@ OK
 It may take a few minutes before the robot responds to commands after it connected to the
 wifi network, especially if you block its internet access.
 
+The token does not change by configuring wifi. All subsequent commands must be sent to
+the IP that the robot obtains via DHCP from your router.
+
 ### Setting the fanspeed
 
 ```
