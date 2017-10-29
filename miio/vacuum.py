@@ -204,7 +204,8 @@ class Vacuum(Device):
 
     def configure_wifi(self, ssid, password, uid=0):
         """Configure the wifi settings."""
-        return self.send("miIO.config_router", { "ssid": ssid, "passwd": password, "uid": uid })[0]
+        params = {"ssid": ssid, "passwd": password, "uid": uid}
+        return self.send("miIO.config_router", params)[0]
 
     def raw_command(self, cmd, params):
         """Send a raw command to the robot."""
