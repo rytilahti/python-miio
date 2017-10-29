@@ -202,6 +202,11 @@ class Vacuum(Device):
         """Set the timezone."""
         return self.send("set_timezone", [new_zone])[0] == 'ok'
 
+    def configure_wifi(self, ssid, password, uid=0):
+        """Configure the wifi settings."""
+        params = {"ssid": ssid, "passwd": password, "uid": uid}
+        return self.send("miIO.config_router", params)[0]
+
     def raw_command(self, cmd, params):
         """Send a raw command to the robot."""
         return self.send(cmd, params)

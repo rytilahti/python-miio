@@ -211,6 +211,22 @@ $ mirobo home
 Requesting return to home: 0
 ```
 
+### Configure wifi settings (WPA2)
+
+```
+$ mirobo configure_wifi "My SSID" "My Wifi password"
+Configuring wifi to SSID: My SSID
+OK
+```
+
+It may take a few minutes before the robot responds to commands after it connected to the
+wifi network, especially if you block its internet access.
+
+The token does not change by configuring wifi. All subsequent commands must be sent to
+the IP that the robot obtains via DHCP from your router.
+
+*Note, that this only works on devices from which you have obtained a token beforehand and therefore rules out e.g. vacuums with firmware 3.3.9_003077 or higher.* Any ideas for extracting the token on newer devices without using the official app and extracting them from the database are appreciated!
+
 ### Setting the fanspeed
 
 ```

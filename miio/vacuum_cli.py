@@ -418,6 +418,17 @@ def timezone(vac: miio.Vacuum, tz=None):
 
 
 @cli.command()
+@click.argument('ssid', required=True)
+@click.argument('password', required=True)
+@click.argument('uid', type=int, required=False)
+@pass_dev
+def configure_wifi(vac: miio.Vacuum, ssid: str, password: str, uid: int):
+    """Configure the wifi settings."""
+    click.echo("Configuring wifi to SSID: %s" % ssid)
+    click.echo(vac.configure_wifi(ssid, password, uid))
+
+
+@cli.command()
 @click.argument('cmd', required=True)
 @click.argument('parameters', required=False)
 @pass_dev
