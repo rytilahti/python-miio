@@ -421,11 +421,16 @@ def timezone(vac: miio.Vacuum, tz=None):
 @click.argument('ssid', required=True)
 @click.argument('password', required=True)
 @click.argument('uid', type=int, required=False)
+@click.option('--timezone', type=str, required=False, default=None)
 @pass_dev
-def configure_wifi(vac: miio.Vacuum, ssid: str, password: str, uid: int):
-    """Configure the wifi settings."""
+def configure_wifi(vac: miio.Vacuum, ssid: str, password: str,
+                   uid: int, timezone: str):
+    """Configure the wifi settings.
+
+    Note that some newer firmwares may expect you to define the timezone
+    by using --timezone."""
     click.echo("Configuring wifi to SSID: %s" % ssid)
-    click.echo(vac.configure_wifi(ssid, password, uid))
+    click.echo(vac.configure_wifi(ssid, password, uid, timezone))
 
 
 @cli.command()
