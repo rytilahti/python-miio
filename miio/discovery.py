@@ -17,6 +17,7 @@ DEVICE_MAP = {
     "chuangmi-plug-m1": Plug,
     "chuangmi-plug-v2": Plug,
     "chuangmi-plug-v1": PlugV1,
+    "chuangmi-plug_": PlugV1,
     "qmi-powerstrip-v1": PowerStrip,
     "zimi-powerstrip-v2": PowerStrip,
     "zhimi-airpurifier-m1": AirPurifier,

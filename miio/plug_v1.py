@@ -24,10 +24,15 @@ class PlugV1Status:
     def usb_power(self) -> bool:
         return self.data["usb_on"]
 
+    @property
+    def temperature(self) -> float:
+        return self.data["temperature"]
+
     def __str__(self) -> str:
-        s = "<PlugV1Status power=%s, usb_power=%s>" % \
+        s = "<PlugV1Status power=%s, usb_power=%s, temperature=%s>" % \
             (self.power,
-             self.usb_power)
+             self.usb_power,
+             self.temperature)
         return s
 
 
@@ -36,7 +41,7 @@ class PlugV1(Device):
 
     def status(self) -> PlugV1Status:
         """Retrieve properties."""
-        properties = ['on', 'usb_on']
+        properties = ['on', 'usb_on', 'temperature']
         values = self.send(
             "get_prop",
             properties
