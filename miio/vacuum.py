@@ -3,6 +3,8 @@ import math
 import time
 from typing import List
 import enum
+import datetime
+import pytz
 
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                CleaningSummary, CleaningDetails, Timer)
@@ -202,9 +204,15 @@ class Vacuum(Device):
         """Set the timezone."""
         return self.send("set_timezone", [new_zone])[0] == 'ok'
 
-    def configure_wifi(self, ssid, password, uid=0):
+    def configure_wifi(self, ssid, password, uid=0, timezone=None):
         """Configure the wifi settings."""
         params = {"ssid": ssid, "passwd": password, "uid": uid}
+        if timezone is not None:
+            now = datetime.datetime.now(pytz.timezone(timezone))
+            offset_as_float = now.utcoffset().total_seconds() / 60 / 60
+            params["tz"] = timezone
+            params["gmt_offset"] = offset_as_float
+
         return self.send("miIO.config_router", params)[0]
 
     def raw_command(self, cmd, params):
