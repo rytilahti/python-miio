@@ -34,7 +34,8 @@ setup(
                       'zeroconf',
                       'pycrypto',
                       'attrs',
-                      'android_backup'],
+                      'android_backup',
+                      'pytz'],
 
     entry_points={
         'console_scripts': [
