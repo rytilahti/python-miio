@@ -1,5 +1,44 @@
 # Change Log
 
+## [0.3.1](https://github.com/rytilahti/python-miio/tree/0.3.1) (2017-11-01)
+
+New supported devices:
+* Xioami Philips Smart LED Ball Lamp
+
+Improvements:
+* Vacuum: add ability to configure used wifi network
+* Plug V1: improved discovery, add temperature reporting
+* Airpurifier: setting of favorite level works now
+* Eyecare: safer mapping of properties
+
+Breaking:
+* Strip has been renamed to PowerStrip to avoid confusion
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.0...0.3.1)
+
+**Fixed bugs:**
+
+- AirPurifier: set\_favorite\_level not working [\#103](https://github.com/rytilahti/python-miio/issues/103)
+
+**Closed issues:**
+
+- Unsupported device [\#108](https://github.com/rytilahti/python-miio/issues/108)
+- Xiaomi Vacuum resume cleaning session from dock capability? [\#102](https://github.com/rytilahti/python-miio/issues/102)
+
+**Merged pull requests:**
+
+- Chuang Mi Plug V1: Property "temperature" added & discovery fixed [\#109](https://github.com/rytilahti/python-miio/pull/109) ([syssi](https://github.com/syssi))
+- Add the ability to define a timezone for configure\_wifi [\#107](https://github.com/rytilahti/python-miio/pull/107) ([rytilahti](https://github.com/rytilahti))
+- Make vacuum robot wifi settings configurable via CLI [\#105](https://github.com/rytilahti/python-miio/pull/105) ([infinitydev](https://github.com/infinitydev))
+- API call set\_favorite\_level \(method: set\_level\_favorite\) updated [\#104](https://github.com/rytilahti/python-miio/pull/104) ([syssi](https://github.com/syssi))
+- use upstream android\_backup [\#101](https://github.com/rytilahti/python-miio/pull/101) ([rytilahti](https://github.com/rytilahti))
+- add some tests to vacuum [\#100](https://github.com/rytilahti/python-miio/pull/100) ([rytilahti](https://github.com/rytilahti))
+- Add a base to allow easier testing of devices [\#99](https://github.com/rytilahti/python-miio/pull/99) ([rytilahti](https://github.com/rytilahti))
+- Rename of Strip to PowerStrip to avoid confusion with led strips [\#97](https://github.com/rytilahti/python-miio/pull/97) ([syssi](https://github.com/syssi))
+- Some typing hints added and the code order aligned [\#96](https://github.com/rytilahti/python-miio/pull/96) ([syssi](https://github.com/syssi))
+- Philips Eyecare: More safety property mapping of the device status [\#95](https://github.com/rytilahti/python-miio/pull/95) ([syssi](https://github.com/syssi))
+- Device support of the Xioami Philips Smart LED Ball Lamp [\#94](https://github.com/rytilahti/python-miio/pull/94) ([syssi](https://github.com/syssi))
+
 ## [0.3.0](https://github.com/rytilahti/python-miio/tree/0.3.0) (2017-10-21)
 Good bye to python-mirobo, say hello to python-miio!
 As the library is getting more mature and supports so many other devices besides the vacuum sporting the miIO protocol,
