@@ -1,7 +1,7 @@
 # Python-miio
 
 [![PyPI version](https://badge.fury.io/py/python-miio.svg)](https://badge.fury.io/py/python-miio)
-[![Build Status](https://travis-ci.org/rytilahti/python-miio.svg?branch=0.2.0)](https://travis-ci.org/rytilahti/python-miio)
+[![Build Status](https://travis-ci.org/rytilahti/python-miio.svg?branch=master)](https://travis-ci.org/rytilahti/python-miio)
 [![Code Health](https://landscape.io/github/rytilahti/python-miio/master/landscape.svg?style=flat)](https://landscape.io/github/rytilahti/python-miio/master)
 [![Coverage Status](https://coveralls.io/repos/github/rytilahti/python-miio/badge.svg?branch=master)](https://coveralls.io/github/rytilahti/python-miio?branch=master)
 
