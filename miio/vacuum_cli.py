@@ -145,6 +145,15 @@ def consumables(vac: miio.Vacuum):
 
 
 @cli.command()
+@click.argument('name', type=str, required=True)
+@pass_dev
+def reset_consumable(vac: miio.Vacuum, name):
+    """Query and reset consumable."""
+    click.echo("Reset consumable %s" % name)
+    vac.consumable_reset(name)
+
+
+@cli.command()
 @pass_dev
 def start(vac: miio.Vacuum):
     """Start cleaning."""

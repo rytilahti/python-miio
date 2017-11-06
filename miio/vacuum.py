@@ -110,10 +110,10 @@ class Vacuum(Device):
         """Return information about consumables."""
         return ConsumableStatus(self.send("get_consumable")[0])
 
-    def consumable_reset(self):
+    def consumable_reset(self, name):
         """Reset consumable information."""
-        raise NotImplementedError("unknown parameters")
-        # self.send("reset_consumable", ["unknown"])
+        # name = ["main_brush_work_time", "side_brush_work_time", "sensor_dirty_time" or "filter_work_time"]
+        return self.send("reset_consumable", [name])
 
     def map(self):
         """Return map token."""
