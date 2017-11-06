@@ -31,7 +31,7 @@ DEVICE_MAP = {
     "yunmi-waterpuri-v2": WaterPurifier,
     # It looks like philips devices cannot be discovered via mdns
     "philips-light-bulb": PhilipsBulb,
-    "philips-light-ceil": Ceil,
+    "philips-light-ceiling": Ceil,
     "philips-light-sread1": PhilipsEyecare,
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "yeelink-light-": Yeelight,
