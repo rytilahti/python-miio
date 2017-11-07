@@ -161,8 +161,10 @@ def reset_consumable(vac: miio.Vacuum, name):
     else:
         return
 
-    click.echo("Resetting consumable '%s': %s" % (name,
-                                                  vac.consumable_reset(consumable)))
+    click.echo("Resetting consumable '%s': %s" % (
+        name,
+        vac.consumable_reset(consumable)
+    ))
 
 
 @cli.command()
