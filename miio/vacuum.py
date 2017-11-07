@@ -21,11 +21,13 @@ class TimerState(enum.Enum):
     On = "on"
     Off = "off"
 
+
 class Consumable(enum.Enum):
     MainBrush = "main_brush_work_time"
     SideBrush = "side_brush_work_time"
     Filter = "filter_work_time"
     SensorDirty = "sensor_dirty_time"
+
 
 class Vacuum(Device):
     """Main class representing the vacuum."""
