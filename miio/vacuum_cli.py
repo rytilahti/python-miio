@@ -148,9 +148,20 @@ def consumables(vac: miio.Vacuum):
 @click.argument('name', type=str, required=True)
 @pass_dev
 def reset_consumable(vac: miio.Vacuum, name):
-    """Query and reset consumable."""
-    click.echo("Reset consumable %s" % name)
-    vac.consumable_reset(name)
+    """Reset consumable."""
+    from miio.vacuum import Consumable
+    if name == 'main_brush':
+        consumable = Consumable.MainBrush
+    elif name == 'side_brush':
+        consumable = Consumable.SideBrush
+    elif name == 'filter':
+        consumable = Consumable.Filter
+    elif name == 'sensor_dirty':
+        consumable = Consumable.SensorDirty
+    else:
+        return
+
+    click.echo("Resetting consumable '%s': %s" % (name, vac.consumable_reset(consumable)))
 
 
 @cli.command()
@@ -454,6 +465,6 @@ def raw_command(vac: miio.Vacuum, cmd, parameters):
     click.echo("Sending cmd %s with params %s" % (cmd, params))
     click.echo(vac.raw_command(cmd, params))
 
-
+cli()
 if __name__ == "__main__":
     cli()

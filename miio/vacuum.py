@@ -21,6 +21,12 @@ class TimerState(enum.Enum):
     On = "on"
     Off = "off"
 
+class Consumable(enum.Enum):
+    MainBrush = "main_brush_work_time"
+    SideBrush = "side_brush_work_time"
+    Filter = "filter_work_time"
+    SensorDirty = "sensor_dirty_time"
+
 class Vacuum(Device):
     """Main class representing the vacuum."""
 
@@ -110,10 +116,9 @@ class Vacuum(Device):
         """Return information about consumables."""
         return ConsumableStatus(self.send("get_consumable")[0])
 
-    def consumable_reset(self, name):
+    def consumable_reset(self, consumable: Consumable):
         """Reset consumable information."""
-        # name = ["main_brush_work_time", "side_brush_work_time", "sensor_dirty_time" or "filter_work_time"]
-        return self.send("reset_consumable", [name])
+        return self.send("reset_consumable", [consumable.value])
 
     def map(self):
         """Return map token."""
