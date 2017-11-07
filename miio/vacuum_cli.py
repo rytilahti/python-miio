@@ -465,6 +465,6 @@ def raw_command(vac: miio.Vacuum, cmd, parameters):
     click.echo("Sending cmd %s with params %s" % (cmd, params))
     click.echo(vac.raw_command(cmd, params))
 
-cli()
+
 if __name__ == "__main__":
     cli()
