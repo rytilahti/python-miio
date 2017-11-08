@@ -27,20 +27,10 @@ class PlugStatus:
         """Return temperature."""
         return self.data["temperature"]
 
-    @property
-    def load_power(self) -> Optional[float]:
-        """Return current load power."""
-        if self.data["current"] is not None:
-            # The constant of 110V is used intentionally. The current was
-            # calculated with a wrong reference voltage already.
-            return self.data["current"] * 110
-        return None
-
     def __str__(self) -> str:
-        s = "<PlugStatus power=%s, temperature=%s, load_power=%s>" % \
+        s = "<PlugStatus power=%s, temperature=%s>" % \
             (self.power,
-             self.temperature,
-             self.load_power)
+             self.temperature)
         return s
 
 
@@ -49,7 +39,7 @@ class Plug(Device):
 
     def status(self) -> PlugStatus:
         """Retrieve properties."""
-        properties = ['power', 'temperature', 'current']
+        properties = ['power', 'temperature']
         values = self.send(
             "get_prop",
             properties

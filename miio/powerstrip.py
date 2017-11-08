@@ -40,10 +40,8 @@ class PowerStripStatus:
     @property
     def load_power(self) -> Optional[float]:
         """Current power load, if available."""
-        if self.data["current"] is not None:
-            # The constant of 110V is used intentionally. The current was
-            # calculated with a wrong reference voltage already.
-            return self.data["current"] * 110
+        if self.data["power_consume_rate"] is not None:
+            return self.data["power_consume_rate"]
         return None
 
     @property
@@ -53,10 +51,11 @@ class PowerStripStatus:
 
     def __str__(self) -> str:
         s = "<PowerStripStatus power=%s, temperature=%s, " \
-            "load_power=%s mode=%s>" % \
+            "load_power=%s, current=%s, mode=%s>" % \
             (self.power,
              self.temperature,
              self.load_power,
+             self.current,
              self.mode)
         return s
 
@@ -66,7 +65,7 @@ class PowerStrip(Device):
 
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
-        properties = ['power', 'temperature', 'current', 'mode']
+        properties = ['power', 'temperature', 'current', 'mode', 'power_consume_rate']
         values = self.send(
             "get_prop",
             properties
