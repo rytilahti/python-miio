@@ -148,7 +148,10 @@ def consumables(vac: miio.Vacuum):
 @click.argument('name', type=str, required=True)
 @pass_dev
 def reset_consumable(vac: miio.Vacuum, name):
-    """Reset consumable."""
+    """Reset consumable state
+
+    Allowed values: main_brush, side_brush, filter, sensor_dirty
+    """
     from miio.vacuum import Consumable
     if name == 'main_brush':
         consumable = Consumable.MainBrush
@@ -159,6 +162,7 @@ def reset_consumable(vac: miio.Vacuum, name):
     elif name == 'sensor_dirty':
         consumable = Consumable.SensorDirty
     else:
+        click.echo("Allowed values: main_brush, side_brush, filter, sensor_dirty")
         return
 
     click.echo("Resetting consumable '%s': %s" % (
