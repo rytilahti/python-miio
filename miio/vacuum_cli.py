@@ -148,7 +148,7 @@ def consumables(vac: miio.Vacuum):
 @click.argument('name', type=str, required=True)
 @pass_dev
 def reset_consumable(vac: miio.Vacuum, name):
-    """Reset consumable state
+    """Reset consumable state.
 
     Allowed values: main_brush, side_brush, filter, sensor_dirty
     """
@@ -162,7 +162,7 @@ def reset_consumable(vac: miio.Vacuum, name):
     elif name == 'sensor_dirty':
         consumable = Consumable.SensorDirty
     else:
-        click.echo("Allowed values: main_brush, side_brush, filter, sensor_dirty")
+        click.echo("Unexpected state name: %s" % name)
         return
 
     click.echo("Resetting consumable '%s': %s" % (
