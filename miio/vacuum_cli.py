@@ -145,6 +145,33 @@ def consumables(vac: miio.Vacuum):
 
 
 @cli.command()
+@click.argument('name', type=str, required=True)
+@pass_dev
+def reset_consumable(vac: miio.Vacuum, name):
+    """Reset consumable state.
+
+    Allowed values: main_brush, side_brush, filter, sensor_dirty
+    """
+    from miio.vacuum import Consumable
+    if name == 'main_brush':
+        consumable = Consumable.MainBrush
+    elif name == 'side_brush':
+        consumable = Consumable.SideBrush
+    elif name == 'filter':
+        consumable = Consumable.Filter
+    elif name == 'sensor_dirty':
+        consumable = Consumable.SensorDirty
+    else:
+        click.echo("Unexpected state name: %s" % name)
+        return
+
+    click.echo("Resetting consumable '%s': %s" % (
+        name,
+        vac.consumable_reset(consumable)
+    ))
+
+
+@cli.command()
 @pass_dev
 def start(vac: miio.Vacuum):
     """Start cleaning."""
