@@ -65,7 +65,8 @@ class PowerStrip(Device):
 
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
-        properties = ['power', 'temperature', 'current', 'mode', 'power_consume_rate']
+        properties = ['power', 'temperature', 'current', 'mode',
+                      'power_consume_rate']
         values = self.send(
             "get_prop",
             properties
