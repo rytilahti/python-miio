@@ -292,6 +292,7 @@ class ConsumableStatus:
         self.main_brush_total = timedelta(hours=300)
         self.side_brush_total = timedelta(hours=200)
         self.filter_total = timedelta(hours=150)
+        self.sensors_total = timedelta(hours=30)         
 
     @property
     def main_brush(self) -> timedelta:
@@ -321,6 +322,10 @@ class ConsumableStatus:
     def sensor_dirty(self) -> timedelta:
         return pretty_seconds(self.data["sensor_dirty_time"])
 
+    @property
+    def sensor_dirty_left(self) -> timedelta:
+        return self.side_brush_total - self.sensor_dirty
+    
     def __repr__(self) -> str:
         return "<ConsumableStatus main: %s, side: %s, filter: %s, sensor dirty: %s>" % (  # noqa: E501
             self.main_brush, self.side_brush, self.filter, self.sensor_dirty)
