@@ -292,7 +292,7 @@ class ConsumableStatus:
         self.main_brush_total = timedelta(hours=300)
         self.side_brush_total = timedelta(hours=200)
         self.filter_total = timedelta(hours=150)
-        self.sensor_total = timedelta(hours=30)
+        self.sensor_dirty_total = timedelta(hours=30)
 
     @property
     def main_brush(self) -> timedelta:
