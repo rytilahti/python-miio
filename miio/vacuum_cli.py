@@ -141,7 +141,8 @@ def consumables(vac: miio.Vacuum):
                                                res.side_brush_left))
     click.echo("Filter:       %s (left %s)" % (res.filter,
                                                res.filter_left))
-    click.echo("Sensor dirty: %s" % res.sensor_dirty)
+    click.echo("Sensor dirty: %s (left %s)" % (res.sensor_dirty,
+                                               res.sensor_dirty_left))
 
 
 @cli.command()
