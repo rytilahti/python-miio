@@ -2,7 +2,7 @@ import logging
 import click
 import tempfile
 import sqlite3
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 from pprint import pformat as pf
 import attr
 from android_backup import AndroidBackup

@@ -32,7 +32,7 @@ setup(
                       'pretty_cron',
                       'typing; python_version < "3.5"',
                       'zeroconf',
-                      'pycrypto',
+                      'pycryptodomex',
                       'attrs',
                       'android_backup',
                       'pytz'],
