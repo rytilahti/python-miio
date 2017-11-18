@@ -6,6 +6,7 @@ from Crypto.Cipher import AES
 from pprint import pformat as pf
 import attr
 from android_backup import AndroidBackup
+from typing import Iterator
 
 logging.basicConfig(level=logging.INFO)
 _LOGGER = logging.getLogger(__name__)

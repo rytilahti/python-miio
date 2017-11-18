@@ -28,14 +28,6 @@ miio\.airqualitymonitor module
     :show-inheritance:
     :undoc-members:
 
-miio\.android\_backup module
-----------------------------
-
-.. automodule:: miio.android_backup
-    :members:
-    :show-inheritance:
-    :undoc-members:
-
 miio\.ceil module
 -----------------
 
