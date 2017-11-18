@@ -59,7 +59,7 @@ Home Assistant support
 
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
    :target: https://badge.fury.io/py/python-miio
-.. |Build Status| image:: https://travis-ci.org/rytilahti/python-miio.svg?branch=0.2.0
+.. |Build Status| image:: https://travis-ci.org/rytilahti/python-miio.svg?branch=master
    :target: https://travis-ci.org/rytilahti/python-miio
 .. |Code Health| image:: https://landscape.io/github/rytilahti/python-miio/master/landscape.svg?style=flat
    :target: https://landscape.io/github/rytilahti/python-miio/master
