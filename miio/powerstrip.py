@@ -43,10 +43,12 @@ class PowerStripStatus:
         return None
 
     @property
-    def mode(self) -> PowerMode:
-        return PowerMode(self.data["mode"])
+    def mode(self) -> Optional[PowerMode]:
+        if self.data["mode"] is not None:
+            return PowerMode(self.data["mode"])
+        return None
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<PowerStripStatus power=%s, temperature=%s, " \
             "load_power=%s mode=%s>" % \
             (self.power,
