@@ -30,7 +30,7 @@ setup(
                       'click',
                       'cryptography',
                       'pretty_cron',
-                      'typing',
+                      'typing; python_version < "3.5"',
                       'zeroconf',
                       'pycrypto',
                       'attrs',
