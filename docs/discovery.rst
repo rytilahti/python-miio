@@ -35,14 +35,15 @@ you need to upgrade pip and setuptools:
 
 Device discovery
 ================
-Devices already connected on the same network where the command-line tool is run
-are automatically detected when ``mirobo discover`` is invoked.
+Devices already connected on the same network where the command-line tool
+is run are automatically detected when ``mirobo discover`` is invoked.
 
-To be able to communicate with devices their IP address and a device-specific encryption token must be known.
-If the discovery returned a token with characters other than ``0``\ s or ``f``\ s,
-that is likely a valid token for the given device and can be used directly.
-In case that is not the case, the token needs to be found out other ways, e.g. by :ref:`extracting from backups <creating_backup>`
-of the Mi Home application.
+To be able to communicate with devices their IP address and a device-specific
+encryption token must be known.
+If the returned a token is with characters other than ``0``\ s or ``f``\ s,
+it is likely a valid token which can be used directly for communication.
+If not, the token needs to be extracted from the Mi Home Application,
+see :ref:`creating_backup` for information how to do this.
 
 .. IMPORTANT::
 
@@ -65,8 +66,10 @@ Discovery by a handshake
 The devices supporting miIO protocol answer to a broadcasted handshake packet,
 which also sometime contain the required token.
 
-Executing ``mirobo discover`` with ``--handshake 1`` option will send the handshake packet,
-which may yield an usable token.
+Executing ``mirobo discover`` with ``--handshake 1`` option will send
+a broadcast handshake.
+Devices supporting the protocol will response with a message
+potentially containing a valid token.
 
 .. code-block:: bash
 
@@ -82,24 +85,24 @@ which may yield an usable token.
 
 Tokens full of ``0``\ s or ``f``\ s (as above) are either already paired
 with the mobile app or will not yield a token through this method.
-In those cases the procedure shown next in :ref`creating_backup` has to be used.
+In those cases the procedure shown in :ref:`creating_backup` has to be used.
 
 .. _creating_backup:
 
 Tokens from backups
 ===================
 
-If you are reading this, the automatic extraction of tokens did not apparently work.
-There is another way to get the tokens which works by extracting them from a database of the Mi Home app.
-For this to work the devices have to be added to the mobile app before the database (or backup) is extracted.
+Extracting tokens from a Mi Home backup is the preferred way to obtain tokens.
+For this to work the devices have to be added to the app beforehand
+before the database (or backup) is extracted.
 
 Creating a backup
 -----------------
 
-The first step to do this is to extract either a database file or a backup from the Mi Home app.
-A procedure to do that will be described next.
-
-You may also find instructions in the following links useful:
+The first step to do this is to extract a backup
+or database from the Mi Home app.
+The procedure is briefly described below,
+but you may find the following links also useful:
 
 - https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain\_token\_mirobot\_new.md
 - https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md
@@ -107,10 +110,11 @@ You may also find instructions in the following links useful:
 Android
 ~~~~~~~
 
-To do a backup of an Android app you need to have the developer mode active.
+To do a backup of an Android app you need to have the developer mode active,
+and your device has to be accessible with ``adb``.
 
 .. TODO::
-    Add a link how to enable the developer mode.
+    Add a link how to check and enable the developer mode.
     This part of documentation needs your help!
     Please consider submitting a pull request to update this.
 
@@ -123,10 +127,11 @@ you can use ``adb`` tool to create a backup.
     adb backup -noapk com.xiaomi.smarthome -f backup.ab
 
 .. NOTE::
-    Depending on your Android you may need to insert a password
+    Depending on your Android version you may need to insert a password
     and/or accept the backup, so check your phone at this point!
 
-If everything went fine and you got a ``backup.ab`` file please continue to :ref:`token_extraction`.
+If everything went fine and you got a ``backup.ab`` file,
+please continue to :ref:`token_extraction`.
 
 Apple
 ~~~~~
@@ -135,7 +140,8 @@ Apple
     This part of documentation needs your help!
     Please consider submitting a pull request to update this.
 
-asdfdsf
+See https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token_mirobot_new.md#ios-users
+for instructions how to extract a database from the app.
 
 .. _token_extraction:
 
@@ -146,10 +152,12 @@ Extracting tokens
 Now having extract either a backup or a database from the application,
 the ``miio-extract-tokens`` can be used to extract the tokens from it.
 
-At the moment extracting tokens from a backup (Android) or from an extracted database (Android, Apple) are supported.
+At the moment extracting tokens from a backup (Android),
+or from an extracted database (Android, Apple) are supported.
 
-Encrypted tokens as recently introduced on iOS devices will be automatically decrypted.
-For decrypting encrypted Android backups the password has to be given to the command with ``--password <password>``.
+Encrypted tokens as `recently introduced on iOS devices <https://github.com/rytilahti/python-miio/issues/75>`_ will be automatically decrypted.
+For decrypting Android backups the password has to be provided
+to the tool with ``--password <password>``.
 
 *Please feel free to submit pull requests to simplify this procedure!*
 
@@ -191,8 +199,8 @@ Environment variables for command-line tools
 
 To simplify the use, instead of passing the IP and the token as a
 parameter for the tool, you can simply set the following environment variables.
-The following works for `mirobo`, see the documentation of other tools
-in their documentation.
+The following works for `mirobo`, for other tools you should consult
+the documentation of corresponding tool.
 
 .. code-block:: bash
 

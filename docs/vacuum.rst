@@ -11,7 +11,8 @@ Following features of the vacuum cleaner are currently supported:
 -  Setting and querying the timezone.
 -  Manual control of the robot. **Patches for a nicer API are very welcome.**
 
-Use :ref:`mirobo --help <HelpOutput>` for help on available commands and their parameters.
+Use :ref:`mirobo --help <HelpOutput>`
+for help on available commands and their parameters.
 
 Usage examples
 --------------

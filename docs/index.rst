@@ -18,7 +18,8 @@ documentation <https://github.com/marcelrv/XiaomiRobotVacuumProtocol>`__)
 First and foremost thanks for the nice people over `ioBroker
 forum <http://forum.iobroker.net/viewtopic.php?f=23&t=4898>`__ who
 figured out the encryption to make this library possible.
-Furthermore thanks goes to contributors of this project who have helped to extend this to cover not only the vacuum cleaner.
+Furthermore thanks goes to contributors of this project
+who have helped to extend this to cover not only the vacuum cleaner.
 
 .. toctree::
     :maxdepth: 2

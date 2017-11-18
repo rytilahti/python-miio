@@ -84,6 +84,14 @@ miio\.philips\_eyecare module
     :show-inheritance:
     :undoc-members:
 
+miio\.philips\_bulb module
+--------------------------
+
+.. automodule:: miio.philips_bulb
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
 miio\.plug module
 -----------------
 
