@@ -15,21 +15,21 @@ This library (and its accompanying cli tool) is used to interface with devices u
 Supported devices
 -----------------
 
--  :doc:`Xiaomi Mi Robot Vacuum <vacuum>` (:class:`API <miio.Vacuum>`)
--  :py:class:`Xiaomi Mi Air Purifier Pro & Air Purifier 2 <miio.AirPurifier>`
--  :py:class:`Xiaomi Mi Smart WiFi Socket <miio.Plug>`
--  :py:class:`Xiaomi Mi Smart Socket Plug (1 Socket, 1 USB Port) <miio.Plug>`
--  :py:class:`Xiaomi Smart Power Strip (WiFi, 6 Ports) <miio.Strip>`
--  :py:class:`Xiaomi Philips Eyecare Smart Lamp 2 <miio.PhilipsEyecare>`
--  :py:class:`Xiaomi Philips LED Ceiling Lamp <miio.Ceil>`
--  Xiaomi Philips LED Ball Lamp
--  :py:class:`Xiaomi Universal IR Remote Controller (Chuang Mi IR) <miio.ChuangmiIr>`
--  :py:class:`Xiaomi Mi Smart Fan <miio.Fan>`
--  :py:class:`Xiaomi Mi Air Humidifier <miio.AirHumidifier>`
--  :py:class:`Xiaomi Mi Water Purifier (Basic support: Turn on & off) <miio.WaterPurifier>`
--  :py:class:`Xiaomi PM2.5 Air Quality Monitor <miio.AirQualityMonitor>`
--  :py:class:`Xiaomi Smart Wifi Speaker <miio.WifiSpeaker>` (untested and incomplete, please `feel free to help improve the support <https://github.com/rytilahti/python-miio/issues/69>`__)
--  :py:class:`Yeelight light bulbs <miio.Yeelight>` (only a very rudimentary support, use `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__ for a more complete support)
+-  :doc:`Xiaomi Mi Robot Vacuum <vacuum>` (:class:`miio.vacuum`)
+-  Xiaomi Mi Air Purifier Pro & Air Purifier 2 (:class:`miio.airpurifier`)
+-  :doc:`Xiaomi Mi Smart WiFi Socket <plug>` (:class:`miio.plug`)
+-  :doc:`Xiaomi Mi Smart Socket Plug (1 Socket, 1 USB Port) <plug>` (:class:`miio.plug`)
+-  Xiaomi Smart Power Strip (WiFi, 6 Ports) (:class:`miio.powerstrip`)
+-  :doc:`Xiaomi Philips Eyecare Smart Lamp 2 <eyecare>` (:class:`miio.philips_eyecare`)
+-  :doc:`Xiaomi Philips LED Ceiling Lamp <ceil>` (:class:`miio.ceil`)
+-  Xiaomi Philips LED Ball Lamp (:class:`miio.philips_bulb`)
+-  Xiaomi Universal IR Remote Controller (Chuang Mi IR) (:class:`miio.chuangmi_ir`)
+-  Xiaomi Mi Smart Fan (:class:`miio.fan`)
+-  Xiaomi Mi Air Humidifier (:class:`miio.airhumidifier`)
+-  Xiaomi Mi Water Purifier (Basic support: Turn on & off) (:class:`miio.waterpurifier`)
+-  Xiaomi PM2.5 Air Quality Monitor (:class:`miio.airqualitymonitor`)
+-  Xiaomi Smart Wifi Speaker (:class:`miio.wifispeaker`) (incomplete, please `feel free to help improve the support <https://github.com/rytilahti/python-miio/issues/69>`__)
+-  Yeelight light bulbs (:class:`miio.yeelight`) (only a very rudimentary support, use `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__ for a more complete support)
 
 *Feel free to create a pull request to add support for new devices as
 well as additional features for supported devices.*
