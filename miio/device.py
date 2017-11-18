@@ -10,11 +10,14 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DeviceException(Exception):
+    """Exception wrapping any communication errors with the device."""
     pass
 
 
 class DeviceInfo:
-    """Presentation of miIO device information."""
+    """Container of miIO device information.
+    Hardware properties such as device model, MAC address, memory information,
+    and hardware and software information is contained here."""
     def __init__(self, data):
         """
         Response of a Xiaomi Smart WiFi Plug
@@ -48,42 +51,56 @@ class DeviceInfo:
 
     @property
     def network_interface(self):
-        """Return information about network configuration."""
+        """Information about network configuration."""
         return self.data["netif"]
 
     @property
     def accesspoint(self):
-        """Return information about connected wlan accesspoint."""
+        """Information about connected wlan accesspoint."""
         return self.data["ap"]
 
     @property
     def model(self) -> Optional[str]:
+        """Model string if available."""
         if self.data["model"] is not None:
             return self.data["model"]
         return None
 
     @property
     def firmware_version(self) -> Optional[str]:
+        """Firmware version if available."""
         if self.data["fw_ver"] is not None:
             return self.data["fw_ver"]
         return None
 
     @property
     def hardware_version(self) -> Optional[str]:
+        """Hardware version if available."""
         if self.data["hw_ver"] is not None:
             return self.data["hw_ver"]
         return None
 
     @property
     def raw(self):
-        """Return raw data returned by the device."""
+        """Raw data as returned by the device."""
         return self.data
 
 
 class Device:
-    """Base class for all device implementations."""
+    """Base class for all device implementations.
+    This is the main class providing the basic protocol handling for devices using
+    the ``miIO`` protocol.
+    This class should not be initialized directly but a device-specific class inheriting
+    it should be used instead of it."""
     def __init__(self, ip: str = None, token: str = None,
                  start_id: int=0, debug: int=0) -> None:
+        """
+        Create a :class:`Device` instance.
+        :param ip: IP address or a hostname for the device
+        :param token: Token used for encryption
+        :param start_id: Running message id sent to the device
+        :param debug: Wanted debug level
+        """
         self.ip = ip
         self.port = 54321
         if token is None:
@@ -99,8 +116,14 @@ class Device:
         self._serial = None
 
     def do_discover(self) -> Message:
-        """Does a discover to fetch the device type and serial.
-        Raises a DeviceException if the device could not be discovered."""
+        """Send a handshake to the device,
+        which can be used to the device type and serial.
+        The handshake must also be done regularly to enable communication
+        with the device.
+
+        :rtype: Message
+
+        :raises DeviceException: if the device could not be discovered."""
         m = Device.discover(self.ip)
         if m is not None:
             self._devtype = m.header.value.devtype
@@ -121,7 +144,13 @@ class Device:
 
     @staticmethod
     def discover(addr: str=None) -> Any:
-        """Scan for devices in the network."""
+        """Scan for devices in the network.
+        This method is used to discover supported devices by sending a
+        handshake message to the broadcast address on port 54321.
+        If the target IP address is given, the handshake will be send as
+        an unicast packet.
+
+        :param str addr: Target IP address"""
         timeout = 5
         is_broadcast = addr is None
         seen_addrs = []  # type: List[str]
@@ -161,7 +190,14 @@ class Device:
                 break
 
     def send(self, command: str, parameters: Any=None, retry_count=3) -> Any:
-        """Build and send the given command."""
+        """Build and send the given command.
+        Note that this will implicitly call :func:`do_discover` to do a handshake,
+        and will re-try in case of errors while incrementing the `_id` by 100.
+
+        :param str command: Command to send
+        :param dict parameters: Parameters to send, or an empty list FIXME
+        :param retry_count: How many times to retry in case of failure
+        :raises DeviceException: if an error has occured during communication."""
         self.do_discover()
 
         cmd = {
@@ -223,11 +259,18 @@ class Device:
             raise DeviceException from ex
 
     def raw_command(self, cmd, params):
-        """Send a raw command to the robot."""
+        """Send a raw command to the device.
+        This is mostly useful when trying out commands which are not
+        implemented by a given device instance.
+
+        :param str cmd: Command to send
+        :param dict params: Parameters to send"""
         return self.send(cmd, params)
 
     def info(self) -> DeviceInfo:
-        """Get miIO information from the device."""
+        """Get miIO protocol information from the device.
+        This includes information about connected wlan network,
+        and harware and software versions."""
         return DeviceInfo(self.send("miIO.info", []))
 
     @property

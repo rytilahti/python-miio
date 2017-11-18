@@ -5,7 +5,6 @@ from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
-
 class PlugV1Status:
     """Container for status reports from the plug."""
 
@@ -14,14 +13,17 @@ class PlugV1Status:
 
     @property
     def power(self) -> bool:
+        """Current power state."""
         return self.data["on"]
 
     @property
     def is_on(self) -> bool:
+        """True if device is on."""
         return self.power
 
     @property
     def usb_power(self) -> bool:
+        """True if USB is on."""
         return self.data["usb_on"]
 
     @property

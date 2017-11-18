@@ -66,10 +66,13 @@ def create_device(addr, device_cls) -> Device:
 
 
 class Listener:
+    """mDNS listener creating Device objects based on detected devices."""
     def __init__(self):
         self.found_devices = {}  # type: Dict[str, Device]
 
     def check_and_create_device(self, info, addr) -> Optional[Device]:
+        """Create a corresponding :class:`Device` implementation
+         for a given info and address.."""
         name = info.name
         for identifier, v in DEVICE_MAP.items():
             if name.startswith(identifier):
@@ -96,6 +99,10 @@ class Listener:
 
 
 class Discovery:
+    """mDNS discoverer for miIO based devices (_miio._udp.local).
+    Calling :func:`discover_mdns` will cause this to subscribe for updates
+    on ``_miio._udp.local`` until any key is pressed, after which a dict
+    of detected devices is returned."""
     @staticmethod
     def discover_mdns() -> Dict[str, Device]:
         """Discover devices with mdns until """

@@ -31,70 +31,86 @@ class FanStatus:
 
     @property
     def power(self) -> str:
+        """Power state."""
         return self.data["power"]
 
     @property
     def is_on(self) -> bool:
+        """True if device is currently on."""
         return self.power == "on"
 
     @property
     def humidity(self) -> int:
+        """Current humidity."""
         return self.data["humidity"]
 
     @property
     def temperature(self) -> Optional[float]:
+        """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
         return None
 
     @property
     def led(self) -> bool:
+        """True if LED is turned on."""
         return self.data["led"] == "on"
 
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
+        """LED brightness, if available."""
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
         return None
 
     @property
     def buzzer(self) -> bool:
+        """True if buzzer is turned on."""
         return self.data["buzzer"] == "on"
 
     @property
     def child_lock(self) -> bool:
+        """True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
     def natural_level(self) -> int:
+        """Natural level. FIXME what is this?"""
         return self.data["natural_level"]
 
     @property
     def speed_level(self) -> int:
+        """Speed level. FIXME how does this compare to speed?"""
         return self.data["speed_level"]
 
     @property
     def oscillate(self) -> bool:
+        """True if oscillation is enabled."""
         return self.data["angle_enable"] == "on"
 
     @property
     def battery(self) -> int:
+        """Current battery level."""
         return self.data["battery"]
 
     @property
     def ac_power(self) -> bool:
+        """True if powered by AC."""
         return self.data["ac_power"] == "on"
 
     @property
     def poweroff_time(self) -> int:
+        """Time until turning off. FIXME verify"""
         return self.data["poweroff_time"]
 
     @property
     def speed(self) -> int:
+        """Current speed. FIXME how does this compare to speed_level?"""
         return self.data["speed"]
 
     @property
     def angle(self) -> int:
+        """Current angle."""
         return self.data["angle"]
 
     def __str__(self) -> str:
