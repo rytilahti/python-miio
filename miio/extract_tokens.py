@@ -2,7 +2,8 @@ import logging
 import click
 import tempfile
 import sqlite3
-from Crypto.Cipher import AES
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
 from pprint import pformat as pf
 import attr
 from android_backup import AndroidBackup
@@ -50,8 +51,11 @@ class BackupDatabaseReader:
 
         keystring = '00000000000000000000000000000000'
         key = bytes.fromhex(keystring)
-        cipher = AES.new(key, AES.MODE_ECB)
-        token = cipher.decrypt(bytes.fromhex(ztoken[:64]))
+        cipher = Cipher(algorithms.AES(key), modes.ECB(),
+                        backend=default_backend())
+        decryptor = cipher.decryptor()
+        token = decryptor.update(bytes.fromhex(ztoken[:64])) \
+                + decryptor.finalize()
 
         return token.decode()
 

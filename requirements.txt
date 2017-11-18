@@ -3,7 +3,6 @@ cryptography
 pretty_cron
 construct
 zeroconf
-pycrypto #  for miio-extract-tokens
 attrs
 typing  # for py3.4 support
 pytz  # for tz offset in vacuum
