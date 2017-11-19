@@ -14,18 +14,22 @@ class PlugStatus:
 
     @property
     def power(self) -> str:
+        """Power state."""
         return self.data["power"]
 
     @property
     def is_on(self) -> bool:
+        """Return True if the device is on."""
         return self.power == "on"
 
     @property
     def temperature(self) -> float:
+        """Return temperature."""
         return self.data["temperature"]
 
     @property
     def load_power(self) -> Optional[float]:
+        """Return current load power."""
         if self.data["current"] is not None:
             # The constant of 110V is used intentionally. The current was
             # calculated with a wrong reference voltage already.

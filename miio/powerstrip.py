@@ -24,18 +24,22 @@ class PowerStripStatus:
 
     @property
     def power(self) -> str:
+        """Current power state."""
         return self.data["power"]
 
     @property
     def is_on(self) -> bool:
+        """True if the device is turned on."""
         return self.power == "on"
 
     @property
     def temperature(self) -> float:
+        """Current temperature."""
         return self.data["temperature"]
 
     @property
     def load_power(self) -> Optional[float]:
+        """Current power load, if available."""
         if self.data["current"] is not None:
             # The constant of 110V is used intentionally. The current was
             # calculated with a wrong reference voltage already.
@@ -44,6 +48,7 @@ class PowerStripStatus:
 
     @property
     def mode(self) -> Optional[PowerMode]:
+        """Current operation mode, can be either green or normal."""
         if self.data["mode"] is not None:
             return PowerMode(self.data["mode"])
         return None

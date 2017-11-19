@@ -6,32 +6,39 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class AirQualityMonitorStatus:
+    """Container of air quality monitor status."""
     def __init__(self, data):
         # ['power': 'on', 'aqi': 34, 'battery': 0, 'usb_state': 'on']
         self.data = data
 
     @property
     def power(self) -> str:
+        """Current power state."""
         return self.data["power"]
 
     @property
     def is_on(self) -> bool:
+        """Return True if the device is turned on."""
         return self.power == "on"
 
     @property
     def usb_power(self) -> bool:
+        """Return True if the device's usb is on."""
         return self.data["usb_state"] == "on"
 
     @property
     def aqi(self) -> int:
+        """Air quality index value."""
         return self.data["aqi"]
 
     @property
     def battery(self) -> int:
+        """Current battery level."""
         return self.data["battery"]
 
 
 class AirQualityMonitor(Device):
+    """Xiaomi PM2.5 Air Quality Monitor."""
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 

@@ -1,3 +1,15 @@
+"""miIO protocol implementation
+
+This module contains the implementation of the routines to encrypt and decrypt
+miIO payloads with a device-specific token.
+
+The payloads to be encrypted (to be passed to a device) are excpected to be
+JSON objects, the same applies for decryption where they are converted
+automatically to JSON objects.
+If the decryption fails, raw bytes as returned by the device are returned.
+
+An usage example can be seen in the source of :func:`miio.Device.send`.
+"""
 import datetime
 import hashlib
 import json
@@ -36,6 +48,7 @@ class Utils:
 
     @staticmethod
     def verify_token(token: bytes):
+        """Checks if the given token is of correct type and length."""
         if not isinstance(token, bytes):
             raise TypeError("Token must be bytes")
         if len(token) != 16:
@@ -43,18 +56,25 @@ class Utils:
 
     @staticmethod
     def md5(data: bytes) -> bytes:
+        """Calculates a md5 hashsum for the given bytes object."""
         checksum = hashlib.md5()
         checksum.update(data)
         return checksum.digest()
 
     @staticmethod
     def key_iv(token: bytes) -> Tuple[bytes, bytes]:
+        """Generate an IV used for encryption based on given token."""
         key = Utils.md5(token)
         iv = Utils.md5(key + token)
         return key, iv
 
     @staticmethod
     def encrypt(plaintext: bytes, token: bytes) -> bytes:
+        """Encrypt plaintext with a given token.
+
+        :param bytes plaintext: Plaintext (json) to encrypt
+        :param bytes token: Token to use
+        :return: Encrypted bytes"""
         if not isinstance(plaintext, bytes):
             raise TypeError("plaintext requires bytes")
         Utils.verify_token(token)
@@ -70,6 +90,11 @@ class Utils:
 
     @staticmethod
     def decrypt(ciphertext: bytes, token: bytes) -> bytes:
+        """Decrypt ciphertext with a given token.
+
+        :param bytes ciphertext: Ciphertext to decrypt
+        :param bytes token: Token to use
+        :return: Decrypted bytes object"""
         if not isinstance(ciphertext, bytes):
             raise TypeError("ciphertext requires bytes")
         Utils.verify_token(token)
@@ -126,11 +151,17 @@ class TimeAdapter(Adapter):
 class EncryptionAdapter(Adapter):
     """Adapter to handle communication encryption."""
     def _encode(self, obj, context):
+        """Encrypt the given payload with the token stored in the context.
+
+        :param obj: JSON object to encrypt"""
         # pp(context)
         return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00',
                              context['_']['token'])
 
     def _decode(self, obj, context):
+        """Decrypts the given payload with the token stored in the context.
+
+        :return str: JSON object"""
         try:
             # pp(context)
             decrypted = Utils.decrypt(obj, context['_']['token'])

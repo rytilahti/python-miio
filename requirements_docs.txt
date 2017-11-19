@@ -1,0 +1,6 @@
+sphinx
+doc8
+restructuredtext_lint
+sphinx-autodoc-typehints
+sphinx-click
+

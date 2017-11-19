@@ -154,7 +154,11 @@ class Vacuum(Device):
         return timers
 
     def add_timer(self, cron: str, command: str, parameters: str):
-        """Add a timer."""
+        """Add a timer.
+
+        :param cron: schedule in cron format
+        :param command: ignored by the vacuum.
+        :param parameters: ignored by the vacuum."""
         import time
         ts = int(round(time.time() * 1000))
         return self.send("set_timer", [
@@ -162,10 +166,16 @@ class Vacuum(Device):
         ])
 
     def delete_timer(self, timer_id: int):
-        """Delete a timer."""
+        """Delete a timer with given ID.
+
+        :param int timer_id: Timer ID"""
         return self.send("del_timer", [str(timer_id)])
 
     def update_timer(self, timer_id: int, mode: TimerState):
+        """Update a timer with given ID.
+
+        :param int timer_id: Timer ID
+        :param TimerStae mode: either On or Off"""
         if mode != TimerState.On and mode != TimerState.Off:
             raise DeviceException("Only 'On' or 'Off' are  allowed")
         return self.send("upd_timer", [str(timer_id), mode.value])
@@ -178,7 +188,12 @@ class Vacuum(Device):
 
     def set_dnd(self, start_hr: int, start_min: int,
                 end_hr: int, end_min: int):
-        """Set do-not-disturb."""
+        """Set do-not-disturb.
+
+        :param int start_hr: Start hour
+        :param int start_min: Start minute
+        :param int end_hr: End hour
+        :param int end_min: End minute"""
         return self.send("set_dnd_timer",
                          [start_hr, start_min, end_hr, end_min])
 
@@ -187,7 +202,9 @@ class Vacuum(Device):
         return self.send("close_dnd_timer", [""])
 
     def set_fan_speed(self, speed: int):
-        """Set fan speed."""
+        """Set fan speed.
+
+        :param int speed: Fan speed to set"""
         # speed = [38, 60 or 77]
         return self.send("set_custom_mode", [speed])
 
