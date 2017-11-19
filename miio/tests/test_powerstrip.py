@@ -8,6 +8,7 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
     def __init__(self, *args, **kwargs):
         self.state = {
             'power': 'on',
+            'mode': 'normal',
             'temperature': 32.5,
             'current': 123,
             'power_consume_rate': 12.5,
