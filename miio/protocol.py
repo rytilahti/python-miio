@@ -167,16 +167,20 @@ class EncryptionAdapter(Adapter):
             decrypted = Utils.decrypt(obj, context['_']['token'])
             decrypted = decrypted.rstrip(b"\x00")
         except Exception:
-            _LOGGER.debug("Unable to decrypt, returning raw bytes.")
+            _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
             return obj
 
+        decoded = decrypted.decode('utf-8')
         try:
-            jsoned = json.loads(decrypted.decode('utf-8'))
+            return json.loads(decoded)
         except:
-            _LOGGER.error("unable to parse json, was: %s", decrypted)
-            raise
-
-        return jsoned
+            try:
+                # powerstrip returns invalid JSON if the device is not
+                # connected to the cloud, so we try to fix it here carefully.
+                decoded = decoded.replace(',,"otu_stat"', ',"otu_stat"')
+                return json.loads(decoded)
+            except Exception as ex:
+                _LOGGER.error("unable to parse json '%s': %s", decoded, ex)
 
 
 Message = Struct(
