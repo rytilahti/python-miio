@@ -54,8 +54,10 @@ class TestPowerStrip(TestCase):
         self.device._reset_state()
 
         assert self.is_on() is True
-        assert self.state().temperature == self.device.start_state["temperature"]
-        assert self.state().load_power == self.device.start_state["power_consume_rate"]
+        assert self.state().temperature == \
+               self.device.start_state["temperature"]
+        assert self.state().load_power == \
+               self.device.start_state["power_consume_rate"]
 
     def test_status_without_power_consume_rate(self):
         del self.device.state["power_consume_rate"]
