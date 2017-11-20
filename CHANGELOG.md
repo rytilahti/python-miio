@@ -1,5 +1,37 @@
 # Change Log
 
+## [0.3.2](https://github.com/rytilahti/python-miio/tree/0.3.2)
+
+This release includes small improvements for powerstrip and vacuum support.
+Furthermore this is the first release with proper documentation.
+Generated docs are available at https://python-miio.readthedocs.io - patches to improve them are more than welcome!
+
+Improvements:
+* Powerstrip: expose correct load power, works also now without cloud connectivity
+* Vacuum: added ability to reset consumable states
+* Vacuum: exposes time left before next sensor clean-up
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.1...0.3.2)
+
+**Closed issues:**
+
+- philips.light.ceiling Unsupported device found! [\#118](https://github.com/rytilahti/python-miio/issues/118)
+- Xiaomi Philips ceiling light automation [\#116](https://github.com/rytilahti/python-miio/issues/116)
+- Unsupported device found [\#112](https://github.com/rytilahti/python-miio/issues/112)
+- PM2.5 Faster Readout [\#111](https://github.com/rytilahti/python-miio/issues/111)
+
+**Merged pull requests:**
+
+- add pure text LICENSE [\#125](https://github.com/rytilahti/python-miio/pull/125) ([rytilahti](https://github.com/rytilahti))
+- Add GPLv3 license [\#124](https://github.com/rytilahti/python-miio/pull/124) ([pluehne](https://github.com/pluehne))
+- Don’t require typing with Python 3.5 and newer [\#123](https://github.com/rytilahti/python-miio/pull/123) ([pluehne](https://github.com/pluehne))
+- Powerstrip fixes [\#121](https://github.com/rytilahti/python-miio/pull/121) ([rytilahti](https://github.com/rytilahti))
+- Added time left for recommended sensor cleaning [\#119](https://github.com/rytilahti/python-miio/pull/119) ([bbbenji](https://github.com/bbbenji))
+- Load power of the PowerStrip fixed and removed from the Plug [\#117](https://github.com/rytilahti/python-miio/pull/117) ([syssi](https://github.com/syssi))
+- Reset consumable by name [\#115](https://github.com/rytilahti/python-miio/pull/115) ([mrin](https://github.com/mrin))
+- Model name of the Xiaomi Philips Ceiling Lamp updated [\#113](https://github.com/rytilahti/python-miio/pull/113) ([syssi](https://github.com/syssi))
+- Update apidocs for sphinx-generated documentation, which follows at l… [\#93](https://github.com/rytilahti/python-miio/pull/93) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.3.1](https://github.com/rytilahti/python-miio/tree/0.3.1) (2017-11-01)
 
 New supported devices:
