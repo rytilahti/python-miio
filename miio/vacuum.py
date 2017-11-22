@@ -89,7 +89,7 @@ class Vacuum(Device):
         """Give a command over manual control interface."""
         if rotation <= -180 or rotation >= 180:
             raise DeviceException("Given rotation is invalid, should "
-                                  "be ]-3.1,3.1[, was %s" % rotation)
+                                  "be ]-180, 180[, was %s" % rotation)
         if velocity <= -0.3 or velocity >= 0.3:
             raise DeviceException("Given velocity is invalid, should "
                                   "be ]-0.3, 0.3[, was: %s" % velocity)
