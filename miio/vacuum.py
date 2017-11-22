@@ -87,10 +87,10 @@ class Vacuum(Device):
     def manual_control(self, rotation: int, velocity: float,
                        duration: int=1500):
         """Give a command over manual control interface."""
-        if rotation <= -180 or rotation >= 180:
+        if rotation < -180 or rotation > 180:
             raise DeviceException("Given rotation is invalid, should "
                                   "be ]-180, 180[, was %s" % rotation)
-        if velocity <= -0.3 or velocity >= 0.3:
+        if velocity < -0.3 or velocity > 0.3:
             raise DeviceException("Given velocity is invalid, should "
                                   "be ]-0.3, 0.3[, was: %s" % velocity)
 
