@@ -149,6 +149,14 @@ export MIROBO_IP=192.168.1.2
 export MIROBO_TOKEN=476e6b70343055483230644c53707a12
 ```
 
+Otherwise, you can create a config file at `~/.config/mirobo.cfg` with the ip and token as contents:
+
+```
+[mirobo]
+ip = 192.168.1.2
+token = 476e6b70343055483230644c53707a12
+```
+
 After that verify that the connection is working by running the command without parameters,
 you should be presented a status report from the vacuum.
 

@@ -1,14 +1,21 @@
 # -*- coding: UTF-8 -*-
-import logging
-import click
-import pretty_cron
 import ast
-import sys
-import json
 import ipaddress
+import json
+import logging
+import os
+import sys
 from pprint import pformat as pf
 from typing import Any  # noqa: F401
 
+import click
+import miio  # noqa: E402
+import pretty_cron
+
+try:
+    import ConfigParser
+except ImportError:
+    import configparser as ConfigParser
 
 if sys.version_info < (3, 4):
     print("To use this script you need python 3.4 or newer, got %s" %
@@ -62,8 +69,15 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         return
 
     if ip is None or token is None:
-        click.echo("You have to give ip and token!")
-        sys.exit(-1)
+        config = ConfigParser.SafeConfigParser()
+        config.read([os.path.expanduser('~/.config/mirobo.cfg')])
+        try:
+            config = dict(config.items("mirobo"))
+            ip = config["ip"]
+            token = config["token"]
+        except:
+            click.echo("You have to give ip and token!")
+            sys.exit(-1)
 
     start_id = manual_seq = 0
     try:
