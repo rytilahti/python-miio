@@ -34,7 +34,7 @@ class YeelightStatus:
     def rgb(self) -> Optional[Tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
         if self.color_mode == YeelightMode.RGB:
-            rgb = self.data["rgb"]
+            rgb = int(self.data["rgb"])
             blue = rgb & 0xff
             green = (rgb >> 8) & 0xff
             red = (rgb >> 16) & 0xff
