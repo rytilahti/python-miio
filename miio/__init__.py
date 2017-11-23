@@ -16,6 +16,7 @@ from miio.chuangmi_ir import ChuangmiIr
 from miio.fan import Fan
 from miio.wifispeaker import WifiSpeaker
 from miio.airqualitymonitor import AirQualityMonitor
+from miio.airconditioningcompanion import AirConditioningCompanion
 from miio.yeelight import Yeelight
 from miio.device import Device, DeviceException
 from miio.discovery import Discovery
