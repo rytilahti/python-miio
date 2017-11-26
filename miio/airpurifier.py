@@ -7,6 +7,10 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
+class AirPurifierException(Exception):
+    pass
+
+
 class OperationMode(enum.Enum):
     Auto = 'auto'
     Silent = 'silent'
@@ -191,6 +195,9 @@ class AirPurifier(Device):
                       # Second request
                       'led', 'led_b', 'bright', 'buzzer', 'child_lock', ]
 
+        # A single request is limited to 16 properties. Therefore the
+        # properties are divided in two groups here. The second group contains
+        # some infrequent and independent updated properties.
         values = self.send(
             "get_prop",
             properties[0:13]
@@ -226,6 +233,8 @@ class AirPurifier(Device):
 
     def set_favorite_level(self, level: int):
         """Set favorite level."""
+        if level < 0 or level > 16:
+            raise AirPurifierException("Invalid favorite level: %s" % level)
 
         # Set the favorite level used when the mode is `favorite`,
         # should be  between 0 and 16.

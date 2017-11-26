@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import AirPurifier
-from miio.airpurifier import OperationMode, LedBrightness
+from miio.airpurifier import OperationMode, LedBrightness, AirPurifierException
 from .dummies import DummyDevice
 import pytest
 
@@ -112,8 +112,17 @@ class TestAirPurifier(TestCase):
         def favorite_level():
             return self.device.status().favorite_level
 
-        self.device.set_favorite_level(1)
-        assert favorite_level() == 1
+        self.device.set_favorite_level(0)
+        assert favorite_level() == 0
+        self.device.set_favorite_level(6)
+        assert favorite_level() == 6
+        self.device.set_favorite_level(10)
+
+        with pytest.raises(AirPurifierException):
+            self.device.set_favorite_level(-1)
+
+        with pytest.raises(AirPurifierException):
+            self.device.set_favorite_level(17)
 
     def test_set_led_brightness(self):
         def led_brightness():
@@ -134,30 +143,30 @@ class TestAirPurifier(TestCase):
 
         # The LED brightness of a Air Purifier Pro cannot be set so far.
         self.device.set_led(True)
-        assert led() == True
+        assert led() is True
 
         self.device.set_led(False)
-        assert led() == False
+        assert led() is False
 
     def test_set_buzzer(self):
         def buzzer():
             return self.device.status().buzzer
 
         self.device.set_buzzer(True)
-        assert buzzer() == True
+        assert buzzer() is True
 
         self.device.set_buzzer(False)
-        assert buzzer() == False
+        assert buzzer() is False
 
     def test_set_child_lock(self):
         def child_lock():
             return self.device.status().child_lock
 
         self.device.set_child_lock(True)
-        assert child_lock() == True
+        assert child_lock() is True
 
         self.device.set_child_lock(False)
-        assert child_lock() == False
+        assert child_lock() is False
 
     def test_status_without_led_b_and_with_bright(self):
         self.device._reset_state()
@@ -165,7 +174,8 @@ class TestAirPurifier(TestCase):
         self.device.state["bright"] = self.device.state["led_b"]
         del self.device.state["led_b"]
 
-        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
+        assert self.state().led_brightness == \
+               LedBrightness(self.device.start_state["led_b"])
 
     def test_status_without_led_brightness_at_all(self):
         self.device._reset_state()
