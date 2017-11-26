@@ -171,11 +171,10 @@ class TestAirPurifier(TestCase):
     def test_status_without_led_b_and_with_bright(self):
         self.device._reset_state()
 
-        self.device.state["bright"] = self.device.state["led_b"]
         del self.device.state["led_b"]
+        self.device.state["bright"] = 1
 
-        assert self.state().led_brightness == LedBrightness(
-            self.device.start_state["led_b"])
+        assert self.state().led_brightness == LedBrightness(1)
 
     def test_status_without_led_brightness_at_all(self):
         self.device._reset_state()
