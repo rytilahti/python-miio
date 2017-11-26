@@ -38,10 +38,7 @@ well as additional features for supported devices.*
 Getting started
 ---------------
 
-See the manual.
-
-.. TODO::
-   Add link to manual.
+Refer `the manual <https://python-miio.readthedocs.io>`__ for getting started.
 
 
 Home Assistant support
