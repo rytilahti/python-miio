@@ -6,13 +6,18 @@ from collections import defaultdict
 _LOGGER = logging.getLogger(__name__)
 
 
+class CeilException(Exception):
+    pass
+
+
 class CeilStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # ['power', 'bright', 'snm', 'dv', 'cctsw', 'bl', 'mb', 'ac', 'ms'
-        #  'sw', 'cct']
-        # ['off', 0, 4, 0, [[0, 3], [0, 2], [0, 1]], 1, 1, 1, 1, 99]
+        # {'power': 'off', 'bright': 0, 'snm': 4, 'dv': 0,
+        #  'cctsw': [[0, 3], [0, 2], [0, 1]], 'bl': 1,
+        #  'mb': 1, 'ac': 1, 'mssw': 1, 'cct': 99}
+
         # NOTE: Only 8 properties can be requested at the same time
         self.data = data
 
@@ -47,14 +52,14 @@ class CeilStatus:
         return self.data["cct"]
 
     @property
-    def smart_night_light(self) -> int:
+    def smart_night_light(self) -> bool:
         """Smart night mode state."""
-        return self.data["bl"]
+        return self.data["bl"] == 1
 
     @property
-    def automatic_color_temperature(self) -> int:
+    def automatic_color_temperature(self) -> bool:
         """Automatic color temperature state."""
-        return self.data["ac"]
+        return self.data["ac"] == 1
 
     def __str__(self) -> str:
         s = "<CeilStatus power=%s, brightness=%s, " \
@@ -100,19 +105,33 @@ class Ceil(Device):
 
     def set_brightness(self, level: int):
         """Set brightness level."""
+        if level < 1 or level > 100:
+            raise CeilException("Invalid brightness: %s" % level)
+
         return self.send("set_bright", [level])
 
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
+        if level < 1 or level > 100:
+            raise CeilException("Invalid color temperature: %s" % level)
+
         return self.send("set_cct", [level])
 
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
+
+        if seconds < 1:
+            raise CeilException(
+                "Invalid value for a delayed turn off: %s" % seconds)
+
         return self.send("delay_off", [seconds])
 
-    def set_scene(self, num: int):
+    def set_scene(self, number: int):
         """Set scene number."""
-        return self.send("apply_fixed_scene", [num])
+        if number < 1 or number > 4:
+            raise CeilException("Invalid fixed scene number: %s" % number)
+
+        return self.send("apply_fixed_scene", [number])
 
     def smart_night_light_on(self):
         """Smart Night Light On."""

@@ -6,11 +6,15 @@ from collections import defaultdict
 _LOGGER = logging.getLogger(__name__)
 
 
+class PhilipsBulbException(Exception):
+    pass
+
+
 class PhilipsBulbStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp"""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # ['power': 'on', 'bright': 85, 'cct': 9, 'snm': 0, 'dv': 0]
+        # {'power': 'on', 'bright': 85, 'cct': 9, 'snm': 0, 'dv': 0}
         self.data = data
 
     @property
@@ -48,30 +52,6 @@ class PhilipsBulbStatus:
 class PhilipsBulb(Device):
     """Main class representing Xiaomi Philips LED Ball Lamp."""
 
-    def on(self):
-        """Power on."""
-        return self.send("set_power", ["on"])
-
-    def off(self):
-        """Power off."""
-        return self.send("set_power", ["off"])
-
-    def set_brightness(self, level: int):
-        """Set brightness level."""
-        return self.send("set_bright", [level])
-
-    def set_color_temperature(self, level: int):
-        """Set Correlated Color Temperature."""
-        return self.send("set_cct", [level])
-
-    def delay_off(self, seconds: int):
-        """Set delay off seconds."""
-        return self.send("delay_off", [seconds])
-
-    def set_scene(self, num: int):
-        """Set scene number."""
-        return self.send("apply_fixed_scene", [num])
-
     def status(self) -> PhilipsBulbStatus:
         """Retrieve properties."""
         properties = ['power', 'bright', 'cct', 'snm', 'dv', ]
@@ -90,3 +70,41 @@ class PhilipsBulb(Device):
 
         return PhilipsBulbStatus(
             defaultdict(lambda: None, zip(properties, values)))
+
+    def on(self):
+        """Power on."""
+        return self.send("set_power", ["on"])
+
+    def off(self):
+        """Power off."""
+        return self.send("set_power", ["off"])
+
+    def set_brightness(self, level: int):
+        """Set brightness level."""
+        if level < 1 or level > 100:
+            raise PhilipsBulbException("Invalid brightness: %s" % level)
+
+        return self.send("set_bright", [level])
+
+    def set_color_temperature(self, level: int):
+        """Set Correlated Color Temperature."""
+        if level < 1 or level > 100:
+            raise PhilipsBulbException("Invalid color temperature: %s" % level)
+
+        return self.send("set_cct", [level])
+
+    def delay_off(self, seconds: int):
+        """Set delay off seconds."""
+
+        if seconds < 1:
+            raise PhilipsBulbException(
+                "Invalid value for a delayed turn off: %s" % seconds)
+
+        return self.send("delay_off", [seconds])
+
+    def set_scene(self, number: int):
+        """Set scene number."""
+        if number < 1 or number > 4:
+            raise PhilipsBulbException("Invalid fixed scene number: %s" % number)
+
+        return self.send("apply_fixed_scene", [number])
