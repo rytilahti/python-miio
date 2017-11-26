@@ -1,10 +1,28 @@
 from .device import Device
+import enum
+
+
+class OperationMode(enum.Enum):
+    Heating = 0
+    Cooling = 1
+    Auto = 2
+
+
+class FanSpeed(enum.Enum):
+    Low = 0
+    Medium = 1
+    High = 2
+    Auto = 3
 
 
 class AirConditioningCompanionStatus:
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
+        # Device model: lumi.acpartner.v2
+        #
+        # Response of "get_model_and_state":
+        # ['010500978022222102', '010201190280222221', '2']
         self.data = data
 
     @property
@@ -18,51 +36,34 @@ class AirConditioningCompanionStatus:
         return str(self.data[0][0:2] + self.data[0][8:16])
 
     @property
-    def power(self):
+    def power(self) -> str:
         """Current power state."""
-        return self.data[1][2:3]
-
-    # FIXME: Introduce a container class
-    @property
-    def wind_force(self):
-        """Current wind force."""
-        if self.data[1][4:5] == '0':
-            return 'low'
-        elif self.data[1][4:5] == '1':
-            return 'medium'
-        elif self.data[1][4:5] == '2':
-            return 'high'
-        else:
-            return 'auto'
+        return 'on' if (self.data[1][2:3] == 1) else 'off'
 
     @property
-    def sweep(self) -> bool:
-        """True if sweep is turned on."""
-        return self.data[1][5:6] == '0'
+    def is_on(self) -> bool:
+        """True if the device is turned on."""
+        return self.power == 'on'
 
     @property
-    def temp(self) -> int:
+    def temperature(self) -> int:
         """Current temperature."""
         return int(self.data[1][6:8], 16)
 
-    # FIXME: Merge both properties
+    @property
+    def sweep_mode(self) -> bool:
+        """True if sweep mode is enabled."""
+        return self.data[1][5:6] == '0'
+
+    @property
+    def fan_speed(self):
+        """Current fan speed."""
+        return OperationMode(self.data[1][4:5])
+
     @property
     def mode(self):
-        """Current mode."""
-        return self.data[1][3:4]
-
-    # FIXME: Introduce a container class
-    @property
-    def operation(self):
-        if self.data[1][2:3] == '0':
-            return 'off'
-        else:
-            if self.data[1][3:4] == '0':
-                return 'heat'
-            elif self.data[1][3:4] == '1':
-                return 'cool'
-            else:
-                return 'auto'
+        """Current operation mode."""
+        return OperationMode(self.data[1][3:4])
 
 
 class AirConditioningCompanion(Device):
