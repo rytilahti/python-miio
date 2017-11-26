@@ -68,8 +68,8 @@ class TestCeil(TestCase):
         assert self.state().color_temperature == self.device.start_state["cct"]
         assert self.state().scene == self.device.start_state["snm"]
         assert self.state().delay_off_countdown == self.device.start_state["dv"]
-        assert self.state().smart_night_light == (self.device.start_state["bl"] == 1)
-        assert self.state().automatic_color_temperature == (self.device.start_state["ac"] == 1)
+        assert self.state().smart_night_light is (self.device.start_state["bl"] == 1)
+        assert self.state().automatic_color_temperature is (self.device.start_state["ac"] == 1)
 
     def test_set_brightness(self):
         def brightness():
@@ -112,15 +112,15 @@ class TestCeil(TestCase):
             return self.device.status().smart_night_light
 
         self.device.smart_night_light_off()
-        assert smart_night_light() == False
+        assert smart_night_light() is False
         self.device.smart_night_light_on()
-        assert smart_night_light() == True
+        assert smart_night_light() is True
 
     def test_automatic_color_temperature_on(self):
         def automatic_color_temperature():
             return self.device.status().automatic_color_temperature
 
         self.device.automatic_color_temperature_on()
-        assert automatic_color_temperature() == True
+        assert automatic_color_temperature() is True
         self.device.automatic_color_temperature_off()
-        assert automatic_color_temperature() == False
+        assert automatic_color_temperature() is False

@@ -68,12 +68,12 @@ class TestPhilipsEyecare(TestCase):
 
         assert self.is_on() is True
         assert self.state().brightness == self.device.start_state["bright"]
-        assert self.state().reminder == (self.device.start_state["notifystatus"] == 'on')
-        assert self.state().ambient == (self.device.start_state["ambstatus"] == 'on')
+        assert self.state().reminder is (self.device.start_state["notifystatus"] == 'on')
+        assert self.state().ambient is (self.device.start_state["ambstatus"] == 'on')
         assert self.state().ambient_brightness == self.device.start_state["ambvalue"]
-        assert self.state().eyecare == (self.device.start_state["eyecare"] == 'on')
+        assert self.state().eyecare is (self.device.start_state["eyecare"] == 'on')
         assert self.state().scene == self.device.start_state["scene_num"]
-        assert self.state().smart_night_light == (self.device.start_state["bls"] == 'on')
+        assert self.state().smart_night_light is (self.device.start_state["bls"] == 'on')
         assert self.state().delay_off_countdown == self.device.start_state["dvalue"]
 
     def test_eyecare(self):
@@ -81,9 +81,9 @@ class TestPhilipsEyecare(TestCase):
             return self.device.status().eyecare
 
         self.device.eyecare_on()
-        assert eyecare() == True
+        assert eyecare() is True
         self.device.eyecare_off()
-        assert eyecare() == False
+        assert eyecare() is False
 
     def test_set_brightness(self):
         def brightness():
@@ -141,27 +141,27 @@ class TestPhilipsEyecare(TestCase):
             return self.device.status().smart_night_light
 
         self.device.smart_night_light_on()
-        assert smart_night_light() == True
+        assert smart_night_light() is True
         self.device.smart_night_light_off()
-        assert smart_night_light() == False
+        assert smart_night_light() is False
 
     def test_reminder(self):
         def reminder():
             return self.device.status().reminder
 
         self.device.reminder_on()
-        assert reminder() == True
+        assert reminder() is True
         self.device.reminder_off()
-        assert reminder() == False
+        assert reminder() is False
 
     def test_ambient(self):
         def ambient():
             return self.device.status().ambient
 
         self.device.ambient_on()
-        assert ambient() == True
+        assert ambient() is True
         self.device.ambient_off()
-        assert ambient() == False
+        assert ambient() is False
 
     def test_set_ambient_brightness(self):
         def ambient_brightness():
