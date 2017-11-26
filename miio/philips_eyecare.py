@@ -6,6 +6,10 @@ from collections import defaultdict
 _LOGGER = logging.getLogger(__name__)
 
 
+class PhilipsEyecareException(Exception):
+    pass
+
+
 class PhilipsEyecareStatus:
     """Container for status reports from Xiaomi Philips Eyecare Smart Lamp 2"""
 
@@ -118,14 +122,25 @@ class PhilipsEyecare(Device):
 
     def set_brightness(self, level: int):
         """Set brightness level."""
+        if level < 1 or level > 100:
+            raise PhilipsEyecareException("Invalid brightness: %s" % level)
+
         return self.send("set_bright", [level])
 
-    def set_scene(self, num: int):
+    def set_scene(self, number: int):
         """Set eyecare user scene."""
-        return self.send("set_user_scene", [num])
+        if number < 1 or number > 4:
+            raise PhilipsEyecareException("Invalid fixed scene number: %s" % number)
+
+        return self.send("set_user_scene", [number])
 
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
+
+        if minutes < 0:
+            raise PhilipsEyecareException(
+                "Invalid value for a delayed turn off: %s" % minutes)
+
         return self.send("delay_off", [minutes])
 
     def smart_night_light_on(self):
@@ -154,4 +169,8 @@ class PhilipsEyecare(Device):
 
     def set_ambient_brightness(self, level: int):
         """Set Ambient Light brightness level."""
+        if level < 1 or level > 100:
+            raise PhilipsEyecareException(
+                "Invalid ambient brightness: %s" % level)
+
         return self.send("set_amb_bright", [level])

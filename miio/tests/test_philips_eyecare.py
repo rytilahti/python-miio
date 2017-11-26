@@ -1,5 +1,6 @@
 from unittest import TestCase
 from miio import PhilipsEyecare
+from miio.philips_eyecare import PhilipsEyecareException
 from .dummies import DummyDevice
 import pytest
 
@@ -8,10 +9,10 @@ class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
     def __init__(self, *args, **kwargs):
         self.state = {
             'power': 'on',
-            'bright': 5,
+            'bright': 100,
             'notifystatus': 'off',
             'ambstatus': 'off',
-            'ambvalue': 41,
+            'ambvalue': 100,
             'eyecare': 'on',
             'scene_num': 3,
             'bls': 'on',
@@ -88,10 +89,20 @@ class TestPhilipsEyecare(TestCase):
         def brightness():
             return self.device.status().brightness
 
-        self.device.set_brightness(10)
-        assert brightness() == 10
-        self.device.set_brightness(20)
-        assert brightness() == 20
+        self.device.set_brightness(1)
+        assert brightness() == 1
+        self.device.set_brightness(50)
+        assert brightness() == 50
+        self.device.set_brightness(100)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_brightness(-1)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_brightness(0)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_brightness(101)
 
     def test_set_scene(self):
         def scene():
@@ -102,14 +113,28 @@ class TestPhilipsEyecare(TestCase):
         self.device.set_scene(2)
         assert scene() == 2
 
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_scene(-1)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_scene(0)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_scene(5)
+
     def test_delay_off(self):
         def delay_off_countdown():
             return self.device.status().delay_off_countdown
 
+        self.device.delay_off(1)
+        assert delay_off_countdown() == 1
         self.device.delay_off(100)
         assert delay_off_countdown() == 100
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.delay_off(-1)
 
     def test_smart_night_light(self):
         def smart_night_light():
@@ -142,7 +167,17 @@ class TestPhilipsEyecare(TestCase):
         def ambient_brightness():
             return self.device.status().ambient_brightness
 
-        self.device.set_ambient_brightness(10)
-        assert ambient_brightness() == 10
-        self.device.set_ambient_brightness(20)
-        assert ambient_brightness() == 20
+        self.device.set_ambient_brightness(1)
+        assert ambient_brightness() == 1
+        self.device.set_ambient_brightness(50)
+        assert ambient_brightness() == 50
+        self.device.set_ambient_brightness(100)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_ambient_brightness(-1)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_ambient_brightness(0)
+
+        with pytest.raises(PhilipsEyecareException):
+            self.device.set_ambient_brightness(101)

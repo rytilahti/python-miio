@@ -6,6 +6,10 @@ from collections import defaultdict
 _LOGGER = logging.getLogger(__name__)
 
 
+class CeilException(Exception):
+    pass
+
+
 class CeilStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp."""
 
@@ -101,19 +105,33 @@ class Ceil(Device):
 
     def set_brightness(self, level: int):
         """Set brightness level."""
+        if level < 1 or level > 100:
+            raise CeilException("Invalid brightness: %s" % level)
+
         return self.send("set_bright", [level])
 
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
+        if level < 1 or level > 100:
+            raise CeilException("Invalid color temperature: %s" % level)
+
         return self.send("set_cct", [level])
 
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
+
+        if seconds < 1:
+            raise CeilException(
+                "Invalid value for a delayed turn off: %s" % seconds)
+
         return self.send("delay_off", [seconds])
 
-    def set_scene(self, num: int):
+    def set_scene(self, number: int):
         """Set scene number."""
-        return self.send("apply_fixed_scene", [num])
+        if number < 1 or number > 4:
+            raise CeilException("Invalid fixed scene number: %s" % number)
+
+        return self.send("apply_fixed_scene", [number])
 
     def smart_night_light_on(self):
         """Smart Night Light On."""

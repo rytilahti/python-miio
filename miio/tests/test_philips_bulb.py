@@ -1,5 +1,6 @@
 from unittest import TestCase
 from miio import PhilipsBulb
+from miio.philips_bulb import PhilipsBulbException
 from .dummies import DummyDevice
 import pytest
 
@@ -8,8 +9,8 @@ class DummyPhilipsBulb(DummyDevice, PhilipsBulb):
     def __init__(self, *args, **kwargs):
         self.state = {
             'power': 'on',
-            'bright': 85,
-            'cct': 9,
+            'bright': 100,
+            'cct': 10,
             'snm': 0,
             'dv': 0
         }
@@ -67,19 +68,39 @@ class TestPhilipsBulb(TestCase):
         def brightness():
             return self.device.status().brightness
 
-        self.device.set_brightness(10)
-        assert brightness() == 10
-        self.device.set_brightness(20)
-        assert brightness() == 20
+        self.device.set_brightness(1)
+        assert brightness() == 1
+        self.device.set_brightness(50)
+        assert brightness() == 50
+        self.device.set_brightness(100)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_brightness(-1)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_brightness(0)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_brightness(101)
 
     def test_set_color_temperature(self):
         def color_temperature():
             return self.device.status().color_temperature
 
-        self.device.set_color_temperature(30)
-        assert color_temperature() == 30
         self.device.set_color_temperature(20)
         assert color_temperature() == 20
+        self.device.set_color_temperature(30)
+        assert color_temperature() == 30
+        self.device.set_color_temperature(10)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_color_temperature(-1)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_color_temperature(0)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_color_temperature(101)
 
     def test_delay_off(self):
         def delay_off_countdown():
@@ -90,6 +111,12 @@ class TestPhilipsBulb(TestCase):
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
 
+        with pytest.raises(PhilipsBulbException):
+            self.device.delay_off(-1)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.delay_off(0)
+
     def test_set_scene(self):
         def scene():
             return self.device.status().scene
@@ -98,3 +125,12 @@ class TestPhilipsBulb(TestCase):
         assert scene() == 1
         self.device.set_scene(2)
         assert scene() == 2
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_scene(-1)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_scene(0)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_scene(5)
