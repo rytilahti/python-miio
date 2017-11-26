@@ -16,6 +16,10 @@ class DummyPhilipsBulb(DummyDevice, PhilipsBulb):
         self.return_values = {
             'get_prop': self._get_state,
             'set_power': lambda x: self._set_state("power", x),
+            'set_bright': lambda x: self._set_state("bright", x),
+            'set_cct': lambda x: self._set_state("cct", x),
+            'delay_off': lambda x: self._set_state("dv", x),
+            'apply_fixed_scene': lambda x: self._set_state("snm", x),
         }
         super().__init__(args, kwargs)
 
@@ -94,6 +98,3 @@ class TestPhilipsBulb(TestCase):
         assert scene() == 1
         self.device.set_scene(2)
         assert scene() == 2
-
-
-
