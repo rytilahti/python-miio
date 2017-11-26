@@ -8,6 +8,10 @@ class DummyPhilipsBulb(DummyDevice, PhilipsBulb):
     def __init__(self, *args, **kwargs):
         self.state = {
             'power': 'on',
+            'bright': 85,
+            'cct': 9,
+            'snm': 0,
+            'dv': 0
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -50,4 +54,46 @@ class TestPhilipsBulb(TestCase):
         self.device._reset_state()
 
         assert self.is_on() is True
+        assert self.state().brightness == self.device.start_state["bright"]
+        assert self.state().color_temperature == self.device.start_state["cct"]
+        assert self.state().scene == self.device.start_state["snm"]
+        assert self.state().delay_off_countdown == self.device.start_state["dv"]
+
+    def set_brightness(self):
+        def brightness():
+            return self.device.status().brightness
+
+        self.device.set_brightness(10)
+        assert brightness() == 10
+        self.device.set_brightness(20)
+        assert brightness() == 20
+
+    def set_color_temperature(self):
+        def color_temperature():
+            return self.device.status().color_temperature
+
+        self.device.set_color_temperature(30)
+        assert color_temperature() == 30
+        self.device.set_color_temperature(20)
+        assert color_temperature() == 20
+
+    def delay_off(self):
+        def delay_off_countdown():
+            return self.device.status().delay_off_countdown
+
+        self.device.delay_off(100)
+        assert delay_off_countdown() == 100
+        self.device.delay_off(200)
+        assert delay_off_countdown() == 200
+
+    def set_scene(self):
+        def scene():
+            return self.device.status().scene
+
+        self.device.set_scene(1)
+        assert scene() == 1
+        self.device.set_scene(2)
+        assert scene() == 2
+
+
 

@@ -10,7 +10,7 @@ class PhilipsBulbStatus:
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp"""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # ['power': 'on', 'bright': 85, 'cct': 9, 'snm': 0, 'dv': 0]
+        # {'power': 'on', 'bright': 85, 'cct': 9, 'snm': 0, 'dv': 0}
         self.data = data
 
     @property
