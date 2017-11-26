@@ -38,12 +38,12 @@ class CeilStatus:
 
     @property
     def scene(self) -> int:
-        """Current scene. FIXME what is this?"""
+        """Current fixed scene (brightness & colortemp)."""
         return self.data["snm"]
 
     @property
     def delay_off_countdown(self) -> int:
-        """Countdown until turning off."""
+        """Countdown until turning off in seconds."""
         return self.data["dv"]
 
     @property
@@ -61,7 +61,7 @@ class CeilStatus:
         """Automatic color temperature state."""
         return self.data["ac"] == 1
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<CeilStatus power=%s, brightness=%s, " \
             "color_temperature=%s, scene=%s, delay_off_countdown=%s, " \
             "smart_night_light=%s, automatic_color_temperature=%s>" % \
@@ -118,7 +118,7 @@ class Ceil(Device):
         return self.send("set_cct", [level])
 
     def delay_off(self, seconds: int):
-        """Set delay off seconds."""
+        """Turn off delay in seconds."""
 
         if seconds < 1:
             raise CeilException(
@@ -127,7 +127,7 @@ class Ceil(Device):
         return self.send("delay_off", [seconds])
 
     def set_scene(self, number: int):
-        """Set scene number."""
+        """Set a fixed scene. 4 fixed scenes are available (1-4)"""
         if number < 1 or number > 4:
             raise CeilException("Invalid fixed scene number: %s" % number)
 

@@ -7,6 +7,10 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
+class AirPurifierException(Exception):
+    pass
+
+
 class OperationMode(enum.Enum):
     Auto = 'auto'
     Silent = 'silent'
@@ -36,14 +40,14 @@ class AirPurifierStatus:
 
         Response of a Air Purifier 2:
 
-        ['power': 'off', 'aqi': 141, 'humidity': 64, 'temp_dec': 236,
-         'mode': 'auto', 'led': 'on', 'led_b': 1, 'buzzer': 'on',
-         'child_lock': 'off', 'limit_hum': null, 'trans_level': null,
-         'bright': null, 'favorite_level': 10, 'filter1_life': 80,
-         'act_det': null, 'f1_hour_used': 680 ]
+        {'power': 'on, 'aqi': 10, 'average_aqi': 8, 'humidity': 62,
+         'temp_dec': 186, 'mode': 'auto', 'favorite_level': 10,
+        'filter1_life': 80, 'f1_hour_used': 682, 'use_time': 2457000,
+        'motor1_speed': 354, 'purify_volume': 25262, 'f1_hour': 3500,
+        'led': 'off', 'led_b': 2, 'bright': None, 'buzzer': 'off',
+        'child_lock': 'off'}
 
-        use_time and motor1_speed is missing because a request is limitted
-        to 16 properties. We request 15 properties at the moment.
+        A request is limited to 16 properties.
         """
 
         self.data = data
@@ -62,6 +66,11 @@ class AirPurifierStatus:
     def aqi(self) -> int:
         """Air quality index."""
         return self.data["aqi"]
+
+    @property
+    def average_aqi(self) -> int:
+        """Average of the air quality index."""
+        return self.data["average_aqi"]
 
     @property
     def humidity(self) -> int:
@@ -90,6 +99,11 @@ class AirPurifierStatus:
         """Brightness of the LED."""
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
+
+        # This is the property name of the Air Purifier Pro
+        if self.data["bright"] is not None:
+            return LedBrightness(self.data["bright"])
+
         return None
 
     @property
@@ -101,11 +115,6 @@ class AirPurifierStatus:
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
-
-    @property
-    def brightness(self) -> int:
-        """Return brightness."""
-        return self.data["bright"]
 
     @property
     def favorite_level(self) -> int:
@@ -125,24 +134,51 @@ class AirPurifierStatus:
 
     @property
     def use_time(self) -> int:
-        """How long the device has been active FIXME"""
+        """How long the device has been active in seconds."""
         return self.data["use_time"]
+
+    @property
+    def purify_volume(self) -> int:
+        """The volume of purified air in cubic meter."""
+        return self.data["purify_volume"]
 
     @property
     def motor_speed(self) -> int:
         """Speed of the motor."""
         return self.data["motor1_speed"]
 
-    def __str__(self) -> str:
-        s = "<AirPurifierStatus power=%s, aqi=%s temperature=%s, " \
-            "humidity=%s%%, mode=%s, led=%s, led_brightness=%s, buzzer=%s, " \
-            "child_lock=%s, brightness=%s, favorite_level=%s, " \
-            "filter_life_remaining=%s, filter_hours_used=%s, " \
-            "use_time=%s, motor_speed=%s>" % \
-            (self.power, self.aqi, self.temperature, self.humidity, self.mode,
-             self.led, self.led_brightness, self.buzzer, self.child_lock,
-             self.brightness, self.favorite_level, self.filter_life_remaining,
-             self.filter_hours_used, self.use_time,
+    def __repr__(self) -> str:
+        s = "<AirPurifierStatus power=%s, " \
+            "aqi=%s," \
+            "average_aqi=%s," \
+            "temperature=%s, " \
+            "humidity=%s%%," \
+            "mode=%s," \
+            "led=%s," \
+            "led_brightness=%s," \
+            "buzzer=%s, " \
+            "child_lock=%s," \
+            "favorite_level=%s," \
+            "filter_life_remaining=%s, " \
+            "filter_hours_used=%s, " \
+            "use_time=%s, " \
+            "purify_volume=%s, " \
+            "motor_speed=%s>" % \
+            (self.power,
+             self.aqi,
+             self.average_aqi,
+             self.temperature,
+             self.humidity,
+             self.mode,
+             self.led,
+             self.led_brightness,
+             self.buzzer,
+             self.child_lock,
+             self.favorite_level,
+             self.filter_life_remaining,
+             self.filter_hours_used,
+             self.use_time,
+             self.purify_volume,
              self.motor_speed)
         return s
 
@@ -153,15 +189,24 @@ class AirPurifier(Device):
     def status(self) -> AirPurifierStatus:
         """Retrieve properties."""
 
-        properties = ['power', 'aqi', 'humidity', 'temp_dec',
-                      'mode', 'led', 'led_b', 'buzzer', 'child_lock',
-                      'bright', 'favorite_level', 'filter1_life',
-                      'f1_hour_used', 'use_time', 'motor1_speed']
+        properties = ['power', 'aqi', 'average_aqi', 'humidity', 'temp_dec',
+                      'mode', 'favorite_level', 'filter1_life', 'f1_hour_used',
+                      'use_time', 'motor1_speed', 'purify_volume', 'f1_hour',
+                      # Second request
+                      'led', 'led_b', 'bright', 'buzzer', 'child_lock', ]
 
+        # A single request is limited to 16 properties. Therefore the
+        # properties are divided in two groups here. The second group contains
+        # some infrequent and independent updated properties.
         values = self.send(
             "get_prop",
-            properties
+            properties[0:13]
         )
+
+        values.extend(self.send(
+            "get_prop",
+            properties[13:]
+        ))
 
         properties_count = len(properties)
         values_count = len(values)
@@ -188,6 +233,8 @@ class AirPurifier(Device):
 
     def set_favorite_level(self, level: int):
         """Set favorite level."""
+        if level < 0 or level > 16:
+            raise AirPurifierException("Invalid favorite level: %s" % level)
 
         # Set the favorite level used when the mode is `favorite`,
         # should be  between 0 and 16.
@@ -210,3 +257,10 @@ class AirPurifier(Device):
             return self.send("set_buzzer", ["on"])
         else:
             return self.send("set_buzzer", ["off"])
+
+    def set_child_lock(self, lock: bool):
+        """Set child lock on/off."""
+        if lock:
+            return self.send("set_child_lock", ["on"])
+        else:
+            return self.send("set_child_lock", ["off"])

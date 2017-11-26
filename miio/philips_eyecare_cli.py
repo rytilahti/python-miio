@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.PhilipsEyecare)
 
 
-def validate_bright(ctx, param, value):
+def validate_brightness(ctx, param, value):
     value = int(value)
     if value < 1 or value > 100:
         raise click.BadParameter('Should be a positive int between 1-100.')
@@ -123,9 +123,9 @@ def off(dev: miio.PhilipsEyecare):
 
 
 @cli.command()
-@click.argument('level', callback=validate_bright, required=True,)
+@click.argument('level', callback=validate_brightness, required=True,)
 @pass_dev
-def set_bright(dev: miio.PhilipsEyecare, level):
+def set_brightness(dev: miio.PhilipsEyecare, level):
     """Set brightness level."""
     click.echo("Brightness: %s" % dev.set_brightness(level))
 
@@ -189,9 +189,9 @@ def ambient_off(dev: miio.PhilipsEyecare):
 
 
 @cli.command()
-@click.argument('level', callback=validate_bright, required=True,)
+@click.argument('level', callback=validate_brightness, required=True,)
 @pass_dev
-def set_amb_bright(dev: miio.PhilipsEyecare, level):
+def set_ambient_brightness(dev: miio.PhilipsEyecare, level):
     """Set Ambient Light brightness level."""
     click.echo("Ambient Light Brightness: %s" %
                dev.set_ambient_brightness(level))
