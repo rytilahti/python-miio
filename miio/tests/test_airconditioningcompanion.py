@@ -1,7 +1,6 @@
 from unittest import TestCase
 from miio import AirConditioningCompanion
 from miio.airconditioningcompanion import OperationMode, FanSpeed
-from .dummies import DummyDevice
 import pytest
 
 
