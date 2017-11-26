@@ -132,6 +132,7 @@ class TestAirPurifier(TestCase):
         def led():
             return self.device.status().led
 
+        # The LED brightness of a Air Purifier Pro cannot be set so far.
         self.device.set_led(True)
         assert led() == True
 
@@ -157,3 +158,29 @@ class TestAirPurifier(TestCase):
 
         self.device.set_child_lock(False)
         assert child_lock() == False
+
+    def test_status_without_led_b_and_with_bright(self):
+        self.device._reset_state()
+
+        self.device.state["bright"] = self.device.state["led_b"]
+        del self.device.state["led_b"]
+
+        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
+
+    def test_status_without_led_brightness_at_all(self):
+        self.device._reset_state()
+
+        self.device.state["led_b"] = None
+        self.device.state["bright"] = None
+        assert self.state().led_brightness is None
+
+    def test_status_without_temperature(self):
+        self.device._reset_state()
+        self.device.state["temp_dec"] = None
+
+        assert self.state().temperature is None
+
+    def test_status_string(self):
+        self.device._reset_state()
+
+        assert self.state().__str__
