@@ -63,7 +63,7 @@ class TestPhilipsBulb(TestCase):
         assert self.state().scene == self.device.start_state["snm"]
         assert self.state().delay_off_countdown == self.device.start_state["dv"]
 
-    def set_brightness(self):
+    def test_set_brightness(self):
         def brightness():
             return self.device.status().brightness
 
@@ -72,7 +72,7 @@ class TestPhilipsBulb(TestCase):
         self.device.set_brightness(20)
         assert brightness() == 20
 
-    def set_color_temperature(self):
+    def test_set_color_temperature(self):
         def color_temperature():
             return self.device.status().color_temperature
 
@@ -81,7 +81,7 @@ class TestPhilipsBulb(TestCase):
         self.device.set_color_temperature(20)
         assert color_temperature() == 20
 
-    def delay_off(self):
+    def test_delay_off(self):
         def delay_off_countdown():
             return self.device.status().delay_off_countdown
 
@@ -90,7 +90,7 @@ class TestPhilipsBulb(TestCase):
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
 
-    def set_scene(self):
+    def test_set_scene(self):
         def scene():
             return self.device.status().scene
 
