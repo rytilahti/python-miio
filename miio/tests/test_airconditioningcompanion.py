@@ -5,14 +5,26 @@ from .dummies import DummyDevice
 import pytest
 
 
-class DummyAirConditioningCompanion(DummyDevice, AirConditioningCompanion):
+class DummyAirConditioningCompanion(AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
         self.state = ['010500978022222102', '010201190280222221', '2']
 
         self.return_values = {
             'get_model_and_state': self._get_state
         }
-        super().__init__(args, kwargs)
+        self.start_state = self.state.copy()
+
+    def send(self, command: str, parameters=None, retry_count=3):
+        """Overridden send() to return values from `self.return_values`."""
+        return self.return_values[command](parameters)
+
+    def _reset_state(self):
+        """Revert back to the original state."""
+        self.state = self.start_state.copy()
+
+    def _get_state(self, props):
+        """Return the requested data"""
+        return self.state
 
 
 @pytest.fixture(scope="class")
@@ -33,9 +45,9 @@ class TestAirConditioningCompanion(TestCase):
         self.device._reset_state()
 
         assert self.is_on() is False
-        assert self.state().ac_power == '2'
-        assert self.state().ac_model == '0180222221'
+        assert self.state().air_condition_power == '2'
+        assert self.state().air_condition_model == '0180222221'
         assert self.state().temperature == 25
-        assert self.state().sweep_mode is False
+        assert self.state().swing_mode is False
         assert self.state().fan_speed == FanSpeed.Low
         assert self.state().mode == OperationMode.Auto

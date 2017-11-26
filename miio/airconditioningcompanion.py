@@ -1,5 +1,6 @@
 from .device import Device
 import enum
+from typing import Optional
 
 
 class OperationMode(enum.Enum):
@@ -15,6 +16,9 @@ class FanSpeed(enum.Enum):
     Auto = 3
 
 
+STORAGE_SLOT_ID = 30
+
+
 class AirConditioningCompanionStatus:
     """Container for status reports of the Xiaomi AC Companion."""
 
@@ -26,12 +30,12 @@ class AirConditioningCompanionStatus:
         self.data = data
 
     @property
-    def air_condition_power(self):
+    def air_condition_power(self) -> str:
         """Current power state of the air conditioner."""
-        return self.data[2]
+        return str(self.data[2])
 
     @property
-    def air_condition_model(self):
+    def air_condition_model(self) -> str:
         """Model of the air conditioner."""
         return str(self.data[0][0:2] + self.data[0][8:16])
 
@@ -56,14 +60,22 @@ class AirConditioningCompanionStatus:
         return self.data[1][5:6] == '0'
 
     @property
-    def fan_speed(self):
+    def fan_speed(self) -> Optional[FanSpeed]:
         """Current fan speed."""
-        return OperationMode(self.data[1][4:5])
+        speed = int(self.data[1][4:5])
+        if speed is not None:
+            return FanSpeed(speed)
+
+        return None
 
     @property
-    def mode(self):
+    def mode(self) -> Optional[OperationMode]:
         """Current operation mode."""
-        return OperationMode(self.data[1][3:4])
+        mode = int(self.data[1][3:4])
+        if mode is not None:
+            return OperationMode(mode)
+
+        return None
 
 
 class AirConditioningCompanion(Device):
@@ -76,7 +88,7 @@ class AirConditioningCompanion(Device):
 
     def learn(self):
         """Learn an infrared command."""
-        return self.send("start_ir_learn", [30])
+        return self.send("start_ir_learn", [STORAGE_SLOT_ID])
 
     def learn_result(self):
         """Read the learned command."""
@@ -84,7 +96,7 @@ class AirConditioningCompanion(Device):
 
     def learn_stop(self):
         """Stop learning of a infrared command."""
-        return self.send("end_ir_learn", [30])
+        return self.send("end_ir_learn", [STORAGE_SLOT_ID])
 
     def send_ir_code(self, command: str):
         """Play a captured command.
