@@ -26,12 +26,12 @@ class AirConditioningCompanionStatus:
         self.data = data
 
     @property
-    def ac_power(self):
+    def air_condition_power(self):
         """Current power state of the air conditioner."""
         return self.data[2]
 
     @property
-    def ac_model(self):
+    def air_condition_model(self):
         """Model of the air conditioner."""
         return str(self.data[0][0:2] + self.data[0][8:16])
 
