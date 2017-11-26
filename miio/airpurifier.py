@@ -47,7 +47,7 @@ class AirPurifierStatus:
         'led': 'off', 'led_b': 2, 'bright': None, 'buzzer': 'off',
         'child_lock': 'off'}
 
-        A request is limitted to 16 properties.
+        A request is limited to 16 properties.
         """
 
         self.data = data
@@ -147,7 +147,7 @@ class AirPurifierStatus:
         """Speed of the motor."""
         return self.data["motor1_speed"]
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<AirPurifierStatus power=%s, " \
             "aqi=%s," \
             "average_aqi=%s," \

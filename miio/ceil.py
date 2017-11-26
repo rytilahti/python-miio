@@ -61,7 +61,7 @@ class CeilStatus:
         """Automatic color temperature state."""
         return self.data["ac"] == 1
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<CeilStatus power=%s, brightness=%s, " \
             "color_temperature=%s, scene=%s, delay_off_countdown=%s, " \
             "smart_night_light=%s, automatic_color_temperature=%s>" % \

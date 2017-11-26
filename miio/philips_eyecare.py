@@ -69,7 +69,7 @@ class PhilipsEyecareStatus:
         """Countdown until turning off in minutes."""
         return self.data["dvalue"]
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<PhilipsEyecareStatus power=%s, brightness=%s, " \
             "notify=%s, ambient=%s, ambient_brightness=%s, " \
             "eyecare=%s, scene=%s, smart_night_light=%s, " \

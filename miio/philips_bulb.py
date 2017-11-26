@@ -41,7 +41,7 @@ class PhilipsBulbStatus:
     def delay_off_countdown(self) -> int:
         return self.data["dv"]
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<PhilipsBulbStatus power=%s, brightness=%s, " \
             "color_temperature=%s, scene=%s, delay_off_countdown=%s>" % \
             (self.power, self.brightness,
