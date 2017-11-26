@@ -1,10 +1,11 @@
 from unittest import TestCase
-from miio import Plug
+from miio import AirPurifier
+from miio.airpurifier import OperationMode, LedBrightness
 from .dummies import DummyDevice
 import pytest
 
 
-class DummyAirPurifier(DummyDevice, Plug):
+class DummyAirPurifier(DummyDevice, AirPurifier):
     def __init__(self, *args, **kwargs):
         self.state = {
             'power': 'on',
@@ -74,5 +75,85 @@ class TestAirPurifier(TestCase):
         self.device._reset_state()
 
         assert self.is_on() is True
-        assert self.state().temperature == \
-               self.device.start_state["temp_dec"] / 10.0
+        assert self.state().aqi == self.device.start_state["aqi"]
+        assert self.state().average_aqi == self.device.start_state["average_aqi"]
+        assert self.state().temperature == self.device.start_state["temp_dec"] / 10.0
+        assert self.state().humidity == self.device.start_state["humidity"]
+        assert self.state().mode == OperationMode(self.device.start_state["mode"])
+        assert self.state().favorite_level == self.device.start_state["favorite_level"]
+        assert self.state().filter_life_remaining == self.device.start_state["filter1_life"]
+        assert self.state().filter_hours_used == self.device.start_state["f1_hour_used"]
+        assert self.state().use_time == self.device.start_state["use_time"]
+        assert self.state().motor_speed == self.device.start_state["motor1_speed"]
+        assert self.state().purify_volume == self.device.start_state["purify_volume"]
+
+        assert self.state().led == (self.device.start_state["led"] == 'on')
+        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
+        assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
+        assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
+
+    def test_set_mode(self):
+        def mode():
+            return self.device.status().mode
+
+        self.device.set_mode(OperationMode.Silent)
+        assert mode() == OperationMode.Silent
+
+        self.device.set_mode(OperationMode.Auto)
+        assert mode() == OperationMode.Auto
+
+        self.device.set_mode(OperationMode.Favorite)
+        assert mode() == OperationMode.Favorite
+
+        self.device.set_mode(OperationMode.Idle)
+        assert mode() == OperationMode.Idle
+
+    def test_set_favorite_level(self):
+        def favorite_level():
+            return self.device.status().favorite_level
+
+        self.device.set_favorite_level(1)
+        assert favorite_level() == 1
+
+    def test_set_led_brightness(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led_brightness(LedBrightness.Bright)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led_brightness(LedBrightness.Dim)
+        assert led_brightness() == LedBrightness.Dim
+
+        self.device.set_led_brightness(LedBrightness.Off)
+        assert led_brightness() == LedBrightness.Off
+
+    def test_set_led(self):
+        def led():
+            return self.device.status().led
+
+        self.device.set_led(True)
+        assert led() == True
+
+        self.device.set_led(False)
+        assert led() == False
+
+    def test_set_buzzer(self):
+        def buzzer():
+            return self.device.status().buzzer
+
+        self.device.set_buzzer(True)
+        assert buzzer() == True
+
+        self.device.set_buzzer(False)
+        assert buzzer() == False
+
+    def test_set_child_lock(self):
+        def child_lock():
+            return self.device.status().child_lock
+
+        self.device.set_child_lock(True)
+        assert child_lock() == True
+
+        self.device.set_child_lock(False)
+        assert child_lock() == False

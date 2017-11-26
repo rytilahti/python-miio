@@ -198,7 +198,7 @@ class AirPurifier(Device):
 
         values.extend(self.send(
             "get_prop",
-            properties[14:]
+            properties[13:]
         ))
 
         properties_count = len(properties)
