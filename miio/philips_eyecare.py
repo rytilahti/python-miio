@@ -11,7 +11,7 @@ class PhilipsEyecareStatus:
 
     def __init__(self, data: Dict[str, Any]) -> None:
         # ['power': 'off', 'bright': 5, 'notifystatus': 'off',
-        #  'ambstatus': 'off': 'ambvalue': 41, 'eyecare': 'on',
+        #  'ambstatus': 'off', 'ambvalue': 41, 'eyecare': 'on',
         #  'scene_num': 3, 'bls': 'on', 'dvalue': 0]
         self.data = data
 
