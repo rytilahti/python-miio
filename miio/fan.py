@@ -75,12 +75,12 @@ class FanStatus:
 
     @property
     def natural_level(self) -> int:
-        """Natural level. FIXME what is this?"""
+        """Fan speed in natural mode."""
         return self.data["natural_level"]
 
     @property
     def speed_level(self) -> int:
-        """Speed level. FIXME how does this compare to speed?"""
+        """Fan speed in direct mode."""
         return self.data["speed_level"]
 
     @property
@@ -105,7 +105,8 @@ class FanStatus:
 
     @property
     def speed(self) -> int:
-        """Current speed. FIXME how does this compare to speed_level?"""
+        """FIXME What is the meaning of this value?
+        (cp. speed_level vs. natural_level)"""
         return self.data["speed"]
 
     @property
