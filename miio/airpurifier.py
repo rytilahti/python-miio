@@ -1,6 +1,5 @@
 import logging
 import enum
-import math
 from typing import Any, Dict, Optional
 from collections import defaultdict
 from .device import Device
