@@ -39,8 +39,3 @@ class TestAirConditioningCompanion(TestCase):
         assert self.state().sweep_mode is False
         assert self.state().fan_speed == FanSpeed.Low
         assert self.state().mode == OperationMode.Auto
-
-    def test_status_without_power_consume_rate(self):
-        del self.device.state["power_consume_rate"]
-
-        assert self.state().load_power is None
