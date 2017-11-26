@@ -36,11 +36,12 @@ class AirPurifierStatus:
 
         Response of a Air Purifier 2:
 
-        ['power': 'on', 'aqi': 22, 'humidity': 61, 'temp_dec': 197,
-         'mode': 'auto', 'led': 2, 'led_b': 'off', 'buzzer': 'off',
-         'child_lock': 'off', 'bright': None, 'favorite_level': 10,
-         'filter1_life': 80, 'f1_hour_used': 678, 'use_time': 2440800,
-         'motor1_speed': 351, 'purify_volume': 25127]
+        {'power': 'on, 'aqi': 10, 'average_aqi': 8, 'humidity': 62,
+         'temp_dec': 186, 'mode': 'auto', 'favorite_level': 10,
+        'filter1_life': 80, 'f1_hour_used': 682, 'use_time': 2457000,
+        'motor1_speed': 354, 'purify_volume': 25262, 'f1_hour': 3500,
+        'led': 'off', 'led_b': 2, 'bright': None, 'buzzer': 'off',
+        'child_lock': 'off'}
 
         A request is limitted to 16 properties.
         """
@@ -65,7 +66,7 @@ class AirPurifierStatus:
     @property
     def average_aqi(self) -> int:
         """Average of the air quality index."""
-        return self.data["averageaqi"]
+        return self.data["average_aqi"]
 
     @property
     def humidity(self) -> int:
@@ -184,7 +185,7 @@ class AirPurifier(Device):
     def status(self) -> AirPurifierStatus:
         """Retrieve properties."""
 
-        properties = ['power', 'aqi', 'averageaqi', 'humidity', 'temp_dec',
+        properties = ['power', 'aqi', 'average_aqi', 'humidity', 'temp_dec',
                       'mode', 'favorite_level', 'filter1_life', 'f1_hour_used',
                       'use_time', 'motor1_speed', 'purify_volume', 'f1_hour',
                       # Second request
@@ -247,3 +248,10 @@ class AirPurifier(Device):
             return self.send("set_buzzer", ["on"])
         else:
             return self.send("set_buzzer", ["off"])
+
+    def set_child_lock(self, lock: bool):
+        """Set child lock on/off."""
+        if lock:
+            return self.send("set_child_lock", ["on"])
+        else:
+            return self.send("set_child_lock", ["off"])
