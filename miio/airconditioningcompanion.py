@@ -51,8 +51,8 @@ class AirConditioningCompanionStatus:
         return int(self.data[1][6:8], 16)
 
     @property
-    def sweep_mode(self) -> bool:
-        """True if sweep mode is enabled."""
+    def swing_mode(self) -> bool:
+        """True if swing mode is enabled."""
         return self.data[1][5:6] == '0'
 
     @property
