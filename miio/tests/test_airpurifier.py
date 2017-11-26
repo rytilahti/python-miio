@@ -179,8 +179,3 @@ class TestAirPurifier(TestCase):
         self.device.state["temp_dec"] = None
 
         assert self.state().temperature is None
-
-    def test_status_string(self):
-        self.device._reset_state()
-
-        assert self.state().__str__
