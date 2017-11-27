@@ -6,24 +6,21 @@ import pytest
 class DummyPlugV1(PlugV1):
     def __init__(self, *args, **kwargs):
         self.state = {
-            'power': True,
+            'on': True,
             'usb_on': True,
             'temperature': 32,
         }
         self.return_values = {
             'get_prop': self._get_state,
-            'set_on': lambda: self._set_state("power", True),
-            'set_off': lambda: self._set_state("power", False),
-            'set_usb_on': lambda: self._set_state("usb_on", True),
-            'set_usb_off': lambda: self._set_state("usb_on", False),
+            'set_on': lambda x: self._set_state("on", True),
+            'set_off': lambda x: self._set_state("on", False),
+            'set_usb_on': lambda x: self._set_state("usb_on", True),
+            'set_usb_off': lambda x: self._set_state("usb_on", False),
         }
         self.start_state = self.state.copy()
 
     def send(self, command: str, parameters=None, retry_count=3):
         """Overridden send() to return values from `self.return_values`."""
-        if parameters is None:
-            return self.return_values[command]()
-
         return self.return_values[command](parameters)
 
     def _reset_state(self):
@@ -31,9 +28,7 @@ class DummyPlugV1(PlugV1):
         self.state = self.start_state.copy()
 
     def _set_state(self, var, value):
-        """Set a state of a variable,
-        the value is expected to be an array with length of 1."""
-        # print("setting %s = %s" % (var, value))
+        """Set a state of a variable"""
         self.state[var] = value
 
     def _get_state(self, props):
