@@ -74,4 +74,3 @@ class TestPowerStrip(TestCase):
         assert mode() == PowerMode.Eco
         self.device.set_power_mode(PowerMode.Normal)
         assert mode() == PowerMode.Normal
-
