@@ -84,7 +84,7 @@ class AirHumidifier(Device):
         """Retrieve properties."""
 
         properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
-                      'led_b', ]
+                      'led_b', 'led', ]
 
         values = self.send(
             "get_prop",
