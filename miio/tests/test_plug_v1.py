@@ -36,7 +36,6 @@ class DummyPlugV1(PlugV1):
         return [self.state[x] for x in props if x in self.state]
 
 
-
 @pytest.fixture(scope="class")
 def plugv1(request):
     request.cls.device = DummyPlugV1()
@@ -72,4 +71,5 @@ class TestPlugV1(TestCase):
 
         assert self.is_on() is True
         assert self.state().usb_power is True
-        assert self.state().temperature == self.device.start_state["temperature"]
+        assert self.state().temperature == self.device.start_state[
+            "temperature"]
