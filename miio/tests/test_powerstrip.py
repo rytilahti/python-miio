@@ -1,5 +1,6 @@
 from unittest import TestCase
 from miio import PowerStrip
+from miio.powerstrip import PowerMode
 from .dummies import DummyDevice
 import pytest
 
@@ -10,12 +11,13 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
             'power': 'on',
             'mode': 'normal',
             'temperature': 32.5,
-            'current': 123,
+            'current': 25.5,
             'power_consume_rate': 12.5,
         }
         self.return_values = {
             'get_prop': self._get_state,
             'set_power': lambda x: self._set_state("power", x),
+            'set_power_mode': lambda x: self._set_state("mode", x),
         }
         super().__init__(args, kwargs)
 
@@ -54,10 +56,22 @@ class TestPowerStrip(TestCase):
         self.device._reset_state()
 
         assert self.is_on() is True
+        assert self.state().mode == PowerMode(self.device.start_state["mode"])
         assert self.state().temperature == self.device.start_state["temperature"]
+        assert self.state().current == self.device.start_state["current"]
         assert self.state().load_power == self.device.start_state["power_consume_rate"]
 
     def test_status_without_power_consume_rate(self):
         del self.device.state["power_consume_rate"]
 
         assert self.state().load_power is None
+
+    def test_set_power_mode(self):
+        def mode():
+            return self.device.status().mode
+
+        self.device.set_power_mode(PowerMode.Eco)
+        assert mode() == PowerMode.Eco
+        self.device.set_power_mode(PowerMode.Normal)
+        assert mode() == PowerMode.Normal
+
