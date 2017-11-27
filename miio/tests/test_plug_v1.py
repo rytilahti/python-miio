@@ -1,0 +1,80 @@
+from unittest import TestCase
+from miio import PlugV1
+import pytest
+
+
+class DummyPlugV1(PlugV1):
+    def __init__(self, *args, **kwargs):
+        self.state = {
+            'power': True,
+            'usb_on': True,
+            'temperature': 32,
+        }
+        self.return_values = {
+            'get_prop': self._get_state,
+            'set_on': lambda: self._set_state("power", True),
+            'set_off': lambda: self._set_state("power", False),
+            'set_usb_on': lambda: self._set_state("usb_on", True),
+            'set_usb_off': lambda: self._set_state("usb_on", False),
+        }
+        self.start_state = self.state.copy()
+
+    def send(self, command: str, parameters=None, retry_count=3):
+        """Overridden send() to return values from `self.return_values`."""
+        if parameters is None:
+            return self.return_values[command]()
+
+        return self.return_values[command](parameters)
+
+    def _reset_state(self):
+        """Revert back to the original state."""
+        self.state = self.start_state.copy()
+
+    def _set_state(self, var, value):
+        """Set a state of a variable,
+        the value is expected to be an array with length of 1."""
+        # print("setting %s = %s" % (var, value))
+        self.state[var] = value
+
+    def _get_state(self, props):
+        """Return wanted properties"""
+        return [self.state[x] for x in props if x in self.state]
+
+
+
+@pytest.fixture(scope="class")
+def plugv1(request):
+    request.cls.device = DummyPlugV1()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("plugv1")
+class TestPlugV1(TestCase):
+    def is_on(self):
+        return self.device.status().is_on
+
+    def state(self):
+        return self.device.status()
+
+    def test_on(self):
+        self.device.off()  # ensure off
+
+        start_state = self.is_on()
+        assert start_state is False
+
+        self.device.on()
+        assert self.is_on() is True
+
+    def test_off(self):
+        self.device.on()  # ensure on
+
+        assert self.is_on() is True
+        self.device.off()
+        assert self.is_on() is False
+
+    def test_status(self):
+        self.device._reset_state()
+
+        assert self.is_on() is True
+        assert self.state().usb_power is True
+        assert self.state().temperature == self.device.start_state["temperature"]
