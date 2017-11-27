@@ -62,18 +62,21 @@ class TestPowerStrip(TestCase):
         assert self.state().load_power == self.device.start_state["power_consume_rate"]
 
     def test_status_without_power_consume_rate(self):
-        del self.device.state["power_consume_rate"]
+        self.device._reset_state()
 
+        self.device.state["power_consume_rate"] = None
         assert self.state().load_power is None
 
     def test_status_without_current(self):
-        del self.device.state["current"]
+        self.device._reset_state()
 
+        self.device.state["current"] = None
         assert self.state().current is None
 
     def test_status_without_mode(self):
-        del self.device.state["mode"]
+        self.device._reset_state()
 
+        self.device.state["mode"] = None
         assert self.state().mode is None
 
     def test_set_power_mode(self):
