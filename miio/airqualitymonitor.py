@@ -8,7 +8,7 @@ _LOGGER = logging.getLogger(__name__)
 class AirQualityMonitorStatus:
     """Container of air quality monitor status."""
     def __init__(self, data):
-        # ['power': 'on', 'aqi': 34, 'battery': 0, 'usb_state': 'on']
+        # {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off'}
         self.data = data
 
     @property
