@@ -73,3 +73,17 @@ class TestPlugV1(TestCase):
         assert self.state().usb_power is True
         assert self.state().temperature == self.device.start_state[
             "temperature"]
+
+    def test_usb_on(self):
+        self.device.usb_off()  # ensure off
+        assert self.device.status().usb_power is False
+
+        self.device.usb_on()
+        assert self.device.status().usb_power is True
+
+    def test_usb_off(self):
+        self.device.usb_on()  # ensure on
+        assert self.device.status().usb_power is True
+
+        self.device.usb_off()
+        assert self.device.status().usb_power is False
