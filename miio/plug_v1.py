@@ -9,6 +9,7 @@ class PlugV1Status:
     """Container for status reports from the plug."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        # { 'power': True, 'usb_on': True, 'temperature': 32 }
         self.data = data
 
     @property
