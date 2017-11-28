@@ -38,6 +38,13 @@ class PowerStripStatus:
         return self.data["temperature"]
 
     @property
+    def current(self) -> Optional[float]:
+        """Current, if available. Meaning and voltage reference unknown."""
+        if self.data["current"] is not None:
+            return self.data["current"]
+        return None
+
+    @property
     def load_power(self) -> Optional[float]:
         """Current power load, if available."""
         if self.data["power_consume_rate"] is not None:
