@@ -42,7 +42,7 @@ class AirConditioningCompanionStatus:
     @property
     def power(self) -> str:
         """Current power state."""
-        return 'on' if (self.data[1][2:3] == 1) else 'off'
+        return 'on' if (self.data[1][2:3] == '1') else 'off'
 
     @property
     def is_on(self) -> bool:
