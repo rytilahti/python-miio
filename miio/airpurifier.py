@@ -18,7 +18,6 @@ class OperationMode(enum.Enum):
     Auto = 'auto'
 
 
-
 class LedBrightness(enum.Enum):
     Bright = 0
     Dim = 1
