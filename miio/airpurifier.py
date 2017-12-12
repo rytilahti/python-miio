@@ -12,10 +12,11 @@ class AirPurifierException(Exception):
 
 
 class OperationMode(enum.Enum):
-    Auto = 'auto'
+    Idle = 'idle'
     Silent = 'silent'
     Favorite = 'favorite'
-    Idle = 'idle'
+    Auto = 'auto'
+
 
 
 class LedBrightness(enum.Enum):
