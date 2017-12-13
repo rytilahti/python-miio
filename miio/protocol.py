@@ -20,7 +20,7 @@ from pprint import pprint as pp  # noqa: F401
 
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
                        Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
-                       Default, Pointer, Pass, Enum)
+                       Default, Pointer, Hex)
 
 # for debugging parsing
 # from construct import Probe
@@ -30,17 +30,6 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
 _LOGGER = logging.getLogger(__name__)
-
-# Map of device ids
-xiaomi_devices_reverse = {0x02c1: "Xiaomi Mi Smart WiFi Socket",
-                          0x02f2: "Xiaomi Mi Robot Vacuum",
-                          0x00c4: "Xiaomi Smart Mi Air Purifier",
-                          0x031a: "Xiaomi Smart home gateway",
-                          0x0330: "Yeelight color bulb",
-                          0x0374: "Xiaomi Philips LED Ceiling Lamp",
-                          0x02f9: "Xiaomi Philips Eyecare Smart Lamp 2"
-                          }
-xiaomi_devices = {y: x for x, y in xiaomi_devices_reverse.items()}
 
 
 class Utils:
@@ -190,9 +179,7 @@ Message = Struct(
         Const(Int16ub, 0x2131),
         "length" / Rebuild(Int16ub, Utils.get_length),
         "unknown" / Default(Int32ub, 0x00000000),
-        "devtype" / Enum(Default(Int16ub, 0x02f2),
-                         default=Pass, **xiaomi_devices),
-        "serial" / Default(Int16ub, 0xa40d),
+        "device_id" / Hex(Bytes(4)),
         "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.utcnow()))
     )),
     "checksum" / IfThenElse(

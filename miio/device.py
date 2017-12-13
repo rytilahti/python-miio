@@ -112,8 +112,7 @@ class Device:
         self._timeout = 5
         self._device_ts = None  # type: datetime.datetime
         self.__id = start_id
-        self._devtype = None
-        self._serial = None
+        self._device_id = None
 
     def do_discover(self) -> Message:
         """Send a handshake to the device,
@@ -126,14 +125,12 @@ class Device:
         :raises DeviceException: if the device could not be discovered."""
         m = Device.discover(self.ip)
         if m is not None:
-            self._devtype = m.header.value.devtype
-            self._serial = m.header.value.serial
+            self._device_id = m.header.value.device_id
             self._device_ts = m.header.value.ts
             if self.debug > 1:
                 _LOGGER.debug(m)
-            _LOGGER.debug("Discovered %s %s with ts: %s, token: %s",
-                          self._devtype,
-                          self._serial,
+            _LOGGER.debug("Discovered %s with ts: %s, token: %s",
+                          self._device_id,
                           self._device_ts,
                           codecs.encode(m.checksum, 'hex'))
         else:
@@ -176,9 +173,9 @@ class Device:
                     return m
 
                 if addr[0] not in seen_addrs:
-                    _LOGGER.info("  IP %s: %s - token: %s",
+                    _LOGGER.info("  IP %s (ID: %s) - token: %s",
                                  addr[0],
-                                 m.header.value.devtype,
+                                 m.header.value.device_id.decode(),
                                  codecs.encode(m.checksum, 'hex'))
                     seen_addrs.append(addr[0])
             except socket.timeout:
@@ -210,8 +207,7 @@ class Device:
 
         send_ts = self._device_ts + datetime.timedelta(seconds=1)
         header = {'length': 0, 'unknown': 0x00000000,
-                  'devtype': self._devtype, 'serial': self._serial,
-                  'ts': send_ts}
+                  'device_id': self._device_id, 'ts': send_ts}
 
         msg = {'data': {'value': cmd},
                'header': {'value': header},
@@ -236,6 +232,7 @@ class Device:
             data, addr = s.recvfrom(1024)
             m = Message.parse(data, ctx)
             self._device_ts = m.header.value.ts
+            self._device_id = m.header.value.device_id
             if self.debug > 1:
                 _LOGGER.debug("recv from %s: %s", addr[0], m)
 
