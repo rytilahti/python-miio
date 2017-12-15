@@ -14,6 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DEVICE_MAP = {
     "rockrobo-vacuum-v1": Vacuum,
+    "roborock-vacuum-s5": Vacuum,
     "chuangmi-plug-m1": Plug,
     "chuangmi-plug-v2": Plug,
     "chuangmi-plug-v1": PlugV1,
