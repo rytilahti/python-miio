@@ -1,5 +1,49 @@
 # Change Log
 
+## [0.3.3](https://github.com/rytilahti/python-miio/tree/0.3.3)
+
+This release brings support for Air Conditioner Companion along some improvements and an increase in the test coverage for future-proofing the code-base. Special thanks for this release goes to @syssi & to all new contributors!
+
+A bug exposed in python-miio when using version 2.8.17 or newer of the underlying construct library -- causing timeouts and inability to control devices -- has also been fixed in this release.
+
+New supported devices:
+* Xiaomi Mi Home Air Conditioner Companion
+
+Improvements:
+* Mi Vacuum 2nd generation is now detected by discovery
+* Air Purifier 2: expose additional properties
+* Yeelight: parse RGB properly
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.2...0.3.3)
+
+**Implemented enhancements:**
+
+- Xiaomi Mi Home Air Conditioner Companion support [\#76](https://github.com/rytilahti/python-miio/issues/76)
+
+**Closed issues:**
+
+- Philip Eye Care Lamp Got error when receiving: timed out [\#146](https://github.com/rytilahti/python-miio/issues/146)
+- Can't reach my mirobo [\#145](https://github.com/rytilahti/python-miio/issues/145)
+- installiation problems [\#130](https://github.com/rytilahti/python-miio/issues/130)
+- Unable to discover Xiaomi Philips LED Bulb  [\#106](https://github.com/rytilahti/python-miio/issues/106)
+- Xiaomi Mi Robot Vacuum 2nd support [\#90](https://github.com/rytilahti/python-miio/issues/90)
+
+**Merged pull requests:**
+
+- Update for Rock Robot \(Mi Robot gen 2\) [\#143](https://github.com/rytilahti/python-miio/pull/143) ([fanthos](https://github.com/fanthos))
+- Unbreak the communication when using construct v2.8.17 [\#142](https://github.com/rytilahti/python-miio/pull/142) ([rytilahti](https://github.com/rytilahti))
+- fix powerstate invalid [\#139](https://github.com/rytilahti/python-miio/pull/139) ([roiff](https://github.com/roiff))
+- Unit tests for the Chuang Mi Plug V1 [\#137](https://github.com/rytilahti/python-miio/pull/137) ([syssi](https://github.com/syssi))
+- Unit tests of the Xiaomi Power Strip extended [\#136](https://github.com/rytilahti/python-miio/pull/136) ([syssi](https://github.com/syssi))
+- Unit tests for the Xiaomi Air Quality Monitor [\#135](https://github.com/rytilahti/python-miio/pull/135) ([syssi](https://github.com/syssi))
+- Unit tests for the Xiaomi Air Humidifier [\#134](https://github.com/rytilahti/python-miio/pull/134) ([syssi](https://github.com/syssi))
+- Unit tests for philips lights [\#133](https://github.com/rytilahti/python-miio/pull/133) ([syssi](https://github.com/syssi))
+- Additional properties of the Xiaomi Air Purifier 2 introduced [\#132](https://github.com/rytilahti/python-miio/pull/132) ([syssi](https://github.com/syssi))
+- Fix Yeelight RGB parsing [\#131](https://github.com/rytilahti/python-miio/pull/131) ([Sduniii](https://github.com/Sduniii))
+- Xiaomi Air Conditioner Companion support [\#129](https://github.com/rytilahti/python-miio/pull/129) ([syssi](https://github.com/syssi))
+- Fix manual\_control error message typo [\#127](https://github.com/rytilahti/python-miio/pull/127) ([skorokithakis](https://github.com/skorokithakis))
+- bump to 0.3.2, add RELEASING.md for describing the process [\#126](https://github.com/rytilahti/python-miio/pull/126) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.3.2](https://github.com/rytilahti/python-miio/tree/0.3.2)
 
 This release includes small improvements for powerstrip and vacuum support.
