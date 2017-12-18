@@ -4,6 +4,14 @@ miio package
 Submodules
 ----------
 
+miio\.airconditioningcompanion module
+-------------------------------------
+
+.. automodule:: miio.airconditioningcompanion
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
 miio\.airhumidifier module
 --------------------------
 
