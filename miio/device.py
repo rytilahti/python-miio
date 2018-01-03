@@ -282,6 +282,23 @@ class Device:
         and harware and software versions."""
         return DeviceInfo(self.send("miIO.info", []))
 
+    def update(self, url: str, md5: str):
+        """Start an OTA update."""
+        payload = {
+            "mode": "normal",
+            "install": "1",
+            "app_url": url,
+            "file_md5": md5,
+            "proc": "dlnd install"
+        }
+        return self.send("miIO.ota", payload)
+
+    def update_progress(self):
+        return self.send("miIO.get_ota_progress", [])
+
+    def update_state(self):
+        return self.send("miIO.get_ota_state", [])
+
     @property
     def _id(self) -> int:
         """Increment and return the sequence id."""

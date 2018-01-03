@@ -482,6 +482,31 @@ def configure_wifi(vac: miio.Vacuum, ssid: str, password: str,
 
 
 @cli.command()
+@click.argument('file', required=True)
+@click.option('md5', required=False, default=None)
+@pass_dev
+def update_firmware(vac: miio.Vacuum, file: str, md5: str):
+    """Update device firmware.
+
+    If `file` starts with http* it is expected to be an URL.
+     In that case --md5 has to be given."""
+
+    url = None
+    if file.lower().startswith("http"):
+        if md5 is None:
+            click.echo("You need to pass --md5 when using URL for updating..")
+            return
+
+        click.echo("Using %s (md5: %s)" % (file, md5))
+    else:
+        pass
+        #Updater()
+
+    click.echo("Updating firmware image..")
+    vac.update(url, md5)
+
+
+@cli.command()
 @click.argument('cmd', required=True)
 @click.argument('parameters', required=False)
 @pass_dev

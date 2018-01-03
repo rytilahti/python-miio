@@ -20,3 +20,4 @@ from miio.airconditioningcompanion import AirConditioningCompanion
 from miio.yeelight import Yeelight
 from miio.device import Device, DeviceException
 from miio.discovery import Discovery
+from miio.updater import Updater
