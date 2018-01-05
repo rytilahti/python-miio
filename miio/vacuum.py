@@ -216,6 +216,26 @@ class Vacuum(Device):
         """Get voice settings."""
         return self.send("get_current_sound")
 
+    def install_sound(self, url: str, md5sum: str, sound_id: int):
+        """Install sound from given url.
+
+        TODO: can we pass e.g. 0 to let installation decide on sid?
+        """
+        payload = {
+            "url": url,
+            "md5": md5sum,
+            "sid": sound_id,
+        }
+        return self.send("dnld_install_sound", payload)
+
+    def sound_install_progress(self):
+        """Get sound installation progress."""
+        return self.send("get_sound_progress")
+
+    def sound_volume(self):
+        """Get sound volume."""
+        return self.send("get_sound_volume")
+
     def serial_number(self):
         """Get serial number."""
         return self.send("get_serial_number")[0]["serial_number"]

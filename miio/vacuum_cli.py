@@ -424,7 +424,18 @@ def cleaning_history(vac: miio.Vacuum):
 def sound(vac: miio.Vacuum):
     """Query sound settings."""
     click.echo(vac.sound_info())
+    click.echo(vac.sound_volume())
 
+
+@cli.command()
+@click.argument('url')
+@click.argument('md5sum')
+@click.argument('sid')
+@pass_dev
+def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int):
+    """Install a sound."""
+    click.echo("Installing from %s (md5: %s) for id %s" % (url, md5sum, sid))
+    click.echo(vac.install_sound(url, md5sum, sid))
 
 @cli.command()
 @pass_dev
