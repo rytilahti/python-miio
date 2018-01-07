@@ -103,8 +103,8 @@ class AirPurifierStatus:
         return None
 
     @property
-    def brightness(self) -> Optional[int]:
-        """Environment brightness level"""
+    def illuminance(self) -> Optional[int]:
+        """Environment illuminance level"""
         return self.data["bright"]
 
     @property
@@ -162,7 +162,7 @@ class AirPurifierStatus:
             "mode=%s, " \
             "led=%s, " \
             "led_brightness=%s, " \
-            "brightness=%s, " \
+            "illuminance=%s, " \
             "buzzer=%s, " \
             "child_lock=%s, " \
             "favorite_level=%s, " \
@@ -180,7 +180,7 @@ class AirPurifierStatus:
              self.mode,
              self.led,
              self.led_brightness,
-             self.brightness,
+             self.illuminance,
              self.buzzer,
              self.child_lock,
              self.favorite_level,
