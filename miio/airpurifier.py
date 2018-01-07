@@ -100,11 +100,12 @@ class AirPurifierStatus:
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
 
-        # This is the property name of the Air Purifier Pro
-        if self.data["bright"] is not None:
-            return LedBrightness(self.data["bright"])
-
         return None
+
+    @property
+    def brightness(self) -> Optional[int]:
+        """Environment brightness level"""
+        return self.data["bright"]
 
     @property
     def buzzer(self) -> bool:
@@ -161,6 +162,7 @@ class AirPurifierStatus:
             "mode=%s," \
             "led=%s," \
             "led_brightness=%s," \
+            "brightness=%s," \
             "buzzer=%s, " \
             "child_lock=%s," \
             "favorite_level=%s," \
@@ -178,6 +180,7 @@ class AirPurifierStatus:
              self.mode,
              self.led,
              self.led_brightness,
+             self.brightness,
              self.buzzer,
              self.child_lock,
              self.favorite_level,
