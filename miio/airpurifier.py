@@ -155,17 +155,17 @@ class AirPurifierStatus:
 
     def __repr__(self) -> str:
         s = "<AirPurifierStatus power=%s, " \
-            "aqi=%s," \
-            "average_aqi=%s," \
+            "aqi=%s, " \
+            "average_aqi=%s, " \
             "temperature=%s, " \
-            "humidity=%s%%," \
-            "mode=%s," \
-            "led=%s," \
-            "led_brightness=%s," \
-            "brightness=%s," \
+            "humidity=%s%%, " \
+            "mode=%s, " \
+            "led=%s, " \
+            "led_brightness=%s, " \
+            "brightness=%s, " \
             "buzzer=%s, " \
-            "child_lock=%s," \
-            "favorite_level=%s," \
+            "child_lock=%s, " \
+            "favorite_level=%s, " \
             "filter_life_remaining=%s, " \
             "filter_hours_used=%s, " \
             "use_time=%s, " \
