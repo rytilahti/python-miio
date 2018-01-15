@@ -9,6 +9,7 @@ Following features of the vacuum cleaner are currently supported:
    is not currently implemented, patches welcome!**
 -  Fetching and setting the schedules.
 -  Setting and querying the timezone.
+-  Installing sound packs.
 -  Manual control of the robot. **Patches for a nicer API are very welcome.**
 
 Use :ref:`mirobo --help <HelpOutput>`
@@ -124,6 +125,27 @@ Cleaning history
     Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
       Area cleaned: 32.16 m²
       Duration: (0:23:54)
+
+
+Sounds
+~~~~~~~~~~~~~~~~~~~~~
+
+To get information about current sound settings:
+
+::
+
+    mirobo sound
+
+
+To install a new sound pack, you have to know its md5sum and a location.
+As the last parameter a sound id (or sid),
+which you can choose by yourself,
+has to be passed.
+
+::
+
+    mirobo install_sound http://10.10.20.1:8000/my_sounds.pkg b50cfea27e52ebd5f46038ac7b9330c8 1005
+
 
 
 DND functionality
