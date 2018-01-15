@@ -37,7 +37,7 @@ class Updater:
     def __init__(self, file, interface=None):
         addr = ('', 0)
         self.server = HTTPServer(addr, UpdateServer)
-        self.server.got_request = False
+        setattr(self.server, "got_request", False)
         _, self.port = self.server.server_address
         _LOGGER.info("Serving on port %s" % self.port)
         self.server.timeout = 10
@@ -50,7 +50,8 @@ class Updater:
 
     def serve_once(self):
         self.server.handle_request()
-        if self.server.got_request:
+        print(getattr(self.server, "got_request"))
+        if getattr(self.server, "got_request"):
             _LOGGER.info("Got a request, serving the file hopefully")
         else:
             _LOGGER.error("No request was made..")
