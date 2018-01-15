@@ -128,7 +128,7 @@ Cleaning history
 
 
 Sounds
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
 
 To get information about current sound settings:
 
@@ -137,16 +137,20 @@ To get information about current sound settings:
     mirobo sound
 
 
-To install a new sound pack, you have to know its md5sum and a location.
-As the last parameter a sound id (or sid),
-which you can choose by yourself,
-has to be passed.
+You can use dustcloud's `audio generator`_ to create your own language packs,
+which will handle both generation and encrypting the package for you.
+
+To install your newly generated sound pack, you have to host it somewhere accessible to the vacuum,
+and you have to know its md5sum.
+The last parameter to give to the command is sound id (or `sid`),
+which you can choose by yourself.
 
 ::
 
     mirobo install_sound http://10.10.20.1:8000/my_sounds.pkg b50cfea27e52ebd5f46038ac7b9330c8 1005
 
 
+.. _audio generator: https://github.com/dgiese/dustcloud/tree/master/xiaomi.vacuum.gen1/audio_generator
 
 DND functionality
 ~~~~~~~~~~~~~~~~~
