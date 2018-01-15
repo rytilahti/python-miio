@@ -7,7 +7,8 @@ import datetime
 import pytz
 
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
-                               CleaningSummary, CleaningDetails, Timer)
+                               CleaningSummary, CleaningDetails, Timer,
+                               SoundStatus, SoundInstallStatus)
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -214,27 +215,28 @@ class Vacuum(Device):
 
     def sound_info(self):
         """Get voice settings."""
-        return self.send("get_current_sound")
+        return SoundStatus(self.send("get_current_sound")[0])
 
     def install_sound(self, url: str, md5sum: str, sound_id: int):
-        """Install sound from given url.
-
-        TODO: can we pass e.g. 0 to let installation decide on sid?
-        """
+        """Install sound from the given url."""
         payload = {
             "url": url,
             "md5": md5sum,
-            "sid": sound_id,
+            "sid": int(sound_id),
         }
-        return self.send("dnld_install_sound", payload)
+        return SoundInstallStatus(self.send("dnld_install_sound", payload)[0])
 
     def sound_install_progress(self):
         """Get sound installation progress."""
-        return self.send("get_sound_progress")
+        return SoundInstallStatus(self.send("get_sound_progress")[0])
 
-    def sound_volume(self):
+    def sound_volume(self) -> int:
         """Get sound volume."""
-        return self.send("get_sound_volume")
+        return self.send("get_sound_volume")[0]
+
+    def set_sound_volume(self, vol: int):
+        """Set sound volume."""
+        raise NotImplementedError("unknown command&parameters")
 
     def serial_number(self):
         """Get serial number."""
