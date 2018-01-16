@@ -104,7 +104,8 @@ class AirPurifierStatus:
 
     @property
     def illuminance(self) -> Optional[int]:
-        """Environment illuminance level"""
+        """Environment illuminance level in lux [0-200].
+        Sensor value is updated only when device is turned on."""
         return self.data["bright"]
 
     @property
@@ -150,7 +151,7 @@ class AirPurifierStatus:
 
     @property
     def volume(self) -> int:
-        """Volume of sound notifications"""
+        """Volume of sound notifications [0-100]."""
         return self.data["volume"]
 
     def __repr__(self) -> str:
@@ -277,5 +278,5 @@ class AirPurifier(Device):
             return self.send("set_child_lock", ["off"])
 
     def set_volume(self, volume: int):
-        """Set volume of sound notifications"""
+        """Set volume of sound notifications [0-100]."""
         return self.send("set_volume", [volume])
