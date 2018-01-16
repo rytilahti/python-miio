@@ -100,11 +100,13 @@ class AirPurifierStatus:
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
 
-        # This is the property name of the Air Purifier Pro
-        if self.data["bright"] is not None:
-            return LedBrightness(self.data["bright"])
-
         return None
+
+    @property
+    def illuminance(self) -> Optional[int]:
+        """Environment illuminance level in lux [0-200].
+        Sensor value is updated only when device is turned on."""
+        return self.data["bright"]
 
     @property
     def buzzer(self) -> bool:
@@ -147,23 +149,30 @@ class AirPurifierStatus:
         """Speed of the motor."""
         return self.data["motor1_speed"]
 
+    @property
+    def volume(self) -> int:
+        """Volume of sound notifications [0-100]."""
+        return self.data["volume"]
+
     def __repr__(self) -> str:
         s = "<AirPurifierStatus power=%s, " \
-            "aqi=%s," \
-            "average_aqi=%s," \
+            "aqi=%s, " \
+            "average_aqi=%s, " \
             "temperature=%s, " \
-            "humidity=%s%%," \
-            "mode=%s," \
-            "led=%s," \
-            "led_brightness=%s," \
+            "humidity=%s%%, " \
+            "mode=%s, " \
+            "led=%s, " \
+            "led_brightness=%s, " \
+            "illuminance=%s, " \
             "buzzer=%s, " \
-            "child_lock=%s," \
-            "favorite_level=%s," \
+            "child_lock=%s, " \
+            "favorite_level=%s, " \
             "filter_life_remaining=%s, " \
             "filter_hours_used=%s, " \
             "use_time=%s, " \
             "purify_volume=%s, " \
-            "motor_speed=%s>" % \
+            "motor_speed=%s, " \
+            "volume=%s>" % \
             (self.power,
              self.aqi,
              self.average_aqi,
@@ -172,6 +181,7 @@ class AirPurifierStatus:
              self.mode,
              self.led,
              self.led_brightness,
+             self.illuminance,
              self.buzzer,
              self.child_lock,
              self.favorite_level,
@@ -179,7 +189,8 @@ class AirPurifierStatus:
              self.filter_hours_used,
              self.use_time,
              self.purify_volume,
-             self.motor_speed)
+             self.motor_speed,
+             self.volume)
         return s
 
 
@@ -193,7 +204,8 @@ class AirPurifier(Device):
                       'mode', 'favorite_level', 'filter1_life', 'f1_hour_used',
                       'use_time', 'motor1_speed', 'purify_volume', 'f1_hour',
                       # Second request
-                      'led', 'led_b', 'bright', 'buzzer', 'child_lock', ]
+                      'led', 'led_b', 'bright', 'buzzer', 'child_lock',
+                      'volume', ]
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided in two groups here. The second group contains
@@ -264,3 +276,7 @@ class AirPurifier(Device):
             return self.send("set_child_lock", ["on"])
         else:
             return self.send("set_child_lock", ["off"])
+
+    def set_volume(self, volume: int):
+        """Set volume of sound notifications [0-100]."""
+        return self.send("set_volume", [volume])
