@@ -9,6 +9,7 @@ Following features of the vacuum cleaner are currently supported:
    is not currently implemented, patches welcome!**
 -  Fetching and setting the schedules.
 -  Setting and querying the timezone.
+-  Installing sound packs.
 -  Manual control of the robot. **Patches for a nicer API are very welcome.**
 
 Use :ref:`mirobo --help <HelpOutput>`
@@ -125,6 +126,31 @@ Cleaning history
       Area cleaned: 32.16 m²
       Duration: (0:23:54)
 
+
+Sounds
+~~~~~~
+
+To get information about current sound settings:
+
+::
+
+    mirobo sound
+
+
+You can use dustcloud's `audio generator`_ to create your own language packs,
+which will handle both generation and encrypting the package for you.
+
+To install your newly generated sound pack, you have to host it somewhere accessible to the vacuum,
+and you have to know its md5sum.
+The last parameter to give to the command is sound id (or `sid`),
+which you can choose by yourself.
+
+::
+
+    mirobo install_sound http://10.10.20.1:8000/my_sounds.pkg b50cfea27e52ebd5f46038ac7b9330c8 1005
+
+
+.. _audio generator: https://github.com/dgiese/dustcloud/tree/master/xiaomi.vacuum.gen1/audio_generator
 
 DND functionality
 ~~~~~~~~~~~~~~~~~

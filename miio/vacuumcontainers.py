@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*#
 from datetime import datetime, timedelta, time
 from typing import Any, Dict, List
+from enum import IntEnum
 import warnings
 import functools
 import inspect
@@ -443,3 +444,69 @@ class Timer:
 
     def __repr__(self) -> str:
         return "<Timer %s: %s - enabled: %s - cron: %s>" % (self.id, self.ts, self.enabled, self.cron)
+
+
+class SoundStatus:
+    """Container for sound status."""
+    def __init__(self, data):
+        # {'sid_in_progress': 0, 'sid_in_use': 1004}
+        self.data = data
+
+    @property
+    def current(self):
+        return self.data['sid_in_use']
+
+    @property
+    def being_installed(self):
+        return self.data['sid_in_progress']
+
+    def __repr__(self):
+        return "<SoundStatus current: %s installing: %s>" % (
+            self.current,
+            self.being_installed)
+
+
+class SoundInstallState(IntEnum):
+    Unknown = 0
+    Downloading = 1
+    Installing = 2
+    Installed = 3
+    Error = 4
+
+
+class SoundInstallStatus:
+    """Container for sound installation status."""
+    def __init__(self, data):
+        # {'progress': 0, 'sid_in_progress': 0, 'state': 0, 'error': 0}
+        self.data = data
+
+    @property
+    def state(self) -> SoundInstallState:
+        """Installation state."""
+        return SoundInstallState(self.data['state'])
+
+    @property
+    def progress(self) -> int:
+        """Progress in percentages."""
+        return self.data['progress']
+
+    @property
+    def sid(self) -> int:
+        """Sound ID for the sound being installed."""
+        # this is missing on install confirmation, so let's use get
+        return self.data.get('sid_in_progress', None)
+
+    @property
+    def error(self) -> int:
+        """Error code, 0 is no error, other values unknown."""
+        return self.data['error']
+
+    @property
+    def is_installing(self) -> bool:
+        """True if install is in progress."""
+        return self.sid != 0 and self.progress < 100 and self.error == 0
+
+    def __repr__(self) -> str:
+        return "<SoundInstallStatus sid: %s (state: %s, error: %s)" \
+               " - progress: %s>" % (self.sid, self.state,
+                                     self.error, self.progress)

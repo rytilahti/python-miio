@@ -6,6 +6,7 @@ import ast
 import sys
 import json
 import ipaddress
+import time
 from pprint import pformat as pf
 from typing import Any  # noqa: F401
 
@@ -423,8 +424,31 @@ def cleaning_history(vac: miio.Vacuum):
 @pass_dev
 def sound(vac: miio.Vacuum):
     """Query sound settings."""
-    click.echo(vac.sound_info())
+    click.echo("Current sound: %s" % vac.sound_info())
+    click.echo("Current volume: %s" % vac.sound_volume())
+    click.echo("Install progress: %s" % vac.sound_install_progress())
 
+
+@cli.command()
+@click.argument('url')
+@click.argument('md5sum')
+@click.argument('sid', type=int)
+@pass_dev
+def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int):
+    """Install a sound."""
+    click.echo("Installing from %s (md5: %s) for id %s" % (url, md5sum, sid))
+    click.echo(vac.install_sound(url, md5sum, sid))
+
+    progress = vac.sound_install_progress()
+    while progress.is_installing:
+        print(progress)
+        progress = vac.sound_install_progress()
+        time.sleep(0.1)
+
+    if progress.progress == 100 and progress.error == 0:
+        click.echo("Installation of sid '%s' complete!" % progress.sid)
+    else:
+        click.echo("Error during installation: %s" % progress.error)
 
 @cli.command()
 @pass_dev
