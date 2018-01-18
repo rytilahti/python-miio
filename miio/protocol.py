@@ -176,7 +176,7 @@ Message = Struct(
     # for building we need data before anything else.
     "data" / Pointer(32, RawCopy(EncryptionAdapter(GreedyBytes))),
     "header" / RawCopy(Struct(
-        Const(Int16ub, 0x2131),
+        Const(0x2131, Int16ub),
         "length" / Rebuild(Int16ub, Utils.get_length),
         "unknown" / Default(Int32ub, 0x00000000),
         "device_id" / Hex(Bytes(4)),
