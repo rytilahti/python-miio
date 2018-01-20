@@ -23,6 +23,7 @@ DEVICE_MAP = {
     "zimi-powerstrip-v2": PowerStrip,
     "zhimi-airpurifier-m1": AirPurifier,
     "zhimi-airpurifier-m2": AirPurifier,
+    "zhimi-airpurifier-ma2": AirPurifier,
     "zhimi-airpurifier-v1": AirPurifier,
     "zhimi-airpurifier-v2": AirPurifier,
     "zhimi-airpurifier-v3": AirPurifier,
