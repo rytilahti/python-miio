@@ -78,7 +78,6 @@ def status(dev: miio.Plug):
 
     click.echo(click.style("Power: %s" % res.power, bold=True))
     click.echo("Temperature: %s" % res.temperature)
-    click.echo("Load (W): %s" % res.load_power)
 
 
 @cli.command()
