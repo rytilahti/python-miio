@@ -152,7 +152,7 @@ class VacuumStatus:
             13: 'Unknown 13',
             14: 'Updating',
             15: 'Unknown 15',
-            16: 'Unknown 16',
+            16: 'Going to target',
             17: 'Zoned cleaning',
         }
         return states[int(self.state_code)]
@@ -208,7 +208,8 @@ class VacuumStatus:
 
     @property
     def is_on(self) -> bool:
-        """True if device is currently cleaning (either automatic, manual or spot)."""
+        """True if device is currently cleaning (either automatic, manual,
+spot, or zone)."""
         return self.state_code == 5 or \
                self.state_code == 7 or \
                self.state_code == 11 or \
