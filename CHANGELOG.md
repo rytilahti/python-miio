@@ -2,8 +2,8 @@
 
 ## [0.3.4](https://github.com/rytilahti/python-miio/tree/0.3.4)
 
-The biggest changes for this release are unbreaking the communication when using a recent construct versions (thanks to @syssi).
-On top of that there are various small fixes e.g. Windows support.
+The biggest changes for this release is unbreaking the communication when using a recent versions of construct library (thanks to @syssi).
+On top of that there are various smaller fixes improvements, e.g. support for sound packs and running python-miio on Windows.
 
 New devices:
 * Air Purifier 2S added to detected devices (@harnash)
