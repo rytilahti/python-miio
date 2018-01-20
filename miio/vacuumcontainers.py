@@ -137,25 +137,28 @@ class VacuumStatus:
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
         states = {
-            1: 'Unknown 1',
+            1: 'Starting',
             2: 'Charger disconnected',
             3: 'Idle',
-            4: 'Unknown 4',
+            4: 'Remote control active',
             5: 'Cleaning',
             6: 'Returning home',
             7: 'Manual mode',
             8: 'Charging',
-            9: 'Unknown 9',
+            9: 'Charging problem',
             10: 'Paused',
             11: 'Spot cleaning',
             12: 'Error',
-            13: 'Unknown 13',
+            13: 'Shutting down',
             14: 'Updating',
-            15: 'Unknown 15',
+            15: 'Docking',
             16: 'Going to target',
             17: 'Zoned cleaning',
         }
-        return states[int(self.state_code)]
+        try:
+            return states[int(self.state_code)]
+        except KeyError:
+            return "Definition missing for state %s" % self.state_code
 
     @property
     def error_code(self) -> int:
@@ -165,7 +168,10 @@ class VacuumStatus:
     @property
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
-        return error_codes[self.error_code]
+        try:
+            return error_codes[self.error_code]
+        except KeyError:
+            return "Definition missing for error %s" % self.error_code
 
     @property
     def battery(self) -> int:
