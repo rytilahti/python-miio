@@ -2,11 +2,11 @@
 
 ## [0.3.4](https://github.com/rytilahti/python-miio/tree/0.3.4)
 
-The biggest changes for this release is unbreaking the communication when using a recent versions of construct library (thanks to @syssi).
-On top of that there are various smaller fixes improvements, e.g. support for sound packs and running python-miio on Windows.
+The most significant change for this release is unbreaking the communication when using a recent versions of construct library (thanks to @syssi).
+On top of that there are various smaller fixes and improvements, e.g. support for sound packs and running python-miio on Windows.
 
 New devices:
-* Air Purifier 2S added to detected devices (@harnash)
+* Air Purifier 2S added to the list of supported and discovered devices by mDNS (@harnash)
 
 Improvements:
 * Air Purifier Pro: support for sound volume level and illuminance sensor (@yawor)
@@ -23,7 +23,7 @@ Improvements:
 **Closed issues:**
 
 - mirobo vacuum sound volume control [\#159](https://github.com/rytilahti/python-miio/issues/159)
-- wifi sugnal strength [\#155](https://github.com/rytilahti/python-miio/issues/155)
+- wifi signal strength [\#155](https://github.com/rytilahti/python-miio/issues/155)
 - xiaomi philips bulb & philips ceiling [\#151](https://github.com/rytilahti/python-miio/issues/151)
 - Vaccum Timer / Timezone issue [\#149](https://github.com/rytilahti/python-miio/issues/149)
 - Exception when displaying Power load using Plug CLI [\#144](https://github.com/rytilahti/python-miio/issues/144)
