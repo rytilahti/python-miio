@@ -235,8 +235,12 @@ class Vacuum(Device):
         return self.send("get_sound_volume")[0]
 
     def set_sound_volume(self, vol: int):
-        """Set sound volume."""
-        raise NotImplementedError("unknown command&parameters")
+        """Set sound volume [0-100]."""
+        return self.send("change_sound_volume", [vol])
+
+    def test_sound_volume(self):
+        """Test current sound volume."""
+        return self.send("test_sound_volume")
 
     def serial_number(self):
         """Get serial number."""

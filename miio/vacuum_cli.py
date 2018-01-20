@@ -421,9 +421,16 @@ def cleaning_history(vac: miio.Vacuum):
 
 
 @cli.command()
+@click.argument('volume', type=int, required=False)
+@click.option('--test', 'test_mode', is_flag=True, help="play a test tune")
 @pass_dev
-def sound(vac: miio.Vacuum):
-    """Query sound settings."""
+def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
+    """Query and change sound settings."""
+    if volume is not None:
+        click.echo("Setting sound volume to %s" % volume)
+        vac.set_sound_volume(volume)
+    if test_mode:
+        vac.test_sound_volume()
     click.echo("Current sound: %s" % vac.sound_info())
     click.echo("Current volume: %s" % vac.sound_volume())
     click.echo("Install progress: %s" % vac.sound_install_progress())
