@@ -7,6 +7,8 @@ import sys
 import json
 import ipaddress
 import time
+import pathlib
+from appdirs import user_cache_dir
 from pprint import pformat as pf
 from typing import Any  # noqa: F401
 
@@ -46,7 +48,7 @@ def validate_token(ctx, param, value):
 @click.option('--token', envvar="MIROBO_TOKEN", callback=validate_token)
 @click.option('-d', '--debug', default=False, count=True)
 @click.option('--id-file', type=click.Path(dir_okay=False, writable=True),
-              default='/tmp/python-mirobo.seq')
+              default=user_cache_dir('python-miio') + '/python-mirobo.seq')
 @click.version_option()
 @click.pass_context
 def cli(ctx, ip: str, token: str, debug: int, id_file: str):
@@ -73,8 +75,8 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
             start_id = x.get("seq", 0)
             manual_seq = x.get("manual_seq", 0)
             _LOGGER.debug("Read stored sequence ids: %s", x)
-    except (FileNotFoundError, TypeError, ValueError) as ex:
-        _LOGGER.error("Unable to read the stored msgid: %s", ex)
+    except (FileNotFoundError, TypeError, ValueError):
+        pass
 
     vac = miio.Vacuum(ip, token, start_id, debug)
 
@@ -96,6 +98,12 @@ def cleanup(vac: miio.Vacuum, **kwargs):
     id_file = kwargs['id_file']
     seqs = {'seq': vac.raw_id, 'manual_seq': vac.manual_seqnum}
     _LOGGER.debug("Writing %s to %s", seqs, id_file)
+    path_obj = pathlib.Path(id_file)
+    dir = path_obj.parents[0]
+    try:
+        dir.mkdir(parents=True)
+    except FileExistsError:
+        pass  # after dropping py3.4 support, use exist_ok for mkdir
     with open(id_file, 'w') as f:
         json.dump(seqs, f)
 
