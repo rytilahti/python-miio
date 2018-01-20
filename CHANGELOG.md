@@ -1,5 +1,46 @@
 # Change Log
 
+## [0.3.4](https://github.com/rytilahti/python-miio/tree/0.3.4)
+
+The biggest changes for this release are unbreaking the communication when using a recent construct versions (thanks to @syssi).
+On top of that there are various small fixes e.g. Windows support.
+
+New devices:
+* Air Purifier 2S added to detected devices (@harnash)
+
+Improvements:
+* Air Purifier Pro: support for sound volume level and illuminance sensor (@yawor)
+* Vacuum: added sound pack handling and ability to change the sound volume (@rytilahti)
+* Vacuum: better support for status information on the 2nd gen model (@hastarin)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.3...0.3.4)
+
+**Fixed bugs:**
+
+- Error with info command [\#156](https://github.com/rytilahti/python-miio/issues/156)
+- Change hard coded /tmp to cross-platform tempfile [\#148](https://github.com/rytilahti/python-miio/issues/148)
+
+**Closed issues:**
+
+- mirobo vacuum sound volume control [\#159](https://github.com/rytilahti/python-miio/issues/159)
+- wifi sugnal strength [\#155](https://github.com/rytilahti/python-miio/issues/155)
+- xiaomi philips bulb & philips ceiling [\#151](https://github.com/rytilahti/python-miio/issues/151)
+- Vaccum Timer / Timezone issue [\#149](https://github.com/rytilahti/python-miio/issues/149)
+- Exception when displaying Power load using Plug CLI [\#144](https://github.com/rytilahti/python-miio/issues/144)
+- Missing states and error\_codes [\#57](https://github.com/rytilahti/python-miio/issues/57)
+
+**Merged pull requests:**
+
+- Use appdirs' user\_cache\_dir for sequence file [\#165](https://github.com/rytilahti/python-miio/pull/165) ([rytilahti](https://github.com/rytilahti))
+- Add a more helpful error message when info\(\) fails with an empty payload [\#164](https://github.com/rytilahti/python-miio/pull/164) ([rytilahti](https://github.com/rytilahti))
+- Adding "Go to target" state description for Roborock S50. [\#163](https://github.com/rytilahti/python-miio/pull/163) ([hastarin](https://github.com/hastarin))
+- Add ability to change the volume [\#162](https://github.com/rytilahti/python-miio/pull/162) ([rytilahti](https://github.com/rytilahti))
+- Added Air Purifier 2S to supported devices [\#161](https://github.com/rytilahti/python-miio/pull/161) ([harnash](https://github.com/harnash))
+- Modified to support zoned cleaning mode of Roborock S50. [\#160](https://github.com/rytilahti/python-miio/pull/160) ([hastarin](https://github.com/hastarin))
+- Fix for a breaking change of construct 2.8.22 [\#158](https://github.com/rytilahti/python-miio/pull/158) ([syssi](https://github.com/syssi))
+- Air Purifier Pro: support for sound volume level and fix for bright propery [\#157](https://github.com/rytilahti/python-miio/pull/157) ([yawor](https://github.com/yawor))
+- Add preliminary support for managing sound files [\#154](https://github.com/rytilahti/python-miio/pull/154) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.3.3](https://github.com/rytilahti/python-miio/tree/0.3.3)
 
 This release brings support for Air Conditioner Companion along some improvements and an increase in the test coverage for future-proofing the code-base. Special thanks for this release goes to @syssi & to all new contributors!
