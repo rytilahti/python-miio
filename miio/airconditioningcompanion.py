@@ -165,7 +165,7 @@ class AirConditioningCompanion(Device):
                            swing_mode: SwingMode):
 
         # Static turn off command available?
-        if (power == False) and (model in DEVICE_COMMAND_PRESETS) and \
+        if (power is False) and (model in DEVICE_COMMAND_PRESETS) and \
                 (POWER_OFF in DEVICE_COMMAND_PRESETS[model]):
             return self.send_command(
                 model + DEVICE_COMMAND_PRESETS[model][POWER_OFF])
@@ -179,7 +179,8 @@ class AirConditioningCompanion(Device):
         configuration = configuration.replace('mo', operation_mode.value)
         configuration = configuration.replace('wi', fan_speed.value)
         configuration = configuration.replace('sw', swing_mode.value)
-        configuration = configuration.replace('tt', hex(int(target_temperature))[2:])
+        configuration = configuration.replace(
+            'tt', hex(int(target_temperature))[2:])
 
         temperature = (1 + int(target_temperature) - 17) % 16
         temperature = hex(temperature)[2:].upper()
