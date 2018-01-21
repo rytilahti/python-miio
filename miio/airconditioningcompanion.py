@@ -1,6 +1,9 @@
+import logging
 from .device import Device
 import enum
 from typing import Optional
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class OperationMode(enum.Enum):
@@ -18,6 +21,86 @@ class FanSpeed(enum.Enum):
 
 STORAGE_SLOT_ID = 30
 
+
+STATE_ON = 'on'
+STATE_OFF = 'off'
+STATE_HEAT = 'heat'
+STATE_COOL = 'cool'
+STATE_AUTO = 'auto'
+
+STATE_IDLE = 'idle'
+STATE_LOW = 'low'
+STATE_MEDIUM = 'medium'
+STATE_HIGH = 'high'
+
+AC_DEVICE_PRESETS = {
+    "default": {
+        "description": "The Default Replacement of AC Partner",
+        "defaultMain": "AC model(10)+po+mo+wi+sw+tt",
+        "VALUE": ["po", "mo", "wi", "sw", "tt", "li"],
+        "po": {
+            "type": "switch",
+            "on": "1",
+            "off": "0"
+        },
+        "mo": {
+            "heater": "0",
+            "cooler": "1",
+            "auto": "2",
+            "dehum": "3",
+            "airSup": "4"
+        },
+        "wi": {
+            "auto": "3",
+            "1": "0",
+            "2": "1",
+            "3": "2"
+        },
+        "sw": {
+            "on": "0",
+            "off": "1"
+        },
+        "tt": "1",
+        "li": {
+            "off": "a0"
+        }
+    },
+    "0180111111": {
+        "des": "media_1",
+        "main": "0180111111pomowiswtt02"
+    },
+    "0180222221": {
+        "des": "gree_1",
+        "main": "0180222221pomowiswtt02"
+    },
+    "0100010727": {
+        "des": "gree_2",
+        "main": "0100010727pomowiswtt1100190t0t20500\
+                2102000t6t0190t0t207002000000t4wt0",
+        "off": "010001072701011101004000205002112000\
+                D04000207002000000A0",
+        "EXTRA_VALUE": ["t0t", "t6t", "t4wt"],
+        "t0t": "1",
+        "t6t": "7",
+        "t4wt": "4"
+    },
+    "0100004795": {
+        "des": "gree_8",
+        "main": "0100004795pomowiswtt0100090900005002"
+    },
+    "0180333331": {
+        "des": "haier_1",
+        "main": "0180333331pomowiswtt12"
+    },
+    "0180666661": {
+        "des": "aux_1",
+        "main": "0180666661pomowiswtt12"
+    },
+    "0180777771": {
+        "des": "chigo_1",
+        "main": "0180777771pomowiswtt12"
+    }
+}
 
 class AirConditioningCompanionStatus:
     """Container for status reports of the Xiaomi AC Companion."""
@@ -76,6 +159,93 @@ class AirConditioningCompanionStatus:
             return OperationMode(mode)
 
         return None
+
+
+class AirConditioningCompanionUtility:
+    """Utility class for infrared command assembly."""
+
+    def assembleCommand(self, model: str, operation_mode: str, target_temperature: float, fan_mode: str, swing_mode: bool) -> str:
+        """
+        model[10]+on/off[1]+mode[1]+wi[1]+sw[1]+temp[2]+scode[2]
+        0180111111 po mo wi sw tt 02
+        """
+
+        # Static turn off command available?
+        if (model in AC_DEVICE_PRESETS) and (STATE_OFF in AC_DEVICE_PRESETS[model]) and ((operation_mode == STATE_OFF) or (operation_mode == STATE_IDLE)):
+            return AC_DEVICE_PRESETS[model][STATE_OFF]
+
+        if model not in AC_DEVICE_PRESETS:
+            command = model + "pomowiswtta0"
+        else:
+            command = AC_DEVICE_PRESETS[model]['main']
+
+        codeconfig = AC_DEVICE_PRESETS['default']
+        valuecont = AC_DEVICE_PRESETS['default']['VALUE']
+        index = 0
+        while index < len(valuecont):
+            tep = valuecont[index]
+            if tep == "tt":
+                temp = hex(int(target_temperature))[2:]
+                command = command.replace('tt', temp)
+            if tep == "po":
+                if (operation_mode == STATE_IDLE) or (operation_mode == STATE_OFF):
+                    pocode = codeconfig['po'][STATE_OFF]
+                else:
+                    pocode = codeconfig['po'][STATE_ON]
+                command = command.replace('po', pocode)
+            if tep == "mo":
+                if operation_mode == STATE_HEAT:
+                    mocode = codeconfig['mo']['heater']
+                elif operation_mode == STATE_COOL:
+                    mocode = codeconfig['mo']['cooler']
+                else:
+                    mocode = '2'
+                command = command.replace('mo', mocode)
+            if tep == "wi":
+                if fan_mode == STATE_LOW:
+                    wicode = '0'
+                elif fan_mode == STATE_MEDIUM:
+                    wicode = '1'
+                elif fan_mode == STATE_HIGH:
+                    wicode = '2'
+                else:
+                    wicode = '3'
+                command = command.replace('wi', wicode)
+            if tep == "sw":
+                if swing_mode == STATE_ON:
+                    command = command.replace(
+                        'sw', codeconfig['sw'][STATE_ON])
+                else:
+                    command = command.replace(
+                        'sw', codeconfig['sw'][STATE_OFF])
+            # BUG: What is li and when should it be used?
+            #if tep == "li":
+            #    command = command.replace('li', codeconfig['li'][STATE_OFF])
+            index += 1
+
+        if (model in AC_DEVICE_PRESETS) and (
+                    'EXTRA_VALUE' in AC_DEVICE_PRESETS[model]):
+            codeconfig = AC_DEVICE_PRESETS[model]
+            valuecont = AC_DEVICE_PRESETS[model]['EXTRA_VALUE']
+            index = 0
+            while index < len(valuecont):
+                tep = valuecont[index]
+                if tep == "t0t":
+                    temp = (
+                               int(codeconfig['t0t']) + int(target_temperature) - 17) % 16
+                    temp = hex(temp)[2:].upper()
+                    command = command.replace('t0t', temp)
+                if tep == "t6t":
+                    temp = (int(codeconfig['t6t']) + int(target_temperature) - 17) % 16
+                    temp = hex(temp)[2:].upper()
+                    command = command.replace('t6t', temp)
+                if tep == "t4wt":
+                    temp = (int(codeconfig['t4wt']) + int(target_temperature) - 17) % 16
+                    temp = hex(temp)[2:].upper()
+                    command = command.replace('t4wt', temp)
+                index += 1
+
+        return command
 
 
 class AirConditioningCompanion(Device):
