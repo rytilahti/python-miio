@@ -30,21 +30,11 @@ class Power(enum.Enum):
     On = 1
     Off = 0
 
+
 STORAGE_SLOT_ID = 30
+POWER_OFF = 'off'
 
-
-STATE_ON = 'on'
-STATE_OFF = 'off'
-STATE_HEAT = 'heat'
-STATE_COOL = 'cool'
-STATE_AUTO = 'auto'
-
-STATE_IDLE = 'idle'
-STATE_LOW = 'low'
-STATE_MEDIUM = 'medium'
-STATE_HIGH = 'high'
-
-AC_DEVICE_PRESETS = {
+DEVICE_COMMAND_PRESETS = {
     "fallback": {
         "deviceType": "generic",
         "base": "pomowiswtta0"
@@ -79,6 +69,7 @@ AC_DEVICE_PRESETS = {
         "base": "pomowiswtt12"
     }
 }
+
 
 class AirConditioningCompanionStatus:
     """Container for status reports of the Xiaomi AC Companion."""
@@ -139,41 +130,6 @@ class AirConditioningCompanionStatus:
         return None
 
 
-class AirConditioningCompanionUtility:
-    """Utility class for infrared command assembly."""
-
-    def assembleCommand(self, model: str, power: Power, operation_mode: OperationMode, target_temperature: float, fan_speed: FanSpeed, swing_mode: SwingMode) -> str:
-
-        # Static turn off command available?
-        if (power == False) and (model in AC_DEVICE_PRESETS) and (STATE_OFF in AC_DEVICE_PRESETS[model]):
-            return model + AC_DEVICE_PRESETS[model][STATE_OFF]
-
-        if model in AC_DEVICE_PRESETS:
-            command = model + AC_DEVICE_PRESETS[model]['base']
-        else:
-            command = model + AC_DEVICE_PRESETS['fallback']['base']
-
-        command = command.replace('po', power.value)
-        command = command.replace('mo', operation_mode.value)
-        command = command.replace('wi', fan_speed.value)
-        command = command.replace('sw', swing_mode.value)
-        command = command.replace('tt', hex(int(target_temperature))[2:])
-
-        temp = (1 + int(target_temperature) - 17) % 16
-        temp = hex(temp)[2:].upper()
-        command = command.replace('t1t', temp)
-
-        temp = (4 + int(target_temperature) - 17) % 16
-        temp = hex(temp)[2:].upper()
-        command = command.replace('t4t', temp)
-
-        temp = (7 + int(target_temperature) - 17) % 16
-        temp = hex(temp)[2:].upper()
-        command = command.replace('t7t', temp)
-
-        return command
-
-
 class AirConditioningCompanion(Device):
     """Main class representing Xiaomi Air Conditioning Companion."""
 
@@ -205,3 +161,39 @@ class AirConditioningCompanion(Device):
 
         :param str command: Command to execute"""
         return self.send("send_cmd", [str(command)])
+
+    def send_configuration(self, model: str, power: Power,
+                           operation_mode: OperationMode,
+                           target_temperature: float, fan_speed: FanSpeed,
+                           swing_mode: SwingMode):
+
+        # Static turn off command available?
+        if (power == False) and (model in DEVICE_COMMAND_PRESETS) and \
+                (POWER_OFF in DEVICE_COMMAND_PRESETS[model]):
+            return self.send_command(
+                model + DEVICE_COMMAND_PRESETS[model][POWER_OFF])
+
+        if model in DEVICE_COMMAND_PRESETS:
+            configuration = model + DEVICE_COMMAND_PRESETS[model]['base']
+        else:
+            configuration = model + DEVICE_COMMAND_PRESETS['fallback']['base']
+
+        configuration = configuration.replace('po', power.value)
+        configuration = configuration.replace('mo', operation_mode.value)
+        configuration = configuration.replace('wi', fan_speed.value)
+        configuration = configuration.replace('sw', swing_mode.value)
+        configuration = configuration.replace('tt', hex(int(target_temperature))[2:])
+
+        temperature = (1 + int(target_temperature) - 17) % 16
+        temperature = hex(temperature)[2:].upper()
+        configuration = configuration.replace('t1t', temperature)
+
+        temperature = (4 + int(target_temperature) - 17) % 16
+        temperature = hex(temperature)[2:].upper()
+        configuration = configuration.replace('t4t', temperature)
+
+        temperature = (7 + int(target_temperature) - 17) % 16
+        temperature = hex(temperature)[2:].upper()
+        configuration = configuration.replace('t7t', temperature)
+
+        return self.send_command(configuration)
