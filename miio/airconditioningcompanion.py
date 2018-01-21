@@ -4,8 +4,8 @@ from typing import Optional
 
 
 class OperationMode(enum.Enum):
-    Heating = 0
-    Cooling = 1
+    Heat = 0
+    Cool = 1
     Auto = 2
 
 
