@@ -1,9 +1,6 @@
-import logging
 from .device import Device
 import enum
 from typing import Optional
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class OperationMode(enum.Enum):
