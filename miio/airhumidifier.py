@@ -7,6 +7,10 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
+class AirHumidifierException(Exception):
+    pass
+
+
 class OperationMode(enum.Enum):
     Silent = 'silent'
     Medium = 'medium'
@@ -27,7 +31,8 @@ class AirHumidifierStatus:
         Response of a Air Humidifier (zhimi.humidifier.v1):
 
         {'power': 'off', 'mode': 'high', 'temp_dec': 294,
-         'humidity': 33, 'buzzer': 'on', 'led_b': 0}
+         'humidity': 33, 'buzzer': 'on', 'led_b': 0,
+         'child_lock': 'on', 'limit_hum': 40}
         """
 
         self.data = data
@@ -71,11 +76,40 @@ class AirHumidifierStatus:
             return LedBrightness(self.data["led_b"])
         return None
 
+    @property
+    def child_lock(self) -> bool:
+        """Return True if child lock is on."""
+        return self.data["child_lock"] == "on"
+
+    @property
+    def target_humidity(self) -> int:
+        """Target humiditiy. Can be either 40, 50, 60, 70, 80 percent."""
+        return self.data["limit_hum"]
+
+    @property
+    def trans_level(self) -> int:
+        """Meaning unknown."""
+        return self.data["trans_level"]
+
     def __str__(self) -> str:
-        s = "<AirHumidiferStatus power=%s, mode=%s, temperature=%s, " \
-            "humidity=%s%%, led_brightness=%s, buzzer=%s>" % \
-            (self.power, self.mode, self.temperature,
-             self.humidity, self.led_brightness, self.buzzer)
+        s = "<AirHumidiferStatus power=%s, " \
+            "mode=%s, " \
+            "temperature=%s, " \
+            "humidity=%s%%, " \
+            "led_brightness=%s, " \
+            "buzzer=%s, " \
+            "child_lock=%s, " \
+            "target_humidity=%s%%, " \
+            "trans_level=%s>" % \
+            (self.power,
+             self.mode,
+             self.temperature,
+             self.humidity,
+             self.led_brightness,
+             self.buzzer,
+             self.child_lock,
+             self.target_humidity,
+             self.trans_level)
         return s
 
 
@@ -86,7 +120,7 @@ class AirHumidifier(Device):
         """Retrieve properties."""
 
         properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
-                      'led_b', ]
+                      'led_b', 'child_lock', 'limit_hum', 'trans_level', ]
 
         values = self.send(
             "get_prop",
@@ -126,3 +160,18 @@ class AirHumidifier(Device):
             return self.send("set_buzzer", ["on"])
         else:
             return self.send("set_buzzer", ["off"])
+
+    def set_child_lock(self, lock: bool):
+        """Set child lock on/off."""
+        if lock:
+            return self.send("set_child_lock", ["on"])
+        else:
+            return self.send("set_child_lock", ["off"])
+
+    def set_target_humidity(self, humidity: int):
+        """Set the target humidity."""
+        if humidity not in [40, 50, 60, 70, 80]:
+            raise AirHumidifierException(
+                "Invalid target humidity: %s" % humidity)
+
+        return self.send("set_limit_hum", [humidity])
