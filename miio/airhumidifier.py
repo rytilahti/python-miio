@@ -26,8 +26,8 @@ class AirHumidifierStatus:
         """
         Response of a Air Humidifier (zhimi.humidifier.v1):
 
-        ['power': 'off', 'mode': 'high', 'temp_dec': 294,
-         'humidity': 33, 'buzzer': 'on', 'led_b': 0 ]
+        {'power': 'off', 'mode': 'high', 'temp_dec': 294,
+         'humidity': 33, 'buzzer': 'on', 'led_b': 0}
         """
 
         self.data = data
