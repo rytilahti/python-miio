@@ -34,7 +34,8 @@ setup(
                       'zeroconf',
                       'attrs',
                       'android_backup',
-                      'pytz'],
+                      'pytz',
+                      'appdirs'],
 
     entry_points={
         'console_scripts': [
