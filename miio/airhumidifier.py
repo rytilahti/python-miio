@@ -23,6 +23,13 @@ class AirHumidifierStatus:
     """Container for status reports from the air humidifier."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response of a Air Humidifier (zhimi.humidifier.v1):
+
+        ['power': 'off', 'mode': 'high', 'temp_dec': 294,
+         'humidity': 33, 'buzzer': 'on', 'led_b': 0 ]
+        """
+
         self.data = data
 
     @property
@@ -58,11 +65,6 @@ class AirHumidifierStatus:
         return self.data["buzzer"] == "on"
 
     @property
-    def led(self) -> bool:
-        """True if LED is turned on."""
-        return self.data["led"] == "on"
-
-    @property
     def led_brightness(self) -> Optional[LedBrightness]:
         """LED brightness if available."""
         if self.data["led_b"] is not None:
@@ -71,9 +73,9 @@ class AirHumidifierStatus:
 
     def __str__(self) -> str:
         s = "<AirHumidiferStatus power=%s, mode=%s, temperature=%s, " \
-            "humidity=%s%%, led=%s, led_brightness=%s, buzzer=%s>" % \
+            "humidity=%s%%, led_brightness=%s, buzzer=%s>" % \
             (self.power, self.mode, self.temperature,
-             self.humidity, self.led, self.led_brightness, self.buzzer)
+             self.humidity, self.led_brightness, self.buzzer)
         return s
 
 
@@ -84,7 +86,7 @@ class AirHumidifier(Device):
         """Retrieve properties."""
 
         properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
-                      'led_b', 'led', ]
+                      'led_b', ]
 
         values = self.send(
             "get_prop",
@@ -117,13 +119,6 @@ class AirHumidifier(Device):
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         return self.send("set_led_b", [brightness.value])
-
-    def set_led(self, led: bool):
-        """Turn led on/off."""
-        if led:
-            return self.send("set_led", ['on'])
-        else:
-            return self.send("set_led", ['off'])
 
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
