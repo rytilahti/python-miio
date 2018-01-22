@@ -31,39 +31,41 @@ class Power(enum.Enum):
 STORAGE_SLOT_ID = 30
 POWER_OFF = 'off'
 
-DEVICE_COMMAND_PRESETS = {
-    "fallback": {
-        "deviceType": "generic",
-        "base": "pomowiswtta0"
+# Command templates per model number (f.e. 0180111111)
+# po, mo, wi, sw, tt, t1t, t4t and t7t are markers which will be replaced
+DEVICE_COMMAND_TEMPLATES = {
+    'fallback': {
+        'deviceType': 'generic',
+        'base': 'pomowiswtta0'
     },
-    "0180111111": {
-        "deviceType": "media_1",
-        "base": "pomowiswtt02"
+    '0180111111': {
+        'deviceType': 'media_1',
+        'base': 'pomowiswtt02'
     },
-    "0180222221": {
-        "deviceType": "gree_1",
-        "base": "pomowiswtt02"
+    '0180222221': {
+        'deviceType': 'gree_1',
+        'base': 'pomowiswtt02'
     },
-    "0100010727": {
-        "deviceType": "gree_2",
-        "base": "pomowiswtt1100190t1t205002102000t7t0190t1t207002000000t4t0",
-        "off": "01011101004000205002112000D04000207002000000A0"
+    '0100010727': {
+        'deviceType': 'gree_2',
+        'base': 'pomowiswtt1100190t1t205002102000t7t0190t1t207002000000t4t0',
+        'off': '01011101004000205002112000D04000207002000000A0'
     },
-    "0100004795": {
-        "deviceType": "gree_8",
-        "base": "pomowiswtt0100090900005002"
+    '0100004795': {
+        'deviceType': 'gree_8',
+        'base': 'pomowiswtt0100090900005002'
     },
-    "0180333331": {
-        "deviceType": "haier_1",
-        "base": "pomowiswtt12"
+    '0180333331': {
+        'deviceType': 'haier_1',
+        'base': 'pomowiswtt12'
     },
-    "0180666661": {
-        "deviceType": "aux_1",
-        "base": "pomowiswtt12"
+    '0180666661': {
+        'deviceType': 'aux_1',
+        'base': 'pomowiswtt12'
     },
-    "0180777771": {
-        "deviceType": "chigo_1",
-        "base": "pomowiswtt12"
+    '0180777771': {
+        'deviceType': 'chigo_1',
+        'base': 'pomowiswtt12'
     }
 }
 
@@ -165,15 +167,15 @@ class AirConditioningCompanion(Device):
                            swing_mode: SwingMode):
 
         # Static turn off command available?
-        if (power is False) and (model in DEVICE_COMMAND_PRESETS) and \
-                (POWER_OFF in DEVICE_COMMAND_PRESETS[model]):
+        if (power is False) and (model in DEVICE_COMMAND_TEMPLATES) and \
+                (POWER_OFF in DEVICE_COMMAND_TEMPLATES[model]):
             return self.send_command(
-                model + DEVICE_COMMAND_PRESETS[model][POWER_OFF])
+                model + DEVICE_COMMAND_TEMPLATES[model][POWER_OFF])
 
-        if model in DEVICE_COMMAND_PRESETS:
-            configuration = model + DEVICE_COMMAND_PRESETS[model]['base']
+        if model in DEVICE_COMMAND_TEMPLATES:
+            configuration = model + DEVICE_COMMAND_TEMPLATES[model]['base']
         else:
-            configuration = model + DEVICE_COMMAND_PRESETS['fallback']['base']
+            configuration = model + DEVICE_COMMAND_TEMPLATES['fallback']['base']
 
         configuration = configuration.replace('po', power.value)
         configuration = configuration.replace('mo', operation_mode.value)
