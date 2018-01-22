@@ -36,7 +36,7 @@ class AirPurifierStatus:
          'child_lock': 'off', 'limit_hum': null, 'trans_level': null,
          'bright': 71, 'favorite_level': 17, 'filter1_life': 77,
          'act_det': null, 'f1_hour_used': 771, 'use_time': 2776200,
-         'motor1_speed': 0]
+         'motor1_speed': 0, 'volume': 100]
 
         Response of a Air Purifier 2:
 
@@ -45,7 +45,7 @@ class AirPurifierStatus:
         'filter1_life': 80, 'f1_hour_used': 682, 'use_time': 2457000,
         'motor1_speed': 354, 'purify_volume': 25262, 'f1_hour': 3500,
         'led': 'off', 'led_b': 2, 'bright': None, 'buzzer': 'off',
-        'child_lock': 'off'}
+        'child_lock': 'off', 'volume': None}
 
         A request is limited to 16 properties.
         """
@@ -150,7 +150,7 @@ class AirPurifierStatus:
         return self.data["motor1_speed"]
 
     @property
-    def volume(self) -> int:
+    def volume(self) -> Optional[int]:
         """Volume of sound notifications [0-100]."""
         return self.data["volume"]
 
