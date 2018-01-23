@@ -109,12 +109,9 @@ class AirPurifierStatus:
         return self.data["bright"]
 
     @property
-    def buzzer(self) -> Optional[bool]:
+    def buzzer(self) -> bool:
         """Return True if buzzer is on."""
-        if self.data["buzzer"] is not None:
-            return self.data["buzzer"] == "on"
-
-        return None
+        return self.data["buzzer"] == "on"
 
     @property
     def child_lock(self) -> bool:
@@ -282,7 +279,4 @@ class AirPurifier(Device):
 
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
-        if volume < 0 or volume > 100:
-            raise AirPurifierException("Invalid volume: %s" % volume)
-
         return self.send("set_volume", [volume])
