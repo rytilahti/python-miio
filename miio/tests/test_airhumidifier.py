@@ -25,6 +25,7 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             'set_led_b': lambda x: self._set_state("led_b", x),
             'set_buzzer': lambda x: self._set_state("buzzer", x),
             'set_child_lock': lambda x: self._set_state("child_lock", x),
+            'set_limit_hum': lambda x: self._set_state("limit_hum", x),
             'set_trans_level': lambda x: self._set_state("trans_level", x),
         }
         super().__init__(args, kwargs)
@@ -173,4 +174,3 @@ class TestAirHumidifier(TestCase):
 
         self.device.set_child_lock(False)
         assert child_lock() is False
-
