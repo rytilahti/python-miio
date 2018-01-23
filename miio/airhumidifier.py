@@ -32,7 +32,7 @@ class AirHumidifierStatus:
 
         {'power': 'off', 'mode': 'high', 'temp_dec': 294,
          'humidity': 33, 'buzzer': 'on', 'led_b': 0,
-         'child_lock': 'on', 'limit_hum': 40}
+         'child_lock': 'on', 'limit_hum': 40, 'trans_level': 85}
         """
 
         self.data = data
@@ -87,8 +87,9 @@ class AirHumidifierStatus:
         return self.data["limit_hum"]
 
     @property
-    def trans_level(self) -> int:
-        """Meaning unknown."""
+    def favorite_level(self) -> int:
+        """Return favorite level, which is used if the mode is ``favorite``."""
+        # Favorite level used when the mode is `favorite`.
         return self.data["trans_level"]
 
     def __str__(self) -> str:
@@ -175,3 +176,12 @@ class AirHumidifier(Device):
                 "Invalid target humidity: %s" % humidity)
 
         return self.send("set_limit_hum", [humidity])
+
+    def set_favorite_level(self, level: int):
+        """Set favorite level."""
+        if level < 30 or level > 85:
+            raise AirHumidifierException("Invalid favorite level: %s" % level)
+
+        # Set the favorite level used when the mode is `favorite`,
+        # should be  between 30 and 85.
+        return self.send("set_trans_level", [level])  # 30 ... 85
