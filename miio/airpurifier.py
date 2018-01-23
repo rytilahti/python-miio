@@ -109,9 +109,12 @@ class AirPurifierStatus:
         return self.data["bright"]
 
     @property
-    def buzzer(self) -> bool:
+    def buzzer(self) -> Optional[bool]:
         """Return True if buzzer is on."""
-        return self.data["buzzer"] == "on"
+        if self.data["buzzer"] is not None:
+            return self.data["buzzer"] == "on"
+
+        return None
 
     @property
     def child_lock(self) -> bool:
