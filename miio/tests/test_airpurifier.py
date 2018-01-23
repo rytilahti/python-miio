@@ -26,7 +26,7 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'bright': 83,
             'buzzer': 'off',
             'child_lock': 'off',
-            'volumne': 50,
+            'volume': 50,
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -94,6 +94,7 @@ class TestAirPurifier(TestCase):
         assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
         assert self.state().illuminance == self.device.start_state["bright"]
+        assert self.state().volume == self.device.start_state["volume"]
 
     def test_set_mode(self):
         def mode():
