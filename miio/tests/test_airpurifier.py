@@ -23,9 +23,10 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'f1_hour': 3500,
             'led': 'off',
             'led_b': 2,
-            'bright': None,
+            'bright': 83,
             'buzzer': 'off',
-            'child_lock': 'off'
+            'child_lock': 'off',
+            'volumne': 50,
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -37,6 +38,7 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'set_level_favorite':
                 lambda x: self._set_state("favorite_level", x),
             'set_led_b': lambda x: self._set_state("led_b", x),
+            'set_volume': lambda x: self._set_state("volume", x),
         }
         super().__init__(args, kwargs)
 
@@ -91,6 +93,7 @@ class TestAirPurifier(TestCase):
         assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
         assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
+        assert self.state().illuminance == self.device.start_state["bright"]
 
     def test_set_mode(self):
         def mode():
@@ -168,6 +171,30 @@ class TestAirPurifier(TestCase):
         self.device.set_child_lock(False)
         assert child_lock() is False
 
+    def test_set_volume(self):
+        def volume():
+            return self.device.status().volume
+
+        self.device.set_volume(0)
+        assert volume() == 0
+        self.device.set_volume(35)
+        assert volume() == 35
+        self.device.set_volume(100)
+        assert volume() == 100
+
+        with pytest.raises(AirPurifierException):
+            self.device.set_volume(-1)
+
+        with pytest.raises(AirPurifierException):
+            self.device.set_volume(101)
+
+    def test_status_without_volume(self):
+        self.device._reset_state()
+
+        # The Air Purifier 2 doesn't support volume
+        self.device.state["volume"] = None
+        assert self.state().volume is None
+
     def test_status_without_led_brightness(self):
         self.device._reset_state()
 
@@ -178,5 +205,16 @@ class TestAirPurifier(TestCase):
     def test_status_without_temperature(self):
         self.device._reset_state()
         self.device.state["temp_dec"] = None
-
         assert self.state().temperature is None
+
+    def test_status_without_illuminance(self):
+        self.device._reset_state()
+        # The Air Purifier 2 doesn't provide illuminance
+        self.device.state["bright"] = None
+        assert self.state().illuminance is None
+
+    def test_status_without_buzzer(self):
+        self.device._reset_state()
+        # The Air Purifier Pro doesn't provide the buzzer property
+        self.device.state["buzzer"] = None
+        assert self.state().buzzer is None

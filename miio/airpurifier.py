@@ -279,4 +279,7 @@ class AirPurifier(Device):
 
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
+        if volume < 0 or volume > 100:
+            raise AirPurifierException("Invalid volume: %s" % volume)
+
         return self.send("set_volume", [volume])
