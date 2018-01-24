@@ -464,6 +464,8 @@ def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int):
         progress = vac.sound_install_progress()
         time.sleep(0.1)
 
+    progress = vac.sound_install_progress()
+
     if progress.progress == 100 and progress.error == 0:
         click.echo("Installation of sid '%s' complete!" % progress.sid)
     else:
