@@ -26,7 +26,6 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             'set_buzzer': lambda x: self._set_state("buzzer", x),
             'set_child_lock': lambda x: self._set_state("child_lock", x),
             'set_limit_hum': lambda x: self._set_state("limit_hum", x),
-            'set_trans_level': lambda x: self._set_state("trans_level", x),
         }
         super().__init__(args, kwargs)
 
@@ -144,26 +143,6 @@ class TestAirHumidifier(TestCase):
 
         with pytest.raises(AirHumidifierException):
             self.device.set_target_humidity(110)
-
-    def test_set_favorite_level(self):
-        def favorite_level():
-            return self.device.status().favorite_level
-
-        self.device.set_favorite_level(30)
-        assert favorite_level() == 30
-        self.device.set_favorite_level(55)
-        assert favorite_level() == 55
-        self.device.set_favorite_level(85)
-        assert favorite_level() == 85
-
-        with pytest.raises(AirHumidifierException):
-            self.device.set_favorite_level(-1)
-
-        with pytest.raises(AirHumidifierException):
-            self.device.set_favorite_level(29)
-
-        with pytest.raises(AirHumidifierException):
-            self.device.set_favorite_level(86)
 
     def test_set_child_lock(self):
         def child_lock():
