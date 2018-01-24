@@ -58,8 +58,8 @@ class Vacuum(Device):
         """Stop cleaning and return home."""
         self.send("app_stop")
         return self.send("app_charge")
-		
-	def zone_clean_start(self, params):
+
+    def zone_clean_start(self, params):
         """Start specific zone cleaning of the map."""
         return self.send("app_zoned_clean", params)
 

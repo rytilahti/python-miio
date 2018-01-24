@@ -230,6 +230,7 @@ def manual(vac: miio.Vacuum):
         return vac.manual_stop()
     # if not vac.manual_mode and command :
 
+
 @cli.command()
 @click.argument('parameters', required=True)
 @pass_dev
@@ -240,6 +241,7 @@ def zone_clean(vac: miio.Vacuum, cmd, parameters):
         params = ast.literal_eval(parameters)
     click.echo("Start a zone cleaning with params %s" % (params))
     click.echo(vac.zone_clean_start(params))
+
 
 @manual.command()  # noqa: F811  # redefinition of start
 @pass_dev
