@@ -2,6 +2,7 @@ import codecs
 import datetime
 import socket
 import logging
+import construct
 from typing import Any, List, Optional  # noqa: F401
 
 from .protocol import Message
@@ -11,6 +12,11 @@ _LOGGER = logging.getLogger(__name__)
 
 class DeviceException(Exception):
     """Exception wrapping any communication errors with the device."""
+    pass
+
+
+class DeviceError(DeviceException):
+    """Exception communicating an error delivered by the target device."""
     pass
 
 
@@ -242,10 +248,17 @@ class Device:
                           m.header.value.ts,
                           m.data.value["id"],
                           m.data.value)
+            if "error" in m.data.value:
+                raise DeviceError(m.data.value["error"])
+
             try:
                 return m.data.value["result"]
             except KeyError:
                 return m.data.value
+        except construct.core.ChecksumError as ex:
+            raise DeviceException("Got checksum error which indicates use "
+                                  "of an invalid token. "
+                                  "Please check your token!") from ex
         except OSError as ex:
             _LOGGER.error("Got error when receiving: %s", ex)
             if retry_count > 0:
