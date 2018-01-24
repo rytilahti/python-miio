@@ -2,12 +2,12 @@ import logging
 import enum
 from typing import Any, Dict, Optional
 from collections import defaultdict
-from .device import Device
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class AirHumidifierException(Exception):
+class AirHumidifierException(DeviceException):
     pass
 
 
