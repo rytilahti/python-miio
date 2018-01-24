@@ -153,6 +153,11 @@ class AirPurifierStatus:
         return self.data["motor1_speed"]
 
     @property
+    def motor2_speed(self) -> Optional[int]:
+        """Speed of the 2nd motor."""
+        return self.data["motor2_speed"]
+
+    @property
     def volume(self) -> Optional[int]:
         """Volume of sound notifications [0-100]."""
         return self.data["volume"]
@@ -175,6 +180,7 @@ class AirPurifierStatus:
             "use_time=%s, " \
             "purify_volume=%s, " \
             "motor_speed=%s, " \
+            "motor2_speed=%s, " \
             "volume=%s>" % \
             (self.power,
              self.aqi,
@@ -193,6 +199,7 @@ class AirPurifierStatus:
              self.use_time,
              self.purify_volume,
              self.motor_speed,
+             self.motor2_speed,
              self.volume)
         return s
 
@@ -205,10 +212,11 @@ class AirPurifier(Device):
 
         properties = ['power', 'aqi', 'average_aqi', 'humidity', 'temp_dec',
                       'mode', 'favorite_level', 'filter1_life', 'f1_hour_used',
-                      'use_time', 'motor1_speed', 'purify_volume', 'f1_hour',
+                      'use_time', 'motor1_speed', 'motor2_speed',
+                      'purify_volume',
                       # Second request
-                      'led', 'led_b', 'bright', 'buzzer', 'child_lock',
-                      'volume', ]
+                      'f1_hour', 'led', 'led_b', 'bright', 'buzzer',
+                      'child_lock', 'volume', ]
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided in two groups here. The second group contains
