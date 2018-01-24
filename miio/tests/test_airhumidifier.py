@@ -71,7 +71,7 @@ class TestAirHumidifier(TestCase):
         assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
         assert self.state().target_humidity == self.device.start_state["limit_hum"]
-        assert self.state().favorite_level == self.device.start_state["trans_level"]
+        assert self.state().trans_level == self.device.start_state["trans_level"]
 
     def test_set_mode(self):
         def mode():
