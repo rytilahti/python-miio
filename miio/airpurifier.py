@@ -2,12 +2,12 @@ import logging
 import enum
 from typing import Any, Dict, Optional
 from collections import defaultdict
-from .device import Device, DeviceException
+from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class AirPurifierException(DeviceException):
+class AirPurifierException(Exception):
     pass
 
 

@@ -1,10 +1,10 @@
+from .device import Device
 from typing import Tuple, Optional
 from enum import IntEnum
 import warnings
-from .device import Device, DeviceException
 
 
-class YeelightException(DeviceException):
+class YeelightException(Exception):
     pass
 
 

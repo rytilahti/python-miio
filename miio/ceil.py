@@ -1,12 +1,12 @@
 import logging
+from .device import Device
 from typing import Any, Dict
 from collections import defaultdict
-from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class CeilException(DeviceException):
+class CeilException(Exception):
     pass
 
 

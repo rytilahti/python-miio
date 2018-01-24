@@ -1,7 +1,7 @@
 import logging
+from .device import Device
 from typing import Any, Dict, Optional
 import enum
-from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 

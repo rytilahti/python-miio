@@ -1,10 +1,6 @@
 from .device import Device, DeviceException
 
 
-class ChuangmiIrException(DeviceException):
-    pass
-
-
 class ChuangmiIr(Device):
     """Main class representing Chuangmi IR Remote Controller."""
 
@@ -14,7 +10,7 @@ class ChuangmiIr(Device):
         :param int key: Storage slot, must be between 1 and 1000000"""
 
         if key < 1 or key > 1000000:
-            raise ChuangmiIrException("Invalid storage slot.")
+            raise DeviceException("Invalid parameter FIXME wrong exception")
         return self.send("miIO.ir_learn", {'key': str(key)})
 
     def read(self, key: int):

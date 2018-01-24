@@ -1,6 +1,6 @@
+from .device import Device
 import enum
 from typing import Optional
-from .device import Device
 
 
 class OperationMode(enum.Enum):
