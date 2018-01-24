@@ -489,6 +489,13 @@ class SoundInstallStatus:
     """Container for sound installation status."""
     def __init__(self, data):
         # {'progress': 0, 'sid_in_progress': 0, 'state': 0, 'error': 0}
+        # error 0 = no error
+        # error 1 = unknown 1
+        # error 2 = download error
+        # error 3 = checksum error
+        # error 4 = unknown 4
+
+
         self.data = data
 
     @property
