@@ -19,6 +19,7 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'f1_hour_used': 682,
             'use_time': 2457000,
             'motor1_speed': 354,
+            'motor2_speed': 800,
             'purify_volume': 25262,
             'f1_hour': 3500,
             'led': 'off',
@@ -87,6 +88,7 @@ class TestAirPurifier(TestCase):
         assert self.state().filter_hours_used == self.device.start_state["f1_hour_used"]
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().motor_speed == self.device.start_state["motor1_speed"]
+        assert self.state().motor2_speed == self.device.start_state["motor2_speed"]
         assert self.state().purify_volume == self.device.start_state["purify_volume"]
 
         assert self.state().led == (self.device.start_state["led"] == 'on')
