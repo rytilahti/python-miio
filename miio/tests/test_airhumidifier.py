@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import AirHumidifier
-from miio.airhumidifier import OperationMode, LedBrightness
+from miio.airhumidifier import OperationMode, LedBrightness, AirHumidifierException
 from .dummies import DummyDevice
 import pytest
 
@@ -10,10 +10,13 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
         self.state = {
             'power': 'on',
             'mode': 'medium',
-            'temp_dec': 186,
-            'humidity': 62,
+            'temp_dec': 294,
+            'humidity': 33,
             'buzzer': 'off',
             'led_b': 2,
+            'child_lock': 'on',
+            'limit_hum': 40,
+            'trans_level': 85,
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -21,6 +24,8 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             'set_mode': lambda x: self._set_state("mode", x),
             'set_led_b': lambda x: self._set_state("led_b", x),
             'set_buzzer': lambda x: self._set_state("buzzer", x),
+            'set_child_lock': lambda x: self._set_state("child_lock", x),
+            'set_limit_hum': lambda x: self._set_state("limit_hum", x),
         }
         super().__init__(args, kwargs)
 
@@ -64,6 +69,9 @@ class TestAirHumidifier(TestCase):
         assert self.state().mode == OperationMode(self.device.start_state["mode"])
         assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
         assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
+        assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
+        assert self.state().target_humidity == self.device.start_state["limit_hum"]
+        assert self.state().trans_level == self.device.start_state["trans_level"]
 
     def test_set_mode(self):
         def mode():
@@ -112,3 +120,36 @@ class TestAirHumidifier(TestCase):
         self.device.state["led_b"] = None
 
         assert self.state().led_brightness is None
+
+    def test_set_target_humidity(self):
+        def target_humidity():
+            return self.device.status().target_humidity
+
+        self.device.set_target_humidity(30)
+        assert target_humidity() == 30
+        self.device.set_target_humidity(60)
+        assert target_humidity() == 60
+        self.device.set_target_humidity(80)
+        assert target_humidity() == 80
+
+        with pytest.raises(AirHumidifierException):
+            self.device.set_target_humidity(-1)
+
+        with pytest.raises(AirHumidifierException):
+            self.device.set_target_humidity(20)
+
+        with pytest.raises(AirHumidifierException):
+            self.device.set_target_humidity(90)
+
+        with pytest.raises(AirHumidifierException):
+            self.device.set_target_humidity(110)
+
+    def test_set_child_lock(self):
+        def child_lock():
+            return self.device.status().child_lock
+
+        self.device.set_child_lock(True)
+        assert child_lock() is True
+
+        self.device.set_child_lock(False)
+        assert child_lock() is False
