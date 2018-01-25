@@ -125,8 +125,8 @@ class TestAirHumidifier(TestCase):
         def target_humidity():
             return self.device.status().target_humidity
 
-        self.device.set_target_humidity(40)
-        assert target_humidity() == 40
+        self.device.set_target_humidity(30)
+        assert target_humidity() == 30
         self.device.set_target_humidity(60)
         assert target_humidity() == 60
         self.device.set_target_humidity(80)
@@ -136,7 +136,7 @@ class TestAirHumidifier(TestCase):
             self.device.set_target_humidity(-1)
 
         with pytest.raises(AirHumidifierException):
-            self.device.set_target_humidity(30)
+            self.device.set_target_humidity(20)
 
         with pytest.raises(AirHumidifierException):
             self.device.set_target_humidity(90)

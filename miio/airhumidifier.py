@@ -83,7 +83,7 @@ class AirHumidifierStatus:
 
     @property
     def target_humidity(self) -> int:
-        """Target humiditiy. Can be either 40, 50, 60, 70, 80 percent."""
+        """Target humiditiy. Can be either 30, 40, 50, 60, 70, 80 percent."""
         return self.data["limit_hum"]
 
     @property
@@ -170,7 +170,7 @@ class AirHumidifier(Device):
 
     def set_target_humidity(self, humidity: int):
         """Set the target humidity."""
-        if humidity not in [40, 50, 60, 70, 80]:
+        if humidity not in [30, 40, 50, 60, 70, 80]:
             raise AirHumidifierException(
                 "Invalid target humidity: %s" % humidity)
 
