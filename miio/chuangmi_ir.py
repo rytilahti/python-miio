@@ -25,7 +25,14 @@ class ChuangmiIr(Device):
     def read(self, key: int):
         """Read a learned command.
 
-        FIXME what is the return value? Examples needed.
+        Positive response (chuangmi.ir.v2):
+        {'key': '1', 'code': 'Z6WPAasBAAA3BQAA4AwJAEA....AAABAAEBAQAAAQAA=='}
+
+        Negative response (chuangmi.ir.v2):
+        {'error': {'code': -5002, 'message': 'no code for this key'}, 'id': 5}
+
+        Negative response (chuangmi.ir.v2):
+        {'error': {'code': -5003, 'message': 'learn timeout'}, 'id': 17}
 
         :param int key: Slot to read from"""
         return self.send("miIO.ir_read", {'key': str(key)})
