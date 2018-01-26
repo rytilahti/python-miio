@@ -285,17 +285,12 @@ class AirPurifier(Device):
                       'act_sleep']
 
         # A single request is limited to 16 properties. Therefore the
-        # properties are divided in two groups here. The second group contains
-        # some infrequent and independent updated properties.
-        values = self.send(
-            "get_prop",
-            properties[0:13]
-        )
-
-        values.extend(self.send(
-            "get_prop",
-            properties[13:]
-        ))
+        # properties are divided into multiple requests
+        _props = properties.copy()
+        values = []
+        while _props:
+            values.extend(self.send("get_prop", _props[:13]))
+            _props[:] = _props[13:]
 
         properties_count = len(properties)
         values_count = len(values)
