@@ -84,7 +84,7 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.learn_result() is True
 
     def test_learn_stop(self):
-        assert self.device.lern_stop(STORAGE_SLOT_ID) is True
+        assert self.device.learn_stop(STORAGE_SLOT_ID) is True
         assert self.device.learn_stop() is True
 
     def test_send_ir_code(self):
