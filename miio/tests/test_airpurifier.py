@@ -258,6 +258,12 @@ class TestAirPurifier(TestCase):
         self.device.state["buzzer"] = None
         assert self.state().buzzer is None
 
+    def test_status_without_motor2_speed(self):
+        self.device._reset_state()
+        # The Air Purifier Pro doesn't provide the buzzer property
+        self.device.state["motor2_speed"] = None
+        assert self.state().motor2_speed is None
+
     def test_status_without_filter_rfid_tag(self):
         self.device._reset_state()
         self.device.state["rfid_tag"] = None
