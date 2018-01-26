@@ -1,6 +1,8 @@
 from unittest import TestCase
 from miio import AirPurifier
-from miio.airpurifier import OperationMode, LedBrightness, AirPurifierException
+from miio.airpurifier import (
+    OperationMode, LedBrightness, FilterType, AirPurifierException
+)
 from .dummies import DummyDevice
 import pytest
 
@@ -28,6 +30,9 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'buzzer': 'off',
             'child_lock': 'off',
             'volume': 50,
+            'rfid_product_id': '0:0:41:30',
+            'rfid_tag': '10:20:30:40:50:60:7',
+            'act_sleep': 'close',
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -40,6 +45,11 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
                 lambda x: self._set_state("favorite_level", x),
             'set_led_b': lambda x: self._set_state("led_b", x),
             'set_volume': lambda x: self._set_state("volume", x),
+            'set_act_sleep': lambda x: self._set_state("act_sleep", x),
+            'reset_filter1': lambda x: (
+                self._set_state('f1_hour_used', [0]),
+                self._set_state('filter1_life', [100])
+            )
         }
         super().__init__(args, kwargs)
 
@@ -97,6 +107,8 @@ class TestAirPurifier(TestCase):
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
         assert self.state().illuminance == self.device.start_state["bright"]
         assert self.state().volume == self.device.start_state["volume"]
+        assert self.state().filter_rfid_product_id == self.device.start_state["rfid_product_id"]
+        assert self.state().filter_rfid_tag == self.device.start_state["rfid_tag"]
 
     def test_set_mode(self):
         def mode():
@@ -191,6 +203,30 @@ class TestAirPurifier(TestCase):
         with pytest.raises(AirPurifierException):
             self.device.set_volume(101)
 
+    def test_set_learn_mode(self):
+        def learn_mode():
+            return self.device.status().learn_mode
+
+        self.device.set_learn_mode(True)
+        assert learn_mode() is True
+
+        self.device.set_learn_mode(False)
+        assert learn_mode() is False
+
+    def test_reset_filter(self):
+        def filter_hours_used():
+            return self.device.status().filter_hours_used
+
+        def filter_life_remaining():
+            return self.device.status().filter_life_remaining
+
+        self.device._reset_state()
+        assert filter_hours_used() != 0
+        assert filter_life_remaining() != 100
+        self.device.reset_filter()
+        assert filter_hours_used() == 0
+        assert filter_life_remaining() == 100
+
     def test_status_without_volume(self):
         self.device._reset_state()
 
@@ -221,3 +257,28 @@ class TestAirPurifier(TestCase):
         # The Air Purifier Pro doesn't provide the buzzer property
         self.device.state["buzzer"] = None
         assert self.state().buzzer is None
+
+    def test_status_without_filter_rfid_tag(self):
+        self.device._reset_state()
+        self.device.state["rfid_tag"] = None
+        assert self.state().filter_rfid_tag is None
+        assert self.state().filter_type is None
+
+    def test_status_with_filter_rfid_tag_zeros(self):
+        self.device._reset_state()
+        self.device.state["rfid_tag"] = '0:0:0:0:0:0:0'
+        assert self.state().filter_type is FilterType.Unknown
+
+    def test_status_without_filter_rfid_product_id(self):
+        self.device._reset_state()
+        self.device.state["rfid_product_id"] = None
+        assert self.state().filter_type is FilterType.Regular
+
+    def test_status_filter_rfid_product_ids(self):
+        self.device._reset_state()
+        self.device.state["rfid_product_id"] = '0:0:30:31'
+        assert self.state().filter_type is FilterType.AntiFormaldehyde
+        self.device.state["rfid_product_id"] = '0:0:30:32'
+        assert self.state().filter_type is FilterType.Regular
+        self.device.state["rfid_product_id"] = '0:0:41:30'
+        assert self.state().filter_type is FilterType.AntiBacterial

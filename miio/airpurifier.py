@@ -1,5 +1,6 @@
 import logging
 import enum
+import re
 from typing import Any, Dict, Optional
 from collections import defaultdict
 from .device import Device
@@ -24,8 +25,24 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
+class FilterType(enum.Enum):
+    Regular = 'regular'
+    AntiBacterial = 'anti-bacterial'
+    AntiFormaldehyde = 'anti-formaldehyde'
+    Unknown = 'unknown'
+
+
+FILTER_TYPE_RE = (
+    (re.compile(r'^\d+:\d+:41:30$'), FilterType.AntiBacterial),
+    (re.compile(r'^\d+:\d+:(30|0|00):31$'), FilterType.AntiFormaldehyde),
+    (re.compile(r'.*'), FilterType.Regular),
+)
+
+
 class AirPurifierStatus:
     """Container for status reports from the air purifier."""
+
+    _filter_type_cache = {}
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """
@@ -36,7 +53,9 @@ class AirPurifierStatus:
          'filter1_life': 52, 'f1_hour_used': 1664, 'use_time': 2642700,
          'motor1_speed': 0, 'motor2_speed': 800, 'purify_volume': 62180,
          'f1_hour': 3500, 'led': 'on', 'led_b': None, 'bright': 83,
-         'buzzer': None, 'child_lock': 'off', 'volume': 50}
+         'buzzer': None, 'child_lock': 'off', 'volume': 50,
+         'rfid_product_id': '0:0:41:30', 'rfid_tag': '80:52:86:e2:d8:86:4',
+         'act_sleep': 'close'}
 
         Response of a Air Purifier 2 (zhimi.airpurifier.m1):
 
@@ -45,7 +64,9 @@ class AirPurifierStatus:
         'filter1_life': 80, 'f1_hour_used': 682, 'use_time': 2457000,
         'motor1_speed': 354, 'motor2_speed': None, 'purify_volume': 25262,
         'f1_hour': 3500, 'led': 'off', 'led_b': 2, 'bright': None,
-        'buzzer': 'off', 'child_lock': 'off', 'volume': None}
+        'buzzer': 'off', 'child_lock': 'off', 'volume': None,
+        'rfid_product_id': None, 'rfid_tag': None,
+        'act_sleep': 'close'}
 
         A request is limited to 16 properties.
         """
@@ -162,6 +183,42 @@ class AirPurifierStatus:
         """Volume of sound notifications [0-100]."""
         return self.data["volume"]
 
+    @property
+    def filter_rfid_product_id(self) -> Optional[str]:
+        """RFID product ID of installed filter."""
+        return self.data["rfid_product_id"]
+
+    @property
+    def filter_rfid_tag(self) -> Optional[str]:
+        """RFID tag ID of installed filter."""
+        return self.data["rfid_tag"]
+
+    @property
+    def filter_type(self) -> Optional[FilterType]:
+        """Type of installed filter."""
+        if self.filter_rfid_tag is None:
+            return None
+        if self.filter_rfid_tag == '0:0:0:0:0:0:0':
+            return FilterType.Unknown
+        if self.filter_rfid_product_id is None:
+            return FilterType.Regular
+        return self._get_filter_type(self.filter_rfid_product_id)
+
+    @property
+    def learn_mode(self) -> bool:
+        """Return True if Learn Mode is enabled."""
+        return self.data["act_sleep"] == "single"
+
+    @classmethod
+    def _get_filter_type(cls, product_id: str) -> FilterType:
+        ft = cls._filter_type_cache.get(product_id, None)
+        if ft is None:
+            for filter_re, filter_type in FILTER_TYPE_RE:
+                if filter_re.match(product_id):
+                    ft = cls._filter_type_cache[product_id] = filter_type
+                    break
+        return ft
+
     def __repr__(self) -> str:
         s = "<AirPurifierStatus power=%s, " \
             "aqi=%s, " \
@@ -181,7 +238,11 @@ class AirPurifierStatus:
             "purify_volume=%s, " \
             "motor_speed=%s, " \
             "motor2_speed=%s, " \
-            "volume=%s>" % \
+            "volume=%s, " \
+            "filter_rfid_product_id=%s, " \
+            "filter_rfid_tag=%s, " \
+            "filter_type=%s, " \
+            "learn_mode=%s>" % \
             (self.power,
              self.aqi,
              self.average_aqi,
@@ -200,7 +261,11 @@ class AirPurifierStatus:
              self.purify_volume,
              self.motor_speed,
              self.motor2_speed,
-             self.volume)
+             self.volume,
+             self.filter_rfid_product_id,
+             self.filter_rfid_tag,
+             self.filter_type,
+             self.learn_mode)
         return s
 
 
@@ -216,7 +281,8 @@ class AirPurifier(Device):
                       'purify_volume',
                       # Second request
                       'f1_hour', 'led', 'led_b', 'bright', 'buzzer',
-                      'child_lock', 'volume', ]
+                      'child_lock', 'volume', 'rfid_product_id', 'rfid_tag',
+                      'act_sleep']
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided in two groups here. The second group contains
@@ -294,3 +360,14 @@ class AirPurifier(Device):
             raise AirPurifierException("Invalid volume: %s" % volume)
 
         return self.send("set_volume", [volume])
+
+    def set_learn_mode(self, learn_mode: bool):
+        """Set the Learn Mode on/off."""
+        if learn_mode:
+            return self.send("set_act_sleep", ["single"])
+        else:
+            return self.send("set_act_sleep", ["close"])
+
+    def reset_filter(self):
+        """Resets filter hours used and remaining life."""
+        return self.send('reset_filter1')
