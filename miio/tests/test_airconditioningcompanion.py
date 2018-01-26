@@ -84,8 +84,8 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.learn_result() is True
 
     def test_learn_stop(self):
-        assert self.device.learn(STORAGE_SLOT_ID) is True
-        assert self.device.learn() is True
+        assert self.device.lern_stop(STORAGE_SLOT_ID) is True
+        assert self.device.learn_stop() is True
 
     def test_send_ir_code(self):
         assert self.device.send_ir_code('0000000') is True
@@ -94,7 +94,7 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.send_command('0000000') is True
 
     def test_send_configuration(self):
-        def send_configuration():
+        def send_configuration_known_aircondition():
             return self.device.send_configuration(
                 '0100010727',
                 Power.On,
@@ -103,4 +103,24 @@ class TestAirConditioningCompanion(TestCase):
                 FanSpeed.Low,
                 SwingMode.On)
 
-        assert send_configuration() is True
+        def send_configuration_known_aircondition_turn_off():
+            return self.device.send_configuration(
+                '0100010727',
+                Power.Off,
+                OperationMode.Auto,
+                22.5,
+                FanSpeed.Low,
+                SwingMode.On)
+
+        def send_configuration_unknown_aircondition():
+            return self.device.send_configuration(
+                '01000fffff',
+                Power.On,
+                OperationMode.Auto,
+                22.5,
+                FanSpeed.Low,
+                SwingMode.On)
+
+        assert send_configuration_known_aircondition() is True
+        assert send_configuration_known_aircondition_turn_off() is True
+        assert send_configuration_unknown_aircondition() is True
