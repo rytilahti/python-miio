@@ -50,3 +50,19 @@ class TestAirConditioningCompanion(TestCase):
         assert self.state().swing_mode is False
         assert self.state().fan_speed == FanSpeed.Low
         assert self.state().mode == OperationMode.Auto
+
+    def test_status_without_temperature(self):
+        self.device._reset_state()
+        self.device.state[1] = None
+        assert self.state().temperature is None
+
+    def test_status_without_mode(self):
+        self.device._reset_state()
+        self.device.state[1] = None
+        assert self.state().mode is None
+
+    def test_status_without_fan_speed(self):
+        self.device._reset_state()
+        self.device.state[1] = None
+        assert self.state().fan_speed is None
+

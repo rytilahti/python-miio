@@ -101,9 +101,12 @@ class AirConditioningCompanionStatus:
         return self.power == 'on'
 
     @property
-    def temperature(self) -> int:
+    def temperature(self) -> Optional[int]:
         """Current temperature."""
-        return int(self.data[1][6:8], 16)
+        try:
+            return int(self.data[1][6:8], 16)
+        except ValueError:
+            return None
 
     @property
     def swing_mode(self) -> bool:
@@ -113,20 +116,20 @@ class AirConditioningCompanionStatus:
     @property
     def fan_speed(self) -> Optional[FanSpeed]:
         """Current fan speed."""
-        speed = int(self.data[1][4:5])
-        if speed is not None:
+        try:
+            speed = int(self.data[1][4:5])
             return FanSpeed(speed)
-
-        return None
+        except ValueError:
+            return None
 
     @property
     def mode(self) -> Optional[OperationMode]:
         """Current operation mode."""
-        mode = int(self.data[1][3:4])
-        if mode is not None:
+        try:
+            mode = int(self.data[1][3:4])
             return OperationMode(mode)
-
-        return None
+        except ValueError:
+            return None
 
 
 class AirConditioningCompanion(Device):
@@ -175,7 +178,8 @@ class AirConditioningCompanion(Device):
         if model in DEVICE_COMMAND_TEMPLATES:
             configuration = model + DEVICE_COMMAND_TEMPLATES[model]['base']
         else:
-            configuration = model + DEVICE_COMMAND_TEMPLATES['fallback']['base']
+            configuration = \
+                model + DEVICE_COMMAND_TEMPLATES['fallback']['base']
 
         configuration = configuration.replace('[po]', power.value)
         configuration = configuration.replace('[mo]', operation_mode.value)
