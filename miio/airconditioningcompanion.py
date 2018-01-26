@@ -105,7 +105,7 @@ class AirConditioningCompanionStatus:
         """Current temperature."""
         try:
             return int(self.data[1][6:8], 16)
-        except ValueError:
+        except TypeError:
             return None
 
     @property
@@ -119,7 +119,7 @@ class AirConditioningCompanionStatus:
         try:
             speed = int(self.data[1][4:5])
             return FanSpeed(speed)
-        except ValueError:
+        except TypeError:
             return None
 
     @property
@@ -128,7 +128,7 @@ class AirConditioningCompanionStatus:
         try:
             mode = int(self.data[1][3:4])
             return OperationMode(mode)
-        except ValueError:
+        except TypeError:
             return None
 
 
