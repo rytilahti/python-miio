@@ -65,4 +65,3 @@ class TestAirConditioningCompanion(TestCase):
         self.device._reset_state()
         self.device.state[1] = None
         assert self.state().fan_speed is None
-
