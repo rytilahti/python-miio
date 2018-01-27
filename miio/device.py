@@ -266,7 +266,7 @@ class Device:
                                 "retries left: %s", retry_count)
                 self.__id += 100
                 return self.send(command, parameters, retry_count - 1)
-            raise DeviceException from ex
+            raise DeviceException("No response from the device") from ex
 
     def raw_command(self, cmd, params):
         """Send a raw command to the device.
