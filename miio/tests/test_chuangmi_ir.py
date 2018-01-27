@@ -16,7 +16,7 @@ class DummyChuangmiIr(DummyDevice, ChuangmiIr):
         self.return_values = {
             'miIO.ir_learn': lambda x: True,
             'miIO.ir_read': lambda x: True,
-            'miIO.ir_play': lambda x: self._ir_play_input_validation,
+            'miIO.ir_play': self._ir_play_input_validation,
         }
         super().__init__(args, kwargs)
 
