@@ -11,20 +11,13 @@ PROSONIC_POWER_ON = 'Z6VPAAUCAABgAgAAxQYAAOUIAACUEQAAqyIAADSeAABwdQEAAAAAAAA' \
 
 class DummyChuangmiIr(ChuangmiIr):
     def __init__(self, *args, **kwargs):
+        self.state = {}
         self.return_values = {
             'miIO.ir_learn': lambda x: True,
             'miIO.ir_read': lambda x: True,
             'miIO.ir_play': lambda x: self._ir_play_input_validation,
         }
-        self.start_state = self.state.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
-
-    def _reset_state(self):
-        """Revert back to the original state."""
-        self.state = self.start_state.copy()
+        super().__init__(args, kwargs)
 
     @staticmethod
     def _ir_play_input_validation(self, props):
