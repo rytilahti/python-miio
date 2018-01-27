@@ -1,6 +1,7 @@
 from unittest import TestCase
 from miio import ChuangmiIr
 from miio.chuangmi_ir import ChuangmiIrException
+from .dummies import DummyDevice
 import pytest
 import base64
 
@@ -9,7 +10,7 @@ PROSONIC_POWER_ON = 'Z6VPAAUCAABgAgAAxQYAAOUIAACUEQAAqyIAADSeAABwdQEAAAAAAAA' \
                     'AgEBAgECAQEBAQIBAgECAgICBgNXA1cDUA'
 
 
-class DummyChuangmiIr(ChuangmiIr):
+class DummyChuangmiIr(DummyDevice, ChuangmiIr):
     def __init__(self, *args, **kwargs):
         self.state = {}
         self.return_values = {
