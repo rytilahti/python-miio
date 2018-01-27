@@ -48,7 +48,7 @@ DEVICE_COMMAND_TEMPLATES = {
     },
     '0100010727': {
         'deviceType': 'gree_2',
-        'base': '[po][mo][wi][sw][tt]1100190[tt1]205002102000t7t0190[tt1]207002000000[tt4]0',
+        'base': '[po][mo][wi][sw][tt]1100190[tt1]205002102000[tt7]0190[tt1]207002000000[tt4]0',
         'off': '01011101004000205002112000D04000207002000000A0'
     },
     '0100004795': {
@@ -101,9 +101,12 @@ class AirConditioningCompanionStatus:
         return self.power == 'on'
 
     @property
-    def temperature(self) -> int:
+    def temperature(self) -> Optional[int]:
         """Current temperature."""
-        return int(self.data[1][6:8], 16)
+        try:
+            return int(self.data[1][6:8], 16)
+        except TypeError:
+            return None
 
     @property
     def swing_mode(self) -> bool:
@@ -113,20 +116,20 @@ class AirConditioningCompanionStatus:
     @property
     def fan_speed(self) -> Optional[FanSpeed]:
         """Current fan speed."""
-        speed = int(self.data[1][4:5])
-        if speed is not None:
+        try:
+            speed = int(self.data[1][4:5])
             return FanSpeed(speed)
-
-        return None
+        except TypeError:
+            return None
 
     @property
     def mode(self) -> Optional[OperationMode]:
         """Current operation mode."""
-        mode = int(self.data[1][3:4])
-        if mode is not None:
+        try:
+            mode = int(self.data[1][3:4])
             return OperationMode(mode)
-
-        return None
+        except TypeError:
+            return None
 
 
 class AirConditioningCompanion(Device):
@@ -137,17 +140,17 @@ class AirConditioningCompanion(Device):
         status = self.send("get_model_and_state", [])
         return AirConditioningCompanionStatus(status)
 
-    def learn(self):
+    def learn(self, slot: int=STORAGE_SLOT_ID):
         """Learn an infrared command."""
-        return self.send("start_ir_learn", [STORAGE_SLOT_ID])
+        return self.send("start_ir_learn", [slot])
 
     def learn_result(self):
         """Read the learned command."""
         return self.send("get_ir_learn_result", [])
 
-    def learn_stop(self):
+    def learn_stop(self, slot: int=STORAGE_SLOT_ID):
         """Stop learning of a infrared command."""
-        return self.send("end_ir_learn", [STORAGE_SLOT_ID])
+        return self.send("end_ir_learn", [slot])
 
     def send_ir_code(self, command: str):
         """Play a captured command.
@@ -175,18 +178,19 @@ class AirConditioningCompanion(Device):
         if model in DEVICE_COMMAND_TEMPLATES:
             configuration = model + DEVICE_COMMAND_TEMPLATES[model]['base']
         else:
-            configuration = model + DEVICE_COMMAND_TEMPLATES['fallback']['base']
+            configuration = \
+                model + DEVICE_COMMAND_TEMPLATES['fallback']['base']
 
-        configuration = configuration.replace('[po]', power.value)
-        configuration = configuration.replace('[mo]', operation_mode.value)
-        configuration = configuration.replace('[wi]', fan_speed.value)
-        configuration = configuration.replace('[sw]', swing_mode.value)
+        configuration = configuration.replace('[po]', str(power.value))
+        configuration = configuration.replace('[mo]', str(operation_mode.value))
+        configuration = configuration.replace('[wi]', str(fan_speed.value))
+        configuration = configuration.replace('[sw]', str(swing_mode.value))
         configuration = configuration.replace(
             '[tt]', hex(int(target_temperature))[2:])
 
         temperature = (1 + int(target_temperature) - 17) % 16
         temperature = hex(temperature)[2:].upper()
-        configuration = configuration.replace('[[tt1]]', temperature)
+        configuration = configuration.replace('[tt1]', temperature)
 
         temperature = (4 + int(target_temperature) - 17) % 16
         temperature = hex(temperature)[2:].upper()
