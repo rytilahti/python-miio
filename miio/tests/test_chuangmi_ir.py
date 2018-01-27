@@ -34,6 +34,7 @@ class DummyChuangmiIr(ChuangmiIr):
         except TypeError:
             return False
 
+
 @pytest.fixture(scope="class")
 def chuangmiir(request):
     request.cls.device = DummyChuangmiIr()
