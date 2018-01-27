@@ -13,7 +13,7 @@ class ChuangmiIrException(DeviceException):
 class ChuangmiIr(Device):
     """Main class representing Chuangmi IR Remote Controller."""
 
-    def learn(self, key: int):
+    def learn(self, key: int = 1):
         """Learn an infrared command.
 
         :param int key: Storage slot, must be between 1 and 1000000"""
@@ -22,7 +22,7 @@ class ChuangmiIr(Device):
             raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_learn", {'key': str(key)})
 
-    def read(self, key: int):
+    def read(self, key: int = 1):
         """Read a learned command.
 
         Positive response (chuangmi.ir.v2):
@@ -35,6 +35,9 @@ class ChuangmiIr(Device):
         {'error': {'code': -5003, 'message': 'learn timeout'}, 'id': 17}
 
         :param int key: Slot to read from"""
+
+        if key < 1 or key > 1000000:
+            raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_read", {'key': str(key)})
 
     def play(self, command: str, frequency: int):
