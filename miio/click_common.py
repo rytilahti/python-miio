@@ -33,6 +33,12 @@ def validate_token(ctx, param, value):
 
 
 class ExceptionHandlerGroup(click.Group):
+    """Add a simple group for catching the miio-related exceptions.
+
+    This simplifies catching the exceptions from different click commands.
+
+    Idea from https://stackoverflow.com/a/44347763
+    """
     def __call__(self, *args, **kwargs):
         try:
             return self.main(*args, **kwargs)
