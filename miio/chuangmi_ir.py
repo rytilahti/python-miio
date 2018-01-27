@@ -40,13 +40,11 @@ class ChuangmiIr(Device):
             raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_read", {'key': str(key)})
 
-    def play(self, command: str, frequency: int):
+    def play(self, command: str, frequency: int=38400):
         """Play a captured command.
 
         :param str command: Command to execute
         :param int frequence: Execution frequency"""
-        if frequency is None:
-            frequency = 38400
         return self.send("miIO.ir_play",
                          {'freq': frequency, 'code': command})
 
