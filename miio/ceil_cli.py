@@ -2,14 +2,10 @@
 import logging
 import click
 import sys
-import ipaddress
-
-if sys.version_info < (3, 4):
-    print("To use this script you need python 3.4 or newer, got %s" %
-          sys.version_info)
-    sys.exit(1)
-
+from miio.click_common import (ExceptionHandlerGroup, validate_ip,
+                               validate_token)
 import miio  # noqa: E402
+
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Ceil)
@@ -36,22 +32,7 @@ def validate_scene(ctx, param, value):
     return value
 
 
-def validate_ip(ctx, param, value):
-    try:
-        ipaddress.ip_address(value)
-        return value
-    except ValueError as ex:
-        raise click.BadParameter("Invalid IP: %s" % ex)
-
-
-def validate_token(ctx, param, value):
-    token_len = len(value)
-    if token_len != 32:
-        raise click.BadParameter("Token length != 32 chars: %s" % token_len)
-    return value
-
-
-@click.group(invoke_without_command=True)
+@click.group(invoke_without_command=True, cls=ExceptionHandlerGroup)
 @click.option('--ip', envvar="DEVICE_IP", callback=validate_ip)
 @click.option('--token', envvar="DEVICE_TOKEN", callback=validate_token)
 @click.option('-d', '--debug', default=False, count=True)
