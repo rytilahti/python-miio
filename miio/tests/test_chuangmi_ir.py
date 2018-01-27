@@ -58,5 +58,5 @@ class TestChuangmiIr(TestCase):
             self.device.read(1000001)
 
     def test_play(self):
-        assert self.device.send(PROSONIC_POWER_ON) is True
-        assert self.device.send(PROSONIC_POWER_ON, 19200) is True
+        assert self.device.play(PROSONIC_POWER_ON) is True
+        assert self.device.play(PROSONIC_POWER_ON, 19200) is True
