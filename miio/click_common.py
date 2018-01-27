@@ -7,7 +7,6 @@ if sys.version_info < (3, 4):
     print("To use this script you need python 3.4 or newer, got %s" %
           sys.version_info)
     sys.exit(1)
-
 import click
 import ipaddress
 import miio
