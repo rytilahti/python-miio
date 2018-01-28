@@ -1,7 +1,7 @@
 from unittest import TestCase
 from miio import AirPurifier
 from miio.airpurifier import (
-    OperationMode, LedBrightness, FilterType, AirPurifierException
+    OperationMode, LedBrightness, FilterType, SleepMode, AirPurifierException
 )
 from .dummies import DummyDevice
 import pytest
@@ -114,7 +114,7 @@ class TestAirPurifier(TestCase):
         assert self.state().illuminance == self.device.start_state["bright"]
         assert self.state().volume == self.device.start_state["volume"]
         assert self.state().filter_rfid_product_id == self.device.start_state["rfid_product_id"]
-        assert self.state().sleep_mode == OperationMode(self.device.start_state["sleep_mode"])
+        assert self.state().sleep_mode == SleepMode(self.device.start_state["sleep_mode"])
         assert self.state().sleep_time == self.device.start_state["sleep_time"]
         assert self.state().sleep_mode_learn_count == self.device.start_state["sleep_data_num"]
         assert self.state().extra_features == self.device.start_state["app_extra"]

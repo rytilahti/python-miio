@@ -19,6 +19,12 @@ class OperationMode(enum.Enum):
     Idle = 'idle'
 
 
+class SleepMode(enum.Enum):
+    Off = 'poweroff'
+    Silent = 'silent'
+    Idle = 'idle'
+
+
 class LedBrightness(enum.Enum):
     Bright = 0
     Dim = 1
@@ -112,10 +118,10 @@ class AirPurifierStatus:
         return OperationMode(self.data["mode"])
 
     @property
-    def sleep_mode(self) -> Optional[OperationMode]:
+    def sleep_mode(self) -> Optional[SleepMode]:
         """Operation mode of the sleep state. (Idle vs. Silent)"""
         if self.data["sleep_mode"] is not None:
-            return OperationMode(self.data["sleep_mode"])
+            return SleepMode(self.data["sleep_mode"])
 
         return None
 
