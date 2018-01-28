@@ -17,6 +17,7 @@ PROSONIC_POWER_ON_PROTON = '0000006C00220002015B00AD001600160016001600160016' \
                            '001600160016004100160041001600410016004100160623' \
                            '015B005700160E6E'
 
+
 class DummyChuangmiIr(DummyDevice, ChuangmiIr):
     def __init__(self, *args, **kwargs):
         self.state = {}
