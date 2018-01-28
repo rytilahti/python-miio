@@ -10,7 +10,8 @@ class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):
             'power': 'on',
             'aqi': 34,
             'battery': 100,
-            'usb_state': 'off'
+            'usb_state': 'off',
+            'time_state' : 'format unknown'
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -56,3 +57,4 @@ class TestAirQualityMonitor(TestCase):
         assert self.state().aqi == self.device.start_state["aqi"]
         assert self.state().battery == self.device.start_state["battery"]
         assert self.state().usb_power == (self.device.start_state["usb_state"] == 'on')
+        assert self.state().time_state == self.device.start_state["time_state"]
