@@ -16,14 +16,14 @@ class DummyChuangmiIr(DummyDevice, ChuangmiIr):
         self.return_values = {
             'miIO.ir_learn': lambda x: True,
             'miIO.ir_read': lambda x: True,
-            'miIO.ir_play': self._ir_play_input_validation,
+            'miIO.ir_play': lambda x: self._ir_play_input_validation(x),
         }
         super().__init__(args, kwargs)
 
     @staticmethod
-    def _ir_play_input_validation(self, props):
+    def _ir_play_input_validation(self, payload):
         try:
-            base64.b64decode(props['code'])
+            base64.b64decode(payload['code'])
             return True
         except TypeError:
             return False
