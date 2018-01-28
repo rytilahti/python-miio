@@ -48,7 +48,7 @@ class ChuangmiIr(Device):
         return self.send("miIO.ir_play",
                          {'freq': frequency, 'code': command})
 
-    def play_pronto(self, pronto: str, repeats: int=0):
+    def play_pronto(self, pronto: str, repeats: int=1):
         """Play a Pronto Hex encoded IR command.
         Supports only raw Pronto format, starting with 0000.
 
