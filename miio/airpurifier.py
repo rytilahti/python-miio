@@ -3,7 +3,10 @@ import enum
 import re
 from typing import Any, Dict, Optional
 from collections import defaultdict
+from functools import wraps
+import click
 from .device import Device, DeviceException
+from .click_common import DeviceGroupMeta, device_command, echo_return_status
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -353,9 +356,40 @@ class AirPurifierStatus:
         return s
 
 
-class AirPurifier(Device):
+class AirPurifier(Device, metaclass=DeviceGroupMeta):
     """Main class representing the air purifier."""
 
+    @device_command(
+        echo_return_status("", """
+Power: {result.power}
+AQI: {result.aqi} μg/m³
+Average AQI: {result.average_aqi} μg/m³
+Temperature: {result.temperature} °C
+Humidity: {result.humidity} %
+Mode: {result.mode.value}
+LED: {result.led}
+LED brightness: {result.led_brightness}
+Illuminance: {result.illuminance} lx
+Buzzer: {result.buzzer}
+Child lock: {result.child_lock}
+Favorite level: {result.favorite_level}
+Filter life remaining: {result.filter_life_remaining} %
+Filter hours used: {result.filter_hours_used}
+Use time: {result.use_time} s
+Purify volume: {result.purify_volume} m³
+Motor speed: {result.motor_speed} rpm
+Motor 2 speed: {result.motor2_speed} rpm
+Sound volume: {result.volume} %
+Filter RFID product id: {result.filter_rfid_product_id}
+Filter RFID tag: {result.filter_rfid_tag}
+Filter type: {result.filter_type.value}
+Learn mode: {result.learn_mode}
+Sleep mode: {result.sleep_mode.value}
+Sleep time: {result.sleep_time}
+Sleep mode learn count: {result.sleep_mode_learn_count}
+AQI sensor enabled on power off: {result.auto_detect}
+        """)
+    )
     def status(self) -> AirPurifierStatus:
         """Retrieve properties."""
 
@@ -388,18 +422,32 @@ class AirPurifier(Device):
         return AirPurifierStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @device_command(
+        echo_return_status("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @device_command(
+        echo_return_status("Powering off")
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
+    @device_command(
+        click.argument("mode", type=OperationMode),
+        echo_return_status("Setting mode to '{mode.value}'")
+    )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
         return self.send("set_mode", [mode.value])
 
+    @device_command(
+        click.argument("level", type=int),
+        echo_return_status("Setting favorite level to {level}")
+    )
     def set_favorite_level(self, level: int):
         """Set favorite level."""
         if level < 0 or level > 16:
@@ -411,10 +459,22 @@ class AirPurifier(Device):
         # should be  between 0 and 16.
         return self.send("set_level_favorite", [level])  # 0 ... 16
 
+    @device_command(
+        click.argument("brightness", type=LedBrightness),
+        echo_return_status(
+            "Setting LED brightness to {brightness}")
+    )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         return self.send("set_led_b", [brightness.value])
 
+    @device_command(
+        click.argument("led", type=bool),
+        echo_return_status(
+            lambda led: "Turning on LED"
+            if led else "Turning off LED"
+        )
+    )
     def set_led(self, led: bool):
         """Turn led on/off."""
         if led:
@@ -422,6 +482,13 @@ class AirPurifier(Device):
         else:
             return self.send("set_led", ['off'])
 
+    @device_command(
+        click.argument("buzzer", type=bool),
+        echo_return_status(
+            lambda buzzer: "Turning on buzzer"
+            if buzzer else "Turning off buzzer"
+        )
+    )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
         if buzzer:
@@ -429,6 +496,13 @@ class AirPurifier(Device):
         else:
             return self.send("set_buzzer", ["off"])
 
+    @device_command(
+        click.argument("lock", type=bool),
+        echo_return_status(
+            lambda lock: "Turning on child lock"
+            if lock else "Turning off child lock"
+        )
+    )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
         if lock:
@@ -436,6 +510,10 @@ class AirPurifier(Device):
         else:
             return self.send("set_child_lock", ["off"])
 
+    @device_command(
+        click.argument("volume", type=int),
+        echo_return_status("Setting favorite level to {volume}")
+    )
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
         if volume < 0 or volume > 100:
@@ -443,6 +521,13 @@ class AirPurifier(Device):
 
         return self.send("set_volume", [volume])
 
+    @device_command(
+        click.argument("learn_mode", type=bool),
+        echo_return_status(
+            lambda learn_mode: "Turning on learn mode"
+            if learn_mode else "Turning off learn mode"
+        )
+    )
     def set_learn_mode(self, learn_mode: bool):
         """Set the Learn Mode on/off."""
         if learn_mode:
@@ -450,6 +535,13 @@ class AirPurifier(Device):
         else:
             return self.send("set_act_sleep", ["close"])
 
+    @device_command(
+        click.argument("auto_detect", type=bool),
+        echo_return_status(
+            lambda auto_detect: "Turning on auto detect"
+            if auto_detect else "Turning off auto detect"
+        )
+    )
     def set_auto_detect(self, auto_detect: bool):
         """Set auto detect on/off. It's a feature of the AirPurifier V1 & V3"""
         if auto_detect:
@@ -457,6 +549,10 @@ class AirPurifier(Device):
         else:
             return self.send("set_act_det", ["off"])
 
+    @device_command(
+        click.argument("value", type=int),
+        echo_return_status("Setting extra to {value}")
+    )
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app.
 
@@ -467,6 +563,9 @@ class AirPurifier(Device):
 
         return self.send("set_app_extra", [value])
 
+    @device_command(
+        echo_return_status("Resetting filter")
+    )
     def reset_filter(self):
         """Resets filter hours used and remaining life."""
         return self.send('reset_filter1')
