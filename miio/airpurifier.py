@@ -113,7 +113,10 @@ class AirPurifierStatus:
     @property
     def sleep_mode(self) -> Optional[OperationMode]:
         """Operation mode of the sleep state. (Idle vs. Silent)"""
-        return OperationMode(self.data["sleep_mode"])
+        if self.data["sleep_mode"] is not None:
+            return OperationMode(self.data["sleep_mode"])
+
+        return None
 
     @property
     def led(self) -> bool:
@@ -228,12 +231,18 @@ class AirPurifierStatus:
 
     @property
     def turbo_mode_supported(self) -> Optional[bool]:
-        return self.data["app_extra"] == 1
+        if self.data["app_extra"] is not None:
+            return self.data["app_extra"] == 1
+
+        return None
 
     @property
     def auto_detect(self) -> Optional[bool]:
         """Return True if auto detect is enabled."""
-        return self.data["act_det"] == "on"
+        if self.data["act_det"] is not None:
+            return self.data["act_det"] == "on"
+
+        return None
 
     @classmethod
     def _get_filter_type(cls, product_id: str) -> FilterType:
