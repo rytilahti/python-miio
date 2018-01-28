@@ -28,13 +28,31 @@ class AirQualityMonitorStatus:
 
     @property
     def aqi(self) -> int:
-        """Air quality index value."""
+        """Air quality index value. (0...600)."""
         return self.data["aqi"]
 
     @property
     def battery(self) -> int:
-        """Current battery level."""
+        """Current battery level (0...100)."""
         return self.data["battery"]
+
+    @property
+    def time_state(self) -> str:
+        """Current time state."""
+        return self.data["time_state"]
+
+    def __repr__(self) -> str:
+        s = "<AirQualityMonitorStatus power=%s, " \
+            "aqi=%s, " \
+            "battery=%s, " \
+            "usb=%s, " \
+            "time_state=%s>" % \
+            (self.power,
+             self.aqi,
+             self.battery,
+             self.usb,
+             self.time_state)
+        return s
 
 
 class AirQualityMonitor(Device):
@@ -42,7 +60,7 @@ class AirQualityMonitor(Device):
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
-        properties = ['power', 'aqi', 'battery', 'usb_state']
+        properties = ['power', 'aqi', 'battery', 'usb_state', 'time_state']
 
         values = self.send(
             "get_prop",
