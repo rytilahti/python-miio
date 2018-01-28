@@ -61,7 +61,8 @@ setup(
             'miplug=miio.plug_cli:cli',
             'miceil=miio.ceil_cli:cli',
             'mieye=miio.philips_eyecare_cli:cli',
-            'miio-extract-tokens=miio.extract_tokens:main'
+            'miio-extract-tokens=miio.extract_tokens:main',
+            'miio=miio.cli:create_cli',
         ],
     },
 )
