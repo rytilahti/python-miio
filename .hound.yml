@@ -1,2 +1,3 @@
 python:
   enabled: true
+  config_file: tox.ini
