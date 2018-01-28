@@ -21,13 +21,17 @@ DEVICE_MAP = {
     "chuangmi-plug_": PlugV1,
     "qmi-powerstrip-v1": PowerStrip,
     "zimi-powerstrip-v2": PowerStrip,
-    "zhimi-airpurifier-m1": AirPurifier,
-    "zhimi-airpurifier-m2": AirPurifier,
-    "zhimi-airpurifier-ma2": AirPurifier,
-    "zhimi-airpurifier-v1": AirPurifier,
-    "zhimi-airpurifier-v2": AirPurifier,
-    "zhimi-airpurifier-v3": AirPurifier,
-    "zhimi-airpurifier-v6": AirPurifier,
+    "zhimi-airpurifier-m1": AirPurifier,   # mini model
+    "zhimi-airpurifier-m2": AirPurifier,   # mini model 2
+    "zhimi-airpurifier-ma1": AirPurifier,  # ms model
+    "zhimi-airpurifier-ma2": AirPurifier,  # ms model 2
+    "zhimi-airpurifier-sa1": AirPurifier,  # super model
+    "zhimi-airpurifier-sa2": AirPurifier,  # super model 2
+    "zhimi-airpurifier-v1": AirPurifier,   # v1
+    "zhimi-airpurifier-v2": AirPurifier,   # v2
+    "zhimi-airpurifier-v3": AirPurifier,   # v3
+    "zhimi-airpurifier-v5": AirPurifier,   # v5
+    "zhimi-airpurifier-v6": AirPurifier,   # v6
     "chuangmi-ir-v2": ChuangmiIr,
     "zhimi-humidifier-v1": AirHumidifier,
     "yunmi-waterpuri-v2": WaterPurifier,
