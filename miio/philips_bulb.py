@@ -93,6 +93,16 @@ class PhilipsBulb(Device):
 
         return self.send("set_cct", [level])
 
+    def set_brightness_and_color_temperature(self, brightness: int, cct: int):
+        """Set brightness level and the correlated color temperature."""
+        if brightness < 1 or brightness > 100:
+            raise PhilipsBulbException("Invalid brightness: %s" % brightness)
+
+        if cct < 1 or cct > 100:
+            raise PhilipsBulbException("Invalid color temperature: %s" % cct)
+
+        return self.send("set_bricct", [brightness, cct])
+
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
 
