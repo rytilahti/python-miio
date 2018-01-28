@@ -103,12 +103,21 @@ class AirPurifierStatus:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
+
         return None
 
     @property
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
+
+    @property
+    def sleep_mode(self) -> Optional[OperationMode]:
+        """Operation mode of the sleep state. (Idle vs. Silent)"""
+        if self.data["sleep_mode"] is not None:
+            return OperationMode(self.data["sleep_mode"])
+
+        return None
 
     @property
     def led(self) -> bool:
@@ -209,6 +218,33 @@ class AirPurifierStatus:
         """Return True if Learn Mode is enabled."""
         return self.data["act_sleep"] == "single"
 
+    @property
+    def sleep_time(self) -> Optional[int]:
+        return self.data["sleep_time"]
+
+    @property
+    def sleep_mode_learn_count(self) -> Optional[int]:
+        return self.data["sleep_data_num"]
+
+    @property
+    def extra_features(self) -> Optional[int]:
+        return self.data["app_extra"]
+
+    @property
+    def turbo_mode_supported(self) -> Optional[bool]:
+        if self.data["app_extra"] is not None:
+            return self.data["app_extra"] == 1
+
+        return None
+
+    @property
+    def auto_detect(self) -> Optional[bool]:
+        """Return True if auto detect is enabled."""
+        if self.data["act_det"] is not None:
+            return self.data["act_det"] == "on"
+
+        return None
+
     @classmethod
     def _get_filter_type(cls, product_id: str) -> FilterType:
         ft = cls._filter_type_cache.get(product_id, None)
@@ -242,7 +278,13 @@ class AirPurifierStatus:
             "filter_rfid_product_id=%s, " \
             "filter_rfid_tag=%s, " \
             "filter_type=%s, " \
-            "learn_mode=%s>" % \
+            "learn_mode=%s, " \
+            "sleep_mode=%s, " \
+            "sleep_time=%s, " \
+            "sleep_mode_learn_count=%s, " \
+            "extra_features=%s, " \
+            "turbo_mode_supported=%s, " \
+            "auto_detect=%s>" % \
             (self.power,
              self.aqi,
              self.average_aqi,
@@ -265,7 +307,13 @@ class AirPurifierStatus:
              self.filter_rfid_product_id,
              self.filter_rfid_tag,
              self.filter_type,
-             self.learn_mode)
+             self.learn_mode,
+             self.sleep_mode,
+             self.sleep_time,
+             self.sleep_mode_learn_count,
+             self.extra_features,
+             self.turbo_mode_supported,
+             self.auto_detect)
         return s
 
 
@@ -278,19 +326,19 @@ class AirPurifier(Device):
         properties = ['power', 'aqi', 'average_aqi', 'humidity', 'temp_dec',
                       'mode', 'favorite_level', 'filter1_life', 'f1_hour_used',
                       'use_time', 'motor1_speed', 'motor2_speed',
-                      'purify_volume',
+                      'purify_volume', 'f1_hour', 'led',
                       # Second request
-                      'f1_hour', 'led', 'led_b', 'bright', 'buzzer',
-                      'child_lock', 'volume', 'rfid_product_id', 'rfid_tag',
-                      'act_sleep']
+                      'led_b', 'bright', 'buzzer', 'child_lock', 'volume',
+                      'rfid_product_id', 'rfid_tag', 'act_sleep', 'sleep_mode',
+                      'sleep_time', 'sleep_data_num', 'app_extra', 'act_det']
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
         _props = properties.copy()
         values = []
         while _props:
-            values.extend(self.send("get_prop", _props[:13]))
-            _props[:] = _props[13:]
+            values.extend(self.send("get_prop", _props[:15]))
+            _props[:] = _props[15:]
 
         properties_count = len(properties)
         values_count = len(values)
@@ -319,6 +367,8 @@ class AirPurifier(Device):
         """Set favorite level."""
         if level < 0 or level > 16:
             raise AirPurifierException("Invalid favorite level: %s" % level)
+
+        # Possible alternative property: set_speed_favorite
 
         # Set the favorite level used when the mode is `favorite`,
         # should be  between 0 and 16.
@@ -362,6 +412,23 @@ class AirPurifier(Device):
             return self.send("set_act_sleep", ["single"])
         else:
             return self.send("set_act_sleep", ["close"])
+
+    def set_auto_detect(self, auto_detect: bool):
+        """Set auto detect on/off. It's a feature of the AirPurifier V1 & V3"""
+        if auto_detect:
+            return self.send("set_act_det", ["on"])
+        else:
+            return self.send("set_act_det", ["off"])
+
+    def set_extra_features(self, value: int):
+        """Storage register to enable extra features at the app.
+
+        app_extra=1 unlocks a turbo mode supported feature
+        """
+        if value < 0:
+            raise AirPurifierException("Invalid app extra value: %s" % value)
+
+        return self.send("set_app_extra", [value])
 
     def reset_filter(self):
         """Resets filter hours used and remaining life."""
