@@ -11,7 +11,7 @@ class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):
             'aqi': 34,
             'battery': 100,
             'usb_state': 'off',
-            'time_state' : 'format unknown'
+            'time_state': 'format unknown'
         }
         self.return_values = {
             'get_prop': self._get_state,
