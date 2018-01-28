@@ -218,12 +218,11 @@ class Device:
         msg = {'data': {'value': cmd},
                'header': {'value': header},
                'checksum': 0}
-        ctx = {'token': self.token}
-        m = Message.build(msg, ctx)
+        m = Message.build(msg, token=self.token)
         _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, cmd)
         if self.debug > 1:
             _LOGGER.debug("send (timeout %s): %s",
-                          self._timeout, Message.parse(m, ctx))
+                          self._timeout, Message.parse(m, token=self.token))
 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(self._timeout)
@@ -236,7 +235,7 @@ class Device:
 
         try:
             data, addr = s.recvfrom(1024)
-            m = Message.parse(data, ctx)
+            m = Message.parse(data, token=self.token)
             self._device_ts = m.header.value.ts
             self._device_id = m.header.value.device_id
             if self.debug > 1:
