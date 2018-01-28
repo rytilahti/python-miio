@@ -94,7 +94,7 @@ class PhilipsBulb(Device):
         return self.send("set_cct", [level])
 
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
-        """Set brightness lvel and the correlated color temperature."""
+        """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
             raise PhilipsBulbException("Invalid brightness: %s" % brightness)
 
