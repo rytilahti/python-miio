@@ -13,7 +13,7 @@ class ChuangmiIrException(DeviceException):
 class ChuangmiIr(Device):
     """Main class representing Chuangmi IR Remote Controller."""
 
-    def learn(self, key: int):
+    def learn(self, key: int=1):
         """Learn an infrared command.
 
         :param int key: Storage slot, must be between 1 and 1000000"""
@@ -22,21 +22,29 @@ class ChuangmiIr(Device):
             raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_learn", {'key': str(key)})
 
-    def read(self, key: int):
+    def read(self, key: int=1):
         """Read a learned command.
 
-        FIXME what is the return value? Examples needed.
+        Positive response (chuangmi.ir.v2):
+        {'key': '1', 'code': 'Z6WPAasBAAA3BQAA4AwJAEA....AAABAAEBAQAAAQAA=='}
+
+        Negative response (chuangmi.ir.v2):
+        {'error': {'code': -5002, 'message': 'no code for this key'}, 'id': 5}
+
+        Negative response (chuangmi.ir.v2):
+        {'error': {'code': -5003, 'message': 'learn timeout'}, 'id': 17}
 
         :param int key: Slot to read from"""
+
+        if key < 1 or key > 1000000:
+            raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_read", {'key': str(key)})
 
-    def play(self, command: str, frequency: int):
+    def play(self, command: str, frequency: int=38400):
         """Play a captured command.
 
         :param str command: Command to execute
-        :param int frequence: Execution frequency"""
-        if frequency is None:
-            frequency = 38400
+        :param int frequency: Execution frequency"""
         return self.send("miIO.ir_play",
                          {'freq': frequency, 'code': command})
 
