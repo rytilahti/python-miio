@@ -33,6 +33,11 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'rfid_product_id': '0:0:41:30',
             'rfid_tag': '10:20:30:40:50:60:7',
             'act_sleep': 'close',
+            'sleep_mode': 'idle',
+            'sleep_time': 83890,
+            'sleep_data_num': 22,
+            'app_extra': 1,
+            'act_det': 'off'
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -49,7 +54,9 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'reset_filter1': lambda x: (
                 self._set_state('f1_hour_used', [0]),
                 self._set_state('filter1_life', [100])
-            )
+            ),
+            'set_act_det': lambda x: self._set_state("act_det", x),
+            'set_app_extra': lambda x: self._set_state("app_extra", x),
         }
         super().__init__(args, kwargs)
 
@@ -100,7 +107,6 @@ class TestAirPurifier(TestCase):
         assert self.state().motor_speed == self.device.start_state["motor1_speed"]
         assert self.state().motor2_speed == self.device.start_state["motor2_speed"]
         assert self.state().purify_volume == self.device.start_state["purify_volume"]
-
         assert self.state().led == (self.device.start_state["led"] == 'on')
         assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
         assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
@@ -108,7 +114,12 @@ class TestAirPurifier(TestCase):
         assert self.state().illuminance == self.device.start_state["bright"]
         assert self.state().volume == self.device.start_state["volume"]
         assert self.state().filter_rfid_product_id == self.device.start_state["rfid_product_id"]
-        assert self.state().filter_rfid_tag == self.device.start_state["rfid_tag"]
+        assert self.state().sleep_mode == OperationMode(self.device.start_state["sleep_mode"])
+        assert self.state().sleep_time == self.device.start_state["sleep_time"]
+        assert self.state().sleep_mode_learn_count == self.device.start_state["sleep_data_num"]
+        assert self.state().extra_features == self.device.start_state["app_extra"]
+        assert self.state().turbo_mode_supported == (self.device.start_state["app_extra"] == 1)
+        assert self.state().auto_detect == (self.device.start_state["act_det"] == 'on')
 
     def test_set_mode(self):
         def mode():
@@ -212,6 +223,27 @@ class TestAirPurifier(TestCase):
 
         self.device.set_learn_mode(False)
         assert learn_mode() is False
+
+    def test_set_auto_detect(self):
+        def auto_detect():
+            return self.device.status().auto_detect
+
+        self.device.set_auto_detect(True)
+        assert auto_detect() is True
+
+        self.device.set_auto_detect(False)
+        assert auto_detect() is False
+
+    def test_set_extra_features(self):
+        def extra_features():
+            return self.device.status().extra_features
+
+        self.device.set_extra_features(0)
+        assert extra_features() == 0
+        self.device.set_extra_features(1)
+        assert extra_features() == 1
+        self.device.set_extra_features(2)
+        assert extra_features() == 2
 
     def test_reset_filter(self):
         def filter_hours_used():
