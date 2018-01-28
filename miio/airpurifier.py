@@ -103,6 +103,7 @@ class AirPurifierStatus:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
+
         return None
 
     @property
