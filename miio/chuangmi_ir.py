@@ -57,6 +57,15 @@ class ChuangmiIr(Device):
 
         :param str pronto: Pronto Hex string.
         :param int repeats: Number of extra signal repeats."""
+        return self.play_raw(*self.pronto_to_raw(pronto, repeats))
+
+    @classmethod
+    def pronto_to_raw(cls, pronto: str, repeats: int=1):
+        """Play a Pronto Hex encoded IR command.
+        Supports only raw Pronto format, starting with 0000.
+
+        :param str pronto: Pronto Hex string.
+        :param int repeats: Number of extra signal repeats."""
         if repeats < 0:
             raise ChuangmiIrException('Invalid repeats value')
 
@@ -87,7 +96,7 @@ class ChuangmiIr(Device):
             'edge_pairs': edge_pairs,
         })).decode()
 
-        return self.play_raw(signal_code, int(round(pronto_data.frequency)))
+        return signal_code, int(round(pronto_data.frequency))
 
     def play(self, command: str):
         """Plays a command in one of the supported formats."""
