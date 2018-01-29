@@ -1,2 +1,9 @@
+*.egg-info/
+
 __pycache__
 .idea/
+.cache/
+.mypy_cache/
+.tox/
+
+.coverage

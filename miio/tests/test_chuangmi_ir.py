@@ -4,23 +4,19 @@ from miio.chuangmi_ir import ChuangmiIrException
 from .dummies import DummyDevice
 import pytest
 import base64
+import json
+import os
 
-PROSONIC_POWER_ON = 'Z6VPAAUCAABgAgAAxQYAAOUIAACUEQAAqyIAADSeAABwdQEAAAAAAAA' \
-                    'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABFEBAQEBAQEBAgICAgIC' \
-                    'AgEBAgECAQEBAQIBAgECAgICBgNXA1cDUA'
-
-PROSONIC_POWER_ON_PROTON = '0000006C00220002015B00AD001600160016001600160016' \
-                           '001600160016001600160016001600160016001600160041' \
-                           '001600410016004100160041001600410016004100160041' \
-                           '001600160016001600160041001600160016004100160016' \
-                           '001600160016001600160016001600410016001600160041' \
-                           '001600160016004100160041001600410016004100160623' \
-                           '015B005700160E6E'
+with open(os.path.join(
+        os.path.dirname(__file__), 'test_chuangmi_ir.json')) as inp:
+    test_data = json.load(inp)
 
 
 class DummyChuangmiIr(DummyDevice, ChuangmiIr):
     def __init__(self, *args, **kwargs):
-        self.state = {}
+        self.state = {
+            'last_ir_played': None,
+        }
         self.return_values = {
             'miIO.ir_learn': lambda x: True,
             'miIO.ir_read': lambda x: True,
@@ -28,10 +24,12 @@ class DummyChuangmiIr(DummyDevice, ChuangmiIr):
         }
         super().__init__(args, kwargs)
 
-    @staticmethod
-    def _ir_play_input_validation(payload):
+    def _ir_play_input_validation(self, payload):
         try:
             base64.b64decode(payload['code'])
+            self._set_state('last_ir_played', [[
+                payload['code'], payload.get('freq')
+            ]])
             return True
         except TypeError:
             return False
@@ -65,14 +63,65 @@ class TestChuangmiIr(TestCase):
         with pytest.raises(ChuangmiIrException):
             self.device.read(1000001)
 
-    def test_play(self):
-        assert self.device.play(PROSONIC_POWER_ON) is True
-        assert self.device.play(PROSONIC_POWER_ON, 19200) is True
+    def test_play_raw(self):
+        for args in test_data['test_raw_ok']:
+            with self.subTest():
+                self.device._reset_state()
+                self.assertTrue(self.device.play_raw(*args['in']))
+                self.assertSequenceEqual(
+                    self.device.state['last_ir_played'],
+                    args['out']
+                )
+
+    def test_pronto_to_raw(self):
+        for args in test_data['test_pronto_ok']:
+            with self.subTest():
+                self.assertSequenceEqual(
+                    ChuangmiIr.pronto_to_raw(*args['in']),
+                    args['out']
+                )
+
+        for args in test_data['test_pronto_exception']:
+            with self.subTest():
+                with pytest.raises(ChuangmiIrException):
+                    ChuangmiIr.pronto_to_raw(*args['in'])
 
     def test_play_pronto(self):
-        assert self.device.play_pronto(PROSONIC_POWER_ON_PROTON) is True
-        assert self.device.play_pronto(PROSONIC_POWER_ON_PROTON, 0) is True
-        assert self.device.play_pronto(PROSONIC_POWER_ON_PROTON, 1) is True
+        for args in test_data['test_pronto_ok']:
+            with self.subTest():
+                self.device._reset_state()
+                self.assertTrue(self.device.play_pronto(*args['in']))
+                self.assertSequenceEqual(
+                    self.device.state['last_ir_played'],
+                    args['out']
+                )
 
-        with pytest.raises(ChuangmiIrException):
-            self.device.play_pronto(PROSONIC_POWER_ON_PROTON, -1)
+        for args in test_data['test_pronto_exception']:
+            with pytest.raises(ChuangmiIrException):
+                self.device.play_pronto(*args['in'])
+
+    def test_play_auto(self):
+        for args in test_data['test_raw_ok'] + test_data['test_pronto_ok']:
+            if len(args['in']) > 1:  # autodetect doesn't take any extra args
+                continue
+            with self.subTest():
+                self.device._reset_state()
+                self.assertTrue(self.device.play(*args['in']))
+                self.assertSequenceEqual(
+                    self.device.state['last_ir_played'],
+                    args['out']
+                )
+
+    def test_play_with_type(self):
+        for type_, tests in [
+                ('raw', test_data['test_raw_ok']),
+                ('pronto', test_data['test_pronto_ok'])]:
+            for args in tests:
+                with self.subTest():
+                    command = '{}:{}'.format(
+                        type_, ':'.join(map(str, args['in'])))
+                    self.assertTrue(self.device.play(command))
+                    self.assertSequenceEqual(
+                        self.device.state['last_ir_played'],
+                        args['out']
+                    )
