@@ -26,7 +26,7 @@ setup(
     packages=["miio", "mirobo"],
 
     python_requires='>=3.4',
-    install_requires=['construct',
+    install_requires=['construct>=2.9.23',
                       'click',
                       'cryptography',
                       'pretty_cron',
