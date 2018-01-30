@@ -64,13 +64,25 @@ class DeviceGroupMeta(type):
 
     def __new__(mcs, name, bases, namespace) -> type:
         commands = {}
-        for key, val in namespace.items():
-            if not callable(val):
-                continue
-            device_group_command = getattr(val, '_device_group_command', None)
-            if device_group_command is None:
-                continue
-            commands[device_group_command.command_name] = device_group_command
+
+        def _get_commands_for_namespace(namespace):
+            commands = {}
+            for key, val in namespace.items():
+                if not callable(val):
+                    continue
+                device_group_command = getattr(val, '_device_group_command', None)
+                if device_group_command is None:
+                    continue
+                commands[device_group_command.command_name] = device_group_command
+
+            return commands
+
+        # 1. Go through base classes for commands
+        for base in bases:
+            commands.update(getattr(base, '_device_group_commands', {}))
+
+        # 2. Add commands from the current class
+        commands.update(_get_commands_for_namespace(namespace))
 
         namespace['_device_group_commands'] = commands
         if 'get_device_group' not in namespace:
