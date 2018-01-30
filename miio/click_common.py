@@ -17,6 +17,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def validate_ip(ctx, param, value):
+    if value == None:
+        return '192.168.8.1'
     try:
         ipaddress.ip_address(value)
         return value
@@ -25,7 +27,10 @@ def validate_ip(ctx, param, value):
 
 
 def validate_token(ctx, param, value):
-    token_len = len(value)
+    try:
+        token_len = len(value)
+    except TypeError as e:
+        return None
     if token_len != 32:
         raise click.BadParameter("Token length != 32 chars: %s" % token_len)
     return value
