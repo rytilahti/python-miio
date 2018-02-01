@@ -1,12 +1,24 @@
+import re
 from setuptools import setup
 
-with open('miio/version.py') as f: exec(f.read())
+with open('miio/version.py') as f:
+    exec(f.read())
+
+
+def readme():
+    # we have intersphinx link in our readme, so let's replace them
+    # for the long_description to make pypi happy
+    reg = re.compile(r':.+?:`(.+?)\s?(<.+?>)?`')
+    with open('README.rst') as f:
+        return re.sub(reg, r'\1', f.read())
+
 
 setup(
     name='python-miio',
 
     version=__version__,
     description='Python library for interfacing with Xiaomi smart appliances',
+    long_description=readme(),
     url='https://github.com/rytilahti/python-miio',
 
     author='Teemu Rytilahti',
@@ -18,6 +30,10 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Programming Language :: Python :: 3.4'
+        'Programming Language :: Python :: 3.5'
+        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.7'
         'Programming Language :: Python :: 3 :: Only',
     ],
 
