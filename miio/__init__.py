@@ -44,3 +44,4 @@ from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
 
 from miio.discovery import Discovery
+from miio.gateway import Gateway
