@@ -26,3 +26,4 @@ from miio.yeelight import Yeelight
 from miio.aqaracamera import AqaraCamera
 
 from miio.discovery import Discovery
+from miio.gateway import Gateway
