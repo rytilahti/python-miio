@@ -33,6 +33,14 @@ class AirHumidifierStatus:
         {'power': 'off', 'mode': 'high', 'temp_dec': 294,
          'humidity': 33, 'buzzer': 'on', 'led_b': 0,
          'child_lock': 'on', 'limit_hum': 40, 'trans_level': 85}
+
+        TODO: Features of the Air Humidifier Ca (zhimi.humidifier.ca1):
+          - Same properties: power, mode, temp_dec, humidity,
+            buzzer, led_b, child_lock, limit_hum
+          - Additional properties: speed, depth, dry, hw_version,
+            use_time, button_pressed
+          - Operation modes: auto, high, medium, silent
+          - Additional setters: set_dry on/off
         """
 
         self.data = data
