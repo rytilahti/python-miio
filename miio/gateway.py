@@ -50,7 +50,7 @@ class SubDevice:
             return None
 
     def __repr__(self):
-        return "<Subdevice %s: %s>" % (self.type, self.sid)
+        return "<Subdevice %s: %s fw: %s bat: %s>" % (self.type, self.sid, self.get_firmware_version(), self.battery())
 
 class SensorHT(SubDevice):
     accessor = "get_prop_sensor_ht"
@@ -95,14 +95,16 @@ class Gateway(Device, metaclass=DeviceGroupMeta):
     def devices(self):
         # from https://github.com/aholstenson/miio/issues/26
         devices_raw = self.send("get_device_prop", ['lumi.0', 'device_list'])
-        devices = [SubDevice(*devices_raw[x:x + 5]) for x in range(0, len(devices_raw), 5)]
+        devices = [SubDevice(self, *devices_raw[x:x + 5]) for x in range(0, len(devices_raw), 5)]
         for dev in devices:
             try:
+                print(dev)
                 # TEMP 10000 = unavailable, humidity stays at 0 then
                 print("temperature and humidity: %s" % self.send("get_prop_sensor_ht", ["temperature", "humidity"],
                                                                  extra_params={'sid': dev.sid}))
             except Exception as ex:
-                pass
+                print(ex)
+                continue
 
     @device_command(echo_return_status())
     def test(self):
@@ -311,6 +313,10 @@ class Gateway(Device, metaclass=DeviceGroupMeta):
     def get_gateway_volume(self):
         """Error/whatever from gateway?"""
         return self.send("get_gateway_volume")[0]
+
+    def set_gateway_volume(self):
+        """Set gateway volume."""
+        return self.send("set_gateway_volume")[0]
 
     def get_alarm_volume(self):
         """Current alarm volume? Returns 0"""
