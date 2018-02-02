@@ -5,7 +5,7 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 
-class UpdateServer(BaseHTTPRequestHandler):
+class OneShotHandler(BaseHTTPRequestHandler):
     """A simplified handler just returning the contents of a single file."""
     def __init__(self, request, client_address, server):
         self.payload = server.payload
@@ -29,14 +29,14 @@ class UpdateServer(BaseHTTPRequestHandler):
         self.wfile.write(self.payload)
 
 
-class Updater:
+class OneShotServer:
     """A simple HTTP server for serving an update file.
 
     The server will be started in an emphemeral port, and will only accept
     a single request to keep it simple."""
     def __init__(self, file, interface=None):
         addr = ('', 0)
-        self.server = HTTPServer(addr, UpdateServer)
+        self.server = HTTPServer(addr, OneShotHandler)
         setattr(self.server, "got_request", False)
         _, self.port = self.server.server_address
         _LOGGER.info("Serving on port %s" % self.port)
