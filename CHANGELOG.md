@@ -1,5 +1,64 @@
 # Change Log
 
+## [0.3.5](https://github.com/rytilahti/python-miio/tree/0.3.5)
+
+TODO: Some words about the awesome work of @yawor and the big number of improvements.
+
+New devices:
+* Air Purifier: Some additional models added to the list of supported and discovered devices by mDNS (@syssi)
+* Air Humidifier CA added to the list of supported and discovered devices by mDNS (@syssi)
+
+Improvements:
+* Air Conditioning Companion: Extended device support (@syssi)
+* Air Humidifier: Device support tested and improved (@syssi)
+* Air Purifier Pro: Second motor speed and filter type detection added (@yawor)
+* Air Purifier: Some additional properties added (@syssi)
+* Air Quality Monitor: Additional property "time_state" added (@syssi)
+* Revise error handling to be more consistent for library users (@rytilahti)
+* Chuangmi IR: Ability to send any Pronto Hex encoded IR command added (@yawor)
+* Chuangmi IR: Command type autodetection added (@yawor)
+* Philips Bulb: New command "bricct" added (@syssi)
+* Command line interface: Make discovery to work with no IP addr and token, courtesy of @M0ses (@rytilahti)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.4...0.3.5)
+
+**Fixed bugs:**
+
+- TypeError: build\(\) takes 2 positional arguments but 3 were given [\#201](https://github.com/rytilahti/python-miio/issues/201)
+- Error on build message [\#197](https://github.com/rytilahti/python-miio/issues/197)
+
+**Closed issues:**
+
+- Control Air purifier and Humidifier? [\#177](https://github.com/rytilahti/python-miio/issues/177)
+- Construct error, "subcon should be a Construct field" [\#167](https://github.com/rytilahti/python-miio/issues/167)
+
+**Merged pull requests:**
+
+- mDNS discovery: Additional air humidifier model \(zhimi-humidifier-ca1\) added [\#200](https://github.com/rytilahti/python-miio/pull/200) ([syssi](https://github.com/syssi))
+- Make discovery to work with no IP addr and token, courtesy of M0ses [\#198](https://github.com/rytilahti/python-miio/pull/198) ([rytilahti](https://github.com/rytilahti))
+- Minimum supported version of construct specified [\#196](https://github.com/rytilahti/python-miio/pull/196) ([syssi](https://github.com/syssi))
+- Chuangmi IR command type autodetection [\#195](https://github.com/rytilahti/python-miio/pull/195) ([yawor](https://github.com/yawor))
+- Point hound-ci to the flake8 configuration. Second try. [\#193](https://github.com/rytilahti/python-miio/pull/193) ([syssi](https://github.com/syssi))
+- Fix a breaking change of construct 2.9.23 [\#192](https://github.com/rytilahti/python-miio/pull/192) ([syssi](https://github.com/syssi))
+- Air Purifier: SleepMode enum added. SleepMode isn't a subset of OperationMode [\#190](https://github.com/rytilahti/python-miio/pull/190) ([syssi](https://github.com/syssi))
+- Point hound-ci to the flake8 configuration [\#189](https://github.com/rytilahti/python-miio/pull/189) ([syssi](https://github.com/syssi))
+- Features of mixed air purifier models added [\#188](https://github.com/rytilahti/python-miio/pull/188) ([syssi](https://github.com/syssi))
+- Air Quality Monitor: New property "time\_state" added [\#187](https://github.com/rytilahti/python-miio/pull/187) ([syssi](https://github.com/syssi))
+- Philips Bulb: New setter "bricct" added [\#186](https://github.com/rytilahti/python-miio/pull/186) ([syssi](https://github.com/syssi))
+- Tests for the Chuangmi IR controller [\#184](https://github.com/rytilahti/python-miio/pull/184) ([syssi](https://github.com/syssi))
+- Chuangmi IR: Add ability to send any Pronto Hex encoded IR command. [\#183](https://github.com/rytilahti/python-miio/pull/183) ([yawor](https://github.com/yawor))
+- Tests for the Xiaomi Air Conditioning Companion [\#182](https://github.com/rytilahti/python-miio/pull/182) ([syssi](https://github.com/syssi))
+- Flake8 configuration updated [\#181](https://github.com/rytilahti/python-miio/pull/181) ([syssi](https://github.com/syssi))
+- Revise error handling to be more consistent for library users [\#180](https://github.com/rytilahti/python-miio/pull/180) ([rytilahti](https://github.com/rytilahti))
+- All device specific exceptions should derive from DeviceException [\#179](https://github.com/rytilahti/python-miio/pull/179) ([syssi](https://github.com/syssi))
+- Air Purifier Pro second motor speed [\#176](https://github.com/rytilahti/python-miio/pull/176) ([yawor](https://github.com/yawor))
+- Tests of the Air Purifier improved [\#174](https://github.com/rytilahti/python-miio/pull/174) ([syssi](https://github.com/syssi))
+- New properties of the Xiaomi Air Humidifier added [\#173](https://github.com/rytilahti/python-miio/pull/173) ([syssi](https://github.com/syssi))
+- Return type of the property "volume" should be Optional [\#172](https://github.com/rytilahti/python-miio/pull/172) ([syssi](https://github.com/syssi))
+- Missing dependency "appdirs" added [\#171](https://github.com/rytilahti/python-miio/pull/171) ([syssi](https://github.com/syssi))
+- Xiaomi Air Humidifier: Unavailable property "led" removed. [\#170](https://github.com/rytilahti/python-miio/pull/170) ([syssi](https://github.com/syssi))
+- Extended Air Conditioning Companion support [\#169](https://github.com/rytilahti/python-miio/pull/169) ([syssi](https://github.com/syssi))
+
 ## [0.3.4](https://github.com/rytilahti/python-miio/tree/0.3.4)
 
 The most significant change for this release is unbreaking the communication when using a recent versions of construct library (thanks to @syssi).
