@@ -2,11 +2,11 @@
 
 ## [0.3.5](https://github.com/rytilahti/python-miio/tree/0.3.5)
 
-This release brings big improvements for various supported devices. Special thanks goes to @yawor for his awesome work!
+This release provides major improvements for various supported devices. Special thanks goes to @yawor for his awesome work!
 
-A compatibility issue when using version 2.9.23 or newer of the underlying construct library -- causing timeouts and inability to control devices -- has also been fixed again.
+Additionally, a compatibility issue when using construct version 2.9.23 and greater -- causing timeouts and inability to control devices -- has been fixed again.
 
-Device errors are now wrapped in DeviceException for easier handling.
+Device errors are now wrapped in a exception (DeviceException) for easier handling.
 
 New devices:
 * Air Purifier: Some additional models added to the list of supported and discovered devices by mDNS (@syssi)
