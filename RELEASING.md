@@ -21,3 +21,5 @@ git push --tags
 7. Upload new version to pypi
 
 python setup.py sdist bdist_wheel upload
+
+8. Click the "Draft a new release" button on github, select the new tag and copy & paste the changelog into the description.
