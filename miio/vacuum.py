@@ -15,7 +15,7 @@ from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                SoundStatus, SoundInstallStatus)
 from .device import Device, DeviceException
 from .click_common import (
-    DeviceGroup, DeviceGroupMeta, device_command, GlobalContextObject
+    DeviceGroup, device_command, GlobalContextObject
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ class Consumable(enum.Enum):
     SensorDirty = "sensor_dirty_time"
 
 
-class Vacuum(Device, metaclass=DeviceGroupMeta):
+class Vacuum(Device):
     """Main class representing the vacuum."""
 
     def __init__(self, ip: str, token: str = None, start_id: int = 0,

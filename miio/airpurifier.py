@@ -6,7 +6,7 @@ from collections import defaultdict
 from functools import wraps
 import click
 from .device import Device, DeviceException
-from .click_common import DeviceGroupMeta, device_command, echo_return_status
+from .click_common import device_command, echo_return_status
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -356,7 +356,7 @@ class AirPurifierStatus:
         return s
 
 
-class AirPurifier(Device, metaclass=DeviceGroupMeta):
+class AirPurifier(Device):
     """Main class representing the air purifier."""
 
     @device_command(
