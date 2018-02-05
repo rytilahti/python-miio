@@ -9,7 +9,7 @@ from typing import Any, List, Optional  # noqa: F401
 from enum import Enum
 
 from .click_common import (
-    DeviceGroupMeta, device_command, echo_return_status
+    DeviceGroupMeta, command, echo_return_status
 )
 from .protocol import Message
 
@@ -293,7 +293,7 @@ class Device(metaclass=DeviceGroupMeta):
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("No response from the device") from ex
 
-    @device_command(
+    @command(
         click.argument('cmd', required=True),
         click.argument('parameters', required=False),
     )
@@ -306,7 +306,7 @@ class Device(metaclass=DeviceGroupMeta):
         :param dict params: Parameters to send"""
         return self.send(cmd, params)
 
-    @device_command(
+    @command(
         echo_return_status("",
                            "Model: {result.model}\n"
                            "Hardware version: {result.hardware_version}\n"

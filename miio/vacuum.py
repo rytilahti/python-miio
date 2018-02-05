@@ -15,7 +15,7 @@ from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                SoundStatus, SoundInstallStatus)
 from .device import Device, DeviceException
 from .click_common import (
-    DeviceGroup, device_command, GlobalContextObject
+    DeviceGroup, command, GlobalContextObject
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,45 +45,45 @@ class Vacuum(Device):
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
 
-    @device_command()
+    @command()
     def start(self):
         """Start cleaning."""
         return self.send("app_start")
 
-    @device_command()
+    @command()
     def stop(self):
         """Stop cleaning."""
         return self.send("app_stop")
 
-    @device_command()
+    @command()
     def spot(self):
         """Start spot cleaning."""
         return self.send("app_spot")
 
-    @device_command()
+    @command()
     def pause(self):
         """Pause cleaning."""
         return self.send("app_pause")
 
-    @device_command()
+    @command()
     def home(self):
         """Stop cleaning and return home."""
         self.send("app_stop")
         return self.send("app_charge")
 
-    @device_command()
+    @command()
     def manual_start(self):
         """Start manual control mode."""
         self.manual_seqnum = 0
         return self.send("app_rc_start")
 
-    @device_command()
+    @command()
     def manual_stop(self):
         """Stop manual control mode."""
         self.manual_seqnum = 0
         return self.send("app_rc_end")
 
-    @device_command(
+    @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
         click.argument("duration", type=int, required=False, default=1500)
@@ -104,7 +104,7 @@ class Vacuum(Device):
             time.sleep(2)
             number_of_tries -= 1
 
-    @device_command(
+    @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
         click.argument("duration", type=int, required=False, default=1500)
@@ -127,7 +127,7 @@ class Vacuum(Device):
 
         self.send("app_rc_move", [params])
 
-    @device_command()
+    @command()
     def status(self) -> VacuumStatus:
         """Return status of the vacuum."""
         return VacuumStatus(self.send("get_status")[0])
@@ -136,35 +136,35 @@ class Vacuum(Device):
         raise NotImplementedError("unknown parameters")
         # return self.send("enable_log_upload")
 
-    @device_command()
+    @command()
     def log_upload_status(self):
         # {"result": [{"log_upload_status": 7}], "id": 1}
         return self.send("get_log_upload_status")
 
-    @device_command()
+    @command()
     def consumable_status(self) -> ConsumableStatus:
         """Return information about consumables."""
         return ConsumableStatus(self.send("get_consumable")[0])
 
-    @device_command(
+    @command(
         click.argument("consumable", type=Consumable),
     )
     def consumable_reset(self, consumable: Consumable):
         """Reset consumable information."""
         return self.send("reset_consumable", [consumable.value])
 
-    @device_command()
+    @command()
     def map(self):
         """Return map token."""
         # returns ['retry'] without internet
         return self.send("get_map_v1")
 
-    @device_command()
+    @command()
     def clean_history(self) -> CleaningSummary:
         """Return generic cleaning history."""
         return CleaningSummary(self.send("get_clean_summary"))
 
-    @device_command(
+    @command(
         click.argument("id_", type=int, metavar="ID"),
     )
     def clean_details(self, id_: int) -> List[CleaningDetails]:
@@ -177,12 +177,12 @@ class Vacuum(Device):
 
         return res
 
-    @device_command()
+    @command()
     def find(self):
         """Find the robot."""
         return self.send("find_me", [""])
 
-    @device_command()
+    @command()
     def timer(self) -> List[Timer]:
         """Return a list of timers."""
         timers = list()
@@ -191,7 +191,7 @@ class Vacuum(Device):
 
         return timers
 
-    @device_command(
+    @command(
         click.argument("cron"),
         click.argument("command", required=False, default=""),
         click.argument("parameters", required=False, default=""),
@@ -208,7 +208,7 @@ class Vacuum(Device):
             [str(ts), [cron, [command, parameters]]]
         ])
 
-    @device_command(
+    @command(
         click.argument("timer_id", type=int),
     )
     def delete_timer(self, timer_id: int):
@@ -217,7 +217,7 @@ class Vacuum(Device):
         :param int timer_id: Timer ID"""
         return self.send("del_timer", [str(timer_id)])
 
-    @device_command(
+    @command(
         click.argument("timer_id", type=int),
         click.argument("mode", type=TimerState),
     )
@@ -230,14 +230,14 @@ class Vacuum(Device):
             raise DeviceException("Only 'On' or 'Off' are  allowed")
         return self.send("upd_timer", [str(timer_id), mode.value])
 
-    @device_command()
+    @command()
     def dnd_status(self):
         """Returns do-not-disturb status."""
         # {'result': [{'enabled': 1, 'start_minute': 0, 'end_minute': 0,
         #  'start_hour': 22, 'end_hour': 8}], 'id': 1}
         return DNDStatus(self.send("get_dnd_timer")[0])
 
-    @device_command(
+    @command(
         click.argument("start_hr", type=int),
         click.argument("start_min", type=int),
         click.argument("end_hr", type=int),
@@ -254,12 +254,12 @@ class Vacuum(Device):
         return self.send("set_dnd_timer",
                          [start_hr, start_min, end_hr, end_min])
 
-    @device_command()
+    @command()
     def disable_dnd(self):
         """Disable do-not-disturb."""
         return self.send("close_dnd_timer", [""])
 
-    @device_command(
+    @command(
         click.argument("speed", type=int),
     )
     def set_fan_speed(self, speed: int):
@@ -269,17 +269,17 @@ class Vacuum(Device):
         # speed = [38, 60 or 77]
         return self.send("set_custom_mode", [speed])
 
-    @device_command()
+    @command()
     def fan_speed(self):
         """Return fan speed."""
         return self.send("get_custom_mode")[0]
 
-    @device_command()
+    @command()
     def sound_info(self):
         """Get voice settings."""
         return SoundStatus(self.send("get_current_sound")[0])
 
-    @device_command(
+    @command(
         click.argument("url"),
         click.argument("md5sum"),
         click.argument("sound_id", type=int),
@@ -293,34 +293,34 @@ class Vacuum(Device):
         }
         return SoundInstallStatus(self.send("dnld_install_sound", payload)[0])
 
-    @device_command()
+    @command()
     def sound_install_progress(self):
         """Get sound installation progress."""
         return SoundInstallStatus(self.send("get_sound_progress")[0])
 
-    @device_command()
+    @command()
     def sound_volume(self) -> int:
         """Get sound volume."""
         return self.send("get_sound_volume")[0]
 
-    @device_command(
+    @command(
         click.argument("vol", type=int),
     )
     def set_sound_volume(self, vol: int):
         """Set sound volume [0-100]."""
         return self.send("change_sound_volume", [vol])
 
-    @device_command()
+    @command()
     def test_sound_volume(self):
         """Test current sound volume."""
         return self.send("test_sound_volume")
 
-    @device_command()
+    @command()
     def serial_number(self):
         """Get serial number."""
         return self.send("get_serial_number")[0]["serial_number"]
 
-    @device_command()
+    @command()
     def timezone(self):
         """Get the timezone."""
         # return self.send("get_timezone")[0]

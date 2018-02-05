@@ -3,10 +3,9 @@ import enum
 import re
 from typing import Any, Dict, Optional
 from collections import defaultdict
-from functools import wraps
 import click
 from .device import Device, DeviceException
-from .click_common import device_command, echo_return_status
+from .click_common import command, echo_return_status
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -359,7 +358,7 @@ class AirPurifierStatus:
 class AirPurifier(Device):
     """Main class representing the air purifier."""
 
-    @device_command(
+    @command(
         echo_return_status("", """
 Power: {result.power}
 AQI: {result.aqi} μg/m³
@@ -422,21 +421,21 @@ AQI sensor enabled on power off: {result.auto_detect}
         return AirPurifierStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
-    @device_command(
+    @command(
         echo_return_status("Powering on"),
     )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @device_command(
+    @command(
         echo_return_status("Powering off")
     )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
-    @device_command(
+    @command(
         click.argument("mode", type=OperationMode),
         echo_return_status("Setting mode to '{mode.value}'")
     )
@@ -444,7 +443,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         """Set mode."""
         return self.send("set_mode", [mode.value])
 
-    @device_command(
+    @command(
         click.argument("level", type=int),
         echo_return_status("Setting favorite level to {level}")
     )
@@ -459,7 +458,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         # should be  between 0 and 16.
         return self.send("set_level_favorite", [level])  # 0 ... 16
 
-    @device_command(
+    @command(
         click.argument("brightness", type=LedBrightness),
         echo_return_status(
             "Setting LED brightness to {brightness}")
@@ -468,7 +467,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         """Set led brightness."""
         return self.send("set_led_b", [brightness.value])
 
-    @device_command(
+    @command(
         click.argument("led", type=bool),
         echo_return_status(
             lambda led: "Turning on LED"
@@ -482,7 +481,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         else:
             return self.send("set_led", ['off'])
 
-    @device_command(
+    @command(
         click.argument("buzzer", type=bool),
         echo_return_status(
             lambda buzzer: "Turning on buzzer"
@@ -496,7 +495,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         else:
             return self.send("set_buzzer", ["off"])
 
-    @device_command(
+    @command(
         click.argument("lock", type=bool),
         echo_return_status(
             lambda lock: "Turning on child lock"
@@ -510,7 +509,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         else:
             return self.send("set_child_lock", ["off"])
 
-    @device_command(
+    @command(
         click.argument("volume", type=int),
         echo_return_status("Setting favorite level to {volume}")
     )
@@ -521,7 +520,7 @@ AQI sensor enabled on power off: {result.auto_detect}
 
         return self.send("set_volume", [volume])
 
-    @device_command(
+    @command(
         click.argument("learn_mode", type=bool),
         echo_return_status(
             lambda learn_mode: "Turning on learn mode"
@@ -535,7 +534,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         else:
             return self.send("set_act_sleep", ["close"])
 
-    @device_command(
+    @command(
         click.argument("auto_detect", type=bool),
         echo_return_status(
             lambda auto_detect: "Turning on auto detect"
@@ -549,7 +548,7 @@ AQI sensor enabled on power off: {result.auto_detect}
         else:
             return self.send("set_act_det", ["off"])
 
-    @device_command(
+    @command(
         click.argument("value", type=int),
         echo_return_status("Setting extra to {value}")
     )
@@ -563,7 +562,7 @@ AQI sensor enabled on power off: {result.auto_detect}
 
         return self.send("set_app_extra", [value])
 
-    @device_command(
+    @command(
         echo_return_status("Resetting filter")
     )
     def reset_filter(self):

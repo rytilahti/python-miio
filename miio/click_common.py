@@ -173,7 +173,7 @@ class DeviceGroup(click.MultiCommand):
         return sorted(self.commands.keys())
 
 
-def device_command(*decorators, name=None, **kwargs):
+def command(*decorators, name=None, **kwargs):
     return DeviceGroup.Command(name, decorators, **kwargs)
 
 
