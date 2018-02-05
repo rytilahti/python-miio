@@ -359,35 +359,36 @@ class AirPurifier(Device):
     """Main class representing the air purifier."""
 
     @command(
-        echo_return_status("", """
-Power: {result.power}
-AQI: {result.aqi} μg/m³
-Average AQI: {result.average_aqi} μg/m³
-Temperature: {result.temperature} °C
-Humidity: {result.humidity} %
-Mode: {result.mode.value}
-LED: {result.led}
-LED brightness: {result.led_brightness}
-Illuminance: {result.illuminance} lx
-Buzzer: {result.buzzer}
-Child lock: {result.child_lock}
-Favorite level: {result.favorite_level}
-Filter life remaining: {result.filter_life_remaining} %
-Filter hours used: {result.filter_hours_used}
-Use time: {result.use_time} s
-Purify volume: {result.purify_volume} m³
-Motor speed: {result.motor_speed} rpm
-Motor 2 speed: {result.motor2_speed} rpm
-Sound volume: {result.volume} %
-Filter RFID product id: {result.filter_rfid_product_id}
-Filter RFID tag: {result.filter_rfid_tag}
-Filter type: {result.filter_type.value}
-Learn mode: {result.learn_mode}
-Sleep mode: {result.sleep_mode.value}
-Sleep time: {result.sleep_time}
-Sleep mode learn count: {result.sleep_mode_learn_count}
-AQI sensor enabled on power off: {result.auto_detect}
-        """)
+        echo_return_status(
+            "",
+            "Power: {result.power}\n"
+            "AQI: {result.aqi} μg/m³\n"
+            "Average AQI: {result.average_aqi} μg/m³\n"
+            "Temperature: {result.temperature} °C\n"
+            "Humidity: {result.humidity} %\n"
+            "Mode: {result.mode.value}\n"
+            "LED: {result.led}\n"
+            "LED brightness: {result.led_brightness}\n"
+            "Illuminance: {result.illuminance} lx\n"
+            "Buzzer: {result.buzzer}\n"
+            "Child lock: {result.child_lock}\n"
+            "Favorite level: {result.favorite_level}\n"
+            "Filter life remaining: {result.filter_life_remaining} %\n"
+            "Filter hours used: {result.filter_hours_used}\n"
+            "Use time: {result.use_time} s\n"
+            "Purify volume: {result.purify_volume} m³\n"
+            "Motor speed: {result.motor_speed} rpm\n"
+            "Motor 2 speed: {result.motor2_speed} rpm\n"
+            "Sound volume: {result.volume} %\n"
+            "Filter RFID product id: {result.filter_rfid_product_id}\n"
+            "Filter RFID tag: {result.filter_rfid_tag}\n"
+            "Filter type: {result.filter_type.value}\n"
+            "Learn mode: {result.learn_mode}\n"
+            "Sleep mode: {result.sleep_mode.value}\n"
+            "Sleep time: {result.sleep_time}\n"
+            "Sleep mode learn count: {result.sleep_mode_learn_count}\n"
+            "AQI sensor enabled on power off: {result.auto_detect}\n"
+        )
     )
     def status(self) -> AirPurifierStatus:
         """Retrieve properties."""
