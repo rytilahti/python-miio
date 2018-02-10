@@ -287,7 +287,7 @@ class Device:
         """Increment and return the sequence id."""
         self.__id += 1
         if self.__id >= 9999:
-            self.__id = 0
+            self.__id = 1
         return self.__id
 
     @property
