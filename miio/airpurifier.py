@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from collections import defaultdict
 import click
 from .device import Device, DeviceException
-from .click_common import command, echo_return_status
+from .click_common import command, format_output
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -354,12 +354,15 @@ class AirPurifierStatus:
              self.button_pressed)
         return s
 
+    def __json__(self):
+        return self.data
+
 
 class AirPurifier(Device):
     """Main class representing the air purifier."""
 
     @command(
-        echo_return_status(
+        default_output=format_output(
             "",
             "Power: {result.power}\n"
             "AQI: {result.aqi} μg/m³\n"
@@ -423,14 +426,14 @@ class AirPurifier(Device):
             defaultdict(lambda: None, zip(properties, values)))
 
     @command(
-        echo_return_status("Powering on"),
+        default_output=format_output("Powering on"),
     )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
     @command(
-        echo_return_status("Powering off")
+        format_output("Powering off")
     )
     def off(self):
         """Power off."""
@@ -438,7 +441,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("mode", type=OperationMode),
-        echo_return_status("Setting mode to '{mode.value}'")
+        default_output=format_output("Setting mode to '{mode.value}'")
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
@@ -446,7 +449,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("level", type=int),
-        echo_return_status("Setting favorite level to {level}")
+        default_output=format_output("Setting favorite level to {level}")
     )
     def set_favorite_level(self, level: int):
         """Set favorite level."""
@@ -461,7 +464,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("brightness", type=LedBrightness),
-        echo_return_status(
+        default_output=format_output(
             "Setting LED brightness to {brightness}")
     )
     def set_led_brightness(self, brightness: LedBrightness):
@@ -470,7 +473,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("led", type=bool),
-        echo_return_status(
+        default_output=format_output(
             lambda led: "Turning on LED"
             if led else "Turning off LED"
         )
@@ -484,7 +487,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("buzzer", type=bool),
-        echo_return_status(
+        default_output=format_output(
             lambda buzzer: "Turning on buzzer"
             if buzzer else "Turning off buzzer"
         )
@@ -498,7 +501,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("lock", type=bool),
-        echo_return_status(
+        default_output=format_output(
             lambda lock: "Turning on child lock"
             if lock else "Turning off child lock"
         )
@@ -512,7 +515,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("volume", type=int),
-        echo_return_status("Setting favorite level to {volume}")
+        default_output=format_output("Setting favorite level to {volume}")
     )
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
@@ -523,7 +526,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("learn_mode", type=bool),
-        echo_return_status(
+        default_output=format_output(
             lambda learn_mode: "Turning on learn mode"
             if learn_mode else "Turning off learn mode"
         )
@@ -537,7 +540,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("auto_detect", type=bool),
-        echo_return_status(
+        default_output=format_output(
             lambda auto_detect: "Turning on auto detect"
             if auto_detect else "Turning off auto detect"
         )
@@ -551,7 +554,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("value", type=int),
-        echo_return_status("Setting extra to {value}")
+        default_output=format_output("Setting extra to {value}")
     )
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app.
@@ -564,7 +567,7 @@ class AirPurifier(Device):
         return self.send("set_app_extra", [value])
 
     @command(
-        echo_return_status("Resetting filter")
+        default_output=format_output("Resetting filter")
     )
     def reset_filter(self):
         """Resets filter hours used and remaining life."""

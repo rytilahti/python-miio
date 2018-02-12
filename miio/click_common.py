@@ -11,9 +11,11 @@ import click
 import ipaddress
 import miio
 import logging
+import json
 from typing import Union
 from functools import wraps
 from functools import partial
+from .exceptions import DeviceError
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,8 +56,9 @@ class ExceptionHandlerGroup(click.Group):
 
 
 class GlobalContextObject:
-    def __init__(self, debug: int=0):
+    def __init__(self, debug: int=0, output: callable=None):
         self.debug = debug
+        self.output = output
 
 
 class DeviceGroupMeta(type):
@@ -100,10 +103,12 @@ class DeviceGroupMeta(type):
 class DeviceGroup(click.MultiCommand):
 
     class Command:
-        def __init__(self, name, decorators, **kwargs):
+        def __init__(self, name, decorators, *, default_output=None, **kwargs):
             self.name = name
             self.decorators = list(decorators)
             self.decorators.reverse()
+            self.default_output = default_output
+
             self.kwargs = kwargs
 
         def __call__(self, func):
@@ -116,7 +121,18 @@ class DeviceGroup(click.MultiCommand):
         def command_name(self):
             return self.name or self.func.__name__.lower()
 
-        def wrap(self, func):
+        def wrap(self, ctx, func):
+            gco = ctx.find_object(GlobalContextObject)
+            if gco is not None and gco.output is not None:
+                output = gco.output
+            elif self.default_output:
+                output = self.default_output
+            else:
+                output = format_output(
+                    "Running command {0}".format(self.command_name)
+                )
+
+            func = output(func)
             for decorator in self.decorators:
                 func = decorator(func)
             return click.command(self.command_name, **self.kwargs)(func)
@@ -165,7 +181,7 @@ class DeviceGroup(click.MultiCommand):
 
     def get_command(self, ctx, cmd_name):
         cmd = self.commands[cmd_name]
-        return self.commands[cmd_name].wrap(self.device_pass(partial(
+        return self.commands[cmd_name].wrap(ctx, self.device_pass(partial(
             self.command_callback, cmd
         )))
 
@@ -173,12 +189,14 @@ class DeviceGroup(click.MultiCommand):
         return sorted(self.commands.keys())
 
 
-def command(*decorators, name=None, **kwargs):
-    return DeviceGroup.Command(name, decorators, **kwargs)
+def command(*decorators, name=None, default_output=None, **kwargs):
+    return DeviceGroup.Command(
+        name, decorators, default_output=default_output, **kwargs
+    )
 
 
-def echo_return_status(msg_fmt: Union[str, callable]="",
-                       result_msg_fmt: Union[str, callable]="{result}"):
+def format_output(msg_fmt: Union[str, callable]= "",
+                  result_msg_fmt: Union[str, callable]="{result}"):
     def decorator(func):
         @wraps(func)
         def wrap(*args, **kwargs):
@@ -197,5 +215,25 @@ def echo_return_status(msg_fmt: Union[str, callable]="",
                     result_msg = result_msg_fmt.format(**kwargs)
                 if result_msg:
                     click.echo(result_msg.strip())
+        return wrap
+    return decorator
+
+
+def json_output(pretty=False):
+    indent = 2 if pretty else None
+    def decorator(func):
+        @wraps(func)
+        def wrap(*args, **kwargs):
+            try:
+                result = func(*args, **kwargs)
+            except DeviceError as ex:
+                click.echo(json.dumps(ex.args[0], indent=indent))
+                return
+
+            get_json_data_func = getattr(result, '__json__', None)
+            if get_json_data_func is not None:
+                result = get_json_data_func()
+            click.echo(json.dumps(result, indent=indent))
+
         return wrap
     return decorator

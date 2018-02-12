@@ -9,21 +9,12 @@ from typing import Any, List, Optional  # noqa: F401
 from enum import Enum
 
 from .click_common import (
-    DeviceGroupMeta, command, echo_return_status
+    DeviceGroupMeta, command, format_output
 )
 from .protocol import Message
+from .exceptions import DeviceException, DeviceError
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class DeviceException(Exception):
-    """Exception wrapping any communication errors with the device."""
-    pass
-
-
-class DeviceError(DeviceException):
-    """Exception communicating an error delivered by the target device."""
-    pass
 
 
 class UpdateState(Enum):
@@ -67,6 +58,9 @@ class DeviceInfo:
             self.data["mac"],
             self.network_interface["localIp"],
             self.data["token"])
+
+    def __json__(self):
+        return self.data
 
     @property
     def network_interface(self):
@@ -307,12 +301,13 @@ class Device(metaclass=DeviceGroupMeta):
         return self.send(cmd, params)
 
     @command(
-        echo_return_status("",
-                           "Model: {result.model}\n"
-                           "Hardware version: {result.hardware_version}\n"
-                           "Firmware version: {result.firmware_version}\n"
-                           "Network: {result.network_interface}\n"
-                           "AP: {result.accesspoint}\n")
+        default_output=format_output(
+            "",
+            "Model: {result.model}\n"
+            "Hardware version: {result.hardware_version}\n"
+            "Firmware version: {result.firmware_version}\n"
+            "Network: {result.network_interface}\n"
+            "AP: {result.accesspoint}\n")
     )
     def info(self) -> DeviceInfo:
         """Get miIO protocol information from the device.
