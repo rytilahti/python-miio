@@ -1,5 +1,6 @@
 from unittest import TestCase
 from miio import Ceil
+from miio.ceil import CeilException
 from .dummies import DummyDevice
 import pytest
 
@@ -26,6 +27,10 @@ class DummyCeil(DummyDevice, Ceil):
             'enable_bl': lambda x: self._set_state("bl", x),
             'enable_ac': lambda x: self._set_state("ac", x),
             'set_cct': lambda x: self._set_state("cct", x),
+            'set_bricct': lambda x: (
+                self._set_state('bright', [x[0]]),
+                self._set_state('cct', [x[1]])
+            ),
         }
         super().__init__(args, kwargs)
 
@@ -88,6 +93,41 @@ class TestCeil(TestCase):
         assert color_temperature() == 30
         self.device.set_color_temperature(20)
         assert color_temperature() == 20
+
+    def test_set_brightness_and_color_temperature(self):
+        def color_temperature():
+            return self.device.status().color_temperature
+
+        def brightness():
+            return self.device.status().brightness
+
+        self.device.set_brightness_and_color_temperature(20, 21)
+        assert brightness() == 20
+        assert color_temperature() == 21
+        self.device.set_brightness_and_color_temperature(31, 30)
+        assert brightness() == 31
+        assert color_temperature() == 30
+        self.device.set_brightness_and_color_temperature(10, 11)
+        assert brightness() == 10
+        assert color_temperature() == 11
+
+        with pytest.raises(CeilException):
+            self.device.set_brightness_and_color_temperature(-1, 10)
+
+        with pytest.raises(CeilException):
+            self.device.set_brightness_and_color_temperature(10, -1)
+
+        with pytest.raises(CeilException):
+            self.device.set_brightness_and_color_temperature(0, 10)
+
+        with pytest.raises(CeilException):
+            self.device.set_brightness_and_color_temperature(10, 0)
+
+        with pytest.raises(CeilException):
+            self.device.set_brightness_and_color_temperature(101, 10)
+
+        with pytest.raises(CeilException):
+            self.device.set_brightness_and_color_temperature(10, 101)
 
     def test_delay_off(self):
         def delay_off_countdown():
