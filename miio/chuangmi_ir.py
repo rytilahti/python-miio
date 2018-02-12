@@ -141,7 +141,7 @@ ChuangmiIrSignal = Struct(
     Const(0xa567, Int16ul),
     'edge_count' / Rebuild(Int16ul, len_(this.edge_pairs) * 2 - 1),
     'times_index' / Array(16, Int32ul),
-    'edge_pairs' / Array((this.edge_count + 1) / 2, BitStruct(
+    'edge_pairs' / Array((this.edge_count + 1) // 2, BitStruct(
         'gap' / BitsInteger(4),
         'pulse' / BitsInteger(4),
     ))
