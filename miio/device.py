@@ -268,6 +268,7 @@ class Device:
                 _LOGGER.warning("Retrying with incremented id, "
                                 "retries left: %s", retry_count)
                 self.__id += 100
+                self._discovered = False
                 return self.send(command, parameters, retry_count - 1)
             raise DeviceException("No response from the device") from ex
 
