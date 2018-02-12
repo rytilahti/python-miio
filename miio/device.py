@@ -116,6 +116,7 @@ class Device:
         self.debug = debug
 
         self._timeout = 5
+        self._discovered = False
         self._device_ts = None  # type: datetime.datetime
         self.__id = start_id
         self._device_id = None
@@ -139,6 +140,7 @@ class Device:
                           self._device_id,
                           self._device_ts,
                           codecs.encode(m.checksum, 'hex'))
+            self._discovered = True
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
@@ -201,7 +203,9 @@ class Device:
         :param dict parameters: Parameters to send, or an empty list FIXME
         :param retry_count: How many times to retry in case of failure
         :raises DeviceException: if an error has occured during communication."""
-        self.do_discover()
+
+        if not self._discovered:
+            self.do_discover()
 
         cmd = {
             "id": self._id,
