@@ -99,7 +99,7 @@ class Device:
     This class should not be initialized directly but a device-specific class inheriting
     it should be used instead of it."""
     def __init__(self, ip: str = None, token: str = None,
-                 start_id: int=0, debug: int=0) -> None:
+                 start_id: int=0, debug: int=0, lazy_discover: bool=False) -> None:
         """
         Create a :class:`Device` instance.
         :param ip: IP address or a hostname for the device
@@ -114,6 +114,7 @@ class Device:
         if token is not None:
             self.token = bytes.fromhex(token)
         self.debug = debug
+        self.lazy_discover = lazy_discover
 
         self._timeout = 5
         self._discovered = False
@@ -134,13 +135,13 @@ class Device:
         if m is not None:
             self._device_id = m.header.value.device_id
             self._device_ts = m.header.value.ts
+            self._discovered = True
             if self.debug > 1:
                 _LOGGER.debug(m)
             _LOGGER.debug("Discovered %s with ts: %s, token: %s",
                           self._device_id,
                           self._device_ts,
                           codecs.encode(m.checksum, 'hex'))
-            self._discovered = True
         else:
             _LOGGER.error("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
@@ -204,7 +205,7 @@ class Device:
         :param retry_count: How many times to retry in case of failure
         :raises DeviceException: if an error has occured during communication."""
 
-        if not self._discovered:
+        if not self.lazy_discover or not self._discovered:
             self.do_discover()
 
         cmd = {
