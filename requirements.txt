@@ -1,7 +1,7 @@
 click
 cryptography
 pretty_cron
-construct>=2.9.23
+construct==2.9.23
 zeroconf
 attrs
 typing  # for py3.4 support
