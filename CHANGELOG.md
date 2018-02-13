@@ -5,6 +5,7 @@
 This is a bugfix release because of further breaking changes of the underlying library construct.
 
 Improvements:
+* Lazy discovery on demand (@syssi)
 * Support of construct 2.9.23 to 2.9.30 (@yawor, @syssi)
 * Avoid device crash on wrap around of the sequence number (@syssi)
 * Extended support of the Philips Ceiling Lamp (@syssi)
@@ -25,6 +26,7 @@ Improvements:
 
 - Fixes for the API change of construct v2.9.30 [\#220](https://github.com/rytilahti/python-miio/pull/220) ([syssi](https://github.com/syssi))
 - Philips Ceiling Lamp: New setter "bricct" added [\#216](https://github.com/rytilahti/python-miio/pull/216) ([syssi](https://github.com/syssi))
+- Lazy discovery on demand [\#215](https://github.com/rytilahti/python-miio/pull/215) ([syssi](https://github.com/syssi))
 - Chuangmi IR: Fix Construct 2.9.28 regression [\#214](https://github.com/rytilahti/python-miio/pull/214) ([yawor](https://github.com/yawor))
 - Philips Bulb crashs if \_id is 0 [\#211](https://github.com/rytilahti/python-miio/pull/211) ([syssi](https://github.com/syssi))
 
