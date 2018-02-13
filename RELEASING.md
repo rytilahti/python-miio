@@ -12,9 +12,13 @@ export CHANGELOG_GITHUB_TOKEN=token
 ~/.gem/ruby/2.4.0/bin/github_changelog_generator --user rytilahti --project python-miio --since-tag 0.3.0 -o newchanges
 ```
 
-3. Copy the changelog block over to CHANGELOG.md and write a short, understandable short changelog
+3. Copy the changelog block over to CHANGELOG.md and write a short and understandable summary.
 
-4. Commit modified CHANGELOG.md
+4. Commit the changed files
+
+```
+git commit -av
+```
 
 5. Tag a release (and add short changelog as a tag commit message)
 
