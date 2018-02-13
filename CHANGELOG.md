@@ -1,5 +1,33 @@
 # Change Log
 
+## [0.3.6](https://github.com/rytilahti/python-miio/tree/0.3.6)
+
+This is a bugfix release because of further breaking changes of the underlying library construct.
+
+Improvements:
+* Support of construct 2.9.23 to 2.9.30 (@yawor, @syssi)
+* Avoid device crash on wrap around of the sequence number (@syssi)
+* Extended support of the Philips Ceiling Lamp (@syssi)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.5...0.3.6)
+
+**Closed issues:**
+
+- Unable to discover a device [\#217](https://github.com/rytilahti/python-miio/issues/217)
+- AirPurifier set\_mode [\#213](https://github.com/rytilahti/python-miio/issues/213)
+- Construct 2.9.28 breaks the Chuangmi IR packet assembly [\#212](https://github.com/rytilahti/python-miio/issues/212)
+- Set mode for Air Purifier 2 not working [\#207](https://github.com/rytilahti/python-miio/issues/207)
+- Trying to get map data without rooting [\#206](https://github.com/rytilahti/python-miio/issues/206)
+- Unknown miio device found [\#204](https://github.com/rytilahti/python-miio/issues/204)
+- Supporting raw and pronto optional parameter without type specifier. [\#199](https://github.com/rytilahti/python-miio/issues/199)
+
+**Merged pull requests:**
+
+- Fixes for the API change of construct v2.9.30 [\#220](https://github.com/rytilahti/python-miio/pull/220) ([syssi](https://github.com/syssi))
+- Philips Ceiling Lamp: New setter "bricct" added [\#216](https://github.com/rytilahti/python-miio/pull/216) ([syssi](https://github.com/syssi))
+- Chuangmi IR: Fix Construct 2.9.28 regression [\#214](https://github.com/rytilahti/python-miio/pull/214) ([yawor](https://github.com/yawor))
+- Philips Bulb crashs if \_id is 0 [\#211](https://github.com/rytilahti/python-miio/pull/211) ([syssi](https://github.com/syssi))
+
 ## [0.3.5](https://github.com/rytilahti/python-miio/tree/0.3.5)
 
 This release provides major improvements for various supported devices. Special thanks goes to @yawor for his awesome work!
