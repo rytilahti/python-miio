@@ -130,16 +130,16 @@ class Utils:
 
 class TimeAdapter(Adapter):
     """Adapter for timestamp conversion."""
-    def _encode(self, obj, context, path):
+    def _encode(self, obj, context, *args, **kwargs):
         return calendar.timegm(obj.timetuple())
 
-    def _decode(self, obj, context, path):
+    def _decode(self, obj, context, *args, **kwargs):
         return datetime.datetime.utcfromtimestamp(obj)
 
 
 class EncryptionAdapter(Adapter):
     """Adapter to handle communication encryption."""
-    def _encode(self, obj, context, path):
+    def _encode(self, obj, context, *args, **kwargs):
         """Encrypt the given payload with the token stored in the context.
 
         :param obj: JSON object to encrypt"""
@@ -147,7 +147,7 @@ class EncryptionAdapter(Adapter):
         return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00',
                              context['_']['token'])
 
-    def _decode(self, obj, context, path):
+    def _decode(self, obj, context, *args, **kwargs):
         """Decrypts the given payload with the token stored in the context.
 
         :return str: JSON object"""
