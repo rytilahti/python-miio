@@ -42,7 +42,7 @@ setup(
     packages=["miio", "mirobo"],
 
     python_requires='>=3.4',
-    install_requires=['construct>=2.9.30,<=2.9.31',
+    install_requires=['construct==2.9.31',
                       'click',
                       'cryptography',
                       'pretty_cron',

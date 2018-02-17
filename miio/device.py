@@ -134,13 +134,13 @@ class Device:
         :raises DeviceException: if the device could not be discovered."""
         m = Device.discover(self.ip)
         if m is not None:
-            self._device_id = binascii.hexlify(m.header.value.device_id)
+            self._device_id = m.header.value.device_id
             self._device_ts = m.header.value.ts
             self._discovered = True
             if self.debug > 1:
                 _LOGGER.debug(m)
             _LOGGER.debug("Discovered %s with ts: %s, token: %s",
-                          self._device_id,
+                          binascii.hexlify(self._device_id).decode(),
                           self._device_ts,
                           codecs.encode(m.checksum, 'hex'))
         else:
@@ -243,7 +243,6 @@ class Device:
             data, addr = s.recvfrom(1024)
             m = Message.parse(data, token=self.token)
             self._device_ts = m.header.value.ts
-            self._device_id = m.header.value.device_id
             if self.debug > 1:
                 _LOGGER.debug("recv from %s: %s", addr[0], m)
 
