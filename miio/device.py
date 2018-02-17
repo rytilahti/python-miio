@@ -4,6 +4,7 @@ import socket
 import logging
 import construct
 from typing import Any, List, Optional  # noqa: F401
+from enum import Enum
 
 from .protocol import Message
 
@@ -18,6 +19,13 @@ class DeviceException(Exception):
 class DeviceError(DeviceException):
     """Exception communicating an error delivered by the target device."""
     pass
+
+
+class UpdateState(Enum):
+    Downloading = "downloading"
+    Installing = "installing"
+    Failed = "failed"
+    Idle = "idle"
 
 
 class DeviceInfo:
@@ -289,15 +297,17 @@ class Device:
             "install": "1",
             "app_url": url,
             "file_md5": md5,
-            "proc": "dlnd install"
+            "proc": "dnld install"
         }
-        return self.send("miIO.ota", payload)
+        return self.send("miIO.ota", payload)[0] == "ok"
 
-    def update_progress(self):
-        return self.send("miIO.get_ota_progress", [])
+    def update_progress(self) -> int:
+        """Return current update progress [0-100]."""
+        return self.send("miIO.get_ota_progress", [])[0]
 
     def update_state(self):
-        return self.send("miIO.get_ota_state", [])
+        """Return current update state."""
+        return UpdateState(self.send("miIO.get_ota_state", [])[0])
 
     @property
     def _id(self) -> int:
