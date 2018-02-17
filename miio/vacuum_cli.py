@@ -504,6 +504,7 @@ def configure_wifi(vac: miio.Vacuum, ssid: str, password: str,
     click.echo("Configuring wifi to SSID: %s" % ssid)
     click.echo(vac.configure_wifi(ssid, password, uid, timezone))
 
+
 @cli.command()
 @pass_dev
 def update_status(vac: miio.Vacuum):
@@ -513,6 +514,7 @@ def update_status(vac: miio.Vacuum):
 
     if update_state == UpdateState.Downloading:
         click.echo("Update progress: %s" % vac.update_progress())
+
 
 @cli.command()
 @click.argument('url', required=True)
@@ -554,7 +556,7 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str):
             try:
                 state = vac.update_state()
                 progress = vac.update_progress()
-            except: # we may not get our messages through during upload
+            except:  # we may not get our messages through during upload
                 continue
 
             if state == UpdateState.Installing:

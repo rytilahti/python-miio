@@ -522,8 +522,8 @@ class SoundInstallStatus:
     @property
     def is_installing(self) -> bool:
         """True if install is in progress."""
-        return self.state == SoundInstallState.Downloading or \
-               self.state == SoundInstallState.Installing
+        return (self.state == SoundInstallState.Downloading or
+                self.state == SoundInstallState.Installing)
 
     @property
     def is_errored(self) -> bool:
