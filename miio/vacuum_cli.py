@@ -7,11 +7,15 @@ import sys
 import json
 import time
 import pathlib
+import threading
+from tqdm import tqdm
 from appdirs import user_cache_dir
 from pprint import pformat as pf
 from typing import Any  # noqa: F401
 from miio.click_common import (ExceptionHandlerGroup, validate_ip,
                                validate_token)
+from .device import UpdateState
+from .updater import OneShotServer
 import miio  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
@@ -425,26 +429,46 @@ def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
 
 @cli.command()
 @click.argument('url')
-@click.argument('md5sum')
-@click.argument('sid', type=int)
+@click.argument('md5sum', required=False, default=None)
+@click.argument('sid', type=int, required=False, default=10000)
 @pass_dev
 def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int):
     """Install a sound."""
     click.echo("Installing from %s (md5: %s) for id %s" % (url, md5sum, sid))
-    click.echo(vac.install_sound(url, md5sum, sid))
+
+    local_url = None
+    server = None
+    if url.startswith("http"):
+        if md5sum is None:
+            click.echo("You need to pass md5 when using URL for updating.")
+            return
+        local_url = url
+    else:
+        server = OneShotServer(url)
+        local_url = server.url()
+        md5sum = server.md5
+
+        t = threading.Thread(target=server.serve_once)
+        t.start()
+        click.echo("Hosting file at %s" % local_url)
+
+    click.echo(vac.install_sound(local_url, md5sum, sid))
 
     progress = vac.sound_install_progress()
     while progress.is_installing:
-        print(progress)
         progress = vac.sound_install_progress()
-        time.sleep(0.1)
+        print("%s (%s %%)" % (progress.state.name, progress.progress))
+        time.sleep(1)
 
     progress = vac.sound_install_progress()
 
-    if progress.progress == 100 and progress.error == 0:
-        click.echo("Installation of sid '%s' complete!" % progress.sid)
-    else:
+    if progress.is_errored:
         click.echo("Error during installation: %s" % progress.error)
+    else:
+        click.echo("Installation of sid '%s' complete!" % sid)
+
+    if server is not None:
+        t.join()
 
 @cli.command()
 @pass_dev
@@ -480,30 +504,66 @@ def configure_wifi(vac: miio.Vacuum, ssid: str, password: str,
     click.echo("Configuring wifi to SSID: %s" % ssid)
     click.echo(vac.configure_wifi(ssid, password, uid, timezone))
 
+@cli.command()
+@pass_dev
+def update_status(vac: miio.Vacuum):
+    """Return update state and progress."""
+    update_state = vac.update_state()
+    click.echo("Update state: %s" % update_state)
+
+    if update_state == UpdateState.Downloading:
+        click.echo("Update progress: %s" % vac.update_progress())
 
 @cli.command()
-@click.argument('file', required=True)
-@click.option('md5', required=False, default=None)
+@click.argument('url', required=True)
+@click.argument('md5', required=False, default=None)
 @pass_dev
-def update_firmware(vac: miio.Vacuum, file: str, md5: str):
+def update_firmware(vac: miio.Vacuum, url: str, md5: str):
     """Update device firmware.
 
     If `file` starts with http* it is expected to be an URL.
-     In that case --md5 has to be given."""
+     In that case md5sum of the file has to be given."""
 
-    url = None
-    if file.lower().startswith("http"):
+    # TODO Check that the device is in updateable state.
+
+    click.echo("Going to update from %s" % url)
+    if url.lower().startswith("http"):
         if md5 is None:
-            click.echo("You need to pass --md5 when using URL for updating..")
+            click.echo("You need to pass md5 when using URL for updating.")
             return
 
-        click.echo("Using %s (md5: %s)" % (file, md5))
+        click.echo("Using %s (md5: %s)" % (url, md5))
     else:
-        pass
-        #Updater()
+        server = OneShotServer(url)
+        url = server.url()
 
-    click.echo("Updating firmware image..")
-    vac.update(url, md5)
+        t = threading.Thread(target=server.serve_once)
+        t.start()
+        click.echo("Hosting file at %s" % url)
+        md5 = server.md5
+
+    update_res = vac.update(url, md5)
+    if update_res:
+        click.echo("Update started!")
+    else:
+        click.echo("Starting the update failed: %s" % update_res)
+
+    with tqdm(total=100) as t:
+        state = vac.update_state()
+        while state == UpdateState.Downloading:
+            try:
+                state = vac.update_state()
+                progress = vac.update_progress()
+            except: # we may not get our messages through during upload
+                continue
+
+            if state == UpdateState.Installing:
+                click.echo("Installation started, please wait until the vacuum reboots")
+                break
+
+            t.update(progress - t.n)
+            t.set_description("%s" % state.name)
+            time.sleep(1)
 
 
 @cli.command()
