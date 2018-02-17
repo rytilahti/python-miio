@@ -219,7 +219,7 @@ class Device:
 
         send_ts = self._device_ts + datetime.timedelta(seconds=1)
         header = {'length': 0, 'unknown': 0x00000000,
-                  'device_id': self._device_id, 'ts': send_ts}
+                  'device_id': binascii.unhexlify(self._device_id), 'ts': send_ts}
 
         msg = {'data': {'value': cmd},
                'header': {'value': header},
@@ -243,7 +243,7 @@ class Device:
             data, addr = s.recvfrom(1024)
             m = Message.parse(data, token=self.token)
             self._device_ts = m.header.value.ts
-            self._device_id = m.header.value.device_id
+            self._device_id = binascii.hexlify(m.header.value.device_id)
             if self.debug > 1:
                 _LOGGER.debug("recv from %s: %s", addr[0], m)
 
