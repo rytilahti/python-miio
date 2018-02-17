@@ -130,10 +130,10 @@ class ChuangmiIr(Device):
 
 
 class ProntoPulseAdapter(Adapter):
-    def _decode(self, obj, context, *args, **kwargs):
+    def _decode(self, obj, context, path):
         return int(obj * context._.modulation_period)
 
-    def _encode(self, obj, context, *args, **kwargs):
+    def _encode(self, obj, context, path):
         raise RuntimeError('Not implemented')
 
 

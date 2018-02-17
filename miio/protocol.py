@@ -20,10 +20,7 @@ from pprint import pprint as pp  # noqa: F401
 
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
                        Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
-                       Default, Pointer, Hex)
-
-# for debugging parsing
-# from construct import Probe
+                       Default, Pointer, Hex, Probe)
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -130,16 +127,16 @@ class Utils:
 
 class TimeAdapter(Adapter):
     """Adapter for timestamp conversion."""
-    def _encode(self, obj, context, *args, **kwargs):
+    def _encode(self, obj, context, path):
         return calendar.timegm(obj.timetuple())
 
-    def _decode(self, obj, context, *args, **kwargs):
+    def _decode(self, obj, context, path):
         return datetime.datetime.utcfromtimestamp(obj)
 
 
 class EncryptionAdapter(Adapter):
     """Adapter to handle communication encryption."""
-    def _encode(self, obj, context, *args, **kwargs):
+    def _encode(self, obj, context, path):
         """Encrypt the given payload with the token stored in the context.
 
         :param obj: JSON object to encrypt"""
@@ -147,7 +144,7 @@ class EncryptionAdapter(Adapter):
         return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00',
                              context['_']['token'])
 
-    def _decode(self, obj, context, *args, **kwargs):
+    def _decode(self, obj, context, path):
         """Decrypts the given payload with the token stored in the context.
 
         :return str: JSON object"""

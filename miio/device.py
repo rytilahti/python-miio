@@ -3,6 +3,7 @@ import datetime
 import socket
 import logging
 import construct
+import binascii
 from typing import Any, List, Optional  # noqa: F401
 
 from .protocol import Message
@@ -133,7 +134,7 @@ class Device:
         :raises DeviceException: if the device could not be discovered."""
         m = Device.discover(self.ip)
         if m is not None:
-            self._device_id = m.header.value.device_id
+            self._device_id = binascii.hexlify(m.header.value.device_id)
             self._device_ts = m.header.value.ts
             self._discovered = True
             if self.debug > 1:
@@ -184,7 +185,7 @@ class Device:
                 if addr[0] not in seen_addrs:
                     _LOGGER.info("  IP %s (ID: %s) - token: %s",
                                  addr[0],
-                                 m.header.value.device_id.decode(),
+                                 binascii.hexlify(m.header.value.device_id).decode(),
                                  codecs.encode(m.checksum, 'hex'))
                     seen_addrs.append(addr[0])
             except socket.timeout:
