@@ -522,7 +522,13 @@ class SoundInstallStatus:
     @property
     def is_installing(self) -> bool:
         """True if install is in progress."""
-        return self.sid != 0 and self.progress < 100 and self.error == 0
+        return self.state == SoundInstallState.Downloading or \
+               self.state == SoundInstallState.Installing
+
+    @property
+    def is_errored(self) -> bool:
+        """True if the state has an error, use `error`to access it."""
+        return self.state == SoundInstallState.Error
 
     def __repr__(self) -> str:
         return "<SoundInstallStatus sid: %s (state: %s, error: %s)" \
