@@ -1,5 +1,23 @@
 # Change Log
 
+## [0.3.7](https://github.com/rytilahti/python-miio/tree/0.3.7)
+
+This is a bugfix release which provides improved stability and compatibility.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.6...0.3.7)
+
+**Closed issues:**
+
+- construct.core.StreamError: could not write bytes, expected 4, found 8 [\#227](https://github.com/rytilahti/python-miio/issues/227)
+- yeelink.light.color1 unsupported [\#225](https://github.com/rytilahti/python-miio/issues/225)
+- Cant decode token \(invalid start byte\) [\#224](https://github.com/rytilahti/python-miio/issues/224)
+- from Construct developer, a note [\#222](https://github.com/rytilahti/python-miio/issues/222)
+
+**Merged pull requests:**
+
+- Proper handling of the device\_id representation [\#228](https://github.com/rytilahti/python-miio/pull/228) ([syssi](https://github.com/syssi))
+- construct-code uptodate [\#226](https://github.com/rytilahti/python-miio/pull/226) ([arekbulski](https://github.com/arekbulski))
+
 ## [0.3.6](https://github.com/rytilahti/python-miio/tree/0.3.6)
 
 This is a bugfix release because of further breaking changes of the underlying library construct.
