@@ -5,6 +5,7 @@ import logging
 import construct
 import binascii
 from typing import Any, List, Optional  # noqa: F401
+from enum import Enum
 
 from .protocol import Message
 
@@ -19,6 +20,13 @@ class DeviceException(Exception):
 class DeviceError(DeviceException):
     """Exception communicating an error delivered by the target device."""
     pass
+
+
+class UpdateState(Enum):
+    Downloading = "downloading"
+    Installing = "installing"
+    Failed = "failed"
+    Idle = "idle"
 
 
 class DeviceInfo:
@@ -287,6 +295,25 @@ class Device:
         This includes information about connected wlan network,
         and harware and software versions."""
         return DeviceInfo(self.send("miIO.info", []))
+
+    def update(self, url: str, md5: str):
+        """Start an OTA update."""
+        payload = {
+            "mode": "normal",
+            "install": "1",
+            "app_url": url,
+            "file_md5": md5,
+            "proc": "dnld install"
+        }
+        return self.send("miIO.ota", payload)[0] == "ok"
+
+    def update_progress(self) -> int:
+        """Return current update progress [0-100]."""
+        return self.send("miIO.get_ota_progress", [])[0]
+
+    def update_state(self):
+        """Return current update state."""
+        return UpdateState(self.send("miIO.get_ota_state", [])[0])
 
     @property
     def _id(self) -> int:
