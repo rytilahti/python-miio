@@ -57,7 +57,7 @@ class TestAirConditioningCompanion(TestCase):
         assert self.state().air_condition_power == '2'
         assert self.state().air_condition_model == '0180222221'
         assert self.state().temperature == 25
-        assert self.state().swing_mode is False
+        assert self.state().swing_mode == SwingMode.Off
         assert self.state().fan_speed == FanSpeed.Low
         assert self.state().mode == OperationMode.Auto
 
