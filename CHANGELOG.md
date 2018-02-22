@@ -16,7 +16,7 @@ This is a bugfix release which provides improved stability and compatibility.
 **Merged pull requests:**
 
 - Proper handling of the device\_id representation [\#228](https://github.com/rytilahti/python-miio/pull/228) ([syssi](https://github.com/syssi))
-- construct-code uptodate [\#226](https://github.com/rytilahti/python-miio/pull/226) ([arekbulski](https://github.com/arekbulski))
+- Construct related, support upto 2.9.31 [\#226](https://github.com/rytilahti/python-miio/pull/226) ([arekbulski](https://github.com/arekbulski))
 
 ## [0.3.6](https://github.com/rytilahti/python-miio/tree/0.3.6)
 
