@@ -45,12 +45,12 @@ class AirQualityMonitorStatus:
         s = "<AirQualityMonitorStatus power=%s, " \
             "aqi=%s, " \
             "battery=%s, " \
-            "usb=%s, " \
+            "usb_power=%s, " \
             "time_state=%s>" % \
             (self.power,
              self.aqi,
              self.battery,
-             self.usb,
+             self.usb_power,
              self.time_state)
         return s
 
