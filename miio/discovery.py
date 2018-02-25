@@ -36,10 +36,11 @@ DEVICE_MAP = {
     "zhimi-humidifier-v1": AirHumidifier,
     "zhimi-humidifier-ca1": AirHumidifier,
     "yunmi-waterpuri-v2": WaterPurifier,
-    # It looks like philips devices cannot be discovered via mdns
+    # It looks like the philips bulb cannot be discovered via mdns
     "philips-light-bulb": PhilipsBulb,
     "philips-light-ceiling": Ceil,
-    "philips-light-sread1": PhilipsEyecare,
+    "philips-light-zyceiling": Ceil,
+    "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "yeelink-light-": Yeelight,
     "lumi-gateway-": lambda x: other_package_info(
