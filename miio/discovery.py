@@ -40,7 +40,7 @@ DEVICE_MAP = {
     "philips-light-bulb": PhilipsBulb,
     "philips-light-ceiling": Ceil,
     "philips-light-zyceiling": Ceil,
-    "philips-light-sread1": PhilipsEyecare, # name needs to be checked
+    "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "yeelink-light-": Yeelight,
     "lumi-gateway-": lambda x: other_package_info(
