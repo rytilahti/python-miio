@@ -70,8 +70,8 @@ DEVICE_COMMAND_TEMPLATES = {
 }
 
 
-class AirConditioningStatus:
-    """Container for status reports of the get_model_and_state command."""
+class AirConditioningCompanionStatus:
+    """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
         # Device model: lumi.acpartner.v2
@@ -135,10 +135,10 @@ class AirConditioningStatus:
 class AirConditioningCompanion(Device):
     """Main class representing Xiaomi Air Conditioning Companion."""
 
-    def air_condition_status(self) -> AirConditioningStatus:
+    def status(self) -> AirConditioningCompanionStatus:
         """Return device status."""
         status = self.send("get_model_and_state", [])
-        return AirConditioningStatus(status)
+        return AirConditioningCompanionStatus(status)
 
     def on(self):
         """Socket power on."""
