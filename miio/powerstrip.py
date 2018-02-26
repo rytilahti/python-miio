@@ -65,7 +65,7 @@ class PowerStripStatus:
     @property
     def wifi_led(self) -> bool:
         """True if the wifi led is turned on."""
-        return self.wifi_led == "on"
+        return self.data["wifi_led"] == "on"
 
     @property
     def power_price(self) -> Optional[float]:
@@ -129,9 +129,9 @@ class PowerStrip(Device):
         # green, normal
         return self.send("set_power_mode", [mode.value])
 
-    def set_wifi_led(self, wifi_led: bool):
+    def set_wifi_led(self, led: bool):
         """Set the wifi led on/off."""
-        if wifi_led:
+        if led:
             return self.send("set_wifi_led", ["on"])
         else:
             return self.send("set_wifi_led", ["off"])

@@ -13,7 +13,7 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
             'temperature': 32.5,
             'current': 25.5,
             'power_consume_rate': 12.5,
-            'wifi_led': 'on',
+            'wifi_led': 'off',
             'power_price': 12.5,
         }
         self.return_values = {
