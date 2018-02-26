@@ -186,7 +186,7 @@ class AirConditioningCompanion(Device):
                            swing_mode: SwingMode):
 
         # Static turn off command available?
-        if (power is False) and (model in DEVICE_COMMAND_TEMPLATES) and \
+        if (power is Power.Off) and (model in DEVICE_COMMAND_TEMPLATES) and \
                 (POWER_OFF in DEVICE_COMMAND_TEMPLATES[model]):
             return self.send_command(
                 model + DEVICE_COMMAND_TEMPLATES[model][POWER_OFF])
