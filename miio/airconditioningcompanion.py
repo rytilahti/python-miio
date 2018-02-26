@@ -78,12 +78,20 @@ class AirConditioningCompanionStatus:
         #
         # Response of "get_model_and_state":
         # ['010500978022222102', '010201190280222221', '2']
+        #
+        # AC turned on by set_power=on:
+        # ['010507950000257301', '011001160100002573', '807']
+        #
+        # AC turned off by set_power=off:
+        # ['010507950000257301', '010001160100002573', '6']
+        # ...
+        # ['010507950000257301', '010001160100002573', '1']
         self.data = data
 
     @property
-    def air_condition_power(self) -> str:
-        """Current power state of the air conditioner."""
-        return str(self.data[2])
+    def load_power(self) -> int:
+        """Current power load of the air conditioner."""
+        return int(self.data[2])
 
     @property
     def air_condition_model(self) -> str:
@@ -140,6 +148,14 @@ class AirConditioningCompanion(Device):
         status = self.send("get_model_and_state", [])
         return AirConditioningCompanionStatus(status)
 
+    def on(self):
+        """Turn the air condition on by infrared."""
+        return self.send("set_power", ["on"])
+
+    def off(self):
+        """Turn the air condition off by infared."""
+        return self.send("set_power", ["off"])
+
     def learn(self, slot: int=STORAGE_SLOT_ID):
         """Learn an infrared command."""
         return self.send("start_ir_learn", [slot])
@@ -170,7 +186,7 @@ class AirConditioningCompanion(Device):
                            swing_mode: SwingMode):
 
         # Static turn off command available?
-        if (power is False) and (model in DEVICE_COMMAND_TEMPLATES) and \
+        if (power is Power.Off) and (model in DEVICE_COMMAND_TEMPLATES) and \
                 (POWER_OFF in DEVICE_COMMAND_TEMPLATES[model]):
             return self.send_command(
                 model + DEVICE_COMMAND_TEMPLATES[model][POWER_OFF])

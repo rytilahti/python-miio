@@ -5,6 +5,8 @@ from miio.airconditioningcompanion import OperationMode, FanSpeed, Power, \
     SwingMode, STORAGE_SLOT_ID
 import pytest
 
+STATE_ON = ['on']
+STATE_OFF = ['off']
 
 class DummyAirConditioningCompanion(AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
@@ -17,6 +19,7 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
             'get_ir_learn_result': lambda x: True,
             'send_ir_code': lambda x: True,
             'send_cmd': self._send_cmd_input_validation,
+            'set_power': lambda x: self._set_power(x),
         }
         self.start_state = self.state.copy()
 
@@ -31,6 +34,14 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
     def _get_state(self, props):
         """Return the requested data"""
         return self.state
+
+    def _set_power(self, value: str):
+        """Set the requested power state"""
+        if value == STATE_ON:
+            self.state[1] = self.state[1][:2] + '1' + self.state[1][3:]
+
+        if value == STATE_OFF:
+            self.state[1] = self.state[1][:2] + '0' + self.state[1][3:]
 
     def _send_cmd_input_validation(self, props):
         return all(c in string.hexdigits for c in props[0])
@@ -50,11 +61,25 @@ class TestAirConditioningCompanion(TestCase):
     def state(self):
         return self.device.status()
 
+    def test_on(self):
+        self.device.off()  # ensure off
+        assert self.is_on() is False
+
+        self.device.on()
+        assert self.is_on() is True
+
+    def test_off(self):
+        self.device.on()  # ensure on
+        assert self.is_on() is True
+
+        self.device.off()
+        assert self.is_on() is False
+
     def test_status(self):
         self.device._reset_state()
 
         assert self.is_on() is False
-        assert self.state().air_condition_power == '2'
+        assert self.state().load_power == 2
         assert self.state().air_condition_model == '0180222221'
         assert self.state().temperature == 25
         assert self.state().swing_mode is False
