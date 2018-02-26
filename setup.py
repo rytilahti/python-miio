@@ -42,16 +42,19 @@ setup(
     packages=["miio", "mirobo"],
 
     python_requires='>=3.4',
-    install_requires=['construct==2.9.31',
-                      'click',
-                      'cryptography',
-                      'pretty_cron',
-                      'typing; python_version < "3.5"',
-                      'zeroconf',
-                      'attrs',
-                      'android_backup',
-                      'pytz',
-                      'appdirs'],
+
+    install_requires=[
+        'construct==2.9.31',
+        'click',
+        'cryptography',
+        'pretty_cron',
+        'typing; python_version < "3.5"',
+        'zeroconf',
+        'attrs',
+        'android_backup',
+        'pytz',
+        'appdirs',
+    ],
 
     entry_points={
         'console_scripts': [

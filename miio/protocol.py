@@ -21,12 +21,16 @@ from pprint import pprint as pp  # noqa: F401
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
                        Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
                        Default, Pointer, Hex, Probe)
+import construct
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
 _LOGGER = logging.getLogger(__name__)
+
+# needs to be maintained in sync with setup.py and requirements.txt
+assert construct.version_string == "2.9.31"
 
 
 class Utils:
