@@ -58,14 +58,33 @@ class PowerStripStatus:
             return PowerMode(self.data["mode"])
         return None
 
+    @property
+    def wifi_led(self) -> bool:
+        """True if the wifi led is turned on."""
+        return self.wifi_led == "on"
+
+    @property
+    def power_price(self) -> Optional[float]:
+        """The stored power price, if available."""
+        if self.data["power_price"] is not None:
+            return self.data["power_price"]
+        return None
+
     def __repr__(self) -> str:
-        s = "<PowerStripStatus power=%s, temperature=%s, " \
-            "load_power=%s, current=%s, mode=%s>" % \
+        s = "<PowerStripStatus power=%s, " \
+            "temperature=%s, " \
+            "load_power=%s, " \
+            "current=%s, " \
+            "mode=%s, " \
+            "wifi_led=%s, " \
+            "power_price=%s>" % \
             (self.power,
              self.temperature,
              self.load_power,
              self.current,
-             self.mode)
+             self.mode,
+             self.wifi_led,
+             self.power_price)
         return s
 
 
@@ -75,7 +94,7 @@ class PowerStrip(Device):
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
         properties = ['power', 'temperature', 'current', 'mode',
-                      'power_consume_rate']
+                      'power_consume_rate', 'wifi_led', 'power_price', ]
         values = self.send(
             "get_prop",
             properties
@@ -101,7 +120,18 @@ class PowerStrip(Device):
         return self.send("set_power", ["off"])
 
     def set_power_mode(self, mode: PowerMode):
-        """Set mode."""
+        """Set the power mode."""
 
         # green, normal
         return self.send("set_power_mode", [mode.value])
+
+    def set_wifi_led(self, wifi_led: bool):
+        """Set the wifi led on/off."""
+        if wifi_led:
+            return self.send("set_wifi_led", ["on"])
+        else:
+            return self.send("set_wifi_led", ["off"])
+
+    def set_power_price(self, price: float):
+        """Set the power price."""
+        return self.send("set_power_price", [price])
