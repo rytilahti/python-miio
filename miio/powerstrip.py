@@ -2,9 +2,13 @@ import logging
 import enum
 from typing import Dict, Any, Optional
 from collections import defaultdict
-from .device import Device
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class PowerStripException(DeviceException):
+    pass
 
 
 class PowerMode(enum.Enum):
@@ -134,4 +138,7 @@ class PowerStrip(Device):
 
     def set_power_price(self, price: float):
         """Set the power price."""
+        if price < 0:
+            raise PowerStripException("Invalid power price: %s" % price)
+
         return self.send("set_power_price", [price])

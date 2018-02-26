@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import PowerStrip
-from miio.powerstrip import PowerMode
+from miio.powerstrip import PowerMode, PowerStripException
 from .dummies import DummyDevice
 import pytest
 
@@ -13,11 +13,15 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
             'temperature': 32.5,
             'current': 25.5,
             'power_consume_rate': 12.5,
+            'wifi_led': 'on',
+            'power_price': 12.5,
         }
         self.return_values = {
             'get_prop': self._get_state,
             'set_power': lambda x: self._set_state("power", x),
             'set_power_mode': lambda x: self._set_state("mode", x),
+            'set_wifi_led': lambda x: self._set_state("wifi_led", x),
+            'set_power_price': lambda x: self._set_state("power_price", x),
         }
         super().__init__(args, kwargs)
 
@@ -87,3 +91,33 @@ class TestPowerStrip(TestCase):
         assert mode() == PowerMode.Eco
         self.device.set_power_mode(PowerMode.Normal)
         assert mode() == PowerMode.Normal
+
+    def test_set_wifi_led(self):
+        def wifi_led():
+            return self.device.status().wifi_led
+
+        self.device.set_wifi_led(True)
+        assert wifi_led() is True
+
+        self.device.set_wifi_led(False)
+        assert wifi_led() is False
+
+    def test_set_power_price(self):
+        def power_price():
+            return self.device.status().power_price
+
+        self.device.set_power_price(0)
+        assert power_price() == 0
+        self.device.set_power_price(1.5)
+        assert power_price() == 1.5
+        self.device.set_power_price(2)
+        assert power_price() == 2
+
+        with pytest.raises(PowerStripException):
+            self.device.set_power_price(-1)
+
+    def test_status_without_power_price(self):
+        self.device._reset_state()
+
+        self.device.state["power_price"] = None
+        assert self.state().power_price is None
