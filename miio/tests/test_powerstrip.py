@@ -14,7 +14,7 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
             'current': 25.5,
             'power_consume_rate': 12.5,
             'wifi_led': 'off',
-            'power_price': 12.5,
+            'power_price': 49,
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -92,6 +92,13 @@ class TestPowerStrip(TestCase):
         self.device.set_power_mode(PowerMode.Normal)
         assert mode() == PowerMode.Normal
 
+    def test_status_without_mode(self):
+        self.device._reset_state()
+
+        # The Power Strip  2 doesn't support power modes
+        self.device.state["mode"] = None
+        assert self.state().mode is None
+
     def test_set_wifi_led(self):
         def wifi_led():
             return self.device.status().wifi_led
@@ -108,8 +115,8 @@ class TestPowerStrip(TestCase):
 
         self.device.set_power_price(0)
         assert power_price() == 0
-        self.device.set_power_price(1.5)
-        assert power_price() == 1.5
+        self.device.set_power_price(1)
+        assert power_price() == 1
         self.device.set_power_price(2)
         assert power_price() == 2
 

@@ -20,10 +20,13 @@ class PowerStripStatus:
     """Container for status reports from the power strip."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # Device model: qmi.powerstrip.v1, zimi.powerstrip.v2
-        #
-        # {'power': 'on', 'temperature': 48.11,
-        # 'current': 0.06, 'mode': 'green'}
+        """
+        Supported device models: qmi.powerstrip.v1, zimi.powerstrip.v2
+
+        Response of a Power Strip 2 (zimi.powerstrip.v2):
+        {'power','on', 'temperature': 48.7, 'current': 0.05, 'mode': None,
+         'power_consume_rate': 4.09, 'wifi_led': 'on', 'power_price': 49}
+        """
         self.data = data
 
     @property
@@ -68,7 +71,7 @@ class PowerStripStatus:
         return self.data["wifi_led"] == "on"
 
     @property
-    def power_price(self) -> Optional[float]:
+    def power_price(self) -> Optional[int]:
         """The stored power price, if available."""
         if self.data["power_price"] is not None:
             return self.data["power_price"]
@@ -136,7 +139,7 @@ class PowerStrip(Device):
         else:
             return self.send("set_wifi_led", ["off"])
 
-    def set_power_price(self, price: float):
+    def set_power_price(self, price: int):
         """Set the power price."""
         if price < 0:
             raise PowerStripException("Invalid power price: %s" % price)
