@@ -117,6 +117,9 @@ class TestPowerStrip(TestCase):
         with pytest.raises(PowerStripException):
             self.device.set_power_price(-1)
 
+        with pytest.raises(PowerStripException):
+            self.device.set_power_price(1000)
+
     def test_status_without_power_price(self):
         self.device._reset_state()
 

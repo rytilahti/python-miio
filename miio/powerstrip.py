@@ -141,7 +141,7 @@ class PowerStrip(Device):
 
     def set_power_price(self, price: int):
         """Set the power price."""
-        if price < 0:
+        if price < 0 or price > 999:
             raise PowerStripException("Invalid power price: %s" % price)
 
         return self.send("set_power_price", [price])
