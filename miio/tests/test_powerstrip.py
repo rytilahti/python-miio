@@ -80,6 +80,7 @@ class TestPowerStrip(TestCase):
     def test_status_without_mode(self):
         self.device._reset_state()
 
+        # The Power Strip  2 doesn't support power modes
         self.device.state["mode"] = None
         assert self.state().mode is None
 
@@ -91,13 +92,6 @@ class TestPowerStrip(TestCase):
         assert mode() == PowerMode.Eco
         self.device.set_power_mode(PowerMode.Normal)
         assert mode() == PowerMode.Normal
-
-    def test_status_without_mode(self):
-        self.device._reset_state()
-
-        # The Power Strip  2 doesn't support power modes
-        self.device.state["mode"] = None
-        assert self.state().mode is None
 
     def test_set_wifi_led(self):
         def wifi_led():
