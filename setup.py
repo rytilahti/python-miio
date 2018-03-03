@@ -54,6 +54,7 @@ setup(
         'android_backup',
         'pytz',
         'appdirs',
+        'tqdm',
     ],
 
     entry_points={
