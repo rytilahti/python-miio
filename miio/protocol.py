@@ -160,17 +160,32 @@ class EncryptionAdapter(Adapter):
             _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
             return obj
 
-        decoded = decrypted.decode('utf-8')
-        try:
-            return json.loads(decoded)
-        except:
+        # list of adaption functions for malformed json payload (quirks)
+        decrypted_quirks = [
+            # try without modifications first
+            lambda decrypted_bytes: decrypted_bytes,
+            # powerstrip returns malformed JSON if the device is not
+            # connected to the cloud, so we try to fix it here carefully.
+            lambda decrypted_bytes: decrypted_bytes.replace(b',,"otu_stat"', b',"otu_stat"'),
+            # xiaomi cloud returns malformed json when answering _sync.batch_gen_room_up_url
+            # command so try to sanitize it
+            lambda decrypted_bytes:
+                decrypted_bytes[:decrypted_bytes.rfind(b'\x00')]
+                if b'\x00' in decrypted_bytes
+                else decrypted_bytes
+        ]
+
+        for i, quirk in enumerate(decrypted_quirks):
+            decoded = quirk(decrypted).decode('utf-8')
             try:
-                # powerstrip returns invalid JSON if the device is not
-                # connected to the cloud, so we try to fix it here carefully.
-                decoded = decoded.replace(',,"otu_stat"', ',"otu_stat"')
                 return json.loads(decoded)
             except Exception as ex:
-                _LOGGER.error("unable to parse json '%s': %s", decoded, ex)
+                # log the error when decrypted bytes couldn't be loaded
+                # after trying all quirk adaptions
+                if i == len(decrypted_quirks) - 1:
+                    _LOGGER.error("unable to parse json '%s': %s", decoded, ex)
+
+        return None
 
 
 Message = Struct(
