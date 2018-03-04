@@ -31,7 +31,7 @@ class PhilipsEyecareStatus:
 
     @property
     def brightness(self) -> int:
-        """Current brightness."""
+        """Current brightness of the primary light."""
         return self.data["bright"]
 
     @property
@@ -51,7 +51,7 @@ class PhilipsEyecareStatus:
 
     @property
     def eyecare(self) -> bool:
-        """True if the eyecare light (first light source) is on."""
+        """True if the eyecare mode is on."""
         return self.data["eyecare"] == "on"
 
     @property
@@ -113,15 +113,15 @@ class PhilipsEyecare(Device):
         return self.send("set_power", ["off"])
 
     def eyecare_on(self):
-        """Turn the eyecare light on."""
+        """Turn the eyecare mode on."""
         return self.send("set_eyecare", ["on"])
 
     def eyecare_off(self):
-        """Turn the eyecare light off."""
+        """Turn the eyecare mode off."""
         return self.send("set_eyecare", ["off"])
 
     def set_brightness(self, level: int):
-        """Set brightness level."""
+        """Set brightness level of the primary light."""
         if level < 1 or level > 100:
             raise PhilipsEyecareException("Invalid brightness: %s" % level)
 
