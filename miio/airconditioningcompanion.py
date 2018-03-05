@@ -104,6 +104,11 @@ class AirConditioningCompanionStatus:
         return 'on' if (self.data[1][2:3] == '1') else 'off'
 
     @property
+    def led(self) -> str:
+        """Current LED state."""
+        return 'on' if (self.data[1][8:9] == '1') else 'off'
+
+    @property
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == 'on'
