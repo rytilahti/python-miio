@@ -183,4 +183,3 @@ class TestAirHumidifier(TestCase):
         self.device.state["dry"] = None
 
         assert self.state().dry is None
-
