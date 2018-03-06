@@ -2,7 +2,7 @@ import string
 from unittest import TestCase
 from miio import AirConditioningCompanion
 from miio.airconditioningcompanion import OperationMode, FanSpeed, Power, \
-    SwingMode, STORAGE_SLOT_ID
+    SwingMode, Led, STORAGE_SLOT_ID
 import pytest
 
 STATE_ON = ['on']
@@ -80,7 +80,7 @@ class TestAirConditioningCompanion(TestCase):
 
         assert self.is_on() is False
         assert self.state().load_power == 2
-        assert self.state().air_condition_model == '0180222221'
+        assert self.state().air_condition_model == '010500978022222102'
         assert self.state().temperature == 25
         assert self.state().swing_mode is False
         assert self.state().fan_speed == FanSpeed.Low
@@ -122,30 +122,33 @@ class TestAirConditioningCompanion(TestCase):
     def test_send_configuration(self):
         def send_configuration_known_aircondition():
             return self.device.send_configuration(
-                '0100010727',
+                '010000000001072700',  # best guess
                 Power.On,
                 OperationMode.Auto,
                 22.5,
                 FanSpeed.Low,
-                SwingMode.On)
+                SwingMode.On,
+                Led.Off)
 
         def send_configuration_known_aircondition_turn_off():
             return self.device.send_configuration(
-                '0100010727',
+                '010000000001072700',  # best guess
                 Power.Off,
                 OperationMode.Auto,
                 22.5,
                 FanSpeed.Low,
-                SwingMode.On)
+                SwingMode.On,
+                Led.Off)
 
         def send_configuration_unknown_aircondition():
             return self.device.send_configuration(
-                '01000fffff',
+                '010507950000257301',
                 Power.On,
                 OperationMode.Auto,
                 22.5,
                 FanSpeed.Low,
-                SwingMode.On)
+                SwingMode.On,
+                Led.Off)
 
         assert send_configuration_known_aircondition() is True
         assert send_configuration_known_aircondition_turn_off() is True
