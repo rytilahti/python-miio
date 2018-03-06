@@ -256,14 +256,14 @@ class Vacuum(Device):
 
     def configure_wifi(self, ssid, password, uid=0, timezone=None):
         """Configure the wifi settings."""
-        params = {"ssid": ssid, "passwd": password, "uid": uid}
+        extra_params = {}
         if timezone is not None:
             now = datetime.datetime.now(pytz.timezone(timezone))
             offset_as_float = now.utcoffset().total_seconds() / 60 / 60
-            params["tz"] = timezone
-            params["gmt_offset"] = offset_as_float
+            extra_params["tz"] = timezone
+            extra_params["gmt_offset"] = offset_as_float
 
-        return self.send("miIO.config_router", params)[0]
+        return super().configure_wifi(ssid, password, uid, extra_params)
 
     def raw_command(self, cmd, params):
         """Send a raw command to the robot."""

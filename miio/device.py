@@ -316,6 +316,15 @@ class Device:
         """Return current update state."""
         return UpdateState(self.send("miIO.get_ota_state", [])[0])
 
+    def configure_wifi(self, ssid, password, uid=0, extra_params=None):
+        """Configure the wifi settings."""
+        if extra_params is None:
+            extra_params = {}
+        params = {"ssid": ssid, "passwd": password, "uid": uid,
+                  **extra_params}
+
+        return self.send("miIO.config_router", params)[0]
+
     @property
     def _id(self) -> int:
         """Increment and return the sequence id."""
