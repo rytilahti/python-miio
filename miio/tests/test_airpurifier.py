@@ -38,7 +38,6 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             'sleep_data_num': 22,
             'app_extra': 1,
             'act_det': 'off',
-            'use_time': '4862700',
             'button_pressed': 'power',
         }
         self.return_values = {
@@ -122,7 +121,6 @@ class TestAirPurifier(TestCase):
         assert self.state().extra_features == self.device.start_state["app_extra"]
         assert self.state().turbo_mode_supported == (self.device.start_state["app_extra"] == 1)
         assert self.state().auto_detect == (self.device.start_state["act_det"] == 'on')
-        assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().button_pressed == self.device.start_state["button_pressed"]
 
     def test_set_mode(self):
