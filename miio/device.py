@@ -272,13 +272,14 @@ class Device:
                                   "of an invalid token. "
                                   "Please check your token!") from ex
         except OSError as ex:
-            _LOGGER.error("Got error when receiving: %s", ex)
             if retry_count > 0:
-                _LOGGER.warning("Retrying with incremented id, "
-                                "retries left: %s", retry_count)
+                _LOGGER.debug("Retrying with incremented id, "
+                              "retries left: %s", retry_count)
                 self.__id += 100
                 self._discovered = False
                 return self.send(command, parameters, retry_count - 1)
+
+            _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("No response from the device") from ex
 
     def raw_command(self, cmd, params):
