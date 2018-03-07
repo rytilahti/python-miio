@@ -123,7 +123,7 @@ class AirHumidifierStatus:
 
     @property
     def button_pressed(self) -> Optional[str]:
-        """Button pressed."""
+        """Last pressed button."""
         return self.data["button_pressed"]
 
     def __str__(self) -> str:
