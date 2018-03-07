@@ -17,6 +17,13 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             'child_lock': 'on',
             'limit_hum': 40,
             'trans_level': 85,
+            'use_time': 941100,
+            'button_pressed': 'led',
+            'hw_version': 0,
+            # Additional attributes of the zhimi.humidifier.ca1
+            'speed': 100,
+            'depth': 1,
+            'dry': 'off',
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -26,6 +33,7 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             'set_buzzer': lambda x: self._set_state("buzzer", x),
             'set_child_lock': lambda x: self._set_state("child_lock", x),
             'set_limit_hum': lambda x: self._set_state("limit_hum", x),
+            'set_dry': lambda x: self._set_state("dry", x),
         }
         super().__init__(args, kwargs)
 
@@ -72,6 +80,12 @@ class TestAirHumidifier(TestCase):
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
         assert self.state().target_humidity == self.device.start_state["limit_hum"]
         assert self.state().trans_level == self.device.start_state["trans_level"]
+        assert self.state().speed == self.device.start_state["speed"]
+        assert self.state().depth == self.device.start_state["depth"]
+        assert self.state().dry == (self.device.start_state["dry"] == 'on')
+        assert self.state().use_time == self.device.start_state["use_time"]
+        assert self.state().hardware_version == self.device.start_state["hw_version"]
+        assert self.state().button_pressed == self.device.start_state["button_pressed"]
 
     def test_set_mode(self):
         def mode():
@@ -153,3 +167,19 @@ class TestAirHumidifier(TestCase):
 
         self.device.set_child_lock(False)
         assert child_lock() is False
+
+    def test_set_dry(self):
+        def dry():
+            return self.device.status().dry
+
+        self.device.set_dry(True)
+        assert dry() is True
+
+        self.device.set_dry(False)
+        assert dry() is False
+
+    def test_status_without_dry(self):
+        self.device._reset_state()
+        self.device.state["dry"] = None
+
+        assert self.state().dry is None

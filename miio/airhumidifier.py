@@ -15,6 +15,7 @@ class OperationMode(enum.Enum):
     Silent = 'silent'
     Medium = 'medium'
     High = 'high'
+    Auto = 'auto'
 
 
 class LedBrightness(enum.Enum):
@@ -32,15 +33,9 @@ class AirHumidifierStatus:
 
         {'power': 'off', 'mode': 'high', 'temp_dec': 294,
          'humidity': 33, 'buzzer': 'on', 'led_b': 0,
-         'child_lock': 'on', 'limit_hum': 40, 'trans_level': 85}
-
-        TODO: Features of the Air Humidifier Ca (zhimi.humidifier.ca1):
-          - Same properties: power, mode, temp_dec, humidity,
-            buzzer, led_b, child_lock, limit_hum
-          - Additional properties: speed, depth, dry, hw_version,
-            use_time, button_pressed
-          - Operation modes: auto, high, medium, silent
-          - Additional setters: set_dry on/off
+         'child_lock': 'on', 'limit_hum': 40, 'trans_level': 85,
+         'speed': None, 'depth': None, 'dry': None, 'use_time': 941100,
+         'hw_version': 0, 'button_pressed': 'led'}
         """
 
         self.data = data
@@ -99,6 +94,38 @@ class AirHumidifierStatus:
         """The meaning of the property is unknown."""
         return self.data["trans_level"]
 
+    @property
+    def speed(self) -> Optional[int]:
+        """Current fan speed."""
+        return self.data["speed"]
+
+    @property
+    def depth(self) -> Optional[int]:
+        """Current depth."""
+        return self.data["depth"]
+
+    @property
+    def dry(self) -> Optional[bool]:
+        """Return True if dry mode is on if available."""
+        if self.data["dry"] is not None:
+            return self.data["dry"] == "on"
+        return None
+
+    @property
+    def use_time(self) -> Optional[int]:
+        """How long the device has been active in seconds."""
+        return self.data["use_time"]
+
+    @property
+    def hardware_version(self) -> Optional[str]:
+        """The hardware version."""
+        return self.data["hw_version"]
+
+    @property
+    def button_pressed(self) -> Optional[str]:
+        """Button pressed."""
+        return self.data["button_pressed"]
+
     def __str__(self) -> str:
         s = "<AirHumidiferStatus power=%s, " \
             "mode=%s, " \
@@ -108,7 +135,13 @@ class AirHumidifierStatus:
             "buzzer=%s, " \
             "child_lock=%s, " \
             "target_humidity=%s%%, " \
-            "trans_level=%s>" % \
+            "trans_level=%s, " \
+            "speed=%s, " \
+            "depth=%s, " \
+            "dry=%s, " \
+            "use_time=%s, " \
+            "hardware_version=%s, " \
+            "button_pressed=%s>" % \
             (self.power,
              self.mode,
              self.temperature,
@@ -117,7 +150,13 @@ class AirHumidifierStatus:
              self.buzzer,
              self.child_lock,
              self.target_humidity,
-             self.trans_level)
+             self.trans_level,
+             self.speed,
+             self.depth,
+             self.dry,
+             self.use_time,
+             self.hardware_version,
+             self.button_pressed)
         return s
 
 
@@ -128,7 +167,9 @@ class AirHumidifier(Device):
         """Retrieve properties."""
 
         properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
-                      'led_b', 'child_lock', 'limit_hum', 'trans_level', ]
+                      'led_b', 'child_lock', 'limit_hum', 'trans_level',
+                      'speed', 'depth', 'dry', 'use_time', 'button_pressed',
+                      'hw_version', ]
 
         values = self.send(
             "get_prop",
@@ -183,3 +224,10 @@ class AirHumidifier(Device):
                 "Invalid target humidity: %s" % humidity)
 
         return self.send("set_limit_hum", [humidity])
+
+    def set_dry(self, dry: bool):
+        """Set dry mode on/off."""
+        if dry:
+            return self.send("set_dry", ["on"])
+        else:
+            return self.send("set_dry", ["off"])
