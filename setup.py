@@ -30,7 +30,6 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -41,14 +40,13 @@ setup(
 
     packages=["miio", "mirobo"],
 
-    python_requires='>=3.4',
+    python_requires='>=3.5',
 
     install_requires=[
         'construct==2.9.31',
         'click',
         'cryptography',
         'pretty_cron',
-        'typing; python_version < "3.5"',
         'zeroconf',
         'attrs',
         'android_backup',
