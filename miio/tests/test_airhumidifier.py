@@ -17,13 +17,13 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             'child_lock': 'on',
             'limit_hum': 40,
             'trans_level': 85,
+            'use_time': 941100,
+            'button_pressed': 'led',
+            'hw_version': 0,
             # Additional attributes of the zhimi.humidifier.ca1
             'speed': 100,
             'depth': 1,
             'dry': 'off',
-            'use_time': 100,
-            'button_pressed': 'unknown',
-            'hw_version': 'unknown',
         }
         self.return_values = {
             'get_prop': self._get_state,

@@ -33,7 +33,9 @@ class AirHumidifierStatus:
 
         {'power': 'off', 'mode': 'high', 'temp_dec': 294,
          'humidity': 33, 'buzzer': 'on', 'led_b': 0,
-         'child_lock': 'on', 'limit_hum': 40, 'trans_level': 85}
+         'child_lock': 'on', 'limit_hum': 40, 'trans_level': 85,
+         'speed': None, 'depth': None, 'dry': None, 'use_time': 941100,
+         'hw_version': 0, 'button_pressed': 'led'}
         """
 
         self.data = data
