@@ -273,6 +273,13 @@ class TestAirPurifier(TestCase):
         self.device.state["led_b"] = None
         assert self.state().led_brightness is None
 
+    def test_status_unknown_led_brightness(self):
+        self.device._reset_state()
+
+        # The Air Purifier V3 returns a led brightness of 10 f.e.
+        self.device.state["led_b"] = 10
+        assert self.state().led_brightness is None
+
     def test_status_without_temperature(self):
         self.device._reset_state()
         self.device.state["temp_dec"] = None

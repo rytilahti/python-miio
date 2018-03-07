@@ -74,6 +74,20 @@ class AirPurifierStatus:
         'rfid_product_id': None, 'rfid_tag': None,
         'act_sleep': 'close'}
 
+        Response of a Air Purifier V3 (zhimi.airpurifier.v3)
+
+        {'power': 'off', 'aqi': 0, 'humidity': None, 'temp_dec': None,
+         'mode': 'idle', 'led': 'off', 'led_b': 10, 'buzzer': 'on',
+         'child_lock': 'off', 'bright': 43, 'favorite_level': None,
+         'filter1_life': 26, 'f1_hour_used': 2573, 'use_time': None,
+         'motor1_speed': 0}
+
+        {‘power’: 'on', ‘aqi’: 18, ‘humidity’: None, ‘temp_dec’: None,
+         ‘mode’: 'silent', ‘led’: 'off', ‘led_b’: 10, ‘buzzer’: 'on',
+         ‘child_lock’: 'off', ‘bright’: 4, ‘favorite_level’: None,
+         ‘filter1_life’: 26, ‘f1_hour_used’: 2574, ‘use_time’: None,
+         ‘motor1_speed’: 648}
+
         A request is limited to 16 properties.
         """
 
@@ -134,7 +148,10 @@ class AirPurifierStatus:
     def led_brightness(self) -> Optional[LedBrightness]:
         """Brightness of the LED."""
         if self.data["led_b"] is not None:
-            return LedBrightness(self.data["led_b"])
+            try:
+                return LedBrightness(self.data["led_b"])
+            except ValueError:
+                return None
 
         return None
 
