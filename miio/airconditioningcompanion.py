@@ -28,6 +28,11 @@ class Power(enum.Enum):
     Off = 0
 
 
+class Led(enum.Enum):
+    On = '0'
+    Off = 'a'
+
+
 STORAGE_SLOT_ID = 30
 POWER_OFF = 'off'
 
@@ -36,36 +41,28 @@ POWER_OFF = 'off'
 DEVICE_COMMAND_TEMPLATES = {
     'fallback': {
         'deviceType': 'generic',
-        'base': '[po][mo][wi][sw][tt]a0'
-    },
-    '0180111111': {
-        'deviceType': 'media_1',
-        'base': '[po][mo][wi][sw][tt]02'
-    },
-    '0180222221': {
-        'deviceType': 'gree_1',
-        'base': '[po][mo][wi][sw][tt]02'
+        'base': '[po][mo][wi][sw][tt][li]'
     },
     '0100010727': {
         'deviceType': 'gree_2',
-        'base': '[po][mo][wi][sw][tt]1100190[tt1]205002102000[tt7]0190[tt1]207002000000[tt4]0',
+        'base': '[po][mo][wi][sw][tt]1100190[tt1]205002102000[tt7]0190[tt1]207002000000[tt4]',
         'off': '01011101004000205002112000D04000207002000000A0'
     },
     '0100004795': {
         'deviceType': 'gree_8',
-        'base': '[po][mo][wi][sw][tt]0100090900005002'
+        'base': '[po][mo][wi][sw][tt][li]10009090000500'
     },
     '0180333331': {
         'deviceType': 'haier_1',
-        'base': '[po][mo][wi][sw][tt]12'
+        'base': '[po][mo][wi][sw][tt]1'
     },
     '0180666661': {
         'deviceType': 'aux_1',
-        'base': '[po][mo][wi][sw][tt]12'
+        'base': '[po][mo][wi][sw][tt]1'
     },
     '0180777771': {
         'deviceType': 'chigo_1',
-        'base': '[po][mo][wi][sw][tt]12'
+        'base': '[po][mo][wi][sw][tt]1'
     }
 }
 
@@ -96,12 +93,17 @@ class AirConditioningCompanionStatus:
     @property
     def air_condition_model(self) -> str:
         """Model of the air conditioner."""
-        return str(self.data[0][0:2] + self.data[0][8:16])
+        return str(self.data[0])
 
     @property
     def power(self) -> str:
         """Current power state."""
         return 'on' if (self.data[1][2:3] == '1') else 'off'
+
+    @property
+    def led(self) -> str:
+        """Current LED state."""
+        return 'on' if (self.data[1][8:9] == '1') else 'off'
 
     @property
     def is_on(self) -> bool:
@@ -183,19 +185,22 @@ class AirConditioningCompanion(Device):
     def send_configuration(self, model: str, power: Power,
                            operation_mode: OperationMode,
                            target_temperature: float, fan_speed: FanSpeed,
-                           swing_mode: SwingMode):
+                           swing_mode: SwingMode, led: Led):
+
+        prefix = str(model[0:2] + model[8:16])
+        suffix = model[-1:]
 
         # Static turn off command available?
-        if (power is Power.Off) and (model in DEVICE_COMMAND_TEMPLATES) and \
-                (POWER_OFF in DEVICE_COMMAND_TEMPLATES[model]):
+        if (power is Power.Off) and (prefix in DEVICE_COMMAND_TEMPLATES) and \
+                (POWER_OFF in DEVICE_COMMAND_TEMPLATES[prefix]):
             return self.send_command(
-                model + DEVICE_COMMAND_TEMPLATES[model][POWER_OFF])
+                prefix + DEVICE_COMMAND_TEMPLATES[prefix][POWER_OFF])
 
-        if model in DEVICE_COMMAND_TEMPLATES:
-            configuration = model + DEVICE_COMMAND_TEMPLATES[model]['base']
+        if prefix in DEVICE_COMMAND_TEMPLATES:
+            configuration = prefix + DEVICE_COMMAND_TEMPLATES[prefix]['base']
         else:
             configuration = \
-                model + DEVICE_COMMAND_TEMPLATES['fallback']['base']
+                prefix + DEVICE_COMMAND_TEMPLATES['fallback']['base']
 
         configuration = configuration.replace('[po]', str(power.value))
         configuration = configuration.replace('[mo]', str(operation_mode.value))
@@ -203,6 +208,7 @@ class AirConditioningCompanion(Device):
         configuration = configuration.replace('[sw]', str(swing_mode.value))
         configuration = configuration.replace(
             '[tt]', hex(int(target_temperature))[2:])
+        configuration = configuration.replace('[li]', str(led.value))
 
         temperature = (1 + int(target_temperature) - 17) % 16
         temperature = hex(temperature)[2:].upper()
@@ -215,5 +221,7 @@ class AirConditioningCompanion(Device):
         temperature = (7 + int(target_temperature) - 17) % 16
         temperature = hex(temperature)[2:].upper()
         configuration = configuration.replace('[tt7]', temperature)
+
+        configuration = configuration + suffix
 
         return self.send_command(configuration)
