@@ -13,10 +13,16 @@ class AirPurifierException(DeviceException):
 
 
 class OperationMode(enum.Enum):
+    # Supported modes of the Air Purifier Pro, 2, V3
     Auto = 'auto'
     Silent = 'silent'
     Favorite = 'favorite'
+    # Additional supported modes of the Air Purifier 2 and V3
     Idle = 'idle'
+    # Additional supported modes of the Air Purifier V3
+    Medium = 'medium'
+    High = 'high'
+    Strong = 'strong'
 
 
 class SleepMode(enum.Enum):
