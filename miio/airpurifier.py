@@ -251,6 +251,16 @@ class AirPurifierStatus:
 
         return None
 
+    @property
+    def use_time(self) -> Optional[int]:
+        """How long the device has been active in seconds."""
+        return self.data["use_time"]
+
+    @property
+    def button_pressed(self) -> Optional[str]:
+        """Last pressed button."""
+        return self.data["button_pressed"]
+
     @classmethod
     def _get_filter_type(cls, product_id: str) -> FilterType:
         ft = cls._filter_type_cache.get(product_id, None)
@@ -290,7 +300,9 @@ class AirPurifierStatus:
             "sleep_mode_learn_count=%s, " \
             "extra_features=%s, " \
             "turbo_mode_supported=%s, " \
-            "auto_detect=%s>" % \
+            "auto_detect=%s, " % \
+            "use_time=%s, " % \
+            "button_pressed=%s>" % \
             (self.power,
              self.aqi,
              self.average_aqi,
@@ -319,7 +331,9 @@ class AirPurifierStatus:
              self.sleep_mode_learn_count,
              self.extra_features,
              self.turbo_mode_supported,
-             self.auto_detect)
+             self.auto_detect,
+             self.use_time,
+             self.button_pressed)
         return s
 
 
@@ -336,7 +350,8 @@ class AirPurifier(Device):
                       # Second request
                       'led_b', 'bright', 'buzzer', 'child_lock', 'volume',
                       'rfid_product_id', 'rfid_tag', 'act_sleep', 'sleep_mode',
-                      'sleep_time', 'sleep_data_num', 'app_extra', 'act_det']
+                      'sleep_time', 'sleep_data_num', 'app_extra', 'act_det',
+                      'use_time', 'button_pressed']
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
