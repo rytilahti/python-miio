@@ -88,11 +88,11 @@ class AirPurifierStatus:
          'filter1_life': 26, 'f1_hour_used': 2573, 'use_time': None,
          'motor1_speed': 0}
 
-        {‘power’: 'on', ‘aqi’: 18, ‘humidity’: None, ‘temp_dec’: None,
-         ‘mode’: 'silent', ‘led’: 'off', ‘led_b’: 10, ‘buzzer’: 'on',
-         ‘child_lock’: 'off', ‘bright’: 4, ‘favorite_level’: None,
-         ‘filter1_life’: 26, ‘f1_hour_used’: 2574, ‘use_time’: None,
-         ‘motor1_speed’: 648}
+        {'power': 'on', 'aqi': 18, 'humidity': None, 'temp_dec': None,
+         'mode': 'silent', 'led': 'off', 'led_b': 10, 'buzzer': 'on',
+         'child_lock': 'off', 'bright': 4, 'favorite_level': None,
+         'filter1_life': 26, 'f1_hour_used': 2574, 'use_time': None,
+         'motor1_speed': 648}
 
         A request is limited to 16 properties.
         """
