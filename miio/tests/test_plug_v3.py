@@ -14,8 +14,8 @@ class DummyPlugV3(DummyDevice, PlugV3):
         }
         self.return_values = {
             'get_prop': self._get_state,
-            'get_power': self._get_power,
-            'set_power': lambda x: self._set_state("power", x == "on"),
+            'get_power': self._get_load_power,
+            'set_power': lambda x: self._set_state_basic("power", x == ["on"]),
             'set_usb_on': lambda x: self._set_state_basic("usb_on", True),
             'set_usb_off': lambda x: self._set_state_basic("usb_on", False),
             'set_wifi_led': lambda x: self._set_state("wifi_led", x),
@@ -26,7 +26,7 @@ class DummyPlugV3(DummyDevice, PlugV3):
         """Set a state of a variable"""
         self.state[var] = value
 
-    def _get_power(self, props):
+    def _get_load_power(self, props=None):
         """Return load power"""
         return [300]
 
