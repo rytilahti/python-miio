@@ -1,44 +1,33 @@
 from unittest import TestCase
 from miio import PlugV3
+from .dummies import DummyDevice
 import pytest
 
 
-class DummyPlugV3(PlugV3):
+class DummyPlugV3(DummyDevice, PlugV3):
     def __init__(self, *args, **kwargs):
         self.state = {
             'on': True,
             'usb_on': True,
             'temperature': 32,
-            'wifi_led': 'on'
+            'wifi_led': 'off'
         }
         self.return_values = {
             'get_prop': self._get_state,
             'get_power': self._get_power,
-            'set_power': lambda x: self._set_state("power", x == 'on'),
-            'set_usb_on': lambda x: self._set_state("usb_on", True),
-            'set_usb_off': lambda x: self._set_state("usb_on", False),
+            'set_power': lambda x: self._set_state("power", x == "on"),
+            'set_usb_on': lambda x: self._set_state_basic("usb_on", True),
+            'set_usb_off': lambda x: self._set_state_basic("usb_on", False),
             'set_wifi_led': lambda x: self._set_state("wifi_led", x),
         }
         self.start_state = self.state.copy()
 
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
-
-    def _reset_state(self):
-        """Revert back to the original state."""
-        self.state = self.start_state.copy()
-
-    def _set_state(self, var, value):
+    def _set_state_basic(self, var, value):
         """Set a state of a variable"""
         self.state[var] = value
 
-    def _get_state(self, props):
-        """Return wanted properties"""
-        return [self.state[x] for x in props if x in self.state]
-
     def _get_power(self, props):
-        """Return wanted properties"""
+        """Return load power"""
         return [300]
 
 
@@ -79,7 +68,7 @@ class TestPlugV3(TestCase):
         assert self.state().usb_power is True
         assert self.state().temperature == self.device.start_state[
             "temperature"]
-        assert self.state().load_power == self._get_power
+        assert self.state().load_power == self.device._get_power()
 
     def test_usb_on(self):
         self.device.usb_off()  # ensure off
