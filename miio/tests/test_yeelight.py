@@ -77,12 +77,14 @@ class TestYeelight(TestCase):
     def test_on(self):
         self.device.off()  # make sure we are off
         assert self.device.status().is_on is False
+
         self.device.on()
         assert self.device.status().is_on is True
 
     def test_off(self):
         self.device.on()  # make sure we are on
         assert self.device.status().is_on is True
+
         self.device.off()
         assert self.device.status().is_on is False
 

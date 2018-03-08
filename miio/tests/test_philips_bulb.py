@@ -45,17 +45,15 @@ class TestPhilipsBulb(TestCase):
 
     def test_on(self):
         self.device.off()  # ensure off
-
-        start_state = self.is_on()
-        assert start_state is False
+        assert self.is_on() is False
 
         self.device.on()
         assert self.is_on() is True
 
     def test_off(self):
         self.device.on()  # ensure on
-
         assert self.is_on() is True
+
         self.device.off()
         assert self.is_on() is False
 
