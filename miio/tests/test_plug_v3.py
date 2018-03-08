@@ -15,7 +15,7 @@ class DummyPlugV3(DummyDevice, PlugV3):
         self.return_values = {
             'get_prop': self._get_state,
             'get_power': self._get_load_power,
-            'set_power': lambda x: self._set_state_basic("power", x == ["on"]),
+            'set_power': lambda x: self._set_state_basic("on", x == ["on"]),
             'set_usb_on': lambda x: self._set_state_basic("usb_on", True),
             'set_usb_off': lambda x: self._set_state_basic("usb_on", False),
             'set_wifi_led': lambda x: self._set_state("wifi_led", x),
@@ -47,17 +47,15 @@ class TestPlugV3(TestCase):
 
     def test_on(self):
         self.device.off()  # ensure off
-
-        start_state = self.is_on()
-        assert start_state is False
+        assert self.is_on() is False
 
         self.device.on()
         assert self.is_on() is True
 
     def test_off(self):
         self.device.on()  # ensure on
-
         assert self.is_on() is True
+
         self.device.off()
         assert self.is_on() is False
 
@@ -68,7 +66,7 @@ class TestPlugV3(TestCase):
         assert self.state().usb_power is True
         assert self.state().temperature == self.device.start_state[
             "temperature"]
-        assert self.state().load_power == self.device._get_power()
+        assert self.state().load_power == self.device._get_load_power()
 
     def test_usb_on(self):
         self.device.usb_off()  # ensure off
