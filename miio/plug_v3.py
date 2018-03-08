@@ -83,10 +83,10 @@ class PlugV3(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        power = self.send("get_power", [])  # Response: [300]
-        if len(power) == 1:
-            properties.append('power')
-            values.append(power[0])
+        load_power = self.send("get_power", [])  # Response: [300]
+        if len(load_power) == 1:
+            properties.append('load_power')
+            values.append(load_power[0])
 
         return PlugV3Status(
             defaultdict(lambda: None, zip(properties, values)))
