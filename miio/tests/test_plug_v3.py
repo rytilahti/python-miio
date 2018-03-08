@@ -14,7 +14,7 @@ class DummyPlugV3(PlugV3):
         self.return_values = {
             'get_prop': self._get_state,
             'get_power': self._get_power,
-            'set_power': lambda x: self._set_state("power", x),
+            'set_power': lambda x: self._set_state("power", x == 'on'),
             'set_usb_on': lambda x: self._set_state("usb_on", True),
             'set_usb_off': lambda x: self._set_state("usb_on", False),
             'set_wifi_led': lambda x: self._set_state("wifi_led", x),
