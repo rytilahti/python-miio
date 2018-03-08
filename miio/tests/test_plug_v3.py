@@ -104,4 +104,3 @@ class TestPlugV3(TestCase):
 
         self.device.set_wifi_led(False)
         assert wifi_led() is False
-

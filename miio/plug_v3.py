@@ -5,6 +5,7 @@ from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class PlugV3Status:
     """Container for status reports from the plug."""
 
@@ -112,4 +113,3 @@ class PlugV3(Device):
             return self.send("set_wifi_led", ["on"])
         else:
             return self.send("set_wifi_led", ["off"])
-
