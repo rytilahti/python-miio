@@ -95,6 +95,12 @@ class DeviceInfo:
             return self.data["hw_ver"]
         return None
 
+    def mac_address(self) -> Optional[str]:
+        """MAC address if available."""
+        if self.data["mac"] is not None:
+            return self.data["mac"]
+        return None
+
     @property
     def raw(self):
         """Raw data as returned by the device."""
