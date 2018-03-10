@@ -12,6 +12,7 @@ import ipaddress
 import miio
 import logging
 import json
+import re
 from typing import Union
 from functools import wraps
 from functools import partial
@@ -53,6 +54,43 @@ class ExceptionHandlerGroup(click.Group):
         except miio.DeviceException as ex:
             _LOGGER.debug("Exception: %s", ex, exc_info=True)
             click.echo(click.style("Error: %s" % ex, fg='red', bold=True))
+
+
+class EnumType(click.Choice):
+    def __init__(self, enumcls, casesensitive=True):
+        choices = enumcls.__members__
+
+        if not casesensitive:
+            choices = (_.lower() for _ in choices)
+
+        self._enumcls = enumcls
+        self._casesensitive = casesensitive
+
+        super().__init__(list(sorted(set(choices))))
+
+    def convert(self, value, param, ctx):
+        if not self._casesensitive:
+            value = value.lower()
+
+        value = super().convert(value, param, ctx)
+
+        if not self._casesensitive:
+            return next(_ for _ in self._enumcls if _.name.lower() == value.lower())
+        else:
+            return next(_ for _ in self._enumcls if _.name == value)
+
+    def get_metavar(self, param):
+        word = self._enumcls.__name__
+
+        # Stolen from jpvanhal/inflection
+        word = re.sub(r"([A-Z]+)([A-Z][a-z])", r'\1_\2', word)
+        word = re.sub(r"([a-z\d])([A-Z])", r'\1_\2', word)
+        word = word.replace("-", "_").lower().split("_")
+
+        if word[-1] == "enum":
+            word.pop()
+
+        return ("_".join(word)).upper()
 
 
 class GlobalContextObject:
@@ -221,6 +259,7 @@ def format_output(msg_fmt: Union[str, callable]= "",
 
 def json_output(pretty=False):
     indent = 2 if pretty else None
+
     def decorator(func):
         @wraps(func)
         def wrap(*args, **kwargs):
