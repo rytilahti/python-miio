@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from collections import defaultdict
 import click
 from .device import Device, DeviceException
-from .click_common import command, format_output
+from .click_common import command, format_output, EnumType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -440,7 +440,7 @@ class AirPurifier(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        click.argument("mode", type=OperationMode),
+        click.argument("mode", type=EnumType(OperationMode, False)),
         default_output=format_output("Setting mode to '{mode.value}'")
     )
     def set_mode(self, mode: OperationMode):
@@ -463,7 +463,7 @@ class AirPurifier(Device):
         return self.send("set_level_favorite", [level])  # 0 ... 16
 
     @command(
-        click.argument("brightness", type=LedBrightness),
+        click.argument("brightness", type=EnumType(LedBrightness, False)),
         default_output=format_output(
             "Setting LED brightness to {brightness}")
     )
