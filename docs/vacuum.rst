@@ -143,7 +143,7 @@ which will handle both generation and encrypting the package for you.
 
 There are two ways to install install sound packs:
 
-1. Install by using self-hosting server, where you just need to point
+1. Install by using self-hosting server, where you just need to point the sound pack you want to install.
 
 ::
 
@@ -162,7 +162,7 @@ If the automatic detection of the IP address for self-hosting server is not work
 you can override this by using `--ip` option.
 
 
-.. _audio generator: https://github.com/dgiese/dustcloud/tree/master/xiaomi.vacuum.gen1/audio_generator
+.. _audio generator: https://github.com/dgiese/dustcloud/tree/master/devices/xiaomi.vacuum/audio_generator
 
 Firmware update
 ~~~~~~~~~~~~~~~
