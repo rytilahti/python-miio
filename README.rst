@@ -19,7 +19,8 @@ Supported devices
 -  Xiaomi Mi Home Air Conditioner Companion (:class:`miio.airconditioningcompanion`)
 -  Xiaomi Mi Air Purifier (:class:`miio.airpurifier`)
 -  :doc:`Xiaomi Mi Smart WiFi Socket <plug>` (:class:`miio.plug`)
--  :doc:`Xiaomi Mi Smart Socket Plug (1 Socket, 1 USB Port) <plug>` (:class:`miio.plug`)
+-  :doc:`Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port) <plug>` (:class:`miio.plug_v1`)
+-  :doc:`Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports) <plug>` (:class:`miio.plug_v3`)
 -  Xiaomi Smart Power Strip (WiFi, 6 Ports) (:class:`miio.powerstrip`)
 -  :doc:`Xiaomi Philips Eyecare Smart Lamp 2 <eyecare>` (:class:`miio.philips_eyecare`)
 -  :doc:`Xiaomi Philips LED Ceiling Lamp <ceil>` (:class:`miio.ceil`)
@@ -57,6 +58,10 @@ Home Assistant support
    <https://home-assistant.io/components/switch.xiaomi_miio/>`__
 -  `Xiaomi Universal IR Remote
    Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__
+-  `Xiaomi Mi Air Quality
+   Monitor (PM2.5) <https://github.com/syssi/xiaomi_airqualitymonitor>`__
+-  `Xiaomi Mi Home Air Conditioner
+   Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
 
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
    :target: https://badge.fury.io/py/python-miio

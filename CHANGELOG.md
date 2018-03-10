@@ -1,5 +1,64 @@
 # Change Log
 
+## [0.3.8](https://github.com/rytilahti/python-miio/tree/0.3.8)
+
+Goodbye Python 3.4! This release marks end of support for python versions older than 3.5, paving a way for cleaner code and a nicer API for a future asyncio support. Highlights of this release:
+
+* Support for several new devices, improvements to existing devices and various fixes thanks to @syssi.
+
+* Firmware updates for vacuums (@rytilahti), the most prominent use case being installing custom firmwares (e.g. for rooting your device). Installing sound packs is also streamlined with a self-hosting server.
+
+* The protocol quirks handling was extended to handle invalid messages from the cloud (thanks @jschmer), improving interoperability for Dustcloud.
+
+New devices:
+* Chuangmi Plug V3 (@syssi)
+* Xiaomi Air Humidifier CA (@syssi)
+* Xiaomi Air Purifier V3 (@syssi)
+* Xiaomi Philips LED Ceiling Light 620mm (@syssi)
+
+Improvements:
+* Provide the mac address as property of the device info (@syssi)
+* Air Purifier: button_pressed property added (@syssi)
+* Generalize and move configure\_wifi to the Device class (@rytilahti)
+* Power Strip: The wifi led and power price can be controlled now (@syssi)
+* Try to fix decrypted payload quirks if it fails to parse as json (@jschmer)
+* Air Conditioning Companion: Turn on/off and LED property added, load power fixed (@syssi)
+* Strict check for version equality of construct (@arekbulski)
+* Firmware update functionality (@rytilahti)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.7...0.3.8)
+
+**Closed issues:**
+
+- Can't retrieve token from Android app [\#246](https://github.com/rytilahti/python-miio/issues/246)
+- Unsupported device found!  chuangmi.ir.v2 [\#242](https://github.com/rytilahti/python-miio/issues/242)
+- Improved support of the Air Humidifier [\#241](https://github.com/rytilahti/python-miio/issues/241)
+- Add support for the Xiaomi Philips LED Ceiling Light 620mm \(philips.light.zyceiling\) [\#234](https://github.com/rytilahti/python-miio/issues/234)
+- Support Xiaomi Air Purifier v3 [\#231](https://github.com/rytilahti/python-miio/issues/231)
+
+**Merged pull requests:**
+
+- Add --ip for install\_sound, update\_firmware & update docs [\#262](https://github.com/rytilahti/python-miio/pull/262) ([rytilahti](https://github.com/rytilahti))
+- Provide the mac address as property of the device info [\#260](https://github.com/rytilahti/python-miio/pull/260) ([syssi](https://github.com/syssi))
+- Tests: Non-essential code removed [\#258](https://github.com/rytilahti/python-miio/pull/258) ([syssi](https://github.com/syssi))
+- Support of the Chuangmi Plug V3  [\#257](https://github.com/rytilahti/python-miio/pull/257) ([syssi](https://github.com/syssi))
+- Air Purifier V3: Response example updated [\#255](https://github.com/rytilahti/python-miio/pull/255) ([syssi](https://github.com/syssi))
+- Support of the Air Purifier V3 added \(Closes: \#231\) [\#254](https://github.com/rytilahti/python-miio/pull/254) ([syssi](https://github.com/syssi))
+- Air Purifier: Property "button\_pressed" added [\#253](https://github.com/rytilahti/python-miio/pull/253) ([syssi](https://github.com/syssi))
+- Respond with an error after the retry counter is down to zero, log retries into debug logger [\#252](https://github.com/rytilahti/python-miio/pull/252) ([rytilahti](https://github.com/rytilahti))
+- Drop python 3.4 support, which paves a way for nicer API for asyncio among other things [\#251](https://github.com/rytilahti/python-miio/pull/251) ([rytilahti](https://github.com/rytilahti))
+- Generalize and move configure\_wifi to the Device class [\#250](https://github.com/rytilahti/python-miio/pull/250) ([rytilahti](https://github.com/rytilahti))
+- Support of the Xiaomi Air Humidifier CA \(zhimi.humidifier.ca1\) [\#249](https://github.com/rytilahti/python-miio/pull/249) ([syssi](https://github.com/syssi))
+- Xiaomi AC Companion: LED property added [\#248](https://github.com/rytilahti/python-miio/pull/248) ([syssi](https://github.com/syssi))
+- Some misleading docstrings updated [\#245](https://github.com/rytilahti/python-miio/pull/245) ([syssi](https://github.com/syssi))
+- Powerstrip support improved [\#239](https://github.com/rytilahti/python-miio/pull/239) ([syssi](https://github.com/syssi))
+- Repr of the AirQualityMonitorStatus fixed [\#238](https://github.com/rytilahti/python-miio/pull/238) ([syssi](https://github.com/syssi))
+- mDNS discovery: Additional philips light added [\#237](https://github.com/rytilahti/python-miio/pull/237) ([syssi](https://github.com/syssi))
+- Try to fix decrypted payload quirks if it fails to parse as json [\#236](https://github.com/rytilahti/python-miio/pull/236) ([jschmer](https://github.com/jschmer))
+- Device support of the Xiaomi Air Conditioning Companion improved [\#233](https://github.com/rytilahti/python-miio/pull/233) ([syssi](https://github.com/syssi))
+- Construct related, strict check for version equality [\#232](https://github.com/rytilahti/python-miio/pull/232) ([arekbulski](https://github.com/arekbulski))
+- Implement firmware update functionality [\#153](https://github.com/rytilahti/python-miio/pull/153) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.3.7](https://github.com/rytilahti/python-miio/tree/0.3.7)
 
 This is a bugfix release which provides improved stability and compatibility.
