@@ -5,11 +5,12 @@ Following features of the vacuum cleaner are currently supported:
 
 -  Starting, stopping, pausing, locating.
 -  Controlling the fan speed.
--  Fetching status and state of consumables. **Resetting consumable state
-   is not currently implemented, patches welcome!**
+-  Fetching the current status.
+-  Fetching and reseting the state of consumables.
 -  Fetching and setting the schedules.
 -  Setting and querying the timezone.
 -  Installing sound packs.
+-  Installing firmware updates.
 -  Manual control of the robot. **Patches for a nicer API are very welcome.**
 
 Use :ref:`mirobo --help <HelpOutput>`
@@ -140,17 +141,53 @@ To get information about current sound settings:
 You can use dustcloud's `audio generator`_ to create your own language packs,
 which will handle both generation and encrypting the package for you.
 
-To install your newly generated sound pack, you have to host it somewhere accessible to the vacuum,
-and you have to know its md5sum.
-The last parameter to give to the command is sound id (or `sid`),
-which you can choose by yourself.
+There are two ways to install install sound packs:
+
+1. Install by using self-hosting server, where you just need to point
 
 ::
 
-    mirobo install_sound http://10.10.20.1:8000/my_sounds.pkg b50cfea27e52ebd5f46038ac7b9330c8 1005
+    mirobo install_sound my_sounds.pkg
+
+2. Install from an URL, in which case you need to pass the md5 hash of the file as a second parameter.
+
+::
+
+    mirobo install_sound http://10.10.20.1:8000/my_sounds.pkg b50cfea27e52ebd5f46038ac7b9330c8
+
+`--sid` can be used to select the sound ID (SID) for the new file,
+using an existing SID will overwrite the old.
+
+If the automatic detection of the IP address for self-hosting server is not working,
+you can override this by using `--ip` option.
 
 
 .. _audio generator: https://github.com/dgiese/dustcloud/tree/master/xiaomi.vacuum.gen1/audio_generator
+
+Firmware update
+~~~~~~~~~~~~~~~
+
+This can be useful if you want to downgrade or do updates without connecting to the cloud,
+or if you want to use a custom rooted firmware.
+`Dustcloud project <https://github.com/dgiese/dustcloud>`_ provides a way to generate your own firmware images,
+and they also have `a firmware archive <https://github.com/dgiese/dustcloud/tree/master/devices/xiaomi.vacuum.gen1/firmware>`_
+for original firmwares.
+
+.. WARNING::
+    Updating firmware should not be taken lightly even when the device will automatically roll-back
+    to the previous version when failing to do an update.
+
+    Using custom firmwares may hamper the functionality of your vacuum,
+    and it is unknown how the factory reset works in these cases.
+
+This feature works similarly to the sound updates,
+so passing a local file will create a self-hosting server
+and updating from an URL requires you to pass the md5 hash of the file.
+
+::
+
+    mirobo update_firmware v11_003094.pkg
+
 
 DND functionality
 ~~~~~~~~~~~~~~~~~
