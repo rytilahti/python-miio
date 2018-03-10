@@ -2,6 +2,27 @@
 
 ## [0.3.8](https://github.com/rytilahti/python-miio/tree/0.3.8)
 
+The most significant new feature of this release is the firmware update functionality for the Xiaomi Mi Robot Vacuum (thanks to @rytilahti).
+On top of that there are various smaller fixes and improvements and a couple of new devices.
+
+Furthermore the support of Python 3.4 was dropped which paves a way for nicer API for asyncio among other things.
+
+New devices:
+* Chuangmi Plug V3 (@syssi)
+* Xiaomi Air Humidifier CA (@syssi)
+* Xiaomi Air Purifier V3 (@syssi)
+* Xiaomi Philips LED Ceiling Light 620mm (@syssi)
+
+Improvements:
+* Provide the mac address as property of the device info (@syssi)
+* Air Purifier: button_pressed property added (@syssi)
+* Generalize and move configure\_wifi to the Device class (@rytilahti)
+* Power Strip: The wifi led and power price can be controlled now (@syssi)
+* Try to fix decrypted payload quirks if it fails to parse as json (@jschmer)
+* Air Conditioning Companion: Turn on/off and LED property added, load power fixed (@syssi)
+* Strict check for version equality of construct (@arekbulski)
+* Firmware update functionality (@rytilahti)
+
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.7...0.3.8)
 
 **Closed issues:**
@@ -14,6 +35,9 @@
 
 **Merged pull requests:**
 
+- Provide the mac address as property of the device info [\#260](https://github.com/rytilahti/python-miio/pull/260) ([syssi](https://github.com/syssi))
+- Tests: Non-essential code removed [\#258](https://github.com/rytilahti/python-miio/pull/258) ([syssi](https://github.com/syssi))
+- Support of the Chuangmi Plug V3  [\#257](https://github.com/rytilahti/python-miio/pull/257) ([syssi](https://github.com/syssi))
 - Air Purifier V3: Response example updated [\#255](https://github.com/rytilahti/python-miio/pull/255) ([syssi](https://github.com/syssi))
 - Support of the Air Purifier V3 added \(Closes: \#231\) [\#254](https://github.com/rytilahti/python-miio/pull/254) ([syssi](https://github.com/syssi))
 - Air Purifier: Property "button\_pressed" added [\#253](https://github.com/rytilahti/python-miio/pull/253) ([syssi](https://github.com/syssi))
