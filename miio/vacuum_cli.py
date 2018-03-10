@@ -430,10 +430,20 @@ def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
 @cli.command()
 @click.argument('url')
 @click.argument('md5sum', required=False, default=None)
-@click.argument('sid', type=int, required=False, default=10000)
+@click.option('--sid', type=int, required=False, default=10000)
+@click.option('--ip', required=False)
 @pass_dev
 def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int):
-    """Install a sound."""
+    """Install a sound.
+
+    When passing a local file this will create a self-hosting server
+     for the given file and the md5sum will be calculated automatically.
+
+    For URLs you have to specify the md5sum manually.
+
+    `--ip` can be used to override automatically detected IP address for
+     the device to contact for the update.
+    """
     click.echo("Installing from %s (md5: %s) for id %s" % (url, md5sum, sid))
 
     local_url = None
@@ -519,12 +529,17 @@ def update_status(vac: miio.Vacuum):
 @cli.command()
 @click.argument('url', required=True)
 @click.argument('md5', required=False, default=None)
+@click.option('--ip', required=False)
 @pass_dev
-def update_firmware(vac: miio.Vacuum, url: str, md5: str):
+def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
     """Update device firmware.
 
-    If `file` starts with http* it is expected to be an URL.
-     In that case md5sum of the file has to be given."""
+    If `url` starts with http* it is expected to be an URL.
+     In that case md5sum of the file has to be given.
+
+    `--ip` can be used to override automatically detected IP address for
+     the device to contact for the update.
+     """
 
     # TODO Check that the device is in updateable state.
 
@@ -537,7 +552,7 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str):
         click.echo("Using %s (md5: %s)" % (url, md5))
     else:
         server = OneShotServer(url)
-        url = server.url()
+        url = server.url(ip)
 
         t = threading.Thread(target=server.serve_once)
         t.start()
