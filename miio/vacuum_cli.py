@@ -433,7 +433,7 @@ def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
 @click.option('--sid', type=int, required=False, default=10000)
 @click.option('--ip', required=False)
 @pass_dev
-def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int):
+def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int, ip: str):
     """Install a sound.
 
     When passing a local file this will create a self-hosting server
@@ -455,7 +455,7 @@ def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int):
         local_url = url
     else:
         server = OneShotServer(url)
-        local_url = server.url()
+        local_url = server.url(ip)
         md5sum = server.md5
 
         t = threading.Thread(target=server.serve_once)
