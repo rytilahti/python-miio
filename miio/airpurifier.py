@@ -433,7 +433,7 @@ class AirPurifier(Device):
         return self.send("set_power", ["on"])
 
     @command(
-        format_output("Powering off")
+        default_output=format_output("Powering off"),
     )
     def off(self):
         """Power off."""
