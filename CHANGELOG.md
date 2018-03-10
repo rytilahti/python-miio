@@ -2,10 +2,13 @@
 
 ## [0.3.8](https://github.com/rytilahti/python-miio/tree/0.3.8)
 
-The most significant new feature of this release is the firmware update functionality for the Xiaomi Mi Robot Vacuum (thanks to @rytilahti).
-On top of that there are various smaller fixes and improvements and a couple of new devices.
+Goodbye Python 3.4! This release marks end of support for python versions older than 3.5, paving a way for cleaner code and a nicer API for a future asyncio support. Highlights of this release:
 
-Furthermore the support of Python 3.4 was dropped which paves a way for nicer API for asyncio among other things.
+* Support for several new devices, improvements to existing devices and various fixes thanks to @syssi.
+
+* Firmware updates for vacuums (@rytilahti), the most prominent use case being installing custom firmwares (e.g. for rooting your device). Installing sound packs is also streamlined with a self-hosting server.
+
+* The protocol quirks handling was extended to handle invalid messages from the cloud (thanks @jschmer), improving interoperability for Dustcloud.
 
 New devices:
 * Chuangmi Plug V3 (@syssi)
@@ -35,6 +38,7 @@ Improvements:
 
 **Merged pull requests:**
 
+- Add --ip for install\_sound, update\_firmware & update docs [\#262](https://github.com/rytilahti/python-miio/pull/262) ([rytilahti](https://github.com/rytilahti))
 - Provide the mac address as property of the device info [\#260](https://github.com/rytilahti/python-miio/pull/260) ([syssi](https://github.com/syssi))
 - Tests: Non-essential code removed [\#258](https://github.com/rytilahti/python-miio/pull/258) ([syssi](https://github.com/syssi))
 - Support of the Chuangmi Plug V3  [\#257](https://github.com/rytilahti/python-miio/pull/257) ([syssi](https://github.com/syssi))
