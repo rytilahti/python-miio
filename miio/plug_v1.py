@@ -31,7 +31,7 @@ class PlugV1Status:
     def temperature(self) -> float:
         return self.data["temperature"]
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<PlugV1Status power=%s, usb_power=%s, temperature=%s>" % \
             (self.power,
              self.usb_power,

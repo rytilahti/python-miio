@@ -27,7 +27,7 @@ class PlugStatus:
         """Return temperature."""
         return self.data["temperature"]
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<PlugStatus power=%s, temperature=%s>" % \
             (self.power,
              self.temperature)
