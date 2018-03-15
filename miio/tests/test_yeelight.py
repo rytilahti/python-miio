@@ -59,19 +59,25 @@ def dummylight(request):
 
 @pytest.mark.usefixtures("dummylight")
 class TestYeelight(TestCase):
+
+    def is_on(self):
+        return self.device.status().is_on
+
+    def state(self):
+        return self.device.status()
+
     def test_status(self):
         self.device._reset_state()
 
         assert repr(self.state()) == repr(YeelightStatus(self.device.start_state))
 
-        status = self.device.status()  # type: YeelightStatus
-        assert status.name == self.device.start_state["name"]
-        assert status.is_on is False
-        assert status.brightness == 100
-        assert status.color_temp == 3584
-        assert status.color_mode == YeelightMode.ColorTemperature
-        assert status.developer_mode is True
-        assert status.save_state_on_change is True
+        assert self.is_on is False
+        assert self.state().name == self.device.start_state["name"]
+        assert self.state().brightness == 100
+        assert self.state().color_temp == 3584
+        assert self.state().color_mode == YeelightMode.ColorTemperature
+        assert self.state().developer_mode is True
+        assert self.state().save_state_on_change is True
 
         # following are tested in set mode tests
         # assert status.rgb == 16711680
@@ -79,21 +85,21 @@ class TestYeelight(TestCase):
 
     def test_on(self):
         self.device.off()  # make sure we are off
-        assert self.device.status().is_on is False
+        assert self.is_on is False
 
         self.device.on()
-        assert self.device.status().is_on is True
+        assert self.is_on is True
 
     def test_off(self):
         self.device.on()  # make sure we are on
-        assert self.device.status().is_on is True
+        assert self.is_on is True
 
         self.device.off()
-        assert self.device.status().is_on is False
+        assert self.is_on is False
 
     def test_set_brightness(self):
         def brightness():
-            return self.device.status().brightness
+            return self.state().brightness
 
         self.device.set_brightness(50)
         assert brightness() == 50
@@ -109,7 +115,7 @@ class TestYeelight(TestCase):
 
     def test_set_color_temp(self):
         def color_temp():
-            return self.device.status().color_temp
+            return self.state().color_temp
 
         self.device.set_color_temp(2000)
         assert color_temp() == 2000
@@ -125,11 +131,11 @@ class TestYeelight(TestCase):
     @pytest.mark.skip("rgb is not properly implemented")
     def test_set_rgb(self):
         self.device._reset_state()
-        assert self.device.status().rgb == 16711680
+        assert self.state().rgb == 16711680
 
         NEW_RGB = 16712222
         self.set_rgb(NEW_RGB)
-        assert self.device.status().rgb == NEW_RGB
+        assert self.state().rgb == NEW_RGB
 
     @pytest.mark.skip("hsv is not properly implemented")
     def test_set_hsv(self):
