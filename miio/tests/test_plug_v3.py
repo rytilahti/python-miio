@@ -63,16 +63,16 @@ class TestPlugV3(TestCase):
     def test_status(self):
         self.device._reset_state()
 
+        load_power = self.device._get_load_power().pop(0)
+
         start_state_extended = self.device.start_state.copy()
-        start_state_extended.append(
-            {'load_power': self.device._get_load_power().pop(0)})
+        start_state_extended['load_power'] = load_power
         assert repr(self.state()) == repr(PlugV3Status(start_state_extended))
 
         assert self.is_on() is True
         assert self.state().usb_power is True
-        assert self.state().temperature == self.device.start_state[
-            "temperature"]
-        assert self.state().load_power == self.device._get_load_power().pop(0)
+        assert self.state().temperature == self.device.start_state["temperature"]
+        assert self.state().load_power == load_power
 
     def test_usb_on(self):
         self.device.usb_off()  # ensure off
