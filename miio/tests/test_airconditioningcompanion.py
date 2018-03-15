@@ -1,8 +1,10 @@
 import string
 from unittest import TestCase
 from miio import AirConditioningCompanion
-from miio.airconditioningcompanion import OperationMode, FanSpeed, Power, \
-    SwingMode, Led, STORAGE_SLOT_ID
+from miio.airconditioningcompanion import (OperationMode, FanSpeed, Power,
+                                           SwingMode, Led,
+                                           AirConditioningCompanionStatus,
+                                           STORAGE_SLOT_ID, )
 import pytest
 
 STATE_ON = ['on']
@@ -77,6 +79,8 @@ class TestAirConditioningCompanion(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(AirConditioningCompanionStatus(self.device.start_state))
 
         assert self.is_on() is False
         assert self.state().load_power == 2

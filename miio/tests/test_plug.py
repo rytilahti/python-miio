@@ -1,5 +1,6 @@
 from unittest import TestCase
 from miio import Plug
+from miio.plug import PlugStatus
 from .dummies import DummyDevice
 import pytest
 
@@ -47,6 +48,8 @@ class TestPlug(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(PlugStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().temperature == self.device.start_state["temperature"]

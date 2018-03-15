@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import PhilipsBulb
-from miio.philips_bulb import PhilipsBulbException
+from miio.philips_bulb import PhilipsBulbStatus, PhilipsBulbException
 from .dummies import DummyDevice
 import pytest
 
@@ -59,6 +59,8 @@ class TestPhilipsBulb(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(PhilipsBulbStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().brightness == self.device.start_state["bright"]

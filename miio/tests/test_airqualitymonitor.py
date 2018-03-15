@@ -1,5 +1,6 @@
 from unittest import TestCase
 from miio import AirQualityMonitor
+from miio.airqualitymonitor import AirQualityMonitorStatus
 from .dummies import DummyDevice
 import pytest
 
@@ -50,6 +51,8 @@ class TestAirQualityMonitor(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(AirQualityMonitorStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().aqi == self.device.start_state["aqi"]
