@@ -39,6 +39,7 @@ DEVICE_MAP = {
     "yunmi-waterpuri-v2": WaterPurifier,
     # It looks like the philips bulb cannot be discovered via mdns
     "philips-light-bulb": PhilipsBulb,
+    "philips-light-candle2": PhilipsBulb,  # name needs to be checked
     "philips-light-ceiling": Ceil,
     "philips-light-zyceiling": Ceil,
     "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
