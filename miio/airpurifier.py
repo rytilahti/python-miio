@@ -319,7 +319,6 @@ class AirPurifierStatus:
             "extra_features=%s, " \
             "turbo_mode_supported=%s, " \
             "auto_detect=%s, " \
-            "use_time=%s, " \
             "button_pressed=%s>" % \
             (self.power,
              self.aqi,
@@ -350,7 +349,6 @@ class AirPurifierStatus:
              self.extra_features,
              self.turbo_mode_supported,
              self.auto_detect,
-             self.use_time,
              self.button_pressed)
         return s
 
