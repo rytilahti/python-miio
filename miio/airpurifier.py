@@ -318,8 +318,8 @@ class AirPurifierStatus:
             "sleep_mode_learn_count=%s, " \
             "extra_features=%s, " \
             "turbo_mode_supported=%s, " \
-            "auto_detect=%s, " % \
-            "use_time=%s, " % \
+            "auto_detect=%s, " \
+            "use_time=%s, " \
             "button_pressed=%s>" % \
             (self.power,
              self.aqi,
