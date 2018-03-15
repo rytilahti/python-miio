@@ -94,7 +94,7 @@ class TestAirPurifier(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirPurifierStatus(self.start_state))
+        assert repr(self.state()) == repr(AirPurifierStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().aqi == self.device.start_state["aqi"]
