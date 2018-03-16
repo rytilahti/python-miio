@@ -6,7 +6,7 @@ from .dummies import DummyDevice
 import pytest
 
 
-class DummyChuangmiPlugV1(ChuangmiPlug):
+class DummyChuangmiPlugV1(DummyDevice, ChuangmiPlug):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_CHUANGMI_PLUG_V1
         self.state = {
@@ -16,28 +16,16 @@ class DummyChuangmiPlugV1(ChuangmiPlug):
         }
         self.return_values = {
             'get_prop': self._get_state,
-            'set_on': lambda x: self._set_state("on", True),
-            'set_off': lambda x: self._set_state("on", False),
-            'set_usb_on': lambda x: self._set_state("usb_on", True),
-            'set_usb_off': lambda x: self._set_state("usb_on", False),
+            'set_on': lambda x: self._set_state_basic("on", True),
+            'set_off': lambda x: self._set_state_basic("on", False),
+            'set_usb_on': lambda x: self._set_state_basic("usb_on", True),
+            'set_usb_off': lambda x: self._set_state_basic("usb_on", False),
         }
         self.start_state = self.state.copy()
 
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
-
-    def _reset_state(self):
-        """Revert back to the original state."""
-        self.state = self.start_state.copy()
-
-    def _set_state(self, var, value):
+    def _set_state_basic(self, var, value):
         """Set a state of a variable"""
         self.state[var] = value
-
-    def _get_state(self, props):
-        """Return wanted properties"""
-        return [self.state[x] for x in props if x in self.state]
 
 
 @pytest.fixture(scope="class")
