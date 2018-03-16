@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import ChuangmiPlug
-from miio.chuangmi_plug import (ChuangmiPlugV1Status, MODEL_CHUANGMI_PLUG_V1,
+from miio.chuangmi_plug import (ChuangmiPlugStatus, MODEL_CHUANGMI_PLUG_V1,
                                 MODEL_CHUANGMI_PLUG_V3, )
 from .dummies import DummyDevice
 import pytest
@@ -158,7 +158,7 @@ class TestChuangmiPlugV3(TestCase):
         start_state_extended = self.device.start_state.copy()
         start_state_extended['load_power'] = load_power
         assert repr(self.state()) == repr(
-            ChuangmiPlugV3Status(start_state_extended))
+            ChuangmiPlugStatus(start_state_extended))
 
         assert self.is_on() is True
         assert self.state().usb_power is True

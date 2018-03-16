@@ -44,14 +44,14 @@ class ChuangmiPlugStatus:
     @property
     def load_power(self) -> Optional[int]:
         """Current power load, if available."""
-        if self.data["load_power"] is not None:
+        if "load_power" in self.data and self.data["load_power"] is not None:
             return self.data["load_power"]
         return None
 
     @property
     def wifi_led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
-        if self.data["wifi_led"] is not None:
+        if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"
         return None
 
@@ -100,10 +100,16 @@ class ChuangmiPlug(Device):
 
     def on(self):
         """Power on."""
+        if self.model == MODEL_CHUANGMI_PLUG_V3:
+            return self.send("set_power", ["on"])
+
         return self.send("set_on", [])
 
     def off(self):
         """Power off."""
+        if self.model == MODEL_CHUANGMI_PLUG_V3:
+            return self.send("set_power", ["off"])
+
         return self.send("set_off", [])
 
     def usb_on(self):
