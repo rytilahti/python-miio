@@ -85,6 +85,13 @@ class ChuangmiPlugStatus:
 class ChuangmiPlug(Device):
     """Main class representing the Chuangmi Plug V1 and V3."""
 
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = None) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        self.model = model
+
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
