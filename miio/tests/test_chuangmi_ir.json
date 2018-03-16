@@ -107,8 +107,8 @@
     {
       "desc": "Invalid pronto command",
       "in": [
-        "Invalid pronto command",
-        -1
+        "FFFFFFFFFFFF",
+        0
       ]
     }
   ]
