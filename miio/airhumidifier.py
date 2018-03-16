@@ -126,7 +126,7 @@ class AirHumidifierStatus:
         """Last pressed button."""
         return self.data["button_pressed"]
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<AirHumidiferStatus power=%s, " \
             "mode=%s, " \
             "temperature=%s, " \

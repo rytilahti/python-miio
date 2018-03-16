@@ -71,6 +71,9 @@ class TestVacuum(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.status()) == repr(VacuumStatus(self.device.start_state))
+
         status = self.status()
         assert status.is_on is False
         assert status.dnd is True

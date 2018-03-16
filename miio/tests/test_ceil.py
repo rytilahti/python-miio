@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import Ceil
-from miio.ceil import CeilException
+from miio.ceil import CeilStatus, CeilException
 from .dummies import DummyDevice
 import pytest
 
@@ -65,6 +65,8 @@ class TestCeil(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(CeilStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().brightness == self.device.start_state["bright"]

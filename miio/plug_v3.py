@@ -49,7 +49,7 @@ class PlugV3Status:
         """True if the wifi led is turned on."""
         return self.data["wifi_led"] == "on"
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<PlugV3Status " \
             "power=%s, " \
             "usb_power=%s, " \

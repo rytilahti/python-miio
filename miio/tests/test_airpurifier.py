@@ -1,8 +1,7 @@
 from unittest import TestCase
 from miio import AirPurifier
-from miio.airpurifier import (
-    OperationMode, LedBrightness, FilterType, SleepMode, AirPurifierException
-)
+from miio.airpurifier import (OperationMode, LedBrightness, FilterType,
+                              SleepMode, AirPurifierStatus, AirPurifierException)
 from .dummies import DummyDevice
 import pytest
 
@@ -92,6 +91,8 @@ class TestAirPurifier(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(AirPurifierStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().aqi == self.device.start_state["aqi"]

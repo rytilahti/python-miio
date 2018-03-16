@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import PowerStrip
-from miio.powerstrip import PowerMode, PowerStripException
+from miio.powerstrip import PowerMode, PowerStripStatus, PowerStripException
 from .dummies import DummyDevice
 import pytest
 
@@ -56,6 +56,8 @@ class TestPowerStrip(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(PowerStripStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().mode == PowerMode(self.device.start_state["mode"])

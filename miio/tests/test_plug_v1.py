@@ -1,5 +1,6 @@
 from unittest import TestCase
 from miio import PlugV1
+from miio.plug_v1 import PlugV1Status
 import pytest
 
 
@@ -66,6 +67,8 @@ class TestPlugV1(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(PlugV1Status(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().usb_power is True

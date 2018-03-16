@@ -62,6 +62,9 @@ class TestYeelight(TestCase):
     def test_status(self):
         self.device._reset_state()
         status = self.device.status()  # type: YeelightStatus
+
+        assert repr(status) == repr(YeelightStatus(self.device.start_state))
+
         assert status.name == self.device.start_state["name"]
         assert status.is_on is False
         assert status.brightness == 100

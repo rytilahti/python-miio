@@ -141,6 +141,26 @@ class AirConditioningCompanionStatus:
         except TypeError:
             return None
 
+    def __repr__(self) -> str:
+        s = "<AirConditioningCompanionStatus " \
+            "power=%s, " \
+            "load_power=%s, " \
+            "air_condition_model=%s, " \
+            "led=%s, " \
+            "temperature=%s, " \
+            "swing_mode=%s, " \
+            "fan_speed=%s, " \
+            "mode=%s>" % \
+            (self.power,
+             self.load_power,
+             self.air_condition_model,
+             self.led,
+             self.temperature,
+             self.swing_mode,
+             self.fan_speed,
+             self.mode)
+        return s
+
 
 class AirConditioningCompanion(Device):
     """Main class representing Xiaomi Air Conditioning Companion."""

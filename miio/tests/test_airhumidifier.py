@@ -1,6 +1,7 @@
 from unittest import TestCase
 from miio import AirHumidifier
-from miio.airhumidifier import OperationMode, LedBrightness, AirHumidifierException
+from miio.airhumidifier import (OperationMode, LedBrightness,
+                                AirHumidifierStatus, AirHumidifierException)
 from .dummies import DummyDevice
 import pytest
 
@@ -68,6 +69,8 @@ class TestAirHumidifier(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(AirHumidifierStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().temperature == self.device.start_state["temp_dec"] / 10.0

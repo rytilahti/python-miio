@@ -1,6 +1,6 @@
 from unittest import TestCase
 from miio import PhilipsEyecare
-from miio.philips_eyecare import PhilipsEyecareException
+from miio.philips_eyecare import PhilipsEyecareStatus, PhilipsEyecareException
 from .dummies import DummyDevice
 import pytest
 
@@ -63,6 +63,8 @@ class TestPhilipsEyecare(TestCase):
 
     def test_status(self):
         self.device._reset_state()
+
+        assert repr(self.state()) == repr(PhilipsEyecareStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().brightness == self.device.start_state["bright"]
