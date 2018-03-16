@@ -131,7 +131,6 @@ class Device:
             self.token = bytes.fromhex(token)
         self.debug = debug
         self.lazy_discover = lazy_discover
-        self.model = model
 
         self._timeout = 5
         self._discovered = False
