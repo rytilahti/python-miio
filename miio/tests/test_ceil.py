@@ -100,7 +100,6 @@ class TestCeil(TestCase):
         self.device.set_color_temperature(20)
         assert color_temperature() == 20
 
-
         with pytest.raises(CeilException):
             self.device.set_color_temperature(-1)
 
