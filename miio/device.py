@@ -115,7 +115,7 @@ class Device:
     This class should not be initialized directly but a device-specific class inheriting
     it should be used instead of it."""
     def __init__(self, ip: str = None, token: str = None,
-                 start_id: int=0, debug: int=0, lazy_discover: bool=True) -> None:
+                 start_id: int=0, debug: int=0, lazy_discover: bool=True,  model: str=None) -> None:
         """
         Create a :class:`Device` instance.
         :param ip: IP address or a hostname for the device
@@ -131,6 +131,7 @@ class Device:
             self.token = bytes.fromhex(token)
         self.debug = debug
         self.lazy_discover = lazy_discover
+        self.model = model
 
         self._timeout = 5
         self._discovered = False

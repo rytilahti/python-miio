@@ -5,15 +5,19 @@ from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_CHUANGMI_PLUG_V3 = 'chuangmi.plug.v3'
+MODEL_CHUANGMI_PLUG_V1 = 'chuangmi.plug.v1'
 
-class PlugV3Status:
+
+class ChuangmiPlugStatus:
     """Container for status reports from the plug."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """
-        Supported device models: chuangmi.plug.v3
+        Response of a Chuangmi Plug V1 (chuangmi.plug.v1)
+        { 'power': True, 'usb_on': True, 'temperature': 32 }
 
-        Response of a Chuang Mi V3 (chuangmi.plug.v3):
+        Response of a Chuangmi Plug V3 (chuangmi.plug.v3):
         { 'on': True, 'usb_on': True, 'temperature': 32, 'wifi_led': True }
         """
         self.data = data
@@ -45,29 +49,31 @@ class PlugV3Status:
         return None
 
     @property
-    def wifi_led(self) -> bool:
+    def wifi_led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
-        return self.data["wifi_led"] == "on"
+        if self.data["wifi_led"] is not None:
+            return self.data["wifi_led"] == "on"
+        return None
 
     def __repr__(self) -> str:
-        s = "<PlugV3Status " \
+        s = "<ChuangmiPlugStatus " \
             "power=%s, " \
             "usb_power=%s, " \
+            "temperature=%s" \
             "load_power=%s, " \
-            "temperature=%s, " \
             "wifi_led=%s>" % \
             (self.power,
              self.usb_power,
-             self.load_power,
              self.temperature,
+             self.load_power,
              self.wifi_led)
         return s
 
 
-class PlugV3(Device):
-    """Main class representing the chuangmi plug v3."""
+class ChuangmiPlug(Device):
+    """Main class representing the Chuangmi Plug V1 and V3."""
 
-    def status(self) -> PlugV3Status:
+    def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
         properties = ['on', 'usb_on', 'temperature', 'wifi_led']
         values = self.send(
@@ -83,21 +89,22 @@ class PlugV3(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        load_power = self.send("get_power", [])  # Response: [300]
-        if len(load_power) == 1:
-            properties.append('load_power')
-            values.append(load_power[0])
+        if self.model == MODEL_CHUANGMI_PLUG_V3:
+            load_power = self.send("get_power", [])  # Response: [300]
+            if len(load_power) == 1:
+                properties.append('load_power')
+                values.append(load_power[0])
 
-        return PlugV3Status(
+        return ChuangmiPlugStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
     def on(self):
         """Power on."""
-        return self.send("set_power", ["on"])
+        return self.send("set_on", [])
 
     def off(self):
         """Power off."""
-        return self.send("set_power", ["off"])
+        return self.send("set_off", [])
 
     def usb_on(self):
         """Power on."""

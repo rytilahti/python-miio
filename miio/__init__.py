@@ -1,11 +1,10 @@
 # flake8: noqa
 from miio.protocol import Message, Utils
 from miio.vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
-                                   CleaningDetails, CleaningSummary, Timer)
+                                   CleaningDetails, CleaningSummary, Timer, )
 from miio.vacuum import Vacuum, VacuumException
 from miio.plug import Plug
-from miio.plug_v1 import PlugV1
-from miio.plug_v3 import PlugV3
+from miio.chuangmi_plug import ChuangmiPlug
 from miio.airpurifier import AirPurifier
 from miio.airhumidifier import AirHumidifier
 from miio.waterpurifier import WaterPurifier

@@ -3,7 +3,7 @@ import zeroconf
 import ipaddress
 import inspect
 import codecs
-from . import (Device, Vacuum, Plug, PlugV1, PlugV3, PowerStrip, AirPurifier, Ceil,
+from . import (Device, Vacuum, Plug, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
                WaterPurifier, WifiSpeaker, Yeelight)
 from typing import Union, Callable, Dict, Optional  # noqa: F401
@@ -17,9 +17,9 @@ DEVICE_MAP = {
     "roborock-vacuum-s5": Vacuum,
     "chuangmi-plug-m1": Plug,
     "chuangmi-plug-v2": Plug,
-    "chuangmi-plug-v1": PlugV1,
-    "chuangmi-plug_": PlugV1,
-    "chuangmi-plug-v3": PlugV3,
+    "chuangmi-plug-v1": ChuangmiPlug,
+    "chuangmi-plug_": ChuangmiPlug,
+    "chuangmi-plug-v3": ChuangmiPlug,
     "qmi-powerstrip-v1": PowerStrip,
     "zimi-powerstrip-v2": PowerStrip,
     "zhimi-airpurifier-m1": AirPurifier,   # mini model
