@@ -20,7 +20,7 @@ class WaterPurifierStatus:
     def is_on(self) -> bool:
         return self.power == "on"
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return "<WaterPurifierStatus power=%s>" % self.power
 
 
