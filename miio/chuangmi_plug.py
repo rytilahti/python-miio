@@ -15,6 +15,7 @@ AVAILABLE_PROPERTIES = {
     MODEL_CHUANGMI_PLUG_M1: ['power', 'temperature']
 }
 
+
 class ChuangmiPlugStatus:
     """Container for status reports from the plug."""
 
