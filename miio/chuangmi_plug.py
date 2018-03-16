@@ -7,7 +7,13 @@ _LOGGER = logging.getLogger(__name__)
 
 MODEL_CHUANGMI_PLUG_V3 = 'chuangmi.plug.v3'
 MODEL_CHUANGMI_PLUG_V1 = 'chuangmi.plug.v1'
+MODEL_CHUANGMI_PLUG_M1 = 'chuangmi.plug.m1'
 
+AVAILABLE_PROPERTIES = {
+    MODEL_CHUANGMI_PLUG_V1: ['on', 'usb_on', 'temperature'],
+    MODEL_CHUANGMI_PLUG_V3: ['on', 'usb_on', 'temperature', 'wifi_led'],
+    MODEL_CHUANGMI_PLUG_M1: ['power', 'temperature']
+}
 
 class ChuangmiPlugStatus:
     """Container for status reports from the plug."""
@@ -25,7 +31,10 @@ class ChuangmiPlugStatus:
     @property
     def power(self) -> bool:
         """Current power state."""
-        return self.data["on"]
+        if "on" in self.data:
+            return self.data["on"]
+        if "power" in self.data:
+            return self.data["power"] == 'on'
 
     @property
     def is_on(self) -> bool:
@@ -33,13 +42,15 @@ class ChuangmiPlugStatus:
         return self.power
 
     @property
-    def usb_power(self) -> bool:
-        """True if USB is on."""
-        return self.data["usb_on"]
-
-    @property
     def temperature(self) -> int:
         return self.data["temperature"]
+
+    @property
+    def usb_power(self) -> Optional[bool]:
+        """True if USB is on."""
+        if "usb_on" in self.data and self.data["usb_on"] is not None:
+            return self.data["usb_on"]
+        return None
 
     @property
     def load_power(self) -> Optional[int]:
@@ -75,7 +86,7 @@ class ChuangmiPlug(Device):
 
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
-        properties = ['on', 'usb_on', 'temperature', 'wifi_led']
+        properties = AVAILABLE_PROPERTIES[self.model]
         values = self.send(
             "get_prop",
             properties
@@ -100,17 +111,17 @@ class ChuangmiPlug(Device):
 
     def on(self):
         """Power on."""
-        if self.model == MODEL_CHUANGMI_PLUG_V3:
-            return self.send("set_power", ["on"])
+        if self.model == MODEL_CHUANGMI_PLUG_V1:
+            return self.send("set_on", [])
 
-        return self.send("set_on", [])
+        return self.send("set_power", ["on"])
 
     def off(self):
         """Power off."""
-        if self.model == MODEL_CHUANGMI_PLUG_V3:
-            return self.send("set_power", ["off"])
+        if self.model == MODEL_CHUANGMI_PLUG_V1:
+            return self.send("set_off", [])
 
-        return self.send("set_off", [])
+        return self.send("set_power", ["off"])
 
     def usb_on(self):
         """Power on."""

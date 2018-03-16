@@ -3,7 +3,7 @@ import zeroconf
 import ipaddress
 import inspect
 import codecs
-from . import (Device, Vacuum, Plug, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
+from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
                WaterPurifier, WifiSpeaker, Yeelight)
 from typing import Union, Callable, Dict, Optional  # noqa: F401
@@ -15,8 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 DEVICE_MAP = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
-    "chuangmi-plug-m1": Plug,
-    "chuangmi-plug-v2": Plug,
+    "chuangmi-plug-m1": ChuangmiPlug,
+    "chuangmi-plug-v2": ChuangmiPlug,
     "chuangmi-plug-v1": ChuangmiPlug,
     "chuangmi-plug_": ChuangmiPlug,
     "chuangmi-plug-v3": ChuangmiPlug,
