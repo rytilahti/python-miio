@@ -111,8 +111,8 @@ class AirConditioningCompanionStatus:
         return self.power == 'on'
 
     @property
-    def temperature(self) -> Optional[int]:
-        """Current temperature."""
+    def target_temperature(self) -> Optional[int]:
+        """Target temperature."""
         try:
             return int(self.data[1][6:8], 16)
         except TypeError:
@@ -147,7 +147,7 @@ class AirConditioningCompanionStatus:
             "load_power=%s, " \
             "air_condition_model=%s, " \
             "led=%s, " \
-            "temperature=%s, " \
+            "target_temperature=%s, " \
             "swing_mode=%s, " \
             "fan_speed=%s, " \
             "mode=%s>" % \
@@ -155,7 +155,7 @@ class AirConditioningCompanionStatus:
              self.load_power,
              self.air_condition_model,
              self.led,
-             self.temperature,
+             self.target_temperature,
              self.swing_mode,
              self.fan_speed,
              self.mode)
