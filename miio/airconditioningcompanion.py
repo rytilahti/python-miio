@@ -119,9 +119,13 @@ class AirConditioningCompanionStatus:
             return None
 
     @property
-    def swing_mode(self) -> bool:
+    def swing_mode(self) -> Optional[SwingMode]:
         """True if swing mode is enabled."""
-        return self.data[1][5:6] == '0'
+        try:
+            mode = int(self.data[1][5:6])
+            return SwingMode(mode)
+        except TypeError:
+            return None
 
     @property
     def fan_speed(self) -> Optional[FanSpeed]:
