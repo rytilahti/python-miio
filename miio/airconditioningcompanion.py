@@ -120,7 +120,7 @@ class AirConditioningCompanionStatus:
 
     @property
     def swing_mode(self) -> Optional[SwingMode]:
-        """True if swing mode is enabled."""
+        """Current swing mode."""
         try:
             mode = int(self.data[1][5:6])
             return SwingMode(mode)
