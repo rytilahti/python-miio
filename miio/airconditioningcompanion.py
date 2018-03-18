@@ -98,12 +98,12 @@ class AirConditioningCompanionStatus:
     @property
     def power(self) -> str:
         """Current power state."""
-        return 'on' if (self.data[1][2:3] == '1') else 'off'
+        return 'on' if (int(self.data[1][2:3]) == Power.On.value) else 'off'
 
     @property
     def led(self) -> str:
         """Current LED state."""
-        return 'on' if (self.data[1][8:9] == '1') else 'off'
+        return 'on' if (int(self.data[1][8:9]) == Led.On.value) else 'off'
 
     @property
     def is_on(self) -> bool:
@@ -121,7 +121,7 @@ class AirConditioningCompanionStatus:
     @property
     def swing_mode(self) -> bool:
         """True if swing mode is enabled."""
-        return self.data[1][5:6] == '0'
+        return int(self.data[1][5:6]) == SwingMode.On.value
 
     @property
     def fan_speed(self) -> Optional[FanSpeed]:
