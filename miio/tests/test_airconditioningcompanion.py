@@ -89,10 +89,10 @@ class TestAirConditioningCompanion(TestCase):
         assert self.state().mode == OperationMode.Auto
         assert self.state().led == 'off'
 
-    def test_status_without_temperature(self):
+    def test_status_without_target_temperature(self):
         self.device._reset_state()
         self.device.state[1] = None
-        assert self.state().temperature is None
+        assert self.state().target_temperature is None
 
     def test_status_without_swing_mode(self):
         self.device._reset_state()
