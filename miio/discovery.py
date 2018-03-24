@@ -6,6 +6,10 @@ import codecs
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
                WaterPurifier, WifiSpeaker, Yeelight)
+from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
+                            MODEL_CHUANGMI_PLUG_M1)
+
+from functools import partial
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 
@@ -15,11 +19,11 @@ _LOGGER = logging.getLogger(__name__)
 DEVICE_MAP = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
-    "chuangmi-plug-m1": ChuangmiPlug,
-    "chuangmi-plug-v2": ChuangmiPlug,
-    "chuangmi-plug-v1": ChuangmiPlug,
-    "chuangmi-plug_": ChuangmiPlug,
-    "chuangmi-plug-v3": ChuangmiPlug,
+    "chuangmi-plug-m1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M1),
+    "chuangmi-plug-v2": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M1),
+    "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
+    "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
+    "chuangmi-plug-v3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V3),
     "qmi-powerstrip-v1": PowerStrip,
     "zimi-powerstrip-v2": PowerStrip,
     "zhimi-airpurifier-m1": AirPurifier,   # mini model
@@ -90,6 +94,11 @@ class Listener:
                     _LOGGER.debug("Found a supported '%s', using '%s' class",
                                   name, v.__name__)
                     return create_device(addr, v)
+                elif type(v) is partial and inspect.isclass(v.func):
+                        _LOGGER.debug(
+                            "Found a supported '%s', using '%s' class",
+                            name, v.func.__name__)
+                        return create_device(addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)
                     _LOGGER.info("%s: token: %s",
