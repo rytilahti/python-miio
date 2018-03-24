@@ -67,13 +67,16 @@ def other_package_info(info, desc):
         desc)
 
 
-def create_device(addr, device_cls) -> Device:
+def create_device(name: str, addr: str, device_cls: partial) -> Device:
     """Return a device object for a zeroconf entry."""
+    _LOGGER.debug("Found a supported '%s', using '%s' class",
+                  name, device_cls.func.__name__)
+
     dev = device_cls(ip=addr)
     m = dev.do_discover()
     dev.token = m.checksum
     _LOGGER.info("Found a supported '%s' at %s - token: %s",
-                 device_cls.__name__,
+                 device_cls.func.__name__,
                  addr,
                  pretty_token(dev.token))
     return dev
@@ -91,14 +94,9 @@ class Listener:
         for identifier, v in DEVICE_MAP.items():
             if name.startswith(identifier):
                 if inspect.isclass(v):
-                    _LOGGER.debug("Found a supported '%s', using '%s' class",
-                                  name, v.__name__)
-                    return create_device(addr, v)
+                    return create_device(addr, partial(v))
                 elif type(v) is partial and inspect.isclass(v.func):
-                        _LOGGER.debug(
-                            "Found a supported '%s', using '%s' class",
-                            name, v.func.__name__)
-                        return create_device(addr, v)
+                    return create_device(addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)
                     _LOGGER.info("%s: token: %s",
