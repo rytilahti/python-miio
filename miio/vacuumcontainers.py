@@ -2,97 +2,11 @@
 from datetime import datetime, timedelta, time
 from typing import Any, Dict, List
 from enum import IntEnum
-import warnings
-import functools
-import inspect
-
-
-def deprecated(reason):
-    """
-    This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.
-
-    From https://stackoverflow.com/a/40301488
-    """
-
-    string_types = (type(b''), type(u''))
-    if isinstance(reason, string_types):
-
-        # The @deprecated is used with a 'reason'.
-        #
-        # .. code-block:: python
-        #
-        #    @deprecated("please, use another function")
-        #    def old_function(x, y):
-        #      pass
-
-        def decorator(func1):
-
-            if inspect.isclass(func1):
-                fmt1 = "Call to deprecated class {name} ({reason})."
-            else:
-                fmt1 = "Call to deprecated function {name} ({reason})."
-
-            @functools.wraps(func1)
-            def new_func1(*args, **kwargs):
-                warnings.simplefilter('always', DeprecationWarning)
-                warnings.warn(
-                    fmt1.format(name=func1.__name__, reason=reason),
-                    category=DeprecationWarning,
-                    stacklevel=2
-                )
-                warnings.simplefilter('default', DeprecationWarning)
-                return func1(*args, **kwargs)
-
-            return new_func1
-
-        return decorator
-
-    elif inspect.isclass(reason) or inspect.isfunction(reason):
-
-        # The @deprecated is used without any 'reason'.
-        #
-        # .. code-block:: python
-        #
-        #    @deprecated
-        #    def old_function(x, y):
-        #      pass
-
-        func2 = reason
-
-        if inspect.isclass(func2):
-            fmt2 = "Call to deprecated class {name}."
-        else:
-            fmt2 = "Call to deprecated function {name}."
-
-        @functools.wraps(func2)
-        def new_func2(*args, **kwargs):
-            warnings.simplefilter('always', DeprecationWarning)
-            warnings.warn(
-                fmt2.format(name=func2.__name__),
-                category=DeprecationWarning,
-                stacklevel=2
-            )
-            warnings.simplefilter('default', DeprecationWarning)
-            return func2(*args, **kwargs)
-
-        return new_func2
-
-    else:
-        raise TypeError(repr(type(reason)))
+from .utils import deprecated, pretty_time, pretty_seconds
 
 
 def pretty_area(x: float) -> float:
     return int(x) / 1000000
-
-
-def pretty_seconds(x: float) -> timedelta:
-    return timedelta(seconds=x)
-
-
-def pretty_time(x: float) -> datetime:
-    return datetime.fromtimestamp(x)
 
 
 error_codes = {  # from vacuum_cleaner-EN.pdf
@@ -215,11 +129,11 @@ class VacuumStatus:
     @property
     def is_on(self) -> bool:
         """True if device is currently cleaning (either automatic, manual,
-spot, or zone)."""
-        return self.state_code == 5 or \
-               self.state_code == 7 or \
-               self.state_code == 11 or \
-               self.state_code == 17
+         spot, or zone)."""
+        return (self.state_code == 5 or
+                self.state_code == 7 or
+                self.state_code == 11 or
+                self.state_code == 17)
 
     @property
     def got_error(self) -> bool:
@@ -311,7 +225,9 @@ class CleaningDetails:
 
     @property
     def complete(self) -> bool:
-        """Return True if the cleaning run was complete (e.g. without errors), see also :func:`error`."""
+        """Return True if the cleaning run was complete (e.g. without errors).
+
+         see also :func:`error`."""
         return bool(self.data[5] == 1)
 
     def __repr__(self) -> str:
@@ -454,7 +370,8 @@ class Timer:
         return str(self.data[2][1])
 
     def __repr__(self) -> str:
-        return "<Timer %s: %s - enabled: %s - cron: %s>" % (self.id, self.ts, self.enabled, self.cron)
+        return "<Timer %s: %s - enabled: %s - cron: %s>" % (self.id, self.ts,
+                                                            self.enabled, self.cron)
 
 
 class SoundStatus:
@@ -494,7 +411,6 @@ class SoundInstallStatus:
         # error 2 = download error
         # error 3 = checksum error
         # error 4 = unknown 4
-
 
         self.data = data
 
