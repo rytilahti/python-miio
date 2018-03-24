@@ -9,11 +9,13 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_CHUANGMI_PLUG_V3 = 'chuangmi.plug.v3'
 MODEL_CHUANGMI_PLUG_V1 = 'chuangmi.plug.v1'
 MODEL_CHUANGMI_PLUG_M1 = 'chuangmi.plug.m1'
+MODEL_CHUANGMI_PLUG_V2 = 'chuangmi.plug.v2'
 
 AVAILABLE_PROPERTIES = {
     MODEL_CHUANGMI_PLUG_V1: ['on', 'usb_on', 'temperature'],
     MODEL_CHUANGMI_PLUG_V3: ['on', 'usb_on', 'temperature', 'wifi_led'],
-    MODEL_CHUANGMI_PLUG_M1: ['power', 'temperature']
+    MODEL_CHUANGMI_PLUG_M1: ['power', 'temperature'],
+    MODEL_CHUANGMI_PLUG_V2: ['power', 'temperature'],
 }
 
 
@@ -91,7 +93,10 @@ class ChuangmiPlug(Device):
                  model: str = MODEL_CHUANGMI_PLUG_M1) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-        self.model = model
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_CHUANGMI_PLUG_M1
 
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
