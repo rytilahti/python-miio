@@ -1,14 +1,11 @@
 from unittest import TestCase
-from miio import ChuangmiPlug
-from miio.chuangmi_plug import (ChuangmiPlugStatus, MODEL_CHUANGMI_PLUG_V1,
-                                MODEL_CHUANGMI_PLUG_V3, MODEL_CHUANGMI_PLUG_M1)
+from miio.chuangmi_plug import (Plug, PlugV1, PlugV3, ChuangmiPlugStatus)
 from .dummies import DummyDevice
 import pytest
 
 
-class DummyChuangmiPlugV1(DummyDevice, ChuangmiPlug):
+class DummyChuangmiPlugV1(DummyDevice, PlugV1):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_CHUANGMI_PLUG_V1
         self.state = {
             'on': True,
             'usb_on': True,
@@ -82,9 +79,8 @@ class TestChuangmiPlugV1(TestCase):
         assert self.device.status().usb_power is False
 
 
-class DummyChuangmiPlugV3(DummyDevice, ChuangmiPlug):
+class DummyChuangmiPlugV3(DummyDevice, PlugV3):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_CHUANGMI_PLUG_V3
         self.state = {
             'on': True,
             'usb_on': True,
@@ -179,9 +175,8 @@ class TestChuangmiPlugV3(TestCase):
         assert wifi_led() is False
 
 
-class DummyChuangmiPlugM1(DummyDevice, ChuangmiPlug):
+class DummyChuangmiPlugM1(DummyDevice, Plug):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_CHUANGMI_PLUG_M1
         self.state = {
             'power': 'on',
             'temperature': 32,
