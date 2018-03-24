@@ -1,4 +1,5 @@
 import logging
+import warnings
 from typing import Dict, Any, Optional
 from collections import defaultdict
 from .device import Device
@@ -145,3 +146,38 @@ class ChuangmiPlug(Device):
             return self.send("set_wifi_led", ["on"])
         else:
             return self.send("set_wifi_led", ["off"])
+
+
+class ClassDeprecatedPlug(ChuangmiPlug):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_CHUANGMI_PLUG_M1) -> None:
+        warnings.simplefilter('always', DeprecationWarning)
+        warnings.warn(
+            "This device class is deprecated. Please use the ChuangmiPlug "
+            "in future and select a model by parameter 'model'.",
+            DeprecationWarning, stacklevel=2)
+
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=model)
+
+
+class Plug(ClassDeprecatedPlug):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_CHUANGMI_PLUG_M1)
+
+
+class PlugV1(ClassDeprecatedPlug):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_CHUANGMI_PLUG_V1)
+
+
+class PlugV3(ClassDeprecatedPlug):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_CHUANGMI_PLUG_V3)
