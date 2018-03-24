@@ -94,9 +94,9 @@ class Listener:
         for identifier, v in DEVICE_MAP.items():
             if name.startswith(identifier):
                 if inspect.isclass(v):
-                    return create_device(addr, partial(v))
+                    return create_device(name, addr, partial(v))
                 elif type(v) is partial and inspect.isclass(v.func):
-                    return create_device(addr, v)
+                    return create_device(name, addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)
                     _LOGGER.info("%s: token: %s",
