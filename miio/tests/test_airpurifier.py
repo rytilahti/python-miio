@@ -246,6 +246,9 @@ class TestAirPurifier(TestCase):
         self.device.set_extra_features(2)
         assert extra_features() == 2
 
+        with pytest.raises(AirPurifierException):
+            self.device.set_extra_features(-1)
+
     def test_reset_filter(self):
         def filter_hours_used():
             return self.device.status().filter_hours_used
@@ -328,3 +331,19 @@ class TestAirPurifier(TestCase):
         assert self.state().filter_type is FilterType.Regular
         self.device.state["rfid_product_id"] = '0:0:41:30'
         assert self.state().filter_type is FilterType.AntiBacterial
+
+    def test_status_without_sleep_mode(self):
+        self.device._reset_state()
+        self.device.state["sleep_mode"] = None
+        assert self.state().sleep_mode is None
+
+    def test_status_without_app_extra(self):
+        self.device._reset_state()
+        self.device.state["app_extra"] = None
+        assert self.state().extra_features is None
+        assert self.state().turbo_mode_supported is None
+
+    def test_status_without_auto_detect(self):
+        self.device._reset_state()
+        self.device.state["act_det"] = None
+        assert self.state().auto_detect is None

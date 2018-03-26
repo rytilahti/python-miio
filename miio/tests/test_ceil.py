@@ -85,6 +85,12 @@ class TestCeil(TestCase):
         self.device.set_brightness(20)
         assert brightness() == 20
 
+        with pytest.raises(CeilException):
+            self.device.set_brightness(-1)
+
+        with pytest.raises(CeilException):
+            self.device.set_brightness(101)
+
     def test_set_color_temperature(self):
         def color_temperature():
             return self.device.status().color_temperature
@@ -93,6 +99,12 @@ class TestCeil(TestCase):
         assert color_temperature() == 30
         self.device.set_color_temperature(20)
         assert color_temperature() == 20
+
+        with pytest.raises(CeilException):
+            self.device.set_color_temperature(-1)
+
+        with pytest.raises(CeilException):
+            self.device.set_color_temperature(101)
 
     def test_set_brightness_and_color_temperature(self):
         def color_temperature():
@@ -138,14 +150,26 @@ class TestCeil(TestCase):
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
 
+        with pytest.raises(CeilException):
+            self.device.delay_off(0)
+
+        with pytest.raises(CeilException):
+            self.device.delay_off(-1)
+
     def test_set_scene(self):
         def scene():
             return self.device.status().scene
 
         self.device.set_scene(1)
         assert scene() == 1
-        self.device.set_scene(2)
-        assert scene() == 2
+        self.device.set_scene(4)
+        assert scene() == 4
+
+        with pytest.raises(CeilException):
+            self.device.set_scene(0)
+
+        with pytest.raises(CeilException):
+            self.device.set_scene(5)
 
     def test_smart_night_light_on(self):
         def smart_night_light():

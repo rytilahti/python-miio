@@ -125,3 +125,11 @@ class TestChuangmiIr(TestCase):
                         self.device.state['last_ir_played'],
                         args['out']
                     )
+        with pytest.raises(ChuangmiIrException):
+            self.device.play('invalid:command')
+
+        with pytest.raises(ChuangmiIrException):
+            self.device.play('pronto:command:invalid:argument:count')
+
+        with pytest.raises(ChuangmiIrException):
+            self.device.play('pronto:command:invalidargument')
