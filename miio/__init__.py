@@ -3,10 +3,7 @@ from miio.protocol import Message, Utils
 from miio.vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                    CleaningDetails, CleaningSummary, Timer)
 from miio.vacuum import Vacuum, VacuumException
-from miio.chuangmi_plug import Plug
-from miio.chuangmi_plug import PlugV1
-from miio.chuangmi_plug import PlugV3
-from miio.chuangmi_plug import ChuangmiPlug
+from miio.chuangmi_plug import (Plug, PlugV1, PlugV3, ChuangmiPlug)
 from miio.airpurifier import AirPurifier
 from miio.airhumidifier import AirHumidifier
 from miio.waterpurifier import WaterPurifier
