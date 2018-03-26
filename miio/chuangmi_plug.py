@@ -1,5 +1,4 @@
 import logging
-import warnings
 from typing import Dict, Any, Optional
 from collections import defaultdict
 from .device import Device
