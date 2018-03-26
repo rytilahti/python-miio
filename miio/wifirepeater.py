@@ -30,6 +30,13 @@ class WifiRepeaterStatus:
         """List of associated stations."""
         return self.data['mat']
 
+    def __repr__(self) -> str:
+        s = "<WifiRepeaterStatus access_policy=%s, " \
+            "associated_stations=%s>" % \
+            (self.access_policy,
+             len(self.associated_stations))
+        return s
+
 
 class WifiRepeaterConfiguration:
     def __init__(self, data):
@@ -51,6 +58,15 @@ class WifiRepeaterConfiguration:
     @property
     def ssid_hidden(self) -> bool:
         return self.data['hidden'] == 1
+
+    def __repr__(self) -> str:
+        s = "<WifiRepeaterConfiguration ssid=%s, " \
+            "password=%s, " \
+            "ssid_hidden=%s>" % \
+            (self.ssid,
+             self.password,
+             self.ssid_hidden)
+        return s
 
 
 class WifiRepeater(Device):
