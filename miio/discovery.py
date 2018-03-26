@@ -3,9 +3,13 @@ import zeroconf
 import ipaddress
 import inspect
 import codecs
-from . import (Device, Vacuum, Plug, PlugV1, PlugV3, PowerStrip, AirPurifier, Ceil,
+from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
                WaterPurifier, WifiSpeaker, Yeelight)
+from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
+                            MODEL_CHUANGMI_PLUG_M1)
+
+from functools import partial
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 
@@ -15,11 +19,11 @@ _LOGGER = logging.getLogger(__name__)
 DEVICE_MAP = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
-    "chuangmi-plug-m1": Plug,
-    "chuangmi-plug-v2": Plug,
-    "chuangmi-plug-v1": PlugV1,
-    "chuangmi-plug_": PlugV1,
-    "chuangmi-plug-v3": PlugV3,
+    "chuangmi-plug-m1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M1),
+    "chuangmi-plug-v2": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M1),
+    "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
+    "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
+    "chuangmi-plug-v3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V3),
     "qmi-powerstrip-v1": PowerStrip,
     "zimi-powerstrip-v2": PowerStrip,
     "zhimi-airpurifier-m1": AirPurifier,   # mini model
@@ -63,13 +67,16 @@ def other_package_info(info, desc):
         desc)
 
 
-def create_device(addr, device_cls) -> Device:
+def create_device(name: str, addr: str, device_cls: partial) -> Device:
     """Return a device object for a zeroconf entry."""
+    _LOGGER.debug("Found a supported '%s', using '%s' class",
+                  name, device_cls.func.__name__)
+
     dev = device_cls(ip=addr)
     m = dev.do_discover()
     dev.token = m.checksum
     _LOGGER.info("Found a supported '%s' at %s - token: %s",
-                 device_cls.__name__,
+                 device_cls.func.__name__,
                  addr,
                  pretty_token(dev.token))
     return dev
@@ -87,9 +94,9 @@ class Listener:
         for identifier, v in DEVICE_MAP.items():
             if name.startswith(identifier):
                 if inspect.isclass(v):
-                    _LOGGER.debug("Found a supported '%s', using '%s' class",
-                                  name, v.__name__)
-                    return create_device(addr, v)
+                    return create_device(name, addr, partial(v))
+                elif type(v) is partial and inspect.isclass(v.func):
+                    return create_device(name, addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)
                     _LOGGER.info("%s: token: %s",

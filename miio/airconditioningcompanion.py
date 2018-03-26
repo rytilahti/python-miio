@@ -98,12 +98,12 @@ class AirConditioningCompanionStatus:
     @property
     def power(self) -> str:
         """Current power state."""
-        return 'on' if (self.data[1][2:3] == '1') else 'off'
+        return 'on' if (int(self.data[1][2:3]) == Power.On.value) else 'off'
 
     @property
     def led(self) -> str:
         """Current LED state."""
-        return 'on' if (self.data[1][8:9] == '1') else 'off'
+        return 'on' if (int(self.data[1][8:9]) == Led.On.value) else 'off'
 
     @property
     def is_on(self) -> bool:
@@ -111,17 +111,21 @@ class AirConditioningCompanionStatus:
         return self.power == 'on'
 
     @property
-    def temperature(self) -> Optional[int]:
-        """Current temperature."""
+    def target_temperature(self) -> Optional[int]:
+        """Target temperature."""
         try:
             return int(self.data[1][6:8], 16)
         except TypeError:
             return None
 
     @property
-    def swing_mode(self) -> bool:
-        """True if swing mode is enabled."""
-        return self.data[1][5:6] == '0'
+    def swing_mode(self) -> Optional[SwingMode]:
+        """Current swing mode."""
+        try:
+            mode = int(self.data[1][5:6])
+            return SwingMode(mode)
+        except TypeError:
+            return None
 
     @property
     def fan_speed(self) -> Optional[FanSpeed]:
@@ -147,7 +151,7 @@ class AirConditioningCompanionStatus:
             "load_power=%s, " \
             "air_condition_model=%s, " \
             "led=%s, " \
-            "temperature=%s, " \
+            "target_temperature=%s, " \
             "swing_mode=%s, " \
             "fan_speed=%s, " \
             "mode=%s>" % \
@@ -155,7 +159,7 @@ class AirConditioningCompanionStatus:
              self.load_power,
              self.air_condition_model,
              self.led,
-             self.temperature,
+             self.target_temperature,
              self.swing_mode,
              self.fan_speed,
              self.mode)

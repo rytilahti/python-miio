@@ -83,16 +83,21 @@ class TestAirConditioningCompanion(TestCase):
         assert self.is_on() is False
         assert self.state().load_power == 2
         assert self.state().air_condition_model == '010500978022222102'
-        assert self.state().temperature == 25
-        assert self.state().swing_mode is False
+        assert self.state().target_temperature == 25
+        assert self.state().swing_mode == SwingMode.Off
         assert self.state().fan_speed == FanSpeed.Low
         assert self.state().mode == OperationMode.Auto
         assert self.state().led == 'off'
 
-    def test_status_without_temperature(self):
+    def test_status_without_target_temperature(self):
         self.device._reset_state()
         self.device.state[1] = None
-        assert self.state().temperature is None
+        assert self.state().target_temperature is None
+
+    def test_status_without_swing_mode(self):
+        self.device._reset_state()
+        self.device.state[1] = None
+        assert self.state().swing_mode is None
 
     def test_status_without_mode(self):
         self.device._reset_state()
