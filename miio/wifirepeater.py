@@ -71,10 +71,6 @@ class WifiRepeaterConfiguration:
 
 class WifiRepeater(Device):
     """Device class for Xiaomi Mi WiFi Repeater 2."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def status(self) -> WifiRepeaterStatus:
         """Return the associated stations."""
         return WifiRepeaterStatus(self.send("miIO.get_repeater_sta_info", []))
