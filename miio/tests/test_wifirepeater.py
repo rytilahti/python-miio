@@ -108,11 +108,11 @@ class TestWifiRepeater(TestCase):
         assert self.state().access_policy == self.device.start_state['sta']['access_policy']
         assert self.state().associated_stations == self.device.start_state['mat']
 
-    def test_set_wifi_explorer(self):
-        self.device.set_wifi_explorer(True)
+    def test_set_wifi_roaming(self):
+        self.device.set_wifi_roaming(True)
         assert self.info().raw['desc']['wifi_explorer'] == 1
 
-        self.device.set_wifi_explorer(False)
+        self.device.set_wifi_roaming(False)
         assert self.info().raw['desc']['wifi_explorer'] == 0
 
     def test_configuration(self):
