@@ -68,10 +68,18 @@ class WifiRepeater(Device):
         return WifiRepeaterConfiguration(
             self.send("miIO.get_repeater_ap_info", []))
 
-    def switch_wifi_explorer(self):
-        """Parameters unknown."""
-        return self.send("miIO.switch_wifi_explorer", [])
+    def set_wifi_explorer(self, wifi_explorer: bool):
+        """Turn the WiFi explorer on/off."""
+        return self.send("miIO.switch_wifi_explorer", [{
+            'wifi_explorer': int(wifi_explorer)
+        }])
 
-    def switch_wifi_ssid(self):
-        """Parameters unknown."""
-        return self.send("miIO.switch_wifi_ssid", [])
+    def set_configuration(self, ssid: str, password: str, hidden: bool = False,
+                          wifi_explorer: bool = True):
+        """Update the configuration of the accesspoint."""
+        return self.send("miIO.switch_wifi_ssid", [{
+            'ssid': ssid,
+            'pwd': password,
+            'hidden': int(hidden),
+            'wifi_explorer': int(wifi_explorer)
+        }])
