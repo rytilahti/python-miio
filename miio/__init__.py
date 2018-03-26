@@ -14,6 +14,7 @@ from miio.philips_eyecare import PhilipsEyecare
 from miio.chuangmi_ir import ChuangmiIr
 from miio.fan import Fan
 from miio.wifispeaker import WifiSpeaker
+from miio.wifirepeater import WifiRepeater
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.airconditioningcompanion import AirConditioningCompanion
 from miio.yeelight import Yeelight
