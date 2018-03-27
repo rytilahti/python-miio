@@ -1,5 +1,51 @@
 # Change Log
 
+## [0.3.9](https://github.com/rytilahti/python-miio/tree/0.3.9)
+
+This release provides support for some new devices, improved support of existing devices and various fixes.
+
+New devices:
+* Xiaomi Mi WiFi Repeater 2 (@syssi)
+* Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp (@syssi)
+
+Improvements:
+* Repr of the AirPurifierStatus fixed (@sq5gvm)
+* Chuangmi Plug V1, V2, V3 and M1 merged into a common class (@syssi)
+* Water Purifier: Some properties added (@syssi)
+* Air Conditioning Companion: LED status fixed (@syssi)
+* Air Conditioning Companion: Target temperature property renamed (@syssi)
+* Air Conditioning Companion: Swing mode property returns the enum now (@syssi)
+* Move some generic util functions from vacuumcontainers to utils module (@rytilahti)
+* Construct version bumped (@syssi)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.8...0.3.9)
+
+**Closed issues:**
+
+- Xiaomi Mi WiFi Amplifier 2 support [\#275](https://github.com/rytilahti/python-miio/issues/275)
+- TypeError: not enough arguments for format string in airpurifier.py [\#264](https://github.com/rytilahti/python-miio/issues/264)
+- Issue vaccum gen 2 - HA 0.64 -\> 0.65 Python 3.6.0 -\> 3.7.0 [\#261](https://github.com/rytilahti/python-miio/issues/261)
+- Add support for Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp [\#243](https://github.com/rytilahti/python-miio/issues/243)
+- Basic support for the Yeelight LED Ceiling Lamp v4 [\#240](https://github.com/rytilahti/python-miio/issues/240)
+- from Construct developer, a note [\#222](https://github.com/rytilahti/python-miio/issues/222)
+
+**Merged pull requests:**
+
+- construct version bumped [\#280](https://github.com/rytilahti/python-miio/pull/280) ([syssi](https://github.com/syssi))
+- Support for the Xiaomi Mi WiFi Repeater 2 added [\#278](https://github.com/rytilahti/python-miio/pull/278) ([syssi](https://github.com/syssi))
+- Move some generic util functions from vacuumcontainers to utils module [\#276](https://github.com/rytilahti/python-miio/pull/276) ([rytilahti](https://github.com/rytilahti))
+- Air Conditioning Companion: Swing mode property returns the enum now [\#274](https://github.com/rytilahti/python-miio/pull/274) ([syssi](https://github.com/syssi))
+- Air Conditioning Companion: Target temperature property properly named [\#273](https://github.com/rytilahti/python-miio/pull/273) ([syssi](https://github.com/syssi))
+- Air Conditioning Companion: LED status fixed [\#272](https://github.com/rytilahti/python-miio/pull/272) ([syssi](https://github.com/syssi))
+- Water Purifier: Some properties added [\#271](https://github.com/rytilahti/python-miio/pull/271) ([syssi](https://github.com/syssi))
+- Merge of the Chuangmi Plug V1, V2, V3 and M1 [\#270](https://github.com/rytilahti/python-miio/pull/270) ([syssi](https://github.com/syssi))
+- Improve test coverage [\#269](https://github.com/rytilahti/python-miio/pull/269) ([syssi](https://github.com/syssi))
+- Support for Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp [\#268](https://github.com/rytilahti/python-miio/pull/268) ([syssi](https://github.com/syssi))
+- Air Purifier: Duplicate property removed from \_\_repr\_\_ [\#267](https://github.com/rytilahti/python-miio/pull/267) ([syssi](https://github.com/syssi))
+- Tests for reprs of the status classes [\#266](https://github.com/rytilahti/python-miio/pull/266) ([syssi](https://github.com/syssi))
+- Repr of the AirPurifierStatus fixed [\#265](https://github.com/rytilahti/python-miio/pull/265) ([sq5gvm](https://github.com/sq5gvm))
+
+
 ## [0.3.8](https://github.com/rytilahti/python-miio/tree/0.3.8)
 
 Goodbye Python 3.4! This release marks end of support for python versions older than 3.5, paving a way for cleaner code and a nicer API for a future asyncio support. Highlights of this release:
