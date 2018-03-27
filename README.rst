@@ -50,8 +50,7 @@ Home Assistant support
 
 -  `Xiaomi Mi Robot Vacuum <https://home-assistant.io/components/vacuum.xiaomi_miio/>`__
 -  `Xiaomi Philips Light <https://home-assistant.io/components/light.xiaomi_miio/>`__
--  `Xiaomi Mi Air Humidifier <https://github.com/syssi/xiaomi_airhumidifier/>`__
--  `Xiaomi Mi Air Purifier <https://home-assistant.io/components/fan.xiaomi_miio/>`__
+-  `Xiaomi Mi Air Purifier and Air Humidifier <https://home-assistant.io/components/fan.xiaomi_miio/>`__
 -  `Xiaomi Smart WiFi Socket and Smart Power Strip <https://home-assistant.io/components/switch.xiaomi_miio/>`__
 -  `Xiaomi Universal IR Remote Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__
 -  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__
