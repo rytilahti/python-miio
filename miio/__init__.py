@@ -17,6 +17,7 @@ from miio.wifispeaker import WifiSpeaker
 from miio.wifirepeater import WifiRepeater
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.airconditioningcompanion import AirConditioningCompanion
+from miio.cooker import Cooker
 from miio.yeelight import Yeelight
 from miio.device import Device, DeviceException
 from miio.discovery import Discovery
