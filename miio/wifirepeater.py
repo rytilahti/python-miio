@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
@@ -95,3 +96,19 @@ class WifiRepeater(Device):
             'hidden': int(hidden),
             'wifi_explorer': int(wifi_roaming)
         }])
+
+    def wifi_roaming(self) -> Optional[bool]:
+        """Return the roaming setting."""
+        device_info = self.info()
+        if 'desc' in device_info.raw and 'wifi_explorer' in device_info.raw['desc']:
+            return device_info.raw['desc']['wifi_explorer'] == 1
+
+        return None
+
+    def rssi_accesspoint(self) -> Optional[int]:
+        """Received signal strength indicator of the accesspoint."""
+        device_info = self.info()
+        if 'rssi' in device_info.accesspoint:
+            return device_info.accesspoint['rssi']
+
+        return None
