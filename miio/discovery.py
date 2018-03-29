@@ -5,7 +5,7 @@ import inspect
 import codecs
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
-               WaterPurifier, WifiSpeaker, Yeelight)
+               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight)
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1)
 
@@ -48,6 +48,8 @@ DEVICE_MAP = {
     "philips-light-zyceiling": Ceil,
     "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
+    "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
+    "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
     "yeelink-light-": Yeelight,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
