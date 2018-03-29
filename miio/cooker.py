@@ -1,6 +1,7 @@
 import logging
+import enum
 from collections import defaultdict
-from .device import Device, DeviceException
+from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
