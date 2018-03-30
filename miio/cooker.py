@@ -198,5 +198,5 @@ class Cooker(Device):
                    lid_open_timeout_alarm_time])
 
     def set_menu(self, profile: str):
-        """Add a cooking profile to the menu"""
+        """Select one of the default(?) cooking profiles"""
         self.send('set_menu', [profile])
