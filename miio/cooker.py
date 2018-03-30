@@ -49,7 +49,7 @@ class OperationMode(enum.Enum):
     Cancel = 'Отмена'
 
 
-class CookerTimeouts:
+class InteractionTimeouts:
     def __init__(self, timeouts: str):
         """
         Example timeouts: 05040f, 05060f
@@ -74,7 +74,7 @@ class CookerTimeouts:
         return self.timeouts
 
     def __repr__(self) -> str:
-        s = "<CookerTimeuts led_off_delay=%s, " \
+        s = "<InteractionTimeuts led_off_delay=%s, " \
             "lid_open_timeout=%s, " \
             "warn_lid_open_timeout=%s>" % \
             (self.led_off_delay,
@@ -235,8 +235,8 @@ class CookerStatus:
         return CookerSettings(int(self.data['setting']))
 
     @property
-    def timeouts(self) -> CookerTimeouts:
-        return CookerTimeouts(self.data['delay'])
+    def timeouts(self) -> InteractionTimeouts:
+        return InteractionTimeouts(self.data['delay'])
 
     @property
     def version(self) -> str:
@@ -317,7 +317,7 @@ class Cooker(Device):
     def set_acknowledge(self):
         self.send('set_func', ['ack'])
 
-    def set_interaction(self, settings: CookerSettings, timeouts: CookerTimeouts):
+    def set_interaction(self, settings: CookerSettings, timeouts: InteractionTimeouts):
         """Set interaction. Supported by all cookers except MODEL_PRESS1"""
         self.send('set_interaction',
                   [str(settings),
