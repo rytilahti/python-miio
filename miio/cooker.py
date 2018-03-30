@@ -95,6 +95,9 @@ class CookerSettings:
         else:
             self.settings &= 239
 
+    def __str__(self) -> str:
+        return str(self.settings).zfill(4)
+
     def __repr__(self) -> str:
         s = "<CookerSettings pressure_supported=%s, " \
             "led_on=%s, " \
@@ -268,14 +271,16 @@ class Cooker(Device):
     def set_acknowledge(self):
         self.send('set_func', ['ack'])
 
-    def set_interaction(self, setting, shut_led_delay, lid_open_timeout,
+    def set_interaction(self, settings: CookerSettings,
+                        shut_led_delay,
+                        lid_open_timeout,
                         lid_open_timeout_alarm_time):
         """Set interaction. Supported by all cookers except MODEL_PRESS1
 
         FIXME: Assemble a proper bitmask. All parameters are hex values
         """
         self.send('set_interaction',
-                  [setting,
+                  [str(settings),
                    shut_led_delay,
                    lid_open_timeout,
                    lid_open_timeout_alarm_time])
