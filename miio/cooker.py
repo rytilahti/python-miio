@@ -230,12 +230,12 @@ class CookerStatus:
         return int(self.data['t_cook'])
 
     @property
-    def setting(self) -> CookerSettings:
+    def settings(self) -> CookerSettings:
         """Settings of the cooker."""
         return CookerSettings(int(self.data['setting']))
 
     @property
-    def timeouts(self) -> InteractionTimeouts:
+    def interaction_timeouts(self) -> InteractionTimeouts:
         return InteractionTimeouts(self.data['delay'])
 
     @property
@@ -255,11 +255,11 @@ class CookerStatus:
             "menu=%s, " \
             "stage=%s, " \
             "temperature=%s, " \
-            "t_func=%s, " \
-            "t_precook=%s, " \
+            "remaining=%s, " \
+            "cooking_delayed=%s, " \
             "cooking_temperature=%s, " \
-            "setting=%s, " \
-            "delay=%s, " \
+            "settings=%s, " \
+            "interaction_timeouts=%s, " \
             "version=%s, " \
             "favorite=%s, " \
             "custom=%s>" % \
@@ -267,11 +267,11 @@ class CookerStatus:
              self.menu,
              self.stage,
              self.temperature,
-             self.t_func,
-             self.t_precook,
-             self.cooking_temperature,
-             self.setting,
-             self.delay,
+             self.remaining,
+             self.cooking_delayed,
+             self.duration,
+             self.settings,
+             self.interaction_timeouts,
              self.version,
              self.favorite,
              self.custom)
