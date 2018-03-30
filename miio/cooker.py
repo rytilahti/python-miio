@@ -5,18 +5,20 @@ from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_PRESS1 = 'chunmi.cooker.press1'
-MODEL_PRESS2 = 'chunmi.cooker.press2'
+MODEL_PRESSURE1 = 'chunmi.cooker.press1'
+MODEL_PRESSURE2 = 'chunmi.cooker.press2'
 MODEL_NORMAL1 = 'chunmi.cooker.normal1'
 MODEL_NORMAL2 = 'chunmi.cooker.normal2'
 MODEL_NORMAL4 = 'chunmi.cooker.normal3'
 MODEL_NORMAL3 = 'chunmi.cooker.normal4'
 MODEL_NORMAL5 = 'chunmi.cooker.normal5'
 
-MODEL_PRESS = [MODEL_PRESS1, MODEL_PRESS2]
+MODEL_PRESSURE = [MODEL_PRESSURE1, MODEL_PRESSURE2]
 MODEL_NORMAL = [MODEL_NORMAL1, MODEL_NORMAL2, MODEL_NORMAL3, MODEL_NORMAL4,
                 MODEL_NORMAL5]
 
+MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
+MODEL_NRRMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
 
 class OperationMode(enum.Enum):
     AutoKeepWarm = 'autokeepwarm'
