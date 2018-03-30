@@ -1,7 +1,8 @@
 import logging
 import enum
+import string
 from collections import defaultdict
-from .device import Device
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -19,6 +20,11 @@ MODEL_NORMAL = [MODEL_NORMAL1, MODEL_NORMAL2, MODEL_NORMAL3, MODEL_NORMAL4,
 
 MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
 MODEL_NRRMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
+
+
+class CookerException(DeviceException):
+    pass
+
 
 class OperationMode(enum.Enum):
     AutoKeepWarm = 'autokeepwarm'
@@ -171,6 +177,9 @@ class Cooker(Device):
 
     def start(self, profile: str):
         """Start cooking a profile"""
+        if not self._validate_profile(profile):
+            raise CookerException("Invalid cooking profile: %s" % profile)
+
         self.send('set_start', [profile])
 
     def stop(self):
@@ -199,4 +208,12 @@ class Cooker(Device):
 
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles"""
+        if not self._validate_profile(profile):
+            raise CookerException("Invalid cooking profile: %s" % profile)
+
         self.send('set_menu', [profile])
+
+    @staticmethod
+    def _validate_profile(profile):
+        return all(c in string.hexdigits for c in profile) and \
+               len(profile) in [228, 242]
