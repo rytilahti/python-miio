@@ -53,6 +53,8 @@ class CookerTimeouts:
     def __init__(self, timeouts: str):
         """
         Example timeouts: 05040f, 05060f
+
+        FIXME: Add setters. Initialize with 05040f (app default)
         """
         self.timeouts = timeouts
 
@@ -85,6 +87,8 @@ class CookerSettings:
     def __init__(self, settings: int):
         """
         Example settings: 1407, 0607, 0207
+
+        FIXME: Initialize with 0004 (app default)
         """
         self.settings = settings
 
