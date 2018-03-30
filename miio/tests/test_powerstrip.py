@@ -15,6 +15,9 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
             'power_consume_rate': 12.5,
             'wifi_led': 'off',
             'power_price': 49,
+            'voltage': 230,
+            'elec_leakage': 0,
+            'power_factor': 1
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -22,6 +25,7 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
             'set_power_mode': lambda x: self._set_state("mode", x),
             'set_wifi_led': lambda x: self._set_state("wifi_led", x),
             'set_power_price': lambda x: self._set_state("power_price", x),
+            'set_rt_power': lambda x: True,
         }
         super().__init__(args, kwargs)
 
@@ -64,6 +68,9 @@ class TestPowerStrip(TestCase):
         assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().current == self.device.start_state["current"]
         assert self.state().load_power == self.device.start_state["power_consume_rate"]
+        assert self.state().voltage == self.device.start_state["voltage"]
+        assert self.state().power_factor == self.device.start_state["power_factor"]
+        assert self.state().leakage_current == self.device.start_state["elec_leakage"]
 
     def test_status_without_power_consume_rate(self):
         self.device._reset_state()
@@ -125,3 +132,9 @@ class TestPowerStrip(TestCase):
 
         self.device.state["power_price"] = None
         assert self.state().power_price is None
+
+    def test_set_realtime_power(self):
+        """The method is open-loop. The new state cannot be retrieved."""
+        self.device.set_realtime_power(True)
+        self.device.set_realtime_power(False)
+
