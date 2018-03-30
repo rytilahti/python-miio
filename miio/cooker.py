@@ -1,6 +1,7 @@
 import logging
 import enum
 import string
+from typing import Optional
 from collections import defaultdict
 from .device import Device, DeviceException
 
@@ -48,10 +49,42 @@ class OperationMode(enum.Enum):
     Cancel = 'Отмена'
 
 
+class CookerTimeouts:
+    def __init__(self, timeouts: str):
+        """
+        Example timeouts: 05040f, 05060f
+        """
+        self.timeouts = timeouts
+
+    @property
+    def led_off_delay(self) -> int:
+        return int(self.timeouts[0:2], 16)
+
+    @property
+    def lid_open_timeout(self) -> int:
+        return int(self.timeouts[2:4], 16)
+
+    @property
+    def warn_lid_open_timeout(self) -> int:
+        return int(self.timeouts[4:6], 16)
+
+    def __str__(self) -> str:
+        return self.timeouts
+
+    def __repr__(self) -> str:
+        s = "<CookerTimeuts led_off_delay=%s, " \
+            "lid_open_timeout=%s, " \
+            "warn_lid_open_timeout=%s>" % \
+            (self.led_off_delay,
+             self.lid_open_timeout,
+             self.warn_lid_open_timeout)
+        return s
+
+
 class CookerSettings:
     def __init__(self, settings: int):
         """
-        Setting examples: 1407, 0607, 0207
+        Example settings: 1407, 0607, 0207
         """
         self.settings = settings
 
@@ -173,24 +206,33 @@ class CookerStatus:
         return int(self.data['temp'])
 
     @property
-    def t_func(self) -> str:
-        return self.data['t_func']
+    def remaining(self) -> int:
+        """Remaining minutes of the cooking process."""
+        return int(self.data['t_func'])
 
     @property
-    def t_precook(self) -> str:
-        return self.data['t_precook']
+    def cooking_delayed(self) -> Optional[int]:
+        """Wait n minutes before cooking / scheduled cooking."""
+        delay = int(self.data['t_precook'])
+
+        if delay >= 0:
+            return delay
+
+        return None
 
     @property
-    def cooking_temperature(self) -> str:
-        return self.data['temperature_cook']
+    def duration(self) -> int:
+        """Duration of the cooking process."""
+        return int(self.data['t_cook'])
 
     @property
     def setting(self) -> CookerSettings:
+        """Settings of the cooker."""
         return CookerSettings(int(self.data['setting']))
 
     @property
-    def delay(self) -> str:
-        return self.data['delay']
+    def timeouts(self) -> CookerTimeouts:
+        return CookerTimeouts(self.data['delay'])
 
     @property
     def version(self) -> str:
@@ -271,19 +313,13 @@ class Cooker(Device):
     def set_acknowledge(self):
         self.send('set_func', ['ack'])
 
-    def set_interaction(self, settings: CookerSettings,
-                        shut_led_delay,
-                        lid_open_timeout,
-                        lid_open_timeout_alarm_time):
-        """Set interaction. Supported by all cookers except MODEL_PRESS1
-
-        FIXME: Assemble a proper bitmask. All parameters are hex values
-        """
+    def set_interaction(self, settings: CookerSettings, timeouts: CookerTimeouts):
+        """Set interaction. Supported by all cookers except MODEL_PRESS1"""
         self.send('set_interaction',
                   [str(settings),
-                   shut_led_delay,
-                   lid_open_timeout,
-                   lid_open_timeout_alarm_time])
+                   timeouts[0:2],
+                   timeouts[2:4],
+                   timeouts[4:6]])
 
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles"""
