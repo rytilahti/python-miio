@@ -48,6 +48,65 @@ class OperationMode(enum.Enum):
     Cancel = 'Отмена'
 
 
+class CookerSettings:
+    def __init__(self, settings: int):
+        """
+        Setting examples: 1407, 0607, 0207
+        """
+        self.settings = settings
+
+    @property
+    def pressure_supported(self) -> bool:
+        return (self.settings & 1) != 0
+
+    @property
+    def led_on(self) -> bool:
+        return (self.settings & 2) != 0
+
+    @property
+    def lid_open_alarm(self) -> bool:
+        return (self.settings & 8) != 0
+
+    @property
+    def lid_open_timeout_alarm(self) -> bool:
+        return (self.settings & 16) != 0
+
+    def set_pressure_supported(self, supported: bool):
+        if supported:
+            self.settings |= 1
+        else:
+            self.settings &= 254
+
+    def set_led_on(self, on: bool):
+        if on:
+            self.settings |= 2
+        else:
+            self.settings &= 253
+
+    def set_lid_open_alarm(self, alarm: bool):
+        if alarm:
+            self.settings |= 8
+        else:
+            self.settings &= 247
+
+    def set_lid_open_timeout_alarm(self, alarm: bool):
+        if alarm:
+            self.settings |= 16
+        else:
+            self.settings &= 239
+
+    def __repr__(self) -> str:
+        s = "<CookerSettings pressure_supported=%s, " \
+            "led_on=%s, " \
+            "lid_open_alarm=%s, " \
+            "lid_open_timeout_alarm=%s>" % \
+            (self.pressure_supported,
+             self.led_on,
+             self.lid_open_alarm,
+             self.lid_open_timeout_alarm)
+        return s
+
+
 class CookerStatus:
     def __init__(self, data):
         """
@@ -123,8 +182,8 @@ class CookerStatus:
         return self.data['temperature_cook']
 
     @property
-    def setting(self) -> str:
-        return self.data['setting']
+    def setting(self) -> CookerSettings:
+        return CookerSettings(int(self.data['setting']))
 
     @property
     def delay(self) -> str:
