@@ -32,7 +32,6 @@ class OperationMode(enum.Enum):
     Waiting = 'waiting'
     AutoKeepWarm = 'autokeepwarm'
     # Potential candidates
-    Cancel = 'Отмена'
     Cooking = 'cooking'
     Finish = 'finish'
     FinishA = 'finisha'
@@ -46,6 +45,7 @@ class OperationMode(enum.Enum):
     ResumeP = 'resumep'
     Start = 'start'
     StartP = 'startp'
+    Cancel = 'Отмена'
 
 
 class CookerStatus:
@@ -92,16 +92,17 @@ class CookerStatus:
     @property
     def stage(self) -> str:
         """
-        idle:                              ['waiting',      '0001', 'null',             '29',     '60', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010000001d1f']
-        quickly preheat:                   ['running',      '0001', '00000000ff', '031e0b23',     '60', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010000001d1f']
-        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '54', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010002013e23']
-        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '48', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010002013f29']
-        operate at full load to boil rice: ['running',      '0001', '03000000ff', '031e0b23',     '39', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010003055332']
-        operate at full load to boil rice: ['running',      '0001', '04000000ff', '031e0b23',     '35', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010004026460']
-        operate at full load to boil rice: ['running',      '0001', '06000000ff', '031e0b23',     '29', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010006015c64']
-        high temperature gelatinization:   ['running',      '0001', '07000000ff', '031e0b23',     '22', '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff010007015d64']
-        temperature gelatinization:        ['running',      '0001', '0a000000ff', '031e0b23',     '2',  '-1', '60', '0607', '05040f', '00030017', '0100', 'ffffffffffff011effff01000a015559']
-        meal is ready:                     ['autokeepwarm', '0001', '1000000000', '031e0b23031e', '1', '750', '60', '0207', '05040f', '00030017', '0100', 'ffffffffffff011effff01000000535d']
+                                              func   ,       menu ,    stage    ,    temp   ,   t_func, t_precook, t_cook, setting,   delay ,  version  , favorite,               custom
+        idle:                              ['waiting',      '0001', 'null',             '29',     '60',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010000001d1f']
+        quickly preheat:                   ['running',      '0001', '00000000ff', '031e0b23',     '60',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010000001d1f']
+        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '54',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010002013e23']
+        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '48',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010002013f29']
+        operate at full load to boil rice: ['running',      '0001', '03000000ff', '031e0b23',     '39',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010003055332']
+        operate at full load to boil rice: ['running',      '0001', '04000000ff', '031e0b23',     '35',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010004026460']
+        operate at full load to boil rice: ['running',      '0001', '06000000ff', '031e0b23',     '29',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010006015c64']
+        high temperature gelatinization:   ['running',      '0001', '07000000ff', '031e0b23',     '22',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010007015d64']
+        temperature gelatinization:        ['running',      '0001', '0a000000ff', '031e0b23',     '2',       '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff01000a015559']
+        meal is ready:                     ['autokeepwarm', '0001', '1000000000', '031e0b23031e', '1',      '750',   '60',  '0207', '05040f', '00030017',   '0100', 'ffffffffffff011effff01000000535d']
         """
         return self.data['stage']
 
