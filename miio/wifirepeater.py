@@ -1,7 +1,11 @@
 import logging
-from .device import Device
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class WifiRepeaterException(DeviceException):
+    pass
 
 
 class WifiRepeaterStatus:
@@ -86,12 +90,19 @@ class WifiRepeater(Device):
             'wifi_explorer': int(wifi_roaming)
         }])
 
-    def set_configuration(self, ssid: str, password: str, hidden: bool = False,
-                          wifi_roaming: bool = False):
+    def set_configuration(self, ssid: str, password: str, hidden: bool = False):
         """Update the configuration of the accesspoint."""
         return self.send("miIO.switch_wifi_ssid", [{
             'ssid': ssid,
             'pwd': password,
             'hidden': int(hidden),
-            'wifi_explorer': int(wifi_roaming)
+            'wifi_explorer': 0
         }])
+
+    def wifi_roaming(self) -> bool:
+        """Return the roaming setting."""
+        return self.info().raw['desc']['wifi_explorer'] == 1
+
+    def rssi_accesspoint(self) -> int:
+        """Received signal strength indicator of the accesspoint."""
+        return self.info().accesspoint['rssi']
