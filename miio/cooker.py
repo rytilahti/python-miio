@@ -212,15 +212,15 @@ class InteractionTimeouts:
         return self.timeouts[2]
 
     @led_off.setter
-    def led_off_delay(self, delay: int):
+    def led_off(self, delay: int):
         self.timeouts[0] = delay
 
     @lid_open.setter
-    def lid_open_timeout(self, timeout: int):
+    def lid_open(self, timeout: int):
         self.timeouts[1] = timeout
 
     @lid_open_warning.setter
-    def lid_open_timeout_warning(self, timeout: int):
+    def lid_open_warning(self, timeout: int):
         self.timeouts[2] = timeout
 
     def __str__(self) -> str:
@@ -230,9 +230,9 @@ class InteractionTimeouts:
         s = "<InteractionTimeouts led_off=%s, " \
             "lid_open=%s, " \
             "lid_open_warning=%s>" % \
-            (self.led_off_delay,
-             self.lid_open_timeout,
-             self.lid_open_timeout_warning)
+            (self.led_off,
+             self.lid_open,
+             self.lid_open_warning)
         return s
 
 
