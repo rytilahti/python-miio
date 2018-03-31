@@ -1,8 +1,12 @@
 import logging
+import click
 from typing import Dict, Any, Optional
 from collections import defaultdict
 from .device import Device
 from .utils import deprecated
+from .click_common import (
+    DeviceGroupMeta, device_command, echo_return_status
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -85,7 +89,7 @@ class ChuangmiPlugStatus:
         return s
 
 
-class ChuangmiPlug(Device):
+class ChuangmiPlug(Device, metaclass=DeviceGroupMeta):
     """Main class representing the Chuangmi Plug V1 and V3."""
 
     def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
@@ -98,6 +102,14 @@ class ChuangmiPlug(Device):
         else:
             self.model = MODEL_CHUANGMI_PLUG_M1
 
+    @device_command(
+        echo_return_status("",
+                           "Power: {result.power}\n"
+                           "USB Power: {result.usb_power}\n"
+                           "Temperature: {result.temperature} °C\n"
+                           "Load power: {result.load_power}\n"
+                           "WiFi LED: {result.wifi_led}")
+        )
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
@@ -123,6 +135,7 @@ class ChuangmiPlug(Device):
         return ChuangmiPlugStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @device_command(echo_return_status("Powering on"))
     def on(self):
         """Power on."""
         if self.model == MODEL_CHUANGMI_PLUG_V1:
@@ -130,6 +143,7 @@ class ChuangmiPlug(Device):
 
         return self.send("set_power", ["on"])
 
+    @device_command(echo_return_status("Powering off"))
     def off(self):
         """Power off."""
         if self.model == MODEL_CHUANGMI_PLUG_V1:
@@ -137,14 +151,23 @@ class ChuangmiPlug(Device):
 
         return self.send("set_power", ["off"])
 
+    @device_command(echo_return_status("Powering USB on"))
     def usb_on(self):
         """Power on."""
         return self.send("set_usb_on", [])
 
+    @device_command(echo_return_status("Powering USB off"))
     def usb_off(self):
         """Power off."""
         return self.send("set_usb_off", [])
 
+    @device_command(
+        click.argument("wifi_led", type=bool),
+        echo_return_status(
+            lambda wifi_led: "Turning on WiFi LED"
+            if wifi_led else "Turning off WiFi LED"
+        )
+    )
     def set_wifi_led(self, led: bool):
         """Set the wifi led on/off."""
         if led:
