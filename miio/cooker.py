@@ -50,100 +50,187 @@ class OperationMode(enum.Enum):
 
 
 class InteractionTimeouts:
-    def __init__(self, timeouts: str):
+    def __init__(self, timeouts: str = None):
         """
         Example timeouts: 05040f, 05060f
-
-        FIXME: Add setters. Initialize with 05040f (app default)
         """
-        self.timeouts = timeouts
+        if timeouts is None:
+            self.timeouts = [5, 4, 15]
+        else:
+            self.timeouts = [int(self.timeouts[0:2], 16),
+                             int(self.timeouts[2:4], 16),
+                             int(self.timeouts[4:6], 16)]
 
     @property
-    def led_off_delay(self) -> int:
-        return int(self.timeouts[0:2], 16)
+    def led_off(self) -> int:
+        return self.timeouts[0]
 
     @property
-    def lid_open_timeout(self) -> int:
-        return int(self.timeouts[2:4], 16)
+    def lid_open(self) -> int:
+        return self.timeouts[1]
 
     @property
-    def warn_lid_open_timeout(self) -> int:
-        return int(self.timeouts[4:6], 16)
+    def lid_open_warning(self) -> int:
+        return self.timeouts[2]
+
+    @led_off.setter
+    def led_off_delay(self, delay: int):
+        self.timeouts[0] = delay
+
+    @lid_open.setter
+    def lid_open_timeout(self, timeout: int):
+        self.timeouts[1] = timeout
+
+    @lid_open_warning.setter
+    def lid_open_timeout_warning(self, timeout: int):
+        self.timeouts[2] = timeout
 
     def __str__(self) -> str:
-        return self.timeouts
+        return "{:02x}{:02x}{:02x}".format(self.timeouts[0],
+                                           self.timeouts[1],
+                                           self.timeouts[2])
 
     def __repr__(self) -> str:
-        s = "<InteractionTimeuts led_off_delay=%s, " \
-            "lid_open_timeout=%s, " \
-            "warn_lid_open_timeout=%s>" % \
+        s = "<InteractionTimeouts led_off=%s, " \
+            "lid_open=%s, " \
+            "lid_open_warning=%s>" % \
             (self.led_off_delay,
              self.lid_open_timeout,
-             self.warn_lid_open_timeout)
+             self.lid_open_timeout_warning)
         return s
 
 
 class CookerSettings:
-    def __init__(self, settings: int):
+    def __init__(self, settings: str = None):
         """
         Example settings: 1407, 0607, 0207
-
-        FIXME: Initialize with 0004 (app default)
         """
-        self.settings = settings
+        if settings is None:
+            self.settings = [0, 4]
+        else:
+            self.settings = [int(settings[0:2], 16), int(settings[2:4], 16)]
 
     @property
     def pressure_supported(self) -> bool:
-        return (self.settings & 1) != 0
+        return self.settings[0] & 1 != 0
 
     @property
     def led_on(self) -> bool:
-        return (self.settings & 2) != 0
+        return self.settings[0] & 2 != 0
 
     @property
-    def lid_open_alarm(self) -> bool:
-        return (self.settings & 8) != 0
+    def auto_keep_warm(self) -> bool:
+        return self.settings[0] & 4 != 0
 
     @property
-    def lid_open_timeout_alarm(self) -> bool:
-        return (self.settings & 16) != 0
+    def lid_open_warning(self) -> bool:
+        return self.settings[0] & 8 != 0
 
-    def set_pressure_supported(self, supported: bool):
+    @property
+    def lid_open_warning_delayed(self) -> bool:
+        return self.settings[0] & 16 != 0
+
+    @property
+    def jingzhu_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 1 != 0
+
+    @property
+    def kuaizhu_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 2 != 0
+
+    @property
+    def zhuzhou_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 4 != 0
+
+    @property
+    def favorite_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 8 != 0
+
+    @pressure_supported.setter
+    def pressure_supported(self, supported: bool):
         if supported:
-            self.settings |= 1
+            self.settings[0] |= 1
         else:
-            self.settings &= 254
+            self.settings[0] &= 254
 
-    def set_led_on(self, on: bool):
+    @led_on.setter
+    def led_on(self, on: bool):
         if on:
-            self.settings |= 2
+            self.settings[0] |= 2
         else:
-            self.settings &= 253
+            self.settings[0] &= 253
 
-    def set_lid_open_alarm(self, alarm: bool):
-        if alarm:
-            self.settings |= 8
+    @auto_keep_warm.setter
+    def auto_keep_warm(self, keep_warm: bool):
+        if keep_warm:
+            self.settings[0] |= 4
         else:
-            self.settings &= 247
+            self.settings[0] &= 251
 
-    def set_lid_open_timeout_alarm(self, alarm: bool):
+    @lid_open_warning.setter
+    def lid_open_warning(self, alarm: bool):
         if alarm:
-            self.settings |= 16
+            self.settings[0] |= 8
         else:
-            self.settings &= 239
+            self.settings[0] &= 247
+
+    @lid_open_warning_delayed.setter
+    def lid_open_warning_delayed(self, alarm: bool):
+        if alarm:
+            self.settings[0] |= 16
+        else:
+            self.settings[0] &= 239
+
+    @jingzhu_auto_keep_warm.setter
+    def jingzhu_auto_keep_warm(self, auto_keep_warm: bool):
+        if auto_keep_warm:
+            self.settings[1] |= 1
+        else:
+            self.settings[1] &= 254
+
+    @kuaizhu_auto_keep_warm.setter
+    def kuaizhu_auto_keep_warm(self, auto_keep_warm: bool):
+        if auto_keep_warm:
+            self.settings[1] |= 2
+        else:
+            self.settings[1] &= 253
+
+    @zhuzhou_auto_keep_warm.setter
+    def zhuzhou_auto_keep_warm(self, auto_keep_warm: bool):
+        if auto_keep_warm:
+            self.settings[1] |= 4
+        else:
+            self.settings[1] &= 251
+
+    @favorite_auto_keep_warm.setter
+    def favorite_auto_keep_warm(self, auto_keep_warm: bool):
+        if auto_keep_warm:
+            self.settings[1] |= 8
+        else:
+            self.settings[1] &= 247
 
     def __str__(self) -> str:
-        return str(self.settings).zfill(4)
+        return "{:02x}{:02x}".format(self.settings[0], self.settings[1])
 
     def __repr__(self) -> str:
         s = "<CookerSettings pressure_supported=%s, " \
             "led_on=%s, " \
-            "lid_open_alarm=%s, " \
-            "lid_open_timeout_alarm=%s>" % \
+            "lid_open_warning=%s, " \
+            "lid_open_warning_delayed=%s, " \
+            "auto_keep_warm=%s, " \
+            "jingzhu_auto_keep_warm=%s, " \
+            "kuaizhu_auto_keep_warm=%s, " \
+            "zhuzhou_auto_keep_warm=%s, " \
+            "favorite_auto_keep_warm=%s>" % \
             (self.pressure_supported,
              self.led_on,
-             self.lid_open_alarm,
-             self.lid_open_timeout_alarm)
+             self.lid_open_warning,
+             self.lid_open_warning_delayed,
+             self.auto_keep_warm,
+             self.jingzhu_auto_keep_warm,
+             self.kuaizhu_auto_keep_warm,
+             self.zhuzhou_auto_keep_warm,
+             self.favorite_auto_keep_warm)
         return s
 
 
@@ -232,7 +319,7 @@ class CookerStatus:
     @property
     def settings(self) -> CookerSettings:
         """Settings of the cooker."""
-        return CookerSettings(int(self.data['setting']))
+        return CookerSettings(self.data['setting'])
 
     @property
     def interaction_timeouts(self) -> InteractionTimeouts:
@@ -317,13 +404,14 @@ class Cooker(Device):
     def set_acknowledge(self):
         self.send('set_func', ['ack'])
 
-    def set_interaction(self, settings: CookerSettings, timeouts: InteractionTimeouts):
+    def set_interaction(self, settings: CookerSettings,
+                        timeouts: InteractionTimeouts):
         """Set interaction. Supported by all cookers except MODEL_PRESS1"""
         self.send('set_interaction',
                   [str(settings),
-                   timeouts[0:2],
-                   timeouts[2:4],
-                   timeouts[4:6]])
+                   "{:x}".format(timeouts.led_off),
+                   "{:x}".format(timeouts.lid_open),
+                   "{:x}".format(timeouts.lid_open_warning)])
 
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles"""
