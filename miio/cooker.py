@@ -66,6 +66,32 @@ class OperationMode(enum.Enum):
     Cancel = 'Отмена'
 
 
+class TemperatureHistory:
+    def __init__(self, data: str):
+        """
+        Example values:
+
+        2 minutes:
+        161515161c242a3031302f2eaa2f2f2e2f
+
+        12 minutes:
+        161515161c242a3031302f2eaa2f2f2e2f2e302f2e2d302f2f2e2f2f2f2f343a3f3f3d3e3c3d3c3f3d3d3d3f3d3d3d3d3e3d3e3c3f3f3d3e3d3e3e3d3f3d3c3e3d3d3e3d3f3e3d3f3e3d3c
+
+        32 minutes:
+        161515161c242a3031302f2eaa2f2f2e2f2e302f2e2d302f2f2e2f2f2f2f343a3f3f3d3e3c3d3c3f3d3d3d3f3d3d3d3d3e3d3e3c3f3f3d3e3d3e3e3d3f3d3c3e3d3d3e3d3f3e3d3f3e3d3c3f3e3d3c3f3e3d3c3f3f3d3d3e3d3d3f3f3d3d3f3f3e3d3d3d3e3e3d3daa3f3f3f3f3f414446474a4e53575e5c5c5b59585755555353545454555554555555565656575757575858585859595b5b5c5c5c5c5d5daa5d5e5f5f606061
+
+        55 minutes:
+        161515161c242a3031302f2eaa2f2f2e2f2e302f2e2d302f2f2e2f2f2f2f343a3f3f3d3e3c3d3c3f3d3d3d3f3d3d3d3d3e3d3e3c3f3f3d3e3d3e3e3d3f3d3c3e3d3d3e3d3f3e3d3f3e3d3c3f3e3d3c3f3e3d3c3f3f3d3d3e3d3d3f3f3d3d3f3f3e3d3d3d3e3e3d3daa3f3f3f3f3f414446474a4e53575e5c5c5b59585755555353545454555554555555565656575757575858585859595b5b5c5c5c5c5d5daa5d5e5f5f60606161616162626263636363646464646464646464646464646464646464646364646464646464646464646464646464646464646464646464646464aa5a59585756555554545453535352525252525151515151
+        """
+        self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
+
+    def __str__(self) -> str:
+        return "".join(["{:02x}".format(value) for value in self.data])
+
+    def __repr__(self) -> str:
+        s = "<TemperatureHistory temperatures=%s>" % self.data
+        return s
+
 class CookerCustomizations:
     def __init__(self, custom: str):
         """
@@ -600,6 +626,19 @@ class Cooker(Device):
             raise CookerException("Invalid cooking profile: %s" % profile)
 
         self.send('set_menu', [profile])
+
+    def get_temperature_history(self) -> Optional[TemperatureHistory]:
+        """Retrieves a temperature history.
+
+        The temperature is only available while cooking.
+        Approx. six data points per minute.
+        """
+        data = self.send('get_temp_history', [])
+
+        if len(data) == 1 and len(data[0]) > 1:
+            return TemperatureHistory(data)
+
+        return None
 
     @staticmethod
     def _validate_profile(profile):
