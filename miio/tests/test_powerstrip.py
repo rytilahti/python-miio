@@ -17,7 +17,7 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
             'power_price': 49,
             'voltage': 230,
             'elec_leakage': 0,
-            'power_factor': 1
+            'power_factor': 0.5,
         }
         self.return_values = {
             'get_prop': self._get_state,
