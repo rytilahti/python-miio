@@ -77,21 +77,48 @@ class PowerStripStatus:
             return self.data["power_price"]
         return None
 
+    @property
+    def leakage_current(self) -> Optional[int]:
+        """The leakage current, if available."""
+        if self.data["elec_leakage"] is not None:
+            return self.data["elec_leakage"]
+        return None
+
+    @property
+    def voltage(self) -> Optional[int]:
+        """The voltage, if available."""
+        if self.data["voltage"] is not None:
+            return self.data["voltage"]
+        return None
+
+    @property
+    def power_factor(self) -> Optional[float]:
+        """The power factor, if available."""
+        if self.data["power_factor"] is not None:
+            return self.data["power_factor"]
+        return None
+
     def __repr__(self) -> str:
         s = "<PowerStripStatus power=%s, " \
             "temperature=%s, " \
-            "load_power=%s, " \
+            "voltage=%s, " \
             "current=%s, " \
+            "load_power=%s, " \
+            "power_factor=%s " \
+            "power_price=%s, " \
+            "leakage_current=%s, " \
             "mode=%s, " \
-            "wifi_led=%s, " \
-            "power_price=%s>" % \
+            "wifi_led=%s>" % \
             (self.power,
              self.temperature,
-             self.load_power,
+             self.voltage,
              self.current,
+             self.load_power,
+             self.power_factor,
+             self.power_price,
+             self.leakage_current,
              self.mode,
-             self.wifi_led,
-             self.power_price)
+             self.wifi_led)
         return s
 
 
@@ -101,7 +128,8 @@ class PowerStrip(Device):
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
         properties = ['power', 'temperature', 'current', 'mode',
-                      'power_consume_rate', 'wifi_led', 'power_price', ]
+                      'power_consume_rate', 'wifi_led', 'power_price',
+                      'voltage', 'power_factor', 'elec_leakage']
         values = self.send(
             "get_prop",
             properties
@@ -145,3 +173,10 @@ class PowerStrip(Device):
             raise PowerStripException("Invalid power price: %s" % price)
 
         return self.send("set_power_price", [price])
+
+    def set_realtime_power(self, power: bool):
+        """Set the realtime power on/off."""
+        if power:
+            return self.send("set_rt_power", [1])
+        else:
+            return self.send("set_rt_power", [0])
