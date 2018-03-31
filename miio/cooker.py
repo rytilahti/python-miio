@@ -421,11 +421,13 @@ class CookerStatus:
         return OperationMode(self.data['func'])
 
     @property
-    def menu(self) -> str:
-        return self.data['menu']
+    def menu(self) -> int:
+        """Selected recipe id."""
+        return int(self.data['menu'], 16)
 
     @property
     def stage(self) -> Optional[CookingStage]:
+        """Current stage if cooking."""
         stage = self.data['stage']
         if len(stage) == 10 and stage.hexdigits:
             return CookingStage(stage)
@@ -472,23 +474,23 @@ class CookerStatus:
 
     @property
     def interaction_timeouts(self) -> InteractionTimeouts:
+        """Interaction timeouts."""
         return InteractionTimeouts(self.data['delay'])
 
     @property
-    def version(self) -> str:
-        return self.data['version']
-
-    @property
     def hardware_version(self) -> int:
-        return int(self.version[0:4], 16)
+        """Hardware version."""
+        return int(self.data['version'][0:4], 16)
 
     @property
-    def software_version(self) -> int:
-        return int(self.version[4:8], 16)
+    def firmware_version(self) -> int:
+        """Firmware version."""
+        return int(self.data['version'][4:8], 16)
 
     @property
-    def favorite(self) -> str:
-        return self.data['favorite']
+    def favorite(self) -> int:
+        """Favored recipe id. Can be compared with the menu property."""
+        return int(self.data['favorite'], 16)
 
     @property
     def custom(self) -> Optional[CookerCustomizations]:
@@ -548,22 +550,26 @@ class Cooker(Device):
             defaultdict(lambda: None, zip(properties, values)))
 
     def start(self, profile: str):
-        """Start cooking a profile"""
+        """Start cooking a profile."""
         if not self._validate_profile(profile):
             raise CookerException("Invalid cooking profile: %s" % profile)
 
         self.send('set_start', [profile])
 
     def stop(self):
+        """Stop cooking."""
         self.send('set_func', ['end02'])
 
     def stop_outdated_firmware(self):
+        """Stop cooking (obsolete)."""
         self.send('set_func', ['end'])
 
     def set_no_warnings(self):
+        """Disable warnings."""
         self.send('set_func', ['nowarn'])
 
     def set_acknowledge(self):
+        """Enable warnings?"""
         self.send('set_func', ['ack'])
 
     def set_interaction(self, settings: CookerSettings,
