@@ -3,7 +3,9 @@ import enum
 import re
 from typing import Any, Dict, Optional
 from collections import defaultdict
+import click
 from .device import Device, DeviceException
+from .click_common import command, format_output, EnumType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -352,10 +354,45 @@ class AirPurifierStatus:
              self.button_pressed)
         return s
 
+    def __json__(self):
+        return self.data
+
 
 class AirPurifier(Device):
     """Main class representing the air purifier."""
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "AQI: {result.aqi} μg/m³\n"
+            "Average AQI: {result.average_aqi} μg/m³\n"
+            "Temperature: {result.temperature} °C\n"
+            "Humidity: {result.humidity} %\n"
+            "Mode: {result.mode.value}\n"
+            "LED: {result.led}\n"
+            "LED brightness: {result.led_brightness}\n"
+            "Illuminance: {result.illuminance} lx\n"
+            "Buzzer: {result.buzzer}\n"
+            "Child lock: {result.child_lock}\n"
+            "Favorite level: {result.favorite_level}\n"
+            "Filter life remaining: {result.filter_life_remaining} %\n"
+            "Filter hours used: {result.filter_hours_used}\n"
+            "Use time: {result.use_time} s\n"
+            "Purify volume: {result.purify_volume} m³\n"
+            "Motor speed: {result.motor_speed} rpm\n"
+            "Motor 2 speed: {result.motor2_speed} rpm\n"
+            "Sound volume: {result.volume} %\n"
+            "Filter RFID product id: {result.filter_rfid_product_id}\n"
+            "Filter RFID tag: {result.filter_rfid_tag}\n"
+            "Filter type: {result.filter_type.value}\n"
+            "Learn mode: {result.learn_mode}\n"
+            "Sleep mode: {result.sleep_mode.value}\n"
+            "Sleep time: {result.sleep_time}\n"
+            "Sleep mode learn count: {result.sleep_mode_learn_count}\n"
+            "AQI sensor enabled on power off: {result.auto_detect}\n"
+        )
+    )
     def status(self) -> AirPurifierStatus:
         """Retrieve properties."""
 
@@ -388,18 +425,32 @@ class AirPurifier(Device):
         return AirPurifierStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        default_output=format_output("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @command(
+        default_output=format_output("Powering off"),
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
+    @command(
+        click.argument("mode", type=EnumType(OperationMode, False)),
+        default_output=format_output("Setting mode to '{mode.value}'")
+    )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
         return self.send("set_mode", [mode.value])
 
+    @command(
+        click.argument("level", type=int),
+        default_output=format_output("Setting favorite level to {level}")
+    )
     def set_favorite_level(self, level: int):
         """Set favorite level."""
         if level < 0 or level > 16:
@@ -411,10 +462,22 @@ class AirPurifier(Device):
         # should be  between 0 and 16.
         return self.send("set_level_favorite", [level])  # 0 ... 16
 
+    @command(
+        click.argument("brightness", type=EnumType(LedBrightness, False)),
+        default_output=format_output(
+            "Setting LED brightness to {brightness}")
+    )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         return self.send("set_led_b", [brightness.value])
 
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED"
+            if led else "Turning off LED"
+        )
+    )
     def set_led(self, led: bool):
         """Turn led on/off."""
         if led:
@@ -422,6 +485,13 @@ class AirPurifier(Device):
         else:
             return self.send("set_led", ['off'])
 
+    @command(
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer"
+            if buzzer else "Turning off buzzer"
+        )
+    )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
         if buzzer:
@@ -429,6 +499,13 @@ class AirPurifier(Device):
         else:
             return self.send("set_buzzer", ["off"])
 
+    @command(
+        click.argument("lock", type=bool),
+        default_output=format_output(
+            lambda lock: "Turning on child lock"
+            if lock else "Turning off child lock"
+        )
+    )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
         if lock:
@@ -436,6 +513,10 @@ class AirPurifier(Device):
         else:
             return self.send("set_child_lock", ["off"])
 
+    @command(
+        click.argument("volume", type=int),
+        default_output=format_output("Setting favorite level to {volume}")
+    )
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
         if volume < 0 or volume > 100:
@@ -443,6 +524,13 @@ class AirPurifier(Device):
 
         return self.send("set_volume", [volume])
 
+    @command(
+        click.argument("learn_mode", type=bool),
+        default_output=format_output(
+            lambda learn_mode: "Turning on learn mode"
+            if learn_mode else "Turning off learn mode"
+        )
+    )
     def set_learn_mode(self, learn_mode: bool):
         """Set the Learn Mode on/off."""
         if learn_mode:
@@ -450,6 +538,13 @@ class AirPurifier(Device):
         else:
             return self.send("set_act_sleep", ["close"])
 
+    @command(
+        click.argument("auto_detect", type=bool),
+        default_output=format_output(
+            lambda auto_detect: "Turning on auto detect"
+            if auto_detect else "Turning off auto detect"
+        )
+    )
     def set_auto_detect(self, auto_detect: bool):
         """Set auto detect on/off. It's a feature of the AirPurifier V1 & V3"""
         if auto_detect:
@@ -457,6 +552,10 @@ class AirPurifier(Device):
         else:
             return self.send("set_act_det", ["off"])
 
+    @command(
+        click.argument("value", type=int),
+        default_output=format_output("Setting extra to {value}")
+    )
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app.
 
@@ -467,6 +566,9 @@ class AirPurifier(Device):
 
         return self.send("set_app_extra", [value])
 
+    @command(
+        default_output=format_output("Resetting filter")
+    )
     def reset_filter(self):
         """Resets filter hours used and remaining life."""
         return self.send('reset_filter1')

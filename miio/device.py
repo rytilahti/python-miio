@@ -4,22 +4,17 @@ import socket
 import logging
 import construct
 import binascii
+import click
 from typing import Any, List, Optional  # noqa: F401
 from enum import Enum
 
+from .click_common import (
+    DeviceGroupMeta, command, format_output
+)
 from .protocol import Message
+from .exceptions import DeviceException, DeviceError
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class DeviceException(Exception):
-    """Exception wrapping any communication errors with the device."""
-    pass
-
-
-class DeviceError(DeviceException):
-    """Exception communicating an error delivered by the target device."""
-    pass
 
 
 class UpdateState(Enum):
@@ -63,6 +58,9 @@ class DeviceInfo:
             self.data["mac"],
             self.network_interface["localIp"],
             self.data["token"])
+
+    def __json__(self):
+        return self.data
 
     @property
     def network_interface(self):
@@ -108,7 +106,7 @@ class DeviceInfo:
         return self.data
 
 
-class Device:
+class Device(metaclass=DeviceGroupMeta):
     """Base class for all device implementations.
     This is the main class providing the basic protocol handling for devices using
     the ``miIO`` protocol.
@@ -289,6 +287,10 @@ class Device:
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("No response from the device") from ex
 
+    @command(
+        click.argument('cmd', required=True),
+        click.argument('parameters', required=False),
+    )
     def raw_command(self, cmd, params):
         """Send a raw command to the device.
         This is mostly useful when trying out commands which are not
@@ -298,6 +300,15 @@ class Device:
         :param dict params: Parameters to send"""
         return self.send(cmd, params)
 
+    @command(
+        default_output=format_output(
+            "",
+            "Model: {result.model}\n"
+            "Hardware version: {result.hardware_version}\n"
+            "Firmware version: {result.firmware_version}\n"
+            "Network: {result.network_interface}\n"
+            "AP: {result.accesspoint}\n")
+    )
     def info(self) -> DeviceInfo:
         """Get miIO protocol information from the device.
         This includes information about connected wlan network,
