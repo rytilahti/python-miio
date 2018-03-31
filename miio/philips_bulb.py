@@ -103,7 +103,7 @@ class PhilipsBulb(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        click.argument("brightness", type=int),
+        click.argument("level", type=int),
         default_output=format_output("Setting brightness to {level}")
     )
     def set_brightness(self, level: int):
