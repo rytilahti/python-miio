@@ -168,14 +168,14 @@ class PowerStrip(Device):
             defaultdict(lambda: None, zip(properties, values)))
 
     @command(
-        default_output = format_output("Powering on"),
+        default_output=format_output("Powering on"),
     )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
     @command(
-        default_output = format_output("Powering off"),
+        default_output=format_output("Powering off"),
     )
     def off(self):
         """Power off."""

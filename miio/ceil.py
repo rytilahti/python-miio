@@ -161,7 +161,8 @@ class Ceil(Device):
     @command(
         click.argument("brightness", type=int),
         click.argument("cct", type=int),
-        default_output=format_output("Setting brightness to {brightness} and color temperature to {cct}")
+        default_output=format_output(
+            "Setting brightness to {brightness} and color temperature to {cct}")
     )
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
