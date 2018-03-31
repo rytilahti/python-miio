@@ -1,9 +1,13 @@
-import logging
 import enum
+import logging
 import string
+from collections import defaultdict
 from datetime import time
 from typing import Optional
-from collections import defaultdict
+
+import click
+
+from .click_common import command, format_output, EnumType
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,6 +88,10 @@ class TemperatureHistory:
         161515161c242a3031302f2eaa2f2f2e2f2e302f2e2d302f2f2e2f2f2f2f343a3f3f3d3e3c3d3c3f3d3d3d3f3d3d3d3d3e3d3e3c3f3f3d3e3d3e3e3d3f3d3c3e3d3d3e3d3f3e3d3f3e3d3c3f3e3d3c3f3e3d3c3f3f3d3d3e3d3d3f3f3d3d3f3f3e3d3d3d3e3e3d3daa3f3f3f3f3f414446474a4e53575e5c5c5b59585755555353545454555554555555565656575757575858585859595b5b5c5c5c5c5d5daa5d5e5f5f60606161616162626263636363646464646464646464646464646464646464646364646464646464646464646464646464646464646464646464646464aa5a59585756555554545453535352525252525151515151
         """
         self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
+
+    @property
+    def temperatures(self) -> list[int]:
+        return self.data
 
     def __str__(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.data])
@@ -546,24 +554,28 @@ class CookerStatus:
             "menu=%s, " \
             "stage=%s, " \
             "temperature=%s, " \
+            "start_time=%s" \
             "remaining=%s, " \
             "cooking_delayed=%s, " \
             "cooking_temperature=%s, " \
             "settings=%s, " \
             "interaction_timeouts=%s, " \
-            "version=%s, " \
+            "hardware_version=%s, " \
+            "firmware_version=%s, " \
             "favorite=%s, " \
             "custom=%s>" % \
             (self.mode,
              self.menu,
              self.stage,
              self.temperature,
+             self.start_time,
              self.remaining,
              self.cooking_delayed,
              self.duration,
              self.settings,
              self.interaction_timeouts,
-             self.version,
+             self.hardware_version,
+             self.firmware_version,
              self.favorite,
              self.custom)
         return s
@@ -571,7 +583,25 @@ class CookerStatus:
 
 class Cooker(Device):
     """Main class representing the cooker."""
-
+    @command(
+        default_output=format_output(
+            "",
+            "Mode: {result.mode}\n"
+            "Menu: {result.menu}\n"
+            "Stage: {result.stage}\n"
+            "Temperature: {result.temperature}\n"
+            "Start time: {result.start_time}\n"
+            "Remaining: {result.remaining}\n"
+            "Cooking delayed: {result.cooking_delayed}\n"
+            "Duration: {result.duration}\n"
+            "Settings: {result.settings}\n"
+            "Interaction timeouts: {result.interaction_timeouts}\n"
+            "Hardware version: {result.hardware_version}\n"
+            "Firmware version: {result.firmware_version}\n"
+            "Favorite: {result.favorite}\n"
+            "Custom: {result.custom}\n"
+        )
+    )
     def status(self) -> CookerStatus:
         """Retrieve properties."""
         properties = ['func', 'menu', 'stage', 'temp', 't_func', 't_precook',
@@ -589,6 +619,10 @@ class Cooker(Device):
         return CookerStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        click.argument("profile", type=str),
+        default_output=format_output("Cooking profile started"),
+    )
     def start(self, profile: str):
         """Start cooking a profile."""
         if not self._validate_profile(profile):
@@ -596,22 +630,40 @@ class Cooker(Device):
 
         self.send('set_start', [profile])
 
+    @command(
+        default_output=format_output("Cooking stopped"),
+    )
     def stop(self):
         """Stop cooking."""
         self.send('set_func', ['end02'])
 
+    @command(
+        default_output=format_output("Cooking stopped"),
+    )
     def stop_outdated_firmware(self):
         """Stop cooking (obsolete)."""
         self.send('set_func', ['end'])
 
+    @command(
+        default_output=format_output("Setting no warnings"),
+    )
     def set_no_warnings(self):
         """Disable warnings."""
         self.send('set_func', ['nowarn'])
 
+    @command(
+        default_output=format_output("Setting acknowledge"),
+    )
     def set_acknowledge(self):
         """Enable warnings?"""
         self.send('set_func', ['ack'])
 
+    @command(
+        # FIXME
+        click.argument("settings", type=EnumType(CookerSettings, False)),
+        click.argument("timeouts", type=EnumType(InteractionTimeouts, False)),
+        default_output=format_output("Setting interaction")
+    )
     def set_interaction(self, settings: CookerSettings,
                         timeouts: InteractionTimeouts):
         """Set interaction. Supported by all cookers except MODEL_PRESS1"""
@@ -621,6 +673,10 @@ class Cooker(Device):
                    "{:x}".format(timeouts.lid_open),
                    "{:x}".format(timeouts.lid_open_warning)])
 
+    @command(
+        click.argument("profile", type=str),
+        default_output=format_output("Setting menu to {profile}")
+    )
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles"""
         if not self._validate_profile(profile):
@@ -628,6 +684,9 @@ class Cooker(Device):
 
         self.send('set_menu', [profile])
 
+    @command(
+        default_output=format_output("Temperature history: {result.temperatures}")
+    )
     def get_temperature_history(self) -> Optional[TemperatureHistory]:
         """Retrieves a temperature history.
 
