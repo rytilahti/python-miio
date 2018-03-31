@@ -24,18 +24,18 @@ MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
 MODEL_NRRMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
 
 COOKING_STAGE_NAME = [
-    'Quick reheating',
-    'Water temperature',
+    'Preheating',
+    'Water-absorbing',
     'Boiling',
-    'Pressure',
-    'Braised rice',
+    'Gelantinizing',
+    'Braising',
 ]
 
 COOKING_STAGE_DESCRIPTION = [
-    'Adjusting temperature (and pressure) to soften the rice',
-    'Longer heating, rice is absorbing water to be more soft and sweet',
-    'Keeping the temperature high, rice is absorbing the heat',
-    'High pressure steam to seal the flavor of sweet taste',
+    'Starting heating, to soften rice gradually',
+    'Increase temperature, to flesh grains with water',
+    'Last high heating, to cook rice evenly',
+    'Steaming under high temperature, to bring sweetness to grains',
     'Reheat the rice to open its taste',
 ]
 
