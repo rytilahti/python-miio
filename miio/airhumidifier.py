@@ -174,7 +174,7 @@ class AirHumidifier(Device):
         default_output=format_output(
             "",
             "Power: {result.power}\n"
-            "Mode: {result.mode.value}\n"
+            "Mode: {result.mode}\n"
             "Temperature: {result.temperature} °C\n"
             "Humidity: {result.humidity} %\n"
             "LED brightness: {result.led_brightness}\n"
