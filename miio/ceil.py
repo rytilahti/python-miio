@@ -96,10 +96,12 @@ class Ceil(Device):
         default_output=format_output(
             "",
             "Power: {result.power}\n"
-            "USB power: {result.usb_power}\n"
-            "AQI: {result.aqi}\n"
-            "Battery: {result.battery}\n"
-            "Time State: {result.time_state}\n"
+            "Brightness: {result.brightness}\n"
+            "Color temperature: {result.color_temperature}\n"
+            "Scene: {result.scene}\n"
+            "Delayed turn off: {result.delay_off_countdown}\n"
+            "Smart night light: {result.smart_night_light}\n"
+            "Automatic color temperature: {result.automatic_color_temperature}\n"
         )
     )
     def status(self) -> CeilStatus:
