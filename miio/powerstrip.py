@@ -3,6 +3,9 @@ import logging
 from collections import defaultdict
 from typing import Dict, Any, Optional
 
+import click
+
+from .click_common import command, format_output, EnumType
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -122,10 +125,27 @@ class PowerStripStatus:
              self.wifi_led)
         return s
 
+    def __json__(self):
+        return self.data
+
 
 class PowerStrip(Device):
     """Main class representing the smart power strip."""
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Temperature: {result.temperature} °C\n"
+            "Voltage: {result.voltage} V\n"
+            "Current: {result.current} A\n"
+            "Load power: {result.load_power} W\n"
+            "Power factor: {result.power_factor}\n"
+            "Power price: {result.power_price}\n"
+            "Leakage current: {result.leakage_current} A\n"
+            "Mode: {result.mode}\n"
+            "WiFi LED: {result.wifi_led}\n")
+    )
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
         properties = ['power', 'temperature', 'current', 'mode',
@@ -147,20 +167,38 @@ class PowerStrip(Device):
         return PowerStripStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        default_output = format_output("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @command(
+        default_output = format_output("Powering off"),
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
+    @command(
+        click.argument("mode", type=EnumType(PowerMode, False)),
+        default_output=format_output(
+            "Setting mode to {mode}")
+    )
     def set_power_mode(self, mode: PowerMode):
         """Set the power mode."""
 
         # green, normal
         return self.send("set_power_mode", [mode.value])
 
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on WiFi LED"
+            if led else "Turning off WiFi LED"
+        )
+    )
     def set_wifi_led(self, led: bool):
         """Set the wifi led on/off."""
         if led:
@@ -168,6 +206,10 @@ class PowerStrip(Device):
         else:
             return self.send("set_wifi_led", ["off"])
 
+    @command(
+        click.argument("price", type=int),
+        default_output=format_output("Setting power price to {price}")
+    )
     def set_power_price(self, price: int):
         """Set the power price."""
         if price < 0 or price > 999:
@@ -175,6 +217,13 @@ class PowerStrip(Device):
 
         return self.send("set_power_price", [price])
 
+    @command(
+        click.argument("power", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on real-time power measurement"
+            if led else "Turning off real-time power measurement"
+        )
+    )
     def set_realtime_power(self, power: bool):
         """Set the realtime power on/off."""
         if power:
