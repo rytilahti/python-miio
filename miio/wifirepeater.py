@@ -91,24 +91,13 @@ class WifiRepeater(Device):
             'wifi_explorer': int(wifi_roaming)
         }])
 
-    def set_configuration(self, wifi_roaming: bool = False, ssid: str = None,
-                          password: str = None, hidden: bool = False):
+    def set_configuration(self, ssid: str, password: str, hidden: bool = False):
         """Update the configuration of the accesspoint."""
-        if wifi_roaming:
-            return self.send("miIO.switch_wifi_ssid", [{
-                'hidden': int(hidden),
-                'wifi_explorer': int(wifi_roaming)
-            }])
-
-        if not ssid or not password:
-            raise WifiRepeaterException(
-                "SSID and password is required if roaming isn't used.")
-
         return self.send("miIO.switch_wifi_ssid", [{
             'ssid': ssid,
             'pwd': password,
             'hidden': int(hidden),
-            'wifi_explorer': int(wifi_roaming)
+            'wifi_explorer': 0
         }])
 
     def wifi_roaming(self) -> Optional[bool]:

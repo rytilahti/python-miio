@@ -110,10 +110,10 @@ class TestWifiRepeater(TestCase):
 
     def test_set_wifi_roaming(self):
         self.device.set_wifi_roaming(True)
-        assert self.info().raw['desc']['wifi_explorer'] == 1
+        assert self.device().wifi_roaming is True
 
         self.device.set_wifi_roaming(False)
-        assert self.info().raw['desc']['wifi_explorer'] == 0
+        assert self.device().wifi_roaming is False
 
     def test_configuration(self):
         self.device._reset_state()
@@ -132,14 +132,12 @@ class TestWifiRepeater(TestCase):
             'ssid': 'SSID2',
             'password': 'PASSWORD2',
             'hidden': True,
-            'wifi_explorer': False
         }
 
         self.device.set_configuration(
             dummy_configuration['ssid'],
             dummy_configuration['password'],
-            dummy_configuration['hidden'],
-            dummy_configuration['wifi_explorer'])
+            dummy_configuration['hidden'])
         assert configuration().ssid == dummy_configuration['ssid']
         assert configuration().password == dummy_configuration['password']
         assert configuration().ssid_hidden is dummy_configuration['hidden']
