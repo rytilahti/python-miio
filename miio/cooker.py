@@ -1,6 +1,7 @@
 import logging
 import enum
 import string
+from datetime import time
 from typing import Optional
 from collections import defaultdict
 from .device import Device, DeviceException
@@ -21,6 +22,23 @@ MODEL_NORMAL = [MODEL_NORMAL1, MODEL_NORMAL2, MODEL_NORMAL3, MODEL_NORMAL4,
 
 MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
 MODEL_NRRMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
+
+COOKING_STAGE_NAME = [
+    'Быстрый разогрев',
+    'Температура воды',
+    'Кипячение',
+    'Давление',
+    'Тушеный рис',
+]
+
+COOKING_STAGE_DESCRIPTION = [
+    'Регулировать температуру, давления, для размягчения риса',
+    'Длительный нагрев, рис поглощает воду, становится более насыщенным и',
+    'сладким',
+    'Держите температуру высокой, рис любит равномерное тепло',
+    'Высокотемпературный пар, рис кристально чистый, запечатанный и сладкий',
+    'Подогрев риса, раскроет весь его вкус',
+]
 
 
 class CookerException(DeviceException):
@@ -47,6 +65,62 @@ class OperationMode(enum.Enum):
     Start = 'start'
     StartP = 'startp'
     Cancel = 'Отмена'
+
+
+class CookerCustomizations:
+    def __init__(self, custom: str):
+        """
+        Example values:
+
+        ffffffffffff011effff010000001d1f,
+        ffffffffffff011effff010004026460,
+        ffffffffffff011effff01000a015559,
+        ffffffffffff011effff01000000535d
+        """
+        self.custom = [int(custom[i:i + 2], 16) for i in
+                       range(0, len(custom), 2)]
+
+    @property
+    def jingzhu_appointment(self) -> time:
+        return time(hour=self.custom[0], minute=self.custom[1])
+
+    @property
+    def kuaizhu_appointment(self) -> time:
+        return time(hour=self.custom[2], minute=self.custom[3])
+
+    @property
+    def zhuzhou_appointment(self) -> time:
+        return time(hour=self.custom[4], minute=self.custom[5])
+
+    @property
+    def zhuzhou_cooking(self) -> time:
+        return time(hour=self.custom[6], minute=self.custom[7])
+
+    @property
+    def favorite_appointment(self) -> time:
+        return time(hour=self.custom[8], minute=self.custom[9])
+
+    @property
+    def favorite_cooking(self) -> time:
+        return time(hour=self.custom[10], minute=self.custom[11])
+
+    def __str__(self) -> str:
+        return "".join(["{:02x}".format(value) for value in self.custom])
+
+    def __repr__(self) -> str:
+        s = "<CookerCustomizations jingzhu_appointment=%s, " \
+            "kuaizhu_appointment=%s, " \
+            "zhuzhou_appointment=%s, " \
+            "zhuzhou_cooking=%s, " \
+            "favorite_appointment=%s," \
+            "favorite_cooking=%s>" % \
+            (self.jingzhu_appointment,
+             self.kuaizhu_appointment,
+             self.zhuzhou_appointment,
+             self.zhuzhou_cooking,
+             self.favorite_appointment,
+             self.favorite_cooking)
+        return s
 
 
 class CookingStage:
@@ -83,6 +157,36 @@ class CookingStage:
         if phase > 2:
             return 2
 
+    @property
+    def name(self) -> str:
+        try:
+            return COOKING_STAGE_NAME[self.state]
+        except IndexError:
+            return 'Cooking finished'
+
+    @property
+    def description(self) -> str:
+        try:
+            return COOKING_STAGE_DESCRIPTION[self.state]
+        except IndexError:
+            return ''
+
+    def __str__(self) -> str:
+        return self.stage
+
+    def __repr__(self) -> str:
+        s = "<CookingStage state=%s, " \
+            "rice_id=%s, " \
+            "taste=%s, " \
+            "taste_phase=%s, " \
+            "raw=%s>" % \
+            (self.state,
+             self.rice_id,
+             self.taste,
+             self.taste_phase,
+             self.stage)
+        return s
+
 
 class InteractionTimeouts:
     def __init__(self, timeouts: str = None):
@@ -92,9 +196,8 @@ class InteractionTimeouts:
         if timeouts is None:
             self.timeouts = [5, 4, 15]
         else:
-            self.timeouts = [int(self.timeouts[0:2], 16),
-                             int(self.timeouts[2:4], 16),
-                             int(self.timeouts[4:6], 16)]
+            self.timeouts = [int(timeouts[i:i + 2], 16) for i in
+                             range(0, len(timeouts), 2)]
 
     @property
     def led_off(self) -> int:
@@ -121,9 +224,7 @@ class InteractionTimeouts:
         self.timeouts[2] = timeout
 
     def __str__(self) -> str:
-        return "{:02x}{:02x}{:02x}".format(self.timeouts[0],
-                                           self.timeouts[1],
-                                           self.timeouts[2])
+        return "".join(["{:02x}".format(value) for value in self.timeouts])
 
     def __repr__(self) -> str:
         s = "<InteractionTimeouts led_off=%s, " \
@@ -143,7 +244,8 @@ class CookerSettings:
         if settings is None:
             self.settings = [0, 4]
         else:
-            self.settings = [int(settings[0:2], 16), int(settings[2:4], 16)]
+            self.settings = [int(settings[i:i + 2], 16) for i in
+                             range(0, len(settings), 2)]
 
     @property
     def pressure_supported(self) -> bool:
@@ -245,7 +347,7 @@ class CookerSettings:
             self.settings[1] &= 247
 
     def __str__(self) -> str:
-        return "{:02x}{:02x}".format(self.settings[0], self.settings[1])
+        return "".join(["{:02x}".format(value) for value in self.settings])
 
     def __repr__(self) -> str:
         s = "<CookerSettings pressure_supported=%s, " \
@@ -389,8 +491,13 @@ class CookerStatus:
         return self.data['favorite']
 
     @property
-    def custom(self) -> str:
-        return self.data['custom']
+    def custom(self) -> Optional[CookerCustomizations]:
+        custom = self.data['custom']
+
+        if len(custom) > 31 and custom.hexdigits:
+            return CookerCustomizations(custom)
+
+        return None
 
     def __repr__(self) -> str:
         s = "<CookerStatus mode=%s " \
