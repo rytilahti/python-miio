@@ -437,13 +437,27 @@ class CookerStatus:
     @property
     def temperature(self) -> Optional[int]:
         """
-        The temperature format while cooking is unknown.
+        Current temperature, if idle.
 
-        Example values: 29, 031e0b23, 031e0b23031e
+        Example values: *29*, 031e0b23, 031e0b23031e
         """
         value = self.data['temp']
         if len(value) == 2 and value.isdigit():
             return int(value)
+
+        return None
+
+    @property
+    def start_time(self) -> Optional[time]:
+        """
+        Start time of cooking?
+
+        The property "temp" is used for different purposes.
+        Example values: 29, *031e0b23*, 031e0b23031e
+        """
+        value = self.data['temp']
+        if len(value) == 8 and value.hexdigits:
+            return time(hour=int(value[4:6], 16), minute=int(value[6:8], 16))
 
         return None
 
