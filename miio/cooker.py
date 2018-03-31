@@ -49,6 +49,41 @@ class OperationMode(enum.Enum):
     Cancel = 'Отмена'
 
 
+class CookingStage:
+    def __init__(self, stage: str):
+        """
+        Example timeouts: 'null', 02000000ff, 03000000ff, 0a000000ff, 1000000000
+
+        The meaning of stage[8:10] is unknown.
+        """
+        self.stage = stage
+
+    @property
+    def state(self) -> int:
+        """
+
+        10: Cooking finished
+        11: Cooking finished
+        12: Cooking finished
+        """
+        return int(self.stage[0:2], 16)
+
+    @property
+    def rice_id(self) -> int:
+        return int(self.stage[2:6], 16)
+
+    @property
+    def taste(self) -> int:
+        return int(self.stage[6:8], 16)
+
+    @property
+    def taste_phase(self) -> int:
+        phase = self.taste / 33
+
+        if phase > 2:
+            return 2
+
+
 class InteractionTimeouts:
     def __init__(self, timeouts: str = None):
         """
@@ -263,6 +298,18 @@ class CookerStatus:
           'version': '00030017',
           'favorite': '0100',
           'custom': '13281323ffff011effff010000001617'}
+
+                                              func   ,       menu ,    stage    ,    temp   ,   t_func, t_precook, t_cook, setting,   delay ,  version  , favorite,               custom
+        idle:                              ['waiting',      '0001', 'null',             '29',     '60',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010000001d1f']
+        quickly preheat:                   ['running',      '0001', '00000000ff', '031e0b23',     '60',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010000001d1f']
+        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '54',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010002013e23']
+        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '48',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010002013f29']
+        operate at full load to boil rice: ['running',      '0001', '03000000ff', '031e0b23',     '39',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010003055332']
+        operate at full load to boil rice: ['running',      '0001', '04000000ff', '031e0b23',     '35',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010004026460']
+        operate at full load to boil rice: ['running',      '0001', '06000000ff', '031e0b23',     '29',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010006015c64']
+        high temperature gelatinization:   ['running',      '0001', '07000000ff', '031e0b23',     '22',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010007015d64']
+        temperature gelatinization:        ['running',      '0001', '0a000000ff', '031e0b23',     '2',       '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff01000a015559']
+        meal is ready:                     ['autokeepwarm', '0001', '1000000000', '031e0b23031e', '1',      '750',   '60',  '0207', '05040f', '00030017',   '0100', 'ffffffffffff011effff01000000535d']
         """
         self.data = data
 
@@ -276,25 +323,25 @@ class CookerStatus:
         return self.data['menu']
 
     @property
-    def stage(self) -> str:
-        """
-                                              func   ,       menu ,    stage    ,    temp   ,   t_func, t_precook, t_cook, setting,   delay ,  version  , favorite,               custom
-        idle:                              ['waiting',      '0001', 'null',             '29',     '60',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010000001d1f']
-        quickly preheat:                   ['running',      '0001', '00000000ff', '031e0b23',     '60',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010000001d1f']
-        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '54',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010002013e23']
-        absorb water at moderate temp:     ['running',      '0001', '02000000ff', '031e0b23',     '48',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010002013f29']
-        operate at full load to boil rice: ['running',      '0001', '03000000ff', '031e0b23',     '39',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010003055332']
-        operate at full load to boil rice: ['running',      '0001', '04000000ff', '031e0b23',     '35',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010004026460']
-        operate at full load to boil rice: ['running',      '0001', '06000000ff', '031e0b23',     '29',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010006015c64']
-        high temperature gelatinization:   ['running',      '0001', '07000000ff', '031e0b23',     '22',      '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff010007015d64']
-        temperature gelatinization:        ['running',      '0001', '0a000000ff', '031e0b23',     '2',       '-1',   '60',  '0607', '05040f', '00030017',   '0100', 'ffffffffffff011effff01000a015559']
-        meal is ready:                     ['autokeepwarm', '0001', '1000000000', '031e0b23031e', '1',      '750',   '60',  '0207', '05040f', '00030017',   '0100', 'ffffffffffff011effff01000000535d']
-        """
-        return self.data['stage']
+    def stage(self) -> Optional[CookingStage]:
+        stage = self.data['stage']
+        if len(stage) == 10 and stage.hexdigits:
+            return CookingStage(stage)
+
+        return None
 
     @property
-    def temperature(self) -> int:
-        return int(self.data['temp'])
+    def temperature(self) -> Optional[int]:
+        """
+        The temperature format while cooking is unknown.
+
+        Example values: 29, 031e0b23, 031e0b23031e
+        """
+        value = self.data['temp']
+        if len(value) == 2 and value.isdigit():
+            return int(value)
+
+        return None
 
     @property
     def remaining(self) -> int:
@@ -328,6 +375,14 @@ class CookerStatus:
     @property
     def version(self) -> str:
         return self.data['version']
+
+    @property
+    def hardware_version(self) -> int:
+        return int(self.version[0:4], 16)
+
+    @property
+    def software_version(self) -> int:
+        return int(self.version[4:8], 16)
 
     @property
     def favorite(self) -> str:
