@@ -137,4 +137,3 @@ class TestPowerStrip(TestCase):
         """The method is open-loop. The new state cannot be retrieved."""
         self.device.set_realtime_power(True)
         self.device.set_realtime_power(False)
-
