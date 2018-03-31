@@ -92,7 +92,7 @@ class PowerStripStatus:
         return None
 
     @property
-    def power_factor(self) -> Optional[int]:
+    def power_factor(self) -> Optional[float]:
         """The power factor, if available."""
         if self.data["power_factor"] is not None:
             return self.data["power_factor"]
