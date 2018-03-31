@@ -100,6 +100,9 @@ class TestWifiRepeater(TestCase):
     def info(self):
         return self.device.info()
 
+    def wifi_roaming(self):
+        return self.device.wifi_roaming()
+
     def test_status(self):
         self.device._reset_state()
 
@@ -110,10 +113,10 @@ class TestWifiRepeater(TestCase):
 
     def test_set_wifi_roaming(self):
         self.device.set_wifi_roaming(True)
-        assert self.device().wifi_roaming is True
+        assert self.wifi_roaming() is True
 
         self.device.set_wifi_roaming(False)
-        assert self.device().wifi_roaming is False
+        assert self.wifi_roaming() is False
 
     def test_configuration(self):
         self.device._reset_state()
