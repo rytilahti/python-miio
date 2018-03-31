@@ -24,20 +24,19 @@ MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
 MODEL_NRRMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
 
 COOKING_STAGE_NAME = [
-    'Быстрый разогрев',
-    'Температура воды',
-    'Кипячение',
-    'Давление',
-    'Тушеный рис',
+    'Quick reheating',
+    'Water temperature',
+    'Boiling',
+    'Pressure',
+    'Braised rice',
 ]
 
 COOKING_STAGE_DESCRIPTION = [
-    'Регулировать температуру, давления, для размягчения риса',
-    'Длительный нагрев, рис поглощает воду, становится более насыщенным и',
-    'сладким',
-    'Держите температуру высокой, рис любит равномерное тепло',
-    'Высокотемпературный пар, рис кристально чистый, запечатанный и сладкий',
-    'Подогрев риса, раскроет весь его вкус',
+    'Adjusting temperature (and pressure) to soften the rice',
+    'Longer heating, rice is absorbing water to be more soft and sweet',
+    'Keeping the temperature high, rice is absorbing the heat',
+    'High pressure steam to seal the flavor of sweet taste',
+    'Reheat the rice to open its taste',
 ]
 
 
