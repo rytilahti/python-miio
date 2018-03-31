@@ -103,6 +103,9 @@ class TestWifiRepeater(TestCase):
     def wifi_roaming(self):
         return self.device.wifi_roaming()
 
+    def rssi_accesspoint(self):
+        return self.device.rssi_accesspoint()
+
     def test_status(self):
         self.device._reset_state()
 
@@ -144,3 +147,8 @@ class TestWifiRepeater(TestCase):
         assert configuration().ssid == dummy_configuration['ssid']
         assert configuration().password == dummy_configuration['password']
         assert configuration().ssid_hidden is dummy_configuration['hidden']
+
+    def test_rssi_accesspoint(self):
+        self.device._reset_state()
+
+        assert self.rssi_accesspoint() is self.device.start_device_info['ap']['rssi']

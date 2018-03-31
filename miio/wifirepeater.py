@@ -100,18 +100,10 @@ class WifiRepeater(Device):
             'wifi_explorer': 0
         }])
 
-    def wifi_roaming(self) -> Optional[bool]:
+    def wifi_roaming(self) -> bool:
         """Return the roaming setting."""
-        device_info = self.info()
-        if 'desc' in device_info.raw and 'wifi_explorer' in device_info.raw['desc']:
-            return device_info.raw['desc']['wifi_explorer'] == 1
+        return self.info().raw['desc']['wifi_explorer'] == 1
 
-        return None
-
-    def rssi_accesspoint(self) -> Optional[int]:
+    def rssi_accesspoint(self) -> int:
         """Received signal strength indicator of the accesspoint."""
-        device_info = self.info()
-        if 'rssi' in device_info.accesspoint:
-            return device_info.accesspoint['rssi']
-
-        return None
+        return self.info().accesspoint['rssi']
