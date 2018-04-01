@@ -1,9 +1,12 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import AirPurifier
 from miio.airpurifier import (OperationMode, LedBrightness, FilterType,
-                              SleepMode, AirPurifierStatus, AirPurifierException)
+                              SleepMode, AirPurifierStatus,
+                              AirPurifierException, )
 from .dummies import DummyDevice
-import pytest
 
 
 class DummyAirPurifier(DummyDevice, AirPurifier):

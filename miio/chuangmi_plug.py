@@ -1,10 +1,12 @@
 import logging
-import click
-from typing import Dict, Any, Optional
 from collections import defaultdict
+from typing import Dict, Any, Optional
+
+import click
+
+from .click_common import command, format_output
 from .device import Device
 from .utils import deprecated
-from .click_common import command, format_output
 
 _LOGGER = logging.getLogger(__name__)
 

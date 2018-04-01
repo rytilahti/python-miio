@@ -1,8 +1,10 @@
-from unittest import TestCase
-import pytest
-from .dummies import DummyDevice
 import datetime
-from miio import Vacuum, VacuumStatus, VacuumException
+from unittest import TestCase
+
+import pytest
+
+from miio import Vacuum, VacuumStatus
+from .dummies import DummyDevice
 
 
 class DummyVacuum(DummyDevice, Vacuum):

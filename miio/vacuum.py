@@ -1,22 +1,24 @@
+import datetime
+import enum
+import json
 import logging
-import os
 import math
+import os
+import pathlib
 import time
 from typing import List
-import enum
-import datetime
-import json
-import pathlib
-import pytz
+
 import click
+import pytz
 from appdirs import user_cache_dir
+
+from .click_common import (
+    DeviceGroup, command, GlobalContextObject,
+)
+from .device import Device, DeviceException
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                CleaningSummary, CleaningDetails, Timer,
-                               SoundStatus, SoundInstallStatus)
-from .device import Device, DeviceException
-from .click_common import (
-    DeviceGroup, command, GlobalContextObject
-)
+                               SoundStatus, SoundInstallStatus, )
 
 _LOGGER = logging.getLogger(__name__)
 

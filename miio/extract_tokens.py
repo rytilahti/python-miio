@@ -1,13 +1,14 @@
 import logging
-import click
-import tempfile
 import sqlite3
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
+import tempfile
 from pprint import pformat as pf
-import attr
-from android_backup import AndroidBackup
 from typing import Iterator
+
+import attr
+import click
+from android_backup import AndroidBackup
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 logging.basicConfig(level=logging.INFO)
 _LOGGER = logging.getLogger(__name__)

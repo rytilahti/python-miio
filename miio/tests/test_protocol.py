@@ -1,7 +1,8 @@
+import binascii
 from unittest import TestCase
+
 from .. import Utils
 from ..protocol import Message
-import binascii
 
 
 class TestProtocol(TestCase):

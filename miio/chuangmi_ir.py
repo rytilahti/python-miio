@@ -1,9 +1,11 @@
 import base64
 import re
+
 from construct import (
     Struct, Const, Rebuild, this, len_, Adapter, Computed,
     Int16ul, Int32ul, Int16ub, Array, BitStruct, BitsInteger,
 )
+
 from .device import Device, DeviceException
 
 

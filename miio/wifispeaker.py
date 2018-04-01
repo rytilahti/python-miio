@@ -1,5 +1,6 @@
-import warnings
 import logging
+import warnings
+
 from .device import Device
 
 _LOGGER = logging.getLogger(__name__)

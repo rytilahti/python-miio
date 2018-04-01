@@ -1,11 +1,13 @@
-import logging
 import enum
+import logging
 import re
-from typing import Any, Dict, Optional
 from collections import defaultdict
+from typing import Any, Dict, Optional
+
 import click
-from .device import Device, DeviceException
+
 from .click_common import command, format_output, EnumType
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
