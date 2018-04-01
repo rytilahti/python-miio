@@ -35,7 +35,7 @@ class ChuangmiIr(Device):
 
     @command(
         click.argument("key", type=int),
-        default_output=format_output("Reading infrared command from key storage key {key}")
+        default_output=format_output("Reading infrared command from storage key {key}")
     )
     def read(self, key: int=1):
         """Read a learned command.
