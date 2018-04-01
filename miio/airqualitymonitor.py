@@ -9,7 +9,7 @@ _LOGGER = logging.getLogger(__name__)
 class AirQualityMonitorStatus:
     """Container of air quality monitor status."""
     def __init__(self, data):
-        # {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off'}
+        # {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off', 'time_state': 'on'}
         self.data = data
 
     @property
@@ -38,9 +38,9 @@ class AirQualityMonitorStatus:
         return self.data["battery"]
 
     @property
-    def time_state(self) -> str:
+    def time_state(self) -> bool:
         """Current time state."""
-        return self.data["time_state"]
+        return self.data["time_state"] == "on"
 
     def __repr__(self) -> str:
         s = "<AirQualityMonitorStatus power=%s, " \
