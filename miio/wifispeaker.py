@@ -124,6 +124,10 @@ class WifiSpeaker(Device):
         """Move to next track."""
         return self.send("next_track")
 
+    def channel_next(self):
+        """Change transport channel."""
+        return self.send("next_channel")
+
     def track_position(self):
         """Return current track position."""
         return self.send("get_prop", ["rel_time"])
@@ -131,7 +135,3 @@ class WifiSpeaker(Device):
     def volume(self):
         """Speaker volume."""
         return self.send("get_prop", ["volume"])
-
-    def next_channel(self):
-        """Change transport channel."""
-        return self.send(["next_channel"])
