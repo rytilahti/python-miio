@@ -1,4 +1,3 @@
-from datetime import timedelta
 import logging
 from collections import defaultdict
 
