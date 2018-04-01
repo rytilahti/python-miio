@@ -1,9 +1,11 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import AirHumidifier
 from miio.airhumidifier import (OperationMode, LedBrightness,
-                                AirHumidifierStatus, AirHumidifierException)
+                                AirHumidifierStatus, AirHumidifierException, )
 from .dummies import DummyDevice
-import pytest
 
 
 class DummyAirHumidifier(DummyDevice, AirHumidifier):

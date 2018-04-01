@@ -1,7 +1,8 @@
-import logging
 import enum
-from typing import Dict, Any, Optional
+import logging
 from collections import defaultdict
+from typing import Dict, Any, Optional
+
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)

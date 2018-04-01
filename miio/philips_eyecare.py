@@ -1,6 +1,7 @@
 import logging
-from typing import Any, Dict
 from collections import defaultdict
+from typing import Any, Dict
+
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)

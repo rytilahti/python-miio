@@ -1,4 +1,5 @@
 import logging
+
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
