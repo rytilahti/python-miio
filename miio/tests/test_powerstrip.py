@@ -1,10 +1,8 @@
 from unittest import TestCase
-
-import pytest
-
 from miio import PowerStrip
 from miio.powerstrip import PowerMode, PowerStripStatus, PowerStripException
 from .dummies import DummyDevice
+import pytest
 
 
 class DummyPowerStrip(DummyDevice, PowerStrip):

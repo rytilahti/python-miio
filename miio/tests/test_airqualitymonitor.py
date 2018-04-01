@@ -1,10 +1,8 @@
 from unittest import TestCase
-
-import pytest
-
 from miio import AirQualityMonitor
 from miio.airqualitymonitor import AirQualityMonitorStatus
 from .dummies import DummyDevice
+import pytest
 
 
 class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):

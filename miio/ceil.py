@@ -1,11 +1,9 @@
 import logging
-from collections import defaultdict
-from typing import Any, Dict
-
 import click
-
-from .click_common import command, format_output
+from typing import Any, Dict
+from collections import defaultdict
 from .device import Device, DeviceException
+from .click_common import command, format_output
 
 _LOGGER = logging.getLogger(__name__)
 

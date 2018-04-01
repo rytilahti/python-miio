@@ -1,12 +1,11 @@
 # -*- coding: UTF-8 -*-
 import logging
-import sys
-
 import click
-
-import miio  # noqa: E402
+import sys
 from miio.click_common import (ExceptionHandlerGroup, validate_ip,
-                               validate_token, )
+                               validate_token)
+import miio  # noqa: E402
+
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Ceil)

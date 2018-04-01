@@ -1,10 +1,8 @@
 from unittest import TestCase
-
-import pytest
-
 from miio import PhilipsBulb
 from miio.philips_bulb import PhilipsBulbStatus, PhilipsBulbException
 from .dummies import DummyDevice
+import pytest
 
 
 class DummyPhilipsBulb(DummyDevice, PhilipsBulb):

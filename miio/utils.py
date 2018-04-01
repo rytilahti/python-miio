@@ -1,5 +1,5 @@
-import functools
 import inspect
+import functools
 import warnings
 from datetime import timedelta, datetime
 

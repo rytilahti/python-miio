@@ -1,7 +1,6 @@
-import warnings
-from enum import IntEnum
 from typing import Tuple, Optional
-
+from enum import IntEnum
+import warnings
 from .device import Device, DeviceException
 
 

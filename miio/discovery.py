@@ -1,17 +1,17 @@
-import codecs
-import inspect
-import ipaddress
 import logging
+import zeroconf
+import ipaddress
+import inspect
+import codecs
+from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
+               PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
+               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight)
+from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
+                            MODEL_CHUANGMI_PLUG_M1)
+
 from functools import partial
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
-import zeroconf
-
-from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
-               PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
-               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, )
-from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
-                            MODEL_CHUANGMI_PLUG_M1, )
 
 _LOGGER = logging.getLogger(__name__)
 

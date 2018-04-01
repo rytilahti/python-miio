@@ -1,13 +1,11 @@
-import base64
-import json
-import os
 from unittest import TestCase
-
-import pytest
-
 from miio import ChuangmiIr
 from miio.chuangmi_ir import ChuangmiIrException
 from .dummies import DummyDevice
+import pytest
+import base64
+import json
+import os
 
 with open(os.path.join(
         os.path.dirname(__file__), 'test_chuangmi_ir.json')) as inp:

@@ -1,12 +1,9 @@
-import logging
 from collections import defaultdict
 
 import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
-
-_LOGGER = logging.getLogger(__name__)
 
 
 class AirQualityMonitorException(DeviceException):

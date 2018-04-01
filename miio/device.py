@@ -1,19 +1,18 @@
-import binascii
 import codecs
 import datetime
-import logging
 import socket
-from enum import Enum
-from typing import Any, List, Optional  # noqa: F401
-
-import click
+import logging
 import construct
+import binascii
+import click
+from typing import Any, List, Optional  # noqa: F401
+from enum import Enum
 
 from .click_common import (
-    DeviceGroupMeta, command, format_output,
+    DeviceGroupMeta, command, format_output
 )
-from .exceptions import DeviceException, DeviceError
 from .protocol import Message
+from .exceptions import DeviceException, DeviceError
 
 _LOGGER = logging.getLogger(__name__)
 

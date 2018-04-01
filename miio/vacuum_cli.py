@@ -1,24 +1,22 @@
 # -*- coding: UTF-8 -*-
-import ast
-import json
 import logging
-import pathlib
-import sys
-import threading
-import time
-from pprint import pformat as pf
-from typing import Any  # noqa: F401
-
 import click
 import pretty_cron
-from appdirs import user_cache_dir
+import ast
+import sys
+import json
+import time
+import pathlib
+import threading
 from tqdm import tqdm
-
-import miio  # noqa: E402
+from appdirs import user_cache_dir
+from pprint import pformat as pf
+from typing import Any  # noqa: F401
 from miio.click_common import (ExceptionHandlerGroup, validate_ip,
-                               validate_token, )
+                               validate_token)
 from .device import UpdateState
 from .updater import OneShotServer
+import miio  # noqa: E402
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Device, ensure=True)

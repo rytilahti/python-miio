@@ -1,8 +1,6 @@
 # -*- coding: UTF-8 -*-
 import logging
-
 import click
-
 from miio.click_common import (
     ExceptionHandlerGroup, DeviceGroupMeta, GlobalContextObject,
     json_output,

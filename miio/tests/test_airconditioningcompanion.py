@@ -1,13 +1,9 @@
 import string
 from unittest import TestCase
-
-import pytest
-
 from miio import AirConditioningCompanion
-from miio.airconditioningcompanion import (OperationMode, FanSpeed, Power,
-                                           SwingMode, Led,
-                                           AirConditioningCompanionStatus,
-                                           STORAGE_SLOT_ID, )
+from miio.airconditioningcompanion import (OperationMode, FanSpeed, Power, SwingMode, Led,
+                                           AirConditioningCompanionStatus, STORAGE_SLOT_ID, )
+import pytest
 
 STATE_ON = ['on']
 STATE_OFF = ['off']
