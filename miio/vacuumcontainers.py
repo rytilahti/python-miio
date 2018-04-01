@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*#
 from datetime import datetime, timedelta, time
-from typing import Any, Dict, List
 from enum import IntEnum
+from typing import Any, Dict, List
+
 from .utils import deprecated, pretty_time, pretty_seconds
 
 

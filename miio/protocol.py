@@ -10,22 +10,20 @@ If the decryption fails, raw bytes as returned by the device are returned.
 
 An usage example can be seen in the source of :func:`miio.Device.send`.
 """
+import calendar
 import datetime
 import hashlib
 import json
 import logging
-import calendar
 from typing import Any, Dict, Tuple
-from pprint import pprint as pp  # noqa: F401
 
+import construct
 from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
                        Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
-                       Default, Pointer, Hex, Probe)
-import construct
-
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+                       Default, Pointer, Hex, )
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 _LOGGER = logging.getLogger(__name__)
 

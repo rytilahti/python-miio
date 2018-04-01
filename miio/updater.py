@@ -1,7 +1,7 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import hashlib
 import logging
 import netifaces
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from os.path import basename
 
 _LOGGER = logging.getLogger(__name__)

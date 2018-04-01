@@ -1,8 +1,10 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import Ceil
 from miio.ceil import CeilStatus, CeilException
 from .dummies import DummyDevice
-import pytest
 
 
 class DummyCeil(DummyDevice, Ceil):

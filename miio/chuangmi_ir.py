@@ -1,12 +1,14 @@
 import base64
 import re
+
 import click
 from construct import (
     Struct, Const, Rebuild, this, len_, Adapter, Computed,
     Int16ul, Int32ul, Int16ub, Array, BitStruct, BitsInteger,
 )
-from .device import Device, DeviceException
+
 from .click_common import command, format_output
+from .device import Device, DeviceException
 
 
 class ChuangmiIrException(DeviceException):

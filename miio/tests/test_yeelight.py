@@ -1,7 +1,9 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import Yeelight
 from miio.yeelight import YeelightMode, YeelightStatus, YeelightException
-import pytest
 from .dummies import DummyDevice
 
 

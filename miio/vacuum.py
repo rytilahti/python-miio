@@ -13,7 +13,7 @@ import pytz
 from appdirs import user_cache_dir
 
 from .click_common import (
-    DeviceGroup, command, GlobalContextObject
+    DeviceGroup, command, GlobalContextObject,
 )
 from .device import Device, DeviceException
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
