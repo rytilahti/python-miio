@@ -1,3 +1,4 @@
+import enum
 import logging
 import warnings
 
@@ -6,16 +7,38 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
+class PlayState(enum.Enum):
+    Playing = "PLAYING"
+    Stopped = "STOPPED"
+    Paused = "PAUSED_PLAYBACK"
+    NoMedia = "NO_MEDIA_PRESENT"
+    Transitioning = "TRANSITIONING"
+
+
+class TransportChannel(enum.Enum):
+    Playlist = "PLAYLIST"
+    OneTime = "ONETIME"
+    Auxiliary = "AUX"
+    Bluetooth = "BT"
+    Radio = "RADIO"
+    Air = "AIR"
+    Qplay = "QPLAY"
+
+
 class WifiSpeakerStatus:
     """Container of a speaker state.
     This contains information such as the name of the device,
     and what is currently being played by it."""
     def __init__(self, data):
-        # {"DeviceName": "Mi Internet Speaker", "channel_title\": "XXX",
-        #  "current_state": "PLAYING", "hardware_version": "S602",
-        # "play_mode": "REPEAT_ALL", "track_artist": "XXX",
-        # "track_duration": "00:04:58", "track_title": "XXX",
-        #  "transport_channel": "PLAYLIST"}
+        """
+        Example response of a xiaomi.wifispeaker.v2:
+
+        {"DeviceName": "Mi Internet Speaker", "channel_title\": "XXX",
+         "current_state": "PLAYING", "hardware_version": "S602",
+         "play_mode": "REPEAT_ALL", "track_artist": "XXX",
+         "track_duration": "00:04:58", "track_title": "XXX",
+         "transport_channel": "PLAYLIST"}
+        """
         self.data = data
 
     @property
@@ -29,15 +52,9 @@ class WifiSpeakerStatus:
         return self.data["channel_title"]
 
     @property
-    def state(self) -> str:
+    def state(self) -> PlayState:
         """State of the device, e.g. PLAYING."""
-        # note: this can be enumized when all values are known
-        class PlayState:
-            Playing = "PLAYING"
-            Stopped = "STOPPED"
-            Paused = "PAUSED_PLAYBACK"
-
-        return self.data["current_state"]
+        return PlayState(self.data["current_state"])
 
     @property
     def hardware_version(self) -> str:
@@ -65,14 +82,9 @@ class WifiSpeakerStatus:
         return self.data["track_duration"]
 
     @property
-    def transport_channel(self) -> str:
+    def transport_channel(self) -> TransportChannel:
         """Transport channel, e.g. PLAYLIST"""
-        # note: this can be enumized when all values are known
-        class TransportChannel:
-            Playlist = "PLAYLIST"
-            OneTime = "ONETIME"
-
-        return self.data["transport_channel"]
+        return TransportChannel(self.data["transport_channel"])
 
 
 class WifiSpeaker(Device):
@@ -92,6 +104,10 @@ class WifiSpeaker(Device):
         # is this a toggle?
         return self.send("power")
 
+    def toggle(self):
+        """Toggle play."""
+        return self.send("toggle")
+
     def volume_up(self, amount: int = 5):
         """Set volume up."""
         return self.send("vol_up", [amount])
@@ -108,6 +124,14 @@ class WifiSpeaker(Device):
         """Move to next track."""
         return self.send("next_track")
 
+    def channel_next(self):
+        """Change transport channel."""
+        return self.send("next_channel")
+
     def track_position(self):
         """Return current track position."""
         return self.send("get_prop", ["rel_time"])
+
+    def volume(self):
+        """Speaker volume."""
+        return self.send("get_prop", ["volume"])
