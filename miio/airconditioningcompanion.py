@@ -100,6 +100,41 @@ class AirConditioningCompanionStatus:
         return str(self.data[0])
 
     @property
+    def hardware_version(self) -> int:
+        """This is a best guess. Hardware version of the AC Companion. 0: V1, 1: V2, 2: V3"""
+        return int(self.air_condition_model[16:18])
+
+    @property
+    def air_condition_type(self) -> str:
+        """This is a best guess."""
+        return self.air_condition_model[0:2]
+
+    @property
+    def air_condition_brand_id(self) -> int:
+        """Known brand ids: 182, 97, 37, 202, 2782, 197, 192"""
+        return int(self.air_condition_model[4:8])
+
+    @property
+    def air_condition_model_id(self) -> int:
+        """
+        Known model ids:
+
+        80111111, 80111112 (brand: 182)
+        80222221 (brand: 97)
+        80333331 (brand: 37)
+        80444441 (brand: 202)
+        80555551 (brand: 2782)
+        80777771 (brand: 197)
+        80666661 (brand: 192)
+
+        """
+        return int(self.air_condition_model[8:16])
+
+    @property
+    def air_condition_configuration(self) -> int:
+        return int(self.data[1][2:10], 16)
+
+    @property
     def power(self) -> str:
         """Current power state."""
         return 'on' if (int(self.data[1][2:3]) == Power.On.value) else 'off'
