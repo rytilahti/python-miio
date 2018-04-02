@@ -100,24 +100,28 @@ class AirConditioningCompanionStatus:
         return str(self.data[0])
 
     @property
-    def hardware_version(self) -> int:
-        """This is a best guess. Hardware version of the AC Companion. 0: V1, 1: V2, 2: V3"""
-        return int(self.air_condition_model[16:18])
-
-    @property
-    def air_condition_type(self) -> str:
-        """This is a best guess."""
+    def model_format(self) -> str:
+        """Version number of the model format."""
         return self.air_condition_model[0:2]
 
     @property
-    def air_condition_brand_id(self) -> int:
-        """Known brand ids: 182, 97, 37, 202, 2782, 197, 192"""
-        return int(self.air_condition_model[4:8])
+    def device_type(self) -> str:
+        """Device type identifier."""
+        return self.air_condition_model[2:4]
 
     @property
-    def air_condition_model_id(self) -> int:
+    def air_condition_brand(self) -> str:
         """
-        Known model ids:
+        Brand of the Air Condition.
+
+        Known brand ids (int) are 0182, 0097, 0037, 0202, 02782, 0197, 0192.
+        """
+        return self.air_condition_model[4:8]
+
+    @property
+    def air_condition_remote(self) -> str:
+        """
+        Known remote ids (int):
 
         80111111, 80111112 (brand: 182)
         80222221 (brand: 97)
@@ -128,7 +132,16 @@ class AirConditioningCompanionStatus:
         80666661 (brand: 192)
 
         """
-        return int(self.air_condition_model[8:16])
+        return self.air_condition_model[8:16]
+
+    @property
+    def state_format(self) -> str:
+        """
+        Version number of the state format.
+
+        Known values (int) are: 01, 02, 03
+        """
+        return self.air_condition_model[16:18]
 
     @property
     def air_condition_configuration(self) -> int:
