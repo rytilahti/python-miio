@@ -325,8 +325,7 @@ class Vacuum(Device):
     @command()
     def timezone(self):
         """Get the timezone."""
-        # return self.send("get_timezone")[0]
-        return None
+        return self.send("get_timezone")[0]
 
     def set_timezone(self, new_zone):
         """Set the timezone."""
