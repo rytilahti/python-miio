@@ -342,10 +342,6 @@ class Vacuum(Device):
 
         return super().configure_wifi(ssid, password, uid, extra_params)
 
-    def raw_command(self, cmd, params):
-        """Send a raw command to the robot."""
-        return self.send(cmd, params)
-
     @classmethod
     def get_device_group(cls):
 
