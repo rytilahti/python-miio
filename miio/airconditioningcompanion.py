@@ -112,7 +112,7 @@ class AirConditioningCompanionStatus:
     @property
     def air_condition_brand(self) -> str:
         """
-        Brand of the Air Condition.
+        Brand of the air conditioner.
 
         Known brand ids (int) are 0182, 0097, 0037, 0202, 02782, 0197, 0192.
         """
