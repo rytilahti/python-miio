@@ -465,7 +465,7 @@ class SoundInstallStatus:
 
     @property
     def is_errored(self) -> bool:
-        """True if the state has an error, use `error`to access it."""
+        """True if the state has an error, use `error` to access it."""
         return self.state == SoundInstallState.Error
 
     def __repr__(self) -> str:

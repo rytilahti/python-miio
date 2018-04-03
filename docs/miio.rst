@@ -100,18 +100,10 @@ miio\.philips\_bulb module
     :show-inheritance:
     :undoc-members:
 
-miio\.plug module
------------------
+miio\.chuangmi_plug module
+--------------------------
 
-.. automodule:: miio.plug
-    :members:
-    :show-inheritance:
-    :undoc-members:
-
-miio\.plug\_v1 module
----------------------
-
-.. automodule:: miio.plug_v1
+.. automodule:: miio.chuangmi_plug
     :members:
     :show-inheritance:
     :undoc-members:
