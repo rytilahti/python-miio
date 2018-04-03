@@ -1,7 +1,7 @@
 python-miio
 ===========
 
-|PyPI version| |Build Status| |Code Health| |Coverage Status|
+|PyPI version| |Build Status| |Code Health| |Coverage Status| |Docs|
 
 This library (and its accompanying cli tool) is used to interface with devices using Xiaomi's `miIO protocol <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__.
 
@@ -66,3 +66,6 @@ Home Assistant support
    :target: https://landscape.io/github/rytilahti/python-miio/master
 .. |Coverage Status| image:: https://coveralls.io/repos/github/rytilahti/python-miio/badge.svg?branch=master
    :target: https://coveralls.io/github/rytilahti/python-miio?branch=master
+.. |Docs| image:: https://readthedocs.org/projects/python-miio/badge/?version=latest
+   :alt: Documentation status
+   :target: https://python-miio.readthedocs.io/en/latest/?badge=latest
