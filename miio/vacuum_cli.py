@@ -502,6 +502,16 @@ def timezone(vac: miio.Vacuum, tz=None):
 
 
 @cli.command()
+@click.argument('enabled', required=False, type=bool)
+@pass_dev
+def carpet_mode(vac: miio.Vacuum, enabled=None):
+    """Query or set the carpet mode."""
+    if enabled is None:
+        click.echo(vac.carpet_mode())
+    else:
+        click.echo(vac.set_carpet_mode(enabled))
+
+@cli.command()
 @click.argument('ssid', required=True)
 @click.argument('password', required=True)
 @click.argument('uid', type=int, required=False)
