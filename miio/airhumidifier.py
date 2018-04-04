@@ -92,7 +92,7 @@ class AirHumidifierStatus:
 
     @property
     def trans_level(self) -> int:
-        """The meaning of the property is unknown."""
+        """The meaning of the property is unknown. Something about strong mode?"""
         return self.data["trans_level"]
 
     @property
@@ -102,12 +102,16 @@ class AirHumidifierStatus:
 
     @property
     def depth(self) -> Optional[int]:
-        """Current depth."""
+        """The remaining amount of water in percent."""
         return self.data["depth"]
 
     @property
     def dry(self) -> Optional[bool]:
-        """Return True if dry mode is on if available."""
+        """
+        Dry mode: Running about 8 hours when there is not enough water?
+
+        Return True if dry mode is on if available.
+        """
         if self.data["dry"] is not None:
             return self.data["dry"] == "on"
         return None
