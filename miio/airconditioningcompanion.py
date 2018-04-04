@@ -205,7 +205,7 @@ class AirConditioningCompanion(Device):
         default_output=format_output("Powering the air condition off"),
     )
     def off(self):
-        """Turn the air condition off by infared."""
+        """Turn the air condition off by infrared."""
         return self.send("set_power", ["off"])
 
     @command(
