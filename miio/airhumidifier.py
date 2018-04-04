@@ -17,6 +17,7 @@ class OperationMode(enum.Enum):
     Medium = 'medium'
     High = 'high'
     Auto = 'auto'
+    Strong = 'strong'
 
 
 class LedBrightness(enum.Enum):
@@ -92,8 +93,38 @@ class AirHumidifierStatus:
 
     @property
     def trans_level(self) -> int:
-        """The meaning of the property is unknown. Something about strong mode?"""
+        """
+        The meaning of the property is unknown.
+
+        The property is used to determine the strong mode is enabled on old firmware.
+        """
         return self.data["trans_level"]
+
+    @property
+    def strong_mode_enabled(self) -> bool:
+        if self.firmware_version_minor == 25:
+            if self.trans_level == 90:
+                return True
+
+        elif self.firmware_version_minor > 25:
+            return self.mode.value == "strong"
+
+        return False
+
+    @property
+    def firmware_version(self) -> str:
+        # FIXME: Retrieve fw_ver from miIO.info
+        return '1.2.9_5033'
+
+    @property
+    def firmware_version_major(self) -> str:
+        major, _ = self.firmware_version.rsplit('_', 1)
+        return major
+
+    @property
+    def firmware_version_minor(self) -> int:
+        _, minor = self.firmware_version.rsplit('_', 1)
+        return int(minor)
 
     @property
     def speed(self) -> Optional[int]:
@@ -108,7 +139,7 @@ class AirHumidifierStatus:
     @property
     def dry(self) -> Optional[bool]:
         """
-        Dry mode: Running about 8 hours when there is not enough water?
+        Dry mode: The amount of water is not enough to continue to work for about 8 hours.
 
         Return True if dry mode is on if available.
         """
