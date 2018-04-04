@@ -204,7 +204,33 @@ To enable (dnd 22:00-0600):
 
     mirobo dnd on 22 0 6 0
 
-It is also possible to run raw commands for testing:
+Carpet mode
+~~~~~~~~~~~
+
+Carpet mode increases the suction when encountering a carpet.
+The optional parameters (when using miiocli) are unknown and set as
+they were in the original firmware.
+
+To enable:
+
+::
+
+    mirobo carpet_mode 1 (or any other true-value, such as 'true')
+
+
+To disable:
+
+::
+
+    mirobo carpet_mode 0
+
+
+Raw commands
+~~~~~~~~~~~~
+
+It is also possible to run raw commands, which can be useful
+ for testing new unknown commands or if you want to have full access
+ to what is being sent to the device:
 
 ::
 
@@ -216,8 +242,13 @@ or with parameters (same as above dnd on):
 
     mirobo raw_command set_dnd_timer '[22,0,6,0]'
 
-If you find a new command please let us know by creating a pull request
-or an issue, if you do not want to implement it on your own!
+The input is passed as it is to the device as the `params` value,
+so it is also possible to pass dicts.
+
+.. NOTE::
+
+    If you find a new command please let us know by creating a pull request
+    or an issue, if you do not want to implement it on your own!
 
 .. _HelpOutput:
 

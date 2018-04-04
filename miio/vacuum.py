@@ -18,7 +18,7 @@ from .click_common import (
 from .device import Device, DeviceException
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                CleaningSummary, CleaningDetails, Timer,
-                               SoundStatus, SoundInstallStatus, )
+                               SoundStatus, SoundInstallStatus, CarpetModeStatus)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -341,6 +341,31 @@ class Vacuum(Device):
             extra_params["gmt_offset"] = offset_as_float
 
         return super().configure_wifi(ssid, password, uid, extra_params)
+
+    @command()
+    def carpet_mode(self):
+        """Get carpet mode settings"""
+        return CarpetModeStatus(self.send("get_carpet_mode")[0])
+
+    @command(
+        click.argument("enabled", required=True, type=bool),
+        click.argument("stall_time", required=False, default=10, type=int),
+        click.argument("low", required=False, default=400, type=int),
+        click.argument("high", required=False, default=500, type=int),
+        click.argument("integral", required=False, default=450, type=int)
+    )
+    def set_carpet_mode(self, enabled: bool, stall_time: int = 10,
+                        low: int = 400, high: int = 500, integral: int = 450):
+        """Set the carpet mode."""
+        click.echo("Setting carpet mode: %s" % enabled)
+        data = {
+            'enable': int(enabled),
+            'stall_time': stall_time,
+            'current_low': low,
+            'current_high': high,
+            'current_integral': integral,
+        }
+        return self.send("set_carpet_mode", [data])[0] == 'ok'
 
     @classmethod
     def get_device_group(cls):
