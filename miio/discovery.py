@@ -41,9 +41,9 @@ DEVICE_MAP = {
     "zhimi-humidifier-v1": AirHumidifier,
     "zhimi-humidifier-ca1": AirHumidifier,
     "yunmi-waterpuri-v2": WaterPurifier,
-    # It looks like the philips bulb cannot be discovered via mdns
-    "philips-light-bulb": PhilipsBulb,
-    "philips-light-candle2": PhilipsBulb,  # name needs to be checked
+    "philips-light-bulb": PhilipsBulb,     # cannot be discovered via mdns
+    "philips-light-candle": PhilipsBulb,   # cannot be discovered via mdns
+    "philips-light-candle2": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-ceiling": Ceil,
     "philips-light-zyceiling": Ceil,
     "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
