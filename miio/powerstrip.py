@@ -19,7 +19,10 @@ AVAILABLE_PROPERTIES = {
         'temperature',
         'current',
         'mode',
-        'power_consume_rate'
+        'power_consume_rate',
+        'voltage',
+        'power_factor',
+        'elec_leakage',
     ],
     MODEL_POWER_STRIP_V2: [
         'power',
@@ -29,9 +32,6 @@ AVAILABLE_PROPERTIES = {
         'power_consume_rate',
         'wifi_led',
         'power_price',
-        'voltage',
-        'power_factor',
-        'elec_leakage'
     ],
 }
 
@@ -116,10 +116,10 @@ class PowerStripStatus:
         return None
 
     @property
-    def voltage(self) -> Optional[int]:
+    def voltage(self) -> Optional[float]:
         """The voltage, if available."""
         if "voltage" in self.data and self.data["voltage"] is not None:
-            return self.data["voltage"]
+            return self.data["voltage"] / 100.0
         return None
 
     @property

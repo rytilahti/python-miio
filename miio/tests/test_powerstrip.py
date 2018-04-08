@@ -17,6 +17,9 @@ class DummyPowerStripV1(DummyDevice, PowerStrip):
             'temperature': 32.5,
             'current': 25.5,
             'power_consume_rate': 12.5,
+            'voltage': 23057,
+            'power_factor': 12,
+            'elec_leakage': 8,
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -64,9 +67,9 @@ class TestPowerStripV1(TestCase):
         assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().current == self.device.start_state["current"]
         assert self.state().load_power == self.device.start_state["power_consume_rate"]
-        assert self.state().voltage is None
-        assert self.state().power_factor is None
-        assert self.state().leakage_current is None
+        assert self.state().voltage == self.device.start_state["voltage"] / 100.0
+        assert self.state().power_factor == self.device.start_state["power_factor"]
+        assert self.state().leakage_current == self.device.start_state["elec_leakage"]
 
     def test_status_without_power_consume_rate(self):
         self.device._reset_state()
@@ -108,9 +111,6 @@ class DummyPowerStripV2(DummyDevice, PowerStrip):
             'power_consume_rate': 12.5,
             'wifi_led': 'off',
             'power_price': 49,
-            'voltage': 230,
-            'elec_leakage': 0,
-            'power_factor': 0.5,
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -161,9 +161,9 @@ class TestPowerStripV2(TestCase):
         assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().current == self.device.start_state["current"]
         assert self.state().load_power == self.device.start_state["power_consume_rate"]
-        assert self.state().voltage == self.device.start_state["voltage"]
-        assert self.state().power_factor == self.device.start_state["power_factor"]
-        assert self.state().leakage_current == self.device.start_state["elec_leakage"]
+        assert self.state().voltage is None
+        assert self.state().power_factor is None
+        assert self.state().leakage_current is None
 
     def test_status_without_power_consume_rate(self):
         self.device._reset_state()
