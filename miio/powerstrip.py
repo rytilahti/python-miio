@@ -10,6 +10,17 @@ from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_POWER_STRIP_V1 = 'qmi.powerstrip.v1'
+MODEL_POWER_STRIP_V2 = 'zimi.powerstrip.v2'
+
+AVAILABLE_PROPERTIES = {
+    MODEL_POWER_STRIP_V1: ['power', 'temperature', 'current', 'mode',
+                          'power_consume_rate'],
+    MODEL_POWER_STRIP_V2: ['power', 'temperature', 'current', 'mode',
+                          'power_consume_rate', 'wifi_led', 'power_price',
+                          'voltage', 'power_factor', 'elec_leakage'],
+}
+
 
 class PowerStripException(DeviceException):
     pass
@@ -70,9 +81,11 @@ class PowerStripStatus:
         return None
 
     @property
-    def wifi_led(self) -> bool:
+    def wifi_led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
-        return self.data["wifi_led"] == "on"
+        if self.data["wifi_led"] is not None:
+            return self.data["wifi_led"] == "on"
+        return None
 
     @property
     def power_price(self) -> Optional[int]:
@@ -132,6 +145,16 @@ class PowerStripStatus:
 class PowerStrip(Device):
     """Main class representing the smart power strip."""
 
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_POWER_STRIP_V1) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_POWER_STRIP_V1
+
     @command(
         default_output=format_output(
             "",
@@ -148,9 +171,7 @@ class PowerStrip(Device):
     )
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
-        properties = ['power', 'temperature', 'current', 'mode',
-                      'power_consume_rate', 'wifi_led', 'power_price',
-                      'voltage', 'power_factor', 'elec_leakage']
+        properties = AVAILABLE_PROPERTIES[self.model]
         values = self.send(
             "get_prop",
             properties
