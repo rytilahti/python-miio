@@ -14,11 +14,25 @@ MODEL_POWER_STRIP_V1 = 'qmi.powerstrip.v1'
 MODEL_POWER_STRIP_V2 = 'zimi.powerstrip.v2'
 
 AVAILABLE_PROPERTIES = {
-    MODEL_POWER_STRIP_V1: ['power', 'temperature', 'current', 'mode',
-                          'power_consume_rate'],
-    MODEL_POWER_STRIP_V2: ['power', 'temperature', 'current', 'mode',
-                          'power_consume_rate', 'wifi_led', 'power_price',
-                          'voltage', 'power_factor', 'elec_leakage'],
+    MODEL_POWER_STRIP_V1: [
+        'power',
+        'temperature',
+        'current',
+        'mode',
+        'power_consume_rate'
+    ],
+    MODEL_POWER_STRIP_V2: [
+        'power',
+        'temperature',
+        'current',
+        'mode',
+        'power_consume_rate',
+        'wifi_led',
+        'power_price',
+        'voltage',
+        'power_factor',
+        'elec_leakage'
+    ],
 }
 
 
