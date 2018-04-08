@@ -51,8 +51,8 @@ DEVICE_MAP = {
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
     "yeelink-light-": Yeelight,
-    "zhimi-fan-v2", Fan,
-    "zhimi-fan-v3", Fan,
+    "zhimi-fan-v2": Fan,
+    "zhimi-fan-v3": Fan,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]
