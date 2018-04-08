@@ -3,12 +3,103 @@ from unittest import TestCase
 import pytest
 
 from miio import PowerStrip
-from miio.powerstrip import PowerMode, PowerStripStatus, PowerStripException
+from miio.powerstrip import (PowerMode, PowerStripStatus, PowerStripException,
+                             MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 from .dummies import DummyDevice
 
 
-class DummyPowerStrip(DummyDevice, PowerStrip):
+class DummyPowerStripV1(DummyDevice, PowerStrip):
     def __init__(self, *args, **kwargs):
+        self.model = MODEL_POWER_STRIP_V1
+        self.state = {
+            'power': 'on',
+            'mode': 'normal',
+            'temperature': 32.5,
+            'current': 25.5,
+            'power_consume_rate': 12.5,
+        }
+        self.return_values = {
+            'get_prop': self._get_state,
+            'set_power': lambda x: self._set_state("power", x),
+            'set_power_mode': lambda x: self._set_state("mode", x),
+        }
+        super().__init__(args, kwargs)
+
+
+@pytest.fixture(scope="class")
+def powerstripv1(request):
+    request.cls.device = DummyPowerStripV1()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("powerstripv1")
+class TestPowerStripV1(TestCase):
+    def is_on(self):
+        return self.device.status().is_on
+
+    def state(self):
+        return self.device.status()
+
+    def test_on(self):
+        self.device.off()  # ensure off
+        assert self.is_on() is False
+
+        self.device.on()
+        assert self.is_on() is True
+
+    def test_off(self):
+        self.device.on()  # ensure on
+        assert self.is_on() is True
+
+        self.device.off()
+        assert self.is_on() is False
+
+    def test_status(self):
+        self.device._reset_state()
+
+        assert repr(self.state()) == repr(PowerStripStatus(self.device.start_state))
+
+        assert self.is_on() is True
+        assert self.state().mode == PowerMode(self.device.start_state["mode"])
+        assert self.state().temperature == self.device.start_state["temperature"]
+        assert self.state().current == self.device.start_state["current"]
+        assert self.state().load_power == self.device.start_state["power_consume_rate"]
+        assert self.state().voltage is None
+        assert self.state().power_factor is None
+        assert self.state().leakage_current is None
+
+    def test_status_without_power_consume_rate(self):
+        self.device._reset_state()
+
+        self.device.state["power_consume_rate"] = None
+        assert self.state().load_power is None
+
+    def test_status_without_current(self):
+        self.device._reset_state()
+
+        self.device.state["current"] = None
+        assert self.state().current is None
+
+    def test_status_without_mode(self):
+        self.device._reset_state()
+
+        # The Power Strip  2 doesn't support power modes
+        self.device.state["mode"] = None
+        assert self.state().mode is None
+
+    def test_set_power_mode(self):
+        def mode():
+            return self.device.status().mode
+
+        self.device.set_power_mode(PowerMode.Eco)
+        assert mode() == PowerMode.Eco
+        self.device.set_power_mode(PowerMode.Normal)
+        assert mode() == PowerMode.Normal
+
+
+class DummyPowerStripV2(DummyDevice, PowerStrip):
+    def __init__(self, *args, **kwargs):
+        self.model = MODEL_POWER_STRIP_V2
         self.state = {
             'power': 'on',
             'mode': 'normal',
@@ -33,13 +124,13 @@ class DummyPowerStrip(DummyDevice, PowerStrip):
 
 
 @pytest.fixture(scope="class")
-def powerstrip(request):
-    request.cls.device = DummyPowerStrip()
+def powerstripv2(request):
+    request.cls.device = DummyPowerStripV2()
     # TODO add ability to test on a real device
 
 
-@pytest.mark.usefixtures("powerstrip")
-class TestPowerStrip(TestCase):
+@pytest.mark.usefixtures("powerstripv2")
+class TestPowerStripV2(TestCase):
     def is_on(self):
         return self.device.status().is_on
 

@@ -97,35 +97,35 @@ class PowerStripStatus:
     @property
     def wifi_led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
-        if self.data["wifi_led"] is not None:
+        if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"
         return None
 
     @property
     def power_price(self) -> Optional[int]:
         """The stored power price, if available."""
-        if self.data["power_price"] is not None:
+        if "power_price" in self.data and self.data["power_price"] is not None:
             return self.data["power_price"]
         return None
 
     @property
     def leakage_current(self) -> Optional[int]:
         """The leakage current, if available."""
-        if self.data["elec_leakage"] is not None:
+        if "elec_leakage" in self.data and self.data["elec_leakage"] is not None:
             return self.data["elec_leakage"]
         return None
 
     @property
     def voltage(self) -> Optional[int]:
         """The voltage, if available."""
-        if self.data["voltage"] is not None:
+        if "voltage" in self.data and self.data["voltage"] is not None:
             return self.data["voltage"]
         return None
 
     @property
     def power_factor(self) -> Optional[float]:
         """The power factor, if available."""
-        if self.data["power_factor"] is not None:
+        if "power_factor" in self.data and self.data["power_factor"] is not None:
             return self.data["power_factor"]
         return None
 
