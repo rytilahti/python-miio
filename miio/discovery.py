@@ -12,6 +12,7 @@ from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
+from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,8 +25,8 @@ DEVICE_MAP = {
     "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "chuangmi-plug-v3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V3),
-    "qmi-powerstrip-v1": PowerStrip,
-    "zimi-powerstrip-v2": PowerStrip,
+    "qmi-powerstrip-v1": partial(PowerStrip, model=MODEL_POWER_STRIP_V1),
+    "zimi-powerstrip-v2": partial(PowerStrip, model=MODEL_POWER_STRIP_V2),
     "zhimi-airpurifier-m1": AirPurifier,   # mini model
     "zhimi-airpurifier-m2": AirPurifier,   # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
