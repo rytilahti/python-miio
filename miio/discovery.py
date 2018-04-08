@@ -9,7 +9,7 @@ import zeroconf
 
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
-               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, )
+               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, Fan, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
 
@@ -51,6 +51,8 @@ DEVICE_MAP = {
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
     "yeelink-light-": Yeelight,
+    "zhimi-fan-v2", Fan,
+    "zhimi-fan-v3", Fan,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]
