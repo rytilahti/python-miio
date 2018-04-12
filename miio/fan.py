@@ -5,9 +5,12 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import command, format_output, EnumType
-from .device import Device
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
+
+class FanException(DeviceException):
+    pass
 
 
 class LedBrightness(enum.Enum):
@@ -25,12 +28,14 @@ class FanStatus:
     """Container for status reports from the Xiaomi Smart Fan."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # ['temp_dec', 'humidity', 'angle', 'speed', 'poweroff_time', 'power',
-        # 'ac_power', 'battery', 'angle_enable', 'speed_level',
-        # 'natural_level', 'child_lock', 'buzzer', 'led_b', 'led']
-        #
-        # [232, 46, 30, 298, 0, 'on', 'off', 98, 'off', 1, 0, 'off', 'on',
-        # 1, 'on']
+        """
+        Response of a Fan (zhimi.fan.v3):
+
+        {'temp_dec': 232, 'humidity': 46, 'angle': 30, 'speed': 298,
+         'poweroff_time': 0, 'power': 'on', 'ac_power': 'off', 'battery': 98,
+         'angle_enable': 'off', 'speed_level': 1, 'natural_level': 0,
+         'child_lock': 'off', 'buzzer': 'on', 'led_b': 1, 'led': 'on'}
+        """
         self.data = data
 
     @property
@@ -216,21 +221,25 @@ class Fan(Device):
 
     @command(
         click.argument("speed", type=int),
-        default_output=format_output("Setting natural level to {level}")
+        default_output=format_output("Setting speed of the natural mode to {speed}")
     )
-    def set_natural_level(self, level: int):
+    def set_natural_speed(self, speed: int):
         """Set natural level."""
-        level = max(0, min(level, 100))
-        return self.send("set_natural_level", [level])  # 0...100
+        if speed < 0 or speed > 100:
+            raise FanException("Invalid speed: %s" % speed)
+
+        return self.send("set_natural_level", [speed])
 
     @command(
         click.argument("speed", type=int),
-        default_output=format_output("Setting speed level to {level}")
+        default_output=format_output("Setting speed of the direct mode to {speed}")
     )
-    def set_speed_level(self, level: int):
-        """Set speed level."""
-        level = max(0, min(level, 100))
-        return self.send("set_speed_level", [level])  # 0...100
+    def set_direct_speed(self, speed: int):
+        """Set speed of the direct mode."""
+        if speed < 0 or speed > 100:
+            raise FanException("Invalid speed: %s" % speed)
+
+        return self.send("set_speed_level", [speed])
 
     @command(
         click.argument("direction", type=EnumType(MoveDirection, False)),
@@ -245,23 +254,23 @@ class Fan(Device):
         click.argument("angle", type=int),
         default_output=format_output("Setting angle to {angle}")
     )
-    def fan_set_angle(self, angle: int):
+    def set_angle(self, angle: int):
         """Set angle."""
         return self.send("set_angle", [angle])
 
     @command(
-        default_output=format_output("Turning on oscillate"),
+        click.argument("oscillate", type=bool),
+        default_output=format_output(
+            lambda lock: "Turning on oscillate"
+            if lock else "Turning off oscillate"
+        )
     )
-    def oscillate_on(self):
-        """Enable oscillate."""
-        return self.send("set_angle_enable", ["on"])
-
-    @command(
-        default_output=format_output("Turning off oscillate"),
-    )
-    def oscillate_off(self):
-        """Disable oscillate."""
-        return self.send("set_angle_enable", ["off"])
+    def set_oscillate(self, oscillate: bool):
+        """Set oscillate on/off."""
+        if oscillate:
+            return self.send("set_angle_enable", ["on"])
+        else:
+            return self.send("set_angle_enable", ["off"])
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
@@ -273,29 +282,43 @@ class Fan(Device):
         return self.send("set_led_b", [brightness.value])
 
     @command(
-        default_output=format_output("Turning on LED"),
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED"
+            if led else "Turning off LED"
+        )
     )
-    def led_on(self):
-        """Turn led on."""
-        return self.send("set_led", ["on"])
+    def set_led(self, led: bool):
+        """Turn led on/off."""
+        if led:
+            return self.send("set_led", ['on'])
+        else:
+            return self.send("set_led", ['off'])
 
     @command(
-        default_output=format_output("Turning off LED"),
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer"
+            if buzzer else "Turning off buzzer"
+        )
     )
-    def led_off(self):
-        """Turn led off."""
-        return self.send("set_led", ["off"])
+    def set_buzzer(self, buzzer: bool):
+        """Set buzzer on/off."""
+        if buzzer:
+            return self.send("set_buzzer", ["on"])
+        else:
+            return self.send("set_buzzer", ["off"])
 
     @command(
-        default_output=format_output("Turning on buzzer"),
+        click.argument("lock", type=bool),
+        default_output=format_output(
+            lambda lock: "Turning on child lock"
+            if lock else "Turning off child lock"
+        )
     )
-    def buzzer_on(self):
-        """Enable buzzer."""
-        return self.send("set_buzzer", ["on"])
-
-    @command(
-        default_output=format_output("Turning off buzzer"),
-    )
-    def buzzer_off(self):
-        """Disable buzzer."""
-        return self.send("set_buzzer", ["off"])
+    def set_child_lock(self, lock: bool):
+        """Set child lock on/off."""
+        if lock:
+            return self.send("set_child_lock", ["on"])
+        else:
+            return self.send("set_child_lock", ["off"])
