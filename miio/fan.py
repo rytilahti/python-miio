@@ -83,13 +83,13 @@ class FanStatus:
         return self.data["child_lock"] == "on"
 
     @property
-    def natural_level(self) -> int:
-        """Fan speed in natural mode."""
+    def natural_speed(self) -> int:
+        """Speed level in natural mode."""
         return self.data["natural_level"]
 
     @property
-    def speed_level(self) -> int:
-        """Fan speed in direct mode."""
+    def direct_speed(self) -> int:
+        """Speed level in direct mode."""
         return self.data["speed_level"]
 
     @property
@@ -108,14 +108,13 @@ class FanStatus:
         return self.data["ac_power"] == "on"
 
     @property
-    def poweroff_time(self) -> int:
-        """Time until turning off. FIXME verify"""
+    def delay_off_countdown(self) -> int:
+        """Countdown until turning off in seconds."""
         return self.data["poweroff_time"]
 
     @property
     def speed(self) -> int:
-        """FIXME What is the meaning of this value?
-        (cp. speed_level vs. natural_level)"""
+        """Speed of the motor."""
         return self.data["speed"]
 
     @property
@@ -131,12 +130,12 @@ class FanStatus:
             "led_brightness=%s, " \
             "buzzer=%s, " \
             "child_lock=%s, " \
-            "natural_level=%s, " \
-            "speed_level=%s, " \
+            "natural_speed=%s, " \
+            "direct_speed=%s, " \
             "oscillate=%s, " \
             "battery=%s, " \
             "ac_power=%s, " \
-            "poweroff_time=%s, " \
+            "delay_off_countdown=%s, " \
             "speed=%s, " \
             "angle=%s" % \
             (self.power,
@@ -146,13 +145,13 @@ class FanStatus:
              self.led_brightness,
              self.buzzer,
              self.child_lock,
-             self.natural_level,
-             self.speed_level,
+             self.natural_speed,
+             self.direct_speed,
              self.oscillate,
              self.battery,
              self.ac_power,
-             self.poweroff_time,
-             self.speed_level,
+             self.delay_off_countdown,
+             self.speed,
              self.angle)
         return s
 
@@ -322,3 +321,16 @@ class Fan(Device):
             return self.send("set_child_lock", ["on"])
         else:
             return self.send("set_child_lock", ["off"])
+
+    @command(
+        click.argument("seconds", type=int),
+        default_output=format_output("Setting delayed turn off to {seconds} seconds")
+    )
+    def delay_off(self, seconds: int):
+        """Set delay off seconds."""
+
+        if seconds < 1:
+            raise FanException(
+                "Invalid value for a delayed turn off: %s" % seconds)
+
+        return self.send("poweroff_time", [seconds])
