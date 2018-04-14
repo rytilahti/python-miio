@@ -160,7 +160,7 @@ class TestFanV2(TestCase):
         self.device.set_rotate(MoveDirection.Left)
         self.device.set_rotate(MoveDirection.Right)
 
-    def test_set_direct_speed(self):
+    def test_set_angle(self):
         """This test doesn't implement the real behaviour of the device may be.
 
         The property "angle" doesn't provide the current setting.
@@ -388,7 +388,7 @@ class TestFanV3(TestCase):
         self.device.set_rotate(MoveDirection.Left)
         self.device.set_rotate(MoveDirection.Right)
 
-    def test_set_direct_speed(self):
+    def test_set_angle(self):
         """This test doesn't implement the real behaviour of the device may be.
 
         The property "angle" doesn't provide the current setting.
