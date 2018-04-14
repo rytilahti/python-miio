@@ -177,7 +177,10 @@ class AirHumidifierStatus:
             "dry=%s, " \
             "use_time=%s, " \
             "hardware_version=%s, " \
-            "button_pressed=%s>" % \
+            "button_pressed=%s, " \
+            "strong_mode_enabled=%s, " \
+            "firmware_version_major=%s, " \
+            "firmware_version_minor=%s>" % \
             (self.power,
              self.mode,
              self.temperature,
@@ -192,7 +195,10 @@ class AirHumidifierStatus:
              self.dry,
              self.use_time,
              self.hardware_version,
-             self.button_pressed)
+             self.button_pressed,
+             self.strong_mode_enabled,
+             self.firmware_version_major,
+             self.firmware_version_minor)
         return s
 
 
