@@ -103,16 +103,14 @@ class FanStatus:
         return self.data["humidity"]
 
     @property
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float:
         """Current temperature, if available."""
-        if self.data["temp_dec"] is not None:
-            return self.data["temp_dec"] / 10.0
-        return None
+        return self.data["temp_dec"] / 10.0
 
     @property
     def led(self) -> Optional[bool]:
         """True if LED is turned on, if available."""
-        if "led" in self.data and  self.data["led"] is not None:
+        if "led" in self.data and self.data["led"] is not None:
             return self.data["led"] == "on"
         return None
 
@@ -346,6 +344,9 @@ class Fan(Device):
     )
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
+        if angle < 0 or angle > 120:
+            raise FanException("Invalid angle: %s" % angle)
+
         return self.send("set_angle", [angle])
 
     @command(
@@ -424,4 +425,4 @@ class Fan(Device):
             raise FanException(
                 "Invalid value for a delayed turn off: %s" % seconds)
 
-        return self.send("poweroff_time", [seconds])
+        return self.send("set_poweroff_time", [seconds])
