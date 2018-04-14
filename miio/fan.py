@@ -9,6 +9,53 @@ from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_FAN_V2 = 'zimi.fan.v2'
+MODEL_FAN_V3 = 'zimi.fan.v3'
+
+AVAILABLE_PROPERTIES = {
+    MODEL_FAN_V2: [
+        'temp_dec',
+        'humidity',
+        'angle',
+        'speed',
+        'poweroff_time',
+        'power',
+        'ac_power',
+        'battery',
+        'angle_enable',
+        'speed_level',
+        'natural_level',
+        'child_lock',
+        'buzzer',
+        'led_b',
+        'led',
+        'use_time',
+        'bat_charge',
+        'bat_state',
+        'button_pressed',
+    ],
+    MODEL_FAN_V3: [
+        'temp_dec',
+        'humidity',
+        'angle',
+        'speed',
+        'poweroff_time',
+        'power',
+        'ac_power',
+        'battery',
+        'angle_enable',
+        'speed_level',
+        'natural_level',
+        'child_lock',
+        'buzzer',
+        'led_b',
+        'use_time',
+        'bat_charge',
+        'button_pressed',
+    ],
+}
+
+
 class FanException(DeviceException):
     pass
 
@@ -31,10 +78,12 @@ class FanStatus:
         """
         Response of a Fan (zhimi.fan.v3):
 
-        {'temp_dec': 232, 'humidity': 46, 'angle': 30, 'speed': 298,
+        {'temp_dec': 232, 'humidity': 46, 'angle': 118, 'speed': 298,
          'poweroff_time': 0, 'power': 'on', 'ac_power': 'off', 'battery': 98,
          'angle_enable': 'off', 'speed_level': 1, 'natural_level': 0,
-         'child_lock': 'off', 'buzzer': 'on', 'led_b': 1, 'led': 'on'}
+         'child_lock': 'off', 'buzzer': 'on', 'led_b': 1, 'led': None,
+         'natural_enable': None, 'use_time': 0, : 118,
+         'bat_charge': 'complete', 'bat_state': None, 'button_pressed':'speed'}
         """
         self.data = data
 
@@ -61,9 +110,11 @@ class FanStatus:
         return None
 
     @property
-    def led(self) -> bool:
-        """True if LED is turned on."""
-        return self.data["led"] == "on"
+    def led(self) -> Optional[bool]:
+        """True if LED is turned on, if available."""
+        if self.data["led"] is not None:
+            return self.data["led"] == "on"
+        return None
 
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
@@ -103,6 +154,20 @@ class FanStatus:
         return self.data["battery"]
 
     @property
+    def battery_charge(self) -> Optional[str]:
+        """State of the battery charger, if available."""
+        if self.data["bat_charge"] is not None:
+            return self.data["bat_charge"]
+        return None
+
+    @property
+    def battery_state(self) -> Optional[str]:
+        """State of the battery, if available."""
+        if self.data["bat_state"] is not None:
+            return self.data["bat_state"]
+        return None
+
+    @property
     def ac_power(self) -> bool:
         """True if powered by AC."""
         return self.data["ac_power"] == "on"
@@ -122,6 +187,18 @@ class FanStatus:
         """Current angle."""
         return self.data["angle"]
 
+    @property
+    def use_time(self) -> int:
+        """How long the device has been active in seconds."""
+        return self.data["use_time"]
+
+    @property
+    def button_pressed(self) -> Optional[str]:
+        """Last pressed button."""
+        if self.data["button_pressed"] is not None:
+            return self.data["button_pressed"]
+        return None
+
     def __str__(self) -> str:
         s = "<FanStatus power=%s, " \
             "temperature=%s, " \
@@ -132,12 +209,16 @@ class FanStatus:
             "child_lock=%s, " \
             "natural_speed=%s, " \
             "direct_speed=%s, " \
-            "oscillate=%s, " \
-            "battery=%s, " \
-            "ac_power=%s, " \
-            "delay_off_countdown=%s, " \
             "speed=%s, " \
-            "angle=%s" % \
+            "oscillate=%s, " \
+            "angle=%s, " \
+            "ac_power=%s, " \
+            "battery=%s, " \
+            "battery_charge=%s, " \
+            "battery_state=%s, " \
+            "use_time=%s, " \
+            "delay_off_countdown=%s, " \
+            "button_pressed=%s>" % \
             (self.power,
              self.temperature,
              self.humidity,
@@ -147,12 +228,16 @@ class FanStatus:
              self.child_lock,
              self.natural_speed,
              self.direct_speed,
-             self.oscillate,
-             self.battery,
-             self.ac_power,
-             self.delay_off_countdown,
              self.speed,
-             self.angle)
+             self.oscillate,
+             self.angle,
+             self.ac_power,
+             self.battery,
+             self.battery_charge,
+             self.battery_state,
+             self.use_time,
+             self.delay_off_countdown,
+             self.button_pressed)
         return s
 
     def __json__(self):
@@ -161,6 +246,16 @@ class FanStatus:
 
 class Fan(Device):
     """Main class representing the Xiaomi Smart Fan."""
+
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_FAN_V3) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_FAN_V3
 
     @command(
         default_output=format_output(
@@ -184,11 +279,7 @@ class Fan(Device):
     )
     def status(self) -> FanStatus:
         """Retrieve properties."""
-        properties = ['temp_dec', 'humidity', 'angle', 'speed',
-                      'poweroff_time', 'power', 'ac_power', 'battery',
-                      'angle_enable', 'speed_level', 'natural_level',
-                      'child_lock', 'buzzer', 'led_b', 'led']
-
+        properties = AVAILABLE_PROPERTIES[self.model]
         values = self.send(
             "get_prop",
             properties
@@ -243,10 +334,10 @@ class Fan(Device):
     @command(
         click.argument("direction", type=EnumType(MoveDirection, False)),
         default_output=format_output(
-            "Setting move direction to {direction}")
+            "Rotating the fan by 5 degrees to the {direction}")
     )
-    def set_direction(self, direction: MoveDirection):
-        """Set move direction."""
+    def set_rotate(self, direction: MoveDirection):
+        """Rotate the fan by 5 degrees left/right."""
         return self.send("set_move", [direction.value])
 
     @command(
@@ -254,7 +345,7 @@ class Fan(Device):
         default_output=format_output("Setting angle to {angle}")
     )
     def set_angle(self, angle: int):
-        """Set angle."""
+        """Set the oscillation angle."""
         return self.send("set_angle", [angle])
 
     @command(
