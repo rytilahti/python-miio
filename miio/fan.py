@@ -82,8 +82,8 @@ class FanStatus:
          'poweroff_time': 0, 'power': 'on', 'ac_power': 'off', 'battery': 98,
          'angle_enable': 'off', 'speed_level': 1, 'natural_level': 0,
          'child_lock': 'off', 'buzzer': 'on', 'led_b': 1, 'led': None,
-         'natural_enable': None, 'use_time': 0, : 118,
-         'bat_charge': 'complete', 'bat_state': None, 'button_pressed':'speed'}
+         'natural_enable': None, 'use_time': 0, 'bat_charge': 'complete',
+         'bat_state': None, 'button_pressed':'speed'}
         """
         self.data = data
 
@@ -112,7 +112,7 @@ class FanStatus:
     @property
     def led(self) -> Optional[bool]:
         """True if LED is turned on, if available."""
-        if self.data["led"] is not None:
+        if "led" in self.data and  self.data["led"] is not None:
             return self.data["led"] == "on"
         return None
 
@@ -163,7 +163,7 @@ class FanStatus:
     @property
     def battery_state(self) -> Optional[str]:
         """State of the battery, if available."""
-        if self.data["bat_state"] is not None:
+        if "bat_state" in self.data and self.data["bat_state"] is not None:
             return self.data["bat_state"]
         return None
 
@@ -199,7 +199,7 @@ class FanStatus:
             return self.data["button_pressed"]
         return None
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         s = "<FanStatus power=%s, " \
             "temperature=%s, " \
             "humidity=%s, " \
