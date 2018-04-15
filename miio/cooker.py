@@ -3,7 +3,7 @@ import logging
 import string
 from collections import defaultdict
 from datetime import time
-from typing import Optional
+from typing import Optional, List
 
 import click
 
@@ -90,7 +90,7 @@ class TemperatureHistory:
         self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
 
     @property
-    def temperatures(self) -> list[int]:
+    def temperatures(self) -> List[int]:
         return self.data
 
     def __str__(self) -> str:
@@ -186,10 +186,11 @@ class CookingStage:
 
     @property
     def taste_phase(self) -> int:
-        phase = self.taste / 33
+        phase = int(self.taste / 33)
 
         if phase > 2:
             return 2
+        return phase
 
     @property
     def name(self) -> str:
