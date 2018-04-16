@@ -54,7 +54,7 @@ class MoveDirection(enum.Enum):
 
 
 class FanStatus:
-    """Container for status reports from the Xiaomi Smart Fan."""
+    """Container for status reports from the Xiaomi Mi Smart Pedestal Fan."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """
@@ -225,7 +225,7 @@ class FanStatus:
 
 
 class Fan(Device):
-    """Main class representing the Xiaomi Smart Fan."""
+    """Main class representing the Xiaomi Mi Smart Pedestal Fan."""
 
     def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
                  debug: int = 0, lazy_discover: bool = True,

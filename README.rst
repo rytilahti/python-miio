@@ -27,7 +27,7 @@ Supported devices
 -  Xiaomi Philips LED Ball Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR) (:class:`miio.chuangmi_ir`)
--  Xiaomi Mi Smart Fan (:class:`miio.fan`)
+-  Xiaomi Mi Smart Pedestal Fan (:class:`miio.fan`)
 -  Xiaomi Mi Air Humidifier (:class:`miio.airhumidifier`)
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off) (:class:`miio.waterpurifier`)
 -  Xiaomi PM2.5 Air Quality Monitor (:class:`miio.airqualitymonitor`)
@@ -55,7 +55,8 @@ Home Assistant support
 -  `Xiaomi Universal IR Remote Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__
 -  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__
 -  `Xiaomi Mi Home Air Conditioner Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
--  `Xiaomi Mi WiFi Repeater 2 <https://github.com/syssi/xiaomi_repeater>`__
+-  `Xiaomi Mi WiFi Repeater 2 <https://www.home-assistant.io/components/device_tracker.xiaomi_miio/>`__
+-  `Xiaomi Mi Smart Pedestal Fan <https://github.com/syssi/xiaomi_fan>`__
 
 
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
