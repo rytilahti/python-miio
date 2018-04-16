@@ -56,6 +56,7 @@ Home Assistant support
 -  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__
 -  `Xiaomi Mi Home Air Conditioner Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
 -  `Xiaomi Mi WiFi Repeater 2 <https://github.com/syssi/xiaomi_repeater>`__
+-  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
 
 
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
