@@ -12,47 +12,29 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_FAN_V2 = 'zimi.fan.v2'
 MODEL_FAN_V3 = 'zimi.fan.v3'
 
+AVAILABLE_PROPERTIES_COMMON = [
+    'temp_dec',
+    'humidity',
+    'angle',
+    'speed',
+    'poweroff_time',
+    'power',
+    'ac_power',
+    'battery',
+    'angle_enable',
+    'speed_level',
+    'natural_level',
+    'child_lock',
+    'buzzer',
+    'led_b',
+    'use_time',
+    'bat_charge',
+    'button_pressed',
+]
+
 AVAILABLE_PROPERTIES = {
-    MODEL_FAN_V2: [
-        'temp_dec',
-        'humidity',
-        'angle',
-        'speed',
-        'poweroff_time',
-        'power',
-        'ac_power',
-        'battery',
-        'angle_enable',
-        'speed_level',
-        'natural_level',
-        'child_lock',
-        'buzzer',
-        'led_b',
-        'led',
-        'use_time',
-        'bat_charge',
-        'bat_state',
-        'button_pressed',
-    ],
-    MODEL_FAN_V3: [
-        'temp_dec',
-        'humidity',
-        'angle',
-        'speed',
-        'poweroff_time',
-        'power',
-        'ac_power',
-        'battery',
-        'angle_enable',
-        'speed_level',
-        'natural_level',
-        'child_lock',
-        'buzzer',
-        'led_b',
-        'use_time',
-        'bat_charge',
-        'button_pressed',
-    ],
+    MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON,
 }
 
 
@@ -309,7 +291,8 @@ class Fan(Device):
 
     @command(
         click.argument("speed", type=int),
-        default_output=format_output("Setting speed of the natural mode to {speed}")
+        default_output=format_output(
+            "Setting speed of the natural mode to {speed}")
     )
     def set_natural_speed(self, speed: int):
         """Set natural level."""
@@ -320,7 +303,8 @@ class Fan(Device):
 
     @command(
         click.argument("speed", type=int),
-        default_output=format_output("Setting speed of the direct mode to {speed}")
+        default_output=format_output(
+            "Setting speed of the direct mode to {speed}")
     )
     def set_direct_speed(self, speed: int):
         """Set speed of the direct mode."""
@@ -332,10 +316,10 @@ class Fan(Device):
     @command(
         click.argument("direction", type=EnumType(MoveDirection, False)),
         default_output=format_output(
-            "Rotating the fan by 5 degrees to the {direction}")
+            "Rotating the fan to the {direction}")
     )
     def set_rotate(self, direction: MoveDirection):
-        """Rotate the fan by 5 degrees left/right."""
+        """Rotate the fan by -5/+5 degrees left/right."""
         return self.send("set_move", [direction.value])
 
     @command(
@@ -416,7 +400,8 @@ class Fan(Device):
 
     @command(
         click.argument("seconds", type=int),
-        default_output=format_output("Setting delayed turn off to {seconds} seconds")
+        default_output=format_output(
+            "Setting delayed turn off to {seconds} seconds")
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
