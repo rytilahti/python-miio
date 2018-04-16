@@ -72,6 +72,19 @@ class Vacuum(Device):
         """Stop cleaning and return home."""
         self.send("app_stop")
         return self.send("app_charge")
+    
+    @command(
+        click.argument("x_coord", type=int),
+        click.argument("y_coord", type=int),
+
+    )
+    def goto(self, x_coord: int, y_coord: int):
+        """Go to specific target.
+
+        :param int x_coord: x coordinate
+        :param int y_coord: y coordinate"""
+        return self.send("app_goto_target",
+                         [x_coord, y_coord])
 
     @command(
         click.argument("x_coord", type=int),
