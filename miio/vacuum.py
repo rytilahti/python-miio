@@ -85,8 +85,8 @@ class Vacuum(Device):
                          [x_coord, y_coord])
 
     @command(
-        click.argument("x_coord", type=int),
-        click.argument("y_coord", type=int),
+        click.argument("x1_coord", type=int),
+        click.argument("y1_coord", type=int),
         click.argument("x2_coord", type=int),
         click.argument("y2_coord", type=int),
         click.argument("iterations", type=int),
