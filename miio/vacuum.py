@@ -91,16 +91,16 @@ class Vacuum(Device):
         click.argument("y2_coord", type=int),
         click.argument("iterations", type=int),
     )
-    def zoned_clean(self, x_coord: int, y_coord: int,
+    def zoned_clean(self, x1_coord: int, y1_coord: int,
                     x2_coord: int, y2_coord: int, iterations: int):
         """Clean a zoned area.
-        :param int x_coord: x coordinate bottom left corner
-        :param int y_coord: y coordinate bottom left corner
+        :param int x1_coord: x1 coordinate bottom left corner
+        :param int y1_coord: y1 coordinate bottom left corner
         :param int x2_coord: x2 coordinate top right corner
         :param int y2_coord: y2 coordinate top right corner
         :param int iterations: How many times the zone should be cleaned"""
         return self.send("app_zoned_clean",
-                         [x_coord, y_coord, x2_coord, y2_coord, iterations])
+                         [x1_coord, y1_coord, x2_coord, y2_coord, iterations])
 
     @command(
         click.argument("x_coord", type=int),
