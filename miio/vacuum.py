@@ -83,7 +83,7 @@ class Vacuum(Device):
         :param int y_coord: y coordinate"""
         return self.send("app_goto_target",
                          [x_coord, y_coord])
-    
+
     @command(
         click.argument("x_coord", type=int),
         click.argument("y_coord", type=int),
@@ -91,7 +91,7 @@ class Vacuum(Device):
         click.argument("y2_coord", type=int),
         click.argument("iterations", type=int),
     )
-    def zoned_clean(self, x_coord: int, y_coord: int, 
+    def zoned_clean(self, x_coord: int, y_coord: int,
                     x2_coord: int, y2_coord: int, iterations: int):
         """Clean a zoned area.
         :param int x_coord: x coordinate bottom left corner
