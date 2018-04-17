@@ -59,7 +59,7 @@ class DummyVacuum(DummyDevice, Vacuum):
             self.state["state"] = DummyVacuum.STATE_IDLE
         elif new_mode == "goto":
             self.state["state"] = DummyVacuum.STATE_GOTO
-        elif new_mode == "zoned cleaning":
+        elif new_mode == "zoned clean":
             self.state["state"] = DummyVacuum.STATE_ZONED_CLEAN
         elif new_mode == "charge":
             self.state["state"] = DummyVacuum.STATE_CHARGING
@@ -139,13 +139,13 @@ class TestVacuum(TestCase):
     def test_goto(self):
         self.device.start()
         assert self.status().is_on is True
-        self.device.goto(24000,24000)
+        self.device.goto(24000, 24000)
         assert self.status().state_code == self.device.STATE_GOTO
 
     def test_zoned_clean(self):
         self.device.start()
         assert self.status().is_on is True
-        self.device.zoned_clean(25000,25000,25500,25500,3)
+        self.device.zoned_clean(25000, 25000, 25500, 25500, 3)
         assert self.status().state_code == self.device.STATE_ZONED_CLEAN
 
     @pytest.mark.xfail
