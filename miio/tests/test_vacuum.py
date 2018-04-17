@@ -10,9 +10,11 @@ from .dummies import DummyDevice
 class DummyVacuum(DummyDevice, Vacuum):
     STATE_CHARGING = 8
     STATE_CLEANING = 5
+    STATE_ZONED_CLEAN = 9
     STATE_IDLE = 3
     STATE_HOME = 6
     STATE_SPOT = 11
+    STATE_GOTO = 4
     STATE_ERROR = 12
     STATE_PAUSED = 10
     STATE_MANUAL = 7
@@ -37,6 +39,8 @@ class DummyVacuum(DummyDevice, Vacuum):
             'app_stop': lambda x: self.change_mode("stop"),
             'app_pause': lambda x: self.change_mode("pause"),
             'app_spot': lambda x: self.change_mode("spot"),
+            'app_goto_target': lambda x: self.change_mode("goto"),
+            'app_zoned_clean': lambda x: self.change_mode("zoned clean"),
             'app_charge': lambda x: self.change_mode("charge")
         }
 
@@ -53,6 +57,10 @@ class DummyVacuum(DummyDevice, Vacuum):
             self.state["state"] = DummyVacuum.STATE_CLEANING
         elif new_mode == "stop":
             self.state["state"] = DummyVacuum.STATE_IDLE
+        elif new_mode == "goto":
+            self.state["state"] = DummyVacuum.STATE_GOTO
+        elif new_mode == "zoned cleaning":
+            self.state["state"] = DummyVacuum.STATE_ZONED_CLEAN
         elif new_mode == "charge":
             self.state["state"] = DummyVacuum.STATE_CHARGING
 
@@ -127,6 +135,18 @@ class TestVacuum(TestCase):
         # TODO pause here and update to idle/charging and assert for that?
         # Another option is to mock that app_stop mode is entered before
         # the charging is activated.
+
+    def test_goto(self):
+        self.device.start()
+        assert self.status().is_on is True
+        self.device.goto()
+        assert self.status().state_code == self.device.STATE_GOTO
+
+    def test_zoned_clean(self):
+        self.device.start()
+        assert self.status().is_on is True
+        self.device.zoned_clean()
+        assert self.status().state_code == self.device.STATE_ZONED_CLEAN
 
     @pytest.mark.xfail
     def test_manual_control(self):
