@@ -31,9 +31,6 @@ class DummyVacuum(DummyDevice, Vacuum):
             'battery': 100,
             'fan_power': 20,
             'msg_seq': 320,
-            'goto_target': {'x_coord': 24000, 'y_coord': 24500},
-            'zoned_area': {'x1_coord': 24000, 'y1_coord': 24500,
-                           'x2_coord': 28000, 'y2_coord': 29500, 'iterations': 3}
         }
 
         self.return_values = {
@@ -149,6 +146,7 @@ class TestVacuum(TestCase):
         self.device.start()
         assert self.status().is_on is True
         self.device.zoned_clean(25000, 25000, 25500, 25500, 3)
+        self.device.zoned_clean(25000,25000,25500,25500,3)
         assert self.status().state_code == self.device.STATE_ZONED_CLEAN
 
     @pytest.mark.xfail
