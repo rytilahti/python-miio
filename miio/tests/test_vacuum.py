@@ -146,7 +146,6 @@ class TestVacuum(TestCase):
         self.device.start()
         assert self.status().is_on is True
         self.device.zoned_clean(25000, 25000, 25500, 25500, 3)
-        self.device.zoned_clean(25000,25000,25500,25500,3)
         assert self.status().state_code == self.device.STATE_ZONED_CLEAN
 
     @pytest.mark.xfail
