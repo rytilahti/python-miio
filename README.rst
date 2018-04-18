@@ -57,6 +57,7 @@ Home Assistant support
 -  `Xiaomi Mi Home Air Conditioner Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
 -  `Xiaomi Mi WiFi Repeater 2 <https://www.home-assistant.io/components/device_tracker.xiaomi_miio/>`__
 -  `Xiaomi Mi Smart Pedestal Fan <https://github.com/syssi/xiaomi_fan>`__
+-  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
 
 
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
