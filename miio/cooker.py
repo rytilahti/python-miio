@@ -73,6 +73,8 @@ class OperationMode(enum.Enum):
 class TemperatureHistory:
     def __init__(self, data: str):
         """
+        Container of temperatures recorded every 10-15 seconds while cooking.
+
         Example values:
 
         2 minutes:
@@ -86,6 +88,13 @@ class TemperatureHistory:
 
         55 minutes:
         161515161c242a3031302f2eaa2f2f2e2f2e302f2e2d302f2f2e2f2f2f2f343a3f3f3d3e3c3d3c3f3d3d3d3f3d3d3d3d3e3d3e3c3f3f3d3e3d3e3e3d3f3d3c3e3d3d3e3d3f3e3d3f3e3d3c3f3e3d3c3f3e3d3c3f3f3d3d3e3d3d3f3f3d3d3f3f3e3d3d3d3e3e3d3daa3f3f3f3f3f414446474a4e53575e5c5c5b59585755555353545454555554555555565656575757575858585859595b5b5c5c5c5c5d5daa5d5e5f5f60606161616162626263636363646464646464646464646464646464646464646364646464646464646464646464646464646464646464646464646464aa5a59585756555554545453535352525252525151515151
+
+        Data structure:
+
+        Octet 1 (16): First temperature measurement in hex (22 °C)
+        Octet 2 (15): Second temperature measurement in hex (21 °C)
+        Octet 3 (15): Third temperature measurement in hex (21 °C)
+        ...
         """
         self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
 
@@ -104,12 +113,28 @@ class TemperatureHistory:
 class CookerCustomizations:
     def __init__(self, custom: str):
         """
+        Container of different user customizations.
+
         Example values:
 
         ffffffffffff011effff010000001d1f,
         ffffffffffff011effff010004026460,
         ffffffffffff011effff01000a015559,
         ffffffffffff011effff01000000535d
+
+        Data structure:
+
+        Octet 1 (ff): Jingzhu Appointment Hour in hex
+        Octet 2 (ff): Jingzhu Appointment Minute in hex
+        Octet 3 (ff): Kuaizhu Appointment Hour in hex
+        Octet 4 (ff): Kuaizhu Appointment Minute in hex
+        Octet 5 (ff): Zhuzhou Appointment Hour in hex
+        Octet 6 (ff): Zhuzhou Appointment Minute in hex
+        Octet 7 (01): Favorite Appointment Hour in hex (1 hour)
+        Octet 8 (1e): Favorite Appointment Minute in hex (30 minutes)
+        Octet 9 (ff): Favorite Cooking Hour in hex
+        Octet 10 (ff): Favorite Cooking Minute in hex
+        Octet 11-16 (01 00 00 00 1d 1f): Meaning unknown
         """
         self.custom = [int(custom[i:i + 2], 16) for i in
                        range(0, len(custom), 2)]
@@ -160,9 +185,16 @@ class CookerCustomizations:
 class CookingStage:
     def __init__(self, stage: str):
         """
+        Container of cooking stages.
+
         Example timeouts: 'null', 02000000ff, 03000000ff, 0a000000ff, 1000000000
 
-        The meaning of stage[8:10] is unknown.
+        Data structure:
+
+        Octet 1 (02): State in hex
+        Octet 2-3 (0000): Rice ID in hex
+        Octet 4 (00): Taste i n hex
+        Octet 5 (ff): Meaning unknown.
         """
         self.stage = stage
 
@@ -227,6 +259,12 @@ class InteractionTimeouts:
     def __init__(self, timeouts: str = None):
         """
         Example timeouts: 05040f, 05060f
+
+        Data structure:
+
+        Octet 1 (05): LED off timeout in hex (5 seconds)
+        Octet 2 (04): Lid open timeout in hex (4 seconds)
+        Octet 3 (0f): Lid open warning timeout (15 seconds)
         """
         if timeouts is None:
             self.timeouts = [5, 4, 15]
@@ -275,6 +313,22 @@ class CookerSettings:
     def __init__(self, settings: str = None):
         """
         Example settings: 1407, 0607, 0207
+
+        Data structure:
+
+        Octet 1 (14): Bitmask of setting flags
+          Bit 1: Pressure supported
+          Bit 2: LED on
+          Bit 3: Auto keep warm
+          Bit 4: Lid open warning
+          Bit 5: Lid open warning delayed
+          Bit 6-8: Unused
+        Octet 2 (07): Second bitmask of setting flags
+          Bit 1: Jingzhu auto keep warm
+          Bit 2: Kuaizhu auto keep warm
+          Bit 3: Zhuzhou auto keep warm
+          Bit 4: Favorite auto keep warm
+          Bit 5-8: Unused
         """
         if settings is None:
             self.settings = [0, 4]
