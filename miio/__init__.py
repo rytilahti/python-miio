@@ -18,6 +18,7 @@ from miio.vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                    CleaningDetails, CleaningSummary, Timer, )
 from miio.waterpurifier import WaterPurifier
 from miio.wifirepeater import WifiRepeater
+from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
 
 from miio.discovery import Discovery
