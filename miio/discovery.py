@@ -9,7 +9,8 @@ import zeroconf
 
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
-               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, Fan, )
+               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, Fan, Cooker, )
+
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
 from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, )
@@ -52,6 +53,13 @@ DEVICE_MAP = {
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
+    "chunmi.cooker.press1": Cooker,
+    "chunmi.cooker.press2": Cooker,
+    "chunmi.cooker.normal1": Cooker,
+    "chunmi.cooker.normal2": Cooker,
+    "chunmi.cooker.normal3": Cooker,
+    "chunmi.cooker.normal4": Cooker,
+    "chunmi.cooker.normal5": Cooker,
     "yeelink-light-": Yeelight,
     "zhimi-fan-v2": partial(Fan, model=MODEL_FAN_V2),
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
