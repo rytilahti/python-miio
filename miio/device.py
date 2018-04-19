@@ -114,7 +114,8 @@ class Device(metaclass=DeviceGroupMeta):
     This class should not be initialized directly but a device-specific class inheriting
     it should be used instead of it."""
     def __init__(self, ip: str = None, token: str = None,
-                 start_id: int=0, debug: int=0, lazy_discover: bool=True) -> None:
+                 start_id: int=0, debug: int=0, lazy_discover: bool=True,
+                 device_info: DeviceInfo=None) -> None:
         """
         Create a :class:`Device` instance.
         :param ip: IP address or a hostname for the device
@@ -130,12 +131,16 @@ class Device(metaclass=DeviceGroupMeta):
             self.token = bytes.fromhex(token)
         self.debug = debug
         self.lazy_discover = lazy_discover
+        self.device_info = device_info
 
         self._timeout = 5
         self._discovered = False
         self._device_ts = None  # type: datetime.datetime
         self.__id = start_id
         self._device_id = None
+
+        if self.device_info is None:
+            self.device_info = self.info()
 
     def do_discover(self) -> Message:
         """Send a handshake to the device,
