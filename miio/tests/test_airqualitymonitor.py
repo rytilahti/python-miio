@@ -1,8 +1,10 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import AirQualityMonitor
 from miio.airqualitymonitor import AirQualityMonitorStatus
 from .dummies import DummyDevice
-import pytest
 
 
 class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):
@@ -12,11 +14,17 @@ class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):
             'aqi': 34,
             'battery': 100,
             'usb_state': 'off',
-            'time_state': 'format unknown'
+            'time_state': 'on',
+            'night_state': 'on',
+            'night_beg_time': 'format unknown',
+            'night_end_time': 'format unknown',
+            'sensor_state': 'format unknown',
         }
         self.return_values = {
             'get_prop': self._get_state,
             'set_power': lambda x: self._set_state("power", x),
+            'set_time_state': lambda x: self._set_state("time_state", x),
+            'set_night_state': lambda x: self._set_state("night_state", x),
         }
         super().__init__(args, kwargs)
 
@@ -57,5 +65,6 @@ class TestAirQualityMonitor(TestCase):
         assert self.is_on() is True
         assert self.state().aqi == self.device.start_state["aqi"]
         assert self.state().battery == self.device.start_state["battery"]
-        assert self.state().usb_power == (self.device.start_state["usb_state"] == 'on')
-        assert self.state().time_state == self.device.start_state["time_state"]
+        assert self.state().usb_power is (self.device.start_state["usb_state"] == 'on')
+        assert self.state().display_clock is (self.device.start_state["time_state"] == 'on')
+        assert self.state().night_mode is (self.device.start_state["night_state"] == 'on')

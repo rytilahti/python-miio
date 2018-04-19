@@ -1,6 +1,10 @@
 import logging
-from typing import Any, Dict
 from collections import defaultdict
+from typing import Any, Dict
+
+import click
+
+from .click_common import command, format_output
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,10 +52,23 @@ class PhilipsBulbStatus:
              self.color_temperature, self.scene, self.delay_off_countdown)
         return s
 
+    def __json__(self):
+        return self.data
+
 
 class PhilipsBulb(Device):
     """Main class representing Xiaomi Philips LED Ball Lamp."""
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Brightness: {result.brightness}\n"
+            "Color temperature: {result.color_temperature}\n"
+            "Scene: {result.scene}\n"
+            "Delayed turn off: {result.delay_off_countdown}\n"
+        )
+    )
     def status(self) -> PhilipsBulbStatus:
         """Retrieve properties."""
         properties = ['power', 'bright', 'cct', 'snm', 'dv', ]
@@ -71,14 +88,24 @@ class PhilipsBulb(Device):
         return PhilipsBulbStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        default_output=format_output("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @command(
+        default_output=format_output("Powering off"),
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
+    @command(
+        click.argument("level", type=int),
+        default_output=format_output("Setting brightness to {level}")
+    )
     def set_brightness(self, level: int):
         """Set brightness level."""
         if level < 1 or level > 100:
@@ -86,6 +113,10 @@ class PhilipsBulb(Device):
 
         return self.send("set_bright", [level])
 
+    @command(
+        click.argument("level", type=int),
+        default_output=format_output("Setting color temperature to {level}")
+    )
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         if level < 1 or level > 100:
@@ -93,6 +124,12 @@ class PhilipsBulb(Device):
 
         return self.send("set_cct", [level])
 
+    @command(
+        click.argument("brightness", type=int),
+        click.argument("cct", type=int),
+        default_output=format_output(
+            "Setting brightness to {brightness} and color temperature to {cct}")
+    )
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
@@ -103,6 +140,10 @@ class PhilipsBulb(Device):
 
         return self.send("set_bricct", [brightness, cct])
 
+    @command(
+        click.argument("seconds", type=int),
+        default_output=format_output("Setting delayed turn off to {seconds} seconds")
+    )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
 
@@ -112,6 +153,10 @@ class PhilipsBulb(Device):
 
         return self.send("delay_off", [seconds])
 
+    @command(
+        click.argument("number", type=int),
+        default_output=format_output("Setting fixed scene to {number}")
+    )
     def set_scene(self, number: int):
         """Set scene number."""
         if number < 1 or number > 4:

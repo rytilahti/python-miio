@@ -1,9 +1,13 @@
 import base64
 import re
+
+import click
 from construct import (
     Struct, Const, Rebuild, this, len_, Adapter, Computed,
     Int16ul, Int32ul, Int16ub, Array, BitStruct, BitsInteger,
 )
+
+from .click_common import command, format_output
 from .device import Device, DeviceException
 
 
@@ -16,6 +20,10 @@ class ChuangmiIr(Device):
 
     PRONTO_RE = re.compile(r'^([\da-f]{4}\s?){3,}([\da-f]{4})$', re.IGNORECASE)
 
+    @command(
+        click.argument("key", type=int),
+        default_output=format_output("Learning command into storage key {key}")
+    )
     def learn(self, key: int=1):
         """Learn an infrared command.
 
@@ -25,6 +33,10 @@ class ChuangmiIr(Device):
             raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_learn", {'key': str(key)})
 
+    @command(
+        click.argument("key", type=int),
+        default_output=format_output("Reading infrared command from storage key {key}")
+    )
     def read(self, key: int=1):
         """Read a learned command.
 
@@ -98,6 +110,10 @@ class ChuangmiIr(Device):
 
         return signal_code, int(round(pronto_data.frequency))
 
+    @command(
+        click.argument("command", type=str),
+        default_output=format_output("Playing the supplied command")
+    )
     def play(self, command: str):
         """Plays a command in one of the supported formats."""
         if ":" not in command:

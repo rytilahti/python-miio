@@ -1,7 +1,7 @@
 python-miio
 ===========
 
-|PyPI version| |Build Status| |Code Health| |Coverage Status|
+|PyPI version| |Build Status| |Code Health| |Coverage Status| |Docs|
 
 This library (and its accompanying cli tool) is used to interface with devices using Xiaomi's `miIO protocol <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__.
 
@@ -27,7 +27,7 @@ Supported devices
 -  Xiaomi Philips LED Ball Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR) (:class:`miio.chuangmi_ir`)
--  Xiaomi Mi Smart Fan (:class:`miio.fan`)
+-  Xiaomi Mi Smart Pedestal Fan (:class:`miio.fan`)
 -  Xiaomi Mi Air Humidifier (:class:`miio.airhumidifier`)
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off) (:class:`miio.waterpurifier`)
 -  Xiaomi PM2.5 Air Quality Monitor (:class:`miio.airqualitymonitor`)
@@ -56,7 +56,9 @@ Home Assistant support
 -  `Xiaomi Universal IR Remote Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__
 -  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__
 -  `Xiaomi Mi Home Air Conditioner Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
--  `Xiaomi Mi WiFi Repeater 2 <https://github.com/syssi/xiaomi_repeater>`__
+-  `Xiaomi Mi WiFi Repeater 2 <https://www.home-assistant.io/components/device_tracker.xiaomi_miio/>`__
+-  `Xiaomi Mi Smart Pedestal Fan <https://github.com/syssi/xiaomi_fan>`__
+-  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
 
 
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
@@ -67,3 +69,6 @@ Home Assistant support
    :target: https://landscape.io/github/rytilahti/python-miio/master
 .. |Coverage Status| image:: https://coveralls.io/repos/github/rytilahti/python-miio/badge.svg?branch=master
    :target: https://coveralls.io/github/rytilahti/python-miio?branch=master
+.. |Docs| image:: https://readthedocs.org/projects/python-miio/badge/?version=latest
+   :alt: Documentation status
+   :target: https://python-miio.readthedocs.io/en/latest/?badge=latest

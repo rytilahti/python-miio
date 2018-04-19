@@ -1,22 +1,24 @@
+import datetime
+import enum
+import json
 import logging
-import os
 import math
+import os
+import pathlib
 import time
 from typing import List
-import enum
-import datetime
-import json
-import pathlib
-import pytz
+
 import click
+import pytz
 from appdirs import user_cache_dir
+
+from .click_common import (
+    DeviceGroup, command, GlobalContextObject,
+)
+from .device import Device, DeviceException
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                CleaningSummary, CleaningDetails, Timer,
-                               SoundStatus, SoundInstallStatus)
-from .device import Device, DeviceException
-from .click_common import (
-    DeviceGroup, command, GlobalContextObject
-)
+                               SoundStatus, SoundInstallStatus, CarpetModeStatus)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,6 +72,35 @@ class Vacuum(Device):
         """Stop cleaning and return home."""
         self.send("app_stop")
         return self.send("app_charge")
+
+    @command(
+        click.argument("x_coord", type=int),
+        click.argument("y_coord", type=int),
+    )
+    def goto(self, x_coord: int, y_coord: int):
+        """Go to specific target.
+        :param int x_coord: x coordinate
+        :param int y_coord: y coordinate"""
+        return self.send("app_goto_target",
+                         [x_coord, y_coord])
+
+    @command(
+        click.argument("x1_coord", type=int),
+        click.argument("y1_coord", type=int),
+        click.argument("x2_coord", type=int),
+        click.argument("y2_coord", type=int),
+        click.argument("iterations", type=int),
+    )
+    def zoned_clean(self, x1_coord: int, y1_coord: int,
+                    x2_coord: int, y2_coord: int, iterations: int):
+        """Clean a zoned area.
+        :param int x1_coord: x1 coordinate bottom left corner
+        :param int y1_coord: y1 coordinate bottom left corner
+        :param int x2_coord: x2 coordinate top right corner
+        :param int y2_coord: y2 coordinate top right corner
+        :param int iterations: How many times the zone should be cleaned"""
+        return self.send("app_zoned_clean",
+                         [x1_coord, y1_coord, x2_coord, y2_coord, iterations])
 
     @command()
     def manual_start(self):
@@ -323,8 +354,7 @@ class Vacuum(Device):
     @command()
     def timezone(self):
         """Get the timezone."""
-        # return self.send("get_timezone")[0]
-        return None
+        return self.send("get_timezone")[0]
 
     def set_timezone(self, new_zone):
         """Set the timezone."""
@@ -341,9 +371,30 @@ class Vacuum(Device):
 
         return super().configure_wifi(ssid, password, uid, extra_params)
 
-    def raw_command(self, cmd, params):
-        """Send a raw command to the robot."""
-        return self.send(cmd, params)
+    @command()
+    def carpet_mode(self):
+        """Get carpet mode settings"""
+        return CarpetModeStatus(self.send("get_carpet_mode")[0])
+
+    @command(
+        click.argument("enabled", required=True, type=bool),
+        click.argument("stall_time", required=False, default=10, type=int),
+        click.argument("low", required=False, default=400, type=int),
+        click.argument("high", required=False, default=500, type=int),
+        click.argument("integral", required=False, default=450, type=int)
+    )
+    def set_carpet_mode(self, enabled: bool, stall_time: int = 10,
+                        low: int = 400, high: int = 500, integral: int = 450):
+        """Set the carpet mode."""
+        click.echo("Setting carpet mode: %s" % enabled)
+        data = {
+            'enable': int(enabled),
+            'stall_time': stall_time,
+            'current_low': low,
+            'current_high': high,
+            'current_integral': integral,
+        }
+        return self.send("set_carpet_mode", [data])[0] == 'ok'
 
     @classmethod
     def get_device_group(cls):

@@ -1,7 +1,9 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import WifiRepeater
 from miio.wifirepeater import WifiRepeaterConfiguration, WifiRepeaterStatus
-import pytest
 
 
 class DummyWifiRepeater(WifiRepeater):

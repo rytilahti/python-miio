@@ -1,7 +1,11 @@
-import logging
 import enum
-from typing import Any, Dict, Optional
+import logging
 from collections import defaultdict
+from typing import Any, Dict, Optional
+
+import click
+
+from .click_common import command, format_output, EnumType
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -159,10 +163,33 @@ class AirHumidifierStatus:
              self.button_pressed)
         return s
 
+    def __json__(self):
+        return self.data
+
 
 class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Mode: {result.mode}\n"
+            "Temperature: {result.temperature} °C\n"
+            "Humidity: {result.humidity} %\n"
+            "LED brightness: {result.led_brightness}\n"
+            "Buzzer: {result.buzzer}\n"
+            "Child lock: {result.child_lock}\n"
+            "Target humidity: {result.target_humidity} %\n"
+            "Trans level: {result.trans_level}\n"
+            "Speed: {result.speed}\n"
+            "Depth: {result.depth}\n"
+            "Dry: {result.dry}\n"
+            "Use time: {result.use_time}\n"
+            "Hardware version: {result.hardware_version}\n"
+            "Button pressed: {result.button_pressed}\n"
+        )
+    )
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
 
@@ -187,22 +214,44 @@ class AirHumidifier(Device):
         return AirHumidifierStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        default_output=format_output("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @command(
+        default_output=format_output("Powering off"),
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
+    @command(
+        click.argument("mode", type=EnumType(OperationMode, False)),
+        default_output=format_output("Setting mode to '{mode.value}'")
+    )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
         return self.send("set_mode", [mode.value])
 
+    @command(
+        click.argument("brightness", type=EnumType(LedBrightness, False)),
+        default_output=format_output(
+            "Setting LED brightness to {brightness}")
+    )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         return self.send("set_led_b", [brightness.value])
 
+    @command(
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer"
+            if buzzer else "Turning off buzzer"
+        )
+    )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
         if buzzer:
@@ -210,6 +259,13 @@ class AirHumidifier(Device):
         else:
             return self.send("set_buzzer", ["off"])
 
+    @command(
+        click.argument("lock", type=bool),
+        default_output=format_output(
+            lambda lock: "Turning on child lock"
+            if lock else "Turning off child lock"
+        )
+    )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
         if lock:
@@ -217,6 +273,10 @@ class AirHumidifier(Device):
         else:
             return self.send("set_child_lock", ["off"])
 
+    @command(
+        click.argument("humidity", type=int),
+        default_output=format_output("Setting target humidity to {humidity}")
+    )
     def set_target_humidity(self, humidity: int):
         """Set the target humidity."""
         if humidity not in [30, 40, 50, 60, 70, 80]:
@@ -225,6 +285,13 @@ class AirHumidifier(Device):
 
         return self.send("set_limit_hum", [humidity])
 
+    @command(
+        click.argument("dry", type=bool),
+        default_output=format_output(
+            lambda dry: "Turning on dry mode"
+            if dry else "Turning off dry mode"
+        )
+    )
     def set_dry(self, dry: bool):
         """Set dry mode on/off."""
         if dry:

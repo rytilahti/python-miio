@@ -1,6 +1,10 @@
 import logging
-from typing import Any, Dict
 from collections import defaultdict
+from typing import Any, Dict
+
+import click
+
+from .click_common import command, format_output
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,20 +74,47 @@ class PhilipsEyecareStatus:
         return self.data["dvalue"]
 
     def __repr__(self) -> str:
-        s = "<PhilipsEyecareStatus power=%s, brightness=%s, " \
-            "notify=%s, ambient=%s, ambient_brightness=%s, " \
-            "eyecare=%s, scene=%s, smart_night_light=%s, " \
+        s = "<PhilipsEyecareStatus power=%s, " \
+            "brightness=%s, " \
+            "ambient=%s, " \
+            "ambient_brightness=%s, " \
+            "eyecare=%s, " \
+            "scene=%s, " \
+            "reminder=%s, " \
+            "smart_night_light=%s, " \
             "delay_off_countdown=%s>" % \
-            (self.power, self.brightness,
-             self.reminder, self.ambient, self.ambient_brightness,
-             self.eyecare, self.scene, self.smart_night_light,
+            (self.power,
+             self.brightness,
+             self.ambient,
+             self.ambient_brightness,
+             self.eyecare,
+             self.scene,
+             self.reminder,
+             self.smart_night_light,
              self.delay_off_countdown)
         return s
+
+    def __json__(self):
+        return self.data
 
 
 class PhilipsEyecare(Device):
     """Main class representing Xiaomi Philips Eyecare Smart Lamp 2."""
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Brightness: {result.brightness}\n"
+            "Ambient light: {result.ambient}\n"
+            "Ambient light brightness: {result.ambient_brightness}\n"
+            "Eyecare mode: {result.eyecare}\n"
+            "Scene: {result.scence}\n"
+            "Eye fatigue reminder: {result.reminder}\n"
+            "Smart night light: {result.smart_night_light}\n"
+            "Delayed turn off: {result.delay_off_countdown}\n"
+        )
+    )
     def status(self) -> PhilipsEyecareStatus:
         """Retrieve properties."""
         properties = ['power', 'bright', 'notifystatus', 'ambstatus',
@@ -104,22 +135,38 @@ class PhilipsEyecare(Device):
         return PhilipsEyecareStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        default_output=format_output("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @command(
+        default_output=format_output("Powering off"),
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
+    @command(
+        default_output=format_output("Turning on eyecare mode"),
+    )
     def eyecare_on(self):
         """Turn the eyecare mode on."""
         return self.send("set_eyecare", ["on"])
 
+    @command(
+        default_output=format_output("Turning off eyecare mode"),
+    )
     def eyecare_off(self):
         """Turn the eyecare mode off."""
         return self.send("set_eyecare", ["off"])
 
+    @command(
+        click.argument("level", type=int),
+        default_output=format_output("Setting brightness to {level}")
+    )
     def set_brightness(self, level: int):
         """Set brightness level of the primary light."""
         if level < 1 or level > 100:
@@ -127,6 +174,10 @@ class PhilipsEyecare(Device):
 
         return self.send("set_bright", [level])
 
+    @command(
+        click.argument("number", type=int),
+        default_output=format_output("Setting fixed scene to {number}")
+    )
     def set_scene(self, number: int):
         """Set one of the fixed eyecare user scenes."""
         if number < 1 or number > 4:
@@ -134,6 +185,10 @@ class PhilipsEyecare(Device):
 
         return self.send("set_user_scene", [number])
 
+    @command(
+        click.argument("minutes", type=int),
+        default_output=format_output("Setting delayed turn off to {minutes} minutes")
+    )
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
 
@@ -143,30 +198,52 @@ class PhilipsEyecare(Device):
 
         return self.send("delay_off", [minutes])
 
+    @command(
+        default_output=format_output("Turning on smart night light"),
+    )
     def smart_night_light_on(self):
         """Turn the smart night light mode on."""
         return self.send("enable_bl", ["on"])
 
+    @command(
+        default_output=format_output("Turning off smart night light"),
+    )
     def smart_night_light_off(self):
         """Turn the smart night light mode off."""
         return self.send("enable_bl", ["off"])
 
+    @command(
+        default_output=format_output("Turning on eye fatigue reminder"),
+    )
     def reminder_on(self):
         """Enable the eye fatigue reminder / notification."""
         return self.send("set_notifyuser", ["on"])
 
+    @command(
+        default_output=format_output("Turning off eye fatigue reminder"),
+    )
     def reminder_off(self):
         """Disable the eye fatigue reminder / notification."""
         return self.send("set_notifyuser", ["off"])
 
+    @command(
+        default_output=format_output("Turning on ambient light"),
+    )
     def ambient_on(self):
         """Turn the ambient light on."""
         return self.send("enable_amb", ["on"])
 
+    @command(
+        default_output=format_output("Turning off ambient light"),
+    )
     def ambient_off(self):
         """Turn the ambient light off."""
         return self.send("enable_amb", ["off"])
 
+    @command(
+        click.argument("level", type=int),
+        default_output=format_output("Setting brightness to {level}")
+    )
     def set_ambient_brightness(self, level: int):
         """Set the brightness of the ambient light."""
         if level < 1 or level > 100:

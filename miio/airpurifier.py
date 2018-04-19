@@ -1,11 +1,13 @@
-import logging
 import enum
+import logging
 import re
-from typing import Any, Dict, Optional
 from collections import defaultdict
+from typing import Any, Dict, Optional
+
 import click
-from .device import Device, DeviceException
+
 from .click_common import command, format_output, EnumType
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -385,9 +387,9 @@ class AirPurifier(Device):
             "Sound volume: {result.volume} %\n"
             "Filter RFID product id: {result.filter_rfid_product_id}\n"
             "Filter RFID tag: {result.filter_rfid_tag}\n"
-            "Filter type: {result.filter_type.value}\n"
+            "Filter type: {result.filter_type}\n"
             "Learn mode: {result.learn_mode}\n"
-            "Sleep mode: {result.sleep_mode.value}\n"
+            "Sleep mode: {result.sleep_mode}\n"
             "Sleep time: {result.sleep_time}\n"
             "Sleep mode learn count: {result.sleep_mode_learn_count}\n"
             "AQI sensor enabled on power off: {result.auto_detect}\n"

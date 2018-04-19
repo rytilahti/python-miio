@@ -1,9 +1,12 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import ChuangmiPlug
 from miio.chuangmi_plug import (ChuangmiPlugStatus, MODEL_CHUANGMI_PLUG_V1,
-                                MODEL_CHUANGMI_PLUG_V3, MODEL_CHUANGMI_PLUG_M1)
+                                MODEL_CHUANGMI_PLUG_V3,
+                                MODEL_CHUANGMI_PLUG_M1, )
 from .dummies import DummyDevice
-import pytest
 
 
 class DummyChuangmiPlugV1(DummyDevice, ChuangmiPlug):

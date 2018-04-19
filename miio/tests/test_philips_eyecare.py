@@ -1,8 +1,10 @@
 from unittest import TestCase
+
+import pytest
+
 from miio import PhilipsEyecare
 from miio.philips_eyecare import PhilipsEyecareStatus, PhilipsEyecareException
 from .dummies import DummyDevice
-import pytest
 
 
 class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):

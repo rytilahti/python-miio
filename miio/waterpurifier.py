@@ -1,6 +1,8 @@
 import logging
-from typing import Any, Dict
 from collections import defaultdict
+from typing import Any, Dict
+
+from .click_common import command, format_output
 from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
@@ -125,10 +127,35 @@ class WaterPurifierStatus:
                 self.uv_filter_state,
                 self.valve)
 
+    def __json__(self):
+        return self.data
+
 
 class WaterPurifier(Device):
     """Main class representing the waiter purifier."""
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Mode: {result.mode}\n"
+            "TDS: {result.tds}\n"
+            "Filter life remaining: {result.filter_life_remaining}\n"
+            "Filter state: {result.filter_state}\n"
+            "Filter2 life remaining: {result.filter2_life_remaining}\n"
+            "Filter2 state: {result.filter2_state}\n"
+            "Life remaining: {result.life_remaining}\n"
+            "State: {result.state}\n"
+            "Level: {result.level}\n"
+            "Volume: {result.volume}\n"
+            "Filter: {result.filter}\n"
+            "Usage: {result.usage}\n"
+            "Temperature: {result.temperature}\n"
+            "UV filter life remaining: {result.uv_filter_life_remaining}\n"
+            "UV filter state: {result.uv_filter_state}\n"
+            "Valve: {result.valve}\n"
+        )
+    )
     def status(self) -> WaterPurifierStatus:
         """Retrieve properties."""
 
@@ -153,10 +180,16 @@ class WaterPurifier(Device):
         return WaterPurifierStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        default_output=format_output("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @command(
+        default_output=format_output("Powering off"),
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
