@@ -659,12 +659,7 @@ class Cooker(Device):
         """Enable warnings?"""
         self.send('set_func', ['ack'])
 
-    @command(
-        # FIXME
-        click.argument("settings", type=EnumType(CookerSettings, False)),
-        click.argument("timeouts", type=EnumType(InteractionTimeouts, False)),
-        default_output=format_output("Setting interaction")
-    )
+    # FIXME: Add unified CLI support
     def set_interaction(self, settings: CookerSettings,
                         timeouts: InteractionTimeouts):
         """Set interaction. Supported by all cookers except MODEL_PRESS1"""
