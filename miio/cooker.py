@@ -7,7 +7,7 @@ from typing import Optional, List
 
 import click
 
-from .click_common import command, format_output, EnumType
+from .click_common import command, format_output
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
