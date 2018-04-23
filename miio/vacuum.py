@@ -119,7 +119,7 @@ class Vacuum(Device):
     def zoned_clean(self, *zones):
         """Cleans zoned areas.
         :enter one or multiple zones: [x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]: 
-        :param int x1 coordinate bottom left corner
+        :param int x1: x1 coordinate bottom left corner
         :param int y1: y1 coordinate bottom left corner
         :param int x2: x2 coordinate top right corner
         :param int y2: y2 coordinate top right corner
