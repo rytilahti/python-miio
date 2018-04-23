@@ -196,6 +196,17 @@ def home(vac: miio.Vacuum):
     """Return home."""
     click.echo("Requesting return to home: %s" % vac.home())
 
+@cli.command()
+@pass_dev
+def goto(vac: miio.Vacuum):
+    """Going to target."""
+    click.echo("Going to target : %s" % vac.goto())
+
+@cli.command()
+@pass_dev
+def zoned_clean(vac: miio.Vacuum):
+    """Cleaning zone(s)."""
+    click.echo("Cleaning zone(s) : %s" % vac.zoned_clean())
 
 @cli.group()
 @pass_dev
