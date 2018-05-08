@@ -54,13 +54,13 @@ DEVICE_MAP = {
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
-    "chunmi.cooker.press1": Cooker,
-    "chunmi.cooker.press2": Cooker,
-    "chunmi.cooker.normal1": Cooker,
-    "chunmi.cooker.normal2": Cooker,
-    "chunmi.cooker.normal3": Cooker,
-    "chunmi.cooker.normal4": Cooker,
-    "chunmi.cooker.normal5": Cooker,
+    "chunmi-cooker-press1": Cooker,
+    "chunmi-cooker-press2": Cooker,
+    "chunmi-cooker-normal1": Cooker,
+    "chunmi-cooker-normal2": Cooker,
+    "chunmi-cooker-normal3": Cooker,
+    "chunmi-cooker-normal4": Cooker,
+    "chunmi-cooker-normal5": Cooker,
     "lumi-acpartner-v1": AirConditioningCompanion,
     "lumi-acpartner-v2": AirConditioningCompanion,
     "lumi-acpartner-v3": AirConditioningCompanion,
