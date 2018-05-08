@@ -34,7 +34,7 @@ class Power(enum.Enum):
 
 class Led(enum.Enum):
     On = '0'
-    Off = 'a'
+    Off = 'A'
 
 
 STORAGE_SLOT_ID = 30
@@ -107,7 +107,7 @@ class AirConditioningCompanionStatus:
     @property
     def led(self) -> str:
         """Current LED state."""
-        return 'on' if (int(self.data[1][8:9]) == Led.On.value) else 'off'
+        return 'on' if (self.data[1][8:9] == Led.On.value) else 'off'
 
     @property
     def is_on(self) -> bool:

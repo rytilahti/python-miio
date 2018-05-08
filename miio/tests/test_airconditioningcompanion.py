@@ -14,7 +14,7 @@ STATE_OFF = ['off']
 
 class DummyAirConditioningCompanion(AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
-        self.state = ['010500978022222102', '010201190280222221', '2']
+        self.state = ['010500978022222102', '01020119A280222221', '2']
 
         self.return_values = {
             'get_model_and_state': self._get_state,
