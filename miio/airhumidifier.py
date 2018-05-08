@@ -3,7 +3,7 @@ import logging
 from collections import defaultdict
 from typing import Any, Dict, Optional
 
-from .device import Device, DeviceException
+from .device import Device, DeviceInfo, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class LedBrightness(enum.Enum):
 class AirHumidifierStatus:
     """Container for status reports from the air humidifier."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
         """
         Response of a Air Humidifier (zhimi.humidifier.v1):
 
@@ -41,6 +41,7 @@ class AirHumidifierStatus:
         """
 
         self.data = data
+        self.device_info = device_info
 
     @property
     def power(self) -> str:
@@ -113,8 +114,8 @@ class AirHumidifierStatus:
 
     @property
     def firmware_version(self) -> str:
-        # FIXME: Retrieve fw_ver from miIO.info
-        return '1.2.9_5033'
+        """Returns the fw_ver of miIO.info. For example 1.2.9_5033."""
+        return self.device_info.firmware_version
 
     @property
     def firmware_version_major(self) -> str:
@@ -205,8 +206,17 @@ class AirHumidifierStatus:
 class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
 
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        self.device_info = None
+
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
+
+        if self.device_info is None:
+            self.device_info = self.info()
 
         properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
                       'led_b', 'child_lock', 'limit_hum', 'trans_level',
@@ -227,7 +237,7 @@ class AirHumidifier(Device):
                 properties_count, values_count)
 
         return AirHumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+            defaultdict(lambda: None, zip(properties, values)), self.device_info)
 
     def on(self):
         """Power on."""
