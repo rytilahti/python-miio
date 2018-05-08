@@ -73,6 +73,35 @@ class Vacuum(Device):
         self.send("app_stop")
         return self.send("app_charge")
 
+    @command(
+        click.argument("x_coord", type=int),
+        click.argument("y_coord", type=int),
+    )
+    def goto(self, x_coord: int, y_coord: int):
+        """Go to specific target.
+        :param int x_coord: x coordinate
+        :param int y_coord: y coordinate"""
+        return self.send("app_goto_target",
+                         [x_coord, y_coord])
+
+    @command(
+        click.argument("x1_coord", type=int),
+        click.argument("y1_coord", type=int),
+        click.argument("x2_coord", type=int),
+        click.argument("y2_coord", type=int),
+        click.argument("iterations", type=int),
+    )
+    def zoned_clean(self, x1_coord: int, y1_coord: int,
+                    x2_coord: int, y2_coord: int, iterations: int):
+        """Clean a zoned area.
+        :param int x1_coord: x1 coordinate bottom left corner
+        :param int y1_coord: y1 coordinate bottom left corner
+        :param int x2_coord: x2 coordinate top right corner
+        :param int y2_coord: y2 coordinate top right corner
+        :param int iterations: How many times the zone should be cleaned"""
+        return self.send("app_zoned_clean",
+                         [x1_coord, y1_coord, x2_coord, y2_coord, iterations])
+
     @command()
     def manual_start(self):
         """Start manual control mode."""

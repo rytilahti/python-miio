@@ -9,9 +9,13 @@ import zeroconf
 
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
                PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
-               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, )
+               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, Fan, Cooker,
+               AirConditioningCompanion)
+
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
+from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, )
+from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,8 +28,8 @@ DEVICE_MAP = {
     "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "chuangmi-plug-v3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V3),
-    "qmi-powerstrip-v1": PowerStrip,
-    "zimi-powerstrip-v2": PowerStrip,
+    "qmi-powerstrip-v1": partial(PowerStrip, model=MODEL_POWER_STRIP_V1),
+    "zimi-powerstrip-v2": partial(PowerStrip, model=MODEL_POWER_STRIP_V2),
     "zhimi-airpurifier-m1": AirPurifier,   # mini model
     "zhimi-airpurifier-m2": AirPurifier,   # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
@@ -41,16 +45,28 @@ DEVICE_MAP = {
     "zhimi-humidifier-v1": AirHumidifier,
     "zhimi-humidifier-ca1": AirHumidifier,
     "yunmi-waterpuri-v2": WaterPurifier,
-    # It looks like the philips bulb cannot be discovered via mdns
-    "philips-light-bulb": PhilipsBulb,
-    "philips-light-candle2": PhilipsBulb,  # name needs to be checked
+    "philips-light-bulb": PhilipsBulb,     # cannot be discovered via mdns
+    "philips-light-candle": PhilipsBulb,   # cannot be discovered via mdns
+    "philips-light-candle2": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-ceiling": Ceil,
     "philips-light-zyceiling": Ceil,
     "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
+    "chunmi-cooker-press1": Cooker,
+    "chunmi-cooker-press2": Cooker,
+    "chunmi-cooker-normal1": Cooker,
+    "chunmi-cooker-normal2": Cooker,
+    "chunmi-cooker-normal3": Cooker,
+    "chunmi-cooker-normal4": Cooker,
+    "chunmi-cooker-normal5": Cooker,
+    "lumi-acpartner-v1": AirConditioningCompanion,
+    "lumi-acpartner-v2": AirConditioningCompanion,
+    "lumi-acpartner-v3": AirConditioningCompanion,
     "yeelink-light-": Yeelight,
+    "zhimi-fan-v2": partial(Fan, model=MODEL_FAN_V2),
+    "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]

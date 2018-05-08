@@ -6,6 +6,7 @@ from miio.airqualitymonitor import AirQualityMonitor
 from miio.ceil import Ceil
 from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import (Plug, PlugV1, PlugV3, ChuangmiPlug)
+from miio.cooker import Cooker
 from miio.device import Device, DeviceException
 from miio.fan import Fan
 from miio.philips_bulb import PhilipsBulb
@@ -19,4 +20,5 @@ from miio.waterpurifier import WaterPurifier
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
+
 from miio.discovery import Discovery

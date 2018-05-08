@@ -136,7 +136,7 @@ class TestAirConditioningCompanion(TestCase):
                 '010000000001072700',  # best guess
                 Power.On,
                 OperationMode.Auto,
-                22.5,
+                22,
                 FanSpeed.Low,
                 SwingMode.On,
                 Led.Off)
@@ -146,7 +146,7 @@ class TestAirConditioningCompanion(TestCase):
                 '010000000001072700',  # best guess
                 Power.Off,
                 OperationMode.Auto,
-                22.5,
+                22,
                 FanSpeed.Low,
                 SwingMode.On,
                 Led.Off)
@@ -156,7 +156,7 @@ class TestAirConditioningCompanion(TestCase):
                 '010507950000257301',
                 Power.On,
                 OperationMode.Auto,
-                22.5,
+                22,
                 FanSpeed.Low,
                 SwingMode.On,
                 Led.Off)

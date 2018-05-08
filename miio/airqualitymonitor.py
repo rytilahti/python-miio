@@ -1,9 +1,9 @@
-import logging
 from collections import defaultdict
 
-from .device import Device, DeviceException
+import click
 
-_LOGGER = logging.getLogger(__name__)
+from .click_common import command, format_output
+from .device import Device, DeviceException
 
 
 class AirQualityMonitorException(DeviceException):
@@ -80,10 +80,23 @@ class AirQualityMonitorStatus:
              self.display_clock)
         return s
 
+    def __json__(self):
+        return self.data
+
 
 class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "USB power: {result.usb_power}\n"
+            "AQI: {result.aqi}\n"
+            "Battery: {result.battery}\n"
+            "Display clock: {result.display_clock}\n"
+        )
+    )
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
@@ -107,14 +120,27 @@ class AirQualityMonitor(Device):
         return AirQualityMonitorStatus(
             defaultdict(lambda: None, zip(properties, values)))
 
+    @command(
+        default_output=format_output("Powering on"),
+    )
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
+    @command(
+        default_output=format_output("Powering off"),
+    )
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
+    @command(
+        click.argument("display_clock", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on display clock"
+            if led else "Turning off display clock"
+        )
+    )
     def set_display_clock(self, display_clock: bool):
         """Enable/disable displaying a clock instead the AQI."""
         if display_clock:
@@ -122,6 +148,13 @@ class AirQualityMonitor(Device):
         else:
             self.send("set_time_state", ["off"])
 
+    @command(
+        click.argument("auto_close", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on auto close"
+            if led else "Turning off auto close"
+        )
+    )
     def set_auto_close(self, auto_close: bool):
         """Purpose unknown."""
         if auto_close:
@@ -129,6 +162,13 @@ class AirQualityMonitor(Device):
         else:
             self.send("set_auto_close", ["off"])
 
+    @command(
+        click.argument("night_mode", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on night mode"
+            if led else "Turning off night mode"
+        )
+    )
     def set_night_mode(self, night_mode: bool):
         """Decrease the brightness of the display."""
         if night_mode:
@@ -136,6 +176,14 @@ class AirQualityMonitor(Device):
         else:
             self.send("set_night_state", ["off"])
 
+    @command(
+        click.argument("begin_hour", type=int),
+        click.argument("begin_minute", type=int),
+        click.argument("end_hour", type=int),
+        click.argument("end_minute", type=int),
+        default_output=format_output(
+            "Setting night time to {begin_hour}:{begin_minute} - {end_hour}:{end_minute}")
+    )
     def set_night_time(self, begin_hour: int, begin_minute: int,
                        end_hour: int, end_minute: int):
         """Enable night mode daily at bedtime."""
