@@ -332,7 +332,7 @@ class AirConditioningCompanion(Device):
             code[26:28] + code[28:32] + '27'
 
         checksum = sum([int(command[i:i + 2], 16) for i in range(0, len(command), 2)])
-        checksum = "{:02X}".format(checksum % 256)
+        checksum = "{:02X}".format(checksum & 0xFF)
 
         command = command + checksum + code[36:]
 
