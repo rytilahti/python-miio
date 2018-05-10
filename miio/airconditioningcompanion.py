@@ -28,6 +28,7 @@ class FanSpeed(enum.Enum):
 class SwingMode(enum.Enum):
     On = 0
     Off = 1
+    Unknown = 2
 
 
 class Power(enum.Enum):
