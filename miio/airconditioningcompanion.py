@@ -103,19 +103,19 @@ class AirConditioningCompanionStatus:
         return int(self.data[2])
 
     @property
-    def air_condition_model(self) -> str:
+    def air_condition_model(self) -> bytes:
         """Model of the air conditioner."""
-        return self.data[0]
+        return bytes.fromhex(self.data[0])
 
     @property
     def model_format(self) -> int:
         """Version number of the model format."""
-        return int(self.air_condition_model[0:2])
+        return self.air_condition_model[0]
 
     @property
     def device_type(self) -> int:
         """Device type identifier."""
-        return int(self.air_condition_model[2:4])
+        return self.air_condition_model[1]
 
     @property
     def air_condition_brand(self) -> int:
@@ -124,7 +124,7 @@ class AirConditioningCompanionStatus:
 
         Known brand ids (int) are 0182, 0097, 0037, 0202, 02782, 0197, 0192.
         """
-        return int(self.air_condition_model[4:8])
+        return int(self.air_condition_model[2:4].hex())
 
     @property
     def air_condition_remote(self) -> int:
@@ -140,7 +140,7 @@ class AirConditioningCompanionStatus:
         80666661 (brand: 192)
 
         """
-        return int(self.air_condition_model[8:16])
+        return int(self.air_condition_model[4:8].hex())
 
     @property
     def state_format(self) -> int:
@@ -149,7 +149,7 @@ class AirConditioningCompanionStatus:
 
         Known values (int) are: 01, 02, 03
         """
-        return int(self.air_condition_model[16:18])
+        return int(self.air_condition_model[8])
 
     @property
     def air_condition_configuration(self) -> int:
@@ -231,7 +231,7 @@ class AirConditioningCompanionStatus:
             "mode=%s>" % \
             (self.power,
              self.load_power,
-             self.air_condition_model,
+             self.air_condition_model.hex(),
              self.model_format,
              self.device_type,
              self.air_condition_brand,
@@ -310,33 +310,29 @@ class AirConditioningCompanion(Device):
         return self.send("end_ir_learn", [slot])
 
     @command(
-        click.argument("model", type=str),
-        click.argument("code", type=str),
+        click.argument("model", type=bytes),
+        click.argument("code", type=bytes),
         default_output=format_output("Sending the supplied infrared command")
     )
-    def send_ir_code(self, model: str, code: str, slot: int=0):
+    def send_ir_code(self, model: bytes, code: bytes, slot: int=0):
         """Play a captured command.
 
-        :param str model: Air condition model
-        :param str command: Command to execute
+        :param bytes model: Air condition model
+        :param bytes code: Command to execute
         :param int slot: Unknown internal register or slot
         """
         if slot < 0 or slot > 132:
             raise AirConditioningCompanionException("Invalid slot: %s" % slot)
 
-        slot = "{:02X}".format(121 + slot)
+        slot = bytes([121 + slot])
 
         # FE + 0487 + 00007145 + 9470 + 1FFF + 7F + FF + 06 + 0042 + 27 + 4E + 0025002D008500AC01...
-        command = code[0:2] + model[4:8] + model[8:16] + '9470' + \
-            '1FFF' + slot + 'FF' + \
-            code[26:28] + code[28:32] + '27'
+        command = code[0:1] + model[2:8] + b'\x94\x70\x1F\xFF' + slot + b'\xFF' + code[13:16] + b'\x27'
 
-        checksum = sum([int(command[i:i + 2], 16) for i in range(0, len(command), 2)])
-        checksum = "{:02X}".format(checksum & 0xFF)
+        checksum = sum(command) & 0xFF
+        command = command + bytes([checksum]) + code[18:]
 
-        command = command + checksum + code[36:]
-
-        return self.send("send_ir_code", [command])
+        return self.send("send_ir_code", [command.hex().upper()])
 
     @command(
         click.argument("command", type=str),
