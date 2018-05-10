@@ -86,7 +86,8 @@ class TestAirConditioningCompanion(TestCase):
 
         assert self.is_on() is False
         assert self.state().load_power == 2
-        assert self.state().air_condition_model == bytes.fromhex('010500978022222102')
+        assert self.state().air_condition_model == \
+               bytes.fromhex('010500978022222102')
         assert self.state().model_format == 1
         assert self.state().device_type == 5
         assert self.state().air_condition_brand == 97

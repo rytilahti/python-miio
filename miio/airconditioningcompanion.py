@@ -327,7 +327,8 @@ class AirConditioningCompanion(Device):
         slot = bytes([121 + slot])
 
         # FE + 0487 + 00007145 + 9470 + 1FFF + 7F + FF + 06 + 0042 + 27 + 4E + 0025002D008500AC01...
-        command = code[0:1] + model[2:8] + b'\x94\x70\x1F\xFF' + slot + b'\xFF' + code[13:16] + b'\x27'
+        command = code[0:1] + model[2:8] + b'\x94\x70\x1F\xFF' + \
+                  slot + b'\xFF' + code[13:16] + b'\x27'
 
         checksum = sum(command) & 0xFF
         command = command + bytes([checksum]) + code[18:]
