@@ -156,14 +156,17 @@ class AirConditioningCompanionStatus:
         return 'on' if int(self.data[1][2:3]) == Power.On.value else 'off'
 
     @property
-    def led(self) -> Optional[Led]:
+    def led(self) -> Optional[bool]:
         """Current LED state."""
         state = self.data[1][8:9]
-        try:
-            return Led(state)
-        except ValueError:
-            _LOGGER.warning("Unsupported LED state: %s", state)
-            return None
+        if state == Led.On.value:
+            return True
+
+        if state == Led.Off.value:
+            return False
+
+        _LOGGER.info("Unsupported LED state: %s", state)
+        return None
 
     @property
     def is_on(self) -> bool:
