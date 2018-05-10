@@ -5,9 +5,13 @@ from typing import Optional
 import click
 
 from .click_common import command, format_output, EnumType
-from .device import Device
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class AirConditioningCompanionException(DeviceException):
+    pass
 
 
 class OperationMode(enum.Enum):
@@ -310,17 +314,21 @@ class AirConditioningCompanion(Device):
         click.argument("code", type=str),
         default_output=format_output("Sending the supplied infrared command")
     )
-    def send_ir_code(self, model: str, code: str):
+    def send_ir_code(self, model: str, code: str, slot: int=0):
         """Play a captured command.
 
         :param str model: Air condition model
         :param str command: Command to execute
+        :param int slot: Unknown internal register or slot
         """
+        if slot < 0 or slot > 132:
+            raise AirConditioningCompanionException("Invalid slot: %s" % slot)
 
-        self_function = "{:02X}".format(121)
-        # FE + 0487 + 00007145 + 9470 + 1FFF7FFF + 06 + 0042 + 27 + 4E + 0025002D008500AC01...
+        slot = "{:02X}".format(121 + slot)
+
+        # FE + 0487 + 00007145 + 9470 + 1FFF + 7F + FF + 06 + 0042 + 27 + 4E + 0025002D008500AC01...
         command = code[0:2] + model[4:8] + model[8:16] + '9470' + \
-            '1FFF' + self_function + 'FF' + \
+            '1FFF' + slot + 'FF' + \
             code[26:28] + code[28:32] + '27'
 
         checksum = sum([int(command[i:i + 2], 16) for i in range(0, len(command), 2)])
