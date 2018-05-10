@@ -1,10 +1,13 @@
 import enum
+import logging
 from typing import Optional
 
 import click
 
 from .click_common import command, format_output, EnumType
 from .device import Device
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class OperationMode(enum.Enum):
@@ -97,29 +100,29 @@ class AirConditioningCompanionStatus:
     @property
     def air_condition_model(self) -> str:
         """Model of the air conditioner."""
-        return str(self.data[0])
+        return self.data[0]
 
     @property
-    def model_format(self) -> str:
+    def model_format(self) -> int:
         """Version number of the model format."""
-        return self.air_condition_model[0:2]
+        return int(self.air_condition_model[0:2])
 
     @property
-    def device_type(self) -> str:
+    def device_type(self) -> int:
         """Device type identifier."""
-        return self.air_condition_model[2:4]
+        return int(self.air_condition_model[2:4])
 
     @property
-    def air_condition_brand(self) -> str:
+    def air_condition_brand(self) -> int:
         """
         Brand of the air conditioner.
 
         Known brand ids (int) are 0182, 0097, 0037, 0202, 02782, 0197, 0192.
         """
-        return self.air_condition_model[4:8]
+        return int(self.air_condition_model[4:8])
 
     @property
-    def air_condition_remote(self) -> str:
+    def air_condition_remote(self) -> int:
         """
         Known remote ids (int):
 
@@ -132,30 +135,35 @@ class AirConditioningCompanionStatus:
         80666661 (brand: 192)
 
         """
-        return self.air_condition_model[8:16]
+        return int(self.air_condition_model[8:16])
 
     @property
-    def state_format(self) -> str:
+    def state_format(self) -> int:
         """
         Version number of the state format.
 
         Known values (int) are: 01, 02, 03
         """
-        return self.air_condition_model[16:18]
+        return int(self.air_condition_model[16:18])
 
     @property
     def air_condition_configuration(self) -> int:
-        return int(self.data[1][2:10], 16)
+        return self.data[1][2:10]
 
     @property
     def power(self) -> str:
         """Current power state."""
-        return 'on' if (int(self.data[1][2:3]) == Power.On.value) else 'off'
+        return 'on' if int(self.data[1][2:3]) == Power.On.value else 'off'
 
     @property
-    def led(self) -> str:
+    def led(self) -> Optional[Led]:
         """Current LED state."""
-        return 'on' if (self.data[1][8:9] == Led.On.value) else 'off'
+        state = self.data[1][8:9]
+        try:
+            return Led(state)
+        except ValueError:
+            _LOGGER.warning("Unsupported LED state: %s", state)
+            return None
 
     @property
     def is_on(self) -> bool:
@@ -202,6 +210,12 @@ class AirConditioningCompanionStatus:
             "power=%s, " \
             "load_power=%s, " \
             "air_condition_model=%s, " \
+            "model_format=%s, " \
+            "device_type=%s," \
+            "air_condition_brand=%s," \
+            "air_condition_remote=%s," \
+            "state_format=%s," \
+            "air_condition_configuration=%s," \
             "led=%s, " \
             "target_temperature=%s, " \
             "swing_mode=%s, " \
@@ -210,6 +224,12 @@ class AirConditioningCompanionStatus:
             (self.power,
              self.load_power,
              self.air_condition_model,
+             self.model_format,
+             self.device_type,
+             self.air_condition_brand,
+             self.air_condition_remote,
+             self.state_format,
+             self.air_condition_configuration,
              self.led,
              self.target_temperature,
              self.swing_mode,
