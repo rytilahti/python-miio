@@ -306,14 +306,29 @@ class AirConditioningCompanion(Device):
         return self.send("end_ir_learn", [slot])
 
     @command(
-        click.argument("command", type=str),
+        click.argument("model", type=str),
+        click.argument("code", type=str),
         default_output=format_output("Sending the supplied infrared command")
     )
-    def send_ir_code(self, command: str):
+    def send_ir_code(self, model: str, code: str):
         """Play a captured command.
 
-        :param str command: Command to execute"""
-        return self.send("send_ir_code", [str(command)])
+        :param str model: Air condition model
+        :param str command: Command to execute
+        """
+
+        self_function = "{:02X}".format(121)
+        # FE + 0487 + 00007145 + 9470 + 1FFF7FFF + 06 + 0042 + 27 + 4E + 0025002D008500AC01...
+        command = code[0:2] + model[4:8] + model[8:16] + '9470' + \
+            '1FFF' + self_function + 'FF' + \
+            code[26:28] + code[28:32] + '27'
+
+        checksum = sum([int(command[i:i + 2], 16) for i in range(0, len(command), 2)])
+        checksum = "{:02X}".format(checksum % 256)
+
+        command = command + checksum + code[36:]
+
+        return self.send("send_ir_code", [command])
 
     @command(
         click.argument("command", type=str),
