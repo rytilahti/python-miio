@@ -131,7 +131,7 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.learn_stop() is True
 
     def test_send_ir_code(self):
-        assert self.device.send_ir_code('0000000') is True
+        assert self.device.send_ir_code('010500978022222102', '0000000') is True
 
     def test_send_command(self):
         assert self.device.send_command('0000000') is True
