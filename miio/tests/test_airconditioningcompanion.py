@@ -87,7 +87,7 @@ class TestAirConditioningCompanion(TestCase):
         assert self.is_on() is False
         assert self.state().load_power == 2
         assert self.state().air_condition_model == \
-               bytes.fromhex('010500978022222102')
+            bytes.fromhex('010500978022222102')
         assert self.state().model_format == 1
         assert self.state().device_type == 5
         assert self.state().air_condition_brand == 97
@@ -132,7 +132,8 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.learn_stop() is True
 
     def test_send_ir_code(self):
-        assert self.device.send_ir_code(bytes.fromhex('010500978022222102'), bytes.fromhex('00')) is True
+        assert self.device.send_ir_code(bytes.fromhex('010500978022222102'),
+            bytes.fromhex('00')) is True
 
     def test_send_command(self):
         assert self.device.send_command('0000000') is True
