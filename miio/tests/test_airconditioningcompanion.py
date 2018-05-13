@@ -134,7 +134,7 @@ class TestAirConditioningCompanion(TestCase):
 
     def test_send_ir_code(self):
         assert self.device.send_ir_code(bytes.fromhex('010500978022222102'),
-            bytes.fromhex('00')) is True
+                                        bytes.fromhex('00')) is True
 
         with pytest.raises(AirConditioningCompanionException):
             self.device.send_ir_code(bytes.fromhex('010500978022222102'),
