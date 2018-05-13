@@ -1,4 +1,3 @@
-import base64
 import string
 import json
 import os

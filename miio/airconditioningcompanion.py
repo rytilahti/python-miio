@@ -323,13 +323,13 @@ class AirConditioningCompanion(Device):
         """
         try:
             model = bytes.fromhex(model)
-        except:
+        except ValueError:
             raise AirConditioningCompanionException(
                 "Invalid model. A hexadecimal string must be provided")
 
         try:
             code = bytes.fromhex(code)
-        except:
+        except ValueError:
             raise AirConditioningCompanionException(
                 "Invalid code. A hexadecimal string must be provided")
 
