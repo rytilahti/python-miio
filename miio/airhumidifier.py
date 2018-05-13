@@ -44,7 +44,7 @@ class AirHumidifierStatus:
         """
 
         self.data = data
-        self._device_info = device_info
+        self.device_info = device_info
 
     @property
     def power(self) -> str:
@@ -118,7 +118,7 @@ class AirHumidifierStatus:
     @property
     def firmware_version(self) -> str:
         """Returns the fw_ver of miIO.info. For example 1.2.9_5033."""
-        return self._device_info.firmware_version
+        return self.device_info.firmware_version
 
     @property
     def firmware_version_major(self) -> str:
