@@ -31,6 +31,7 @@ def as_enum(d):
     else:
         return d
 
+
 with open(os.path.join(os.path.dirname(__file__),
                        'test_airconditioningcompanion.json')) as inp:
     test_data = json.load(inp, object_hook=as_enum)
