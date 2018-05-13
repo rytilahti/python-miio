@@ -4,7 +4,7 @@ from typing import Optional
 
 import click
 
-from .click_common import command, format_output, EnumType, HexStringParamType
+from .click_common import command, format_output, EnumType
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -310,17 +310,29 @@ class AirConditioningCompanion(Device):
         return self.send("end_ir_learn", [slot])
 
     @command(
-        click.argument("model", type=HexStringParamType),
-        click.argument("code", type=HexStringParamType),
+        click.argument("model", type=str),
+        click.argument("code", type=str),
         default_output=format_output("Sending the supplied infrared command")
     )
-    def send_ir_code(self, model: bytes, code: bytes, slot: int=0):
+    def send_ir_code(self, model: str, code: str, slot: int=0):
         """Play a captured command.
 
-        :param bytes model: Air condition model
-        :param bytes code: Command to execute
+        :param str model: Air condition model
+        :param str code: Command to execute
         :param int slot: Unknown internal register or slot
         """
+        try:
+            model = bytes.fromhex(model)
+        except:
+            raise AirConditioningCompanionException(
+                "Invalid model. A hexadecimal string must be provided")
+
+        try:
+            code = bytes.fromhex(code)
+        except:
+            raise AirConditioningCompanionException(
+                "Invalid code. A hexadecimal string must be provided")
+
         if slot < 0 or slot > 134:
             raise AirConditioningCompanionException("Invalid slot: %s" % slot)
 
@@ -346,7 +358,7 @@ class AirConditioningCompanion(Device):
         return self.send("send_cmd", [str(command)])
 
     @command(
-        click.argument("model", type=HexStringParamType),
+        click.argument("model", type=str),
         click.argument("power", type=EnumType(Power, False)),
         click.argument("operation_mode", type=EnumType(OperationMode, False)),
         click.argument("target_temperature", type=int),

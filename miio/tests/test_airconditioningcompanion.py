@@ -1,4 +1,7 @@
+import base64
 import string
+import json
+import os
 from unittest import TestCase
 
 import pytest
@@ -10,20 +13,26 @@ from miio.airconditioningcompanion import (OperationMode, FanSpeed, Power,
                                            AirConditioningCompanionException,
                                            STORAGE_SLOT_ID, )
 
+with open(os.path.join(os.path.dirname(__file__),
+                       'test_airconditioningcompanion.json')) as inp:
+    test_data = json.load(inp)
+
 STATE_ON = ['on']
 STATE_OFF = ['off']
+
 
 class DummyAirConditioningCompanion(AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
         self.state = ['010500978022222102', '01020119A280222221', '2']
+        self.last_ir_played = None
 
         self.return_values = {
             'get_model_and_state': self._get_state,
             'start_ir_learn': lambda x: True,
             'end_ir_learn': lambda x: True,
             'get_ir_learn_result': lambda x: True,
-            'send_ir_code': lambda x: True,
-            'send_cmd': self._send_cmd_input_validation,
+            'send_ir_code': lambda x: self._send_ir_code_input_validation(x),
+            'send_cmd': self._hex_input_validation,
             'set_power': lambda x: self._set_power(x),
         }
         self.start_state = self.state.copy()
@@ -48,8 +57,19 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
         if value == STATE_OFF:
             self.state[1] = self.state[1][:2] + '0' + self.state[1][3:]
 
-    def _send_cmd_input_validation(self, props):
-        return all(c in string.hexdigits for c in props[0])
+    @staticmethod
+    def _hex_input_validation(payload):
+        return all(c in string.hexdigits for c in payload[0])
+
+    def _send_ir_code_input_validation(self, payload):
+        if self._hex_input_validation(payload[0]):
+            self.last_ir_played = payload[0]
+            return True
+
+        return False
+
+    def get_last_ir_played(self):
+        return self.last_ir_played
 
 
 @pytest.fixture(scope="class")
@@ -133,16 +153,18 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.learn_stop() is True
 
     def test_send_ir_code(self):
-        assert self.device.send_ir_code(bytes.fromhex('010500978022222102'),
-                                        bytes.fromhex('00')) is True
+        for args in test_data['test_raw_ok']:
+            with self.subTest():
+                self.device._reset_state()
+                self.assertTrue(self.device.send_ir_code(*args['in']))
+                self.assertSequenceEqual(
+                    self.device.get_last_ir_played(),
+                    args['out']
+                )
 
-        with pytest.raises(AirConditioningCompanionException):
-            self.device.send_ir_code(bytes.fromhex('010500978022222102'),
-                                     bytes.fromhex('00'), -1)
-
-        with pytest.raises(AirConditioningCompanionException):
-            self.device.send_ir_code(bytes.fromhex('010500978022222102'),
-                                     bytes.fromhex('00'), 1+255-121)
+        for args in test_data['test_raw_exception']:
+            with pytest.raises(AirConditioningCompanionException):
+                self.device.send_ir_code(*args['in'])
 
     def test_send_command(self):
         assert self.device.send_command('0000000') is True
