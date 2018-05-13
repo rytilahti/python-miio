@@ -321,7 +321,7 @@ class AirConditioningCompanion(Device):
         :param bytes code: Command to execute
         :param int slot: Unknown internal register or slot
         """
-        if slot < 0 or slot > 132:
+        if slot < 0 or slot > 134:
             raise AirConditioningCompanionException("Invalid slot: %s" % slot)
 
         slot = bytes([121 + slot])

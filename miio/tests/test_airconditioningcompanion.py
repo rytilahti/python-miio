@@ -7,6 +7,7 @@ from miio import AirConditioningCompanion
 from miio.airconditioningcompanion import (OperationMode, FanSpeed, Power,
                                            SwingMode, Led,
                                            AirConditioningCompanionStatus,
+                                           AirConditioningCompanionException,
                                            STORAGE_SLOT_ID, )
 
 STATE_ON = ['on']
@@ -134,6 +135,14 @@ class TestAirConditioningCompanion(TestCase):
     def test_send_ir_code(self):
         assert self.device.send_ir_code(bytes.fromhex('010500978022222102'),
             bytes.fromhex('00')) is True
+
+        with pytest.raises(AirConditioningCompanionException):
+            self.device.send_ir_code(bytes.fromhex('010500978022222102'),
+                                     bytes.fromhex('00'), -1)
+
+        with pytest.raises(AirConditioningCompanionException):
+            self.device.send_ir_code(bytes.fromhex('010500978022222102'),
+                                     bytes.fromhex('00'), 1+255-121)
 
     def test_send_command(self):
         assert self.device.send_command('0000000') is True
