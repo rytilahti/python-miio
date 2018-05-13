@@ -12,12 +12,35 @@ from miio.airconditioningcompanion import (OperationMode, FanSpeed, Power,
                                            AirConditioningCompanionException,
                                            STORAGE_SLOT_ID, )
 
-with open(os.path.join(os.path.dirname(__file__),
-                       'test_airconditioningcompanion.json')) as inp:
-    test_data = json.load(inp)
-
 STATE_ON = ['on']
 STATE_OFF = ['off']
+
+PUBLIC_ENUMS = {
+    'OperationMode': OperationMode,
+    'FanSpeed': FanSpeed,
+    'Power': Power,
+    'SwingMode': SwingMode,
+    'Led': Led,
+}
+
+
+def as_enum(d):
+    if "__enum__" in d:
+        name, member = d["__enum__"].split(".")
+        return getattr(PUBLIC_ENUMS[name], member)
+    else:
+        return d
+
+with open(os.path.join(os.path.dirname(__file__),
+                       'test_airconditioningcompanion.json')) as inp:
+    test_data = json.load(inp, object_hook=as_enum)
+
+
+class EnumEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if type(obj) in PUBLIC_ENUMS.values():
+            return {"__enum__": str(obj)}
+        return json.JSONEncoder.default(self, obj)
 
 
 class DummyAirConditioningCompanion(AirConditioningCompanion):
@@ -30,8 +53,8 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
             'start_ir_learn': lambda x: True,
             'end_ir_learn': lambda x: True,
             'get_ir_learn_result': lambda x: True,
-            'send_ir_code': lambda x: self._send_ir_code_input_validation(x),
-            'send_cmd': self._hex_input_validation,
+            'send_ir_code': lambda x: self._send_input_validation(x),
+            'send_cmd': lambda x: self._send_input_validation(x),
             'set_power': lambda x: self._set_power(x),
         }
         self.start_state = self.state.copy()
@@ -60,7 +83,7 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
     def _hex_input_validation(payload):
         return all(c in string.hexdigits for c in payload[0])
 
-    def _send_ir_code_input_validation(self, payload):
+    def _send_input_validation(self, payload):
         if self._hex_input_validation(payload[0]):
             self.last_ir_played = payload[0]
             return True
@@ -152,7 +175,7 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.learn_stop() is True
 
     def test_send_ir_code(self):
-        for args in test_data['test_raw_ok']:
+        for args in test_data['test_send_ir_code_ok']:
             with self.subTest():
                 self.device._reset_state()
                 self.assertTrue(self.device.send_ir_code(*args['in']))
@@ -161,7 +184,7 @@ class TestAirConditioningCompanion(TestCase):
                     args['out']
                 )
 
-        for args in test_data['test_raw_exception']:
+        for args in test_data['test_send_ir_code_exception']:
             with pytest.raises(AirConditioningCompanionException):
                 self.device.send_ir_code(*args['in'])
 
@@ -169,36 +192,12 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.send_command('0000000') is True
 
     def test_send_configuration(self):
-        def send_configuration_known_aircondition():
-            return self.device.send_configuration(
-                '010000000001072700',  # best guess
-                Power.On,
-                OperationMode.Auto,
-                22,
-                FanSpeed.Low,
-                SwingMode.On,
-                Led.Off)
 
-        def send_configuration_known_aircondition_turn_off():
-            return self.device.send_configuration(
-                '010000000001072700',  # best guess
-                Power.Off,
-                OperationMode.Auto,
-                22,
-                FanSpeed.Low,
-                SwingMode.On,
-                Led.Off)
-
-        def send_configuration_unknown_aircondition():
-            return self.device.send_configuration(
-                '010507950000257301',
-                Power.On,
-                OperationMode.Auto,
-                22,
-                FanSpeed.Low,
-                SwingMode.On,
-                Led.Off)
-
-        assert send_configuration_known_aircondition() is True
-        assert send_configuration_known_aircondition_turn_off() is True
-        assert send_configuration_unknown_aircondition() is True
+        for args in test_data['test_send_configuration_ok']:
+            with self.subTest():
+                self.device._reset_state()
+                self.assertTrue(self.device.send_configuration(*args['in']))
+                self.assertSequenceEqual(
+                    self.device.get_last_ir_played(),
+                    args['out']
+                )
