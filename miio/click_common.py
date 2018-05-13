@@ -93,6 +93,14 @@ class EnumType(click.Choice):
         return ("_".join(word)).upper()
 
 
+class HexStringParamType(click.ParamType):
+    def convert(self, value, param, ctx):
+        try:
+            return bytes.fromhex(value)
+        except ValueError:
+            self.fail('%s is not a valid hexadecimal string' % value, param, ctx)
+
+
 class GlobalContextObject:
     def __init__(self, debug: int=0, output: callable=None):
         self.debug = debug

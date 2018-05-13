@@ -4,7 +4,7 @@ from typing import Optional
 
 import click
 
-from .click_common import command, format_output, EnumType
+from .click_common import command, format_output, EnumType, HexStringParamType
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -310,8 +310,8 @@ class AirConditioningCompanion(Device):
         return self.send("end_ir_learn", [slot])
 
     @command(
-        click.argument("model", type=bytes),
-        click.argument("code", type=bytes),
+        click.argument("model", type=HexStringParamType),
+        click.argument("code", type=HexStringParamType),
         default_output=format_output("Sending the supplied infrared command")
     )
     def send_ir_code(self, model: bytes, code: bytes, slot: int=0):
@@ -346,7 +346,7 @@ class AirConditioningCompanion(Device):
         return self.send("send_cmd", [str(command)])
 
     @command(
-        click.argument("model", type=str),
+        click.argument("model", type=HexStringParamType),
         click.argument("power", type=EnumType(Power, False)),
         click.argument("operation_mode", type=EnumType(OperationMode, False)),
         click.argument("target_temperature", type=int),
