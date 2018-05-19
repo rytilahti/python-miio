@@ -518,7 +518,7 @@ class CookerStatus:
     def stage(self) -> Optional[CookingStage]:
         """Current stage if cooking."""
         stage = self.data['stage']
-        if len(stage) == 10 and stage.hexdigits:
+        if len(stage) == 10:
             return CookingStage(stage)
 
         return None
@@ -545,7 +545,7 @@ class CookerStatus:
         Example values: 29, *031e0b23*, 031e0b23031e
         """
         value = self.data['temp']
-        if len(value) == 8 and value.hexdigits:
+        if len(value) == 8:
             return time(hour=int(value[4:6], 16), minute=int(value[6:8], 16))
 
         return None
@@ -599,7 +599,7 @@ class CookerStatus:
     def custom(self) -> Optional[CookerCustomizations]:
         custom = self.data['custom']
 
-        if len(custom) > 31 and custom.hexdigits:
+        if len(custom) > 31:
             return CookerCustomizations(custom)
 
         return None
@@ -660,7 +660,7 @@ class Cooker(Device):
     def status(self) -> CookerStatus:
         """Retrieve properties."""
         properties = ['func', 'menu', 'stage', 'temp', 't_func', 't_precook',
-                      't_cook', 'setting', 'delay', 'version']
+                      't_cook', 'setting', 'delay', 'version', 'favorite', 'custom']
         values = self.send("get_prop", properties)
 
         properties_count = len(properties)
