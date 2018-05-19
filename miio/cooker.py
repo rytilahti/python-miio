@@ -27,21 +27,50 @@ MODEL_NORMAL = [MODEL_NORMAL1, MODEL_NORMAL2, MODEL_NORMAL3, MODEL_NORMAL4,
 MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
 MODEL_NORMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
 
-COOKING_STAGE_NAME = [
-    'Preheating',
-    'Water-absorbing',
-    'Boiling',
-    'Gelantinizing',
-    'Braising',
-]
-
-COOKING_STAGE_DESCRIPTION = [
-    'Starting heating, to soften rice gradually',
-    'Increase temperature, to flesh grains with water',
-    'Last high heating, to cook rice evenly',
-    'Steaming under high temperature, to bring sweetness to grains',
-    'Reheat the rice to open its taste',
-]
+COOKING_STAGES = {
+    0: {
+        'name': 'Quickly preheat',
+        'description': 'Increase temperature in a controlled manner to soften rice gradually',
+    },
+    1: {
+        'name': 'Water-absorbing',
+        'description': 'Increase temperature, to flesh grains with water',
+    },
+    2: {
+        'name': 'Boiling',
+        'description': 'Last high heating, to cook rice evenly',
+    },
+    3: {
+        'name': 'Gelantinizing',
+        'description': 'Steaming under high temperature, to bring sweetness to grains',
+    },
+    4: {
+        'name': 'Braising',
+        'description': 'Absorb water at moderate temperature',
+    },
+    5: {
+        'name': 'Boiling',
+        'description': 'Operate at full load to boil rice',
+        # Keep heating at high temperature. Let rice to receive
+    },
+    7: {
+        'name': 'Boiling',
+        'description': 'Operate at full load to boil rice',
+        # Keep heating at high temperature. Let rice to receive
+    },
+    8: {
+        'name': 'Warm up rice',
+        'description': 'Temperature control adjustment and cyclic heating achieve combination of taste, dolor and nutrition',
+    },
+    10: {
+        'name': 'High temperature gelatinization',
+        'description': 'High-temperature steam generates crystal clear rice g...',
+    },
+    16: {
+        'name': 'Cooking finished',
+        'description': '',
+    }
+}
 
 
 class CookerException(DeviceException):
@@ -240,27 +269,49 @@ class CookingStage:
     @property
     def name(self) -> str:
         try:
-            return COOKING_STAGE_NAME[self.state]
-        except IndexError:
-            return 'Cooking finished'
+            return COOKING_STAGES[self.state]['name']
+        except KeyError:
+            return 'Unknown stage'
 
     @property
     def description(self) -> str:
         try:
-            return COOKING_STAGE_DESCRIPTION[self.state]
-        except IndexError:
+            return COOKING_STAGES[self.state]['description']
+        except KeyError:
             return ''
 
-    def __str__(self) -> str:
+    @property
+    def raw(self) -> str:
         return self.stage
 
+    def __str__(self) -> str:
+        s = "name=%s, " \
+            "description=%s, " \
+            "state=%s, " \
+            "rice_id=%s, " \
+            "taste=%s, " \
+            "taste_phase=%s, " \
+            "raw=%s" % \
+            (self.name,
+             self.description,
+             self.state,
+             self.rice_id,
+             self.taste,
+             self.taste_phase,
+             self.raw)
+        return s
+
     def __repr__(self) -> str:
-        s = "<CookingStage state=%s, " \
+        s = "<CookingStage name=%s, " \
+            "description=%s, " \
+            "state=%s, " \
             "rice_id=%s, " \
             "taste=%s, " \
             "taste_phase=%s, " \
             "raw=%s>" % \
-            (self.state,
+            (self.name,
+             self.description,
+             self.state,
              self.rice_id,
              self.taste,
              self.taste_phase,
