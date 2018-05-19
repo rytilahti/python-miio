@@ -27,21 +27,51 @@ MODEL_NORMAL = [MODEL_NORMAL1, MODEL_NORMAL2, MODEL_NORMAL3, MODEL_NORMAL4,
 MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
 MODEL_NORMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
 
-COOKING_STAGE_NAME = [
-    'Preheating',
-    'Water-absorbing',
-    'Boiling',
-    'Gelantinizing',
-    'Braising',
-]
-
-COOKING_STAGE_DESCRIPTION = [
-    'Starting heating, to soften rice gradually',
-    'Increase temperature, to flesh grains with water',
-    'Last high heating, to cook rice evenly',
-    'Steaming under high temperature, to bring sweetness to grains',
-    'Reheat the rice to open its taste',
-]
+COOKING_STAGES = {
+    0: {
+        'name': 'Quickly preheat',
+        'description': 'Increase temperature in a controlled manner to soften rice gradually',
+    },
+    1: {
+        'name': 'Water-absorbing',
+        'description': 'Increase temperature, to flesh grains with water',
+    },
+    2: {
+        'name': 'Boiling',
+        'description': 'Last high heating, to cook rice evenly',
+    },
+    3: {
+        'name': 'Gelantinizing',
+        'description': 'Steaming under high temperature, to bring sweetness to grains',
+    },
+    4: {
+        'name': 'Braising',
+        'description': 'Absorb water at moderate temperature',
+    },
+    5: {
+        'name': 'Boiling',
+        'description': 'Operate at full load to boil rice',
+        # Keep heating at high temperature. Let rice to receive
+    },
+    7: {
+        'name': 'Boiling',
+        'description': 'Operate at full load to boil rice',
+        # Keep heating at high temperature. Let rice to receive
+    },
+    8: {
+        'name': 'Warm up rice',
+        'description': 'Temperature control adjustment and cyclic heating '
+                       'achieve combination of taste, dolor and nutrition',
+    },
+    10: {
+        'name': 'High temperature gelatinization',
+        'description': 'High-temperature steam generates crystal clear rice g...',
+    },
+    16: {
+        'name': 'Cooking finished',
+        'description': '',
+    }
+}
 
 
 class CookerException(DeviceException):
@@ -77,6 +107,9 @@ class TemperatureHistory:
 
         Example values:
 
+        Status waiting:
+        0
+
         2 minutes:
         161515161c242a3031302f2eaa2f2f2e2f
 
@@ -96,18 +129,28 @@ class TemperatureHistory:
         Octet 3 (15): Third temperature measurement in hex (21 °C)
         ...
         """
-        self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
+        if not len(data) % 2:
+            self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
+        else:
+            self.data = []
 
     @property
     def temperatures(self) -> List[int]:
         return self.data
 
-    def __str__(self) -> str:
+    @property
+    def raw(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.data])
 
+    def __str__(self) -> str:
+        return str(self.data)
+
     def __repr__(self) -> str:
-        s = "<TemperatureHistory temperatures=%s>" % self.data
+        s = "<TemperatureHistory temperatures=%s>" % str(self.data)
         return s
+
+    def __json__(self):
+        return self.data
 
 
 class CookerCustomizations:
@@ -227,27 +270,49 @@ class CookingStage:
     @property
     def name(self) -> str:
         try:
-            return COOKING_STAGE_NAME[self.state]
-        except IndexError:
-            return 'Cooking finished'
+            return COOKING_STAGES[self.state]['name']
+        except KeyError:
+            return 'Unknown stage'
 
     @property
     def description(self) -> str:
         try:
-            return COOKING_STAGE_DESCRIPTION[self.state]
-        except IndexError:
+            return COOKING_STAGES[self.state]['description']
+        except KeyError:
             return ''
 
-    def __str__(self) -> str:
+    @property
+    def raw(self) -> str:
         return self.stage
 
+    def __str__(self) -> str:
+        s = "name=%s, " \
+            "description=%s, " \
+            "state=%s, " \
+            "rice_id=%s, " \
+            "taste=%s, " \
+            "taste_phase=%s, " \
+            "raw=%s" % \
+            (self.name,
+             self.description,
+             self.state,
+             self.rice_id,
+             self.taste,
+             self.taste_phase,
+             self.raw)
+        return s
+
     def __repr__(self) -> str:
-        s = "<CookingStage state=%s, " \
+        s = "<CookingStage name=%s, " \
+            "description=%s, " \
+            "state=%s, " \
             "rice_id=%s, " \
             "taste=%s, " \
             "taste_phase=%s, " \
             "raw=%s>" % \
-            (self.state,
+            (self.name,
+             self.description,
+             self.state,
              self.rice_id,
              self.taste,
              self.taste_phase,
@@ -518,7 +583,7 @@ class CookerStatus:
     def stage(self) -> Optional[CookingStage]:
         """Current stage if cooking."""
         stage = self.data['stage']
-        if len(stage) == 10 and stage.hexdigits:
+        if len(stage) == 10:
             return CookingStage(stage)
 
         return None
@@ -545,7 +610,7 @@ class CookerStatus:
         Example values: 29, *031e0b23*, 031e0b23031e
         """
         value = self.data['temp']
-        if len(value) == 8 and value.hexdigits:
+        if len(value) == 8:
             return time(hour=int(value[4:6], 16), minute=int(value[6:8], 16))
 
         return None
@@ -599,7 +664,7 @@ class CookerStatus:
     def custom(self) -> Optional[CookerCustomizations]:
         custom = self.data['custom']
 
-        if len(custom) > 31 and custom.hexdigits:
+        if len(custom) > 31:
             return CookerCustomizations(custom)
 
         return None
@@ -660,7 +725,7 @@ class Cooker(Device):
     def status(self) -> CookerStatus:
         """Retrieve properties."""
         properties = ['func', 'menu', 'stage', 'temp', 't_func', 't_precook',
-                      't_cook', 'setting', 'delay', 'version']
+                      't_cook', 'setting', 'delay', 'version', 'favorite', 'custom']
         values = self.send("get_prop", properties)
 
         properties_count = len(properties)
@@ -735,9 +800,12 @@ class Cooker(Device):
         self.send('set_menu', [profile])
 
     @command(
-        default_output=format_output("Temperature history: {result.temperatures}")
+        default_output=format_output(
+            "",
+            "Temperature history: {result}\n"
+        )
     )
-    def get_temperature_history(self) -> Optional[TemperatureHistory]:
+    def get_temperature_history(self) -> TemperatureHistory:
         """Retrieves a temperature history.
 
         The temperature is only available while cooking.
@@ -745,10 +813,7 @@ class Cooker(Device):
         """
         data = self.send('get_temp_history', [])
 
-        if len(data) == 1 and len(data[0]) > 1:
-            return TemperatureHistory(data)
-
-        return None
+        return TemperatureHistory(data[0])
 
     @staticmethod
     def _validate_profile(profile):
