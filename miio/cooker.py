@@ -60,7 +60,8 @@ COOKING_STAGES = {
     },
     8: {
         'name': 'Warm up rice',
-        'description': 'Temperature control adjustment and cyclic heating achieve combination of taste, dolor and nutrition',
+        'description': 'Temperature control adjustment and cyclic heating '
+                       'achieve combination of taste, dolor and nutrition',
     },
     10: {
         'name': 'High temperature gelatinization',
