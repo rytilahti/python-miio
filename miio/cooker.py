@@ -77,6 +77,9 @@ class TemperatureHistory:
 
         Example values:
 
+        Status waiting:
+        0
+
         2 minutes:
         161515161c242a3031302f2eaa2f2f2e2f
 
@@ -96,18 +99,28 @@ class TemperatureHistory:
         Octet 3 (15): Third temperature measurement in hex (21 °C)
         ...
         """
-        self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
+        if not len(data) % 2:
+            self.data = [int(data[i:i + 2], 16) for i in range(0, len(data), 2)]
+        else:
+            self.data = []
 
     @property
     def temperatures(self) -> List[int]:
         return self.data
 
-    def __str__(self) -> str:
+    @property
+    def raw(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.data])
 
+    def __str__(self) -> str:
+        return str(self.data)
+
     def __repr__(self) -> str:
-        s = "<TemperatureHistory temperatures=%s>" % self.data
+        s = "<TemperatureHistory temperatures=%s>" % str(self.data)
         return s
+
+    def __json__(self):
+        return self.data
 
 
 class CookerCustomizations:
@@ -735,9 +748,12 @@ class Cooker(Device):
         self.send('set_menu', [profile])
 
     @command(
-        default_output=format_output("Temperature history: {result.temperatures}")
+        default_output=format_output(
+            "",
+            "Temperature history: {result}\n"
+        )
     )
-    def get_temperature_history(self) -> Optional[TemperatureHistory]:
+    def get_temperature_history(self) -> TemperatureHistory:
         """Retrieves a temperature history.
 
         The temperature is only available while cooking.
@@ -745,10 +761,7 @@ class Cooker(Device):
         """
         data = self.send('get_temp_history', [])
 
-        if len(data) == 1 and len(data[0]) > 1:
-            return TemperatureHistory(data)
-
-        return None
+        return TemperatureHistory(data[0])
 
     @staticmethod
     def _validate_profile(profile):
