@@ -21,7 +21,7 @@ Supported devices
 -  :doc:`Xiaomi Mi Smart WiFi Socket <plug>` (:class:`miio.chuangmi_plug`)
 -  :doc:`Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port) <plug>` (:class:`miio.chuangmi_plug`)
 -  :doc:`Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports) <plug>` (:class:`miio.chuangmi_plug`)
--  Xiaomi Smart Power Strip (WiFi, 6 Ports) (:class:`miio.powerstrip`)
+-  Xiaomi Smart Power Strip V1 and V2 (WiFi, 6 Ports) (:class:`miio.powerstrip`)
 -  :doc:`Xiaomi Philips Eyecare Smart Lamp 2 <eyecare>` (:class:`miio.philips_eyecare`)
 -  :doc:`Xiaomi Philips LED Ceiling Lamp <ceil>` (:class:`miio.ceil`)
 -  Xiaomi Philips LED Ball Lamp (:class:`miio.philips_bulb`)
