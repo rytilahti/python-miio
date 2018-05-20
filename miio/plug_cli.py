@@ -11,7 +11,7 @@ from miio.click_common import (ExceptionHandlerGroup, validate_ip,
                                validate_token, )
 
 _LOGGER = logging.getLogger(__name__)
-pass_dev = click.make_pass_decorator(miio.Plug)
+pass_dev = click.make_pass_decorator(miio.ChuangmiPlug)
 
 
 @click.group(invoke_without_command=True, cls=ExceptionHandlerGroup)
@@ -35,7 +35,7 @@ def cli(ctx, ip: str, token: str, debug: int):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    dev = miio.Plug(ip, token, debug)
+    dev = miio.ChuangmiPlug(ip, token, debug)
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
 
     ctx.obj = dev
