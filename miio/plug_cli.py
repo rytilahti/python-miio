@@ -52,7 +52,7 @@ def discover():
 
 @cli.command()
 @pass_dev
-def status(dev: miio.Plug):
+def status(dev: miio.ChuangmiPlug):
     """Returns the state information."""
     res = dev.status()
     if not res:
@@ -64,14 +64,14 @@ def status(dev: miio.Plug):
 
 @cli.command()
 @pass_dev
-def on(dev: miio.Plug):
+def on(dev: miio.ChuangmiPlug):
     """Power on."""
     click.echo("Power on: %s" % dev.on())
 
 
 @cli.command()
 @pass_dev
-def off(dev: miio.Plug):
+def off(dev: miio.ChuangmiPlug):
     """Power off."""
     click.echo("Power off: %s" % dev.off())
 
@@ -80,7 +80,7 @@ def off(dev: miio.Plug):
 @click.argument('cmd', required=True)
 @click.argument('parameters', required=False)
 @pass_dev
-def raw_command(dev: miio.Plug, cmd, parameters):
+def raw_command(dev: miio.ChuangmiPlug, cmd, parameters):
     """Run a raw command."""
     params = []  # type: Any
     if parameters:
