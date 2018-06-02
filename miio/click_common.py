@@ -218,6 +218,9 @@ class DeviceGroup(click.MultiCommand):
         return command.call(device, *args, **kwargs)
 
     def get_command(self, ctx, cmd_name):
+        if cmd_name not in self.commands:
+            ctx.fail('Unknown command (%s)' % cmd_name)
+
         cmd = self.commands[cmd_name]
         return self.commands[cmd_name].wrap(ctx, self.device_pass(partial(
             self.command_callback, cmd
