@@ -214,8 +214,8 @@ class DeviceGroup(click.MultiCommand):
             kwargs['debug'] = gco.debug
         ctx.obj = self.device_class(*args, **kwargs)
 
-    def command_callback(self, command, device, *args, **kwargs):
-        return command.call(device, *args, **kwargs)
+    def command_callback(self, miio_command, miio_device, *args, **kwargs):
+        return miio_command.call(miio_device, *args, **kwargs)
 
     def get_command(self, ctx, cmd_name):
         cmd = self.commands[cmd_name]
