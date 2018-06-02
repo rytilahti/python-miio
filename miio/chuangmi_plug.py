@@ -116,7 +116,7 @@ class ChuangmiPlug(Device):
     )
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES[self.model].copy()
         values = self.send(
             "get_prop",
             properties
