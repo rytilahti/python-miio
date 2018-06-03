@@ -2,7 +2,7 @@
 
 ## [0.4.0](https://github.com/rytilahti/python-miio/tree/0.4.0)
 
-The highlight of this release is a crisp, unified and scalable command line interface called `miiocli` (thanks @yawor). Each supported device is already integrated to be controlled easily.
+The highlight of this release is a crisp, unified and scalable command line interface called `miiocli` (thanks @yawor). Each supported device of this library is already integrated.
 
 New devices:
 * Xiaomi Mi Smart Electric Rice Cooker (@syssi)
