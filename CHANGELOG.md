@@ -1,5 +1,93 @@
 # Change Log
 
+## [0.4.0](https://github.com/rytilahti/python-miio/tree/0.4.0)
+
+The highlight of this release is a crisp, unified and scalable command line interface called `miiocli` (thanks @yawor). Each supported device of this library is already integrated.
+
+New devices:
+* Xiaomi Mi Smart Electric Rice Cooker (@syssi)
+
+Improvements:
+* Unified and scalable command line interface (@yawor)
+* Air Conditioning Companion: Support for captured infrared commands added (@syssi)
+* Air Conditioning Companion: LED property fixed (@syssi)
+* Air Quality Monitor: Night mode added (@syssi)
+* Chuangi Plug V3 support fixed (@syssi)
+* Pedestal Fan: Improved support of both versions
+* Power Strip: Both versions are fully supported now (@syssi)
+* Vacuum: New commands app\_goto\_target and app\_zoned\_clean added (@ciB89)
+* Vacuum: Carpet mode support (@rytilahti)
+* WiFi Repeater: WiFi roaming and signal strange indicator added (@syssi)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.3.9...0.4.0)
+
+**Implemented enhancements:**
+
+- Extend the Air Quality Monitor PM2.5 support [\#283](https://github.com/rytilahti/python-miio/issues/283)
+- Support for Xiaomi Mi Smart Electric Rice Cooker [\#282](https://github.com/rytilahti/python-miio/issues/282)
+- Improved support of the Xiaomi Smart Fan [\#244](https://github.com/rytilahti/python-miio/issues/244)
+- Extended support of the Philips LED Ceiling Lamp [\#209](https://github.com/rytilahti/python-miio/issues/209)
+- Add JSON output for easier integration with other tools [\#98](https://github.com/rytilahti/python-miio/issues/98)
+- Xiaomi Mi Water Purifier support [\#71](https://github.com/rytilahti/python-miio/issues/71)
+- Xiaomi WiFi Speaker support [\#69](https://github.com/rytilahti/python-miio/issues/69)
+- Air Quality Monitor: Full support of the night mode [\#294](https://github.com/rytilahti/python-miio/pull/294) ([syssi](https://github.com/syssi))
+
+**Fixed bugs:**
+
+- Unable to extract token from Android backup [\#138](https://github.com/rytilahti/python-miio/issues/138)
+- Xiaomi-Philips Eyecare control fail [\#74](https://github.com/rytilahti/python-miio/issues/74)
+- Working with water purifier [\#48](https://github.com/rytilahti/python-miio/issues/48)
+
+**Closed issues:**
+
+- miiocli: Provide an error message for unknown commands [\#327](https://github.com/rytilahti/python-miio/issues/327)
+- miplug status crash [\#326](https://github.com/rytilahti/python-miio/issues/326)
+- IR remote chuangmiir module [\#325](https://github.com/rytilahti/python-miio/issues/325)
+- Qing Mi Smart Power Strip cannot be setup，device id is 04b8824e [\#318](https://github.com/rytilahti/python-miio/issues/318)
+- I can not start mirobo [\#316](https://github.com/rytilahti/python-miio/issues/316)
+- acpartner-v3 [\#312](https://github.com/rytilahti/python-miio/issues/312)
+- Vacuum v1 new firmware [\#305](https://github.com/rytilahti/python-miio/issues/305)
+- Xiaomi Power Strip V1 is unable to handle some V2 properties [\#302](https://github.com/rytilahti/python-miio/issues/302)
+- TypeError: isinstance\(\) arg 2 must be a type or tuple of types [\#296](https://github.com/rytilahti/python-miio/issues/296)
+- Extend the Power Strip support [\#286](https://github.com/rytilahti/python-miio/issues/286)
+- when i try to send a command  [\#277](https://github.com/rytilahti/python-miio/issues/277)
+- Obtain token for given IP address [\#263](https://github.com/rytilahti/python-miio/issues/263)
+- Unable to discover the device  [\#259](https://github.com/rytilahti/python-miio/issues/259)
+- xiaomi vaccum cleaner not responding [\#92](https://github.com/rytilahti/python-miio/issues/92)
+- xiaomi vacuum, manual moving mode: duration definition incorrect [\#62](https://github.com/rytilahti/python-miio/issues/62)
+
+**Merged pull requests:**
+
+- Chuangmi Plug V3: Make a local copy of the available properties [\#330](https://github.com/rytilahti/python-miio/pull/330) ([syssi](https://github.com/syssi))
+- miiocli: Handle unknown commands \(Closes: \#327\) [\#329](https://github.com/rytilahti/python-miio/pull/329) ([syssi](https://github.com/syssi))
+- Fix a name clash of click\_common and the argument "command" [\#328](https://github.com/rytilahti/python-miio/pull/328) ([syssi](https://github.com/syssi))
+- Update README [\#324](https://github.com/rytilahti/python-miio/pull/324) ([syssi](https://github.com/syssi))
+- Migrate miplug cli to the new ChuangmiPlug class \(Fixes: \#296\) [\#323](https://github.com/rytilahti/python-miio/pull/323) ([syssi](https://github.com/syssi))
+- Link to the Home Assistant custom component "xiaomi\_cooker" added [\#320](https://github.com/rytilahti/python-miio/pull/320) ([syssi](https://github.com/syssi))
+- Improve the Xiaomi Rice Cooker support [\#319](https://github.com/rytilahti/python-miio/pull/319) ([syssi](https://github.com/syssi))
+- Air Conditioning Companion: Rewrite a captured command before replay [\#317](https://github.com/rytilahti/python-miio/pull/317) ([syssi](https://github.com/syssi))
+- Air Conditioning Companion: Led property fixed [\#315](https://github.com/rytilahti/python-miio/pull/315) ([syssi](https://github.com/syssi))
+- mDNS names of the cooker fixed [\#314](https://github.com/rytilahti/python-miio/pull/314) ([syssi](https://github.com/syssi))
+- mDNS names of the Air Conditioning Companion \(AC partner\) added [\#313](https://github.com/rytilahti/python-miio/pull/313) ([syssi](https://github.com/syssi))
+- Added new commands app\_goto\_target and app\_zoned\_clean [\#310](https://github.com/rytilahti/python-miio/pull/310) ([ciB89](https://github.com/ciB89))
+- Link to the Home Assistant custom component "xiaomi\_raw" added [\#309](https://github.com/rytilahti/python-miio/pull/309) ([syssi](https://github.com/syssi))
+- Improved support of the Xiaomi Smart Fan [\#306](https://github.com/rytilahti/python-miio/pull/306) ([syssi](https://github.com/syssi))
+- mDNS discovery: Xiaomi Smart Fans added [\#304](https://github.com/rytilahti/python-miio/pull/304) ([syssi](https://github.com/syssi))
+- Xiaomi Power Strip V1 is unable to handle some V2 properties  [\#303](https://github.com/rytilahti/python-miio/pull/303) ([syssi](https://github.com/syssi))
+- mDNS discovery: Additional Philips Candle Light added [\#301](https://github.com/rytilahti/python-miio/pull/301) ([syssi](https://github.com/syssi))
+- Add support for vacuum's carpet mode, which requires a recent firmware version [\#299](https://github.com/rytilahti/python-miio/pull/299) ([rytilahti](https://github.com/rytilahti))
+- Air Conditioning Companion: Extended parsing of model and state [\#297](https://github.com/rytilahti/python-miio/pull/297) ([syssi](https://github.com/syssi))
+- Air Quality Monitor: Type and payload example of the time\_state property updated [\#293](https://github.com/rytilahti/python-miio/pull/293) ([syssi](https://github.com/syssi))
+- WiFi Speaker support improved [\#291](https://github.com/rytilahti/python-miio/pull/291) ([syssi](https://github.com/syssi))
+- Imports optimized [\#290](https://github.com/rytilahti/python-miio/pull/290) ([syssi](https://github.com/syssi))
+- Support of the unified command line interface for all devices [\#289](https://github.com/rytilahti/python-miio/pull/289) ([syssi](https://github.com/syssi))
+- Power Strip support extended by additional attributes [\#288](https://github.com/rytilahti/python-miio/pull/288) ([syssi](https://github.com/syssi))
+- Basic support for Xiaomi Mi Smart Electric Rice Cooker [\#287](https://github.com/rytilahti/python-miio/pull/287) ([syssi](https://github.com/syssi))
+- WiFi Repeater: Wifi roaming and signal strange indicator added [\#285](https://github.com/rytilahti/python-miio/pull/285) ([syssi](https://github.com/syssi))
+- Preparation of release 0.3.9 [\#281](https://github.com/rytilahti/python-miio/pull/281) ([syssi](https://github.com/syssi))
+- Unified and scalable command line interface [\#191](https://github.com/rytilahti/python-miio/pull/191) ([yawor](https://github.com/yawor))
+
+
 ## [0.3.9](https://github.com/rytilahti/python-miio/tree/0.3.9)
 
 This release provides support for some new devices, improved support of existing devices and various fixes.
