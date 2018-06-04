@@ -260,10 +260,14 @@ class Fan(Device):
     def status(self) -> FanStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
-        values = self.send(
-            "get_prop",
-            properties
-        )
+
+        # A single request is limited to 16 properties. Therefore the
+        # properties are divided into multiple requests
+        _props = properties.copy()
+        values = []
+        while _props:
+            values.extend(self.send("get_prop", _props[:15]))
+            _props[:] = _props[15:]
 
         properties_count = len(properties)
         values_count = len(values)
