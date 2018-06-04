@@ -383,6 +383,23 @@ class TestFanV3(TestCase):
         with pytest.raises(FanException):
             self.device.set_direct_speed(101)
 
+    def test_set_natural_speed(self):
+        def natural_speed():
+            return self.device.status().natural_speed
+
+        self.device.set_natural_speed(0)
+        assert natural_speed() == 0
+        self.device.set_natural_speed(1)
+        assert natural_speed() == 1
+        self.device.set_natural_speed(100)
+        assert natural_speed() == 100
+
+        with pytest.raises(FanException):
+            self.device.set_natural_speed(-1)
+
+        with pytest.raises(FanException):
+            self.device.set_natural_speed(101)
+
     def test_set_rotate(self):
         """The method is open-loop. The new state cannot be retrieved."""
         self.device.set_rotate(MoveDirection.Left)
