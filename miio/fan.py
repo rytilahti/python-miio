@@ -175,7 +175,7 @@ class FanStatus:
     @property
     def button_pressed(self) -> Optional[str]:
         """Last pressed button."""
-        if self.data["button_pressed"] is not None:
+        if "button_pressed" in self.data and self.data["button_pressed"] is not None:
             return self.data["button_pressed"]
         return None
 
