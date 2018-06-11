@@ -2,6 +2,7 @@
 
 This file contains common functions for cli tools.
 """
+import ast
 import sys
 if sys.version_info < (3, 5):
     print("To use this script you need python 3.5 or newer, got %s" %
@@ -91,6 +92,16 @@ class EnumType(click.Choice):
             word.pop()
 
         return ("_".join(word)).upper()
+
+
+class LiteralParamType(click.ParamType):
+    name = 'literal'
+
+    def convert(self, value, param, ctx):
+        try:
+            return ast.literal_eval(value)
+        except ValueError:
+            self.fail('%s is not a valid literal' % value, param, ctx)
 
 
 class GlobalContextObject:
