@@ -10,7 +10,7 @@ import click
 import construct
 
 from .click_common import (
-    DeviceGroupMeta, command, format_output,
+    DeviceGroupMeta, command, format_output, LiteralParamType
 )
 from .exceptions import DeviceException, DeviceError
 from .protocol import Message
@@ -289,17 +289,17 @@ class Device(metaclass=DeviceGroupMeta):
             raise DeviceException("No response from the device") from ex
 
     @command(
-        click.argument('cmd', required=True),
-        click.argument('parameters', required=False),
+        click.argument('command', type=str, required=True),
+        click.argument('parameters', type=LiteralParamType(), required=False),
     )
-    def raw_command(self, cmd, params):
+    def raw_command(self, command, parameters):
         """Send a raw command to the device.
         This is mostly useful when trying out commands which are not
         implemented by a given device instance.
 
-        :param str cmd: Command to send
-        :param dict params: Parameters to send"""
-        return self.send(cmd, params)
+        :param str command: Command to send
+        :param dict parameters: Parameters to send"""
+        return self.send(command, parameters)
 
     @command(
         default_output=format_output(
