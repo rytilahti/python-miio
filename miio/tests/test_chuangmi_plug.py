@@ -147,7 +147,7 @@ class TestChuangmiPlugV3(TestCase):
         load_power = self.device._get_load_power().pop(0)
 
         start_state_extended = self.device.start_state.copy()
-        start_state_extended['load_power'] = float(load_power)
+        start_state_extended['load_power'] = load_power
         assert repr(self.state()) == repr(
             ChuangmiPlugStatus(start_state_extended))
 
