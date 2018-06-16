@@ -61,10 +61,10 @@ class ChuangmiPlugStatus:
         return None
 
     @property
-    def load_power(self) -> Optional[int]:
+    def load_power(self) -> Optional[float]:
         """Current power load, if available."""
         if "load_power" in self.data and self.data["load_power"] is not None:
-            return self.data["load_power"]
+            return float(self.data["load_power"])
         return None
 
     @property
@@ -134,7 +134,7 @@ class ChuangmiPlug(Device):
             load_power = self.send("get_power", [])  # Response: [300]
             if len(load_power) == 1:
                 properties.append('load_power')
-                values.append(load_power[0])
+                values.append(load_power[0] * 0.01)
 
         return ChuangmiPlugStatus(
             defaultdict(lambda: None, zip(properties, values)))
