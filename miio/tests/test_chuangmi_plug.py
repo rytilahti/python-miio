@@ -155,7 +155,7 @@ class TestChuangmiPlugV3(TestCase):
         assert self.state().usb_power is True
         assert self.state().temperature == self.device.start_state[
             "temperature"]
-        assert self.state().load_power == float(load_power)
+        assert self.state().load_power == float(load_power * 0.01)
 
     def test_usb_on(self):
         self.device.usb_off()  # ensure off
