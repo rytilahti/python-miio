@@ -78,7 +78,7 @@ class ChuangmiPlugStatus:
         s = "<ChuangmiPlugStatus " \
             "power=%s, " \
             "usb_power=%s, " \
-            "temperature=%s" \
+            "temperature=%s, " \
             "load_power=%s, " \
             "wifi_led=%s>" % \
             (self.power,
