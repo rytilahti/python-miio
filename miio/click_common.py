@@ -210,7 +210,8 @@ class DeviceGroup(click.MultiCommand):
         self.device_class = device_class
         self.device_pass = click.make_pass_decorator(device_class)
 
-        attrs.setdefault('params', self.DEFAULT_PARAMS)
+        # FIXME: Must be made optional for the "discover" command
+        #attrs.setdefault('params', self.DEFAULT_PARAMS)
         attrs.setdefault('callback', click.pass_context(self.group_callback))
         if result_callback_pass_device and callable(result_callback):
             result_callback = self.device_pass(result_callback)

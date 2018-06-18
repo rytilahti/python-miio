@@ -163,8 +163,10 @@ class Device(metaclass=DeviceGroupMeta):
 
         return m
 
-    @staticmethod
-    def discover(addr: str=None) -> Any:
+    @command(
+        default_output=format_output("Discovering"),
+    )
+    def discover(self, addr: str=None) -> Any:
         """Scan for devices in the network.
         This method is used to discover supported devices by sending a
         handshake message to the broadcast address on port 54321.
