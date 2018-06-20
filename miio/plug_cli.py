@@ -47,7 +47,7 @@ def cli(ctx, ip: str, token: str, debug: int):
 @cli.command()
 def discover():
     """Search for plugs in the network."""
-    miio.Plug.discover()
+    miio.ChuangmiPlug.discover()
 
 
 @cli.command()
