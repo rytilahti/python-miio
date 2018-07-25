@@ -36,8 +36,8 @@ AVAILABLE_PROPERTIES_COMMON = [
 AVAILABLE_PROPERTIES = {
     MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON,
-    MODEL_FAN_SA1: ['led', 'angle', 'speed', 'poweroff_time', 'power', 'ac_power', 'angle_enable', 'speed_level',
-                    'natural_level', 'child_lock', 'buzzer', 'led_b', 'use_time'],
+    MODEL_FAN_SA1: ['led', 'angle', 'speed', 'poweroff_time', 'power', 'ac_power', 'angle_enable',
+                    'speed_level', 'natural_level', 'child_lock', 'buzzer', 'led_b', 'use_time'],
 }
 
 
