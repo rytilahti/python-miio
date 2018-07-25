@@ -11,6 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 
 MODEL_FAN_V2 = 'zimi.fan.v2'
 MODEL_FAN_V3 = 'zimi.fan.v3'
+MODEL_FAN_SA1 = 'zimi.fan.sa1'
 
 AVAILABLE_PROPERTIES_COMMON = [
     'temp_dec',
@@ -35,6 +36,8 @@ AVAILABLE_PROPERTIES_COMMON = [
 AVAILABLE_PROPERTIES = {
     MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_SA1: ['led', 'angle', 'speed', 'poweroff_time', 'power', 'ac_power', 'angle_enable', 'speed_level',
+                    'natural_level', 'child_lock', 'buzzer', 'led_b', 'use_time'],
 }
 
 
@@ -66,6 +69,11 @@ class FanStatus:
          'child_lock': 'off', 'buzzer': 'on', 'led_b': 1, 'led': None,
          'natural_enable': None, 'use_time': 0, 'bat_charge': 'complete',
          'bat_state': None, 'button_pressed':'speed'}
+
+        Response of a Fan (zhimi.fan.sa1):
+        {'led': 0, 'angle': 120, 'speed': 277, 'poweroff_time': 0, 'power': 'on',
+         'ac_power': 'on', 'angle_enable': 'off', 'speed_level': 1, 'natural_level': 2,
+         'child_lock': 'off', 'buzzer': 0, 'led_b': 0, 'use_time': 2318}
         """
         self.data = data
 
@@ -80,14 +88,18 @@ class FanStatus:
         return self.power == "on"
 
     @property
-    def humidity(self) -> int:
+    def humidity(self) -> Optional[int]:
         """Current humidity."""
-        return self.data["humidity"]
+        if "humidity" in self.data and self.data["humidity"] is not None:
+            return self.data["humidity"]
+        return None
 
     @property
-    def temperature(self) -> float:
+    def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
-        return self.data["temp_dec"] / 10.0
+        if "temp_dec" in self.data and self.data["temp_dec"] is not None:
+            return self.data["temp_dec"] / 10.0
+        return None
 
     @property
     def led(self) -> Optional[bool]:
@@ -129,14 +141,15 @@ class FanStatus:
         return self.data["angle_enable"] == "on"
 
     @property
-    def battery(self) -> int:
+    def battery(self) -> Optional[int]:
         """Current battery level."""
-        return self.data["battery"]
+        if "battery" in self.data and self.data["battery"] is not None:
+            return self.data["battery"]
 
     @property
     def battery_charge(self) -> Optional[str]:
         """State of the battery charger, if available."""
-        if self.data["bat_charge"] is not None:
+        if "bat_charge" in self.data and self.data["bat_charge"] is not None:
             return self.data["bat_charge"]
         return None
 
