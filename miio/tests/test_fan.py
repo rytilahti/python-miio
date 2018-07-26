@@ -4,7 +4,7 @@ import pytest
 
 from miio import Fan
 from miio.fan import (MoveDirection, LedBrightness, FanStatus, FanException,
-                      MODEL_FAN_V2, MODEL_FAN_V3, )
+                      MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1)
 from .dummies import DummyDevice
 
 
@@ -365,6 +365,215 @@ class TestFanV3(TestCase):
 
         self.device.state["button_pressed"] = None
         assert self.state().button_pressed is None
+
+    def test_set_direct_speed(self):
+        def direct_speed():
+            return self.device.status().direct_speed
+
+        self.device.set_direct_speed(0)
+        assert direct_speed() == 0
+        self.device.set_direct_speed(1)
+        assert direct_speed() == 1
+        self.device.set_direct_speed(100)
+        assert direct_speed() == 100
+
+        with pytest.raises(FanException):
+            self.device.set_direct_speed(-1)
+
+        with pytest.raises(FanException):
+            self.device.set_direct_speed(101)
+
+    def test_set_natural_speed(self):
+        def natural_speed():
+            return self.device.status().natural_speed
+
+        self.device.set_natural_speed(0)
+        assert natural_speed() == 0
+        self.device.set_natural_speed(1)
+        assert natural_speed() == 1
+        self.device.set_natural_speed(100)
+        assert natural_speed() == 100
+
+        with pytest.raises(FanException):
+            self.device.set_natural_speed(-1)
+
+        with pytest.raises(FanException):
+            self.device.set_natural_speed(101)
+
+    def test_set_rotate(self):
+        """The method is open-loop. The new state cannot be retrieved."""
+        self.device.set_rotate(MoveDirection.Left)
+        self.device.set_rotate(MoveDirection.Right)
+
+    def test_set_angle(self):
+        """This test doesn't implement the real behaviour of the device may be.
+
+        The property "angle" doesn't provide the current setting.
+        It's a measurement of the current position probably.
+        """
+        def angle():
+            return self.device.status().angle
+
+        self.device.set_angle(0)  # TODO: Is this value allowed?
+        assert angle() == 0
+        self.device.set_angle(1)  # TODO: Is this value allowed?
+        assert angle() == 1
+        self.device.set_angle(30)
+        assert angle() == 30
+        self.device.set_angle(60)
+        assert angle() == 60
+        self.device.set_angle(90)
+        assert angle() == 90
+        self.device.set_angle(120)
+        assert angle() == 120
+
+        with pytest.raises(FanException):
+            self.device.set_angle(-1)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(121)
+
+    def test_set_oscillate(self):
+        def oscillate():
+            return self.device.status().oscillate
+
+        self.device.set_oscillate(True)
+        assert oscillate() is True
+
+        self.device.set_oscillate(False)
+        assert oscillate() is False
+
+    def test_set_led_brightness(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led_brightness(LedBrightness.Bright)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led_brightness(LedBrightness.Dim)
+        assert led_brightness() == LedBrightness.Dim
+
+        self.device.set_led_brightness(LedBrightness.Off)
+        assert led_brightness() == LedBrightness.Off
+
+    def test_set_buzzer(self):
+        def buzzer():
+            return self.device.status().buzzer
+
+        self.device.set_buzzer(True)
+        assert buzzer() is True
+
+        self.device.set_buzzer(False)
+        assert buzzer() is False
+
+    def test_set_child_lock(self):
+        def child_lock():
+            return self.device.status().child_lock
+
+        self.device.set_child_lock(True)
+        assert child_lock() is True
+
+        self.device.set_child_lock(False)
+        assert child_lock() is False
+
+    def test_delay_off(self):
+        def delay_off_countdown():
+            return self.device.status().delay_off_countdown
+
+        self.device.delay_off(100)
+        assert delay_off_countdown() == 100
+        self.device.delay_off(200)
+        assert delay_off_countdown() == 200
+
+        with pytest.raises(FanException):
+            self.device.delay_off(-1)
+
+        with pytest.raises(FanException):
+            self.device.delay_off(0)
+
+
+class DummyFanSA1(DummyDevice, Fan):
+    def __init__(self, *args, **kwargs):
+        self.model = MODEL_FAN_SA1
+        self.state = {
+            'led': 0,
+            'angle': 120,
+            'speed': 277,
+            'poweroff_time': 0,
+            'power': 'on',
+            'ac_power': 'on',
+            'angle_enable': 'off',
+            'speed_level': 1,
+            'natural_level': 2,
+            'child_lock': 'off',
+            'buzzer': 0,
+            'led_b': 0,
+            'use_time': 2318
+        }
+
+        self.return_values = {
+            'get_prop': self._get_state,
+            'set_power': lambda x: self._set_state("power", x),
+            'set_speed_level': lambda x: self._set_state("speed_level", x),
+            'set_natural_level': lambda x: self._set_state("natural_level", x),
+            'set_move': lambda x: True,
+            'set_angle': lambda x: self._set_state("angle", x),
+            'set_angle_enable': lambda x: self._set_state("angle_enable", x),
+            'set_led_b': lambda x: self._set_state("led_b", x),
+            'set_led': lambda x: self._set_state("led", x),
+            'set_buzzer': lambda x: self._set_state("buzzer", x),
+            'set_child_lock': lambda x: self._set_state("child_lock", x),
+            'set_poweroff_time': lambda x: self._set_state("poweroff_time", x),
+        }
+        super().__init__(args, kwargs)
+
+
+@pytest.fixture(scope="class")
+def fansa1(request):
+    request.cls.device = DummyFanSA1()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("fansa1")
+class TestFanSA1(TestCase):
+    def is_on(self):
+        return self.device.status().is_on
+
+    def state(self):
+        return self.device.status()
+
+    def test_on(self):
+        self.device.off()  # ensure off
+        assert self.is_on() is False
+
+        self.device.on()
+        assert self.is_on() is True
+
+    def test_off(self):
+        self.device.on()  # ensure on
+        assert self.is_on() is True
+
+        self.device.off()
+        assert self.is_on() is False
+
+    def test_status(self):
+        self.device._reset_state()
+
+        assert repr(self.state()) == repr(FanStatus(self.device.start_state))
+
+        assert self.is_on() is True
+        assert self.state().angle == self.device.start_state["angle"]
+        assert self.state().speed == self.device.start_state["speed"]
+        assert self.state().delay_off_countdown == self.device.start_state["poweroff_time"]
+        assert self.state().ac_power is (self.device.start_state["ac_power"] == 'on')
+        assert self.state().oscillate is (self.device.start_state["angle_enable"] == 'on')
+        assert self.state().direct_speed == self.device.start_state["speed_level"]
+        assert self.state().natural_speed == self.device.start_state["natural_level"]
+        assert self.state().child_lock is (self.device.start_state["child_lock"] == 'on')
+        assert self.state().buzzer is (self.device.start_state["buzzer"] == 'on')
+        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
+        assert self.state().led == self.device.start_state["led"]
+        assert self.state().use_time == self.device.start_state["use_time"]
 
     def test_set_direct_speed(self):
         def direct_speed():
