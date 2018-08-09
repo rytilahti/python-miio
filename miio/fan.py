@@ -36,7 +36,7 @@ AVAILABLE_PROPERTIES_COMMON = [
 AVAILABLE_PROPERTIES = {
     MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON,
-    MODEL_FAN_SA1: ['led', 'angle', 'speed', 'poweroff_time', 'power', 'ac_power', 'angle_enable',
+    MODEL_FAN_SA1: ['angle', 'speed', 'poweroff_time', 'power', 'ac_power', 'angle_enable',
                     'speed_level', 'natural_level', 'child_lock', 'buzzer', 'led_b', 'use_time'],
 }
 
@@ -71,7 +71,7 @@ class FanStatus:
          'bat_state': None, 'button_pressed':'speed'}
 
         Response of a Fan (zhimi.fan.sa1):
-        {'led': 0, 'angle': 120, 'speed': 277, 'poweroff_time': 0, 'power': 'on',
+        {'angle': 120, 'speed': 277, 'poweroff_time': 0, 'power': 'on',
          'ac_power': 'on', 'angle_enable': 'off', 'speed_level': 1, 'natural_level': 2,
          'child_lock': 'off', 'buzzer': 0, 'led_b': 0, 'use_time': 2318}
         """
@@ -118,7 +118,7 @@ class FanStatus:
     @property
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
-        return self.data["buzzer"] == "on"
+        return self.data["buzzer"] in ["on", 1, 2]
 
     @property
     def child_lock(self) -> bool:
@@ -353,8 +353,8 @@ class Fan(Device):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on oscillate"
-            if lock else "Turning off oscillate"
+            lambda oscillate: "Turning on oscillate"
+            if oscillate else "Turning off oscillate"
         )
     )
     def set_oscillate(self, oscillate: bool):
@@ -381,7 +381,7 @@ class Fan(Device):
         )
     )
     def set_led(self, led: bool):
-        """Turn led on/off."""
+        """Turn led on/off. Not supported by model SA1."""
         if led:
             return self.send("set_led", ['on'])
         else:
@@ -396,6 +396,12 @@ class Fan(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
+        if MODEL_FAN_SA1:
+            if buzzer:
+                return self.send("set_buzzer", [2])
+            else:
+                return self.send("set_buzzer", [0])
+
         if buzzer:
             return self.send("set_buzzer", ["on"])
         else:

@@ -496,7 +496,6 @@ class DummyFanSA1(DummyDevice, Fan):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_FAN_SA1
         self.state = {
-            'led': 0,
             'angle': 120,
             'speed': 277,
             'poweroff_time': 0,
@@ -520,7 +519,6 @@ class DummyFanSA1(DummyDevice, Fan):
             'set_angle': lambda x: self._set_state("angle", x),
             'set_angle_enable': lambda x: self._set_state("angle_enable", x),
             'set_led_b': lambda x: self._set_state("led_b", x),
-            'set_led': lambda x: self._set_state("led", x),
             'set_buzzer': lambda x: self._set_state("buzzer", x),
             'set_child_lock': lambda x: self._set_state("child_lock", x),
             'set_poweroff_time': lambda x: self._set_state("poweroff_time", x),
@@ -572,7 +570,7 @@ class TestFanSA1(TestCase):
         assert self.state().child_lock is (self.device.start_state["child_lock"] == 'on')
         assert self.state().buzzer is (self.device.start_state["buzzer"] == 'on')
         assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
-        assert self.state().led == self.device.start_state["led"]
+        assert self.state().led is None
         assert self.state().use_time == self.device.start_state["use_time"]
 
     def test_set_direct_speed(self):
