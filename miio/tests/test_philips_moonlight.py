@@ -10,7 +10,7 @@ from .dummies import DummyDevice
 class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
     def __init__(self, *args, **kwargs):
         self.state = {
-            'pow': 'off',
+            'pow': 'on',
             'sta': 0,
             'bri': 1,
             'rgb': 16741971,
@@ -26,12 +26,12 @@ class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
         }
         self.return_values = {
             'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_bright': lambda x: self._set_state("bright", x),
+            'set_power': lambda x: self._set_state("pow", x),
+            'set_bright': lambda x: self._set_state("bri", x),
             'set_cct': lambda x: self._set_state("cct", x),
             'apply_fixed_scene': lambda x: self._set_state("snm", x),
             'set_bricct': lambda x: (
-                self._set_state('bright', [x[0]]),
+                self._set_state('bri', [x[0]]),
                 self._set_state('cct', [x[1]])
             )
         }
