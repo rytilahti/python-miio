@@ -50,6 +50,41 @@ class PhilipsMoonlightStatus:
     def scene(self) -> int:
         return self.data["snm"]
 
+    @property
+    def sleep_assistant(self) -> int:
+        """
+        Example values:
+
+        0: Unknown
+        1: Unknown
+        2: Sleep assistant enabled
+        3: Awake
+        """
+        return self.data["sta"]
+
+    @property
+    def sleep_off_time(self) -> int:
+        return self.data["spr"]
+
+    @property
+    def total_assistant_sleep_time(self) -> int:
+        return self.data["spt"]
+
+    @property
+    def brand_sleep(self) -> bool:
+        # sp_sleep_open?
+        return self.data["ms"] == 1
+
+    @property
+    def brand(self) -> bool:
+        # sp_xm_bracelet?
+        return self.data["mb"] == 1
+
+    @property
+    def wake_up_time(self) -> [int, int, int]:
+        # Example: [weekdays?, hour, minute]
+        return self.data["wkp"]
+
     def __repr__(self) -> str:
         s = "<PhilipsMoonlightStatus power=%s, " \
             "brightness=%s, " \
