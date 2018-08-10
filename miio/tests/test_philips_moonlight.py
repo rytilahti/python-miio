@@ -34,6 +34,10 @@ class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
             'set_bricct': lambda x: (
                 self._set_state('bri', [x[0]]),
                 self._set_state('cct', [x[1]])
+            ),
+            'set_brirgb': lambda x: (
+                self._set_state('bri', [x[0]]),
+                self._set_state('rgb', [x[1]])
             )
         }
         super().__init__(args, kwargs)
@@ -167,6 +171,38 @@ class TestPhilipsMoonlight(TestCase):
 
         with pytest.raises(PhilipsMoonlightException):
             self.device.set_brightness_and_color_temperature(10, 101)
+
+    def test_set_brightness_and_rgb(self):
+        def brightness():
+            return self.device.status().brightness
+
+        def rgb():
+            return self.device.status().rgb
+
+        self.device.set_brightness_and_rgb(20, 0)
+        assert brightness() == 20
+        assert rgb() == 0
+        self.device.set_brightness_and_rgb(31, 16711680)
+        assert brightness() == 31
+        assert rgb() == 16711680
+        self.device.set_brightness_and_rgb(100, 16777215)
+        assert brightness() == 100
+        assert rgb() == 16777215
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_brightness_and_rgb(-1, 10)
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_brightness_and_rgb(10, -1)
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_brightness_and_rgb(0, 10)
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_brightness_and_rgb(101, 10)
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_brightness_and_rgb(10, 16777216)
 
     def test_set_scene(self):
         def scene():

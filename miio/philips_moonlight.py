@@ -92,8 +92,7 @@ class PhilipsMoonlight(Device):
     go_night                        # Night light / read mode
     get_wakeup_time
     enable_bl                       # Night light
-    set_brirgb                      # Brightness & RGB
- 
+
     """
 
     @command(
@@ -187,6 +186,22 @@ class PhilipsMoonlight(Device):
             raise PhilipsMoonlightException("Invalid color temperature: %s" % cct)
 
         return self.send("set_bricct", [brightness, cct])
+
+    @command(
+        click.argument("brightness", type=int),
+        click.argument("rgb", type=int),
+        default_output=format_output(
+            "Setting brightness to {brightness} and color to {rgb}")
+    )
+    def set_brightness_and_rgb(self, brightness: int, rgb: int):
+        """Set brightness level and the color."""
+        if brightness < 1 or brightness > 100:
+            raise PhilipsMoonlightException("Invalid brightness: %s" % brightness)
+
+        if rgb < 0 or rgb > 16777215:
+            raise PhilipsMoonlightException("Invalid color: %s" % rgb)
+
+        return self.send("set_brirgb", [brightness, rgb])
 
     @command(
         click.argument("number", type=int),
