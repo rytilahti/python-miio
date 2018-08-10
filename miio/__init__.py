@@ -1,5 +1,6 @@
 # flake8: noqa
 from miio.airconditioningcompanion import AirConditioningCompanion
+from miio.airfresh import AirFresh
 from miio.airhumidifier import AirHumidifier
 from miio.airpurifier import AirPurifier
 from miio.airqualitymonitor import AirQualityMonitor
