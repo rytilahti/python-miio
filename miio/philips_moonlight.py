@@ -101,6 +101,7 @@ class PhilipsMoonlight(Device):
             "Power: {result.power}\n"
             "Brightness: {result.brightness}\n"
             "Color temperature: {result.color_temperature}\n"
+            "RGB: {result.rgb}\n"
             "Scene: {result.scene}\n"
         )
     )
