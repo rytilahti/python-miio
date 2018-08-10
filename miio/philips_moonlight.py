@@ -43,14 +43,24 @@ class PhilipsMoonlightStatus:
         return self.data["cct"]
 
     @property
+    def rgb(self) -> int:
+        return self.data["rgb"]
+
+    @property
     def scene(self) -> int:
         return self.data["snm"]
 
     def __repr__(self) -> str:
-        s = "<PhilipsMoonlightStatus power=%s, brightness=%s, " \
-            "color_temperature=%s, scene=%s>" % \
-            (self.power, self.brightness,
-             self.color_temperature, self.scene)
+        s = "<PhilipsMoonlightStatus power=%s, " \
+            "brightness=%s, " \
+            "color_temperature=%s, " \
+            "rgb=%s, " \
+            "scene=%s>" % \
+            (self.power,
+             self.brightness,
+             self.color_temperature,
+             self.rgb,
+             self.scene)
         return s
 
     def __json__(self):
@@ -83,8 +93,7 @@ class PhilipsMoonlight(Device):
     get_wakeup_time
     enable_bl                       # Night light
     set_brirgb                      # Brightness & RGB
-    set_rgb                         # RGB
-
+ 
     """
 
     @command(
@@ -129,6 +138,17 @@ class PhilipsMoonlight(Device):
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
+
+    @command(
+        click.argument("rgb", type=int),
+        default_output=format_output("Setting color to {rgb}")
+    )
+    def set_rgb(self, rgb):
+        """Set color in encoded RGB."""
+        if rgb < 0 or rgb > 16777215:
+            raise PhilipsMoonlightException("Invalid color: %s" % rgb)
+
+        return self.send("set_rgb", [rgb])
 
     @command(
         click.argument("level", type=int),
