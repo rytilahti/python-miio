@@ -276,11 +276,17 @@ class Fan(Device):
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
+        _props_per_request = 15
+
+        # The SA1 is limited to a single property per request
+        if self.model == MODEL_FAN_SA1:
+            _props_per_request = 1
+
         _props = properties.copy()
         values = []
         while _props:
-            values.extend(self.send("get_prop", _props[:15]))
-            _props[:] = _props[15:]
+            values.extend(self.send("get_prop", _props[:_props_per_request]))
+            _props[:] = _props[_props_per_request:]
 
         properties_count = len(properties)
         values_count = len(values)
@@ -396,7 +402,7 @@ class Fan(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        if MODEL_FAN_SA1:
+        if self.model == MODEL_FAN_SA1:
             if buzzer:
                 return self.send("set_buzzer", [2])
             else:
