@@ -126,14 +126,16 @@ class FanStatus:
         return self.data["child_lock"] == "on"
 
     @property
-    def natural_speed(self) -> int:
+    def natural_speed(self) -> Optional[int]:
         """Speed level in natural mode."""
-        return self.data["natural_level"]
+        if "natural_level" in self.data and self.data["natural_level"] is not None:
+            return self.data["natural_level"]
 
     @property
-    def direct_speed(self) -> int:
+    def direct_speed(self) -> Optional[int]:
         """Speed level in direct mode."""
-        return self.data["speed_level"]
+        if "speed_level" in self.data and self.data["speed_level"] is not None:
+            return self.data["speed_level"]
 
     @property
     def oscillate(self) -> bool:
