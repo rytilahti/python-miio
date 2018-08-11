@@ -264,11 +264,11 @@ class Fan(Device):
             "LED brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
             "Child lock: {result.child_lock}\n"
-            "Natural level: {result.natural_level}\n"
-            "Speed level: {result.speed_level}\n"
+            "Speed: {result.speed}\n"
+            "Natural speed: {result.natural_speed}\n"
+            "Direct speed: {result.direct_speed}\n"
             "Oscillate: {result.oscillate}\n"
             "Power-off time: {result.poweroff_time}\n"
-            "Speed: {result.speed}\n"
             "Angle: {result.angle}\n"
         )
     )
