@@ -268,7 +268,7 @@ class Fan(Device):
             "Natural speed: {result.natural_speed}\n"
             "Direct speed: {result.direct_speed}\n"
             "Oscillate: {result.oscillate}\n"
-            "Power-off time: {result.delay_off_countdown(self)}\n"
+            "Power-off time: {result.delay_off_countdown}\n"
             "Angle: {result.angle}\n"
         )
     )
