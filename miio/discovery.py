@@ -14,7 +14,7 @@ from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
 
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
-from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, )
+from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, )
 from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
 _LOGGER = logging.getLogger(__name__)
