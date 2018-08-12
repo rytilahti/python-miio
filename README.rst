@@ -34,6 +34,7 @@ Supported devices
 -  Xiaomi Smart WiFi Speaker (:class:`miio.wifispeaker`) (incomplete, please `feel free to help improve the support <https://github.com/rytilahti/python-miio/issues/69>`__)
 -  Xiaomi Mi WiFi Repeater 2 (:class:`miio.wifirepeater`)
 -  Xiaomi Mi Smart Rice Cooker (:class:`miio.cooker`)
+-  Xiaomi Smartmi Fresh Air System (:class:`miio.airfresh`)
 -  Yeelight light bulbs (:class:`miio.yeelight`) (only a very rudimentary support, use `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__ for a more complete support)
 
 *Feel free to create a pull request to add support for new devices as
