@@ -16,7 +16,7 @@ class AirFreshException(DeviceException):
 
 
 class OperationMode(enum.Enum):
-    # Supported modes of the Air Fresh VA2
+    # Supported modes of the Air Fresh VA2 (zhimi.airfresh.va2)
     Auto = 'auto'
     Silent = 'silent'
     Interval = 'interval'
