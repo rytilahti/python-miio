@@ -87,6 +87,7 @@ class AirFreshStatus:
             try:
                 return LedBrightness(self.data["led_level"])
             except ValueError:
+                _LOGGER.error("Unsupported LED brightness discarded: %s", self.data["led_level"])
                 return None
 
         return None
