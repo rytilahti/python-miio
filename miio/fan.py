@@ -12,16 +12,14 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_FAN_V2 = 'zimi.fan.v2'
 MODEL_FAN_V3 = 'zimi.fan.v3'
 MODEL_FAN_SA1 = 'zimi.fan.sa1'
+MODEL_FAN_ZA1 = 'zimi.fan.za1'
 
 AVAILABLE_PROPERTIES_COMMON = [
-    'temp_dec',
-    'humidity',
     'angle',
     'speed',
     'poweroff_time',
     'power',
     'ac_power',
-    'battery',
     'angle_enable',
     'speed_level',
     'natural_level',
@@ -29,15 +27,21 @@ AVAILABLE_PROPERTIES_COMMON = [
     'buzzer',
     'led_b',
     'use_time',
-    'bat_charge',
-    'button_pressed',
 ]
 
+AVAILABLE_PROPERTIES_COMMON_V2_V3 = [
+    'temp_dec',
+    'humidity',
+    'battery',
+    'bat_charge',
+    'button_pressed',
+] + AVAILABLE_PROPERTIES_COMMON
+
 AVAILABLE_PROPERTIES = {
-    MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON,
-    MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON,
-    MODEL_FAN_SA1: ['angle', 'speed', 'poweroff_time', 'power', 'ac_power', 'angle_enable',
-                    'speed_level', 'natural_level', 'child_lock', 'buzzer', 'led_b', 'use_time'],
+    MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON_V2_V3,
+    MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON_V2_V3,
+    MODEL_FAN_SA1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_ZA1: AVAILABLE_PROPERTIES_COMMON,
 }
 
 
@@ -280,8 +284,8 @@ class Fan(Device):
         # properties are divided into multiple requests
         _props_per_request = 15
 
-        # The SA1 is limited to a single property per request
-        if self.model == MODEL_FAN_SA1:
+        # The SA1 and ZA1 is limited to a single property per request
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1]:
             _props_per_request = 1
 
         _props = properties.copy()
@@ -404,7 +408,7 @@ class Fan(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        if self.model == MODEL_FAN_SA1:
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1]:
             if buzzer:
                 return self.send("set_buzzer", [2])
             else:
@@ -456,3 +460,10 @@ class FanSA1(Fan):
                  debug: int = 0, lazy_discover: bool = True) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover,
                          model=MODEL_FAN_SA1)
+
+
+class FanZA1(Fan):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_FAN_ZA1)
