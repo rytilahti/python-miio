@@ -35,7 +35,7 @@ AVAILABLE_PROPERTIES_COMMON_V2_V3 = [
     'battery',
     'bat_charge',
     'button_pressed',
-]
+] + AVAILABLE_PROPERTIES_COMMON
 
 AVAILABLE_PROPERTIES = {
     MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON_V2_V3,
