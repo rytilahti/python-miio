@@ -68,6 +68,7 @@ DEVICE_MAP = {
     "zhimi-fan-v2": partial(Fan, model=MODEL_FAN_V2),
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
+    "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
     "zhimi-airfresh-va2": AirFresh,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")

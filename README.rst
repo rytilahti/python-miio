@@ -27,7 +27,7 @@ Supported devices
 -  Xiaomi Philips LED Ball Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR) (:class:`miio.chuangmi_ir`)
--  Xiaomi Mi Smart Pedestal Fan V2, V3 and SA1 (:class:`miio.fan`)
+-  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1 and ZA1 (:class:`miio.fan`)
 -  Xiaomi Mi Air Humidifier (:class:`miio.airhumidifier`)
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off) (:class:`miio.waterpurifier`)
 -  Xiaomi PM2.5 Air Quality Monitor (:class:`miio.airqualitymonitor`)
