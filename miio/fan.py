@@ -9,10 +9,10 @@ from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_FAN_V2 = 'zimi.fan.v2'
-MODEL_FAN_V3 = 'zimi.fan.v3'
-MODEL_FAN_SA1 = 'zimi.fan.sa1'
-MODEL_FAN_ZA1 = 'zimi.fan.za1'
+MODEL_FAN_V2 = 'zhimi.fan.v2'
+MODEL_FAN_V3 = 'zhimi.fan.v3'
+MODEL_FAN_SA1 = 'zhimi.fan.sa1'
+MODEL_FAN_ZA1 = 'zhimi.fan.za1'
 
 AVAILABLE_PROPERTIES_COMMON = [
     'angle',
