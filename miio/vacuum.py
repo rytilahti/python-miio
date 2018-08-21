@@ -15,7 +15,7 @@ from appdirs import user_cache_dir
 from .click_common import (
     DeviceGroup, command, GlobalContextObject,
 )
-from .device import Device, DeviceException
+from .device import Device, DeviceException, LiteralParamType
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                CleaningSummary, CleaningDetails, Timer,
                                SoundStatus, SoundInstallStatus, CarpetModeStatus)
@@ -84,45 +84,11 @@ class Vacuum(Device):
         return self.send("app_goto_target", [x_coord, y_coord])
 
     @command(
-        click.argument("x1_coord", type=int),
-        click.argument("y1_coord", type=int),
-        click.argument("x2_coord", type=int),
-        click.argument("y2_coord", type=int),
-        click.argument("iterations", type=int),
-    )
-    def zoned_clean(self, x1_coord: int, y1_coord: int,
-                    x2_coord: int, y2_coord: int, iterations: int):
-        """Clean a zoned area.
-        :param int x1_coord: x1 coordinate bottom left corner
-        :param int y1_coord: y1 coordinate bottom left corner
-        :param int x2_coord: x2 coordinate top right corner
-        :param int y2_coord: y2 coordinate top right corner
-        :param int iterations: How many times the zone should be cleaned"""
-        return self.send("app_zoned_clean",
-                         [x1_coord, y1_coord, x2_coord, y2_coord, iterations])
-
-    @command(
-        click.argument("x_coord", type=int),
-        click.argument("y_coord", type=int),
-    )
-    def goto(self, x_coord: int, y_coord: int):
-        """Go to specific target.
-        :param int x_coord: x coordinate
-        :param int y_coord: y coordinate"""
-        return self.send("app_goto_target",
-                         [x_coord, y_coord])
-
-    @command(
-        click.argument("zones"),
+        click.argument("zones", type=LiteralParamType(), required=True),
     )
     def zoned_clean(self, zones: List):
         """Cleans zoned areas.
-        :Enter a list of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]
-        :param int x1: x1 coordinate bottom left corner
-        :param int y1: y1 coordinate bottom left corner
-        :param int x2: x2 coordinate top right corner
-        :param int y2: y2 coordinate top right corner
-        :param int iterations: How many times the zone should be cleaned"""
+        :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]"""
         return self.send("app_zoned_clean", zones)
 
     @command()
