@@ -12,6 +12,7 @@ from miio.device import Device, DeviceException
 from miio.fan import (Fan, FanV2, FanSA1)
 from miio.philips_bulb import PhilipsBulb
 from miio.philips_eyecare import PhilipsEyecare
+from miio.philips_moonlight import PhilipsMoonlight
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.vacuum import Vacuum, VacuumException

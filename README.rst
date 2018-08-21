@@ -26,6 +26,7 @@ Supported devices
 -  :doc:`Xiaomi Philips LED Ceiling Lamp <ceil>` (:class:`miio.ceil`)
 -  Xiaomi Philips LED Ball Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp (:class:`miio.philips_bulb`)
+-  Xiaomi Philips Zhirui Bedroom Smart Lamp (:class:`miio.philips_moonlight`)
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR) (:class:`miio.chuangmi_ir`)
 -  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1 and ZA1 (:class:`miio.fan`)
 -  Xiaomi Mi Air Humidifier (:class:`miio.airhumidifier`)

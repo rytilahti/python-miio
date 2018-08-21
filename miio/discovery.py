@@ -8,9 +8,9 @@ from typing import Union, Callable, Dict, Optional  # noqa: F401
 import zeroconf
 
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, Ceil,
-               PhilipsBulb, PhilipsEyecare, ChuangmiIr, AirHumidifier,
-               WaterPurifier, WifiSpeaker, WifiRepeater, Yeelight, Fan, Cooker,
-               AirConditioningCompanion)
+               PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
+               AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
+               Yeelight, Fan, Cooker, AirConditioningCompanion)
 
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
@@ -51,6 +51,7 @@ DEVICE_MAP = {
     "philips-light-ceiling": Ceil,
     "philips-light-zyceiling": Ceil,
     "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
+    "philips-light-moonlight": PhilipsMoonlight,  # name needs to be checked
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
