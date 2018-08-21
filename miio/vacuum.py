@@ -13,7 +13,7 @@ import pytz
 from appdirs import user_cache_dir
 
 from .click_common import (
-    DeviceGroup, command, GlobalContextObject,
+    DeviceGroup, command, GlobalContextObject, LiteralParamType
 )
 from .device import Device, DeviceException
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
@@ -81,26 +81,15 @@ class Vacuum(Device):
         """Go to specific target.
         :param int x_coord: x coordinate
         :param int y_coord: y coordinate"""
-        return self.send("app_goto_target",
-                         [x_coord, y_coord])
+        return self.send("app_goto_target", [x_coord, y_coord])
 
     @command(
-        click.argument("x1_coord", type=int),
-        click.argument("y1_coord", type=int),
-        click.argument("x2_coord", type=int),
-        click.argument("y2_coord", type=int),
-        click.argument("iterations", type=int),
+        click.argument("zones", type=LiteralParamType(), required=True),
     )
-    def zoned_clean(self, x1_coord: int, y1_coord: int,
-                    x2_coord: int, y2_coord: int, iterations: int):
-        """Clean a zoned area.
-        :param int x1_coord: x1 coordinate bottom left corner
-        :param int y1_coord: y1 coordinate bottom left corner
-        :param int x2_coord: x2 coordinate top right corner
-        :param int y2_coord: y2 coordinate top right corner
-        :param int iterations: How many times the zone should be cleaned"""
-        return self.send("app_zoned_clean",
-                         [x1_coord, y1_coord, x2_coord, y2_coord, iterations])
+    def zoned_clean(self, zones: List):
+        """Clean zones.
+        :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]"""
+        return self.send("app_zoned_clean", zones)
 
     @command()
     def manual_start(self):
