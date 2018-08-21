@@ -7,7 +7,7 @@ import sys
 import threading
 import time
 from pprint import pformat as pf
-from typing import Any  # noqa: F401
+from typing import Any, List  # noqa: F401
 
 import click
 import pretty_cron
@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 import miio  # noqa: E402
 from miio.click_common import (ExceptionHandlerGroup, validate_ip,
-                               validate_token, )
+                               validate_token, LiteralParamType)
 from .device import UpdateState
 from .updater import OneShotServer
 
@@ -199,16 +199,19 @@ def home(vac: miio.Vacuum):
 
 @cli.command()
 @pass_dev
-def goto(vac: miio.Vacuum):
-    """Going to target."""
-    click.echo("Going to target : %s" % vac.goto())
+@click.argument('x_coord', type=int)
+@click.argument('y_coord', type=int)
+def goto(vac: miio.Vacuum, x_coord: int, y_coord: int):
+    """Go to specific target."""
+    click.echo("Going to target : %s" % vac.goto(x_coord, y_coord))
 
 
 @cli.command()
 @pass_dev
-def zoned_clean(vac: miio.Vacuum):
-    """Cleaning zone(s)."""
-    click.echo("Cleaning zone(s) : %s" % vac.zoned_clean())
+@click.argument("zones", type=LiteralParamType(), required=True)
+def zoned_clean(vac: miio.Vacuum, zones: List):
+    """Clean zone."""
+    click.echo("Cleaning zone(s) : %s" % vac.zoned_clean(zones))
 
 @cli.group()
 @pass_dev

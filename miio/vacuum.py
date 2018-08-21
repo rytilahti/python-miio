@@ -13,9 +13,9 @@ import pytz
 from appdirs import user_cache_dir
 
 from .click_common import (
-    DeviceGroup, command, GlobalContextObject,
+    DeviceGroup, command, GlobalContextObject, LiteralParamType
 )
-from .device import Device, DeviceException, LiteralParamType
+from .device import Device, DeviceException
 from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
                                CleaningSummary, CleaningDetails, Timer,
                                SoundStatus, SoundInstallStatus, CarpetModeStatus)
@@ -87,7 +87,7 @@ class Vacuum(Device):
         click.argument("zones", type=LiteralParamType(), required=True),
     )
     def zoned_clean(self, zones: List):
-        """Cleans zoned areas.
+        """Clean zones.
         :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]"""
         return self.send("app_zoned_clean", zones)
 
