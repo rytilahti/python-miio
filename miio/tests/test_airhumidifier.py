@@ -6,10 +6,32 @@ from miio import AirHumidifier
 from miio.airhumidifier import (OperationMode, LedBrightness,
                                 AirHumidifierStatus, AirHumidifierException, )
 from .dummies import DummyDevice
+from miio.device import DeviceInfo
 
 
 class DummyAirHumidifier(DummyDevice, AirHumidifier):
     def __init__(self, *args, **kwargs):
+        self.dummy_device_info = {
+            'fw_ver': '1.2.9_5033',
+            'token': '68ffffffffffffffffffffffffffffff',
+            'otu_stat': [101, 74, 5343, 0, 5327, 407],
+            'mmfree': 228248,
+            'netif': {'gw': '192.168.0.1',
+                      'localIp': '192.168.0.25',
+                      'mask': '255.255.255.0'},
+            'ott_stat': [0, 0, 0, 0],
+            'model': 'zhimi.humidifier.v1',
+            'cfg_time': 0,
+            'life': 575661,
+            'ap': {'rssi': -35, 'ssid': 'ap',
+            'bssid': 'FF:FF:FF:FF:FF:FF'},
+            'wifi_fw_ver': 'SD878x-14.76.36.p84-702.1.0-WM',
+            'hw_ver': 'MW300',
+            'ot': 'otu',
+            'mac': '78:11:FF:FF:FF:FF'
+        }
+        self.device_info = None
+
         self.state = {
             'power': 'on',
             'mode': 'medium',
@@ -37,8 +59,13 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             'set_child_lock': lambda x: self._set_state("child_lock", x),
             'set_limit_hum': lambda x: self._set_state("limit_hum", x),
             'set_dry': lambda x: self._set_state("dry", x),
+            'miIO.info': self._get_device_info,
         }
         super().__init__(args, kwargs)
+
+    def _get_device_info(self, _):
+        """Return dummy device info."""
+        return self.dummy_device_info
 
 
 @pytest.fixture(scope="class")
@@ -72,7 +99,9 @@ class TestAirHumidifier(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirHumidifierStatus(self.device.start_state))
+        device_info = DeviceInfo(self.device.dummy_device_info)
+
+        assert repr(self.state()) == repr(AirHumidifierStatus(self.device.start_state, device_info))
 
         assert self.is_on() is True
         assert self.state().temperature == self.device.start_state["temp_dec"] / 10.0
@@ -89,6 +118,11 @@ class TestAirHumidifier(TestCase):
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().hardware_version == self.device.start_state["hw_version"]
         assert self.state().button_pressed == self.device.start_state["button_pressed"]
+
+        assert self.state().firmware_version == device_info.firmware_version
+        assert self.state().firmware_version_major == device_info.firmware_version.rsplit('_', 1)[0]
+        assert self.state().firmware_version_minor == int(device_info.firmware_version.rsplit('_', 1)[1])
+        assert self.state().strong_mode_enabled is False
 
     def test_set_mode(self):
         def mode():

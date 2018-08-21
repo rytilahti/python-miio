@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import command, format_output, EnumType
-from .device import Device, DeviceException
+from .device import Device, DeviceInfo, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ class OperationMode(enum.Enum):
     Medium = 'medium'
     High = 'high'
     Auto = 'auto'
+    Strong = 'strong'
 
 
 class LedBrightness(enum.Enum):
@@ -31,7 +32,7 @@ class LedBrightness(enum.Enum):
 class AirHumidifierStatus:
     """Container for status reports from the air humidifier."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
         """
         Response of a Air Humidifier (zhimi.humidifier.v1):
 
@@ -43,6 +44,7 @@ class AirHumidifierStatus:
         """
 
         self.data = data
+        self.device_info = device_info
 
     @property
     def power(self) -> str:
@@ -95,8 +97,38 @@ class AirHumidifierStatus:
 
     @property
     def trans_level(self) -> int:
-        """The meaning of the property is unknown."""
+        """
+        The meaning of the property is unknown.
+
+        The property is used to determine the strong mode is enabled on old firmware.
+        """
         return self.data["trans_level"]
+
+    @property
+    def strong_mode_enabled(self) -> bool:
+        if self.firmware_version_minor == 25:
+            if self.trans_level == 90:
+                return True
+
+        elif self.firmware_version_minor > 25:
+            return self.mode.value == "strong"
+
+        return False
+
+    @property
+    def firmware_version(self) -> str:
+        """Returns the fw_ver of miIO.info. For example 1.2.9_5033."""
+        return self.device_info.firmware_version
+
+    @property
+    def firmware_version_major(self) -> str:
+        major, _ = self.firmware_version.rsplit('_', 1)
+        return major
+
+    @property
+    def firmware_version_minor(self) -> int:
+        _, minor = self.firmware_version.rsplit('_', 1)
+        return int(minor)
 
     @property
     def speed(self) -> Optional[int]:
@@ -105,12 +137,16 @@ class AirHumidifierStatus:
 
     @property
     def depth(self) -> Optional[int]:
-        """Current depth."""
+        """The remaining amount of water in percent."""
         return self.data["depth"]
 
     @property
     def dry(self) -> Optional[bool]:
-        """Return True if dry mode is on if available."""
+        """
+        Dry mode: The amount of water is not enough to continue to work for about 8 hours.
+
+        Return True if dry mode is on if available.
+        """
         if self.data["dry"] is not None:
             return self.data["dry"] == "on"
         return None
@@ -145,7 +181,10 @@ class AirHumidifierStatus:
             "dry=%s, " \
             "use_time=%s, " \
             "hardware_version=%s, " \
-            "button_pressed=%s>" % \
+            "button_pressed=%s, " \
+            "strong_mode_enabled=%s, " \
+            "firmware_version_major=%s, " \
+            "firmware_version_minor=%s>" % \
             (self.power,
              self.mode,
              self.temperature,
@@ -160,7 +199,10 @@ class AirHumidifierStatus:
              self.dry,
              self.use_time,
              self.hardware_version,
-             self.button_pressed)
+             self.button_pressed,
+             self.strong_mode_enabled,
+             self.firmware_version_major,
+             self.firmware_version_minor)
         return s
 
     def __json__(self):
@@ -169,6 +211,12 @@ class AirHumidifierStatus:
 
 class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
+
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        self.device_info = None
 
     @command(
         default_output=format_output(
@@ -193,6 +241,9 @@ class AirHumidifier(Device):
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
 
+        if self.device_info is None:
+            self.device_info = self.info()
+
         properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
                       'led_b', 'child_lock', 'limit_hum', 'trans_level',
                       'speed', 'depth', 'dry', 'use_time', 'button_pressed',
@@ -212,7 +263,7 @@ class AirHumidifier(Device):
                 properties_count, values_count)
 
         return AirHumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+            defaultdict(lambda: None, zip(properties, values)), self.device_info)
 
     @command(
         default_output=format_output("Powering on"),
