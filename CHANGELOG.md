@@ -1,5 +1,55 @@
 # Change Log
 
+## [0.4.1](https://github.com/rytilahti/python-miio/tree/0.4.1)
+
+This release provides support for some new devices, improved support of existing devices and various fixes.
+
+New devices:
+* Xiaomi Mijia Smartmi Fresh Air System Wall-Mounted (@syssi)
+* Xiaomi Philips Zhirui Bedside Lamp (@syssi)
+
+Improvements:
+* Vacuum: Support of multiple zones for app\_zoned\_cleaning added (@ciB89)
+* Fan: SA1 and ZA1 support added as well as various fixes and improvements (@syssi)
+* Chuangmi Plug V3: Measurement unit of the power consumption fixed (@syssi)
+* Air Humidifier: Strong mode property added (@syssi)
+
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.0...0.4.1)
+
+**Closed issues:**
+
+- Xiaomi Rice Cooker component not working [\#365](https://github.com/rytilahti/python-miio/issues/365)
+- vacuum refuses to answer if the access to internet is blocked [\#353](https://github.com/rytilahti/python-miio/issues/353)
+- Xiaomi Philips Zhirui Bedside Lamp [\#351](https://github.com/rytilahti/python-miio/issues/351)
+- Unable to get Xiaomi miplug working on HA [\#350](https://github.com/rytilahti/python-miio/issues/350)
+- Error codes [\#346](https://github.com/rytilahti/python-miio/issues/346)
+- miiocli plug does not show the USB power status [\#344](https://github.com/rytilahti/python-miio/issues/344)
+- could you pls add support to gateway's functions of security and light? [\#340](https://github.com/rytilahti/python-miio/issues/340)
+- miplug discover throws exception [\#339](https://github.com/rytilahti/python-miio/issues/339)
+- miioclio: raw\_command\(\) got an unexpected keyword argument 'parameters' [\#335](https://github.com/rytilahti/python-miio/issues/335)
+- qmi.powerstrip.v1 no longer working on 0.40 [\#334](https://github.com/rytilahti/python-miio/issues/334)
+- Starting the vacuum clean up after remote control [\#235](https://github.com/rytilahti/python-miio/issues/235)
+
+**Merged pull requests:**
+
+- Fan: Fix broken model names [\#363](https://github.com/rytilahti/python-miio/pull/363) ([syssi](https://github.com/syssi))
+- Xiaomi Mi Smart Pedestal Fan: Add ZA1 \(zimi.fan.za1\) support [\#362](https://github.com/rytilahti/python-miio/pull/362) ([syssi](https://github.com/syssi))
+- ignore cli and test files from test coverage to get correct coverage percentage [\#361](https://github.com/rytilahti/python-miio/pull/361) ([rytilahti](https://github.com/rytilahti))
+- Add Xiaomi Airfresh VA2 support [\#360](https://github.com/rytilahti/python-miio/pull/360) ([syssi](https://github.com/syssi))
+- Add basic Philips Moonlight support \(Closes: \#351\) [\#359](https://github.com/rytilahti/python-miio/pull/359) ([syssi](https://github.com/syssi))
+- Xiaomi Mi Smart Pedestal Fan: Add SA1 \(zimi.fan.sa1\) support [\#354](https://github.com/rytilahti/python-miio/pull/354) ([syssi](https://github.com/syssi))
+- Fix "miplug discover" method \(Closes: \#339\) [\#342](https://github.com/rytilahti/python-miio/pull/342) ([syssi](https://github.com/syssi))
+- Fix ChuangmiPlugStatus repr format [\#341](https://github.com/rytilahti/python-miio/pull/341) ([syssi](https://github.com/syssi))
+- Chuangmi Plug V3: Fix measurement unit \(W\) of the power consumption \(load\_power\) [\#338](https://github.com/rytilahti/python-miio/pull/338) ([syssi](https://github.com/syssi))
+- miiocli: Fix raw\_command parameters \(Closes: \#335\) [\#336](https://github.com/rytilahti/python-miio/pull/336) ([syssi](https://github.com/syssi))
+- Fan: Fix a KeyError if button\_pressed isn't available [\#333](https://github.com/rytilahti/python-miio/pull/333) ([syssi](https://github.com/syssi))
+- Fan: Add test for the natural speed setter [\#332](https://github.com/rytilahti/python-miio/pull/332) ([syssi](https://github.com/syssi))
+- Fan: Divide the retrieval of properties into multiple requests [\#331](https://github.com/rytilahti/python-miio/pull/331) ([syssi](https://github.com/syssi))
+- Support of multiple zones for app\_zoned\_cleaning [\#311](https://github.com/rytilahti/python-miio/pull/311) ([ciB89](https://github.com/ciB89))
+- Air Humidifier: Strong mode property added and docstrings updated [\#300](https://github.com/rytilahti/python-miio/pull/300) ([syssi](https://github.com/syssi))
+
+
 ## [0.4.0](https://github.com/rytilahti/python-miio/tree/0.4.0)
 
 The highlight of this release is a crisp, unified and scalable command line interface called `miiocli` (thanks @yawor). Each supported device of this library is already integrated.
