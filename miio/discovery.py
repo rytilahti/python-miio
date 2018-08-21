@@ -7,14 +7,14 @@ from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 import zeroconf
 
-from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, Ceil,
+from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, Ceil,
                PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
                Yeelight, Fan, Cooker, AirConditioningCompanion)
 
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
-from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, )
+from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, )
 from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
 _LOGGER = logging.getLogger(__name__)
@@ -68,6 +68,9 @@ DEVICE_MAP = {
     "yeelink-light-": Yeelight,
     "zhimi-fan-v2": partial(Fan, model=MODEL_FAN_V2),
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
+    "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
+    "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
+    "zhimi-airfresh-va2": AirFresh,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]

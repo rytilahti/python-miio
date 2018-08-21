@@ -28,13 +28,14 @@ Supported devices
 -  Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp (:class:`miio.philips_bulb`)
 -  Xiaomi Philips Zhirui Bedroom Smart Lamp (:class:`miio.philips_moonlight`)
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR) (:class:`miio.chuangmi_ir`)
--  Xiaomi Mi Smart Pedestal Fan (:class:`miio.fan`)
+-  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1 and ZA1 (:class:`miio.fan`)
 -  Xiaomi Mi Air Humidifier (:class:`miio.airhumidifier`)
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off) (:class:`miio.waterpurifier`)
 -  Xiaomi PM2.5 Air Quality Monitor (:class:`miio.airqualitymonitor`)
 -  Xiaomi Smart WiFi Speaker (:class:`miio.wifispeaker`) (incomplete, please `feel free to help improve the support <https://github.com/rytilahti/python-miio/issues/69>`__)
 -  Xiaomi Mi WiFi Repeater 2 (:class:`miio.wifirepeater`)
 -  Xiaomi Mi Smart Rice Cooker (:class:`miio.cooker`)
+-  Xiaomi Smartmi Fresh Air System (:class:`miio.airfresh`)
 -  Yeelight light bulbs (:class:`miio.yeelight`) (only a very rudimentary support, use `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__ for a more complete support)
 
 *Feel free to create a pull request to add support for new devices as

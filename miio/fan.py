@@ -9,18 +9,17 @@ from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_FAN_V2 = 'zimi.fan.v2'
-MODEL_FAN_V3 = 'zimi.fan.v3'
+MODEL_FAN_V2 = 'zhimi.fan.v2'
+MODEL_FAN_V3 = 'zhimi.fan.v3'
+MODEL_FAN_SA1 = 'zhimi.fan.sa1'
+MODEL_FAN_ZA1 = 'zhimi.fan.za1'
 
 AVAILABLE_PROPERTIES_COMMON = [
-    'temp_dec',
-    'humidity',
     'angle',
     'speed',
     'poweroff_time',
     'power',
     'ac_power',
-    'battery',
     'angle_enable',
     'speed_level',
     'natural_level',
@@ -28,13 +27,21 @@ AVAILABLE_PROPERTIES_COMMON = [
     'buzzer',
     'led_b',
     'use_time',
-    'bat_charge',
-    'button_pressed',
 ]
 
+AVAILABLE_PROPERTIES_COMMON_V2_V3 = [
+    'temp_dec',
+    'humidity',
+    'battery',
+    'bat_charge',
+    'button_pressed',
+] + AVAILABLE_PROPERTIES_COMMON
+
 AVAILABLE_PROPERTIES = {
-    MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON,
-    MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON_V2_V3,
+    MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON_V2_V3,
+    MODEL_FAN_SA1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_ZA1: AVAILABLE_PROPERTIES_COMMON,
 }
 
 
@@ -66,6 +73,11 @@ class FanStatus:
          'child_lock': 'off', 'buzzer': 'on', 'led_b': 1, 'led': None,
          'natural_enable': None, 'use_time': 0, 'bat_charge': 'complete',
          'bat_state': None, 'button_pressed':'speed'}
+
+        Response of a Fan (zhimi.fan.sa1):
+        {'angle': 120, 'speed': 277, 'poweroff_time': 0, 'power': 'on',
+         'ac_power': 'on', 'angle_enable': 'off', 'speed_level': 1, 'natural_level': 2,
+         'child_lock': 'off', 'buzzer': 0, 'led_b': 0, 'use_time': 2318}
         """
         self.data = data
 
@@ -80,14 +92,18 @@ class FanStatus:
         return self.power == "on"
 
     @property
-    def humidity(self) -> int:
+    def humidity(self) -> Optional[int]:
         """Current humidity."""
-        return self.data["humidity"]
+        if "humidity" in self.data and self.data["humidity"] is not None:
+            return self.data["humidity"]
+        return None
 
     @property
-    def temperature(self) -> float:
+    def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
-        return self.data["temp_dec"] / 10.0
+        if "temp_dec" in self.data and self.data["temp_dec"] is not None:
+            return self.data["temp_dec"] / 10.0
+        return None
 
     @property
     def led(self) -> Optional[bool]:
@@ -106,7 +122,7 @@ class FanStatus:
     @property
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
-        return self.data["buzzer"] == "on"
+        return self.data["buzzer"] in ["on", 1, 2]
 
     @property
     def child_lock(self) -> bool:
@@ -114,14 +130,16 @@ class FanStatus:
         return self.data["child_lock"] == "on"
 
     @property
-    def natural_speed(self) -> int:
+    def natural_speed(self) -> Optional[int]:
         """Speed level in natural mode."""
-        return self.data["natural_level"]
+        if "natural_level" in self.data and self.data["natural_level"] is not None:
+            return self.data["natural_level"]
 
     @property
-    def direct_speed(self) -> int:
+    def direct_speed(self) -> Optional[int]:
         """Speed level in direct mode."""
-        return self.data["speed_level"]
+        if "speed_level" in self.data and self.data["speed_level"] is not None:
+            return self.data["speed_level"]
 
     @property
     def oscillate(self) -> bool:
@@ -129,14 +147,15 @@ class FanStatus:
         return self.data["angle_enable"] == "on"
 
     @property
-    def battery(self) -> int:
+    def battery(self) -> Optional[int]:
         """Current battery level."""
-        return self.data["battery"]
+        if "battery" in self.data and self.data["battery"] is not None:
+            return self.data["battery"]
 
     @property
     def battery_charge(self) -> Optional[str]:
         """State of the battery charger, if available."""
-        if self.data["bat_charge"] is not None:
+        if "bat_charge" in self.data and self.data["bat_charge"] is not None:
             return self.data["bat_charge"]
         return None
 
@@ -249,11 +268,11 @@ class Fan(Device):
             "LED brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
             "Child lock: {result.child_lock}\n"
-            "Natural level: {result.natural_level}\n"
-            "Speed level: {result.speed_level}\n"
-            "Oscillate: {result.oscillate}\n"
-            "Power-off time: {result.poweroff_time}\n"
             "Speed: {result.speed}\n"
+            "Natural speed: {result.natural_speed}\n"
+            "Direct speed: {result.direct_speed}\n"
+            "Oscillate: {result.oscillate}\n"
+            "Power-off time: {result.delay_off_countdown}\n"
             "Angle: {result.angle}\n"
         )
     )
@@ -263,11 +282,17 @@ class Fan(Device):
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
+        _props_per_request = 15
+
+        # The SA1 and ZA1 is limited to a single property per request
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1]:
+            _props_per_request = 1
+
         _props = properties.copy()
         values = []
         while _props:
-            values.extend(self.send("get_prop", _props[:15]))
-            _props[:] = _props[15:]
+            values.extend(self.send("get_prop", _props[:_props_per_request]))
+            _props[:] = _props[_props_per_request:]
 
         properties_count = len(properties)
         values_count = len(values)
@@ -340,8 +365,8 @@ class Fan(Device):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on oscillate"
-            if lock else "Turning off oscillate"
+            lambda oscillate: "Turning on oscillate"
+            if oscillate else "Turning off oscillate"
         )
     )
     def set_oscillate(self, oscillate: bool):
@@ -368,7 +393,7 @@ class Fan(Device):
         )
     )
     def set_led(self, led: bool):
-        """Turn led on/off."""
+        """Turn led on/off. Not supported by model SA1."""
         if led:
             return self.send("set_led", ['on'])
         else:
@@ -383,6 +408,12 @@ class Fan(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1]:
+            if buzzer:
+                return self.send("set_buzzer", [2])
+            else:
+                return self.send("set_buzzer", [0])
+
         if buzzer:
             return self.send("set_buzzer", ["on"])
         else:
@@ -415,3 +446,24 @@ class Fan(Device):
                 "Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("set_poweroff_time", [seconds])
+
+
+class FanV2(Fan):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_FAN_V2)
+
+
+class FanSA1(Fan):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_FAN_SA1)
+
+
+class FanZA1(Fan):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_FAN_ZA1)
