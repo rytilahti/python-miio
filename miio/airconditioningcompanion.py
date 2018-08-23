@@ -219,11 +219,11 @@ class AirConditioningCompanionStatus:
             "load_power=%s, " \
             "air_condition_model=%s, " \
             "model_format=%s, " \
-            "device_type=%s," \
-            "air_condition_brand=%s," \
-            "air_condition_remote=%s," \
-            "state_format=%s," \
-            "air_condition_configuration=%s," \
+            "device_type=%s, " \
+            "air_condition_brand=%s, " \
+            "air_condition_remote=%s, " \
+            "state_format=%s, " \
+            "air_condition_configuration=%s, " \
             "led=%s, " \
             "target_temperature=%s, " \
             "swing_mode=%s, " \
