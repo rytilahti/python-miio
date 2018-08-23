@@ -214,7 +214,7 @@ class CookerCustomizations:
             "kuaizhu_appointment=%s, " \
             "zhuzhou_appointment=%s, " \
             "zhuzhou_cooking=%s, " \
-            "favorite_appointment=%s," \
+            "favorite_appointment=%s, " \
             "favorite_cooking=%s>" % \
             (self.jingzhu_appointment,
              self.kuaizhu_appointment,
