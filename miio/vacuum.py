@@ -6,7 +6,7 @@ import math
 import os
 import pathlib
 import time
-from typing import List
+from typing import List, Any
 
 import click
 import pytz
@@ -43,9 +43,17 @@ class Vacuum(Device):
     """Main class representing the vacuum."""
 
     def __init__(self, ip: str, token: str = None, start_id: int = 0,
-                 debug: int = 0) -> None:
+                 debug: int = 0, nextgen: bool = False) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
+        self.nextgen = nextgen
+
+    def send(self, command: str, parameters: Any = None,
+             retry_count=3, prefix=True) -> Any:
+        """Overridden to prefix the commands for nextgen."""
+        if self.nextgen and prefix:
+            command = "user.%s" % command
+        return super().send(command, parameters, retry_count)
 
     @command()
     def start(self):
@@ -321,19 +329,19 @@ class Vacuum(Device):
     @command()
     def sound_volume(self) -> int:
         """Get sound volume."""
-        return self.send("get_sound_volume")[0]
+        return self.send("get_sound_volume", prefix=False)[0]
 
     @command(
         click.argument("vol", type=int),
     )
     def set_sound_volume(self, vol: int):
         """Set sound volume [0-100]."""
-        return self.send("change_sound_volume", [vol])
+        return self.send("change_sound_volume", [vol], prefix=False)
 
     @command()
     def test_sound_volume(self):
         """Test current sound volume."""
-        return self.send("test_sound_volume")
+        return self.send("test_sound_volume", prefix=False)
 
     @command()
     def serial_number(self):
@@ -359,6 +367,22 @@ class Vacuum(Device):
             extra_params["gmt_offset"] = offset_as_float
 
         return super().configure_wifi(ssid, password, uid, extra_params)
+
+    @command()
+    def locale(self):
+        """Get locale information."""
+        # TODO: add a container
+        # [{"name":"A.03.0009_PRC","bom":"A.03.0009","location":"prc",
+        # "language":"prc","wifiplan":"CN","timezone":"CST-8;Asia/Shanghai","logserver":"awsbj0"}]
+        # TODO: this may only be available on nextgen, needs testing.
+        return self.send("app_get_locale", prefix=False)[0]
+
+    @command()
+    def firmware_features(self):
+        """Return firmware features."""
+        # example result: [102]
+        # TODO: unknown values, support unknown.
+        return self.send("get_fw_features", prefix=False)[0]
 
     @command()
     def carpet_mode(self):

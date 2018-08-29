@@ -30,9 +30,10 @@ pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
 @click.option('-d', '--debug', default=False, count=True)
 @click.option('--id-file', type=click.Path(dir_okay=False, writable=True),
               default=user_cache_dir('python-miio') + '/python-mirobo.seq')
+@click.option('--nextgen', is_flag=True)
 @click.version_option()
 @click.pass_context
-def cli(ctx, ip: str, token: str, debug: int, id_file: str):
+def cli(ctx, ip: str, token: str, debug: int, id_file: str, nextgen: bool):
     """A tool to command Xiaomi Vacuum robot."""
     if debug:
         logging.basicConfig(level=logging.DEBUG)
@@ -59,7 +60,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
     except (FileNotFoundError, TypeError, ValueError):
         pass
 
-    vac = miio.Vacuum(ip, token, start_id, debug)
+    vac = miio.Vacuum(ip, token, start_id, debug, nextgen)
 
     vac.manual_seqnum = manual_seq
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
