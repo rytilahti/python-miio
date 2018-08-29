@@ -34,6 +34,53 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 }
 
 
+class VacuumError(IntEnum):
+    """Enum representing an error."""
+    Invalid = -1
+    NoError = 0
+    LaserDistanceError = 1
+    CollisionSensorError = 2
+    WheelsOnVoid = 3
+    CleanHoverSensor = 4
+    CleanMainBrush = 5
+    CleanSideBrush = 6
+    StuckMainWheel = 7
+    DeviceStuck = 8
+    DustBinMissing = 9
+    CleanFilter = 10
+    StuckMagneticBarrier = 11
+    LowBattery = 12
+    ChargingError = 13
+    BatteryError = 14
+    CleanWallSensors = 15
+    NotOnFlatSurface = 16
+    SideBrushError = 17
+    SuctionFanError = 18
+    ChargerNoPower = 19
+
+
+class VacuumState(IntEnum):
+    """Enum representing the vacuum state."""
+    Invalid = -1
+    Starting = 1
+    ChargerDisconnected = 2
+    Idle = 3
+    RemoteControl = 4
+    Cleaning = 5
+    Returning = 6
+    ManualMode = 7
+    Charging = 8
+    ChargingProblem = 9
+    Paused = 10
+    SpotClean = 11
+    Error = 12
+    ShuttingDown = 13
+    Updating = 14
+    Docking = 15
+    GoingToTarget = 16
+    ZoneClean = 17
+
+
 class VacuumStatus:
     """Container for status reports from the vacuum."""
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -60,8 +107,17 @@ class VacuumStatus:
         return int(self.data["state"])
 
     @property
+    @deprecated("Use state_str for string presentation, this will return an enum in the future.")
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
+        return self.state_str
+
+    @property
+    def state_str(self) -> str:
+        """Human readable state description.
+
+         See also :func:`state_code`, :func:`state`, and :func:`state_enum`.
+         """
         states = {
             1: 'Starting',
             2: 'Charger disconnected',
@@ -87,17 +143,38 @@ class VacuumStatus:
             return "Definition missing for state %s" % self.state_code
 
     @property
+    def state_enum(self) -> VacuumState:
+        """Vacuum state as enum."""
+        try:
+            return VacuumState(self.state_code)
+        except:
+            return VacuumState(VacuumState.Invalid)
+
+    @property
     def error_code(self) -> int:
         """Error code as returned by the device."""
         return int(self.data["error_code"])
 
     @property
-    def error(self) -> str:
+    @deprecated("Use error_str for human readable, this will change in the future to return an enum.")
+    def error(self):
+        """Human readable error description, see also :func:`error_code`."""
+        return self.error_str
+
+    @property
+    def error_str(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
         try:
             return error_codes[self.error_code]
         except KeyError:
             return "Definition missing for error %s" % self.error_code
+
+    @property
+    def error_enum(self) -> VacuumError:
+        try:
+            return VacuumError(self.error_code)
+        except:
+            return VacuumError(VacuumError.Invalid)
 
     @property
     def battery(self) -> int:
@@ -142,10 +219,10 @@ class VacuumStatus:
     def is_on(self) -> bool:
         """True if device is currently cleaning (either automatic, manual,
          spot, or zone)."""
-        return (self.state_code == 5 or
-                self.state_code == 7 or
-                self.state_code == 11 or
-                self.state_code == 17)
+        return (self.state_enum == VacuumState.Cleaning or
+                self.state_enum == VacuumState.ManualMode or
+                self.state_enum == VacuumState.SpotClean or
+                self.state_enum == VacuumState.ZoneClean)
 
     @property
     def got_error(self) -> bool:
