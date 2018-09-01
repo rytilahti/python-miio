@@ -8,7 +8,7 @@ TODO: add tests
 """
 import attr
 import logging
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import click
 
@@ -113,7 +113,6 @@ class CameraStatus:
         """TODO: What is this? Password for the cloud?"""
         return self.data["avPass"]
 
-
     def __repr__(self) -> str:
         s = "<CameraStatus is_on=%s, " \
             "type=%s, " \
@@ -130,8 +129,8 @@ class CameraStatus:
                self.md,
                self.led,
                self.flipped,
-               self.fullstop,
-             )
+               self.fullstop
+               )
         return s
 
     def __json__(self):
