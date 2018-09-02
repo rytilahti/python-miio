@@ -45,7 +45,7 @@ setup(
     python_requires='>=3.5',
 
     install_requires=[
-        'construct==2.9.41',
+        'construct==2.9.45',
         'click',
         'cryptography',
         'pretty_cron',
