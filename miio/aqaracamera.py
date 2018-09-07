@@ -9,6 +9,7 @@ TODO: add tests
 import attr
 import logging
 from typing import Any, Dict
+from enum import IntEnum
 
 import click
 
@@ -29,6 +30,29 @@ class CameraOffset:
     y = attr.ib()
     radius = attr.ib()
 
+
+@attr.s
+class ArmStatus:
+    """Container for arm statuses."""
+    is_armed = attr.ib(converter=bool)
+    arm_wait_time = attr.ib(converter=int)
+    alarm_volume = attr.ib(converter=int)
+
+
+class SDCardStatus(IntEnum):
+    """State of the SD card."""
+    NoCardInserted = 0
+    Ok = 1
+    FormatRequired = 2
+    Formating = 3
+
+class MotionDetectionSensitivity(IntEnum):
+    """'Default' values for md sensitivity.
+    Currently unused as the value can also be set arbitrarily.
+    """
+    High = 6000000
+    Medium = 10000000
+    Low = 11000000
 
 class CameraStatus:
     """Container for status reports from the Aqara Camera."""
@@ -63,8 +87,13 @@ class CameraStatus:
 
     @property
     def md(self) -> bool:
-        """TODO what is md? motion detection?"""
+        """Motion detection state."""
         return bool(self.data["md_status"])
+
+    @property
+    def md_sensitivity(self):
+        """Motion detection sensitivity."""
+        return self.data["mdsensitivity"]
 
     @property
     def ir(self):
@@ -95,12 +124,12 @@ class CameraStatus:
 
     @property
     def fullstop(self) -> bool:
-        """TODO: What is this?"""
-        return bool(self.data["fullstop"])
+        """Is alarm triggered by MD."""
+        return self.data["fullstop"] != 0
 
     @property
     def p2p_id(self) -> str:
-        """TODO: What is this? Cloud?"""
+        """P2P ID for video and audio."""
         return self.data["p2p_id"]
 
     @property
@@ -119,6 +148,7 @@ class CameraStatus:
             "offset=%s, " \
             "ir=%s, " \
             "md=%s, " \
+            "md_sensitivity=%s, " \
             "led=%s, " \
             "flip=%s, " \
             "fullstop=%s>" \
@@ -127,6 +157,7 @@ class CameraStatus:
                self.offsets,
                self.ir,
                self.md,
+               self.md_sensitivity,
                self.led,
                self.flipped,
                self.fullstop
@@ -147,7 +178,7 @@ class AqaraCamera(Device):
             "Video: {result.is_on}\n"
             "Offsets: {result.offsets}\n"
             "IR: {result.ir_status} %\n"
-            "MD: {result.md_status}\n"
+            "MD: {result.md_status} (sensitivity: {result.md_sensitivity}\n"
             "LED: {result.led}\n"
             "Flipped: {result.flipped}\n"
             "Full stop: {result.fullstop}\n"
@@ -202,6 +233,17 @@ class AqaraCamera(Device):
     def md_off(self):
         """MD off."""
         return self.send("set_md", ["off"])
+
+    @command(
+        click.argument("sensitivity", type=int, required=False)
+    )
+    def md_sensitivity(self, sensitivity):
+        """Get or set the motion detection sensitivity."""
+        if sensitivity:
+            click.echo("Setting MD sensitivity to %s" % sensitivity)
+            return self.send("set_mdsensitivity", [sensitivity])[0] == 'ok'
+        else:
+            return self.send("get_mdsensitivity")
 
     @command(
         default_output=format_output("LED on")
@@ -259,21 +301,55 @@ class AqaraCamera(Device):
 
     @command()
     def sd_status(self):
-        """SD card status. TODO: please report output."""
-        return self.send("get_sdstatus")
+        """SD card status."""
+        return SDCardStatus(self.send("get_sdstatus"))
 
     @command()
     def sd_format(self):
-        """TODO: Format SD card? parameters & result unknown."""
-        return self.send("sdformat")
+        """Format the SD card.
+
+        Returns True when formating has started successfully.
+        """
+        return bool(self.send("sdformat"))
 
     @command()
     def arm_status(self):
         """Return arming information."""
-        # TODO: return a container
         is_armed = self.send("get_arming")
         arm_wait_time = self.send("get_arm_wait_time")
-        return {'is_armed': is_armed, 'wait_time': arm_wait_time}
+        alarm_volume = self.send("get_alarming_volume")
+
+        return ArmStatus(is_armed=bool(is_armed),
+                         arm_wait_time=arm_wait_time,
+                         alarm_volume=alarm_volume)
+
+    @command(
+        click.argument("volume", type=int, default=100),
+        default_output=format_output(
+            "Setting alarm volume to {volume}"
+        )
+    )
+    def set_alarm_volume(self, volume):
+        """Set alarm volume."""
+        if volume < 0 or volume > 100:
+            raise CameraException("Volume has to be [0,100], was %s" % volume)
+        return self.send("set_alarming_volume", [volume])[0] == 'ok'
+
+    @command(
+        click.argument("sound_id", type=str, required=False, default=None)
+    )
+    def alarm_sound(self, sound_id):
+        """List or set the alarm sound."""
+        if id is None:
+            sound_status = self.send("get_music_info", [0])
+            @attr.s
+            class SoundList:
+                default = attr.ib()
+                total = attr.ib(type=int)
+                sounds = attr.ib(type=list)
+
+        click.echo("Setting alarm sound to %s" % sound_id)
+        return self.send("set_default_music", [0, sound_id])[0] == 'ok'
 
     @command(
         default_output=format_output("Arming")
