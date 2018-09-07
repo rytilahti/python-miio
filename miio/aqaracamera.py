@@ -342,11 +342,14 @@ class AqaraCamera(Device):
         """List or set the alarm sound."""
         if id is None:
             sound_status = self.send("get_music_info", [0])
+            # TODO: make a list out from this.
             @attr.s
             class SoundList:
                 default = attr.ib()
                 total = attr.ib(type=int)
                 sounds = attr.ib(type=list)
+
+            return sound_status
 
         click.echo("Setting alarm sound to %s" % sound_id)
         return self.send("set_default_music", [0, sound_id])[0] == 'ok'
