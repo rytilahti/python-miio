@@ -139,7 +139,7 @@ class VacuumStatus:
     @property
     def got_error(self) -> bool:
         """True if an error has occured."""
-        return self.state_code == 12
+        return self.error_code != 0
 
     def __repr__(self) -> str:
         s = "<VacuumStatus state=%s, error=%s " % (self.state, self.error)
