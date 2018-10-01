@@ -1,1 +1,10 @@
-include miio/data/*
+include *.md
+include *.txt
+include .flake8.ini
+include LICENSE
+include tox.ini
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs Makefile
+recursive-include miio *.json
+recursive-include miio *.py
