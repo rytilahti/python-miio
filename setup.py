@@ -27,7 +27,7 @@ setup(
     license='GPLv3',
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3.5',
@@ -38,14 +38,14 @@ setup(
 
     keywords='xiaomi miio vacuum',
 
-    packages=["miio", "mirobo"],
+    packages=["miio"],
 
     include_package_data=True,
 
     python_requires='>=3.5',
 
     install_requires=[
-        'construct==2.9.41',
+        'construct',
         'click',
         'cryptography',
         'pretty_cron',
