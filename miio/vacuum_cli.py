@@ -73,7 +73,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 
 @cli.resultcallback()
 @pass_dev
-def cleanup(vac: miio.Vacuum, **kwargs):
+def cleanup(vac: miio.Vacuum, *args, **kwargs):
     if vac.ip is None:  # dummy Device for discovery, skip teardown
         return
     id_file = kwargs['id_file']

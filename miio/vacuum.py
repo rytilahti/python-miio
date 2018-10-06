@@ -419,7 +419,7 @@ class Vacuum(Device):
 
         @dg.resultcallback()
         @dg.device_pass
-        def cleanup(vac: Vacuum, **kwargs):
+        def cleanup(vac: Vacuum, *args, **kwargs):
             if vac.ip is None:  # dummy Device for discovery, skip teardown
                 return
             id_file = kwargs['id_file']
