@@ -3,8 +3,8 @@
 ## [0.4.2](https://github.com/rytilahti/python-miio/tree/0.4.2)
 
 This release removes the version pinning for "construct" library as its API has been stabilized and we don't want to force our downstreams for our version choices.
-
 Another notable change is dropping the "mirobo" package which has been deprecated for a very long time, and everyone using it should have had converted to use "miio" already.
+Furthermore the client tools work now with click's version 7+.
 
 This release also changes the behavior of vacuum's `got_error` property to signal properly if an error has occured. The previous behavior was based on checking the state instead of the error number, which changed after an error to 'idle' after a short while.
 
@@ -26,6 +26,7 @@ This release also changes the behavior of vacuum's `got_error` property to signa
 
 **Merged pull requests:**
 
+- Fix click7 compatibility [\#387](https://github.com/rytilahti/python-miio/pull/387) ([rytilahti](https://github.com/rytilahti))
 - Expand documentation for token from Android backup [\#382](https://github.com/rytilahti/python-miio/pull/382) ([sgtio](https://github.com/sgtio))
 - vacuum's got\_error: compare against error code, not against the state [\#379](https://github.com/rytilahti/python-miio/pull/379) ([rytilahti](https://github.com/rytilahti))
 - Add tqdm to requirements list [\#369](https://github.com/rytilahti/python-miio/pull/369) ([pluehne](https://github.com/pluehne))
