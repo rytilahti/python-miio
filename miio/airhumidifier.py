@@ -22,16 +22,13 @@ AVAILABLE_PROPERTIES_COMMON = [
     'led_b',
     'child_lock',
     'limit_hum',
-    'speed',
-    'depth',
-    'dry',
     'use_time',
     'hw_version',
 ]
 
 AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_V1: AVAILABLE_PROPERTIES_COMMON + ['trans_level', 'button_pressed'],
-    MODEL_HUMIDIFIER_CA1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_HUMIDIFIER_CA1: AVAILABLE_PROPERTIES_COMMON + ['speed', 'depth', 'dry'],
 }
 
 
@@ -126,7 +123,9 @@ class AirHumidifierStatus:
 
         The property is used to determine the strong mode is enabled on old firmware.
         """
-        return self.data["trans_level"]
+        if "trans_level" in self.data and self.data["trans_level"] is not None:
+            return self.data["trans_level"]
+        return None
 
     @property
     def strong_mode_enabled(self) -> bool:
@@ -157,12 +156,16 @@ class AirHumidifierStatus:
     @property
     def speed(self) -> Optional[int]:
         """Current fan speed."""
-        return self.data["speed"]
+        if "speed" in self.data and self.data["speed"] is not None:
+            return self.data["speed"]
+        return None
 
     @property
     def depth(self) -> Optional[int]:
         """The remaining amount of water in percent."""
-        return self.data["depth"]
+        if "depth" in self.data and self.data["depth"] is not None:
+            return self.data["depth"]
+        return None
 
     @property
     def dry(self) -> Optional[bool]:
@@ -171,7 +174,7 @@ class AirHumidifierStatus:
 
         Return True if dry mode is on if available.
         """
-        if self.data["dry"] is not None:
+        if "dry" in self.data and self.data["dry"] is not None:
             return self.data["dry"] == "on"
         return None
 
@@ -188,7 +191,9 @@ class AirHumidifierStatus:
     @property
     def button_pressed(self) -> Optional[str]:
         """Last pressed button."""
-        return self.data["button_pressed"]
+        if "button_pressed" in self.data and self.data["button_pressed"] is not None:
+            return self.data["button_pressed"]
+        return None
 
     def __repr__(self) -> str:
         s = "<AirHumidiferStatus power=%s, " \
