@@ -1,5 +1,38 @@
 # Change Log
 
+## [0.4.2](https://github.com/rytilahti/python-miio/tree/0.4.2)
+
+This release removes the version pinning for "construct" library as its API has been stabilized and we don't want to force our downstreams for our version choices.
+Another notable change is dropping the "mirobo" package which has been deprecated for a very long time, and everyone using it should have had converted to use "miio" already.
+Furthermore the client tools work now with click's version 7+.
+
+This release also changes the behavior of vacuum's `got_error` property to signal properly if an error has occured. The previous behavior was based on checking the state instead of the error number, which changed after an error to 'idle' after a short while.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.1...0.4.2)
+
+**Fixed bugs:**
+
+- Zoned cleanup start and stops imediately [\#355](https://github.com/rytilahti/python-miio/issues/355)
+
+**Closed issues:**
+
+- STATE not supported: Updating, state\_code: 14 [\#381](https://github.com/rytilahti/python-miio/issues/381)
+- cant get it to work with xiaomi robot vacuum cleaner s50 [\#378](https://github.com/rytilahti/python-miio/issues/378)
+- airfresh problem [\#377](https://github.com/rytilahti/python-miio/issues/377)
+- get device token is 000000000000000000 [\#366](https://github.com/rytilahti/python-miio/issues/366)
+- Rockrobo firmware 3.3.9\_003254 [\#358](https://github.com/rytilahti/python-miio/issues/358)
+- No response from the device on Xiaomi Roborock v2 [\#349](https://github.com/rytilahti/python-miio/issues/349)
+- Information : Xiaomi Aqara Smart Camera Hack [\#347](https://github.com/rytilahti/python-miio/issues/347)
+
+**Merged pull requests:**
+
+- Fix click7 compatibility [\#387](https://github.com/rytilahti/python-miio/pull/387) ([rytilahti](https://github.com/rytilahti))
+- Expand documentation for token from Android backup [\#382](https://github.com/rytilahti/python-miio/pull/382) ([sgtio](https://github.com/sgtio))
+- vacuum's got\_error: compare against error code, not against the state [\#379](https://github.com/rytilahti/python-miio/pull/379) ([rytilahti](https://github.com/rytilahti))
+- Add tqdm to requirements list [\#369](https://github.com/rytilahti/python-miio/pull/369) ([pluehne](https://github.com/pluehne))
+- Improve repr format [\#368](https://github.com/rytilahti/python-miio/pull/368) ([syssi](https://github.com/syssi))
+
+
 ## [0.4.1](https://github.com/rytilahti/python-miio/tree/0.4.1)
 
 This release provides support for some new devices, improved support of existing devices and various fixes.
