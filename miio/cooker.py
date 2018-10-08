@@ -726,7 +726,13 @@ class Cooker(Device):
         """Retrieve properties."""
         properties = ['func', 'menu', 'stage', 'temp', 't_func', 't_precook',
                       't_cook', 'setting', 'delay', 'version', 'favorite', 'custom']
-        values = self.send("get_prop", properties)
+
+        """
+        Some cookers doesn't support a list of properties here. Therefore "all" properties
+        are requested. If the property count or order changes the property list above must
+        be updated.
+        """
+        values = self.send("get_prop", ['all'])
 
         properties_count = len(properties)
         values_count = len(values)
