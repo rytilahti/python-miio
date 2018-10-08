@@ -28,7 +28,7 @@ class DummyAirFresh(DummyDevice, AirFresh):
             'filter_life': 80,
             'f_hour': 3500,
             'favorite_level': None,
-            'led': None,
+            'led': 'on',
         }
         self.return_values = {
             'get_prop': self._get_state,
@@ -36,6 +36,7 @@ class DummyAirFresh(DummyDevice, AirFresh):
             'set_mode': lambda x: self._set_state("mode", x),
             'set_buzzer': lambda x: self._set_state("buzzer", x),
             'set_child_lock': lambda x: self._set_state("child_lock", x),
+            'set_led': lambda x: self._set_state("led", x),
             'set_led_level': lambda x: self._set_state("led_level", x),
             'reset_filter1': lambda x: (
                 self._set_state('f1_hour_used', [0]),
@@ -90,6 +91,7 @@ class TestAirFresh(TestCase):
         assert self.state().filter_hours_used == self.device.start_state["f1_hour_used"]
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().motor_speed == self.device.start_state["motor1_speed"]
+        assert self.state().led == (self.device.start_state["led"] == 'on')
         assert self.state().led_brightness == LedBrightness(self.device.start_state["led_level"])
         assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
@@ -116,6 +118,16 @@ class TestAirFresh(TestCase):
 
         self.device.set_mode(OperationMode.Strong)
         assert mode() == OperationMode.Strong
+
+    def test_set_led(self):
+        def led():
+            return self.device.status().led
+
+        self.device.set_led(True)
+        assert led() is True
+
+        self.device.set_led(False)
+        assert led() is False
 
     def test_set_led_brightness(self):
         def led_brightness():
