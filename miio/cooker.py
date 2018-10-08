@@ -728,8 +728,8 @@ class Cooker(Device):
                       't_cook', 'setting', 'delay', 'version', 'favorite', 'custom']
 
         """
-        Some cookers doesn't support a list of properties here. Therefore "all" properties 
-        are requested. If the property count or order changes the property list above must 
+        Some cookers doesn't support a list of properties here. Therefore "all" properties
+        are requested. If the property count or order changes the property list above must
         be updated.
         """
         values = self.send("get_prop", ['all'])
