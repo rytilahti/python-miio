@@ -390,3 +390,10 @@ class AirHumidifier(Device):
             return self.send("set_dry", ["on"])
         else:
             return self.send("set_dry", ["off"])
+
+
+class AirHumidifierCA1(AirHumidifier):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_HUMIDIFIER_CA1)
