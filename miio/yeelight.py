@@ -1,7 +1,9 @@
 import warnings
+import click
 from enum import IntEnum
 from typing import Tuple, Optional
 
+from .click_common import command, format_output
 from .device import Device, DeviceException
 
 
@@ -108,6 +110,20 @@ class Yeelight(Device):
                       "for more complete support.", stacklevel=2)
         super().__init__(*args, **kwargs)
 
+    @command(
+        default_output=format_output(
+            "",
+            "Name: {result.name}\n"
+            "Power: {result.is_on}\n"
+            "Brightness: {result.brightness}\n"
+            "Color mode: {result.color_mode}\n"
+            "RGB: {result.rgb}\n"
+            "HSV: {result.hsv}\n"
+            "Temperature: {result.color_temp}\n"
+            "Developer mode: {result.developer_mode}\n"
+            "Update default on change: {result.save_state_on_change}\n"
+            "\n")
+    )
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
         properties = [
@@ -130,7 +146,12 @@ class Yeelight(Device):
 
         return YeelightStatus(dict(zip(properties, values)))
 
-    def on(self):
+    @command(
+        click.option("--transition", type=int, required=False, default=0),
+        click.option("--mode", type=int, required=False, default=0),
+        default_output=format_output("Powering on"),
+    )
+    def on(self, transition=0, mode=0):
         """Power on."""
         """
         set_power ["on|off", "smooth", time_in_ms, mode]
@@ -142,23 +163,46 @@ class Yeelight(Device):
         4: color flow
         5: moonlight
         """
+        if transition > 0 or mode > 0:
+            return self.send("set_power", ["on", "smooth", transition, mode])
         return self.send("set_power", ["on"])
 
-    def off(self):
+    @command(
+        click.option("--transition", type=int, required=False, default=0),
+        default_output=format_output("Powering off"),
+    )
+    def off(self, transition=0):
         """Power off."""
+        if transition > 0:
+            return self.send("set_power", ["off", "smooth", transition])
         return self.send("set_power", ["off"])
 
-    def set_brightness(self, bright):
+    @command(
+        click.argument("level", type=int),
+        click.option("--transition", type=int, required=False, default=0),
+        default_output=format_output("Setting brightness to {level}")
+    )
+    def set_brightness(self, level, transition=0):
         """Set brightness."""
-        if bright < 0 or bright > 100:
-            raise YeelightException("Invalid brightness: %s" % bright)
-        return self.send("set_bright", [bright])
+        if level < 0 or level > 100:
+            raise YeelightException("Invalid brightness: %s" % level)
+        if transition > 0:
+            return self.send("set_bright", [level, "smooth", transition])
+        return self.send("set_bright", [level])
 
-    def set_color_temp(self, ct):
+    @command(
+        click.argument("level", type=int),
+        click.option("--transition", type=int, required=False, default=0),
+        default_output=format_output("Setting color temperature to {level}")
+    )
+    def set_color_temp(self, level, transition=500):
         """Set color temp in kelvin."""
-        if ct > 6500 or ct < 1700:
-            raise YeelightException("Invalid color temperature: %s" % ct)
-        return self.send("set_ct_abx", [ct, "smooth", 500])
+        if level > 6500 or level < 1700:
+            raise YeelightException("Invalid color temperature: %s" % level)
+        if transition > 0:
+            return self.send("set_ct_abx", [level, "smooth", transition])
+        else:
+            return self.send("set_ct_abx", [level])
 
     def set_rgb(self, rgb):
         """Set color in encoded RGB."""
@@ -168,22 +212,40 @@ class Yeelight(Device):
         """Set color in HSV."""
         return self.send("set_hsv", [hsv])
 
+    @command(
+        click.argument("enable", type=bool),
+        default_output=format_output("Setting developer mode to {enable}")
+    )
     def set_developer_mode(self, enable: bool) -> bool:
         """Enable or disable the developer mode."""
         return self.send("set_ps", ["cfg_lan_ctrl", str(int(enable))])
 
+    @command(
+        click.argument("enable", type=bool),
+        default_output=format_output("Setting save state on change {enable}")
+    )
     def set_save_state_on_change(self, enable: bool) -> bool:
         """Enable or disable saving the state on changes."""
         return self.send("set_ps", ["cfg_save_state", str(int(enable))])
 
+    @command(
+        click.argument("name", type=bool),
+        default_output=format_output("Setting name to {enable}")
+    )
     def set_name(self, name: str) -> bool:
         """Set an internal name for the bulb."""
         return self.send("set_name", [name])
 
+    @command(
+        default_output=format_output("Toggling the bulb"),
+    )
     def toggle(self):
         """Toggle bulb state."""
         return self.send("toggle")
 
+    @command(
+        default_output=format_output("Setting current settings to default"),
+    )
     def set_default(self):
         """Set current state as default."""
         return self.send("set_default")
