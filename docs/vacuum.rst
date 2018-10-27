@@ -118,7 +118,7 @@ Cleaning history
 
 ::
 
-    $ mirobo cleaning_history
+    $ mirobo cleaning-history
     Total clean count: 43
     Clean #0: 2017-03-05 19:09:40-2017-03-05 19:09:50 (complete: False, unknown: 0)
       Area cleaned: 0.0 m²
@@ -147,13 +147,13 @@ There are two ways to install install sound packs:
 
 ::
 
-    mirobo install_sound my_sounds.pkg
+    mirobo install-sound my_sounds.pkg
 
 2. Install from an URL, in which case you need to pass the md5 hash of the file as a second parameter.
 
 ::
 
-    mirobo install_sound http://10.10.20.1:8000/my_sounds.pkg b50cfea27e52ebd5f46038ac7b9330c8
+    mirobo install-sound http://10.10.20.1:8000/my_sounds.pkg b50cfea27e52ebd5f46038ac7b9330c8
 
 `--sid` can be used to select the sound ID (SID) for the new file,
 using an existing SID will overwrite the old.
@@ -186,7 +186,7 @@ and updating from an URL requires you to pass the md5 hash of the file.
 
 ::
 
-    mirobo update_firmware v11_003094.pkg
+    mirobo update-firmware v11_003094.pkg
 
 
 DND functionality
@@ -215,14 +215,14 @@ To enable:
 
 ::
 
-    mirobo carpet_mode 1 (or any other true-value, such as 'true')
+    mirobo carpet-mode 1 (or any other true-value, such as 'true')
 
 
 To disable:
 
 ::
 
-    mirobo carpet_mode 0
+    mirobo carpet-mode 0
 
 
 Raw commands
@@ -234,13 +234,13 @@ It is also possible to run raw commands, which can be useful
 
 ::
 
-    mirobo raw_command app_start
+    mirobo raw-command app_start
 
 or with parameters (same as above dnd on):
 
 ::
 
-    mirobo raw_command set_dnd_timer '[22,0,6,0]'
+    mirobo raw-command set_dnd_timer '[22,0,6,0]'
 
 The input is passed as it is to the device as the `params` value,
 so it is also possible to pass dicts.
