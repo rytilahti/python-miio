@@ -6,7 +6,7 @@ import math
 import os
 import pathlib
 import time
-from typing import List
+from typing import List, Optional, Union
 
 import click
 import pytz
@@ -184,17 +184,39 @@ class Vacuum(Device):
         """Return generic cleaning history."""
         return CleaningSummary(self.send("get_clean_summary"))
 
+    @command()
+    def last_clean_details(self) -> CleaningDetails:
+        """Return details from the last cleaning."""
+        last_clean_id = self.clean_history().ids.pop()
+        return self.clean_details(last_clean_id, return_list=False)
+
     @command(
         click.argument("id_", type=int, metavar="ID"),
+        click.argument("return_list", type=bool, default=False)
     )
-    def clean_details(self, id_: int) -> List[CleaningDetails]:
+    def clean_details(self, id_: int, return_list=True) -> Union[
+            List[CleaningDetails],
+            Optional[CleaningDetails]]:
         """Return details about specific cleaning."""
         details = self.send("get_clean_record", [id_])
 
-        res = list()
-        for rec in details:
-            res.append(CleaningDetails(rec))
+        if not details:
+            _LOGGER.warning("No cleaning record found for id %s" % id_)
+            return None
 
+        if return_list:
+            _LOGGER.warning("This method will be returning the details "
+                            "without wrapping them into a list in the "
+                            "near future. The current behavior can be "
+                            "kept by passing return_list=True and this "
+                            "warning will be removed when the default gets "
+                            "changed.")
+            return [CleaningDetails(entry) for entry in details]
+
+        if len(details) > 1:
+            _LOGGER.warning("Got multiple clean details, returning the first")
+
+        res = CleaningDetails(details.pop())
         return res
 
     @command()

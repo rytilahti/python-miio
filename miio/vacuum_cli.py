@@ -418,15 +418,15 @@ def cleaning_history(vac: miio.Vacuum):
                                                   res.total_area))
     click.echo()
     for idx, id_ in enumerate(res.ids):
-        for e in vac.clean_details(id_):
-            color = "green" if e.complete else "yellow"
-            click.echo(click.style(
-                "Clean #%s: %s-%s (complete: %s, error: %s)" % (
-                    idx, e.start, e.end, e.complete, e.error),
-                bold=True, fg=color))
-            click.echo("  Area cleaned: %s m²" % e.area)
-            click.echo("  Duration: (%s)" % e.duration)
-            click.echo()
+        details = vac.clean_details(id_, return_list=False)
+        color = "green" if details.complete else "yellow"
+        click.echo(click.style(
+            "Clean #%s: %s-%s (complete: %s, error: %s)" % (
+                idx, details.start, details.end, details.complete, details.error),
+            bold=True, fg=color))
+        click.echo("  Area cleaned: %s m²" % details.area)
+        click.echo("  Duration: (%s)" % details.duration)
+        click.echo()
 
 
 @cli.command()
