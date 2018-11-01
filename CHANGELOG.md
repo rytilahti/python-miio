@@ -1,5 +1,32 @@
 # Change Log
 
+## [0.4.3](https://github.com/rytilahti/python-miio/tree/0.4.3)
+
+This is a bugfix release which provides improved compatibility.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.2...0.4.3)
+
+**Closed issues:**
+
+- unsupported device zhimi airmonitor v1 [\#393](https://github.com/rytilahti/python-miio/issues/393)
+- Unsupported device found: chuangmi.ir.v2 [\#392](https://github.com/rytilahti/python-miio/issues/392)
+- TypeError: not all arguments converted during string formatting [\#385](https://github.com/rytilahti/python-miio/issues/385)
+- Status not worked for AirHumidifier CA1 [\#383](https://github.com/rytilahti/python-miio/issues/383)
+- Xiaomi Rice Cooker Normal5: get\_prop only works if "all" properties are requested [\#380](https://github.com/rytilahti/python-miio/issues/380)
+- python-construct-2.9.45 [\#374](https://github.com/rytilahti/python-miio/issues/374)
+
+**Merged pull requests:**
+
+- Update commands in manual [\#398](https://github.com/rytilahti/python-miio/pull/398) ([olskar](https://github.com/olskar))
+- Add cli interface for yeelight devices [\#397](https://github.com/rytilahti/python-miio/pull/397) ([rytilahti](https://github.com/rytilahti))
+- Add last\_clean\_details to return information from the last clean [\#395](https://github.com/rytilahti/python-miio/pull/395) ([rytilahti](https://github.com/rytilahti))
+- Add discovery of the Xiaomi Air Quality Monitor \(PM2.5\) \(Closes: \#393\) [\#394](https://github.com/rytilahti/python-miio/pull/394) ([syssi](https://github.com/syssi))
+- Add miiocli support for the Air Humidifier CA1 [\#391](https://github.com/rytilahti/python-miio/pull/391) ([syssi](https://github.com/syssi))
+- Add property LED to the Xiaomi Air Fresh [\#390](https://github.com/rytilahti/python-miio/pull/390) ([syssi](https://github.com/syssi))
+- Fix Cooker Normal5: get\_prop only works if "all" properties are requested \(Closes: \#380\) [\#389](https://github.com/rytilahti/python-miio/pull/389) ([syssi](https://github.com/syssi))
+- Improve the support of the Air Humidifier CA1 \(Closes: \#383\) [\#388](https://github.com/rytilahti/python-miio/pull/388) ([syssi](https://github.com/syssi))
+
+
 ## [0.4.2](https://github.com/rytilahti/python-miio/tree/0.4.2)
 
 This release removes the version pinning for "construct" library as its API has been stabilized and we don't want to force our downstreams for our version choices.
