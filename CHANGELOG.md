@@ -17,7 +17,9 @@ This is a bugfix release which provides improved compatibility.
 
 **Merged pull requests:**
 
+- Update commands in manual [\#398](https://github.com/rytilahti/python-miio/pull/398) ([olskar](https://github.com/olskar))
 - Add cli interface for yeelight devices [\#397](https://github.com/rytilahti/python-miio/pull/397) ([rytilahti](https://github.com/rytilahti))
+- Add last\_clean\_details to return information from the last clean [\#395](https://github.com/rytilahti/python-miio/pull/395) ([rytilahti](https://github.com/rytilahti))
 - Add discovery of the Xiaomi Air Quality Monitor \(PM2.5\) \(Closes: \#393\) [\#394](https://github.com/rytilahti/python-miio/pull/394) ([syssi](https://github.com/syssi))
 - Add miiocli support for the Air Humidifier CA1 [\#391](https://github.com/rytilahti/python-miio/pull/391) ([syssi](https://github.com/syssi))
 - Add property LED to the Xiaomi Air Fresh [\#390](https://github.com/rytilahti/python-miio/pull/390) ([syssi](https://github.com/syssi))
