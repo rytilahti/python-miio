@@ -78,7 +78,7 @@ class OneShotServer:
     def serve_once(self):
         self.server.handle_request()
         if getattr(self.server, "got_request"):
-            _LOGGER.info("Got a request, shold be downloading now.")
+            _LOGGER.info("Got a request, should be downloading now.")
             return True
         else:
             _LOGGER.error("No request was made..")
