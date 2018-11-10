@@ -230,6 +230,8 @@ class Device(metaclass=DeviceGroupMeta):
 
         if parameters is not None:
             cmd["params"] = parameters
+        else:
+            cmd["params"] = []
 
         send_ts = self._device_ts + datetime.timedelta(seconds=1)
         header = {'length': 0, 'unknown': 0x00000000,
