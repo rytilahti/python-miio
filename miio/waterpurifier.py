@@ -164,21 +164,22 @@ class WaterPurifier(Device):
                       'volume', 'filter', 'usage', 'temperature', 'uv_life',
                       'uv_state', 'elecval_state']
 
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        _props_per_request = 1
+        _props = properties.copy()
+        values = []
+        while _props:
+            values.extend(self.send("get_prop", _props[:_props_per_request]))
+            _props[:] = _props[_props_per_request:]
 
         properties_count = len(properties)
         values_count = len(values)
         if properties_count != values_count:
-            _LOGGER.debug(
+            _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return WaterPurifierStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+        return WaterPurifierStatus(dict(zip(properties, values)))
 
     @command(
         default_output=format_output("Powering on"),

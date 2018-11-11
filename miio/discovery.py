@@ -10,7 +10,7 @@ import zeroconf
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, Ceil,
                PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
-               Yeelight, Fan, Cooker, AirConditioningCompanion)
+               Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor)
 
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
@@ -41,6 +41,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v3": AirPurifier,   # v3
     "zhimi-airpurifier-v5": AirPurifier,   # v5
     "zhimi-airpurifier-v6": AirPurifier,   # v6
+    "zhimi-airpurifier-mc1": AirPurifier,  # mc1
     "chuangmi-ir-v2": ChuangmiIr,
     "zhimi-humidifier-v1": AirHumidifier,
     "zhimi-humidifier-ca1": AirHumidifier,
@@ -71,6 +72,7 @@ DEVICE_MAP = {
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
     "zhimi-airfresh-va2": AirFresh,
+    "zhimi-airmonitor-v1": AirQualityMonitor,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]

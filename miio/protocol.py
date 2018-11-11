@@ -27,9 +27,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 _LOGGER = logging.getLogger(__name__)
 
-# needs to be maintained in sync with setup.py and requirements.txt
-assert construct.version_string == "2.9.41"
-
 
 class Utils:
     """ This class is adapted from the original xpn.py code by gst666 """

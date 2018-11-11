@@ -81,6 +81,11 @@ class AirFreshStatus:
         return OperationMode(self.data["mode"])
 
     @property
+    def led(self) -> bool:
+        """Return True if LED is on."""
+        return self.data["led"] == "on"
+
+    @property
     def led_brightness(self) -> Optional[LedBrightness]:
         """Brightness of the LED."""
         if self.data["led_level"] is not None:
@@ -137,6 +142,7 @@ class AirFreshStatus:
             "humidity=%s%%, " \
             "co2=%s, " \
             "mode=%s, " \
+            "led=%s, " \
             "led_brightness=%s, " \
             "buzzer=%s, " \
             "child_lock=%s, " \
@@ -152,6 +158,7 @@ class AirFreshStatus:
              self.humidity,
              self.co2,
              self.mode,
+             self.led,
              self.led_brightness,
              self.buzzer,
              self.child_lock,
@@ -179,6 +186,7 @@ class AirFresh(Device):
             "Humidity: {result.humidity} %\n"
             "CO2: {result.co2} %\n"
             "Mode: {result.mode.value}\n"
+            "LED: {result.led}\n"
             "LED brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
             "Child lock: {result.child_lock}\n"
@@ -236,6 +244,20 @@ class AirFresh(Device):
     def set_mode(self, mode: OperationMode):
         """Set mode."""
         return self.send("set_mode", [mode.value])
+
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED"
+            if led else "Turning off LED"
+        )
+    )
+    def set_led(self, led: bool):
+        """Turn led on/off."""
+        if led:
+            return self.send("set_led", ['on'])
+        else:
+            return self.send("set_led", ['off'])
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),

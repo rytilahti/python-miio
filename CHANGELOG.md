@@ -1,5 +1,65 @@
 # Change Log
 
+## [0.4.3](https://github.com/rytilahti/python-miio/tree/0.4.3)
+
+This is a bugfix release which provides improved compatibility.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.2...0.4.3)
+
+**Closed issues:**
+
+- unsupported device zhimi airmonitor v1 [\#393](https://github.com/rytilahti/python-miio/issues/393)
+- Unsupported device found: chuangmi.ir.v2 [\#392](https://github.com/rytilahti/python-miio/issues/392)
+- TypeError: not all arguments converted during string formatting [\#385](https://github.com/rytilahti/python-miio/issues/385)
+- Status not worked for AirHumidifier CA1 [\#383](https://github.com/rytilahti/python-miio/issues/383)
+- Xiaomi Rice Cooker Normal5: get\_prop only works if "all" properties are requested [\#380](https://github.com/rytilahti/python-miio/issues/380)
+- python-construct-2.9.45 [\#374](https://github.com/rytilahti/python-miio/issues/374)
+
+**Merged pull requests:**
+
+- Update commands in manual [\#398](https://github.com/rytilahti/python-miio/pull/398) ([olskar](https://github.com/olskar))
+- Add cli interface for yeelight devices [\#397](https://github.com/rytilahti/python-miio/pull/397) ([rytilahti](https://github.com/rytilahti))
+- Add last\_clean\_details to return information from the last clean [\#395](https://github.com/rytilahti/python-miio/pull/395) ([rytilahti](https://github.com/rytilahti))
+- Add discovery of the Xiaomi Air Quality Monitor \(PM2.5\) \(Closes: \#393\) [\#394](https://github.com/rytilahti/python-miio/pull/394) ([syssi](https://github.com/syssi))
+- Add miiocli support for the Air Humidifier CA1 [\#391](https://github.com/rytilahti/python-miio/pull/391) ([syssi](https://github.com/syssi))
+- Add property LED to the Xiaomi Air Fresh [\#390](https://github.com/rytilahti/python-miio/pull/390) ([syssi](https://github.com/syssi))
+- Fix Cooker Normal5: get\_prop only works if "all" properties are requested \(Closes: \#380\) [\#389](https://github.com/rytilahti/python-miio/pull/389) ([syssi](https://github.com/syssi))
+- Improve the support of the Air Humidifier CA1 \(Closes: \#383\) [\#388](https://github.com/rytilahti/python-miio/pull/388) ([syssi](https://github.com/syssi))
+
+
+## [0.4.2](https://github.com/rytilahti/python-miio/tree/0.4.2)
+
+This release removes the version pinning for "construct" library as its API has been stabilized and we don't want to force our downstreams for our version choices.
+Another notable change is dropping the "mirobo" package which has been deprecated for a very long time, and everyone using it should have had converted to use "miio" already.
+Furthermore the client tools work now with click's version 7+.
+
+This release also changes the behavior of vacuum's `got_error` property to signal properly if an error has occured. The previous behavior was based on checking the state instead of the error number, which changed after an error to 'idle' after a short while.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.1...0.4.2)
+
+**Fixed bugs:**
+
+- Zoned cleanup start and stops imediately [\#355](https://github.com/rytilahti/python-miio/issues/355)
+
+**Closed issues:**
+
+- STATE not supported: Updating, state\_code: 14 [\#381](https://github.com/rytilahti/python-miio/issues/381)
+- cant get it to work with xiaomi robot vacuum cleaner s50 [\#378](https://github.com/rytilahti/python-miio/issues/378)
+- airfresh problem [\#377](https://github.com/rytilahti/python-miio/issues/377)
+- get device token is 000000000000000000 [\#366](https://github.com/rytilahti/python-miio/issues/366)
+- Rockrobo firmware 3.3.9\_003254 [\#358](https://github.com/rytilahti/python-miio/issues/358)
+- No response from the device on Xiaomi Roborock v2 [\#349](https://github.com/rytilahti/python-miio/issues/349)
+- Information : Xiaomi Aqara Smart Camera Hack [\#347](https://github.com/rytilahti/python-miio/issues/347)
+
+**Merged pull requests:**
+
+- Fix click7 compatibility [\#387](https://github.com/rytilahti/python-miio/pull/387) ([rytilahti](https://github.com/rytilahti))
+- Expand documentation for token from Android backup [\#382](https://github.com/rytilahti/python-miio/pull/382) ([sgtio](https://github.com/sgtio))
+- vacuum's got\_error: compare against error code, not against the state [\#379](https://github.com/rytilahti/python-miio/pull/379) ([rytilahti](https://github.com/rytilahti))
+- Add tqdm to requirements list [\#369](https://github.com/rytilahti/python-miio/pull/369) ([pluehne](https://github.com/pluehne))
+- Improve repr format [\#368](https://github.com/rytilahti/python-miio/pull/368) ([syssi](https://github.com/syssi))
+
+
 ## [0.4.1](https://github.com/rytilahti/python-miio/tree/0.4.1)
 
 This release provides support for some new devices, improved support of existing devices and various fixes.

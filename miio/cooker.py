@@ -16,8 +16,8 @@ MODEL_PRESSURE1 = 'chunmi.cooker.press1'
 MODEL_PRESSURE2 = 'chunmi.cooker.press2'
 MODEL_NORMAL1 = 'chunmi.cooker.normal1'
 MODEL_NORMAL2 = 'chunmi.cooker.normal2'
-MODEL_NORMAL4 = 'chunmi.cooker.normal3'
-MODEL_NORMAL3 = 'chunmi.cooker.normal4'
+MODEL_NORMAL3 = 'chunmi.cooker.normal3'
+MODEL_NORMAL4 = 'chunmi.cooker.normal4'
 MODEL_NORMAL5 = 'chunmi.cooker.normal5'
 
 MODEL_PRESSURE = [MODEL_PRESSURE1, MODEL_PRESSURE2]
@@ -726,7 +726,13 @@ class Cooker(Device):
         """Retrieve properties."""
         properties = ['func', 'menu', 'stage', 'temp', 't_func', 't_precook',
                       't_cook', 'setting', 'delay', 'version', 'favorite', 'custom']
-        values = self.send("get_prop", properties)
+
+        """
+        Some cookers doesn't support a list of properties here. Therefore "all" properties
+        are requested. If the property count or order changes the property list above must
+        be updated.
+        """
+        values = self.send("get_prop", ['all'])
 
         properties_count = len(properties)
         values_count = len(values)

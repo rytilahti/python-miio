@@ -104,14 +104,38 @@ or database from the Mi Home app.
 The procedure is briefly described below,
 but you may find the following links also useful:
 
-- https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain\_token\_mirobot\_new.md
+- https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token.md
 - https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md
 
 Android
 ~~~~~~~
 
-To do a backup of an Android app you need to have the developer mode active,
-and your device has to be accessible with ``adb``.
+Start by installing the newest version of the Mi Home app from Google Play and
+setting up your account. When the app asks you which server you want to use,
+it's important to pick one that is also available in older versions of Mi
+Home (we'll see why a bit later). U.S or china servers are OK, but the european
+server is not supported by the old app. Then, set up your Xiaomi device with the
+Mi Home app.
+
+After the setup is completed, and the device has been connected to the Wi-Fi
+network of your choice, it is necessary to downgrade the Mi Home app to some
+version equal or below 5.0.19. As explained `here <https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token.md#method-3---obtain-mi-home-device-token-for-devices-that-hide-their-tokens-after-setup>`_
+and `here <https://github.com/rytilahti/python-miio/issues/185>`_, newer versions
+of the app do not download the token into the local database, which means that
+we can't retrieve the token from the backup. You can find older versions of the
+Mi Home app in `apkmirror <https://www.apkmirror.com/apk/xiaomi-inc/mihome/>`_.
+
+Download, install and start up the older version of the Mi Home app. When the
+app asks which server should be used, pick the same one you used with the newer
+version of the app. Then, log into your account.
+
+After this point, you are ready to perform the backup and extract the token.
+Please note that it's possible that your device does not show under the old app.
+As long as you picked the same server, it should be OK, and the token should
+have been downloaded and stored into the database.
+
+To do a backup of an Android app you need to have the developer mode active, and
+your device has to be accessible with ``adb``.
 
 .. TODO::
     Add a link how to check and enable the developer mode.

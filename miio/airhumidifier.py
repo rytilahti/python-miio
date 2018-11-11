@@ -10,6 +10,27 @@ from .device import Device, DeviceInfo, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_HUMIDIFIER_V1 = 'zhimi.humidifier.v1'
+MODEL_HUMIDIFIER_CA1 = 'zhimi.humidifier.ca1'
+
+AVAILABLE_PROPERTIES_COMMON = [
+    'power',
+    'mode',
+    'temp_dec',
+    'humidity',
+    'buzzer',
+    'led_b',
+    'child_lock',
+    'limit_hum',
+    'use_time',
+    'hw_version',
+]
+
+AVAILABLE_PROPERTIES = {
+    MODEL_HUMIDIFIER_V1: AVAILABLE_PROPERTIES_COMMON + ['trans_level', 'button_pressed'],
+    MODEL_HUMIDIFIER_CA1: AVAILABLE_PROPERTIES_COMMON + ['speed', 'depth', 'dry'],
+}
+
 
 class AirHumidifierException(DeviceException):
     pass
@@ -96,13 +117,15 @@ class AirHumidifierStatus:
         return self.data["limit_hum"]
 
     @property
-    def trans_level(self) -> int:
+    def trans_level(self) -> Optional[int]:
         """
         The meaning of the property is unknown.
 
         The property is used to determine the strong mode is enabled on old firmware.
         """
-        return self.data["trans_level"]
+        if "trans_level" in self.data and self.data["trans_level"] is not None:
+            return self.data["trans_level"]
+        return None
 
     @property
     def strong_mode_enabled(self) -> bool:
@@ -133,12 +156,16 @@ class AirHumidifierStatus:
     @property
     def speed(self) -> Optional[int]:
         """Current fan speed."""
-        return self.data["speed"]
+        if "speed" in self.data and self.data["speed"] is not None:
+            return self.data["speed"]
+        return None
 
     @property
     def depth(self) -> Optional[int]:
         """The remaining amount of water in percent."""
-        return self.data["depth"]
+        if "depth" in self.data and self.data["depth"] is not None:
+            return self.data["depth"]
+        return None
 
     @property
     def dry(self) -> Optional[bool]:
@@ -147,7 +174,7 @@ class AirHumidifierStatus:
 
         Return True if dry mode is on if available.
         """
-        if self.data["dry"] is not None:
+        if "dry" in self.data and self.data["dry"] is not None:
             return self.data["dry"] == "on"
         return None
 
@@ -164,7 +191,9 @@ class AirHumidifierStatus:
     @property
     def button_pressed(self) -> Optional[str]:
         """Last pressed button."""
-        return self.data["button_pressed"]
+        if "button_pressed" in self.data and self.data["button_pressed"] is not None:
+            return self.data["button_pressed"]
+        return None
 
     def __repr__(self) -> str:
         s = "<AirHumidiferStatus power=%s, " \
@@ -213,8 +242,14 @@ class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
 
     def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_HUMIDIFIER_V1) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_HUMIDIFIER_V1
 
         self.device_info = None
 
@@ -244,20 +279,26 @@ class AirHumidifier(Device):
         if self.device_info is None:
             self.device_info = self.info()
 
-        properties = ['power', 'mode', 'temp_dec', 'humidity', 'buzzer',
-                      'led_b', 'child_lock', 'limit_hum', 'trans_level',
-                      'speed', 'depth', 'dry', 'use_time', 'button_pressed',
-                      'hw_version', ]
+        properties = AVAILABLE_PROPERTIES[self.model]
 
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        # A single request is limited to 16 properties. Therefore the
+        # properties are divided into multiple requests
+        _props_per_request = 15
+
+        # The  CA1 is limited to a single property per request
+        if self.model == MODEL_HUMIDIFIER_CA1:
+            _props_per_request = 1
+
+        _props = properties.copy()
+        values = []
+        while _props:
+            values.extend(self.send("get_prop", _props[:_props_per_request]))
+            _props[:] = _props[_props_per_request:]
 
         properties_count = len(properties)
         values_count = len(values)
         if properties_count != values_count:
-            _LOGGER.debug(
+            _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
                 properties_count, values_count)
@@ -349,3 +390,10 @@ class AirHumidifier(Device):
             return self.send("set_dry", ["on"])
         else:
             return self.send("set_dry", ["off"])
+
+
+class AirHumidifierCA1(AirHumidifier):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_HUMIDIFIER_CA1)

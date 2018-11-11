@@ -74,7 +74,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str, nextgen: bool):
 
 @cli.resultcallback()
 @pass_dev
-def cleanup(vac: miio.Vacuum, **kwargs):
+def cleanup(vac: miio.Vacuum, *args, **kwargs):
     if vac.ip is None:  # dummy Device for discovery, skip teardown
         return
     id_file = kwargs['id_file']
@@ -419,15 +419,15 @@ def cleaning_history(vac: miio.Vacuum):
                                                   res.total_area))
     click.echo()
     for idx, id_ in enumerate(res.ids):
-        for e in vac.clean_details(id_):
-            color = "green" if e.complete else "yellow"
-            click.echo(click.style(
-                "Clean #%s: %s-%s (complete: %s, error: %s)" % (
-                    idx, e.start, e.end, e.complete, e.error),
-                bold=True, fg=color))
-            click.echo("  Area cleaned: %s m²" % e.area)
-            click.echo("  Duration: (%s)" % e.duration)
-            click.echo()
+        details = vac.clean_details(id_, return_list=False)
+        color = "green" if details.complete else "yellow"
+        click.echo(click.style(
+            "Clean #%s: %s-%s (complete: %s, error: %s)" % (
+                idx, details.start, details.end, details.complete, details.error),
+            bold=True, fg=color))
+        click.echo("  Area cleaned: %s m²" % details.area)
+        click.echo("  Duration: (%s)" % details.duration)
+        click.echo()
 
 
 @cli.command()
