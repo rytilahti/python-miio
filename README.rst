@@ -5,12 +5,6 @@ python-miio
 
 This library (and its accompanying cli tool) is used to interface with devices using Xiaomi's `miIO protocol <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__.
 
-.. NOTE::
-   The project has been recently renamed to `python-miio`.
-   Although the `mirobo` python package (as well as the console tool with the same name) are still available,
-   the users of the library are encouraged to start using the `miio` package.
-   The shipped console tools (and the API) are expected to stay backwards-compatible for the near future.
-
 
 Supported devices
 -----------------
