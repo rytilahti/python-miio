@@ -360,7 +360,15 @@ class Vacuum(Device):
     @command()
     def serial_number(self):
         """Get serial number."""
-        return self.send("get_serial_number")[0]["serial_number"]
+        serial = self.send("get_serial_number")
+        if isinstance(serial, list):
+            return serial[0]["serial_number"]
+        return serial
+
+    @command()
+    def locale(self):
+        """Return locale information."""
+        return self.send("app_get_locale")
 
     @command()
     def timezone(self):
