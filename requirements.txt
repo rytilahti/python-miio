@@ -8,3 +8,4 @@ typing  # for py3.4 support
 pytz  # for tz offset in vacuum
 appdirs  # for user_cache_dir of vacuum_cli
 tqdm
+netifaces # for updater

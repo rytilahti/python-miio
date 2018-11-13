@@ -55,6 +55,7 @@ setup(
         'pytz',
         'appdirs',
         'tqdm',
+        'netifaces',
     ],
 
     entry_points={
