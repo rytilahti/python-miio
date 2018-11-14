@@ -1,0 +1,4 @@
+requirements_file: requirements_docs.txt
+python:
+  version: 3
+  setup_py_install: true
