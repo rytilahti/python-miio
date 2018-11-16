@@ -54,7 +54,11 @@ class Vacuum(Device):
 
     @command()
     def stop(self):
-        """Stop cleaning."""
+        """Stop cleaning.
+
+        Note, prefer 'pause' instead of this for wider support.
+        Some newer vacuum models do not support this command.
+        """
         return self.send("app_stop")
 
     @command()
@@ -70,7 +74,7 @@ class Vacuum(Device):
     @command()
     def home(self):
         """Stop cleaning and return home."""
-        self.send("app_stop")
+        self.send("app_pause")
         return self.send("app_charge")
 
     @command(
