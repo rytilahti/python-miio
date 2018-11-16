@@ -41,6 +41,17 @@ class VacuumStatus:
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
         #  'id': 1}
+
+        # v8 new items
+        # clean_mode, begin_time, clean_trigger,
+        # back_trigger, clean_strategy, and completed
+        # TODO: create getters if wanted
+        #
+        # {"msg_ver":8,"msg_seq":60,"state":5,"battery":93,"clean_mode":0,
+        # "fan_power":50,"error_code":0,"map_present":1,"in_cleaning":1,
+        # "dnd_enabled":0,"begin_time":1534333389,"clean_time":21,
+        # "clean_area":202500,"clean_trigger":2,"back_trigger":0,
+        # "completed":0,"clean_strategy":1}
         self.data = data
 
     @property
