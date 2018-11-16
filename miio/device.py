@@ -230,6 +230,8 @@ class Device(metaclass=DeviceGroupMeta):
 
         if parameters is not None:
             cmd["params"] = parameters
+        else:
+            cmd["params"] = []
 
         send_ts = self._device_ts + datetime.timedelta(seconds=1)
         header = {'length': 0, 'unknown': 0x00000000,
@@ -314,7 +316,7 @@ class Device(metaclass=DeviceGroupMeta):
         """Get miIO protocol information from the device.
         This includes information about connected wlan network,
         and harware and software versions."""
-        return DeviceInfo(self.send("miIO.info", []))
+        return DeviceInfo(self.send("miIO.info"))
 
     def update(self, url: str, md5: str):
         """Start an OTA update."""
@@ -329,11 +331,11 @@ class Device(metaclass=DeviceGroupMeta):
 
     def update_progress(self) -> int:
         """Return current update progress [0-100]."""
-        return self.send("miIO.get_ota_progress", [])[0]
+        return self.send("miIO.get_ota_progress")[0]
 
     def update_state(self):
         """Return current update state."""
-        return UpdateState(self.send("miIO.get_ota_state", [])[0])
+        return UpdateState(self.send("miIO.get_ota_state")[0])
 
     def configure_wifi(self, ssid, password, uid=0, extra_params=None):
         """Configure the wifi settings."""

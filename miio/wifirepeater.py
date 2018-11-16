@@ -94,7 +94,7 @@ class WifiRepeater(Device):
     )
     def status(self) -> WifiRepeaterStatus:
         """Return the associated stations."""
-        return WifiRepeaterStatus(self.send("miIO.get_repeater_sta_info", []))
+        return WifiRepeaterStatus(self.send("miIO.get_repeater_sta_info"))
 
     @command(
         default_output=format_output(
@@ -107,7 +107,7 @@ class WifiRepeater(Device):
     def configuration(self) -> WifiRepeaterConfiguration:
         """Return the configuration of the accesspoint."""
         return WifiRepeaterConfiguration(
-            self.send("miIO.get_repeater_ap_info", []))
+            self.send("miIO.get_repeater_ap_info"))
 
     @command(
         click.argument("wifi_roaming", type=bool),

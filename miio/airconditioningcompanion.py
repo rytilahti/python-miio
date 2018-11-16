@@ -267,7 +267,7 @@ class AirConditioningCompanion(Device):
     )
     def status(self) -> AirConditioningCompanionStatus:
         """Return device status."""
-        status = self.send("get_model_and_state", [])
+        status = self.send("get_model_and_state")
         return AirConditioningCompanionStatus(status)
 
     @command(
@@ -298,7 +298,7 @@ class AirConditioningCompanion(Device):
     )
     def learn_result(self):
         """Read the learned command."""
-        return self.send("get_ir_learn_result", [])
+        return self.send("get_ir_learn_result")
 
     @command(
         click.argument("slot", type=int),
