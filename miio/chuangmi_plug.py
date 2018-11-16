@@ -131,7 +131,7 @@ class ChuangmiPlug(Device):
                 properties_count, values_count)
 
         if self.model == MODEL_CHUANGMI_PLUG_V3:
-            load_power = self.send("get_power", [])  # Response: [300]
+            load_power = self.send("get_power")  # Response: [300]
             if len(load_power) == 1:
                 properties.append('load_power')
                 values.append(load_power[0] * 0.01)
@@ -145,7 +145,7 @@ class ChuangmiPlug(Device):
     def on(self):
         """Power on."""
         if self.model == MODEL_CHUANGMI_PLUG_V1:
-            return self.send("set_on", [])
+            return self.send("set_on")
 
         return self.send("set_power", ["on"])
 
@@ -155,7 +155,7 @@ class ChuangmiPlug(Device):
     def off(self):
         """Power off."""
         if self.model == MODEL_CHUANGMI_PLUG_V1:
-            return self.send("set_off", [])
+            return self.send("set_off")
 
         return self.send("set_power", ["off"])
 
@@ -164,14 +164,14 @@ class ChuangmiPlug(Device):
     )
     def usb_on(self):
         """Power on."""
-        return self.send("set_usb_on", [])
+        return self.send("set_usb_on")
 
     @command(
         default_output = format_output("Powering USB off"),
     )
     def usb_off(self):
         """Power off."""
-        return self.send("set_usb_off", [])
+        return self.send("set_usb_off")
 
     @command(
         click.argument("wifi_led", type=bool),

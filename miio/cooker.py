@@ -817,7 +817,7 @@ class Cooker(Device):
         The temperature is only available while cooking.
         Approx. six data points per minute.
         """
-        data = self.send('get_temp_history', [])
+        data = self.send('get_temp_history')
 
         return TemperatureHistory(data[0])
 
