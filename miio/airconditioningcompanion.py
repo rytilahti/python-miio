@@ -285,14 +285,14 @@ class AirConditioningCompanion(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        default_output = format_output("Powering socket on"),
+        default_output=format_output("Powering socket on"),
     )
     def socket_on(self):
         """Socket power on. Supported by acpartner.v3 only."""
         return self.send("toggle_plug", ["on"])
 
     @command(
-        default_output = format_output("Powering socket off"),
+        default_output=format_output("Powering socket off"),
     )
     def socket_off(self):
         """Socket power off. Supported by acpartner.v3 only."""
