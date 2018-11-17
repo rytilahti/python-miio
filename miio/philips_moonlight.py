@@ -1,11 +1,12 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
+from .utils import pretty_rgb
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,8 +44,9 @@ class PhilipsMoonlightStatus:
         return self.data["cct"]
 
     @property
-    def rgb(self) -> int:
-        return self.data["rgb"]
+    def rgb(self) -> Tuple[int, int, int]:
+        """Return color in RGB."""
+        return pretty_rgb(int(self.data["rgb"]))
 
     @property
     def scene(self) -> int:
