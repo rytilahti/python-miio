@@ -6,7 +6,7 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
-from .utils import pretty_rgb
+from .utils import int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class PhilipsMoonlightStatus:
     @property
     def rgb(self) -> Tuple[int, int, int]:
         """Return color in RGB."""
-        return pretty_rgb(int(self.data["rgb"]))
+        return int_to_rgb(int(self.data["rgb"]))
 
     @property
     def scene(self) -> int:

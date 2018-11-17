@@ -5,7 +5,7 @@ from typing import Tuple, Optional
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
-from .utils import pretty_rgb
+from .utils import int_to_rgb
 
 
 class YeelightException(DeviceException):
@@ -38,7 +38,7 @@ class YeelightStatus:
     def rgb(self) -> Optional[Tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
         if self.color_mode == YeelightMode.RGB:
-            return pretty_rgb(int(self.data["rgb"]))
+            return int_to_rgb(int(self.data["rgb"]))
         return None
 
     @property
