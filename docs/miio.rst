@@ -12,6 +12,15 @@ miio\.airconditioningcompanion module
     :show-inheritance:
     :undoc-members:
 
+miio\.airfresh module
+---------------------
+
+.. automodule:: miio.airfresh
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
+
 miio\.airhumidifier module
 --------------------------
 
@@ -52,6 +61,14 @@ miio\.chuangmi\_ir module
     :show-inheritance:
     :undoc-members:
 
+miio\.cooker module
+-------------------
+
+.. automodule:: miio.cooker
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
 miio\.device module
 -------------------
 
@@ -84,6 +101,14 @@ miio\.fan module
     :show-inheritance:
     :undoc-members:
 
+miio\.philips\_bulb module
+--------------------------
+
+.. automodule:: miio.philips_bulb
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
 miio\.philips\_eyecare module
 -----------------------------
 
@@ -92,10 +117,10 @@ miio\.philips\_eyecare module
     :show-inheritance:
     :undoc-members:
 
-miio\.philips\_bulb module
---------------------------
+miio\.philips\_moonlight module
+-------------------------------
 
-.. automodule:: miio.philips_bulb
+.. automodule:: miio.philips_moonlight
     :members:
     :show-inheritance:
     :undoc-members:
@@ -152,6 +177,14 @@ miio\.waterpurifier module
 --------------------------
 
 .. automodule:: miio.waterpurifier
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
+miio\.wifirepeater module
+-------------------------
+
+.. automodule:: miio.wifirepeater
     :members:
     :show-inheritance:
     :undoc-members:
