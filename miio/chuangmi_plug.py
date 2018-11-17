@@ -140,7 +140,7 @@ class ChuangmiPlug(Device):
             defaultdict(lambda: None, zip(properties, values)))
 
     @command(
-        default_output = format_output("Powering on"),
+        default_output=format_output("Powering on"),
     )
     def on(self):
         """Power on."""
@@ -150,7 +150,7 @@ class ChuangmiPlug(Device):
         return self.send("set_power", ["on"])
 
     @command(
-        default_output = format_output("Powering off"),
+        default_output=format_output("Powering off"),
     )
     def off(self):
         """Power off."""
@@ -160,14 +160,14 @@ class ChuangmiPlug(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        default_output = format_output("Powering USB on"),
+        default_output=format_output("Powering USB on"),
     )
     def usb_on(self):
         """Power on."""
         return self.send("set_usb_on")
 
     @command(
-        default_output = format_output("Powering USB off"),
+        default_output=format_output("Powering USB off"),
     )
     def usb_off(self):
         """Power off."""
