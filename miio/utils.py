@@ -4,6 +4,7 @@ import warnings
 from datetime import timedelta, datetime
 from typing import Tuple
 
+
 def deprecated(reason):
     """
     This is a decorator which can be used to mark functions and classes
