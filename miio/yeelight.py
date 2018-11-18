@@ -5,7 +5,7 @@ from typing import Tuple, Optional
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
-from .utils import int_to_rgb
+from .utils import int_to_rgb, rgb_to_int
 
 
 class YeelightException(DeviceException):
@@ -201,9 +201,18 @@ class Yeelight(Device):
         else:
             return self.send("set_ct_abx", [level])
 
-    def set_rgb(self, rgb):
-        """Set color in encoded RGB."""
-        return self.send("set_rgb", [rgb])
+    @command(
+        click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
+        default_output=format_output("Setting color to {rgb}")
+    )
+    def set_rgb(self, rgb: Tuple[int, int, int]):
+        """Set color in RGB."""
+        """Set color in RGB."""
+        for color in rgb:
+            if color < 0 or color > 255:
+                raise YeelightException("Invalid color: %s" % color)
+
+        return self.send("set_rgb", [rgb_to_int(rgb)])
 
     def set_hsv(self, hsv):
         """Set color in HSV."""

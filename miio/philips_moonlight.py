@@ -6,7 +6,7 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
-from .utils import int_to_rgb
+from .utils import int_to_rgb, rgb_to_int
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -177,15 +177,16 @@ class PhilipsMoonlight(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        click.argument("rgb", type=int),
+        click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
         default_output=format_output("Setting color to {rgb}")
     )
-    def set_rgb(self, rgb):
-        """Set color in encoded RGB."""
-        if rgb < 0 or rgb > 16777215:
-            raise PhilipsMoonlightException("Invalid color: %s" % rgb)
+    def set_rgb(self, rgb: Tuple[int, int, int]):
+        """Set color in RGB."""
+        for color in rgb:
+            if color < 0 or color > 255:
+                raise PhilipsMoonlightException("Invalid color: %s" % color)
 
-        return self.send("set_rgb", [rgb])
+        return self.send("set_rgb", [rgb_to_int(rgb)])
 
     @command(
         click.argument("level", type=int),
