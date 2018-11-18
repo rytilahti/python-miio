@@ -207,7 +207,6 @@ class Yeelight(Device):
     )
     def set_rgb(self, rgb: Tuple[int, int, int]):
         """Set color in RGB."""
-        """Set color in RGB."""
         for color in rgb:
             if color < 0 or color > 255:
                 raise YeelightException("Invalid color: %s" % color)
