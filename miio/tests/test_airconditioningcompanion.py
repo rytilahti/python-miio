@@ -132,6 +132,7 @@ class TestAirConditioningCompanion(TestCase):
             model_and_state=self.device.start_state)))
 
         assert self.is_on() is False
+        assert self.state().power_socket is None
         assert self.state().load_power == 2
         assert self.state().air_condition_model == \
             bytes.fromhex('010500978022222102')
@@ -209,7 +210,7 @@ class TestAirConditioningCompanion(TestCase):
 
 class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
     def __init__(self, *args, **kwargs):
-        self.state = ['010500978022222102', '01020119A280222221', '2']
+        self.state = ['010507950000257301', '011001160100002573', '807']
         self.device_prop = {'lumi.0': {'plug_state': 'on'}}
         self.model = MODEL_ACPARTNER_V3
         self.last_ir_played = None
@@ -279,19 +280,19 @@ class TestAirConditioningCompanionV3(TestCase):
             power_socket=self.device.start_device_prop['lumi.0']['plug_state'])
         ))
 
-        assert self.is_on() is False
+        assert self.is_on() is True
         assert self.state().power_socket == 'on'
-        assert self.state().load_power == 2
+        assert self.state().load_power == 807
         assert self.state().air_condition_model == \
-            bytes.fromhex('010500978022222102')
+            bytes.fromhex('010507950000257301')
         assert self.state().model_format == 1
         assert self.state().device_type == 5
-        assert self.state().air_condition_brand == 97
-        assert self.state().air_condition_remote == 80222221
-        assert self.state().state_format == 2
-        assert self.state().air_condition_configuration == '020119A2'
-        assert self.state().target_temperature == 25
+        assert self.state().air_condition_brand == 795
+        assert self.state().air_condition_remote == 2573
+        assert self.state().state_format == 1
+        assert self.state().air_condition_configuration == '10011601'
+        assert self.state().target_temperature == 22
         assert self.state().swing_mode == SwingMode.Off
         assert self.state().fan_speed == FanSpeed.Low
-        assert self.state().mode == OperationMode.Auto
-        assert self.state().led is False
+        assert self.state().mode == OperationMode.Heat
+        assert self.state().led is True

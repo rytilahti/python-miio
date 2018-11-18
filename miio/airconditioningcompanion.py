@@ -104,7 +104,7 @@ class AirConditioningCompanionStatus:
 
         Example data payload:
         { 'model_and_state': ['010500978022222102', '010201190280222221', '2'],
-          'socket_power': 'on' }
+          'power_socket': 'on' }
         """
         self.data = data
 
@@ -116,7 +116,7 @@ class AirConditioningCompanionStatus:
     @property
     def power_socket(self) -> Optional[str]:
         """Current socket power state."""
-        if self.data["power_socket"] is not None:
+        if "power_socket" in self.data and self.data["power_socket"] is not None:
             return self.data["power_socket"]
 
         return None
