@@ -72,6 +72,7 @@ class TestYeelight(TestCase):
         assert status.brightness == 100
         assert status.color_temp == 3584
         assert status.color_mode == YeelightMode.ColorTemperature
+        assert status.rgb is None
         assert status.developer_mode is True
         assert status.save_state_on_change is True
 

@@ -194,13 +194,13 @@ class TestPhilipsMoonlight(TestCase):
 
         self.device.set_brightness_and_rgb(20, 0)
         assert brightness() == 20
-        assert rgb() == int_to_rgb(0)
+        assert rgb() == (0, 0, 0)
         self.device.set_brightness_and_rgb(31, 16711680)
         assert brightness() == 31
-        assert rgb() == int_to_rgb(16711680)
+        assert rgb() == (255, 0, 0)
         self.device.set_brightness_and_rgb(100, 16777215)
         assert brightness() == 100
-        assert rgb() == int_to_rgb(16777215)
+        assert rgb() == (255, 255, 255)
 
         with pytest.raises(PhilipsMoonlightException):
             self.device.set_brightness_and_rgb(-1, 10)
