@@ -4,6 +4,7 @@ import pytest
 
 from miio import PhilipsMoonlight
 from miio.philips_moonlight import PhilipsMoonlightStatus, PhilipsMoonlightException
+from miio.utils import int_to_rgb
 from .dummies import DummyDevice
 
 
@@ -79,7 +80,7 @@ class TestPhilipsMoonlight(TestCase):
         assert self.is_on() is True
         assert self.state().brightness == self.device.start_state["bri"]
         assert self.state().color_temperature == self.device.start_state["cct"]
-        assert self.state().rgb == self.device.start_state["rgb"]
+        assert self.state().rgb == int_to_rgb(int(self.device.start_state["rgb"]))
         assert self.state().scene == self.device.start_state["snm"]
 
     def test_set_brightness(self):
@@ -105,18 +106,30 @@ class TestPhilipsMoonlight(TestCase):
         def rgb():
             return self.device.status().rgb
 
-        self.device.set_rgb(1)
-        assert rgb() == 1
-        self.device.set_rgb(16711680)
-        assert rgb() == 16711680
-        self.device.set_rgb(16777215)
-        assert rgb() == 16777215
+        self.device.set_rgb((0, 0, 1))
+        assert rgb() == (0, 0, 1)
+        self.device.set_rgb((255, 255, 0))
+        assert rgb() == (255, 255, 0)
+        self.device.set_rgb((255, 255, 255))
+        assert rgb() == (255, 255, 255)
 
         with pytest.raises(PhilipsMoonlightException):
-            self.device.set_rgb(-1)
+            self.device.set_rgb((-1, 0, 0))
 
         with pytest.raises(PhilipsMoonlightException):
-            self.device.set_rgb(16777216)
+            self.device.set_rgb((256, 0, 0))
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_rgb((0, -1, 0))
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_rgb((0, 256, 0))
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_rgb((0, 0, -1))
+
+        with pytest.raises(PhilipsMoonlightException):
+            self.device.set_rgb((0, 0, 256))
 
     def test_set_color_temperature(self):
         def color_temperature():
@@ -181,13 +194,13 @@ class TestPhilipsMoonlight(TestCase):
 
         self.device.set_brightness_and_rgb(20, 0)
         assert brightness() == 20
-        assert rgb() == 0
+        assert rgb() == (0, 0, 0)
         self.device.set_brightness_and_rgb(31, 16711680)
         assert brightness() == 31
-        assert rgb() == 16711680
+        assert rgb() == (255, 0, 0)
         self.device.set_brightness_and_rgb(100, 16777215)
         assert brightness() == 100
-        assert rgb() == 16777215
+        assert rgb() == (255, 255, 255)
 
         with pytest.raises(PhilipsMoonlightException):
             self.device.set_brightness_and_rgb(-1, 10)

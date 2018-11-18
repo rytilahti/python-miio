@@ -72,6 +72,7 @@ class TestYeelight(TestCase):
         assert status.brightness == 100
         assert status.color_temp == 3584
         assert status.color_mode == YeelightMode.ColorTemperature
+        assert status.rgb is None
         assert status.developer_mode is True
         assert status.save_state_on_change is True
 
@@ -124,14 +125,39 @@ class TestYeelight(TestCase):
         with pytest.raises(YeelightException):
             self.device.set_color_temp(7000)
 
-    @pytest.mark.skip("rgb is not properly implemented")
     def test_set_rgb(self):
-        self.device._reset_state()
-        assert self.device.status().rgb == 16711680
+        def rgb():
+            return self.device.status().rgb
 
-        NEW_RGB = 16712222
-        self.set_rgb(NEW_RGB)
-        assert self.device.status().rgb == NEW_RGB
+        self.device._reset_state()
+        self.device._set_state('color_mode', [1])
+
+        assert rgb() == (255, 0, 0)
+
+        self.device.set_rgb((0, 0, 1))
+        assert rgb() == (0, 0, 1)
+        self.device.set_rgb((255, 255, 0))
+        assert rgb() == (255, 255, 0)
+        self.device.set_rgb((255, 255, 255))
+        assert rgb() == (255, 255, 255)
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((-1, 0, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((256, 0, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, -1, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, 256, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, 0, -1))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, 0, 256))
 
     @pytest.mark.skip("hsv is not properly implemented")
     def test_set_hsv(self):

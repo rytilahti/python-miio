@@ -2,6 +2,7 @@ import functools
 import inspect
 import warnings
 from datetime import timedelta, datetime
+from typing import Tuple
 
 
 def deprecated(reason):
@@ -88,3 +89,16 @@ def pretty_seconds(x: float) -> timedelta:
 def pretty_time(x: float) -> datetime:
     """Return a datetime object from unix timestamp."""
     return datetime.fromtimestamp(x)
+
+
+def int_to_rgb(x: int) -> Tuple[int, int, int]:
+    """Return a RGB tuple from integer."""
+    red = (x >> 16) & 0xff
+    green = (x >> 8) & 0xff
+    blue = x & 0xff
+    return red, green, blue
+
+
+def rgb_to_int(x: Tuple[int, int, int]) -> int:
+    """Return an integer from RGB tuple."""
+    return int(x[0] << 16 | x[1] << 8 | x[2])
