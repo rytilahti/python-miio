@@ -128,7 +128,8 @@ class TestAirConditioningCompanion(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(model_and_state=self.device.start_state)))
+        assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(
+            model_and_state=self.device.start_state)))
 
         assert self.is_on() is False
         assert self.state().load_power == 2
@@ -273,7 +274,10 @@ class TestAirConditioningCompanionV3(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(model_and_state=self.device.start_state, power_socket=self.device.start_device_prop['lumi.0']['plug_state'])))
+        assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(
+            model_and_state=self.device.start_state,
+            power_socket=self.device.start_device_prop['lumi.0']['plug_state'])
+        ))
 
         assert self.is_on() is False
         assert self.state().power_socket == 'on'
