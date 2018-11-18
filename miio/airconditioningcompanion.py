@@ -107,6 +107,8 @@ class AirConditioningCompanionStatus:
           'power_socket': 'on' }
         """
         self.data = data
+        self.model = data['model_and_state'][0]
+        self.state = data['model_and_state'][1]
 
     @property
     def load_power(self) -> int:
@@ -124,7 +126,7 @@ class AirConditioningCompanionStatus:
     @property
     def air_condition_model(self) -> bytes:
         """Model of the air conditioner."""
-        return bytes.fromhex(self.data['model_and_state'][0])
+        return bytes.fromhex(self.model)
 
     @property
     def model_format(self) -> int:
@@ -172,17 +174,17 @@ class AirConditioningCompanionStatus:
 
     @property
     def air_condition_configuration(self) -> int:
-        return self.data['model_and_state'][1][2:10]
+        return self.state[2:10]
 
     @property
     def power(self) -> str:
         """Current power state."""
-        return 'on' if int(self.data['model_and_state'][1][2:3]) == Power.On.value else 'off'
+        return 'on' if int(self.state[2:3]) == Power.On.value else 'off'
 
     @property
     def led(self) -> Optional[bool]:
         """Current LED state."""
-        state = self.data['model_and_state'][1][8:9]
+        state = self.state[8:9]
         if state == Led.On.value:
             return True
 
@@ -201,7 +203,7 @@ class AirConditioningCompanionStatus:
     def target_temperature(self) -> Optional[int]:
         """Target temperature."""
         try:
-            return int(self.data['model_and_state'][1][6:8], 16)
+            return int(self.state[6:8], 16)
         except TypeError:
             return None
 
@@ -209,7 +211,7 @@ class AirConditioningCompanionStatus:
     def swing_mode(self) -> Optional[SwingMode]:
         """Current swing mode."""
         try:
-            mode = int(self.data['model_and_state'][1][5:6])
+            mode = int(self.state[5:6])
             return SwingMode(mode)
         except TypeError:
             return None
@@ -218,7 +220,7 @@ class AirConditioningCompanionStatus:
     def fan_speed(self) -> Optional[FanSpeed]:
         """Current fan speed."""
         try:
-            speed = int(self.data['model_and_state'][1][4:5])
+            speed = int(self.state[4:5])
             return FanSpeed(speed)
         except TypeError:
             return None
@@ -227,7 +229,7 @@ class AirConditioningCompanionStatus:
     def mode(self) -> Optional[OperationMode]:
         """Current operation mode."""
         try:
-            mode = int(self.data['model_and_state'][1][3:4])
+            mode = int(self.state[3:4])
             return OperationMode(mode)
         except TypeError:
             return None
