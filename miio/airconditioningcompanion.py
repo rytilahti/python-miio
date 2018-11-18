@@ -9,6 +9,11 @@ from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_ACPARTNER_V1 = 'lumi.acpartner.v1'
+MODEL_ACPARTNER_V2 = 'lumi.acpartner.v2'
+MODEL_ACPARTNER_V3 = 'lumi.acpartner.v3'
+
+MODELS_SUPPORTED = [MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3]
 
 class AirConditioningCompanionException(DeviceException):
     pass
@@ -83,29 +88,43 @@ class AirConditioningCompanionStatus:
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
-        # Device model: lumi.acpartner.v2
-        #
-        # Response of "get_model_and_state":
-        # ['010500978022222102', '010201190280222221', '2']
-        #
-        # AC turned on by set_power=on:
-        # ['010507950000257301', '011001160100002573', '807']
-        #
-        # AC turned off by set_power=off:
-        # ['010507950000257301', '010001160100002573', '6']
-        # ...
-        # ['010507950000257301', '010001160100002573', '1']
+        """
+        Device model: lumi.acpartner.v2
+
+        Response of "get_model_and_state":
+        ['010500978022222102', '010201190280222221', '2']
+
+        AC turned on by set_power=on:
+        ['010507950000257301', '011001160100002573', '807']
+
+        AC turned off by set_power=off:
+        ['010507950000257301', '010001160100002573', '6']
+        ...
+        ['010507950000257301', '010001160100002573', '1']
+
+        Example data payload:
+        { 'model_and_state': ['010500978022222102', '010201190280222221', '2'],
+          'socket_power': 'on' }
+        """
         self.data = data
 
     @property
     def load_power(self) -> int:
         """Current power load of the air conditioner."""
-        return int(self.data[2])
+        return int(self.data['model_and_state'][2])
+
+    @property
+    def power_socket(self) -> Optional[str]:
+        """Current socket power state."""
+        if self.data["power_socket"] is not None:
+            return self.data["power_socket"]
+
+        return None
 
     @property
     def air_condition_model(self) -> bytes:
         """Model of the air conditioner."""
-        return bytes.fromhex(self.data[0])
+        return bytes.fromhex(self.data['model_and_state'][0])
 
     @property
     def model_format(self) -> int:
@@ -153,17 +172,17 @@ class AirConditioningCompanionStatus:
 
     @property
     def air_condition_configuration(self) -> int:
-        return self.data[1][2:10]
+        return self.data['model_and_state'][1][2:10]
 
     @property
     def power(self) -> str:
         """Current power state."""
-        return 'on' if int(self.data[1][2:3]) == Power.On.value else 'off'
+        return 'on' if int(self.data['model_and_state'][1][2:3]) == Power.On.value else 'off'
 
     @property
     def led(self) -> Optional[bool]:
         """Current LED state."""
-        state = self.data[1][8:9]
+        state = self.data['model_and_state'][1][8:9]
         if state == Led.On.value:
             return True
 
@@ -182,7 +201,7 @@ class AirConditioningCompanionStatus:
     def target_temperature(self) -> Optional[int]:
         """Target temperature."""
         try:
-            return int(self.data[1][6:8], 16)
+            return int(self.data['model_and_state'][1][6:8], 16)
         except TypeError:
             return None
 
@@ -190,7 +209,7 @@ class AirConditioningCompanionStatus:
     def swing_mode(self) -> Optional[SwingMode]:
         """Current swing mode."""
         try:
-            mode = int(self.data[1][5:6])
+            mode = int(self.data['model_and_state'][1][5:6])
             return SwingMode(mode)
         except TypeError:
             return None
@@ -199,7 +218,7 @@ class AirConditioningCompanionStatus:
     def fan_speed(self) -> Optional[FanSpeed]:
         """Current fan speed."""
         try:
-            speed = int(self.data[1][4:5])
+            speed = int(self.data['model_and_state'][1][4:5])
             return FanSpeed(speed)
         except TypeError:
             return None
@@ -208,7 +227,7 @@ class AirConditioningCompanionStatus:
     def mode(self) -> Optional[OperationMode]:
         """Current operation mode."""
         try:
-            mode = int(self.data[1][3:4])
+            mode = int(self.data['model_and_state'][1][3:4])
             return OperationMode(mode)
         except TypeError:
             return None
@@ -250,7 +269,17 @@ class AirConditioningCompanionStatus:
 
 
 class AirConditioningCompanion(Device):
-    """Main class representing Xiaomi Air Conditioning Companion."""
+    """Main class representing Xiaomi Air Conditioning Companion V1 and V2."""
+
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_ACPARTNER_V2) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in MODELS_SUPPORTED:
+            self.model = model
+        else:
+            self.model = MODEL_ACPARTNER_V2
 
     @command(
         default_output=format_output(
@@ -268,7 +297,7 @@ class AirConditioningCompanion(Device):
     def status(self) -> AirConditioningCompanionStatus:
         """Return device status."""
         status = self.send("get_model_and_state")
-        return AirConditioningCompanionStatus(status)
+        return AirConditioningCompanionStatus(dict(model_and_state=status))
 
     @command(
         default_output=format_output("Powering the air condition on"),
@@ -283,20 +312,6 @@ class AirConditioningCompanion(Device):
     def off(self):
         """Turn the air condition off by infrared."""
         return self.send("set_power", ["off"])
-
-    @command(
-        default_output=format_output("Powering socket on"),
-    )
-    def socket_on(self):
-        """Socket power on. Supported by acpartner.v3 only."""
-        return self.send("toggle_plug", ["on"])
-
-    @command(
-        default_output=format_output("Powering socket off"),
-    )
-    def socket_off(self):
-        """Socket power off. Supported by acpartner.v3 only."""
-        return self.send("toggle_plug", ["off"])
 
     @command(
         click.argument("slot", type=int),
@@ -421,3 +436,45 @@ class AirConditioningCompanion(Device):
         configuration = configuration + suffix
 
         return self.send_command(configuration)
+
+
+class AirConditioningCompanionV3(AirConditioningCompanion):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_ACPARTNER_V3)
+
+    @command(
+        default_output=format_output("Powering socket on"),
+    )
+    def socket_on(self):
+        """Socket power on."""
+        return self.send("toggle_plug", ["on"])
+
+    @command(
+        default_output=format_output("Powering socket off"),
+    )
+    def socket_off(self):
+        """Socket power off."""
+        return self.send("toggle_plug", ["off"])
+
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Power socket: {result.power_socket}\n"
+            "Load power: {result.load_power}\n"
+            "Air Condition model: {result.air_condition_model}\n"
+            "LED: {result.led}\n"
+            "Target temperature: {result.target_temperature} °C\n"
+            "Swing mode: {result.swing_mode}\n"
+            "Fan speed: {result.fan_speed}\n"
+            "Mode: {result.mode}\n"
+        )
+    )
+    def status(self) -> AirConditioningCompanionStatus:
+        """Return device status."""
+        status = self.send("get_model_and_state")
+        power_socket = self.send("get_device_prop", ["lumi.0", "plug_state"])
+        return AirConditioningCompanionStatus(dict(
+            model_and_state=status, power_socket=power_socket))
