@@ -73,6 +73,7 @@ DEVICE_MAP = {
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
     "zhimi-airfresh-va2": AirFresh,
     "zhimi-airmonitor-v1": AirQualityMonitor,
+    "cgllc-airmonitor-b1": AirQualityMonitor,
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]

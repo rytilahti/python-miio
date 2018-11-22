@@ -14,7 +14,15 @@ class AirQualityMonitorStatus:
     """Container of air quality monitor status."""
 
     def __init__(self, data):
-        # {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off', 'time_state': 'on'}
+        """
+        Response of a Xiaomi Air Quality Monitor (zhimi.airmonitor.v1):
+
+        {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off', 'time_state': 'on'}
+
+        Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.b1):
+
+        unknown.
+        """
         self.data = data
 
     @property
