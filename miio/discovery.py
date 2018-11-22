@@ -12,6 +12,8 @@ from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, 
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
                Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor)
 
+from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
+from .airhumidifier import (MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_V1, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
 from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, )
@@ -43,8 +45,8 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v6": AirPurifier,   # v6
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
     "chuangmi-ir-v2": ChuangmiIr,
-    "zhimi-humidifier-v1": AirHumidifier,
-    "zhimi-humidifier-ca1": AirHumidifier,
+    "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
+    "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "yunmi-waterpuri-v2": WaterPurifier,
     "philips-light-bulb": PhilipsBulb,     # cannot be discovered via mdns
     "philips-light-candle": PhilipsBulb,   # cannot be discovered via mdns
@@ -63,9 +65,9 @@ DEVICE_MAP = {
     "chunmi-cooker-normal3": Cooker,
     "chunmi-cooker-normal4": Cooker,
     "chunmi-cooker-normal5": Cooker,
-    "lumi-acpartner-v1": AirConditioningCompanion,
-    "lumi-acpartner-v2": AirConditioningCompanion,
-    "lumi-acpartner-v3": AirConditioningCompanion,
+    "lumi-acpartner-v1": partial(AirConditioningCompanion, model=MODEL_ACPARTNER_V1),
+    "lumi-acpartner-v2": partial(AirConditioningCompanion, model=MODEL_ACPARTNER_V2),
+    "lumi-acpartner-v3": partial(AirConditioningCompanion, model=MODEL_ACPARTNER_V3),
     "yeelink-light-": Yeelight,
     "zhimi-fan-v2": partial(Fan, model=MODEL_FAN_V2),
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
