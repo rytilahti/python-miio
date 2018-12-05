@@ -1,5 +1,62 @@
 # Change Log
 
+## [0.4.4](https://github.com/rytilahti/python-miio/tree/0.4.4) (2018-12-03)
+
+This release adds support for the following new devices:
+
+* Air Purifier 2s
+* Vacuums roborock.vacuum.e2 and roborock.vacuum.c1 (limited features, sound packs are known not to be working)
+
+Fixes & Enhancements:
+
+* AC Partner V3: Add socket support
+* AC Parner & AirHumidifer: improved autodetection
+* Cooker: fixed model confusion
+* Vacuum: add last_clean_details() to directly access the information from latest cleaning
+* Yeelight: RGB support
+* Waterpurifier: improved support
+
+API changes:
+* Vacuum: returning a list for clean_details() is deprecated and to be removed in the future.
+* Philips Moonlight: RGB values are expected and delivered as tuples instead of an integer
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.3...0.4.4)
+
+**Implemented enhancements:**
+
+- Not working with Rockrobo Xiaowa \(roborock.vacuum.e2\) [\#364](https://github.com/rytilahti/python-miio/issues/364)
+- Support for new vacuum model Xiaowa E20  [\#348](https://github.com/rytilahti/python-miio/issues/348)
+
+**Fixed bugs:**
+
+- No working with Xiaowa \(roborock.vacuum.c1 v1.3.0\) [\#370](https://github.com/rytilahti/python-miio/issues/370)
+- Send multiple params broken result [\#73](https://github.com/rytilahti/python-miio/issues/73)
+
+**Closed issues:**
+
+- Add lumi.gateway.aqhm01 as unsuppported gateway [\#424](https://github.com/rytilahti/python-miio/issues/424)
+- Unsupported device zhimi.airpurifier.mc1 [\#403](https://github.com/rytilahti/python-miio/issues/403)
+- xiaomi repeater v1 [\#396](https://github.com/rytilahti/python-miio/issues/396)
+- Control Air Conditioner Companion like Xiaomi Mi Smart WiFi Socket [\#337](https://github.com/rytilahti/python-miio/issues/337)
+
+**Merged pull requests:**
+
+- Improve discovery a specific device models [\#421](https://github.com/rytilahti/python-miio/pull/421) ([syssi](https://github.com/syssi))
+- Fix PEP8 lint issue: unexpected spaces around keyword / parameter equals [\#416](https://github.com/rytilahti/python-miio/pull/416) ([syssi](https://github.com/syssi))
+- AC Partner V3: Add socket support \(Closes \#337\) [\#415](https://github.com/rytilahti/python-miio/pull/415) ([syssi](https://github.com/syssi))
+- Moonlight: Provide property rgb as tuple [\#414](https://github.com/rytilahti/python-miio/pull/414) ([syssi](https://github.com/syssi))
+- fix last\_clean\_details to return the latest, not the oldest [\#413](https://github.com/rytilahti/python-miio/pull/413) ([rytilahti](https://github.com/rytilahti))
+- generate docs for more modules [\#412](https://github.com/rytilahti/python-miio/pull/412) ([rytilahti](https://github.com/rytilahti))
+- Use pause instead of stop for home command [\#411](https://github.com/rytilahti/python-miio/pull/411) ([rytilahti](https://github.com/rytilahti))
+- Add .readthedocs.yml [\#410](https://github.com/rytilahti/python-miio/pull/410) ([rytilahti](https://github.com/rytilahti))
+- Fix serial number reporting for some devices, add locale command [\#409](https://github.com/rytilahti/python-miio/pull/409) ([rytilahti](https://github.com/rytilahti))
+- Force parameters to be an empty list if none is given [\#408](https://github.com/rytilahti/python-miio/pull/408) ([rytilahti](https://github.com/rytilahti))
+- Cooker: Fix mixed model name [\#406](https://github.com/rytilahti/python-miio/pull/406) ([syssi](https://github.com/syssi))
+- Waterpurifier: Divide properties into multiple requests \(Closes: \#73\) [\#405](https://github.com/rytilahti/python-miio/pull/405) ([syssi](https://github.com/syssi))
+- Add Xiaomi Air Purifier 2s support [\#404](https://github.com/rytilahti/python-miio/pull/404) ([syssi](https://github.com/syssi))
+- Fixed typo in log message [\#402](https://github.com/rytilahti/python-miio/pull/402) ([microraptor](https://github.com/microraptor))
+
+
 ## [0.4.3](https://github.com/rytilahti/python-miio/tree/0.4.3)
 
 This is a bugfix release which provides improved compatibility.
