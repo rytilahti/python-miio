@@ -15,7 +15,7 @@ from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, 
 from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
 from .airhumidifier import (MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_V1, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
-                            MODEL_CHUANGMI_PLUG_M1, )
+                            MODEL_CHUANGMI_PLUG_M1, MODEL_CHUANGMI_PLUG_HMI205, )
 from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, )
 from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
@@ -30,6 +30,7 @@ DEVICE_MAP = {
     "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "chuangmi-plug-v3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V3),
+    "chuangmi-plug-hmi205": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_HMI205),
     "qmi-powerstrip-v1": partial(PowerStrip, model=MODEL_POWER_STRIP_V1),
     "zimi-powerstrip-v2": partial(PowerStrip, model=MODEL_POWER_STRIP_V2),
     "zhimi-airpurifier-m1": AirPurifier,   # mini model
