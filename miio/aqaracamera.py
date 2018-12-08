@@ -2,7 +2,8 @@
 
 Support for lumi.camera.aq1
 
-TODO: add alarm/sound parts (get_music_info, {get,set}_alarming_volume, set_default_music, play_music_new, set_sound_playing)
+TODO: add alarm/sound parts (get_music_info, {get,set}_alarming_volume,
+      set_default_music, play_music_new, set_sound_playing)
 TODO: add sdcard status & fix all TODOS
 TODO: add tests
 """
@@ -46,6 +47,7 @@ class SDCardStatus(IntEnum):
     FormatRequired = 2
     Formating = 3
 
+
 class MotionDetectionSensitivity(IntEnum):
     """'Default' values for md sensitivity.
     Currently unused as the value can also be set arbitrarily.
@@ -53,6 +55,7 @@ class MotionDetectionSensitivity(IntEnum):
     High = 6000000
     Medium = 10000000
     Low = 11000000
+
 
 class CameraStatus:
     """Container for status reports from the Aqara Camera."""
@@ -342,6 +345,7 @@ class AqaraCamera(Device):
         """List or set the alarm sound."""
         if id is None:
             sound_status = self.send("get_music_info", [0])
+
             # TODO: make a list out from this.
             @attr.s
             class SoundList:
