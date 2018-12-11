@@ -199,7 +199,8 @@ class Yeelight(Device):
         if transition > 0:
             return self.send("set_ct_abx", [level, "smooth", transition])
         else:
-            return self.send("set_ct_abx", [level])
+            # Bedside lamp requires transition
+            return self.send("set_ct_abx", [level, "sudden", 0])
 
     @command(
         click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
@@ -234,8 +235,8 @@ class Yeelight(Device):
         return self.send("set_ps", ["cfg_save_state", str(int(enable))])
 
     @command(
-        click.argument("name", type=bool),
-        default_output=format_output("Setting name to {enable}")
+        click.argument("name", type=str),
+        default_output=format_output("Setting name to {name}")
     )
     def set_name(self, name: str) -> bool:
         """Set an internal name for the bulb."""
