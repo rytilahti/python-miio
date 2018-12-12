@@ -1,7 +1,9 @@
+import binascii
 import codecs
 import inspect
 import ipaddress
 import logging
+import netifaces
 from functools import partial
 from typing import Union, Callable, Dict, Optional  # noqa: F401
 
@@ -82,11 +84,6 @@ DEVICE_MAP = {
 }  # type: Dict[str, Union[Callable, Device]]
 
 
-def pretty_token(token):
-    """Return a pretty string presentation for a token."""
-    return codecs.encode(token, 'hex').decode()
-
-
 def other_package_info(info, desc):
     """Return information about another package supporting the device."""
     return "%s @ %s, check %s" % (
@@ -101,12 +98,11 @@ def create_device(name: str, addr: str, device_cls: partial) -> Device:
                   name, device_cls.func.__name__)
 
     dev = device_cls(ip=addr)
-    m = dev.do_discover()
-    dev.token = m.checksum
+    dev.send_handshake(initialize_token=True)
     _LOGGER.info("Found a supported '%s' at %s - token: %s",
                  device_cls.func.__name__,
                  addr,
-                 pretty_token(dev.token))
+                 dev.pretty_token)
     return dev
 
 
@@ -127,9 +123,10 @@ class Listener:
                     return create_device(name, addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)
+                    dev.send_handshake(initialize_token=True)
                     _LOGGER.info("%s: token: %s",
                                  v(info),
-                                 pretty_token(dev.do_discover().checksum))
+                                 dev.pretty_token)
                     return None
         _LOGGER.warning("Found unsupported device %s at %s, "
                         "please report to developers", name, addr)
@@ -161,3 +158,83 @@ class Discovery:
         browser.cancel()
 
         return listener.found_devices
+
+import socket
+from . import Message
+
+class MiIODiscovery:
+    """MiIO broadcast discovery"""
+
+    @staticmethod
+    def send_handshake(addr):
+        """Scan for devices in the network.
+        This method is used to discover supported devices by sending a
+        handshake message to the broadcast address on port 54321.
+        If the target IP address is given, the handshake will be send as
+        an unicast packet.
+
+        :param str addr: Target IP address
+        :param bool return_first: Return a single, first encountered message"""
+        timeout = 5
+        devices = []
+
+        # magic, length 32
+        helobytes = bytes.fromhex(
+            '21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.settimeout(timeout)
+        s.sendto(helobytes, (addr, 54321))
+        while True:
+            try:
+                data, addr = s.recvfrom(1024)
+                m = Message.parse(data)  # type: Message
+                _LOGGER.debug("Got a response: %s", m)
+
+                m = Device.from_handshake_reply(addr, m)
+
+                devices.append(m)
+            except Exception as ex:
+                _LOGGER.warning("error while reading discover results: %s", ex)
+                break
+
+        return devices
+    
+    @staticmethod
+    def discover(timeout=5, interfaces=None):
+        """Discover devices using MiIO broadcast hello.
+
+        Note, the timeout is per interface
+        :param timeout: how long to wait for responses
+        :param interfaces: list of interfaces to send broadcasts
+        :return:
+        """
+        if not interfaces:
+            interfaces = netifaces.interfaces()
+
+        _LOGGER.debug("Available interfaces: %s", interfaces)
+        ipv4_broadcasts = set()
+        for interface in interfaces:
+            addresses = netifaces.ifaddresses(interface)
+            if netifaces.AF_INET not in addresses:
+                continue
+
+            v4 = addresses[netifaces.AF_INET]
+            for addr in v4:
+                if "broadcast" in addr:
+                    ipv4_broadcasts.add(addr["broadcast"])
+
+        all_devices = []
+
+        _LOGGER.debug("Broadcast addreses: %s", ipv4_broadcasts)
+        for broadcast in ipv4_broadcasts:
+            _LOGGER.debug("Sending discovery to %s with timeout of %ss..",
+                         broadcast, timeout)
+            devices = MiIODiscovery.send_handshake(addr=broadcast)
+            _LOGGER.debug("Got %s devices", len(devices))
+            if devices is None:
+                continue
+            all_devices.extend(devices)
+
+        return all_devices

@@ -67,7 +67,7 @@ def cli(ctx, ip: str, token: str, debug: int):
 @cli.command()
 def discover():
     """Search for plugs in the network."""
-    miio.PhilipsEyecare.discover()
+    miio.PhilipsEyecare.send_handshake()
 
 
 @cli.command()

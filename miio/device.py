@@ -4,7 +4,7 @@ import datetime
 import logging
 import socket
 from enum import Enum
-from typing import Any, List, Optional  # noqa: F401
+from typing import Any, List, Optional, Union  # noqa: F401
 
 import click
 import construct
@@ -53,11 +53,12 @@ class DeviceInfo:
         self.data = data
 
     def __repr__(self):
-        return "%s v%s (%s) @ %s - token: %s" % (
+        return "%s v%s (%s) @ %s (%s) - token: %s" % (
             self.data["model"],
             self.data["fw_ver"],
             self.data["mac"],
             self.network_interface["localIp"],
+            self.ssid,
             self.data["token"])
 
     def __json__(self):
@@ -72,6 +73,21 @@ class DeviceInfo:
     def accesspoint(self):
         """Information about connected wlan accesspoint."""
         return self.data["ap"]
+
+    @property
+    def ssid(self) -> Optional[str]:
+        """SSID of the connected wlan accesspoint."""
+        return self.accesspoint["ssid"] or None
+
+    @property
+    def rssi(self) -> int:
+        """RSSI of the wifi connection"""
+        return self.accesspoint["rssi"]
+
+    @property
+    def is_configured(self) -> bool:
+        """If the device is TODO paired"""
+        return self.ssid is not None
 
     @property
     def model(self) -> Optional[str]:
@@ -125,8 +141,10 @@ class Device(metaclass=DeviceGroupMeta):
         self.ip = ip
         self.port = 54321
         if token is None:
-            token = 32 * '0'
-        if token is not None:
+            self.token = 32 * '0'
+        elif isinstance(token, bytes):
+            self.token = token
+        else:
             self.token = bytes.fromhex(token)
         self.debug = debug
         self.lazy_discover = lazy_discover
@@ -137,7 +155,7 @@ class Device(metaclass=DeviceGroupMeta):
         self.__id = start_id
         self._device_id = None
 
-    def do_discover(self) -> Message:
+    def do_handshake(self) -> Message:
         """Send a handshake to the device,
         which can be used to the device type and serial.
         The handshake must also be done regularly to enable communication
@@ -146,10 +164,8 @@ class Device(metaclass=DeviceGroupMeta):
         :rtype: Message
 
         :raises DeviceException: if the device could not be discovered."""
-        m = Device.discover(self.ip)
+        m = Device.send_handshake(self.ip)
         if m is not None:
-            self._device_id = m.header.value.device_id
-            self._device_ts = m.header.value.ts
             self._discovered = True
             if self.debug > 1:
                 _LOGGER.debug(m)
@@ -163,23 +179,18 @@ class Device(metaclass=DeviceGroupMeta):
 
         return m
 
-    @staticmethod
-    def discover(addr: str=None) -> Any:
-        """Scan for devices in the network.
-        This method is used to discover supported devices by sending a
-        handshake message to the broadcast address on port 54321.
-        If the target IP address is given, the handshake will be send as
-        an unicast packet.
+    @classmethod
+    def from_handshake_reply(cls, addr, message, device_class=None):
+        if device_class:
+            cls = device_class
+        dev = cls(addr[0], message.checksum)
+        dev._device_id = message.header.value.device_id
+        dev._device_ts = message.header.value.ts
+        return dev
 
-        :param str addr: Target IP address"""
+    def send_handshake(self, initialize_token=False):
         timeout = 5
-        is_broadcast = addr is None
-        seen_addrs = []  # type: List[str]
-        if is_broadcast:
-            addr = '<broadcast>'
-            is_broadcast = True
-            _LOGGER.info("Sending discovery to %s with timeout of %ss..",
-                         addr, timeout)
+
         # magic, length 32
         helobytes = bytes.fromhex(
             '21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
@@ -187,28 +198,18 @@ class Device(metaclass=DeviceGroupMeta):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(timeout)
-        s.sendto(helobytes, (addr, 54321))
-        while True:
+        s.sendto(helobytes, (self.ip, 54321))
+        while True:  # TODO add retry
             try:
                 data, addr = s.recvfrom(1024)
                 m = Message.parse(data)  # type: Message
-                _LOGGER.debug("Got a response: %s", m)
-                if not is_broadcast:
-                    return m
-
-                if addr[0] not in seen_addrs:
-                    _LOGGER.info("  IP %s (ID: %s) - token: %s",
-                                 addr[0],
-                                 binascii.hexlify(m.header.value.device_id).decode(),
-                                 codecs.encode(m.checksum, 'hex'))
-                    seen_addrs.append(addr[0])
-            except socket.timeout:
-                if is_broadcast:
-                    _LOGGER.info("Discovery done")
-                return  # ignore timeouts on discover
+                self._device_id = m.header.value.device_id
+                self._device_ts = m.header.value.ts
+                if initialize_token:
+                    self.token = m.checksum
+                return
             except Exception as ex:
-                _LOGGER.warning("error while reading discover results: %s", ex)
-                break
+                raise DeviceException("Unable to do a handshake") from ex
 
     def send(self, command: str, parameters: Any=None, retry_count=3) -> Any:
         """Build and send the given command.
@@ -221,7 +222,7 @@ class Device(metaclass=DeviceGroupMeta):
         :raises DeviceException: if an error has occured during communication."""
 
         if not self.lazy_discover or not self._discovered:
-            self.do_discover()
+            self.send_handshake()
 
         cmd = {
             "id": self._id,
@@ -344,7 +345,7 @@ class Device(metaclass=DeviceGroupMeta):
         params = {"ssid": ssid, "passwd": password, "uid": uid,
                   **extra_params}
 
-        return self.send("miIO.config_router", params)[0]
+        return self.send("miIO.config_router", params)[0] == "ok"
 
     @property
     def _id(self) -> int:
@@ -358,3 +359,11 @@ class Device(metaclass=DeviceGroupMeta):
     def raw_id(self) -> int:
         """Return the sequence id."""
         return self.__id
+
+    @property
+    def pretty_token(self):
+        """Return a pretty string presentation for a token."""
+        return codecs.encode(self.token, 'hex').decode()
+
+    def __repr__(self):
+        return "<Device %s token: %s>" % (self.ip, self.pretty_token)

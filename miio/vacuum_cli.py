@@ -19,6 +19,7 @@ from miio.click_common import (ExceptionHandlerGroup, validate_ip,
                                validate_token, LiteralParamType)
 from .device import UpdateState
 from .updater import OneShotServer
+from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
@@ -90,13 +91,40 @@ def cleanup(vac: miio.Vacuum, *args, **kwargs):
 
 
 @cli.command()
-@click.option('--handshake', type=bool, default=False)
-def discover(handshake):
+@click.option('--handshake', is_flag=True, default=False)
+@click.argument('interfaces', type=str, required=False, nargs=-1)
+def discover(handshake, interfaces):
     """Search for robots in the network."""
+    def configure(dev):
+        """Ask for wlan configuration.
+        TODO move this to miiocli"""
+        if click.prompt("Do you want to connect the device to the wifi?"):
+            ssid = click.prompt("Name of the network")
+            password = click.prompt("Password")
+
+            try:
+                if dev.configure_wifi(ssid, password):
+                    click.echo("Wifi configuration was changed successfully, "
+                               "the device should connect to the given network")
+            except DeviceException as ex:
+                click.echo("Unable to configure the wifi connection: %s" % ex)
+    
     if handshake:
-        miio.Vacuum.discover()
+        for dev in miio.discovery.MiIODiscovery.discover(interfaces=interfaces):
+            click.echo("Found %s, trying to request device information.." % dev)
+            try:
+                info = dev.info()
+                click.echo("  Device information: %s" % info)
+            except DeviceException as ex:
+                click.echo("  Unable to request info from device: %s" % ex)
+                continue
+
+            if not info.is_configured:
+                configure(dev)
+
     else:
-        miio.Discovery.discover_mdns()
+        for device in miio.Discovery.discover_mdns().values():
+            click.echo("Found %s" % device)
 
 
 @cli.command()
