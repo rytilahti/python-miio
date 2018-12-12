@@ -4,7 +4,7 @@ import pytest
 
 from miio import PhilipsMoonlight
 from miio.philips_moonlight import PhilipsMoonlightStatus, PhilipsMoonlightException
-from miio.utils import int_to_rgb
+from miio.utils import int_to_rgb, rgb_to_int
 from .dummies import DummyDevice
 
 
@@ -30,15 +30,15 @@ class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
             'set_power': lambda x: self._set_state("pow", x),
             'set_bright': lambda x: self._set_state("bri", x),
             'set_cct': lambda x: self._set_state("cct", x),
-            'set_rgb': lambda x: self._set_state("rgb", x),
+            'set_rgb': lambda x: self._set_state("rgb", [rgb_to_int(x)]),
             'apply_fixed_scene': lambda x: self._set_state("snm", x),
             'set_bricct': lambda x: (
                 self._set_state('bri', [x[0]]),
-                self._set_state('cct', [x[1]])
+                self._set_state('cct', [x[1]]),
             ),
             'set_brirgb': lambda x: (
-                self._set_state('bri', [x[0]]),
-                self._set_state('rgb', [x[1]])
+                self._set_state('rgb', [rgb_to_int((x[0], x[1], x[2]))]),
+                self._set_state('bri', [x[3]]),
             )
         }
         super().__init__(args, kwargs)
@@ -228,8 +228,6 @@ class TestPhilipsMoonlight(TestCase):
 
         with pytest.raises(PhilipsMoonlightException):
             self.device.set_brightness_and_rgb(10, (0, 0, 256))
-
-
 
     def test_set_scene(self):
         def scene():

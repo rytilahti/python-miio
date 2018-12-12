@@ -186,7 +186,7 @@ class PhilipsMoonlight(Device):
             if color < 0 or color > 255:
                 raise PhilipsMoonlightException("Invalid color: %s" % color)
 
-        return self.send("set_rgb", [rgb_to_int(rgb)])
+        return self.send("set_rgb", list(rgb))
 
     @command(
         click.argument("level", type=int),
@@ -241,7 +241,9 @@ class PhilipsMoonlight(Device):
             if color < 0 or color > 255:
                 raise PhilipsMoonlightException("Invalid color: %s" % color)
 
-        return self.send("set_brirgb", [brightness, rgb_to_int(rgb)])
+        params = list(rgb)
+        params.append(brightness)
+        return self.send("set_brirgb", params)
 
     @command(
         click.argument("number", type=int),
