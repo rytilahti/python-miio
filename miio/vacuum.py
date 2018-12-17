@@ -183,6 +183,77 @@ class Vacuum(Device):
         # returns ['retry'] without internet
         return self.send("get_map_v1")
 
+    @command(
+        click.argument("start", type=bool)
+    )
+    def edit_map(self, start):
+        """Start map editing?"""
+        if start:
+            return self.send("start_edit_map")[0] == "ok"
+        else:
+            return self.send("end_edit_map")[0] == "ok"
+
+    @command(
+        click.option("--version", default=1)
+    )
+    def fresh_map(self, version):
+        """Return fresh map?"""
+        if version == 1:
+            return self.send("get_fresh_map")
+        elif version == 2:
+            return self.send("get_fresh_map_v2")
+        else:
+            raise VacuumException("Unknown map version: %s" % version)
+
+    @command(
+        click.option("--version", default=1)
+    )
+    def persist_map(self, version):
+        """Return fresh map?"""
+        if version == 1:
+            return self.send("get_persist_map")
+        elif version == 2:
+            return self.send("get_persist_map_v2")
+        else:
+            raise VacuumException("Unknown map version: %s" % version)
+
+    @command(
+        click.argument("id", type=int),
+        click.argument("x1", type=int),
+        click.argument("y1", type=int),
+        click.argument("x2", type=int),
+        click.argument("y2", type=int),
+    )
+    def create_software_barrier(self, id, x1, y1, x2, y2):
+        """Create software barrier (gen2 only?).
+
+        Requires new fw version.
+        3.3.9_001633+?
+        """
+        return self.send("save_map", [id, x1, y1, x2, y2])[0] == "ok"
+
+    @command(
+        click.argument("id", type=int),
+        click.argument("x1")
+    )
+    def create_nogo_zone(self, id, x1, y1, x2, y2, x3, y3, x4, y4):
+        """Create a rectangular no-go zone (gen2 only?).
+
+        Requires new fw version.
+        3.3.9_001633+?
+        """
+        return self.send("save_map",
+                         [id, x1, y1, x2, y2, x3, y3, x4, y4])[0] == "ok"
+
+    @command(
+        click.argument("enable", type=bool)
+    )
+    def set_lab_mode(self, enable):
+        """Set the lab mode?
+
+        No clue what does this oo and which fw is required."""
+        return self.send("set_lab_status", int(enable))['ok']
+
     @command()
     def clean_history(self) -> CleaningSummary:
         """Return generic cleaning history."""
