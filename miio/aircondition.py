@@ -137,11 +137,12 @@ class AirCondition(Device):
     def status(self) -> AirConditionStatus:
         """Retrieve properties."""
 
-        properties = ['mode', 'lcd_auto', 'lcd_level', 'volume', 'idle_timer', 'open_timer', 'power', 'temp_dec',
-                      'st_temp_dec', 'speed_level', 'vertical_swing', 'ptc', 'ptc_rt', 'silent', 'vertical_end',
-                      'vertical_rt', 'speed_level', 'vertical_swing', 'comfort', 'ot_run_temp', 'ep_temp', 'es_temp',
-                      'he_temp', 'compressor_frq', 'motor_speed', 'humidity', 'ele_quantity', 'ex_humidity',
-                      'remote_mac', 'htsensor_mac', 'ht_sensor', 'ot_humidity']
+        properties = ['mode', 'lcd_auto', 'lcd_level', 'volume', 'idle_timer', 'open_timer',
+                      'power', 'temp_dec', 'st_temp_dec', 'speed_level', 'vertical_swing',
+                      'ptc', 'ptc_rt', 'silent', 'vertical_end', 'vertical_rt', 'speed_level',
+                      'vertical_swing', 'comfort', 'ot_run_temp', 'ep_temp', 'es_temp',
+                      'he_temp', 'compressor_frq', 'motor_speed', 'humidity', 'ele_quantity',
+                      'ex_humidity', 'remote_mac', 'htsensor_mac', 'ht_sensor', 'ot_humidity']
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
