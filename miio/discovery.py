@@ -44,6 +44,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v3": AirPurifier,   # v3
     "zhimi-airpurifier-v5": AirPurifier,   # v5
     "zhimi-airpurifier-v6": AirPurifier,   # v6
+    "zhimi-airpurifier-v7": AirPurifier,   # v7
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
     "chuangmi-ir-v2": ChuangmiIr,
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
