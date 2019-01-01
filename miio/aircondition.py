@@ -206,7 +206,7 @@ class AirCondition(Device):
     )
     def set_swing_range(self, start: int=0, stop: int=60):
         """Set swing range."""
-        if start < 0 or stop <= start:
+        if start < 0 or stop <= start or start > 60 or stop > 60:
             raise AirConditionException("Invalid swing range: %s %s", start, stop)
 
         return self.send("set_ver_range", [start, stop])
