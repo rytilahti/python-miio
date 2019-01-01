@@ -293,28 +293,31 @@ class AirCondition(Device):
     @command(
         click.argument("brightness", type=int),
         default_output=format_output(
-            "Setting LCD brightness to {brightness}")
+            "Setting display brightness to {brightness}")
     )
-    def set_lcd_brightness(self, brightness: int):
-        """Set lcd brightness."""
+    def set_display_brightness(self, brightness: int):
+        """Set display brightness."""
         if brightness < 0 or brightness > 5:
-            raise AirConditionException("Invalid LCD brightness: %s", brightness)
+            raise AirConditionException("Invalid display brightness: %s", brightness)
 
         return self.send("set_lcd", [brightness])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
-        default_output=format_output("Setting mode to '{mode.value}'")
+        default_output=format_output("Setting operation mode to '{mode.value}'")
     )
     def set_mode(self, mode: OperationMode):
-        """Set mode."""
+        """Set operation mode."""
         return self.send("set_mode", [mode.value])
 
     @command(
         click.argument("seconds", type=int),
-        default_output=format_output(
-            "Setting idle timer to {seconds} seconds")
+        default_output=format_output("Setting delayed turn off to {seconds} seconds")
     )
-    def set_idle_timer(self, seconds: int):
-        """Set idle timer."""
+    def delay_off(self, seconds: int):
+        """Set delay off seconds."""
+        if seconds < 1:
+            raise AirConditionException(
+                "Invalid value for a delayed turn off: %s" % seconds)
+
         return self.send("set_idle_timer", [seconds])
