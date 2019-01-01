@@ -3,6 +3,8 @@ import logging
 from collections import defaultdict
 from typing import Optional
 
+import click
+
 from .click_common import command, format_output, EnumType
 from .device import Device, DeviceException
 
