@@ -86,18 +86,43 @@ class AirConditionStatus:
         return self.data['temp_dec'] / 10.0
 
     @property
+    def ot_run_temperature(self) -> int:
+        """Outdoor operation temperature."""
+        return self.data['ot_run_temp']
+
+    @property
+    def ep_temperature(self) -> int:
+        """Outer ring temperature."""
+        return self.data['ep_temp']
+
+    @property
+    def es_temperature(self) -> int:
+        """Outer ring temperature."""
+        return self.data['es_temp']
+
+    @property
+    def he_temperature(self) -> int:
+        """Outlet temperature."""
+        return self.data['he_temp']
+
+    @property
     def target_temperature(self) -> int:
         """Target temperature."""
         return self.data['st_temp_dec'] / 10.0
 
     @property
     def humidity(self) -> Optional[int]:
-        """Current humidity."""
+        """Current indoor humidity."""
         return self.data["humidity"]
 
     def external_humidity(self) -> Optional[int]:
         """Current external humidity."""
         return self.data["ex_humidity"]
+
+    @property
+    def outdoor_humidity(self) -> Optional[int]:
+        """Current outdoor humidity."""
+        return self.data["ot_humidity"]
 
     @property
     def mode(self) -> Optional[OperationMode]:
@@ -109,7 +134,7 @@ class AirConditionStatus:
 
     @property
     def lcd_auto(self) -> bool:
-        """Lcd auto?."""
+        """Automatic display brightness."""
         return self.data['lcd_auto'] == 'on'
 
     @property
@@ -124,7 +149,7 @@ class AirConditionStatus:
 
     @property
     def swing(self) -> bool:
-        """Swing."""
+        """Vertical swing."""
         return self.data['vertical_swing'] == 'on'
 
     @property
@@ -164,7 +189,7 @@ class AirConditionStatus:
 
     @property
     def compressor_frequency(self) -> int:
-        """Compressor frequency."""
+        """Compressor frequency in Hz."""
         return self.data['compressor_frq']
 
     @property
@@ -176,6 +201,11 @@ class AirConditionStatus:
     def swing_range(self) -> [int, int]:
         """Swing range."""
         return [self.data['vertical_rt'], self.data['vertical_end']]
+
+    @property
+    def power_consumption(self) -> float:
+        """Power consumption in kWh."""
+        return self.data['ele_quantity'] / 10.0
 
     @property
     def extra_features(self) -> Optional[int]:
