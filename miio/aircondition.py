@@ -26,6 +26,7 @@ class OperationMode(enum.Enum):
     Cool = 'cooling'
     Heat = 'heat'
     Wind = 'wind'
+    Auto = 'automode'
 
 
 class AirConditionStatus:
