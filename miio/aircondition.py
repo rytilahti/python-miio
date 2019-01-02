@@ -302,21 +302,6 @@ class AirCondition(Device):
         return self.send("set_spd_level", [speed])
 
     @command(
-        click.argument("high", type=bool),
-        default_output=format_output(
-            lambda ptc: "Turning on high speed"
-            if ptc else "Turning off high speed"
-        )
-    )
-    def set_speed_high(self, high: bool):
-        """Turn automatic display brightness on/off."""
-        if high:
-            return self.send("set_spd_high", ["on"])
-        else:
-            return self.send("set_spd_high", ["off"])
-
-
-    @command(
         click.argument("start", type=int),
         click.argument("stop", type=int),
         default_output=format_output("Setting swing range from {start} degrees to {stop} degrees")
