@@ -228,10 +228,13 @@ class AirCondition(Device):
     @command(
         click.argument("direction", type=int),
         default_output=format_output(
-            "Setting wind direction to {direction} degree")
+            "Setting wind direction to {direction} degrees")
     )
     def set_wind_direction(self, direction: int):
         """Set wind direction."""
+        if direction < 0 or direction > 60:
+            raise AirConditionException("Invalid wind direction: %s", direction)
+
         return self.send("set_ver_pos", [direction])
 
     @command(
@@ -277,18 +280,18 @@ class AirCondition(Device):
             return self.send("set_ptc", ["off"])
 
     @command(
-        click.argument("volume", type=bool),
+        click.argument("audio", type=bool),
         default_output=format_output(
-            lambda ptc: "Turning on ptc mode"
-            if ptc else "Turning off ptc mode"
+            lambda ptc: "Turning on audio"
+            if ptc else "Turning off audio"
         )
     )
-    def set_mute_audio(self, mute: bool):
-        """Mute audio on/off."""
-        if mute:
-            return self.send("set_volume_sw", ["off"])
-        else:
+    def set_audio(self, audio: bool):
+        """Turn audio on/off."""
+        if audio:
             return self.send("set_volume_sw", ["on"])
+        else:
+            return self.send("set_volume_sw", ["off"])
 
     @command(
         click.argument("brightness", type=int),
