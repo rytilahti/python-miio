@@ -13,6 +13,7 @@ from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, 
                Yeelight, Fan, Cooker, AirCondition, AirConditioningCompanion,
                AirQualityMonitor, AqaraCamera, )
 
+from .aircondition import (MODEL_AIRCONDITION_MA1, MODEL_AIRCONDITION_MA2, MODEL_AIRCONDITION_SA1)
 from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
 from .airhumidifier import (MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_V1, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
@@ -76,7 +77,9 @@ DEVICE_MAP = {
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
-    "zhimi-aircondition-ma1": AirCondition,
+    "zhimi-aircondition-ma1": partial(AirCondition, model=MODEL_AIRCONDITION_MA1),
+    "zhimi-aircondition-ma2": partial(AirCondition, model=MODEL_AIRCONDITION_MA2),
+    "zhimi-aircondition-sa1": partial(AirCondition, model=MODEL_AIRCONDITION_SA1),
     "zhimi-airfresh-va2": AirFresh,
     "zhimi-airmonitor-v1": AirQualityMonitor,
     "lumi-gateway-": lambda x: other_package_info(

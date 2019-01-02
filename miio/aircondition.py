@@ -11,8 +11,10 @@ from .device import Device, DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_AIRCONDITION_MA1 = 'zhimi.aircondition.ma1'
+MODEL_AIRCONDITION_MA2 = 'zhimi.aircondition.ma2'
+MODEL_AIRCONDITION_SA1 = 'zhimi.aircondition.sa1'
 
-MODELS_SUPPORTED = [MODEL_AIRCONDITION_MA1]
+MODELS_SUPPORTED = [MODEL_AIRCONDITION_MA1, MODEL_AIRCONDITION_MA2, MODEL_AIRCONDITION_SA1]
 
 
 class AirConditionException(DeviceException):
@@ -42,28 +44,27 @@ class AirConditionStatus:
          'power': 'on',
          'temp_dec': 244,
          'st_temp_dec': 320,
-         'humidity': null,
-         'speed_level': 5,
          'vertical_swing': 'on',
          'ptc': 'off',
          'ptc_rt': 'off',
          'silent': 'off',
          'vertical_end': 60,
          'vertical_rt': 19,
-         'ele_quantity': null,
-         'ex_humidity': null,
-         'remote_mac': null,
-         'htsensor_mac': null,
          'speed_level': 5,
-         'ht_sensor': null,
          'comfort': 'off',
          'ot_run_temp': 7,
          'ep_temp': 27,
          'es_temp': 13,
          'he_temp': 39,
-         'ot_humidity': null,
          'compressor_frq': 0,
-         'motor_speed': 1000}
+         'motor_speed': 1000,
+         'humidity': null,
+         'ele_quantity': null,
+         'ex_humidity': null,
+         'remote_mac': null,
+         'htsensor_mac': null,
+         'ht_sensor': null,
+         'ot_humidity': null}
 
         """
         self.data = data
@@ -95,6 +96,80 @@ class AirConditionStatus:
             return OperationMode(self.data['mode'])
         except TypeError:
             return None
+
+    @property
+    def lcd_auto(self) -> bool:
+        """Lcd auto?."""
+        return self.data['lcd_auto'] == 'on'
+
+    @property
+    def display_brightness(self) -> int:
+        """Display brightness."""
+        return self.data['lcd_level']
+
+    @property
+    def audio(self) -> bool:
+        """Audio output."""
+        return self.data['volume'] == 'on'
+
+    @property
+    def swing(self) -> bool:
+        """Swing."""
+        return self.data['vertical_swing'] == 'on'
+
+    @property
+    def electric_auxiliary_heat(self) -> bool:
+        """Electric auxiliary heat."""
+        return self.data['ptc'] == 'on'
+
+    @property
+    def ptc_rt(self) -> bool:
+        """Ptc rt?"""
+        return self.data['ptc'] == 'on'
+
+    @property
+    def silent(self) -> bool:
+        """Silent mode."""
+        return self.data['silent'] == 'on'
+
+    @property
+    def comfort(self) -> bool:
+        """Comfort mode."""
+        return self.data['comfort'] == 'on'
+
+    @property
+    def delay_off(self) -> int:
+        """Delayed turn off."""
+        return self.data['idle_timer']
+
+    @property
+    def open_timer(self) -> int:
+        """Open timer?."""
+        return self.data['open_timer']
+
+    @property
+    def speed(self) -> int:
+        """Speed level."""
+        return self.data['speed_level']
+
+    @property
+    def compressor_frequency(self) -> int:
+        """Compressor frequency."""
+        return self.data['compressor_frq']
+
+    @property
+    def motor_speed(self) -> int:
+        """Motor speed."""
+        return self.data['motor_speed']
+
+    @property
+    def swing_range(self) -> [int, int]:
+        """Swing range."""
+        return [self.data['vertical_rt'], self.data['vertical_end']]
+
+    @property
+    def extra_features(self) -> Optional[int]:
+        return self.data["app_extra"]
 
     def __repr__(self) -> str:
         s = "<AirConditionStatus " \
@@ -138,12 +213,39 @@ class AirCondition(Device):
     def status(self) -> AirConditionStatus:
         """Retrieve properties."""
 
-        properties = ['mode', 'lcd_auto', 'lcd_level', 'volume', 'idle_timer', 'open_timer',
-                      'power', 'temp_dec', 'st_temp_dec', 'speed_level', 'vertical_swing',
-                      'ptc', 'ptc_rt', 'silent', 'vertical_end', 'vertical_rt', 'speed_level',
-                      'comfort', 'ot_run_temp', 'ep_temp', 'es_temp', 'he_temp', 'compressor_frq',
-                      'motor_speed', 'humidity', 'ele_quantity', 'ex_humidity', 'remote_mac',
-                      'htsensor_mac', 'ht_sensor', 'ot_humidity']
+        properties = [
+            'mode',
+            'lcd_auto',
+            'lcd_level',
+            'volume',
+            'idle_timer',
+            'open_timer',
+            'power',
+            'temp_dec',
+            'st_temp_dec',
+            'vertical_swing',
+            'ptc',
+            'ptc_rt',
+            'silent',
+            'vertical_end',
+            'vertical_rt',
+            'speed_level',
+            'comfort',
+            'ot_run_temp',
+            'ep_temp',
+            'es_temp',
+            'he_temp',
+            'compressor_frq',
+            'motor_speed',
+            'app_extra',
+            'humidity',
+            'ele_quantity',
+            'ex_humidity',
+            'remote_mac',
+            'htsensor_mac',
+            'ht_sensor',
+            'ot_humidity',
+        ]
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
@@ -198,6 +300,21 @@ class AirCondition(Device):
             raise AirConditionException("Invalid speed level: %s", speed)
 
         return self.send("set_spd_level", [speed])
+
+    @command(
+        click.argument("high", type=bool),
+        default_output=format_output(
+            lambda ptc: "Turning on high speed"
+            if ptc else "Turning off high speed"
+        )
+    )
+    def set_speed_high(self, high: bool):
+        """Turn automatic display brightness on/off."""
+        if high:
+            return self.send("set_spd_high", ["on"])
+        else:
+            return self.send("set_spd_high", ["off"])
+
 
     @command(
         click.argument("start", type=int),
@@ -266,15 +383,15 @@ class AirCondition(Device):
             return self.send("set_silent", ["off"])
 
     @command(
-        click.argument("ptc", type=bool),
+        click.argument("power", type=bool),
         default_output=format_output(
-            lambda ptc: "Turning on ptc mode"
-            if ptc else "Turning off ptc mode"
+            lambda ptc: "Turning on electric auxiliary heat"
+            if ptc else "Turning off electric auxiliary heat"
         )
     )
-    def set_ptc(self, ptc: bool):
-        """Set ptc on/off."""
-        if ptc:
+    def set_electric_auxiliary_heat(self, power: bool):
+        """Set electric auxiliary heat on/off."""
+        if power:
             return self.send("set_ptc", ["on"])
         else:
             return self.send("set_ptc", ["off"])
@@ -306,6 +423,20 @@ class AirCondition(Device):
         return self.send("set_lcd", [brightness])
 
     @command(
+        click.argument("auto", type=bool),
+        default_output=format_output(
+            lambda ptc: "Turning on auto display brightness"
+            if ptc else "Turning off auto display brightness"
+        )
+    )
+    def set_auto_display_brightess(self, auto: bool):
+        """Turn automatic display brightness on/off."""
+        if auto:
+            return self.send("set_lcd_auto", ["on"])
+        else:
+            return self.send("set_lcd_auto", ["off"])
+
+    @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
         default_output=format_output("Setting operation mode to '{mode.value}'")
     )
@@ -324,3 +455,34 @@ class AirCondition(Device):
                 "Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("set_idle_timer", [seconds])
+
+    @command(
+        click.argument("seconds", type=int),
+        default_output=format_output("Setting open timer to {seconds} seconds")
+    )
+    def set_open_timer(self, seconds: int):
+        """Set open timer."""
+        if seconds < 1:
+            raise AirConditionException(
+                "Invalid open timer value: %s" % seconds)
+
+        return self.send("set_open_timer", [seconds])
+
+    @command(
+        click.argument("value", type=int),
+        default_output=format_output("Setting extra to {value}")
+    )
+    def set_extra_features(self, value: int):
+        """Storage register to enable extra features at the app."""
+        if value < 0:
+            raise AirConditionException("Invalid app extra value: %s", value)
+
+        return self.send("set_app_extra", [value])
+
+    @command(
+        click.argument("value", type=int),
+        default_output=format_output("Setting humidity/temperature sensor to {value}")
+    )
+    def set_ht_sensor(self, value: int):
+        """Set humidity/temperature sensor."""
+        return self.send("set_ht_sensor", [value])
