@@ -91,6 +91,15 @@ class AirConditionStatus:
         return self.data['st_temp_dec'] / 10.0
 
     @property
+    def humidity(self) -> Optional[int]:
+        """Current humidity."""
+        return self.data["humidity"]
+
+    def external_humidity(self) -> Optional[int]:
+        """Current external humidity."""
+        return self.data["ex_humidity"]
+
+    @property
     def mode(self) -> Optional[OperationMode]:
         """Current operation mode."""
         try:
@@ -371,8 +380,8 @@ class AirCondition(Device):
     @command(
         click.argument("power", type=bool),
         default_output=format_output(
-            lambda ptc: "Turning on electric auxiliary heat"
-            if ptc else "Turning off electric auxiliary heat"
+            lambda power: "Turning on electric auxiliary heat"
+            if power else "Turning off electric auxiliary heat"
         )
     )
     def set_electric_auxiliary_heat(self, power: bool):
@@ -385,8 +394,8 @@ class AirCondition(Device):
     @command(
         click.argument("audio", type=bool),
         default_output=format_output(
-            lambda ptc: "Turning on audio"
-            if ptc else "Turning off audio"
+            lambda audio: "Turning on audio"
+            if audio else "Turning off audio"
         )
     )
     def set_audio(self, audio: bool):
@@ -411,8 +420,8 @@ class AirCondition(Device):
     @command(
         click.argument("auto", type=bool),
         default_output=format_output(
-            lambda ptc: "Turning on auto display brightness"
-            if ptc else "Turning off auto display brightness"
+            lambda auto: "Turning on auto display brightness"
+            if auto else "Turning off auto display brightness"
         )
     )
     def set_auto_display_brightess(self, auto: bool):
@@ -466,9 +475,15 @@ class AirCondition(Device):
         return self.send("set_app_extra", [value])
 
     @command(
-        click.argument("value", type=int),
-        default_output=format_output("Setting humidity/temperature sensor to {value}")
+        click.argument("sensor", type=bool),
+        default_output=format_output(
+            lambda sensor: "Turning on humidity/temperature sensor"
+            if sensor else "Turning off humidity/temperature sensor"
+        )
     )
-    def set_ht_sensor(self, value: int):
-        """Set humidity/temperature sensor."""
-        return self.send("set_ht_sensor", [value])
+    def set_sensor(self, sensor: bool):
+        """Turn automatic display brightness on/off."""
+        if sensor:
+            return self.send("set_ht_sensor", ["on"])
+        else:
+            return self.send("set_ht_sensor", ["off"])
