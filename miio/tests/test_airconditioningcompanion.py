@@ -211,7 +211,7 @@ class TestAirConditioningCompanion(TestCase):
 class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
     def __init__(self, *args, **kwargs):
         self.state = ['010507950000257301', '011001160100002573', '807']
-        self.device_prop = {'lumi.0': {'plug_state': 'on'}}
+        self.device_prop = {'lumi.0': {'plug_state': ['on']}}
         self.model = MODEL_ACPARTNER_V3
         self.last_ir_played = None
 
@@ -241,7 +241,7 @@ class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
 
     def _toggle_plug(self, props):
         """Toggle the lumi.0 plug state"""
-        self.device_prop['lumi.0']['plug_state'] = props.pop()
+        self.device_prop['lumi.0']['plug_state'] = [props.pop()]
 
 
 @pytest.fixture(scope="class")
@@ -277,7 +277,7 @@ class TestAirConditioningCompanionV3(TestCase):
 
         assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(
             model_and_state=self.device.start_state,
-            power_socket=self.device.start_device_prop['lumi.0']['plug_state'])
+            power_socket=self.device.start_device_prop['lumi.0']['plug_state'][0])
         ))
 
         assert self.is_on() is True

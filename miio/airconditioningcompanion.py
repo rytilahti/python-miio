@@ -483,4 +483,4 @@ class AirConditioningCompanionV3(AirConditioningCompanion):
         status = self.send("get_model_and_state")
         power_socket = self.send("get_device_prop", ["lumi.0", "plug_state"])
         return AirConditioningCompanionStatus(dict(
-            model_and_state=status, power_socket=power_socket))
+            model_and_state=status, power_socket=power_socket[0]))
