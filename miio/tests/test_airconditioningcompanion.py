@@ -138,8 +138,8 @@ class TestAirConditioningCompanion(TestCase):
             bytes.fromhex('010500978022222102')
         assert self.state().model_format == 1
         assert self.state().device_type == 5
-        assert self.state().air_condition_brand == 97
-        assert self.state().air_condition_remote == 80222221
+        assert self.state().air_condition_brand == int('0097', 16)
+        assert self.state().air_condition_remote == int('80222221', 16)
         assert self.state().state_format == 2
         assert self.state().air_condition_configuration == '020119A2'
         assert self.state().target_temperature == 25
@@ -287,8 +287,8 @@ class TestAirConditioningCompanionV3(TestCase):
             bytes.fromhex('010507950000257301')
         assert self.state().model_format == 1
         assert self.state().device_type == 5
-        assert self.state().air_condition_brand == 795
-        assert self.state().air_condition_remote == 2573
+        assert self.state().air_condition_brand == int('0795', 16)
+        assert self.state().air_condition_remote == int('00002573', 16)
         assert self.state().state_format == 1
         assert self.state().air_condition_configuration == '10011601'
         assert self.state().target_temperature == 22

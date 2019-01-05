@@ -144,32 +144,32 @@ class AirConditioningCompanionStatus:
         """
         Brand of the air conditioner.
 
-        Known brand ids (int) are 0182, 0097, 0037, 0202, 02782, 0197, 0192.
+        Known brand ids are 0x0182, 0x0097, 0x0037, 0x0202, 0x02782, 0x0197, 0x0192.
         """
-        return int(self.air_condition_model[2:4].hex())
+        return int(self.air_condition_model[2:4].hex(), 16)
 
     @property
     def air_condition_remote(self) -> int:
         """
-        Known remote ids (int):
+        Known remote ids:
 
-        80111111, 80111112 (brand: 182)
-        80222221 (brand: 97)
-        80333331 (brand: 37)
-        80444441 (brand: 202)
-        80555551 (brand: 2782)
-        80777771 (brand: 197)
-        80666661 (brand: 192)
+        0x80111111, 0x80111112 (brand: 0x0182)
+        0x80222221 (brand: 0x0097)
+        0x80333331 (brand: 0x0037)
+        0x80444441 (brand: 0x0202)
+        0x80555551 (brand: 0x2782)
+        0x80777771 (brand: 0x0197)
+        0x80666661 (brand: 0x0192)
 
         """
-        return int(self.air_condition_model[4:8].hex())
+        return int(self.air_condition_model[4:8].hex(), 16)
 
     @property
     def state_format(self) -> int:
         """
         Version number of the state format.
 
-        Known values (int) are: 01, 02, 03
+        Known values are: 1, 2, 3
         """
         return int(self.air_condition_model[8])
 
