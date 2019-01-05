@@ -238,6 +238,7 @@ class AirConditioningCompanionStatus:
     def __repr__(self) -> str:
         s = "<AirConditioningCompanionStatus " \
             "power=%s, " \
+            "power_socket=%s, " \
             "load_power=%s, " \
             "air_condition_model=%s, " \
             "model_format=%s, " \
@@ -252,6 +253,7 @@ class AirConditioningCompanionStatus:
             "fan_speed=%s, " \
             "mode=%s>" % \
             (self.power,
+             self.power_socket,
              self.load_power,
              self.air_condition_model.hex(),
              self.model_format,
