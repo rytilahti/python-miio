@@ -12,7 +12,7 @@ import construct
 from .click_common import (
     DeviceGroupMeta, command, format_output, LiteralParamType
 )
-from .exceptions import DeviceException, DeviceError
+from .exceptions import DeviceException, DeviceError, RecoverableError
 from .protocol import Message
 
 _LOGGER = logging.getLogger(__name__)
@@ -269,7 +269,10 @@ class Device(metaclass=DeviceGroupMeta):
                           m.data.value["id"],
                           m.data.value)
             if "error" in m.data.value:
-                raise DeviceError(m.data.value["error"])
+                error = m.data.value["error"]
+                if "code" in error and error["code"] == -30001:
+                    raise RecoverableError(error)
+                raise DeviceError(error)
 
             try:
                 return m.data.value["result"]
@@ -281,14 +284,21 @@ class Device(metaclass=DeviceGroupMeta):
                                   "Please check your token!") from ex
         except OSError as ex:
             if retry_count > 0:
-                _LOGGER.debug("Retrying with incremented id, "
-                              "retries left: %s", retry_count)
+                _LOGGER.debug("Retrying with incremented id, retries left: %s", retry_count)
                 self.__id += 100
                 self._discovered = False
                 return self.send(command, parameters, retry_count - 1)
 
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("No response from the device") from ex
+
+        except RecoverableError as ex:
+            if retry_count > 0:
+                _LOGGER.debug("Retrying to send failed command, retries left: %s", retry_count)
+                return self.send(command, parameters, retry_count - 1)
+
+            _LOGGER.error("Got error when receiving: %s", ex)
+            raise DeviceException("Unable to recover failed command") from ex
 
     @command(
         click.argument('command', type=str, required=True),

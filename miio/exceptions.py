@@ -6,3 +6,8 @@ class DeviceException(Exception):
 class DeviceError(DeviceException):
     """Exception communicating an error delivered by the target device."""
     pass
+
+
+class RecoverableError(DeviceException):
+    """Exception communicating an recoverable error delivered by the target device."""
+    pass
