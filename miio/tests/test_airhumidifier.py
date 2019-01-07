@@ -247,7 +247,7 @@ class DummyAirHumidifierCA1(DummyDevice, AirHumidifier):
             'get_prop': self._get_state,
             'set_power': lambda x: self._set_state("power", x),
             'set_mode': lambda x: self._set_state("mode", x),
-            'set_led_b': lambda x: self._set_state("led_b", x),
+            'set_led_b': lambda x: self._set_state("led_b", [int(x[0])]),
             'set_buzzer': lambda x: self._set_state("buzzer", x),
             'set_child_lock': lambda x: self._set_state("child_lock", x),
             'set_limit_hum': lambda x: self._set_state("limit_hum", x),
