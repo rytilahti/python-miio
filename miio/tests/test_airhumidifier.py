@@ -147,6 +147,16 @@ class TestAirHumidifierV1(TestCase):
         self.device.set_led_brightness(LedBrightness.Off)
         assert led_brightness() == LedBrightness.Off
 
+    def test_set_led(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led(True)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led(False)
+        assert led_brightness() == LedBrightness.Off
+
     def test_set_buzzer(self):
         def buzzer():
             return self.device.status().buzzer
@@ -341,6 +351,16 @@ class TestAirHumidifierCA1(TestCase):
         assert led_brightness() == LedBrightness.Dim
 
         self.device.set_led_brightness(LedBrightness.Off)
+        assert led_brightness() == LedBrightness.Off
+
+    def test_set_led(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led(True)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led(False)
         assert led_brightness() == LedBrightness.Off
 
     def test_set_buzzer(self):
