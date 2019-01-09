@@ -8,6 +8,6 @@ class DeviceError(DeviceException):
     pass
 
 
-class RecoverableError(DeviceException):
+class RecoverableError(DeviceError):
     """Exception communicating an recoverable error delivered by the target device."""
     pass
