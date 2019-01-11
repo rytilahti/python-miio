@@ -13,6 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_CHUANGMI_PLUG_V3 = 'chuangmi.plug.v3'
 MODEL_CHUANGMI_PLUG_V1 = 'chuangmi.plug.v1'
 MODEL_CHUANGMI_PLUG_M1 = 'chuangmi.plug.m1'
+MODEL_CHUANGMI_PLUG_M3 = 'chuangmi.plug.m3'
 MODEL_CHUANGMI_PLUG_V2 = 'chuangmi.plug.v2'
 MODEL_CHUANGMI_PLUG_HMI205 = 'chuangmi.plug.hmi205'
 
@@ -20,6 +21,7 @@ AVAILABLE_PROPERTIES = {
     MODEL_CHUANGMI_PLUG_V1: ['on', 'usb_on', 'temperature'],
     MODEL_CHUANGMI_PLUG_V3: ['on', 'usb_on', 'temperature', 'wifi_led'],
     MODEL_CHUANGMI_PLUG_M1: ['power', 'temperature'],
+    MODEL_CHUANGMI_PLUG_M3: ['power', 'temperature'],
     MODEL_CHUANGMI_PLUG_V2: ['power', 'temperature'],
     MODEL_CHUANGMI_PLUG_HMI205: ['power', 'temperature'],
 }
