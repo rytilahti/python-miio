@@ -12,6 +12,7 @@ from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, 
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
                Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor)
 
+from .airqualitymonitor import(MODEL_AIRQUALITYMONITOR_V1, MODEL_AIRQUALITYMONITOR_B1, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, )
 from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, )
@@ -72,8 +73,8 @@ DEVICE_MAP = {
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
     "zhimi-airfresh-va2": AirFresh,
-    "zhimi-airmonitor-v1": AirQualityMonitor,
-    "cgllc-airmonitor-b1": AirQualityMonitor,
+    "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
+    "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]
