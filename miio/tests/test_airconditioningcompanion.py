@@ -138,8 +138,8 @@ class TestAirConditioningCompanion(TestCase):
             bytes.fromhex('010500978022222102')
         assert self.state().model_format == 1
         assert self.state().device_type == 5
-        assert self.state().air_condition_brand == 97
-        assert self.state().air_condition_remote == 80222221
+        assert self.state().air_condition_brand == int('0097', 16)
+        assert self.state().air_condition_remote == int('80222221', 16)
         assert self.state().state_format == 2
         assert self.state().air_condition_configuration == '020119A2'
         assert self.state().target_temperature == 25
@@ -211,7 +211,7 @@ class TestAirConditioningCompanion(TestCase):
 class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
     def __init__(self, *args, **kwargs):
         self.state = ['010507950000257301', '011001160100002573', '807']
-        self.device_prop = {'lumi.0': {'plug_state': 'on'}}
+        self.device_prop = {'lumi.0': {'plug_state': ['on']}}
         self.model = MODEL_ACPARTNER_V3
         self.last_ir_played = None
 
@@ -241,7 +241,7 @@ class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
 
     def _toggle_plug(self, props):
         """Toggle the lumi.0 plug state"""
-        self.device_prop['lumi.0']['plug_state'] = props.pop()
+        self.device_prop['lumi.0']['plug_state'] = [props.pop()]
 
 
 @pytest.fixture(scope="class")
@@ -277,7 +277,7 @@ class TestAirConditioningCompanionV3(TestCase):
 
         assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(
             model_and_state=self.device.start_state,
-            power_socket=self.device.start_device_prop['lumi.0']['plug_state'])
+            power_socket=self.device.start_device_prop['lumi.0']['plug_state'][0])
         ))
 
         assert self.is_on() is True
@@ -287,8 +287,8 @@ class TestAirConditioningCompanionV3(TestCase):
             bytes.fromhex('010507950000257301')
         assert self.state().model_format == 1
         assert self.state().device_type == 5
-        assert self.state().air_condition_brand == 795
-        assert self.state().air_condition_remote == 2573
+        assert self.state().air_condition_brand == int('0795', 16)
+        assert self.state().air_condition_remote == int('00002573', 16)
         assert self.state().state_format == 1
         assert self.state().air_condition_configuration == '10011601'
         assert self.state().target_temperature == 22

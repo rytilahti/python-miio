@@ -45,6 +45,15 @@ miio\.airqualitymonitor module
     :show-inheritance:
     :undoc-members:
 
+miio\.aqaracamera module
+------------------------
+
+.. automodule:: miio.aqaracamera
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
+
 miio\.ceil module
 -----------------
 

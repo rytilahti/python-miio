@@ -186,7 +186,7 @@ class PhilipsMoonlight(Device):
             if color < 0 or color > 255:
                 raise PhilipsMoonlightException("Invalid color: %s" % color)
 
-        return self.send("set_rgb", [rgb_to_int(rgb)])
+        return self.send("set_rgb", [*rgb])
 
     @command(
         click.argument("level", type=int),
@@ -228,19 +228,20 @@ class PhilipsMoonlight(Device):
 
     @command(
         click.argument("brightness", type=int),
-        click.argument("rgb", type=int),
+        click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
         default_output=format_output(
             "Setting brightness to {brightness} and color to {rgb}")
     )
-    def set_brightness_and_rgb(self, brightness: int, rgb: int):
+    def set_brightness_and_rgb(self, brightness: int, rgb: Tuple[int, int, int]):
         """Set brightness level and the color."""
         if brightness < 1 or brightness > 100:
             raise PhilipsMoonlightException("Invalid brightness: %s" % brightness)
 
-        if rgb < 0 or rgb > 16777215:
-            raise PhilipsMoonlightException("Invalid color: %s" % rgb)
+        for color in rgb:
+            if color < 0 or color > 255:
+                raise PhilipsMoonlightException("Invalid color: %s" % color)
 
-        return self.send("set_brirgb", [brightness, rgb])
+        return self.send("set_brirgb", [*rgb, brightness])
 
     @command(
         click.argument("number", type=int),

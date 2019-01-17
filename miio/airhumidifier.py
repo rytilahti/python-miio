@@ -335,7 +335,24 @@ class AirHumidifier(Device):
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
+        if self.model == MODEL_HUMIDIFIER_CA1:
+            return self.send("set_led_b", [str(brightness.value)])
+
         return self.send("set_led_b", [brightness.value])
+
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED"
+            if led else "Turning off LED"
+        )
+    )
+    def set_led(self, led: bool):
+        """Turn led on/off."""
+        if led:
+            return self.set_led_brightness(LedBrightness.Bright)
+        else:
+            return self.set_led_brightness(LedBrightness.Off)
 
     @command(
         click.argument("buzzer", type=bool),
