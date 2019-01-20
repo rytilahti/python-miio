@@ -35,3 +35,20 @@ If you're in control of the router in between, then you have one more chance to 
 .. note::
 
     Read more about `Network address translation on Wikipedia <https://en.wikipedia.org/wiki/Network_address_translation>`_. 
+
+
+Intermittent connection issues, timeouts (Xiaomi Vacuum)
+--------------------------------------------------------
+
+Blocking the network access from vacuums is known to cause connectivity problems, presenting themselves as connection timeouts (discussed in `this github issue <https://github.com/rytilahti/python-miio/issues/92>`_):
+
+.. code-block:: text
+
+    mirobo.device.DeviceException: Unable to discover the device x.x.x.x
+
+The root cause lies in the software running on the device, which will hang when it is unable to receive responses.
+The connectivity will get restored by device's internal watchdog restarting the service (``miio_client``).
+
+.. hint::
+
+    If you want to keep your device out from the Internet, use REJECT instead of DROP in your firewall confinguration.
