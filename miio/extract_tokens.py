@@ -157,7 +157,6 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
      If the given file is an iOS backup, the tokens will be
      extracted (and decrypted if needed) automatically.
     """
-
     def read_miio_database(tar):
         DBFILE = "apps/com.xiaomi.smarthome/db/miio2.db"
         try:
@@ -187,7 +186,6 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
             return []
 
         return list(read_android_yeelight(db))
-
 
     devices = []
     reader = BackupDatabaseReader(dump_raw)
