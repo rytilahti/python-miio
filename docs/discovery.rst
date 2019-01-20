@@ -237,6 +237,29 @@ to the tool with ``--password <password>``.
             Token: 476e6b70343055483XXX
             MAC: 28:6C:07:XX:XX:XX
 
+Extracting tokens manually
+--------------------------
+
+Run the following SQLite command:
+
+.. code-block:: bash
+
+    sqlite3 <path of *_mihome.sqlite database> "select ZNAME,ZLOCALIP,ZTOKEN from ZDEVICE"
+
+You should get a list which looks like this:
+
+.. code-block:: text
+
+    Device 1|x.x.x.x|0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    Device 2|x.x.x.x|0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    Device 3|x.x.x.x|0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+These are your device names, IP addresses and tokens. However, the tokens are encrypted and you need to decrypt them.
+The command for decrypting the token manually is:
+
+.. code-block:: bash
+
+    echo '0: <YOUR 32 CHARACTER TOKEN>' | xxd -r -p | openssl enc -d -aes-128-ecb -nopad -nosalt -K 00000000000000000000000000000000
 
 Environment variables for command-line tools
 ============================================
