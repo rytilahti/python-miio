@@ -259,4 +259,4 @@ so it is also possible to pass dicts.
    :prog: mirobo
    :show-nested:
 
-:py:class:`API <miio.Vacuum>`
+:py:class:`API <miio.vacuum>`
