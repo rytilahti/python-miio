@@ -160,15 +160,35 @@ please continue to :ref:`token_extraction`.
 Apple
 ~~~~~
 
-.. TODO::
-    This part of documentation needs your help!
-    Please consider submitting a pull request to update this.
+Create a new unencrypted iOS backup to your computer. 
+To do that you've to follow these steps:
 
-See https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token_mirobot_new.md#ios-users
-for instructions how to extract a database from the app.
+- Connect your iOS device to the computer
+- Open iTunes
+- Click on your iOS device (sidebar left or icon on top navigation bar)
+- In the Summary view check the following settings
+    - Automatically Back Up: ``This Computer``
+    - **Disable** ``Encrypt iPhone backup``
+- Click ``Back Up Now``
+
+When the backup is finished, download `iBackup Viewer <https://www.imactools.com/iphonebackupviewer/>`_ and follow these steps:
+
+- Open iBackup Viewer
+- Click on your newly created backup
+- Click on the ``Raw Files`` icon (looks like a file tree)
+- On the left column, search for ``AppDomain-com.xiaomi.mihome`` and select it
+- Click on the search icon in the header
+- Enter ``_mihome`` in the search field
+- Select the ``Documents/0123456789_mihome.sqlite`` file (the one with the number prefixed)
+- Click ``Export -> Selected…`` in the header and store the file
+
+Now you've exported the SQLite database to your Mac and you can extract the tokens.
+
+.. note::
+
+    See also `jghaanstra's obtain token docs <https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token.md#ios-users>`_ for alternative ways.
 
 .. _token_extraction:
-
 
 Extracting tokens
 -----------------
