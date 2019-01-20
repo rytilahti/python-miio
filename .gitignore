@@ -5,5 +5,8 @@ __pycache__
 .cache/
 .mypy_cache/
 .tox/
+.venv/
 
 .coverage
+
+docs/_build/
