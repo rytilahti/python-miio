@@ -33,3 +33,4 @@ who have helped to extend this to cover not only the vacuum cleaner.
     ceil
     eyecare
     API <miio>
+    troubleshooting
