@@ -455,14 +455,14 @@ class AirPurifier(Device):
     )
     def set_favorite_level(self, level: int):
         """Set favorite level."""
-        if level < 0 or level > 16:
+        if level < 0 or level > 17:
             raise AirPurifierException("Invalid favorite level: %s" % level)
 
         # Possible alternative property: set_speed_favorite
 
         # Set the favorite level used when the mode is `favorite`,
-        # should be  between 0 and 16.
-        return self.send("set_level_favorite", [level])  # 0 ... 16
+        # should be  between 0 and 17.
+        return self.send("set_level_favorite", [level])  # 0 ... 17
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
