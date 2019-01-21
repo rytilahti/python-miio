@@ -32,5 +32,6 @@ who have helped to extend this to cover not only the vacuum cleaner.
     plug
     ceil
     eyecare
+    yeelight
     API <miio>
     troubleshooting

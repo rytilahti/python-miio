@@ -1,8 +1,10 @@
 import logging
 import sqlite3
 import tempfile
+import json
 from pprint import pformat as pf
 from typing import Iterator
+import xml.etree.ElementTree as ET
 
 import attr
 import click
@@ -22,7 +24,30 @@ class DeviceConfig:
     ip = attr.ib()
     token = attr.ib()
     model = attr.ib()
+    everything = attr.ib(default=None)
 
+
+def read_android_yeelight(db) -> Iterator[DeviceConfig]:
+    """Read tokens from Yeelight's android backup."""
+    _LOGGER.info("Reading tokens from Yeelight Android DB")
+    xml = ET.parse(db)
+    devicelist = xml.find(".//set[@name='deviceList']")
+    if not devicelist:
+        _LOGGER.warning("Unable to find deviceList")
+        return []
+
+    for dev_elem in list(devicelist):
+        dev = json.loads(dev_elem.text)
+        ip = dev['localip']
+        mac = dev['mac']
+        model = dev['model']
+        name = dev['name']
+        token = dev['token']
+
+        config = DeviceConfig(name=name, ip=ip, mac=mac, model=model,
+                              token=token, everything=dev)
+
+        yield config
 
 class BackupDatabaseReader:
     """Main class for reading backup files.
@@ -73,7 +98,8 @@ class BackupDatabaseReader:
             name = dev['ZNAME']
             token = BackupDatabaseReader.decrypt_ztoken(dev['ZTOKEN'])
 
-            config = DeviceConfig(name=name, mac=mac, ip=ip, model=model, token=token)
+            config = DeviceConfig(name=name, mac=mac, ip=ip, model=model,
+                                  token=token, everything=dev)
             yield config
 
     def read_android(self) -> Iterator[DeviceConfig]:
@@ -89,8 +115,8 @@ class BackupDatabaseReader:
             name = dev['name']
             token = dev['token']
 
-            config = DeviceConfig(name=name, ip=ip, mac=mac,
-                                  model=model, token=token)
+            config = DeviceConfig(name=name, ip=ip, mac=mac, model=model,
+                                  token=token, everything=dev)
             yield config
 
     def read_tokens(self, db) -> Iterator[DeviceConfig]:
@@ -131,26 +157,46 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
      If the given file is an iOS backup, the tokens will be
      extracted (and decrypted if needed) automatically.
     """
+    def read_miio_database(tar):
+        DBFILE = "apps/com.xiaomi.smarthome/db/miio2.db"
+        try:
+            db = tar.extractfile(DBFILE)
+        except KeyError as ex:
+            click.echo("Unable to find miio database file %s: %s" % (
+                DBFILE, ex))
+            return []
+        if write_to_disk:
+            file = write_to_disk
+        else:
+            file = tempfile.NamedTemporaryFile()
+        with file as fp:
+            click.echo("Saving database to %s" % fp.name)
+            fp.write(db.read())
 
+            return list(reader.read_tokens(fp.name))
+
+    def read_yeelight_database(tar):
+        DBFILE = "apps/com.yeelight.cherry/sp/miot.xml"
+        _LOGGER.info("Trying to read %s", DBFILE)
+        try:
+            db = tar.extractfile(DBFILE)
+        except KeyError as ex:
+            click.echo("Unable to find yeelight database file %s: %s" % (
+                DBFILE, ex))
+            return []
+
+        return list(read_android_yeelight(db))
+
+    devices = []
     reader = BackupDatabaseReader(dump_raw)
     if backup.endswith(".ab"):
-        DBFILE = "apps/com.xiaomi.smarthome/db/miio2.db"
+
         with AndroidBackup(backup, stream=False) as f:
             tar = f.read_data(password)
-            try:
-                db = tar.extractfile(DBFILE)
-            except KeyError as ex:
-                click.echo("Unable to extract the database file %s: %s" % (DBFILE, ex))
-                return
-            if write_to_disk:
-                file = write_to_disk
-            else:
-                file = tempfile.NamedTemporaryFile()
-            with file as fp:
-                click.echo("Saving database to %s" % fp.name)
-                fp.write(db.read())
 
-                devices = list(reader.read_tokens(fp.name))
+            devices.extend(read_miio_database(tar))
+
+            devices.extend(read_yeelight_database(tar))
     else:
         devices = list(reader.read_tokens(backup))
 
@@ -162,6 +208,8 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
                        "\tToken: %s\n"
                        "\tMAC: %s" % (dev.name, dev.model,
                                       dev.ip, dev.token, dev.mac))
+            if dump_raw:
+                click.echo(dev)
 
 
 if __name__ == "__main__":
