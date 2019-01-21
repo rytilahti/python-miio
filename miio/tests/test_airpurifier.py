@@ -156,7 +156,7 @@ class TestAirPurifier(TestCase):
             self.device.set_favorite_level(-1)
 
         with pytest.raises(AirPurifierException):
-            self.device.set_favorite_level(17)
+            self.device.set_favorite_level(18)
 
     def test_set_led_brightness(self):
         def led_brightness():

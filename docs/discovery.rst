@@ -85,7 +85,20 @@ potentially containing a valid token.
 
 Tokens full of ``0``\ s or ``f``\ s (as above) are either already paired
 with the mobile app or will not yield a token through this method.
-In those cases the procedure shown in :ref:`creating_backup` has to be used.
+In those cases the procedure shown in :ref:`logged_tokens` has to be used.
+
+.. _logged_tokens:
+
+Tokens from Mi Home logs
+========================
+
+The easiest way to obtain tokens is to browse through log files of the Mi Home
+app version 5.4.49 for Android. It seems that version was released with debug
+messages turned on by mistake. An APK file with the old version can be easily
+found using one of the popular web search engines. After downgrading use a file
+browser to navigate to directory ``SmartHome/logs/plug_DeviceManager``, then
+open the most recent file and search for the token. When finished, use Google
+Play to get the most recent version back.
 
 .. _logged_tokens:
 
