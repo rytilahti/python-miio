@@ -109,7 +109,7 @@ class TestAirHumidifierV1(TestCase):
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
         assert self.state().target_humidity == self.device.start_state["limit_hum"]
         assert self.state().trans_level == self.device.start_state["trans_level"]
-        assert self.state().speed is None
+        assert self.state().motor_speed is None
         assert self.state().depth is None
         assert self.state().dry is None
         assert self.state().use_time == self.device.start_state["use_time"]
@@ -315,7 +315,7 @@ class TestAirHumidifierCA1(TestCase):
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
         assert self.state().target_humidity == self.device.start_state["limit_hum"]
         assert self.state().trans_level is None
-        assert self.state().speed == self.device.start_state["speed"]
+        assert self.state().motor_speed == self.device.start_state["speed"]
         assert self.state().depth == self.device.start_state["depth"]
         assert self.state().dry == (self.device.start_state["dry"] == 'on')
         assert self.state().use_time == self.device.start_state["use_time"]
