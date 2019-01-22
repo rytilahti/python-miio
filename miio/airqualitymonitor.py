@@ -1,9 +1,26 @@
+import logging
 from collections import defaultdict
 
 import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
+
+_LOGGER = logging.getLogger(__name__)
+
+MODEL_AIRQUALITYMONITOR_V1 = 'zhimi.airmonitor.v1'
+MODEL_AIRQUALITYMONITOR_B1 = 'cgllc.airmonitor.b1'
+
+AVAILABLE_PROPERTIES_COMMON = [
+    'power', 'aqi', 'battery', 'usb_state', 'time_state',
+    'night_state', 'night_beg_time', 'night_end_time',
+    'sensor_state'
+]
+
+AVAILABLE_PROPERTIES = {
+    MODEL_AIRQUALITYMONITOR_V1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_AIRQUALITYMONITOR_B1: AVAILABLE_PROPERTIES_COMMON,
+}
 
 
 class AirQualityMonitorException(DeviceException):
@@ -14,7 +31,15 @@ class AirQualityMonitorStatus:
     """Container of air quality monitor status."""
 
     def __init__(self, data):
-        # {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off', 'time_state': 'on'}
+        """
+        Response of a Xiaomi Air Quality Monitor (zhimi.airmonitor.v1):
+
+        {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off', 'time_state': 'on'}
+
+        Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.b1):
+
+        unknown.
+        """
         self.data = data
 
     @property
@@ -86,6 +111,18 @@ class AirQualityMonitorStatus:
 
 class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_AIRQUALITYMONITOR_V1) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_AIRQUALITYMONITOR_V1
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+
+        self.device_info = None
 
     @command(
         default_output=format_output(
@@ -100,9 +137,7 @@ class AirQualityMonitor(Device):
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
-        properties = ['power', 'aqi', 'battery', 'usb_state', 'time_state',
-                      'night_state', 'night_beg_time', 'night_end_time',
-                      'sensor_state']
+        properties = AVAILABLE_PROPERTIES[self.model]
 
         values = self.send(
             "get_prop",

@@ -13,10 +13,12 @@ from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, 
                Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera)
 
 from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
+from .airqualitymonitor import (MODEL_AIRQUALITYMONITOR_V1, MODEL_AIRQUALITYMONITOR_B1, )
 from .airhumidifier import (MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_V1, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V2, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, MODEL_CHUANGMI_PLUG_M3,
                             MODEL_CHUANGMI_PLUG_HMI205, )
+
 from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, )
 from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
@@ -79,7 +81,8 @@ DEVICE_MAP = {
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
     "zhimi-airfresh-va2": AirFresh,
-    "zhimi-airmonitor-v1": AirQualityMonitor,
+    "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
+    "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway")
 }  # type: Dict[str, Union[Callable, Device]]

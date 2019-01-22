@@ -3,12 +3,13 @@ from unittest import TestCase
 import pytest
 
 from miio import AirQualityMonitor
-from miio.airqualitymonitor import AirQualityMonitorStatus
+from miio.airqualitymonitor import AirQualityMonitorStatus, MODEL_AIRQUALITYMONITOR_V1
 from .dummies import DummyDevice
 
 
 class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
+        self.model = MODEL_AIRQUALITYMONITOR_V1
         self.state = {
             'power': 'on',
             'aqi': 34,
