@@ -154,7 +154,7 @@ class AirHumidifierStatus:
         return int(minor)
 
     @property
-    def speed(self) -> Optional[int]:
+    def motor_speed(self) -> Optional[int]:
         """Current fan speed."""
         if "speed" in self.data and self.data["speed"] is not None:
             return self.data["speed"]
@@ -205,7 +205,7 @@ class AirHumidifierStatus:
             "child_lock=%s, " \
             "target_humidity=%s%%, " \
             "trans_level=%s, " \
-            "speed=%s, " \
+            "motor_speed=%s, " \
             "depth=%s, " \
             "dry=%s, " \
             "use_time=%s, " \
@@ -223,7 +223,7 @@ class AirHumidifierStatus:
              self.child_lock,
              self.target_humidity,
              self.trans_level,
-             self.speed,
+             self.motor_speed,
              self.depth,
              self.dry,
              self.use_time,
@@ -265,7 +265,7 @@ class AirHumidifier(Device):
             "Child lock: {result.child_lock}\n"
             "Target humidity: {result.target_humidity} %\n"
             "Trans level: {result.trans_level}\n"
-            "Speed: {result.speed}\n"
+            "Speed: {result.motor_speed}\n"
             "Depth: {result.depth}\n"
             "Dry: {result.dry}\n"
             "Use time: {result.use_time}\n"
