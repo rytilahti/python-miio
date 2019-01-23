@@ -188,15 +188,35 @@ please continue to :ref:`token_extraction`.
 Apple
 ~~~~~
 
-.. TODO::
-    This part of documentation needs your help!
-    Please consider submitting a pull request to update this.
+Create a new unencrypted iOS backup to your computer. 
+To do that you've to follow these steps:
 
-See https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token_mirobot_new.md#ios-users
-for instructions how to extract a database from the app.
+- Connect your iOS device to the computer
+- Open iTunes
+- Click on your iOS device (sidebar left or icon on top navigation bar)
+- In the Summary view check the following settings
+    - Automatically Back Up: ``This Computer``
+    - **Disable** ``Encrypt iPhone backup``
+- Click ``Back Up Now``
+
+When the backup is finished, download `iBackup Viewer <https://www.imactools.com/iphonebackupviewer/>`_ and follow these steps:
+
+- Open iBackup Viewer
+- Click on your newly created backup
+- Click on the ``Raw Files`` icon (looks like a file tree)
+- On the left column, search for ``AppDomain-com.xiaomi.mihome`` and select it
+- Click on the search icon in the header
+- Enter ``_mihome`` in the search field
+- Select the ``Documents/0123456789_mihome.sqlite`` file (the one with the number prefixed)
+- Click ``Export -> Selected…`` in the header and store the file
+
+Now you've exported the SQLite database to your Mac and you can extract the tokens.
+
+.. note::
+
+    See also `jghaanstra's obtain token docs <https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token.md#ios-users>`_ for alternative ways.
 
 .. _token_extraction:
-
 
 Extracting tokens
 -----------------
@@ -245,6 +265,29 @@ to the tool with ``--password <password>``.
             Token: 476e6b70343055483XXX
             MAC: 28:6C:07:XX:XX:XX
 
+Extracting tokens manually
+--------------------------
+
+Run the following SQLite command:
+
+.. code-block:: bash
+
+    sqlite3 <path of *_mihome.sqlite database> "select ZNAME,ZLOCALIP,ZTOKEN from ZDEVICE"
+
+You should get a list which looks like this:
+
+.. code-block:: text
+
+    Device 1|x.x.x.x|0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    Device 2|x.x.x.x|0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    Device 3|x.x.x.x|0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+These are your device names, IP addresses and tokens. However, the tokens are encrypted and you need to decrypt them.
+The command for decrypting the token manually is:
+
+.. code-block:: bash
+
+    echo '0: <YOUR 32 CHARACTER TOKEN>' | xxd -r -p | openssl enc -d -aes-128-ecb -nopad -nosalt -K 00000000000000000000000000000000
 
 Environment variables for command-line tools
 ============================================
