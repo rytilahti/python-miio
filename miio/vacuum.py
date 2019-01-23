@@ -22,6 +22,11 @@ from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_VACUUM_V1 = 'rockrobo.vacuum.v1'
+MODEL_VACUUM_S5 = 'roborock.vacuum.s5'
+
+MODELS_SUPPORTED = [MODEL_VACUUM_V1, MODEL_VACUUM_S5]
+
 
 class VacuumException(DeviceException):
     pass
@@ -39,12 +44,35 @@ class Consumable(enum.Enum):
     SensorDirty = "sensor_dirty_time"
 
 
+class FanSpeedS5(enum.Enum):
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+    Mop = 105
+
+
+class FanSpeed(enum.Enum):
+    Quiet = 38
+    Balanced = 60
+    Turbo = 77
+    Max = 90
+
+
 class Vacuum(Device):
     """Main class representing the vacuum."""
 
     def __init__(self, ip: str, token: str = None, start_id: int = 0,
-                 debug: int = 0) -> None:
-        super().__init__(ip, token, start_id, debug)
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_VACUUM_V1) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in MODELS_SUPPORTED:
+            self.model = model
+        else:
+            self.model = MODEL_VACUUM_V1
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+
         self.manual_seqnum = -1
 
     @command()
@@ -306,19 +334,34 @@ class Vacuum(Device):
         return self.send("close_dnd_timer", [""])
 
     @command(
-        click.argument("speed", type=int),
+        click.argument("speed", type=str),
     )
-    def set_fan_speed(self, speed: int):
+    def set_fan_speed(self, speed: str):
         """Set fan speed.
 
-        :param int speed: Fan speed to set"""
-        # speed = [38, 60 or 77]
-        return self.send("set_custom_mode", [speed])
+        :param str speed: Fan speed to set"""
+
+        speed = speed.title()
+        if self.model == MODEL_VACUUM_S5:
+            return self.send("set_custom_mode", [FanSpeedS5[speed]])
+
+        return self.send("set_custom_mode", [FanSpeed[speed]])
 
     @command()
     def fan_speed(self):
         """Return fan speed."""
-        return self.send("get_custom_mode")[0]
+        speed = self.send("get_custom_mode")[0]
+        if self.model == MODEL_VACUUM_S5:
+            return FanSpeedS5(speed)
+
+        return FanSpeed(speed)
+
+    def fan_speed_list(self):
+        """Get the list of available fan speed steps of the vacuum cleaner."""
+        if self.model == MODEL_VACUUM_S5:
+            return [speed for speed in FanSpeedS5]
+
+        return [speed for speed in FanSpeed]
 
     @command()
     def sound_info(self):
