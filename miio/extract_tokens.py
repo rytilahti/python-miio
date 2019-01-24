@@ -72,8 +72,8 @@ class BackupDatabaseReader:
     @staticmethod
     def decrypt_ztoken(ztoken):
         """Decrypt the given ztoken, used by apple."""
-        if len(ztoken) <= 32:
-            return ztoken
+        if ztoken is None or len(ztoken) <= 32:
+            return str(ztoken)
 
         keystring = '00000000000000000000000000000000'
         key = bytes.fromhex(keystring)
