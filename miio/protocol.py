@@ -218,23 +218,3 @@ Message = Struct(
         Checksum(Bytes(16), Utils.md5, Utils.checksum_field_bytes),
     ),
 )
-
-MessageNet = Struct(
-    # for building we need data before anything else.
-    "data" / Pointer(32, RawCopy(EncryptionAdapter(GreedyBytes))),
-    "header" / RawCopy(Struct(
-        #Const(0x2131, Int16ub),
-        Int16ub,
-        "length" / Rebuild(Int16ub, Utils.get_length),
-        "unknown" / Default(Int32ub, 0x00000000),
-        "device_id" / Hex(Bytes(4)),
-        "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.utcnow()))
-    )),
-    Bytes(16),
-    #"checksum" / IfThenElse(
-    #    Utils.is_hello,
-    #    Bytes(16),
-    #    Checksum(Bytes(16),
-    #             Utils.md5,
-    #             Utils.checksum_field_bytes)),
-)
