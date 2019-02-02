@@ -218,40 +218,55 @@ class Vacuum(Device):
             raise VacuumException("Unknown map version: %s" % version)
 
     @command(
-        click.argument("id", type=int),
         click.argument("x1", type=int),
         click.argument("y1", type=int),
         click.argument("x2", type=int),
         click.argument("y2", type=int),
     )
-    def create_software_barrier(self, id, x1, y1, x2, y2):
+    def create_software_barrier(self, x1, y1, x2, y2):
         """Create software barrier (gen2 only?).
 
+        NOTE: Multiple nogo zones and barriers could be added by passing
+        a list of them to save_map.
+
         Requires new fw version.
         3.3.9_001633+?
         """
-        return self.send("save_map", [id, x1, y1, x2, y2])[0] == "ok"
+        # First parameter indicates the type, 1 = barrier
+        payload = [1, x1, y1, x2, y2]
+        return self.send("save_map", payload)[0] == "ok"
 
     @command(
-        click.argument("id", type=int),
-        click.argument("x1")
+        click.argument("x1", type=int),
+        click.argument("y1", type=int),
+        click.argument("x2", type=int),
+        click.argument("y2", type=int),
+        click.argument("x3", type=int),
+        click.argument("y3", type=int),
+        click.argument("x4", type=int),
+        click.argument("y4", type=int),
     )
-    def create_nogo_zone(self, id, x1, y1, x2, y2, x3, y3, x4, y4):
+    def create_nogo_zone(self, x1, y1, x2, y2, x3, y3, x4, y4):
         """Create a rectangular no-go zone (gen2 only?).
+
+        NOTE: Multiple nogo zones and barriers could be added by passing
+        a list of them to save_map.
 
         Requires new fw version.
         3.3.9_001633+?
         """
-        return self.send("save_map",
-                         [id, x1, y1, x2, y2, x3, y3, x4, y4])[0] == "ok"
+        # First parameter indicates the type, 0 = zone
+        payload = [0, x1, y1, x2, y2, x3, y3, x4, y4]
+        return self.send("save_map", payload)[0] == "ok"
 
     @command(
         click.argument("enable", type=bool)
     )
-    def set_lab_mode(self, enable):
-        """Set the lab mode?
+    def enable_lab_mode(self, enable):
+        """Enable persistent maps and software barriers.
 
-        No clue what does this oo and which fw is required."""
+        This is required to use create_nogo_zone and create_software_barrier
+        commands."""
         return self.send("set_lab_status", int(enable))['ok']
 
     @command()
