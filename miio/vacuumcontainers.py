@@ -7,6 +7,7 @@ from .utils import deprecated, pretty_time, pretty_seconds
 
 
 def pretty_area(x: float) -> float:
+    """Prettify area value."""
     return int(x) / 1000000
 
 
@@ -34,8 +35,30 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 }
 
 
+states = {
+    1: 'Starting',
+    2: 'Charger disconnected',
+    3: 'Idle',
+    4: 'Remote control active',
+    5: 'Cleaning',
+    6: 'Returning home',
+    7: 'Manual mode',
+    8: 'Charging',
+    9: 'Charging problem',
+    10: 'Paused',
+    11: 'Spot cleaning',
+    12: 'Error',
+    13: 'Shutting down',
+    14: 'Updating',
+    15: 'Docking',
+    16: 'Going to target',
+    17: 'Zoned cleaning',
+}
+
+
 class VacuumError(IntEnum):
     """Enum representing an error."""
+
     Invalid = -1
     NoError = 0
     LaserDistanceError = 1
@@ -61,6 +84,7 @@ class VacuumError(IntEnum):
 
 class VacuumState(IntEnum):
     """Enum representing the vacuum state."""
+
     Invalid = -1
     Starting = 1
     ChargerDisconnected = 2
@@ -83,6 +107,7 @@ class VacuumState(IntEnum):
 
 class VacuumStatus:
     """Container for status reports from the vacuum."""
+
     def __init__(self, data: Dict[str, Any]) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
@@ -117,27 +142,8 @@ class VacuumStatus:
     def state_str(self) -> str:
         """Human readable state description.
 
-         See also :func:`state_code`, :func:`state`, and :func:`state_enum`.
-         """
-        states = {
-            1: 'Starting',
-            2: 'Charger disconnected',
-            3: 'Idle',
-            4: 'Remote control active',
-            5: 'Cleaning',
-            6: 'Returning home',
-            7: 'Manual mode',
-            8: 'Charging',
-            9: 'Charging problem',
-            10: 'Paused',
-            11: 'Spot cleaning',
-            12: 'Error',
-            13: 'Shutting down',
-            14: 'Updating',
-            15: 'Docking',
-            16: 'Going to target',
-            17: 'Zoned cleaning',
-        }
+        See also :func:`state_code`, :func:`state`, and :func:`state_enum`.
+        """
         try:
             return states[int(self.state_code)]
         except KeyError:
@@ -148,7 +154,7 @@ class VacuumStatus:
         """Vacuum state as enum."""
         try:
             return VacuumState(self.state_code)
-        except:
+        except ValueError:
             return VacuumState(VacuumState.Invalid)
 
     @property
@@ -173,6 +179,7 @@ class VacuumStatus:
 
     @property
     def error_enum(self) -> VacuumError:
+        """Return error as enum."""
         try:
             return VacuumError(self.error_code)
         except ValueError:
@@ -180,47 +187,58 @@ class VacuumStatus:
 
     @property
     def battery(self) -> int:
-        """Remaining battery in percentage. """
+        """Remaining battery in percentage."""
         return int(self.data["battery"])
 
     @property
     def fanspeed(self) -> int:
-        """Current fan speed."""
+        """Return current fan speed."""
         return int(self.data["fan_power"])
 
     @property
     def clean_time(self) -> timedelta:
-        """Time used for cleaning (if finished, shows how long it took)."""
+        """Return time in cleaning.
+
+        If cleaning is finished, returns the duration.
+        """
         return pretty_seconds(self.data["clean_time"])
 
     @property
     def clean_area(self) -> float:
-        """Cleaned area in m2."""
+        """Return cleaned area in m2."""
         return pretty_area(self.data["clean_area"])
 
     @property
     @deprecated("Use vacuum's dnd_status() instead, which is more accurate")
     def dnd(self) -> bool:
-        """DnD status. Use :func:`vacuum.dnd_status` instead of this."""
+        """Return DnD status.
+
+        Use :func:`vacuum.dnd_status` instead of this.
+        """
         return bool(self.data["dnd_enabled"])
 
     @property
     def map(self) -> bool:
-        """Map token."""
+        """Return the map token."""
         return bool(self.data["map_present"])
 
     @property
     @deprecated("See is_on")
     def in_cleaning(self) -> bool:
-        """True if currently cleaning. Please use :func:`is_on` instead of this."""
+        """Return True if in cleaning.
+
+        Please use :func:`is_on` instead of this.
+        """
         return self.is_on
         # we are not using in_cleaning as it does not seem to work properly.
         # return bool(self.data["in_cleaning"])
 
     @property
     def is_on(self) -> bool:
-        """True if device is currently cleaning (either automatic, manual,
-         spot, or zone)."""
+        """Return True if device is currently cleaning.
+
+        Either automatic, manual, spot, or zone.
+        """
         return (self.state_enum == VacuumState.Cleaning or
                 self.state_enum == VacuumState.ManualMode or
                 self.state_enum == VacuumState.SpotClean or
@@ -228,7 +246,7 @@ class VacuumStatus:
 
     @property
     def got_error(self) -> bool:
-        """True if an error has occured."""
+        """Return True if an error has occured."""
         return self.error_code != 0
 
     def __repr__(self) -> str:
@@ -243,6 +261,7 @@ class VacuumStatus:
 
 class CleaningSummary:
     """Contains summarized information about available cleaning runs."""
+
     def __init__(self, data: List[Any]) -> None:
         # total duration, total area, amount of cleans
         # [ list, of, ids ]
@@ -254,22 +273,25 @@ class CleaningSummary:
 
     @property
     def total_duration(self) -> timedelta:
-        """Total cleaning duration."""
+        """Return total cleaning duration."""
         return pretty_seconds(self.data[0])
 
     @property
     def total_area(self) -> float:
-        """Total cleaned area."""
+        """Return total cleaned area."""
         return pretty_area(self.data[1])
 
     @property
     def count(self) -> int:
-        """Number of cleaning runs."""
+        """Return number of cleaning runs."""
         return int(self.data[2])
 
     @property
     def ids(self) -> List[int]:
-        """A list of available cleaning IDs, see also :class:`CleaningDetails`."""
+        """Return a list of available cleaning IDs.
+
+        See also :class:`CleaningDetails`.
+        """
         return list(self.data[3])
 
     def __repr__(self) -> str:
@@ -285,6 +307,7 @@ class CleaningSummary:
 
 class CleaningDetails:
     """Contains details about a specific cleaning run."""
+
     def __init__(self, data: List[Any]) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
@@ -292,39 +315,40 @@ class CleaningDetails:
 
     @property
     def start(self) -> datetime:
-        """When cleaning was started."""
+        """Return when cleaning was started."""
         return pretty_time(self.data[0])
 
     @property
     def end(self) -> datetime:
-        """When cleaning was finished."""
+        """Return when cleaning was finished."""
         return pretty_time(self.data[1])
 
     @property
     def duration(self) -> timedelta:
-        """Total duration of the cleaning run."""
+        """Return total duration of the cleaning run."""
         return pretty_seconds(self.data[2])
 
     @property
     def area(self) -> float:
-        """Total cleaned area."""
+        """Return cleaned area."""
         return pretty_area(self.data[3])
 
     @property
     def error_code(self) -> int:
-        """Error code."""
+        """Return error code of the cleaning run."""
         return int(self.data[4])
 
     @property
     def error(self) -> str:
-        """Error state of this cleaning run."""
+        """Return error state of the cleaning run."""
         return error_codes[self.data[4]]
 
     @property
     def complete(self) -> bool:
-        """Return True if the cleaning run was complete (e.g. without errors).
+        """Return True if the cleaning run was complete without errors.
 
-         see also :func:`error`."""
+        see also :func:`error`.
+        """
         return bool(self.data[5] == 1)
 
     def __repr__(self) -> str:
@@ -337,15 +361,18 @@ class CleaningDetails:
 
 
 class ConsumableStatus:
-    """Container for consumable status information,
-    including information about brushes and duration until they should be changed.
-    The methods returning time left are based on the following lifetimes:
+    """Container for consumable status information.
 
-    - Sensor cleanup time: XXX FIXME
+    This includes information about brushes and sensors,
+    and provides also helpers to return time remaining for maintenance.
+
+    The methods returning time left are based on the following lifetimes:
+    - Sensor cleanup time: 30 hours
     - Main brush: 300 hours
     - Side brush: 200 hours
     - Filter: 150 hours
     """
+
     def __init__(self, data: Dict[str, Any]) -> None:
         # {'id': 1, 'result': [{'filter_work_time': 32454,
         #  'sensor_dirty_time': 3798,
@@ -359,41 +386,42 @@ class ConsumableStatus:
 
     @property
     def main_brush(self) -> timedelta:
-        """Main brush usage time."""
+        """Return main brush usage time."""
         return pretty_seconds(self.data["main_brush_work_time"])
 
     @property
     def main_brush_left(self) -> timedelta:
-        """How long until the main brush should be changed."""
+        """Return time remaining until the main brush should be replaced."""
         return self.main_brush_total - self.main_brush
 
     @property
     def side_brush(self) -> timedelta:
-        """Side brush usage time."""
+        """Return side brush usage time."""
         return pretty_seconds(self.data["side_brush_work_time"])
 
     @property
     def side_brush_left(self) -> timedelta:
-        """How long until the side brush should be changed."""
+        """Return time remaining until the side brush should be replaced."""
         return self.side_brush_total - self.side_brush
 
     @property
     def filter(self) -> timedelta:
-        """Filter usage time."""
+        """Return filter usage time."""
         return pretty_seconds(self.data["filter_work_time"])
 
     @property
     def filter_left(self) -> timedelta:
-        """How long until the filter should be changed."""
+        """Return time remaining until the filter should be replaced."""
         return self.filter_total - self.filter
 
     @property
     def sensor_dirty(self) -> timedelta:
-        """Return ``sensor_dirty_time``"""
+        """Return time since sensor cleaning."""
         return pretty_seconds(self.data["sensor_dirty_time"])
 
     @property
     def sensor_dirty_left(self) -> timedelta:
+        """Return time remaining until the sensors should be cleaned."""
         return self.sensor_dirty_total - self.sensor_dirty
 
     def __repr__(self) -> str:
@@ -406,6 +434,7 @@ class ConsumableStatus:
 
 class DNDStatus:
     """A container for the do-not-disturb status."""
+
     def __init__(self, data: Dict[str, Any]):
         # {'end_minute': 0, 'enabled': 1, 'start_minute': 0,
         #  'start_hour': 22, 'end_hour': 8}
@@ -413,18 +442,18 @@ class DNDStatus:
 
     @property
     def enabled(self) -> bool:
-        """True if DnD is enabled."""
+        """Return True if DnD is enabled."""
         return bool(self.data["enabled"])
 
     @property
     def start(self) -> time:
-        """Start time of DnD."""
+        """Return the start time of DnD."""
         return time(hour=self.data["start_hour"],
                     minute=self.data["start_minute"])
 
     @property
     def end(self) -> time:
-        """End time of DnD."""
+        """Return the end time of DnD."""
         return time(hour=self.data["end_hour"],
                     minute=self.data["end_minute"])
 
@@ -440,8 +469,11 @@ class DNDStatus:
 
 class Timer:
     """A container for scheduling.
+
     The timers are accessed using an integer ID, which is based on the unix
-    timestamp of the creation time."""
+    timestamp of the creation time.
+    """
+
     def __init__(self, data: List[Any]) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
@@ -451,28 +483,30 @@ class Timer:
 
     @property
     def id(self) -> int:
-        """ID which can be used to point to this timer."""
+        """Return the ID of this timer."""
         return int(self.data[0])
 
     @property
     def ts(self) -> datetime:
-        """Pretty-printed ID (timestamp) presentation as time."""
+        """Return the creation time of the timer."""
         return pretty_time(int(self.data[0]) / 1000)
 
     @property
     def enabled(self) -> bool:
-        """True if the timer is active."""
+        """Return True if the timer is active."""
         return bool(self.data[1] == 'on')
 
     @property
     def cron(self) -> str:
-        """Cron-formated timer string."""
+        """Return cron-formated timer string."""
         return str(self.data[2][0])
 
     @property
     def action(self) -> str:
-        """The action to be taken on the given time.
-        Note, this seems to be always 'start'."""
+        """Return the action to be executed by the timer.
+
+        Note, this seems to be always 'start'.
+        """
         return str(self.data[2][1])
 
     def __repr__(self) -> str:
@@ -485,16 +519,19 @@ class Timer:
 
 class SoundStatus:
     """Container for sound status."""
+
     def __init__(self, data):
         # {'sid_in_progress': 0, 'sid_in_use': 1004}
         self.data = data
 
     @property
     def current(self):
+        """Return the ID of currently used sound pack."""
         return self.data['sid_in_use']
 
     @property
     def being_installed(self):
+        """Return True if a sound pack is being installed."""
         return self.data['sid_in_progress']
 
     def __repr__(self):
@@ -507,6 +544,8 @@ class SoundStatus:
 
 
 class SoundInstallState(IntEnum):
+    """Enum for sound install states."""
+
     Unknown = 0
     Downloading = 1
     Installing = 2
@@ -516,6 +555,7 @@ class SoundInstallState(IntEnum):
 
 class SoundInstallStatus:
     """Container for sound installation status."""
+
     def __init__(self, data):
         # {'progress': 0, 'sid_in_progress': 0, 'state': 0, 'error': 0}
         # error 0 = no error
@@ -523,39 +563,41 @@ class SoundInstallStatus:
         # error 2 = download error
         # error 3 = checksum error
         # error 4 = unknown 4
-
         self.data = data
 
     @property
     def state(self) -> SoundInstallState:
-        """Installation state."""
+        """Return the installation state."""
         return SoundInstallState(self.data['state'])
 
     @property
     def progress(self) -> int:
-        """Progress in percentages."""
+        """Return the install progress in percentage."""
         return self.data['progress']
 
     @property
     def sid(self) -> int:
-        """Sound ID for the sound being installed."""
+        """Return the Sound ID currently being installed."""
         # this is missing on install confirmation, so let's use get
         return self.data.get('sid_in_progress', None)
 
     @property
     def error(self) -> int:
-        """Error code, 0 is no error, other values unknown."""
+        """Return the error code.
+
+        0 is no error, other values unknown.
+        """
         return self.data['error']
 
     @property
     def is_installing(self) -> bool:
-        """True if install is in progress."""
+        """Return True if install is in progress."""
         return (self.state == SoundInstallState.Downloading or
                 self.state == SoundInstallState.Installing)
 
     @property
     def is_errored(self) -> bool:
-        """True if the state has an error, use `error` to access it."""
+        """Return True if an error has occured, use `error` to access it."""
         return self.state == SoundInstallState.Error
 
     def __repr__(self) -> str:
@@ -569,6 +611,7 @@ class SoundInstallStatus:
 
 class CarpetModeStatus:
     """Container for carpet mode status."""
+
     def __init__(self, data):
         # {'current_high': 500, 'enable': 1, 'current_integral': 450,
         #  'current_low': 400, 'stall_time': 10}
@@ -576,7 +619,7 @@ class CarpetModeStatus:
 
     @property
     def enabled(self) -> bool:
-        """True if carpet mode is enabled."""
+        """Return True if carpet mode is enabled."""
         return self.data['enable'] == 1
 
     @property
