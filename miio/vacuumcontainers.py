@@ -107,7 +107,8 @@ class VacuumStatus:
         return int(self.data["state"])
 
     @property
-    @deprecated("Use state_str for string presentation, this will return an enum in the future.")
+    @deprecated("Use state_str for string presentation, "
+                "this will return an enum in the future.")
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
         return self.state_str
@@ -156,7 +157,8 @@ class VacuumStatus:
         return int(self.data["error_code"])
 
     @property
-    @deprecated("Use error_str for human readable, this will change in the future to return an enum.")
+    @deprecated("Use error_str for human readable, "
+                "this will change in the future to return an enum.")
     def error(self):
         """Human readable error description, see also :func:`error_code`."""
         return self.error_str
@@ -173,7 +175,7 @@ class VacuumStatus:
     def error_enum(self) -> VacuumError:
         try:
             return VacuumError(self.error_code)
-        except:
+        except ValueError:
             return VacuumError(VacuumError.Invalid)
 
     @property
