@@ -51,12 +51,15 @@ setup(
         'pretty_cron',
         'zeroconf',
         'attrs',
-        'android_backup',
         'pytz',
         'appdirs',
         'tqdm',
         'netifaces',
     ],
+
+    extras_require={
+        'Android backup extraction': 'android_backup',
+    },
 
     entry_points={
         'console_scripts': [
