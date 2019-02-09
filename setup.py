@@ -48,7 +48,6 @@ setup(
         'construct',
         'click',
         'cryptography',
-        'pretty_cron',
         'zeroconf',
         'attrs',
         'android_backup',

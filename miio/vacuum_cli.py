@@ -10,7 +10,6 @@ from pprint import pformat as pf
 from typing import Any, List  # noqa: F401
 
 import click
-import pretty_cron
 from appdirs import user_cache_dir
 from tqdm import tqdm
 
@@ -342,7 +341,7 @@ def timer(ctx, vac: miio.Vacuum):
         click.echo("  %s" % timer.cron)
         min, hr, x, y, days = timer.cron.split(' ')
         cron = "%s %s %s %s %s" % (min, hr, x, y, days)
-        click.echo("  %s" % pretty_cron.prettify_cron(cron))
+        click.echo("  %s" % cron)
 
 
 @timer.command()
