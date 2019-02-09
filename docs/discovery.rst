@@ -100,19 +100,6 @@ browser to navigate to directory ``SmartHome/logs/plug_DeviceManager``, then
 open the most recent file and search for the token. When finished, use Google
 Play to get the most recent version back.
 
-.. _logged_tokens:
-
-Tokens from Mi Home logs
-========================
-
-The easiest way to obtain tokens is to browse through log files of the Mi Home
-app version 5.4.49 for Android. It seems that version was released with debug
-messages turned on by mistake. An APK file with the old version can be easily
-found using one of the popular web search engines. After downgrading use a file
-browser to navigate to directory ``SmartHome/logs/plug_DeviceManager``, then
-open the most recent file and search for the token. When finished, use Google
-Play to get the most recent version back.
-
 .. _creating_backup:
 
 Tokens from backups
