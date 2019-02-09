@@ -8,7 +8,6 @@ import xml.etree.ElementTree as ET
 
 import attr
 import click
-from android_backup import AndroidBackup
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -190,6 +189,12 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
     devices = []
     reader = BackupDatabaseReader(dump_raw)
     if backup.endswith(".ab"):
+        try:
+            from android_backup import AndroidBackup
+        except ModuleNotFoundError:
+            click.echo("You need to install android_backup to extract "
+                       "tokens from Android backup files.")
+            return
 
         with AndroidBackup(backup, stream=False) as f:
             tar = f.read_data(password)
