@@ -249,7 +249,7 @@ class PhilipsMoonlight(Device):
     )
     def set_scene(self, number: int):
         """Set scene number."""
-        if number < 1 or number > 4:
+        if number < 1 or number > 6:
             raise PhilipsMoonlightException("Invalid fixed scene number: %s" % number)
 
         return self.send("apply_fixed_scene", [number])

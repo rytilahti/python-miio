@@ -235,8 +235,8 @@ class TestPhilipsMoonlight(TestCase):
 
         self.device.set_scene(1)
         assert scene() == 1
-        self.device.set_scene(2)
-        assert scene() == 2
+        self.device.set_scene(6)
+        assert scene() == 6
 
         with pytest.raises(PhilipsMoonlightException):
             self.device.set_scene(-1)
@@ -245,4 +245,4 @@ class TestPhilipsMoonlight(TestCase):
             self.device.set_scene(0)
 
         with pytest.raises(PhilipsMoonlightException):
-            self.device.set_scene(5)
+            self.device.set_scene(7)
