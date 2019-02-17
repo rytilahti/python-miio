@@ -32,6 +32,7 @@ class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
             'set_cct': lambda x: self._set_state("cct", x),
             'set_rgb': lambda x: self._set_state("rgb", [rgb_to_int(x)]),
             'apply_fixed_scene': lambda x: self._set_state("snm", x),
+            'go_night': lambda x: self._set_state("snm", [6]),
             'set_bricct': lambda x: (
                 self._set_state('bri', [x[0]]),
                 self._set_state('cct', [x[1]]),
