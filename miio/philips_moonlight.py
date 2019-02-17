@@ -252,4 +252,7 @@ class PhilipsMoonlight(Device):
         if number < 1 or number > 6:
             raise PhilipsMoonlightException("Invalid fixed scene number: %s" % number)
 
+        if number == 6:
+            return self.send("go_night")
+
         return self.send("apply_fixed_scene", [number])
