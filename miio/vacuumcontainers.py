@@ -33,7 +33,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     19: "Unpowered charging station",
     21: "Laser disance sensor blocked", 
     22: "Clean the dock charging contacts",
-    23: "Docking station not reachable"
+    23: "Docking station not reachable",
 }
 
 
