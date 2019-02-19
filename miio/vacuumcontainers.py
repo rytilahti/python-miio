@@ -31,6 +31,9 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     17: "Side brushes problem, reboot me",
     18: "Suction fan problem",
     19: "Unpowered charging station",
+    21: "Laser disance sensor blocked", 
+    22: "Clean the dock charging contacts",
+    23: "Docking station not reachable"
 }
 
 
