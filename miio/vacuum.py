@@ -72,6 +72,15 @@ class Vacuum(Device):
         return self.send("app_pause")
 
     @command()
+    def resume_or_start(self):
+        """A shortcut for resuming or starting cleaning."""
+        status = self.status()
+        if status.in_zone_cleaning and status.is_paused:
+            return self.resume_zoned_clean()
+
+        return self.start()
+
+    @command()
     def home(self):
         """Stop cleaning and return home."""
         self.send("app_pause")
@@ -94,6 +103,11 @@ class Vacuum(Device):
         """Clean zones.
         :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]"""
         return self.send("app_zoned_clean", zones)
+
+    @command()
+    def resume_zoned_clean(self):
+        """Resume zone cleaning after being paused."""
+        return self.send("resume_zoned_clean")
 
     @command()
     def manual_start(self):

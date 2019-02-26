@@ -142,6 +142,16 @@ class VacuumStatus:
         # return bool(self.data["in_cleaning"])
 
     @property
+    def in_zone_cleaning(self) -> bool:
+        """Return True if the vacuum is in zone cleaning mode."""
+        return self.data["in_cleaning"] == 2
+
+    @property
+    def is_paused(self) -> bool:
+        """Return True if vacuum is paused."""
+        return self.state_code == 10
+
+    @property
     def is_on(self) -> bool:
         """True if device is currently cleaning (either automatic, manual,
          spot, or zone)."""
