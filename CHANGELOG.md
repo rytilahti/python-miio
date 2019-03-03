@@ -4,11 +4,36 @@
 
 This release adds support for the following new devices:
 
-TBD.
+* Xiaomi Chuangmi Plug M3
+* Xiaomi Chuangmi Plug HMI205
+* Xiaomi Air Purifier Pro V7
+* Xiaomi Air Quality Monitor 2gen
+* Xiaomi Aqara Camera
 
 Fixes & Enhancements:
 
-TBD.
+* Handle "resp invalid json" error
+* Drop pretty\_cron dependency
+* Make android\_backup an optional dependency
+* Docs: Add troubleshooting guide for cross-subnet communications
+* Docs: Sphinx config fix
+* Docs: Token extraction for Apple users
+* Docs: Add a troubleshooting entry for vacuum timeouts
+* Docs: New method to obtain tokens
+* miio-extract-tokens: Allow extraction from Yeelight app db
+* miio-extract-tokens: Fix for devices without tokens
+* Air Humidifier: Add set\_led method
+* Air Humidifier CA1: Fix led brightness command
+* Air Conditioning Partner: Add swing mode 7 with unknown meaning
+* Air Conditioning Partner: Extract the return value of the plug\_state request properly
+* Air Conditioning Partner: Expose power\_socket property
+* Moonlight: Align signature of set\_brightness\_and\_rgb
+* Moonlight: Fix parameters of the set\_rgb api call
+* Moonlight: Night mode support and additional scenes
+* Vacuum: Additional error descriptions
+* Vacuum: Add control for persistent maps, no-go zones and barriers
+* Vacuum: Add resume\_zoned\_clean\(\) and resume\_or\_start\(\) helper
+* Yeelight Bedside: Fix set\_name and set\_color\_temp
 
 API changes:
 
