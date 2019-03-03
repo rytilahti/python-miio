@@ -1,5 +1,80 @@
 # Change Log
 
+## [0.4.5](https://github.com/rytilahti/python-miio/tree/0.4.5)
+
+This release adds support for the following new devices:
+
+TBD.
+
+Fixes & Enhancements:
+
+TBD.
+
+API changes:
+
+TBD.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.4...0.4.5)
+
+**Fixed bugs:**
+
+- miio-extract-tokens raises a TypeError when running against extracted SQLite database [\#467](https://github.com/rytilahti/python-miio/issues/467)
+- Do not crash on last\_clean\_details when no history available [\#457](https://github.com/rytilahti/python-miio/issues/457)
+- install-sound command not working on Xiaowa vacuum \(roborock.vacuum.c1 v1.3.0\) [\#418](https://github.com/rytilahti/python-miio/issues/418)
+- DeviceError code -30001 \(Resp Invalid JSON\) - Philips Bulb [\#205](https://github.com/rytilahti/python-miio/issues/205)
+
+**Closed issues:**
+
+- Issues adding roborock s50 vacuum to HA and controlling from mirobo [\#456](https://github.com/rytilahti/python-miio/issues/456)
+- Support for chuangmi plug m3 [\#454](https://github.com/rytilahti/python-miio/issues/454)
+- Xiaomi Phillips Smart LED Ball Lamp and API token for Home Assistant \(yaml\) [\#445](https://github.com/rytilahti/python-miio/issues/445)
+- xiaomi ir control [\#444](https://github.com/rytilahti/python-miio/issues/444)
+- Mirobo does not start on raspberry pi [\#442](https://github.com/rytilahti/python-miio/issues/442)
+- Add mi band 3 watch to your library [\#441](https://github.com/rytilahti/python-miio/issues/441)
+- Unsupported Device: chuangmi.plug.hmi205 [\#440](https://github.com/rytilahti/python-miio/issues/440)
+- Air Purifier zhimi.airpurifier.m1 set\_mode isn't working [\#436](https://github.com/rytilahti/python-miio/issues/436)
+- Can't make it work in a Domoticz plugin [\#433](https://github.com/rytilahti/python-miio/issues/433)
+- chuangmi.plug.hmi205 unsupported device [\#427](https://github.com/rytilahti/python-miio/issues/427)
+- Some devices not responding across subnets. [\#422](https://github.com/rytilahti/python-miio/issues/422)
+
+**Merged pull requests:**
+
+- Add missing error description [\#483](https://github.com/rytilahti/python-miio/pull/483) ([oncleben31](https://github.com/oncleben31))
+- Enable the night mode \(scene 6\) by calling "go\_night" [\#481](https://github.com/rytilahti/python-miio/pull/481) ([syssi](https://github.com/syssi))
+- Philips Moonlight: Support up to 6 fixed scenes [\#478](https://github.com/rytilahti/python-miio/pull/478) ([syssi](https://github.com/syssi))
+- Remove duplicate paragraph about "Tokens from Mi Home logs" [\#477](https://github.com/rytilahti/python-miio/pull/477) ([syssi](https://github.com/syssi))
+- Make android\_backup an optional dependency [\#476](https://github.com/rytilahti/python-miio/pull/476) ([rytilahti](https://github.com/rytilahti))
+- Drop pretty\_cron dependency [\#475](https://github.com/rytilahti/python-miio/pull/475) ([rytilahti](https://github.com/rytilahti))
+- Vacuum: add resume\_zoned\_clean\(\) and resume\_or\_start\(\) helper [\#473](https://github.com/rytilahti/python-miio/pull/473) ([rytilahti](https://github.com/rytilahti))
+- Check for empty clean\_history instead of crashing on it [\#472](https://github.com/rytilahti/python-miio/pull/472) ([rytilahti](https://github.com/rytilahti))
+- Fix miio-extract-tokens for devices without tokens [\#469](https://github.com/rytilahti/python-miio/pull/469) ([domibarton](https://github.com/domibarton))
+- Rename speed property to avoid a name clash at HA [\#466](https://github.com/rytilahti/python-miio/pull/466) ([syssi](https://github.com/syssi))
+- Corrected link in discovery.rst and Xiaomi Air Purifier Pro fix [\#465](https://github.com/rytilahti/python-miio/pull/465) ([swiergot](https://github.com/swiergot))
+- New method to obtain tokens [\#464](https://github.com/rytilahti/python-miio/pull/464) ([swiergot](https://github.com/swiergot))
+- Add a troubleshooting entry for vacuum timeouts [\#463](https://github.com/rytilahti/python-miio/pull/463) ([rytilahti](https://github.com/rytilahti))
+- Extend miio-extract-tokens to allow extraction from yeelight app db [\#462](https://github.com/rytilahti/python-miio/pull/462) ([rytilahti](https://github.com/rytilahti))
+- Docs for token extraction for Apple users [\#460](https://github.com/rytilahti/python-miio/pull/460) ([domibarton](https://github.com/domibarton))
+- Add troubleshooting guide for cross-subnet communications [\#459](https://github.com/rytilahti/python-miio/pull/459) ([domibarton](https://github.com/domibarton))
+- Sphinx config fix [\#458](https://github.com/rytilahti/python-miio/pull/458) ([domibarton](https://github.com/domibarton))
+- Add Xiaomi Chuangmi Plug M3 support \(Closes: \#454\) [\#455](https://github.com/rytilahti/python-miio/pull/455) ([syssi](https://github.com/syssi))
+- Add a "Reviewed by Hound" badge [\#453](https://github.com/rytilahti/python-miio/pull/453) ([salbertson](https://github.com/salbertson))
+- Air Humidifier: Add set\_led method [\#451](https://github.com/rytilahti/python-miio/pull/451) ([syssi](https://github.com/syssi))
+- Air Humidifier CA1: Fix led brightness command [\#450](https://github.com/rytilahti/python-miio/pull/450) ([syssi](https://github.com/syssi))
+- Handle "resp invalid json" error \(Closes: \#205\) [\#449](https://github.com/rytilahti/python-miio/pull/449) ([syssi](https://github.com/syssi))
+- Air Conditioning Partner: Extract the return value of the plug\_state request properly [\#448](https://github.com/rytilahti/python-miio/pull/448) ([syssi](https://github.com/syssi))
+- Expose power\_socket property at AirConditioningCompanionStatus.\_\_repr\_\_\(\) [\#447](https://github.com/rytilahti/python-miio/pull/447) ([syssi](https://github.com/syssi))
+- Air Conditioning Companion: Fix some conversion issues [\#446](https://github.com/rytilahti/python-miio/pull/446) ([syssi](https://github.com/syssi))
+- Add support v7 version for Xiaomi AirPurifier PRO [\#443](https://github.com/rytilahti/python-miio/pull/443) ([quamilek](https://github.com/quamilek))
+- Add control for persistent maps, no-go zones and barriers [\#438](https://github.com/rytilahti/python-miio/pull/438) ([rytilahti](https://github.com/rytilahti))
+- Moonlight: Fix parameters of the set\_rgb api call [\#435](https://github.com/rytilahti/python-miio/pull/435) ([syssi](https://github.com/syssi))
+- yeelight bedside: fix set\_name and set\_color\_temp [\#434](https://github.com/rytilahti/python-miio/pull/434) ([rytilahti](https://github.com/rytilahti))
+- AC Partner: Add swing mode 7 with unknown meaning [\#431](https://github.com/rytilahti/python-miio/pull/431) ([syssi](https://github.com/syssi))
+- Philips Moonlight: Align signature of set\_brightness\_and\_rgb [\#430](https://github.com/rytilahti/python-miio/pull/430) ([syssi](https://github.com/syssi))
+- Add support for next generation of the Xiaomi Mi Smart Plug  [\#428](https://github.com/rytilahti/python-miio/pull/428) ([syssi](https://github.com/syssi))
+- Add Xiaomi Air Quality Monitor 2gen \(cgllc.airmonitor.b1\) support [\#420](https://github.com/rytilahti/python-miio/pull/420) ([syssi](https://github.com/syssi))
+- Add initial support for aqara camera \(lumi.camera.aq1\) [\#375](https://github.com/rytilahti/python-miio/pull/375) ([rytilahti](https://github.com/rytilahti))
+
+
 ## [0.4.4](https://github.com/rytilahti/python-miio/tree/0.4.4) (2018-12-03)
 
 This release adds support for the following new devices:
