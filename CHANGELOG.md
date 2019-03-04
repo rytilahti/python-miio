@@ -16,6 +16,7 @@ Fixes & Enhancements:
 * Drop pretty\_cron dependency
 * Make android\_backup an optional dependency
 * Docs: Add troubleshooting guide for cross-subnet communications
+* Docs: Fix link in discovery.rst
 * Docs: Sphinx config fix
 * Docs: Token extraction for Apple users
 * Docs: Add a troubleshooting entry for vacuum timeouts
@@ -25,11 +26,14 @@ Fixes & Enhancements:
 
 API changes:
 
-* Air Humidifier: Add set\_led method
-* Air Humidifier CA1: Fix led brightness command
 * Air Conditioning Partner: Add swing mode 7 with unknown meaning
 * Air Conditioning Partner: Extract the return value of the plug\_state request properly
 * Air Conditioning Partner: Expose power\_socket property
+* Air Conditioning Partner: Fix some conversion issues
+* Air Humidifier: Add set\_led method
+* Air Humidifier: Rename speed property to avoid a name clash at HA
+* Air Humidifier CA1: Fix led brightness command
+* Air Purifier: Add favorite level 17
 * Moonlight: Align signature of set\_brightness\_and\_rgb
 * Moonlight: Fix parameters of the set\_rgb api call
 * Moonlight: Night mode support and additional scenes
