@@ -22,6 +22,9 @@ Fixes & Enhancements:
 * Docs: New method to obtain tokens
 * miio-extract-tokens: Allow extraction from Yeelight app db
 * miio-extract-tokens: Fix for devices without tokens
+
+API changes:
+
 * Air Humidifier: Add set\_led method
 * Air Humidifier CA1: Fix led brightness command
 * Air Conditioning Partner: Add swing mode 7 with unknown meaning
@@ -30,14 +33,10 @@ Fixes & Enhancements:
 * Moonlight: Align signature of set\_brightness\_and\_rgb
 * Moonlight: Fix parameters of the set\_rgb api call
 * Moonlight: Night mode support and additional scenes
-* Vacuum: Additional error descriptions
 * Vacuum: Add control for persistent maps, no-go zones and barriers
 * Vacuum: Add resume\_zoned\_clean\(\) and resume\_or\_start\(\) helper
+* Vacuum: Additional error descriptions
 * Yeelight Bedside: Fix set\_name and set\_color\_temp
-
-API changes:
-
-TBD.
 
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.4...0.4.5)
 
