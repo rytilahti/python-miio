@@ -7,10 +7,10 @@ from miio.airpurifier import AirPurifier
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.ceil import Ceil
 from miio.chuangmi_ir import ChuangmiIr
-from miio.chuangmi_plug import (Plug, PlugV1, PlugV3, ChuangmiPlug)
+from miio.chuangmi_plug import Plug, PlugV1, PlugV3, ChuangmiPlug
 from miio.cooker import Cooker
-from miio.device import Device, DeviceException
-from miio.fan import (Fan, FanV2, FanSA1)
+from miio.device import Device, DeviceException, DeviceError
+from miio.fan import Fan, FanV2, FanSA1
 from miio.philips_bulb import PhilipsBulb
 from miio.philips_eyecare import PhilipsEyecare
 from miio.philips_moonlight import PhilipsMoonlight
