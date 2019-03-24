@@ -6,8 +6,8 @@ class DeviceException(Exception):
 class DeviceError(DeviceException):
     """Exception communicating an error delivered by the target device."""
     def __init__(self, error):
-        self.code = error.get['code']
-        self.message = error.get['message']
+        self.code = error.get('code')
+        self.message = error.get('message')
 
 
 class RecoverableError(DeviceError):
