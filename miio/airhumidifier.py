@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import command, format_output, EnumType
-from .device import Device, DeviceInfo, DeviceException
+from .device import Device, DeviceInfo, DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -329,7 +329,14 @@ class AirHumidifier(Device):
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
-        return self.send("set_mode", [mode.value])
+        try:
+            return self.send("set_mode", [mode.value])
+        except DeviceError as error:
+            # {'code': -6011, 'message': 'device_poweroff'}
+            if error.code == -6011:
+                self.on()
+                return self.send("set_mode", [mode.value])
+            raise
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
