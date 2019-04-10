@@ -86,10 +86,10 @@ class AirHumidifierStatus:
     @property
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
+        if "temp_dec" in self.data and self.data["temp_dec"] is not None:
+            return self.data["temp_dec"] / 10.0
         if "temperature" in self.data and self.data["temperature"] is not None:
             return self.data["temperature"]
-        elif "temp_dec" in self.data and self.data["temp_dec"] is not None:
-            return self.data["temp_dec"] / 10.0
         return None
 
     @property
@@ -288,8 +288,8 @@ class AirHumidifier(Device):
         # properties are divided into multiple requests
         _props_per_request = 15
 
-        # The CA1/CB1 are limited to a single property per request
-        if self.model != MODEL_HUMIDIFIER_V1:
+        # The CA1 and CB1 are limited to a single property per request
+        if self.model in [MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB1]:
             _props_per_request = 1
 
         _props = properties.copy()
@@ -338,10 +338,10 @@ class AirHumidifier(Device):
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
-        if self.model == MODEL_HUMIDIFIER_V1:
-            return self.send("set_led_b", [brightness.value])
+        if self.model in [MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB1]:
+            return self.send("set_led_b", [str(brightness.value)])
 
-        return self.send("set_led_b", [str(brightness.value)])
+        return self.send("set_led_b", [brightness.value])
 
     @command(
         click.argument("led", type=bool),
@@ -417,6 +417,7 @@ class AirHumidifierCA1(AirHumidifier):
                  debug: int = 0, lazy_discover: bool = True) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover,
                          model=MODEL_HUMIDIFIER_CA1)
+
 
 class AirHumidifierCB1(AirHumidifier):
     def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
