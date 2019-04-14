@@ -184,9 +184,9 @@ class ChuangmiPlug(Device):
             if wifi_led else "Turning off WiFi LED"
         )
     )
-    def set_wifi_led(self, led: bool):
+    def set_wifi_led(self, wifi_led: bool):
         """Set the wifi led on/off."""
-        if led:
+        if wifi_led:
             return self.send("set_wifi_led", ["on"])
         else:
             return self.send("set_wifi_led", ["off"])
