@@ -8,7 +8,7 @@ from typing import Union, Callable, Dict, Optional  # noqa: F401
 import zeroconf
 
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, Ceil,
-               PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
+               PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr, ChuangmiRemote,
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
                Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera)
 
@@ -51,7 +51,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v7": AirPurifier,   # v7
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
     "chuangmi-ir-v2": ChuangmiIr,
-    "chuangmi-remote-h102a03_": ChuangmiIr,
+    "chuangmi-remote-h102a03_": ChuangmiRemote,
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
     "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),

@@ -5,7 +5,7 @@ from unittest import TestCase
 
 import pytest
 
-from miio import ChuangmiIr
+from miio import ChuangmiIr, ChuangmiRemote
 from miio.chuangmi_ir import ChuangmiIrException
 from .dummies import DummyDevice
 
@@ -14,7 +14,7 @@ with open(os.path.join(
     test_data = json.load(inp)
 
 
-class DummyChuangmiIr(DummyDevice, ChuangmiIr):
+class DummyChuangmiBase(DummyDevice):
     def __init__(self, *args, **kwargs):
         self.state = {
             'last_ir_played': None,
@@ -37,10 +37,23 @@ class DummyChuangmiIr(DummyDevice, ChuangmiIr):
             return False
 
 
+class DummyChuangmiIr(DummyChuangmiBase, ChuangmiIr):
+    pass
+
+
+class DummyChuangmiRemote(DummyChuangmiBase, ChuangmiRemote):
+    pass
+
+
 @pytest.fixture(scope="class")
 def chuangmiir(request):
     request.cls.device = DummyChuangmiIr()
     # TODO add ability to test on a real device
+
+
+@pytest.fixture(scope="class")
+def chuangmiremote(request):
+    request.cls.device = DummyChuangmiRemote()
 
 
 @pytest.mark.usefixtures("chuangmiir")
@@ -135,3 +148,14 @@ class TestChuangmiIr(TestCase):
 
         with pytest.raises(ChuangmiIrException):
             self.device.play('pronto:command:invalidargument')
+
+
+@pytest.mark.usefixtures("chuangmiremote")
+class TestChuangmiRemote(TestCase):
+    def test_pronto_to_raw(self):
+        for args in test_data['test_pronto_ok_chuangmi_remote']:
+            with self.subTest():
+                self.assertSequenceEqual(
+                    ChuangmiRemote.pronto_to_raw(*args['in']),
+                    args['out']
+                )

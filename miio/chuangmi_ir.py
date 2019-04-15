@@ -6,6 +6,10 @@ from construct import (
     Struct, Const, Rebuild, this, len_, Adapter, Computed,
     Int16ul, Int32ul, Int16ub, Array, BitStruct, BitsInteger,
 )
+try:
+    import heatshrink
+except:
+    heatshrink = None
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
@@ -143,6 +147,18 @@ class ChuangmiIr(Device):
             raise ChuangmiIrException('Invalid command arguments') from ex
 
         return play_method(command, *command_args)
+
+
+class ChuangmiRemote(ChuangmiIr):
+
+    @classmethod
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1):
+        if heatshrink is None:
+            raise ChuangmiIrException("Heatshrink library is missing")
+        raw, frequency = super().pronto_to_raw(pronto, repeats)
+        return base64.b64encode(
+            heatshrink.encode('learn{}'.format(raw).encode())
+        ).decode(), frequency
 
 
 class ProntoPulseAdapter(Adapter):

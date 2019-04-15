@@ -6,7 +6,7 @@ from miio.airhumidifier import AirHumidifier
 from miio.airpurifier import AirPurifier
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.ceil import Ceil
-from miio.chuangmi_ir import ChuangmiIr
+from miio.chuangmi_ir import ChuangmiIr, ChuangmiRemote
 from miio.chuangmi_plug import Plug, PlugV1, PlugV3, ChuangmiPlug
 from miio.cooker import Cooker
 from miio.device import Device, DeviceException, DeviceError

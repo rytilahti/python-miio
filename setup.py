@@ -1,5 +1,6 @@
 import re
 from setuptools import setup
+import pkg_resources
 
 with open('miio/version.py') as f:
     exec(f.read())
@@ -12,6 +13,14 @@ def readme():
     with open('README.rst') as f:
         return re.sub(reg, r'\1', f.read())
 
+
+try:
+    pkg_resources.get_distribution('pip>=18.1')
+    heatshrink_requirement = [
+        'heatshrink @ git+https://github.com/yawor/pyheatshrink@py3fix',
+    ]
+except:
+    heatshrink_requirement = []
 
 setup(
     name='python-miio',
@@ -54,7 +63,8 @@ setup(
         'appdirs',
         'tqdm',
         'netifaces',
-    ],
+        'cython',
+    ] + heatshrink_requirement,
 
     extras_require={
         'Android backup extraction': 'android_backup',
