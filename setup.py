@@ -17,6 +17,7 @@ def readme():
 try:
     pkg_resources.get_distribution('pip>=18.1')
     heatshrink_requirement = [
+        'cython',
         'heatshrink @ git+https://github.com/yawor/pyheatshrink@py3fix',
     ]
 except:
@@ -63,7 +64,6 @@ setup(
         'appdirs',
         'tqdm',
         'netifaces',
-        'cython',
     ] + heatshrink_requirement,
 
     extras_require={
