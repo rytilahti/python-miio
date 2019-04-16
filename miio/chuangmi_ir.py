@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import base64
 import re
 
@@ -76,8 +78,10 @@ class ChuangmiIr(Device):
         return self.play_raw(*self.pronto_to_raw(pronto, repeats))
 
     @classmethod
-    def pronto_to_raw(cls, pronto: str, repeats: int=1):
-        """Play a Pronto Hex encoded IR command.
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+        """Takes a Pronto Hex encoded IR command and number of repeats
+        and returns a tuple containing a string encoded IR signal accepted by
+        controller and frequency.
         Supports only raw Pronto format, starting with 0000.
 
         :param str pronto: Pronto Hex string.
@@ -150,9 +154,23 @@ class ChuangmiIr(Device):
 
 
 class ChuangmiRemote(ChuangmiIr):
+    """Class representing new type of Chuangmi IR Remote Controller
+    called Chuangmi Remote. The new controller uses different format for
+    learned IR commands, which actually is the old format but with additional
+    layer of compression.
+    """
 
     @classmethod
-    def pronto_to_raw(cls, pronto: str, repeats: int = 1):
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+        """Takes a Pronto Hex encoded IR command and number of repeats
+        and returns a tuple containing a string encoded IR signal accepted by
+        controller and frequency.
+        Supports only raw Pronto format, starting with 0000.
+
+        :raises ChuangmiIrException if heatshrink package is not installed
+
+        :param str pronto: Pronto Hex string.
+        :param int repeats: Number of extra signal repeats."""
         if heatshrink is None:
             raise ChuangmiIrException("Heatshrink library is missing")
         raw, frequency = super().pronto_to_raw(pronto, repeats)
