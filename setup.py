@@ -46,7 +46,7 @@ setup(
 
     install_requires=[
         'construct',
-        'click',
+        'click>=7',
         'cryptography',
         'zeroconf',
         'attrs',
