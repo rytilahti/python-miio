@@ -10,8 +10,10 @@ import zeroconf
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, Ceil,
                PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
-               Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera)
+               Yeelight, Fan, Cooker, AirCondition, AirConditioningCompanion,
+               AirQualityMonitor, AqaraCamera, )
 
+from .aircondition import (MODEL_AIRCONDITION_MA1, MODEL_AIRCONDITION_MA2, MODEL_AIRCONDITION_SA1)
 from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
 from .airqualitymonitor import (MODEL_AIRQUALITYMONITOR_V1, MODEL_AIRQUALITYMONITOR_B1, )
 from .airhumidifier import (MODEL_HUMIDIFIER_CB1, MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_V1, )
@@ -82,6 +84,9 @@ DEVICE_MAP = {
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
+    "zhimi-aircondition-ma1": partial(AirCondition, model=MODEL_AIRCONDITION_MA1),
+    "zhimi-aircondition-ma2": partial(AirCondition, model=MODEL_AIRCONDITION_MA2),
+    "zhimi-aircondition-sa1": partial(AirCondition, model=MODEL_AIRCONDITION_SA1),
     "zhimi-airfresh-va2": AirFresh,
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),

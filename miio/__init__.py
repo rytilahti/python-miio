@@ -1,4 +1,5 @@
 # flake8: noqa
+from miio.aircondition import AirCondition
 from miio.airconditioningcompanion import AirConditioningCompanion
 from miio.airconditioningcompanion import AirConditioningCompanionV3
 from miio.airfresh import AirFresh
