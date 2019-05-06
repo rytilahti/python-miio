@@ -166,9 +166,9 @@ class ChuangmiIr(Device):
 
 class ChuangmiRemote(ChuangmiIr):
     """Class representing new type of Chuangmi IR Remote Controller
-    called Chuangmi Remote. The new controller uses different format for
-    learned IR commands, which actually is the old format but with additional
-    layer of compression.
+    identified by model "chuangmi-remote-h102a03_". The new controller uses
+    different format for learned IR commands, which actually is the old
+    format but with additional layer of compression.
     """
 
     @classmethod
