@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 import base64
 import re
@@ -78,6 +78,19 @@ class ChuangmiIr(Device):
         return self.play_raw(*self.pronto_to_raw(pronto, repeats))
 
     @classmethod
+    def _parse_pronto(cls, pronto: str) -> Tuple[List['ProntoBurstPair'],
+                                                 List['ProntoBurstPair'],
+                                                 int]:
+        """Parses Pronto Hex encoded IR command and returns a tuple containing
+        a list of intro pairs, a list of repeat pairs and a signal carrier frequency"""
+        try:
+            pronto_data = Pronto.parse(bytearray.fromhex(pronto))
+        except Exception as ex:
+            raise ChuangmiIrException("Invalid Pronto command") from ex
+
+        return pronto_data.intro, pronto_data.repeat, int(round(pronto_data.frequency))
+
+    @classmethod
     def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
         """Takes a Pronto Hex encoded IR command and number of repeats
         and returns a tuple containing a string encoded IR signal accepted by
@@ -86,26 +99,24 @@ class ChuangmiIr(Device):
 
         :param str pronto: Pronto Hex string.
         :param int repeats: Number of extra signal repeats."""
+
         if repeats < 0:
             raise ChuangmiIrException('Invalid repeats value')
 
-        try:
-            pronto_data = Pronto.parse(bytearray.fromhex(pronto))
-        except Exception as ex:
-            raise ChuangmiIrException("Invalid Pronto command") from ex
+        intro_pairs, repeat_pairs, frequency = cls._parse_pronto(pronto)
 
-        if len(pronto_data.intro) == 0:
+        if len(intro_pairs) == 0:
             repeats += 1
 
         times = set()
-        for pair in pronto_data.intro + pronto_data.repeat * (1 if repeats else 0):
+        for pair in intro_pairs + repeat_pairs * (1 if repeats else 0):
             times.add(pair.pulse)
             times.add(pair.gap)
 
         times = sorted(times)
         times_map = {t: idx for idx, t in enumerate(times)}
         edge_pairs = []
-        for pair in pronto_data.intro + pronto_data.repeat * repeats:
+        for pair in intro_pairs + repeat_pairs * repeats:
             edge_pairs.append({
                 'pulse': times_map[pair.pulse],
                 'gap': times_map[pair.gap],
@@ -116,7 +127,7 @@ class ChuangmiIr(Device):
             'edge_pairs': edge_pairs,
         })).decode()
 
-        return signal_code, int(round(pronto_data.frequency))
+        return signal_code, frequency
 
     @command(
         click.argument("command", type=str),
