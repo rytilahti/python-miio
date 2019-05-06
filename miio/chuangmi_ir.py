@@ -190,6 +190,46 @@ class ChuangmiRemote(ChuangmiIr):
         ).decode(), frequency
 
 
+class ChuangmiRemoteV2(ChuangmiIr):
+    """Class representing new type of Chuangmi IR Remote Controller
+    identified by model "chuangmi-remote-v2". The new controller uses
+    different format for learned IR commands, which compresses an ASCII list
+    of comma separated edge timings.
+    """
+
+    @classmethod
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+        """Takes a Pronto Hex encoded IR command and number of repeats
+        and returns a tuple containing a string encoded IR signal accepted by
+        controller and frequency.
+        Supports only raw Pronto format, starting with 0000.
+
+        :param str pronto: Pronto Hex string.
+        :param int repeats: Number of extra signal repeats."""
+        if heatshrink is None:
+            raise ChuangmiIrException("Heatshrink library is missing")
+
+        if repeats < 0:
+            raise ChuangmiIrException('Invalid repeats value')
+
+        intro_pairs, repeat_pairs, frequency = cls._parse_pronto(pronto)
+
+        if len(intro_pairs) == 0:
+            repeats += 1
+
+        timings = []
+        for pair in intro_pairs + repeat_pairs * repeats:
+            timings.append(pair.pulse)
+            timings.append(pair.gap)
+        timings[-1] = 0
+
+        timings = '{}\0'.format(','.join(map(str, timings))).encode()
+
+        return base64.b64encode(
+            heatshrink.encode(timings)
+        ).decode(), frequency
+
+
 class ProntoPulseAdapter(Adapter):
     def _decode(self, obj, context, path):
         return int(obj * context._.modulation_period)

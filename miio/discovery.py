@@ -9,7 +9,7 @@ import zeroconf
 
 from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, Ceil,
                PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr, ChuangmiRemote,
-               AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
+               ChuangmiRemoteV2, AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
                Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera)
 
 from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
@@ -52,6 +52,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
     "chuangmi-ir-v2": ChuangmiIr,
     "chuangmi-remote-h102a03_": ChuangmiRemote,
+    "chuangmi-remote-v2": ChuangmiRemoteV2,
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
     "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),

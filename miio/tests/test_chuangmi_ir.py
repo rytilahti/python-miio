@@ -5,7 +5,7 @@ from unittest import TestCase
 
 import pytest
 
-from miio import ChuangmiIr, ChuangmiRemote
+from miio import ChuangmiIr, ChuangmiRemote, ChuangmiRemoteV2
 from miio.chuangmi_ir import ChuangmiIrException
 from .dummies import DummyDevice
 
@@ -45,6 +45,10 @@ class DummyChuangmiRemote(DummyChuangmiBase, ChuangmiRemote):
     pass
 
 
+class DummyChuangmiRemoteV2(DummyChuangmiBase, ChuangmiRemoteV2):
+    pass
+
+
 @pytest.fixture(scope="class")
 def chuangmiir(request):
     request.cls.device = DummyChuangmiIr()
@@ -54,6 +58,11 @@ def chuangmiir(request):
 @pytest.fixture(scope="class")
 def chuangmiremote(request):
     request.cls.device = DummyChuangmiRemote()
+
+
+@pytest.fixture(scope="class")
+def chuangmiremotev2(request):
+    request.cls.device = DummyChuangmiRemoteV2()
 
 
 @pytest.mark.usefixtures("chuangmiir")
@@ -157,5 +166,16 @@ class TestChuangmiRemote(TestCase):
             with self.subTest():
                 self.assertSequenceEqual(
                     ChuangmiRemote.pronto_to_raw(*args['in']),
+                    args['out']
+                )
+
+
+@pytest.mark.usefixtures("chuangmiremotev2")
+class TestChuangmiRemoteV2(TestCase):
+    def test_pronto_to_raw(self):
+        for args in test_data['test_pronto_ok_chuangmi_remote_v2']:
+            with self.subTest():
+                self.assertSequenceEqual(
+                    ChuangmiRemoteV2.pronto_to_raw(*args['in']),
                     args['out']
                 )
