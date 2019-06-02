@@ -19,7 +19,7 @@ from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V2, MODE
                             MODEL_CHUANGMI_PLUG_M1, MODEL_CHUANGMI_PLUG_M3,
                             MODEL_CHUANGMI_PLUG_HMI205, )
 
-from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, )
+from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA4, )
 from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,6 +82,7 @@ DEVICE_MAP = {
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
+    "zhimi-fan-za4": partial(Fan, model=MODEL_FAN_ZA4),
     "zhimi-airfresh-va2": AirFresh,
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),

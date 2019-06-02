@@ -13,6 +13,7 @@ MODEL_FAN_V2 = 'zhimi.fan.v2'
 MODEL_FAN_V3 = 'zhimi.fan.v3'
 MODEL_FAN_SA1 = 'zhimi.fan.sa1'
 MODEL_FAN_ZA1 = 'zhimi.fan.za1'
+MODEL_FAN_ZA4 = 'zhimi.fan.za4'
 
 AVAILABLE_PROPERTIES_COMMON = [
     'angle',
@@ -42,6 +43,7 @@ AVAILABLE_PROPERTIES = {
     MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON_V2_V3,
     MODEL_FAN_SA1: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_ZA1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_ZA4: AVAILABLE_PROPERTIES_COMMON,
 }
 
 
@@ -78,6 +80,11 @@ class FanStatus:
         {'angle': 120, 'speed': 277, 'poweroff_time': 0, 'power': 'on',
          'ac_power': 'on', 'angle_enable': 'off', 'speed_level': 1, 'natural_level': 2,
          'child_lock': 'off', 'buzzer': 0, 'led_b': 0, 'use_time': 2318}
+
+        Response of a Fan (zhimi.fan.sa4):
+        {'angle': 120, 'speed': 327, 'poweroff_time': 0, 'power': 'on',
+         'ac_power': 'on', 'angle_enable': 'off', 'speed_level': 1, 'natural_level': 0,
+         'child_lock': 'off', 'buzzer': 2, 'led_b': 0, 'use_time': 85}
         """
         self.data = data
 
@@ -284,8 +291,8 @@ class Fan(Device):
         # properties are divided into multiple requests
         _props_per_request = 15
 
-        # The SA1 and ZA1 is limited to a single property per request
-        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1]:
+        # The SA1, ZA1 and ZA4 is limited to a single property per request
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA4]:
             _props_per_request = 1
 
         _props = properties.copy()
@@ -408,7 +415,7 @@ class Fan(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1]:
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA4]:
             if buzzer:
                 return self.send("set_buzzer", [2])
             else:
@@ -467,3 +474,10 @@ class FanZA1(Fan):
                  debug: int = 0, lazy_discover: bool = True) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover,
                          model=MODEL_FAN_ZA1)
+
+
+class FanZA4(Fan):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_FAN_ZA4)
