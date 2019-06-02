@@ -13,6 +13,7 @@ MODEL_FAN_V2 = 'zhimi.fan.v2'
 MODEL_FAN_V3 = 'zhimi.fan.v3'
 MODEL_FAN_SA1 = 'zhimi.fan.sa1'
 MODEL_FAN_ZA1 = 'zhimi.fan.za1'
+MODEL_FAN_ZA3 = 'zhimi.fan.za3'
 MODEL_FAN_ZA4 = 'zhimi.fan.za4'
 MODEL_FAN_P5 = 'dmaker.fan.p5'
 
@@ -56,6 +57,7 @@ AVAILABLE_PROPERTIES = {
     MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON_V2_V3,
     MODEL_FAN_SA1: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_ZA1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_ZA3: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_ZA4: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_P5: AVAILABLE_PROPERTIES_P5,
 }
@@ -396,8 +398,8 @@ class Fan(Device):
         # properties are divided into multiple requests
         _props_per_request = 15
 
-        # The SA1, ZA1 and ZA4 is limited to a single property per request
-        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA4]:
+        # The SA1, ZA1, ZA3 and ZA4 is limited to a single property per request
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA3, MODEL_FAN_ZA4]:
             _props_per_request = 1
 
         _props = properties.copy()
@@ -520,7 +522,7 @@ class Fan(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA4]:
+        if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA3, MODEL_FAN_ZA4]:
             if buzzer:
                 return self.send("set_buzzer", [2])
             else:
@@ -579,6 +581,13 @@ class FanZA1(Fan):
                  debug: int = 0, lazy_discover: bool = True) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover,
                          model=MODEL_FAN_ZA1)
+
+
+class FanZA3(Fan):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover,
+                         model=MODEL_FAN_ZA3)
 
 
 class FanZA4(Fan):
