@@ -676,8 +676,8 @@ class FanP5(Device):
     )
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
-        if angle < 0 or angle > 140:
-            raise FanException("Invalid angle: %s" % angle)
+        if angle not in [30, 60, 90, 120, 140]:
+            raise FanException("Unsupported angle. Supported values: 30, 60, 90, 120, 140")
 
         return self.send("s_angle", [angle])
 

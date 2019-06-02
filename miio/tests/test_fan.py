@@ -803,21 +803,25 @@ class TestFanP5(TestCase):
         def angle():
             return self.device.status().angle
 
-        self.device.set_angle(0)
-        assert angle() == 0
-        self.device.set_angle(1)
-        assert angle() == 1
         self.device.set_angle(30)
         assert angle() == 30
         self.device.set_angle(60)
         assert angle() == 60
         self.device.set_angle(90)
         assert angle() == 90
+        self.device.set_angle(120)
+        assert angle() == 120
         self.device.set_angle(140)
         assert angle() == 140
 
         with pytest.raises(FanException):
             self.device.set_angle(-1)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(1)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(31)
 
         with pytest.raises(FanException):
             self.device.set_angle(141)
