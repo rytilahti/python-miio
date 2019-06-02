@@ -103,11 +103,6 @@ class FanStatus:
         {'angle': 120, 'speed': 327, 'poweroff_time': 0, 'power': 'on',
          'ac_power': 'on', 'angle_enable': 'off', 'speed_level': 1, 'natural_level': 0,
          'child_lock': 'off', 'buzzer': 2, 'led_b': 0, 'use_time': 85}
-
-        Response of a Fan (dmaker.fan.p5):
-        {'power': False, 'mode': 'normal','speed': 35,'roll_enable': False,
-         'roll_angle': 140, 'time_off': 0, 'light': True, 'beep_sound': False,
-         'child_lock': False}
         """
         self.data = data
 
@@ -279,7 +274,7 @@ class FanStatusP5:
     def __init__(self, data: Dict[str, Any]) -> None:
         """
         Response of a Fan (dmaker.fan.p5):
-        {'power': False, 'mode': 'normal','speed': 35,'roll_enable': False,
+        {'power': False, 'mode': 'normal', 'speed': 35, 'roll_enable': False,
          'roll_angle': 140, 'time_off': 0, 'light': True, 'beep_sound': False,
          'child_lock': False}
         """
