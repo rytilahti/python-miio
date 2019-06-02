@@ -19,7 +19,8 @@ from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V2, MODE
                             MODEL_CHUANGMI_PLUG_M1, MODEL_CHUANGMI_PLUG_M3,
                             MODEL_CHUANGMI_PLUG_HMI205, )
 
-from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA4, MODEL_FAN_P5, )
+from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA4,
+                  MODEL_FAN_P5, )
 from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
 
 _LOGGER = logging.getLogger(__name__)
