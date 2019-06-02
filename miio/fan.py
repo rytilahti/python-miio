@@ -14,6 +14,7 @@ MODEL_FAN_V3 = 'zhimi.fan.v3'
 MODEL_FAN_SA1 = 'zhimi.fan.sa1'
 MODEL_FAN_ZA1 = 'zhimi.fan.za1'
 MODEL_FAN_ZA4 = 'zhimi.fan.za4'
+MODEL_FAN_P5 = 'dmaker.fan.p5'
 
 AVAILABLE_PROPERTIES_COMMON = [
     'angle',
@@ -38,18 +39,35 @@ AVAILABLE_PROPERTIES_COMMON_V2_V3 = [
     'button_pressed',
 ] + AVAILABLE_PROPERTIES_COMMON
 
+AVAILABLE_PROPERTIES_P5 = [
+    'power',
+    'mode',
+    'speed',
+    'roll_enable',
+    'roll_angle',
+    'time_off',
+    'light',
+    'beep_sound',
+    'child_lock'
+]
+
 AVAILABLE_PROPERTIES = {
     MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON_V2_V3,
     MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON_V2_V3,
     MODEL_FAN_SA1: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_ZA1: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_ZA4: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_FAN_P5: AVAILABLE_PROPERTIES_P5,
 }
 
 
 class FanException(DeviceException):
     pass
 
+
+class OperationMode(enum.Enum):
+    Normal = 'normal'
+    Nature = 'nature'
 
 class LedBrightness(enum.Enum):
     Bright = 0
@@ -85,6 +103,11 @@ class FanStatus:
         {'angle': 120, 'speed': 327, 'poweroff_time': 0, 'power': 'on',
          'ac_power': 'on', 'angle_enable': 'off', 'speed_level': 1, 'natural_level': 0,
          'child_lock': 'off', 'buzzer': 2, 'led_b': 0, 'use_time': 85}
+
+        Response of a Fan (dmaker.fan.p5):
+        {'power': False, 'mode': 'normal','speed': 35,'roll_enable': False,
+         'roll_angle': 140, 'time_off': 0, 'light': True, 'beep_sound': False,
+         'child_lock': False}
         """
         self.data = data
 
@@ -244,6 +267,93 @@ class FanStatus:
              self.use_time,
              self.delay_off_countdown,
              self.button_pressed)
+        return s
+
+    def __json__(self):
+        return self.data
+
+
+class FanStatusP5:
+    """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker P5."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response of a Fan (dmaker.fan.p5):
+        {'power': False, 'mode': 'normal','speed': 35,'roll_enable': False,
+         'roll_angle': 140, 'time_off': 0, 'light': True, 'beep_sound': False,
+         'child_lock': False}
+        """
+        self.data = data
+
+    @property
+    def power(self) -> str:
+        """Power state."""
+        return 'on' if self.data["power"] else 'off'
+
+    @property
+    def is_on(self) -> bool:
+        """True if device is currently on."""
+        return self.data["power"]
+
+    @property
+    def mode(self) -> OperationMode:
+        """Operation mode."""
+        return OperationMode(self.data["mode"])
+
+    @property
+    def speed(self) -> int:
+        """Speed of the motor."""
+        return self.data["speed"]
+
+    @property
+    def oscillate(self) -> bool:
+        """True if oscillation is enabled."""
+        return self.data["roll_enable"]
+
+    @property
+    def angle(self) -> int:
+        """Oscillation angle."""
+        return self.data["roll_angle"]
+
+    @property
+    def delay_off_countdown(self) -> int:
+        """Countdown until turning off in seconds."""
+        return self.data["time_off"]
+
+    @property
+    def led(self) -> bool:
+        """True if LED is turned on, if available."""
+        return self.data["light"]
+
+    @property
+    def buzzer(self) -> bool:
+        """True if buzzer is turned on."""
+        return self.data["beep_sound"]
+
+    @property
+    def child_lock(self) -> bool:
+        """True if child lock is on."""
+        return self.data["child_lock"]
+
+    def __repr__(self) -> str:
+        s = "<FanStatus power=%s, " \
+            "mode=%s, " \
+            "speed=%s, " \
+            "oscillate=%s, " \
+            "angle=%s, " \
+            "led=%s, " \
+            "buzzer=%s, " \
+            "child_lock=%s, " \
+            "delay_off_countdown=%s>" % \
+            (self.power,
+             self.mode,
+             self.speed,
+             self.oscillate,
+             self.angle,
+             self.led,
+             self.buzzer,
+             self.child_lock,
+             self.delay_off_countdown)
         return s
 
     def __json__(self):
@@ -481,3 +591,167 @@ class FanZA4(Fan):
                  debug: int = 0, lazy_discover: bool = True) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover,
                          model=MODEL_FAN_ZA4)
+
+
+class FanP5(Device):
+    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
+                 debug: int = 0, lazy_discover: bool = True,
+                 model: str = MODEL_FAN_P5) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_FAN_P5
+
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Operation mode: {result.mode}\n"
+            "Speed: {result.speed}\n"
+            "Oscillate: {result.oscillate}\n"
+            "Angle: {result.angle}\n"
+            "LED: {result.led}\n"
+            "Buzzer: {result.buzzer}\n"
+            "Child lock: {result.child_lock}\n"
+            "Power-off time: {result.delay_off_countdown}\n"
+        )
+    )
+    def status(self) -> FanStatusP5:
+        """Retrieve properties."""
+        properties = AVAILABLE_PROPERTIES[self.model]
+
+        # A single request is limited to 16 properties. Therefore the
+        # properties are divided into multiple requests
+        _props_per_request = 15
+        _props = properties.copy()
+        values = []
+        while _props:
+            values.extend(self.send("get_prop", _props[:_props_per_request]))
+            _props[:] = _props[_props_per_request:]
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.error(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count, values_count)
+
+        return FanStatusP5(dict(zip(properties, values)))
+
+    @command(
+        default_output=format_output("Powering on"),
+    )
+    def on(self):
+        """Power on."""
+        return self.send("s_power", [True])
+
+    @command(
+        default_output=format_output("Powering off"),
+    )
+    def off(self):
+        """Power off."""
+        return self.send("s_power", [False])
+
+    @command(
+        click.argument("mode", type=EnumType(OperationMode, False)),
+        default_output=format_output("Setting mode to '{mode.value}'")
+    )
+    def set_mode(self, mode: OperationMode):
+        """Set mode."""
+        return self.send("s_mode", [mode.value])
+
+    @command(
+        click.argument("speed", type=int),
+        default_output=format_output(
+            "Setting speed to {speed}")
+    )
+    def set_speed(self, speed: int):
+        """Set speed."""
+        if speed < 0 or speed > 100:
+            raise FanException("Invalid speed: %s" % speed)
+
+        return self.send("s_speed", [speed])
+
+    @command(
+        click.argument("angle", type=int),
+        default_output=format_output("Setting angle to {angle}")
+    )
+    def set_angle(self, angle: int):
+        """Set the oscillation angle."""
+        if angle < 0 or angle > 140:
+            raise FanException("Invalid angle: %s" % angle)
+
+        return self.send("s_roll", [angle])
+
+    @command(
+        click.argument("oscillate", type=bool),
+        default_output=format_output(
+            lambda oscillate: "Turning on oscillate"
+            if oscillate else "Turning off oscillate"
+        )
+    )
+    def set_oscillate(self, oscillate: bool):
+        """Set oscillate on/off."""
+        if oscillate:
+            return self.send("s_roll", [True])
+        else:
+            return self.send("s_roll", [False])
+
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED"
+            if led else "Turning off LED"
+        )
+    )
+    def set_led(self, led: bool):
+        """Turn led on/off."""
+        if led:
+            return self.send("s_light", [True])
+        else:
+            return self.send("s_light", [False])
+
+    @command(
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer"
+            if buzzer else "Turning off buzzer"
+        )
+    )
+    def set_buzzer(self, buzzer: bool):
+        """Set buzzer on/off."""
+        if buzzer:
+            return self.send("s_sound", [True])
+        else:
+            return self.send("s_sound", [False])
+
+    @command(
+        click.argument("lock", type=bool),
+        default_output=format_output(
+            lambda lock: "Turning on child lock"
+            if lock else "Turning off child lock"
+        )
+    )
+    def set_child_lock(self, lock: bool):
+        """Set child lock on/off."""
+        if lock:
+            return self.send("s_lock", [True])
+        else:
+            return self.send("s_lock", [False])
+
+    @command(
+        click.argument("seconds", type=int),
+        default_output=format_output(
+            "Setting delayed turn off to {seconds} seconds")
+    )
+    def delay_off(self, seconds: int):
+        """Set delay off seconds."""
+
+        if seconds < 1:
+            raise FanException(
+                "Invalid value for a delayed turn off: %s" % seconds)
+
+        return self.send("s_t_off", [seconds])
