@@ -684,7 +684,7 @@ class FanP5(Device):
         if angle < 0 or angle > 140:
             raise FanException("Invalid angle: %s" % angle)
 
-        return self.send("s_roll", [angle])
+        return self.send("s_angle", [angle])
 
     @command(
         click.argument("oscillate", type=bool),
