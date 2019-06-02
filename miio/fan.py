@@ -750,3 +750,12 @@ class FanP5(Device):
                 "Invalid value for a delayed turn off: %s" % minutes)
 
         return self.send("s_t_off", [minutes])
+
+    @command(
+        click.argument("direction", type=EnumType(MoveDirection, False)),
+        default_output=format_output(
+            "Rotating the fan to the {direction}")
+    )
+    def set_rotate(self, direction: MoveDirection):
+        """Rotate the fan by -5/+5 degrees left/right."""
+        return self.send("m_roll", [direction.value])
