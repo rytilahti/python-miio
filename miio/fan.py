@@ -738,15 +738,15 @@ class FanP5(Device):
             return self.send("s_lock", [False])
 
     @command(
-        click.argument("seconds", type=int),
+        click.argument("minutes", type=int),
         default_output=format_output(
-            "Setting delayed turn off to {seconds} seconds")
+            "Setting delayed turn off to {minutes} minutes")
     )
-    def delay_off(self, seconds: int):
-        """Set delay off seconds."""
+    def delay_off(self, minutes: int):
+        """Set delay off minutes."""
 
-        if seconds < 1:
+        if minutes < 1:
             raise FanException(
-                "Invalid value for a delayed turn off: %s" % seconds)
+                "Invalid value for a delayed turn off: %s" % minutes)
 
-        return self.send("s_t_off", [seconds])
+        return self.send("s_t_off", [minutes])
