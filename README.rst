@@ -13,6 +13,7 @@ Supported devices
 -  Xiaomi Mi Home Air Conditioner Companion (:class:`miio.airconditioningcompanion`)
 -  Xiaomi Mi Air Purifier (:class:`miio.airpurifier`)
 -  Xiaomi Aqara Camera (:class:`miia.aqaracamera`)
+-  Xiaomi Mijia 360 1080p (:class`miio.chuangmi_camera`)
 -  :doc:`Xiaomi Mi Smart WiFi Socket <plug>` (:class:`miio.chuangmi_plug`)
 -  :doc:`Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port) <plug>` (:class:`miio.chuangmi_plug`)
 -  :doc:`Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports) <plug>` (:class:`miio.chuangmi_plug`)

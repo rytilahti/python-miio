@@ -62,6 +62,14 @@ miio\.ceil module
     :show-inheritance:
     :undoc-members:
 
+miio\.chuangmi\_camera module
+-------------------------
+
+.. automodule:: miio.chuangmi_camera
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
 miio\.chuangmi\_ir module
 -------------------------
 
