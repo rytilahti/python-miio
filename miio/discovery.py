@@ -7,8 +7,8 @@ from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 import zeroconf
 
-from . import (Device, Vacuum, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh, Ceil,
-               PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
+from . import (Device, Vacuum, ChuangmiCamera, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh,
+               Ceil, PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
                Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera)
 
@@ -51,6 +51,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v6": AirPurifier,   # v6
     "zhimi-airpurifier-v7": AirPurifier,   # v7
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
+    "chuangmi.camera.ipc009": ChuangmiCamera,
     "chuangmi-ir-v2": ChuangmiIr,
     "chuangmi-remote-h102a03_": ChuangmiIr,
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
@@ -124,6 +125,7 @@ def create_device(name: str, addr: str, device_cls: partial) -> Device:
 
 class Listener:
     """mDNS listener creating Device objects based on detected devices."""
+
     def __init__(self):
         self.found_devices = {}  # type: Dict[str, Device]
 
