@@ -1,4 +1,4 @@
-""" Xiaomi Chuangmi camera (chuangmi.camera.ipc009) support. """
+"""Xiaomi Chuangmi camera (chuangmi.camera.ipc009) support."""
 
 import logging
 from typing import Any, Dict
@@ -13,68 +13,79 @@ class CameraStatus:
     """Container for status reports from the Xiaomi Chuangmi Camera."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Request:
+        ["power", "motion_record", "light", "full_color", "flip", "improve_program", "wdr",
+        "track", "sdcard_status", "watermark", "max_client", "night_mode", "mini_level"]
+
+        Response:
+        ["on","on","on","on","off","on","on","off","0","off","0","0","1"]
+        """
         self.data = data
 
     @property
-    def power(self) -> str:
-        """ Camera power """
-        return self.data["power"]
+    def power(self) -> bool:
+        """Camera power."""
+        return self.data["power"] == "on"
 
     @property
-    def motion_record(self) -> str:
-        """ Motion record status """
-        return self.data["motion_record"]
+    def motion_record(self) -> bool:
+        """Motion record status."""
+        return self.data["motion_record"] == "on"
 
     @property
-    def light(self) -> str:
-        """ Camera light status """
-        return self.data["light"]
+    def light(self) -> bool:
+        """Camera light status."""
+        return self.data["light"] == "on"
 
     @property
-    def full_color(self) -> str:
-        """ Full color with bad lighting conditions """
-        return self.data["full_color"]
+    def full_color(self) -> bool:
+        """Full color with bad lighting conditions."""
+        return self.data["full_color"] == "on"
 
     @property
-    def flip(self) -> str:
-        """ Image 180 degrees flip status """
-        return self.data["flip"]
+    def flip(self) -> bool:
+        """Image 180 degrees flip status."""
+        return self.data["flip"] == "on"
 
     @property
-    def improve_program(self) -> str:
-        """ Customer experience improvement program status """
-        return self.data["improve_program"]
+    def improve_program(self) -> bool:
+        """Customer experience improvement program status."""
+        return self.data["improve_program"] == "on"
 
     @property
-    def wdr(self) -> str:
-        """ Wide dynamic range status """
-        return self.data["wdr"]
+    def wdr(self) -> bool:
+        """Wide dynamic range status."""
+        return self.data["wdr"] == "on"
 
     @property
-    def track(self) -> str:
-        """ Tracking status """
-        return self.data["track"]
+    def track(self) -> bool:
+        """Tracking status."""
+        return self.data["track"] == "on"
 
     @property
-    def watermark(self) -> str:
-        return self.data["watermark"]
+    def watermark(self) -> bool:
+        """Apply watermark to video."""
+        return self.data["watermark"] == "on"
 
     @property
     def sdcard_status(self) -> int:
-        """ SD card status """
+        """SD card status."""
         return self.data["sdcard_status"]
 
     @property
     def max_client(self) -> int:
+        """Unknown."""
         return self.data["max_client"]
 
     @property
     def night_mode(self) -> int:
+        """Night mode."""
         return self.data["night_mode"]
 
     @property
     def mini_level(self) -> int:
-        """ ??? """
+        """Unknown."""
         return self.data["mini_level"]
 
     def __repr__(self) -> str:
@@ -178,21 +189,21 @@ class ChuangmiCamera(Device):
         default_output=format_output("MotionRecord on")
     )
     def motion_record_on(self):
-        """Start recording when motion detected"""
+        """Start recording when motion detected."""
         return self.send("set_motion_record", ["on"])
 
     @command(
         default_output=format_output("MotionRecord off")
     )
     def motion_record_off(self):
-        """Motion record off. Always record video."""
+        """Motion record off, always record video."""
         return self.send("set_motion_record", ["off"])
 
     @command(
         default_output=format_output("MotionRecord stop")
     )
     def motion_record_stop(self):
-        """Motion record off. Video recording stopped."""
+        """Motion record off, video recording stopped."""
         return self.send("set_motion_record", ["stop"])
 
     @command(
