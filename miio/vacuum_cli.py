@@ -314,15 +314,28 @@ def dnd(vac: miio.Vacuum, cmd: str,
 
 
 @cli.command()
-@click.argument('speed', type=int, required=False)
+@click.argument('speed', type=str, required=False)
 @pass_dev
 def fanspeed(vac: miio.Vacuum, speed):
     """Query and adjust the fan speed."""
+    from miio.vacuum import FanSpeed
     if speed:
         click.echo("Setting fan speed to %s" % speed)
+        try:
+            speed = int(speed)
+        except ValueError:
+            speed = FanSpeed(speed.lower())
+
         vac.set_fan_speed(speed)
     else:
         click.echo("Current fan speed: %s" % vac.fan_speed())
+
+@cli.command()
+@pass_dev
+def fanspeed_list(vac: miio.Vacuum):
+    """Query the list of available fan speed steps of the vacuum cleaner."""
+
+    click.echo("%s" % [e.value for e in vac.fan_speed_list()])
 
 
 @cli.group(invoke_without_command=True)

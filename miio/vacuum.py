@@ -23,6 +23,23 @@ from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
 _LOGGER = logging.getLogger(__name__)
 
 
+MODELS_VACUUM_V1 = ['rockrobo.vacuum.v1']
+MODELS_VACUUM_V2 = ['roborock.vacuum.s5']
+
+
+FanSpeed = enum.Enum('FanSpeed',
+    [
+        ('Quiet', 'quiet'),
+        ('Balanced', 'balanced'),
+        ('Turbo', 'turbo'),
+        ('Max', 'max'),
+        ('Mop', 'mop'),
+    ]
+    # comment if only levels above are wanted...
+    + [("Level_%d" % x, x) for x in range(0, 101)]
+)
+
+
 class VacuumException(DeviceException):
     pass
 
@@ -31,6 +48,21 @@ class TimerState(enum.Enum):
     On = "on"
     Off = "off"
 
+
+@enum.unique
+class _FanSpeedV1(enum.Enum):
+    Quiet = 38
+    Balanced = 60
+    Turbo = 77
+    Max = 90
+
+@enum.unique
+class _FanSpeedV2(enum.Enum):
+    Quiet = 101     # -> 38
+    Balanced = 102  # -> 60
+    Turbo = 103     # -> 75
+    Max = 104       # -> 100
+    Mop = 105
 
 class Consumable(enum.Enum):
     MainBrush = "main_brush_work_time"
@@ -46,6 +78,32 @@ class Vacuum(Device):
                  debug: int = 0) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
+        self._model = self.info().model
+        self._init_fan_speeds()
+
+    def _init_fan_speeds(self):
+        # initialize int -> enum fan speed map
+
+        if not hasattr(self, '_fanspeedMap'):
+            fanspeedMap = dict()
+            for fs in list(FanSpeed):
+                if type(fs.value) is int:
+                    fanspeedMap[fs.value] = FanSpeed(fs.value)
+
+            if self._model in MODELS_VACUUM_V1:
+                for fs in list(_FanSpeedV1):
+                    fanspeedMap[fs.value] = FanSpeed(fs.name.lower())
+
+            elif self._model in MODELS_VACUUM_V2:
+                _cur = self.fan_speed()
+
+                for fs in list(_FanSpeedV2):
+                    self.set_fan_speed(fs.value)
+                    fanspeedMap[self.fan_speed()] = FanSpeed(fs.name.lower())
+
+                self.set_fan_speed(_cur)
+
+            self._fanspeedMap = fanspeedMap
 
     @command()
     def start(self):
@@ -412,19 +470,50 @@ class Vacuum(Device):
         return self.send("close_dnd_timer", [""])
 
     @command(
-        click.argument("speed", type=int),
+        click.argument("speed", type=str),
     )
-    def set_fan_speed(self, speed: int):
+    def set_fan_speed(self, speed: [int,FanSpeed]):
         """Set fan speed.
 
         :param int speed: Fan speed to set"""
         # speed = [38, 60 or 77]
+        if isinstance(speed, FanSpeed):
+            try:
+                speed = int(speed.value)
+
+            except ValueError:
+                for k, v in self._fanspeedMap.items():
+                    if v == speed:
+                        speed = k
+                        break
+
         return self.send("set_custom_mode", [speed])
 
     @command()
     def fan_speed(self):
         """Return fan speed."""
-        return self.send("get_custom_mode")[0]
+        speed = self.send("get_custom_mode")[0]
+        try:
+            if hasattr(self, '_fanspeedMap'):
+                return self._fanspeedMap[speed]
+        except KeyError:
+            pass
+
+        return speed
+
+    @command()
+    def fan_speed_list(self):
+        """Get the list of available fan speed steps of the vacuum cleaner."""
+
+        if not hasattr(self, '_fanspeeds'):
+            fanspeeds = list(FanSpeed)
+
+            if self._model in MODELS_VACUUM_V1:
+                fanspeeds.remove(FanSpeed.Mop)
+
+            self._fanspeeds = fanspeeds
+
+        return self._fanspeeds
 
     @command()
     def sound_info(self):
