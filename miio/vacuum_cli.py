@@ -330,6 +330,7 @@ def fanspeed(vac: miio.Vacuum, speed):
     else:
         click.echo("Current fan speed: %s" % vac.fan_speed())
 
+
 @cli.command()
 @pass_dev
 def fanspeed_list(vac: miio.Vacuum):

@@ -27,8 +27,7 @@ MODELS_VACUUM_V1 = ['rockrobo.vacuum.v1']
 MODELS_VACUUM_V2 = ['roborock.vacuum.s5']
 
 
-FanSpeed = enum.Enum('FanSpeed',
-    [
+FanSpeed = enum.Enum('FanSpeed', [
         ('Quiet', 'quiet'),
         ('Balanced', 'balanced'),
         ('Turbo', 'turbo'),
@@ -56,6 +55,7 @@ class _FanSpeedV1(enum.Enum):
     Turbo = 77
     Max = 90
 
+
 @enum.unique
 class _FanSpeedV2(enum.Enum):
     Quiet = 101     # -> 38
@@ -63,6 +63,7 @@ class _FanSpeedV2(enum.Enum):
     Turbo = 103     # -> 75
     Max = 104       # -> 100
     Mop = 105
+
 
 class Consumable(enum.Enum):
     MainBrush = "main_brush_work_time"
@@ -472,7 +473,7 @@ class Vacuum(Device):
     @command(
         click.argument("speed", type=str),
     )
-    def set_fan_speed(self, speed: [int,FanSpeed]):
+    def set_fan_speed(self, speed: [int, FanSpeed]):
         """Set fan speed.
 
         :param int speed: Fan speed to set"""
