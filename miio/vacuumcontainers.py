@@ -83,6 +83,7 @@ class VacuumStatus:
             15: 'Docking',
             16: 'Going to target',
             17: 'Zoned cleaning',
+            18: 'Segment cleaning',
         }
         try:
             return states[int(self.state_code)]
