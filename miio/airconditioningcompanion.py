@@ -35,10 +35,12 @@ class FanSpeed(enum.Enum):
 
 
 class SwingMode(enum.Enum):
-    On = 0
-    Off = 1
-    Unknown2 = 2
-    Unknown7 = 7
+    On = '0'
+    Off = '1'
+    Unknown2 = '2'
+    Unknown7 = '7'
+    ChigoOn = 'C'
+    ChigoOff = 'D'
 
 
 class Power(enum.Enum):
@@ -212,7 +214,7 @@ class AirConditioningCompanionStatus:
     def swing_mode(self) -> Optional[SwingMode]:
         """Current swing mode."""
         try:
-            mode = int(self.state[5:6])
+            mode = self.state[5:6]
             return SwingMode(mode)
         except TypeError:
             return None
