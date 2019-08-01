@@ -32,14 +32,6 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class FanSpeed(enum.Enum):
-    Sleep = 0
-    Low = 1
-    Medium = 2
-    High = 3
-    Strong = 4
-
-
 class AirDehumidifierException(DeviceException):
     pass
 
@@ -48,6 +40,14 @@ class OperationMode(enum.Enum):
     On = 'on'
     Auto = 'auto'
     DryCloth = 'dry_cloth'
+
+
+class FanSpeed(enum.Enum):
+    Sleep = 0
+    Low = 1
+    Medium = 2
+    High = 3
+    Strong = 4
 
 
 class AirDehumidifierStatus:
