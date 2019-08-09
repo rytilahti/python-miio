@@ -10,6 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 MODEL_AIRQUALITYMONITOR_V1 = 'zhimi.airmonitor.v1'
 MODEL_AIRQUALITYMONITOR_B1 = 'cgllc.airmonitor.b1'
+MODEL_AIRQUALITYMONITOR_S1 = 'cgllc.airmonitor.s1'
 
 AVAILABLE_PROPERTIES_COMMON = [
     'power', 'aqi', 'battery', 'usb_state', 'time_state',
@@ -17,9 +18,14 @@ AVAILABLE_PROPERTIES_COMMON = [
     'sensor_state'
 ]
 
+AVAILABLE_PROPERTIES_S1 = [
+    'battery', 'co2', 'humidity', 'pm25', 'temperature', 'tvoc'
+]
+
 AVAILABLE_PROPERTIES = {
     MODEL_AIRQUALITYMONITOR_V1: AVAILABLE_PROPERTIES_COMMON,
     MODEL_AIRQUALITYMONITOR_B1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_AIRQUALITYMONITOR_S1: AVAILABLE_PROPERTIES_S1,
 }
 
 
@@ -39,6 +45,11 @@ class AirQualityMonitorStatus:
         Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.b1):
 
         unknown.
+
+        Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.s1):
+
+        {'battery': 100, 'co2': 695, 'humidity': 62.1, 'pm25': 19.4, 'temperature': 27.4,
+         'tvoc': 254}
         """
         self.data = data
 
@@ -92,16 +103,51 @@ class AirQualityMonitorStatus:
         """Sensor state."""
         return self.data["sensor_state"]
 
+    @property
+    def co2(self) -> int:
+        """Return co2 value for MODEL_AIRQUALITYMONITOR_S1."""
+        return self.data["co2"]
+
+    @property
+    def humidity(self) -> float:
+        """Return humidity value for MODEL_AIRQUALITYMONITOR_S1."""
+        return self.data["humidity"]
+
+    @property
+    def pm25(self) -> float:
+        """Return pm2.5 value for MODEL_AIRQUALITYMONITOR_S1."""
+        return self.data["pm25"]
+
+    @property
+    def temperature(self) -> float:
+        """Return temperature value for MODEL_AIRQUALITYMONITOR_S1."""
+        return self.data["temperature"]
+
+    @property
+    def tvoc(self) -> int:
+        """Return tvoc value for MODEL_AIRQUALITYMONITOR_S1."""
+        return self.data["tvoc"]
+
     def __repr__(self) -> str:
         s = "<AirQualityMonitorStatus power=%s, " \
             "aqi=%s, " \
             "battery=%s, " \
             "usb_power=%s, " \
+            "temperature=%s, " \
+            "humidity=%s, " \
+            "co2=%s, " \
+            "pm2.5=%s, " \
+            "tvoc=%s, " \
             "display_clock=%s>" % \
             (self.power,
              self.aqi,
              self.battery,
              self.usb_power,
+             self.temperature,
+             self.humidity,
+             self.co2,
+             self.pm25,
+             self.tvoc,
              self.display_clock)
         return s
 
@@ -113,16 +159,18 @@ class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
     def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
                  debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_AIRQUALITYMONITOR_V1) -> None:
+                 model: str = None) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        self.device_info = self.info()
+        if self.device_info and model is None:
+            model = self.device_info.model
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
         else:
             self.model = MODEL_AIRQUALITYMONITOR_V1
             _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
-
-        self.device_info = None
 
     @command(
         default_output=format_output(
@@ -152,8 +200,10 @@ class AirQualityMonitor(Device):
                 "count (%s) of received values.",
                 properties_count, values_count)
 
-        return AirQualityMonitorStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+        if self.model == MODEL_AIRQUALITYMONITOR_S1:
+            return AirQualityMonitorStatus(defaultdict(lambda: None, values))
+        else:
+            return AirQualityMonitorStatus(defaultdict(lambda: None, zip(properties, values)))
 
     @command(
         default_output=format_output("Powering on"),
