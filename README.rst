@@ -33,6 +33,7 @@ Supported devices
 -  Xiaomi Mi Smart Rice Cooker (:class:`miio.cooker`)
 -  Xiaomi Smartmi Fresh Air System (:class:`miio.airfresh`)
 -  :doc:`Yeelight light bulbs <yeelight>` (:class:`miio.yeelight`) (only a very rudimentary support, use `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__ for a more complete support)
+-  Xiaomi Mi Air Dehumidifier (:class:`miio.airdehumidifier`)
 
 *Feel free to create a pull request to add support for new devices as
 well as additional features for supported devices.*

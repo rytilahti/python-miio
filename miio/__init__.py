@@ -3,6 +3,7 @@ from miio.airconditioningcompanion import AirConditioningCompanion
 from miio.airconditioningcompanion import AirConditioningCompanionV3
 from miio.airfresh import AirFresh
 from miio.airhumidifier import AirHumidifier
+from miio.airdehumidifier import AirDehumidifier
 from miio.airpurifier import AirPurifier
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.ceil import Ceil
