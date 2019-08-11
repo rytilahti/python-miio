@@ -10,9 +10,15 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_PWZN_RELAY_APPLE = 'pwzn.relay.apple'
+MODEL_PWZN_RELAY_BANANA = 'pwzn.relay.banana'
 
 AVAILABLE_PROPERTIES = {
     MODEL_PWZN_RELAY_APPLE: [
+        'relay_status', 'on_count', 'name0', 'name1', 'name2', 'name3',
+        'name4', 'name5', 'name6', 'name7', 'name8', 'name9', 'name10',
+        'name11', 'name12', 'name13', 'name14', 'name15'
+    ],
+    MODEL_PWZN_RELAY_BANANA: [
         'relay_status', 'on_count', 'name0', 'name1', 'name2', 'name3',
         'name4', 'name5', 'name6', 'name7', 'name8', 'name9', 'name10',
         'name11', 'name12', 'name13', 'name14', 'name15'
