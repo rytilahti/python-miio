@@ -1,12 +1,11 @@
 import logging
 from collections import defaultdict
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 import click
 
 from .click_common import command, format_output
 from .device import Device
-from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -293,6 +292,7 @@ class PwznRelayStatus:
 
     def __json__(self):
         return self.data
+
 
 class PwznRelay(Device):
     """Main class representing the PWZN Relay."""
