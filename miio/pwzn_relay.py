@@ -33,90 +33,11 @@ class PwznRelayStatus:
         """
         self.data = data
 
-    def relay(self, num: int) -> bool:
-        """Current relay X state."""
+    @property
+    def relay_state(self) -> int:
+        """Current relay state."""
         if "relay_status" in self.data:
-            return True if self.data["relay_status"] & (1 << num) else False
-
-    @property
-    def relay0(self) -> bool:
-        """Current relay0 state."""
-        return self.relay(0)
-
-    @property
-    def relay1(self) -> bool:
-        """Current relay1 state."""
-        return self.relay(1)
-
-    @property
-    def relay2(self) -> bool:
-        """Current relay2 state."""
-        return self.relay(2)
-
-    @property
-    def relay3(self) -> bool:
-        """Current relay3 state."""
-        return self.relay(3)
-
-    @property
-    def relay4(self) -> bool:
-        """Current relay4 state."""
-        return self.relay(4)
-
-    @property
-    def relay5(self) -> bool:
-        """Current relay5 state."""
-        return self.relay(5)
-
-    @property
-    def relay6(self) -> bool:
-        """Current relay6 state."""
-        return self.relay(6)
-
-    @property
-    def relay7(self) -> bool:
-        """Current relay7 state."""
-        return self.relay(7)
-
-    @property
-    def relay8(self) -> bool:
-        """Current relay8 state."""
-        return self.relay(8)
-
-    @property
-    def relay9(self) -> bool:
-        """Current relay9 state."""
-        return self.relay(9)
-
-    @property
-    def relay10(self) -> bool:
-        """Current relay10 state."""
-        return self.relay(10)
-
-    @property
-    def relay11(self) -> bool:
-        """Current relay11 state."""
-        return self.relay(11)
-
-    @property
-    def relay12(self) -> bool:
-        """Current relay12 state."""
-        return self.relay(12)
-
-    @property
-    def relay13(self) -> bool:
-        """Current relay13 state."""
-        return self.relay(13)
-
-    @property
-    def relay14(self) -> bool:
-        """Current relay14 state."""
-        return self.relay(14)
-
-    @property
-    def relay15(self) -> bool:
-        """Current relay15 state."""
-        return self.relay(15)
+            return self.data["relay_status"]
 
     @property
     def name0(self) -> str:
@@ -222,22 +143,7 @@ class PwznRelayStatus:
 
     def __repr__(self) -> str:
         s = "<PwznRelayStatus " \
-            "relay0=%s, " \
-            "relay1=%s, " \
-            "relay2=%s, " \
-            "relay3=%s, " \
-            "relay4=%s, " \
-            "relay5=%s, " \
-            "relay6=%s, " \
-            "relay7=%s, " \
-            "relay8=%s, " \
-            "relay9=%s, " \
-            "relay10=%s, " \
-            "relay11=%s, " \
-            "relay12=%s, " \
-            "relay13=%s, " \
-            "relay14=%s, " \
-            "relay15=%s, " \
+            "relay_status=%s, " \
             "name0=%s, " \
             "name1=%s, " \
             "name2=%s, " \
@@ -255,22 +161,7 @@ class PwznRelayStatus:
             "name14=%s, " \
             "name15=%s, " \
             "on_count=%s>" % \
-            (self.relay0,
-             self.relay1,
-             self.relay2,
-             self.relay3,
-             self.relay4,
-             self.relay5,
-             self.relay6,
-             self.relay7,
-             self.relay8,
-             self.relay9,
-             self.relay10,
-             self.relay11,
-             self.relay12,
-             self.relay13,
-             self.relay14,
-             self.relay15,
+            (self.relay_state,
              self.name0,
              self.name1,
              self.name2,
