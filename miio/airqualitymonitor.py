@@ -105,22 +105,22 @@ class AirQualityMonitorStatus:
 
     @property
     def co2(self) -> int:
-        """Return co2 value for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return co2 value (400...9999)ppm for MODEL_AIRQUALITYMONITOR_S1."""
         return self.data["co2"]
 
     @property
     def humidity(self) -> float:
-        """Return humidity value for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return humidity value (0...100)% for MODEL_AIRQUALITYMONITOR_S1."""
         return self.data["humidity"]
 
     @property
     def pm25(self) -> float:
-        """Return pm2.5 value for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return pm2.5 value (0...999)μg/m³ for MODEL_AIRQUALITYMONITOR_S1."""
         return self.data["pm25"]
 
     @property
     def temperature(self) -> float:
-        """Return temperature value for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return temperature value (-10...50)°C for MODEL_AIRQUALITYMONITOR_S1."""
         return self.data["temperature"]
 
     @property
