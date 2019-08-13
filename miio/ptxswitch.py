@@ -64,17 +64,17 @@ class PtxSwitchStatus:
     @property
     def switch_name_1(self) -> Optional[str]:
         # Name of the switch button 1
-        return switch_name_index(1)
+        return self.switch_name_index(1)
 
     @property
     def switch_name_2(self) -> Optional[str]:
         # Name of the switch button 2
-        return switch_name_index(2)
+        return self.switch_name_index(2)
 
     @property
     def switch_name_3(self) -> Optional[str]:
         # Name of the switch button 3
-        return switch_name_index(3)
+        return self.switch_name_index(3)
 
     def __repr__(self) -> str:
         s = "<PtxSwitchStatus " \
