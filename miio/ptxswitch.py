@@ -10,26 +10,26 @@ _LOGGER = logging.getLogger(__name__)
 
 
 # This model name is just a guess. Please update!
-MODEL_PTX_WIRED_ONE_BUTTON_SWITCH = '090615.switch.switch01'
+MODEL_PTX_SINGLE_WALL_SWITCH = '090615.switch.switch01'
 
 # This model name is just a guess. Please update!
-MODEL_PTX_WIRED_TWO_BUTTON_SWITCH = '090615.switch.switch02'
+MODEL_PTX_DUAL_WALL_SWITCH = '090615.switch.switch02'
 
-MODEL_PTX_WIRED_THREE_BUTTON_SWITCH = '090615.switch.switch03'
+MODEL_PTX_TRIPLE_WALL_SWITCH = '090615.switch.switch03'
 
 
 AVAILABLE_PROPERTIES = {
-    MODEL_PTX_WIRED_ONE_BUTTON_SWITCH: [
+    MODEL_PTX_SINGLE_WALL_SWITCH: [
         "is_on_1",
         "switchname1"],
 
-    MODEL_PTX_WIRED_TWO_BUTTON_SWITCH: [
+    MODEL_PTX_DUAL_WALL_SWITCH: [
         "is_on_1",
         "is_on_2",
         "switchname1",
         "switchname2"],
 
-    MODEL_PTX_WIRED_THREE_BUTTON_SWITCH: [
+    MODEL_PTX_TRIPLE_WALL_SWITCH: [
         "is_on_1",
         "is_on_2",
         "is_on_3",
@@ -115,13 +115,13 @@ class PtxSwitch(Device):
 
     def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
                  debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_PTX_WIRED_THREE_BUTTON_SWITCH) -> None:
+                 model: str = MODEL_PTX_TRIPLE_WALL_SWITCH) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
         else:
-            self.model = MODEL_PTX_WIRED_THREE_BUTTON_SWITCH
+            self.model = MODEL_PTX_TRIPLE_WALL_SWITCH
 
     @command(
         default_output=format_output(
