@@ -33,43 +33,48 @@ class PtxSwitchStatus:
         self.data = data
 
 
+    def is_on_index(self, index) -> Optional[bool]:
+        # True if switch {index} is on.
+        k = "is_on_{}".format(index)
+        if k in self.data and self.data[k] is not None:
+            return self.data[k]
+        return None
     @property
-    def is_on_1(self) -> bool:
+    def is_on_1(self) -> Optional[bool]:
         # True if switch 1 is on.
-        return self.data["is_on_1"]
+        return self.is_on_index(1)
 
     @property
     def is_on_2(self) -> Optional[bool]:
         # True if switch 2 is on.
-        if "is_on_2" in self.data and self.data["is_on_2"] is not None:
-            return self.data["is_on_2"]
-        return None
+        return self.is_on_index(2)
 
     @property
     def is_on_3(self) -> Optional[bool]:
         # True if switch 3 is on.
-        if "is_on_3" in self.data and self.data["is_on_3"] is not None:
-            return self.data["is_on_3"]
+        return self.is_on_index(3)
+
+    def switch_name_index(self, index) -> Optional[str]:
+        # Name of the switch button {index}
+        k = "switchname{}".format(index)
+        if k in self.data and self.data[k] is not None:
+            return self.data[k]
         return None
 
     @property
     def switch_name_1(self) -> Optional[str]:
         # Name of the switch button 1
-        return self.data["switchname1"]
+        return switch_name_index(1)
 
     @property
     def switch_name_2(self) -> Optional[str]:
         # Name of the switch button 2
-        if "switchname2" in self.data and self.data["switchname2"] is not None:
-            return self.data["switchname2"]
-        return None
+        return switch_name_index(2)
 
     @property
     def switch_name_3(self) -> Optional[str]:
         # Name of the switch button 3
-        if "switchname3" in self.data and self.data["switchname3"] is not None:
-            return self.data["switchname3"]
-        return None
+        return switch_name_index(3)
 
     def __repr__(self) -> str:
         s = "<PtxSwitchStatus " \
@@ -140,7 +145,7 @@ class PtxSwitch(Device):
             # get return values only we want
             result_1 = result_1[:param_count]
         else:
-            result_1 = [0,0,0]
+            result_1 = [None,None,None]
             _LOGGER.debug(
                 "Count (%s) of requested params does not match the "
                 "count (%s) of received values.",
