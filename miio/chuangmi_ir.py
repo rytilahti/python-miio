@@ -144,6 +144,27 @@ class ChuangmiIr(Device):
 
         return play_method(command, *command_args)
 
+    @command(
+        click.argument("indicator_led", type=bool),
+        default_output=format_output(
+            lambda indicator_led: "Turning on indicator LED"
+            if indicator_led else "Turning off indicator LED"
+        )
+    )
+    def set_indicator_led(self, indicator_led: bool):
+        """Set the indicator led on/off."""
+        if indicator_led:
+            return self.send("set_indicatorLamp", ["on"])
+        else:
+            return self.send("set_indicatorLamp", ["off"])
+
+    @command(
+        default_output=format_output("Indicator LED status: {result}"),
+    )
+    def get_indicator_led(self):
+        """Get the indicator led status."""
+        return self.send("get_indicatorLamp")
+
 
 class ProntoPulseAdapter(Adapter):
     def _decode(self, obj, context, path):
