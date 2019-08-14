@@ -525,6 +525,51 @@ class Vacuum(Device):
         }
         return self.send("set_carpet_mode", [data])[0] == 'ok'
 
+    @command()
+    def stop_zoned_clean(self):
+        """Stop cleaning a zone."""
+        return self.send("stop_zoned_clean")
+
+    @command()
+    def stop_segment_clean(self):
+        """Stop cleaning a segment."""
+        return self.send("stop_segment_clean")
+
+    @command()
+    def resume_segment_clean(self):
+        """Resuming cleaning a segment."""
+        return self.send("resume_segment_clean")
+
+    @command(
+        click.argument("segments", type=LiteralParamType(), required=True),
+    )
+    def segment_clean(self, segments: List):
+        """Clean segments.
+        :param List segments: List of segments to clean: [16,17,18]"""
+        return self.send("app_segment_clean", segments)
+
+    @command()
+    def get_room_mapping(self):
+        """Retrieves a list of segments."""
+        return self.send("get_room_mapping")
+
+    @command()
+    def get_segment_status(self):
+        """Get the status of a segment."""
+        return self.send("get_segment_status")
+
+    def name_segment(self):
+        raise NotImplementedError("unknown parameters")
+        # return self.send("name_segment")
+
+    def merge_segment(self):
+        raise NotImplementedError("unknown parameters")
+        # return self.send("merge_segment")
+
+    def split_segment(self):
+        raise NotImplementedError("unknown parameters")
+        # return self.send("split_segment")
+
     @classmethod
     def get_device_group(cls):
 
