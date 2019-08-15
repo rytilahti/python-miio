@@ -43,7 +43,6 @@ class PtxSwitchStatus:
     # Container for status of PTX switch.
 
     def __init__(self, data: Dict[str, Any]) -> None:
-
         self.data = data
 
     def is_on_index(self, index) -> Optional[bool]:
