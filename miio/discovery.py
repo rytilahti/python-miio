@@ -31,9 +31,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 DEVICE_MAP = {
-    "090615.switch.switch01" : partial(PtxSwitch, model=MODEL_PTX_SINGLE_WALL_SWITCH),
-    "090615.switch.switch02" : partial(PtxSwitch, model=MODEL_PTX_DUAL_WALL_SWITCH),
-    "090615.switch.switch03" : partial(PtxSwitch, model=MODEL_PTX_TRIPLE_WALL_SWITCH),
+    "090615.switch.switch01": partial(PtxSwitch, model=MODEL_PTX_SINGLE_WALL_SWITCH),
+    "090615.switch.switch02": partial(PtxSwitch, model=MODEL_PTX_DUAL_WALL_SWITCH),
+    "090615.switch.switch03": partial(PtxSwitch, model=MODEL_PTX_TRIPLE_WALL_SWITCH),
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
     "roborock-vacuum-m1s": Vacuum,

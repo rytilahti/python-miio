@@ -46,13 +46,13 @@ class PtxSwitchStatus:
 
         self.data = data
 
-
     def is_on_index(self, index) -> Optional[bool]:
         # True if switch {index} is on.
         k = "is_on_{}".format(index)
         if k in self.data and self.data[k] is not None:
             return self.data[k]
         return None
+
     @property
     def is_on_1(self) -> Optional[bool]:
         # True if switch 1 is on.
@@ -159,7 +159,7 @@ class PtxSwitch(Device):
             # get return values only we want
             result_1 = result_1[:param_count]
         else:
-            result_1 = [None,None,None]
+            result_1 = [None, None, None]
             _LOGGER.debug(
                 "Count (%s) of requested params does not match the "
                 "count (%s) of received values.",
@@ -196,7 +196,6 @@ class PtxSwitch(Device):
                         zip(properties,
                             result_1 + result_2)))
 
-
     def turn_switch(self, index: int, switch_state: int) -> bool:
         """
         Turn a switch channel on/off.
@@ -219,7 +218,6 @@ class PtxSwitch(Device):
         else:
             _LOGGER.debug("Toogle switch {} failed.".format(index))
             return False
-
 
     def turn_on_switch(self, index: int) -> bool:
         return self.turn_switch(index, 1)
