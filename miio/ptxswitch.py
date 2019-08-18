@@ -126,32 +126,87 @@ class PtxSwitch(Device):
         default_output=format_output(
             "",
             "Switch 1 Status: {result.is_on_1}\n"
-            "Switch 2 Status: {result.is_on_1}\n"
-            "Switch 2 Status: {result.is_on_1}\n"
+            "Switch 2 Status: {result.is_on_2}\n"
+            "Switch 2 Status: {result.is_on_3}\n"
             "Switch 1 Name: {result.switch_name_1}\n"
-            "Switch 2 Name: {result.switch_name_1}\n"
-            "Switch 3 Name: {result.switch_name_1}\n")
+            "Switch 2 Name: {result.switch_name_2}\n"
+            "Switch 3 Name: {result.switch_name_3}\n")
     )
     def status(self) -> PtxSwitchStatus:
+        """
+        PTX Triple wall switch payload dump:
+
+        # Query all 3 Switches status
+        ->  {Mi Home App} data= {"id":2468,"method":"get_prop","params":[0,0,0]}
+
+        # Returns On, Off, Off
+        <-  {PTX Switch}  data= {"result":[1,0,0,1],"id":2468}
+
+        # Query Switch Name 3
+        ->  {Mi Home App} data= {"id":2471,"method":"get_prop","params":["switchname3"]}
+
+        # Returns Switch Name 3
+        <-  {PTX Switch}  data= {"result":["switch3"],"id":2471}
+
+        # Set switch name 1 to 'test name 1'
+        ->  {Mi Home App} data= {"id":2472,"method":"SetSwtichname1","params":["test name 1"]}
+
+        # Didn't firgure out meaning of this return data.
+        # Switches status were On, Off, Off at this moment
+        <-  {PTX Switch}  data= {"result":[0],"id":2472}
+
+        # Turn on switch 1
+        ->  {Mi Home App} data= {"id":2473,"method":"SetSwitch1","params":[1]}
+
+        # Returns status On
+        <-  {PTX Switch}  data= {"result":[1],"id":2473}
+
+        # Turn Off switch 1
+        ->  {Mi Home App} data= {"id":2474,"method":"SetSwitch1","params":[0]}
+
+        # Returns status Off
+        <-  {PTX Switch}  data= {"result":[0],"id":2474}
+
+        # Turn on all switches
+        ->  {Mi Home App} data= {"id":3381,"method":"SetSwitchAll","params":[1,1,1]}
+
+        # Returns On, On, On
+        <-  {PTX Switch}  data= {"result":[1,1,1],"id":3381}
+
+        # Turn off all switches
+        ->  {Mi Home App} data= {"id":3382,"method":"SetSwitchAll","params":[0,0,0]}
+
+        # Returns off, off, off
+        <-  {PTX Switch}  data= {"result":[0,0,0],"id":3382}
+
+        """
         # Retrieve properties.
         properties = AVAILABLE_PROPERTIES[self.model].copy()
-        param_list_1 = list()
-        param_list_2 = list()
 
-        # Query every channel status
+        # Querying switch status require [0,0,0] as the request 
+        # params. Querying other property require property name 
+        # (eg. 'switchname1') as the request param.
+
+        # params for querying status of the switches
+        params_switch_status = list()
+
+        # params for querying other properties
+        params_other = list()
+
+        # Query every switch status
 
         for k in properties:
             if k[:5] == "is_on":
-                param_list_1.append(0)
+                params_switch_status.append(0)
             else:
-                param_list_2.append(k)
+                params_other.append(k)
 
         result_1 = self.send(
             "get_prop",
-            param_list_1
+            params_switch_status
         )
 
-        param_count = len(param_list_1)
+        param_count = len(params_switch_status)
         values_count = len(result_1)
         if values_count >= param_count:
             # return values always have one more than requested.
@@ -169,7 +224,7 @@ class PtxSwitch(Device):
         # properties are divided into multiple requests
 
         result_2 = list()
-        for param in param_list_2:
+        for param in params_other:
             value = self.send(
                 "get_prop",
                 [param]
