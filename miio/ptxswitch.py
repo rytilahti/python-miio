@@ -266,8 +266,7 @@ class PtxSwitch(Device):
             "SetSwitch{}".format(index),
             [switch_state]
         )
-
-        if result[:1] == 0 or result[:1] == 1:
+        if result[:1] == [0] or result[:1] == [1]:
             return True
         else:
             _LOGGER.debug("Toogle switch {} failed.".format(index))
