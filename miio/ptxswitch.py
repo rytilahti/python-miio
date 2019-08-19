@@ -183,8 +183,8 @@ class PtxSwitch(Device):
         # Retrieve properties.
         properties = AVAILABLE_PROPERTIES[self.model].copy()
 
-        # Querying switch status require [0,0,0] as the request 
-        # params. Querying other property require property name 
+        # Querying switch status require [0,0,0] as the request
+        # params. Querying other property require property name
         # (eg. 'switchname1') as the request param.
 
         # params for querying status of the switches
