@@ -46,100 +46,12 @@ class PwznRelayStatus:
             return self.data["relay_status"]
 
     @property
-    def name0(self) -> str:
-        """Name of relay0."""
-        if "name0" in self.data:
-            return self.data["name0"]
+    def relay_names(self) -> Dict[int, str]:
+        def _extract_index_from_key(name) -> int:
+            """extract the index from the variable"""
+            return int(name[4:])
 
-    @property
-    def name1(self) -> str:
-        """Name of relay1."""
-        if "name1" in self.data:
-            return self.data["name1"]
-
-    @property
-    def name2(self) -> str:
-        """Name of relay2."""
-        if "name2" in self.data:
-            return self.data["name2"]
-
-    @property
-    def name3(self) -> str:
-        """Name of relay3."""
-        if "name3" in self.data:
-            return self.data["name3"]
-
-    @property
-    def name4(self) -> str:
-        """Name of relay4."""
-        if "name4" in self.data:
-            return self.data["name4"]
-
-    @property
-    def name5(self) -> str:
-        """Name of relay5."""
-        if "name5" in self.data:
-            return self.data["name5"]
-
-    @property
-    def name6(self) -> str:
-        """Name of relay6."""
-        if "name6" in self.data:
-            return self.data["name6"]
-
-    @property
-    def name7(self) -> str:
-        """Name of relay7."""
-        if "name7" in self.data:
-            return self.data["name7"]
-
-    @property
-    def name8(self) -> str:
-        """Name of relay8."""
-        if "name8" in self.data:
-            return self.data["name8"]
-
-    @property
-    def name9(self) -> str:
-        """Name of relay9."""
-        if "name9" in self.data:
-            return self.data["name9"]
-
-    @property
-    def name10(self) -> str:
-        """Name of relay10."""
-        if "name10" in self.data:
-            return self.data["name10"]
-
-    @property
-    def name11(self) -> str:
-        """Name of relay11."""
-        if "name11" in self.data:
-            return self.data["name11"]
-
-    @property
-    def name12(self) -> str:
-        """Name of relay12."""
-        if "name12" in self.data:
-            return self.data["name12"]
-
-    @property
-    def name13(self) -> str:
-        """Name of relay13."""
-        if "name13" in self.data:
-            return self.data["name13"]
-
-    @property
-    def name14(self) -> str:
-        """Name of relay14."""
-        if "name14" in self.data:
-            return self.data["name14"]
-
-    @property
-    def name15(self) -> str:
-        """Name of relay15."""
-        if "name15" in self.data:
-            return self.data["name15"]
+        return {_extract_index_from_key(name): value for name, value in self.data.items() if name.startswith("name")}
 
     @property
     def on_count(self) -> int:
@@ -150,40 +62,10 @@ class PwznRelayStatus:
     def __repr__(self) -> str:
         s = "<PwznRelayStatus " \
             "relay_status=%s, " \
-            "name0=%s, " \
-            "name1=%s, " \
-            "name2=%s, " \
-            "name3=%s, " \
-            "name4=%s, " \
-            "name5=%s, " \
-            "name6=%s, " \
-            "name7=%s, " \
-            "name8=%s, " \
-            "name9=%s, " \
-            "name10=%s, " \
-            "name11=%s, " \
-            "name12=%s, " \
-            "name13=%s, " \
-            "name14=%s, " \
-            "name15=%s, " \
+            "relay_names=%s, " \
             "on_count=%s>" % \
             (self.relay_state,
-             self.name0,
-             self.name1,
-             self.name2,
-             self.name3,
-             self.name4,
-             self.name5,
-             self.name6,
-             self.name7,
-             self.name8,
-             self.name9,
-             self.name10,
-             self.name11,
-             self.name12,
-             self.name13,
-             self.name14,
-             self.name15,
+             self.relay_names,
              self.on_count)
         return s
 
