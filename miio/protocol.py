@@ -140,7 +140,7 @@ class EncryptionAdapter(Adapter):
 
         :param obj: JSON object to encrypt"""
         # pp(context)
-        return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00',
+        return Utils.encrypt(json.dumps(obj, separators=(',',':')).encode('utf-8') + b'\x00',
                              context['_']['token'])
 
     def _decode(self, obj, context, path):
