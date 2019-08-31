@@ -75,7 +75,7 @@ class Toilet(Device):
     @command(
         default_output=format_output(
             "",
-            "Use: {result.use}\n"
+            "Work: {result.work}\n"
             "Filter remaining: {result.filter_use_percentage} %\n"
             "Filter remaining time: {result.filter_remaining_time}\n"
         )
