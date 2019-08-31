@@ -38,24 +38,33 @@ class ToiletStatus:
         self.data = data
 
     @property
+    def work_state(self) -> int:
+        """Device state code"""
+        return self.data['work_state']
+
+    @property
     def work(self) -> bool:
-        """True if device is currently on."""
-        return self.work != 1
+        """True if device is use on."""
+        return self.work_state != 1
 
     @property
     def filter_use_percentage(self) -> str:
+        """Filter percentage of remaining life"""
         return "{}%".format(self.data["filter_use_flux"])
 
     @property
-    def filter_remaining_time(self) -> str:
+    def filter_remaining_time(self) -> int:
+        """Filter remaining life days"""
         return self.data["filter_use_time"]
 
     def __repr__(self) -> str:
         return "<ToiletStatus work=%s, " \
+               "state=%s" \
                "filter_use_percentage=%s, " \
                "filter_remaining_time=%s>" % \
                (
                    self.work,
+                   self.work_state,
                    self.filter_use_percentage,
                    self.filter_remaining_time
                )
@@ -76,7 +85,8 @@ class Toilet(Device):
         default_output=format_output(
             "",
             "Work: {result.work}\n"
-            "Filter remaining: {result.filter_use_percentage} %\n"
+            "State: {result.work_state}\n"
+            "Filter remaining: {result.filter_use_percentage}\n"
             "Filter remaining time: {result.filter_remaining_time}\n"
         )
     )
