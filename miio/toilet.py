@@ -23,14 +23,14 @@ AVAILABLE_PROPERTIES = {
 
 
 class AmbientLightColor(enum.Enum):
-    White = 0
-    Yellow = 1
-    Powder = 2
-    Green = 3
-    Purple = 4
-    Blue = 5
-    Orange = 6
-    Red = 7
+    White = "0"
+    Yellow = "1"
+    Powder = "2"
+    Green = "3"
+    Purple = "4"
+    Blue = "5"
+    Orange = "6"
+    Red = "7"
 
 
 class ToiletStatus:
