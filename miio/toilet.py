@@ -38,7 +38,7 @@ class ToiletStatus:
         self.data = data
 
     @property
-    def is_use(self) -> bool:
+    def work(self) -> bool:
         """True if device is currently on."""
         return self.work != 1
 
@@ -55,7 +55,7 @@ class ToiletStatus:
                "filter_use_percentage=%s, " \
                "filter_remaining_time=%s>" % \
                (
-                   self.is_use,
+                   self.work,
                    self.filter_use_percentage,
                    self.filter_remaining_time
                )
