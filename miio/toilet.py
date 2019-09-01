@@ -43,6 +43,10 @@ class ToiletStatus:
         return self.data['work_state']
 
     @property
+    def is_on(self) -> bool:
+        return self.work
+
+    @property
     def work(self) -> bool:
         """True if device is use on."""
         return self.work_state != 1
@@ -140,4 +144,4 @@ class Toilet(Device):
         if color:
             return AmbientLightColor(color[0])
         else:
-            return AmbientLightColor(0)
+            return AmbientLightColor("0")
