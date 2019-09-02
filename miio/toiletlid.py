@@ -99,6 +99,7 @@ class Toiletlid(Device):
             "",
             "Work: {result.work}\n"
             "State: {result.work_state}\n"
+            "Ambient Light: {result.ambient_light}\n"
             "Filter remaining: {result.filter_use_percentage}\n"
             "Filter remaining time: {result.filter_remaining_time}\n",
         )
