@@ -56,7 +56,7 @@ class ToiletlidStatus:
         return self.data["filter_use_time"]
 
     @property
-    def ambient_light(self) -> AmbientLightColor:
+    def ambient_light(self) -> str:
         """Ambient light color."""
         return self.data["ambient_light"]
 
@@ -70,7 +70,7 @@ class ToiletlidStatus:
             % (
                 self.work,
                 self.work_state,
-                self.ambient_light.name,
+                self.ambient_light,
                 self.filter_use_percentage,
                 self.filter_remaining_time,
             )
@@ -138,10 +138,10 @@ class Toiletlid(Device):
         return self.send("set_aled_v_of_uid", ["", color.value])
 
     @command(default_output=format_output("Get the Ambient light color."))
-    def get_ambient_light(self) -> AmbientLightColor:
+    def get_ambient_light(self) -> str:
         """Set Ambient light color."""
         color = self.send("get_aled_v_of_uid", [""])
         if color:
-            return AmbientLightColor(color[0])
+            return AmbientLightColor(color[0]).name
         else:
-            return AmbientLightColor("0")
+            return AmbientLightColor("0").name
