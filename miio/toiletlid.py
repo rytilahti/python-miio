@@ -9,17 +9,11 @@ from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_TOILET_V1 = 'tinymu.toiletlid.v1'
+MODEL_TOILETLID_V1 = "tinymu.toiletlid.v1"
 
-AVAILABLE_PROPERTIES_COMMON = [
-    'work_state',
-    'filter_use_flux',
-    'filter_use_time',
-]
+AVAILABLE_PROPERTIES_COMMON = ["work_state", "filter_use_flux", "filter_use_time"]
 
-AVAILABLE_PROPERTIES = {
-    MODEL_TOILET_V1: AVAILABLE_PROPERTIES_COMMON
-}
+AVAILABLE_PROPERTIES = {MODEL_TOILETLID_V1: AVAILABLE_PROPERTIES_COMMON}
 
 
 class AmbientLightColor(enum.Enum):
@@ -33,14 +27,14 @@ class AmbientLightColor(enum.Enum):
     Red = "7"
 
 
-class ToiletStatus:
+class ToiletlidStatus:
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
 
     @property
     def work_state(self) -> int:
         """Device state code"""
-        return self.data['work_state']
+        return self.data["work_state"]
 
     @property
     def is_on(self) -> bool:
@@ -61,29 +55,44 @@ class ToiletStatus:
         """Filter remaining life days"""
         return self.data["filter_use_time"]
 
+    @property
+    def ambient_light(self) -> AmbientLightColor:
+        """Ambient light color."""
+        return self.data["ambient_light"]
+
     def __repr__(self) -> str:
-        return "<ToiletStatus work=%s, " \
-               "state=%s" \
-               "filter_use_percentage=%s, " \
-               "filter_remaining_time=%s>" % \
-               (
-                   self.work,
-                   self.work_state,
-                   self.filter_use_percentage,
-                   self.filter_remaining_time
-               )
+        return (
+            "<ToiletlidStatus work=%s, "
+            "state=%s, "
+            "ambient_light=%s, "
+            "filter_use_percentage=%s, "
+            "filter_remaining_time=%s>"
+            % (
+                self.work,
+                self.work_state,
+                self.ambient_light.name,
+                self.filter_use_percentage,
+                self.filter_remaining_time,
+            )
+        )
 
 
-class Toilet(Device):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_TOILET_V1) -> None:
+class Toiletlid(Device):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_TOILETLID_V1,
+    ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
         else:
-            self.model = MODEL_TOILET_V1
+            self.model = MODEL_TOILETLID_V1
 
     @command(
         default_output=format_output(
@@ -91,36 +100,28 @@ class Toilet(Device):
             "Work: {result.work}\n"
             "State: {result.work_state}\n"
             "Filter remaining: {result.filter_use_percentage}\n"
-            "Filter remaining time: {result.filter_remaining_time}\n"
+            "Filter remaining time: {result.filter_remaining_time}\n",
         )
     )
-    def status(self) -> ToiletStatus:
+    def status(self) -> ToiletlidStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
-
-        # A single request is limited to 16 properties. Therefore the
-        # properties are divided into multiple requests
         _props_per_request = 15
 
-        _props = properties.copy()
-        values = []
-        while _props:
-            values.extend(self.send("get_prop", _props[:_props_per_request]))
-            _props[:] = _props[_props_per_request:]
-
+        values = self.send("get_prop", properties)
         properties_count = len(properties)
         values_count = len(values)
         if properties_count != values_count:
             _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
+        color = self.get_ambient_light()
+        return ToiletlidStatus(dict(zip(properties, values), ambient_light=color))
 
-        return ToiletStatus(dict(zip(properties, values)))
-
-    @command(
-        default_output=format_output("Nozzle clean"),
-    )
+    @command(default_output=format_output("Nozzle clean"))
     def nozzle_clean(self):
         """Nozzle clean."""
         return self.send("nozzle_clean", ["on"])
@@ -128,16 +129,14 @@ class Toilet(Device):
     @command(
         click.argument("color", type=EnumType(AmbientLightColor, False)),
         default_output=format_output(
-            "Set the ambient light to {color} color the next time you start it.")
+            "Set the ambient light to {color} color the next time you start it."
+        ),
     )
     def set_ambient_light(self, color: AmbientLightColor):
         """Set Ambient light color."""
         return self.send("set_aled_v_of_uid", ["", color.value])
 
-    @command(
-        default_output=format_output(
-            "Get the Ambient light color.")
-    )
+    @command(default_output=format_output("Get the Ambient light color."))
     def get_ambient_light(self) -> AmbientLightColor:
         """Set Ambient light color."""
         color = self.send("get_aled_v_of_uid", [""])
