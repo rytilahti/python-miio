@@ -28,37 +28,32 @@ MODEL_NORMAL_GROUP1 = [MODEL_NORMAL2, MODEL_NORMAL5]
 MODEL_NORMAL_GROUP2 = [MODEL_NORMAL3, MODEL_NORMAL4]
 
 COOKING_STAGES = {
-    0: {
+    1: {
         'name': 'Quickly preheat',
         'description': 'Increase temperature in a controlled manner to soften rice gradually',
     },
-    1: {
-        'name': 'Water-absorbing',
-        'description': 'Increase temperature, to flesh grains with water',
-    },
     2: {
+        'name': 'Water-absorbing',
+        'description': 'Increase temperature steadily and let rice absorb enough water',
+    },
+    3: {
         'name': 'Boiling',
         'description': 'Last high heating, to cook rice evenly',
     },
-    3: {
+    4: {
         'name': 'Gelantinizing',
         'description': 'Steaming under high temperature, to bring sweetness to grains',
     },
-    4: {
+    5: {
         'name': 'Braising',
         'description': 'Absorb water at moderate temperature',
     },
-    5: {
+    6: {
         'name': 'Boiling',
         'description': 'Operate at full load to boil rice',
         # Keep heating at high temperature. Let rice to receive
     },
     7: {
-        'name': 'Boiling',
-        'description': 'Operate at full load to boil rice',
-        # Keep heating at high temperature. Let rice to receive
-    },
-    8: {
         'name': 'Warm up rice',
         'description': 'Temperature control adjustment and cyclic heating '
                        'achieve combination of taste, dolor and nutrition',
