@@ -5,7 +5,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import command, format_output, EnumType
-from .device import Device, DeviceException
+from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,10 +25,6 @@ class AmbientLightColor(enum.Enum):
     Blue = "5"
     Orange = "6"
     Red = "7"
-
-
-class AmbientLightException(DeviceException):
-    pass
 
 
 class ToiletlidStatus:
@@ -140,9 +136,8 @@ class Toiletlid(Device):
         color = self.send("get_aled_v_of_uid", [""])
         try:
             return AmbientLightColor(color[0]).name
-        except TypeError:
-            raise DeviceException(
-                "Get Ambient Light Operating Device Not Responding!"
-            ) from None
-        except ValueError as e:
-            raise AmbientLightException(e) from None
+        except ValueError:
+            _LOGGER.warning(
+                "Get ambient light response error, return unknown value: %s.", color[0]
+            )
+            return "Unknown"
