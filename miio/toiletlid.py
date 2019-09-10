@@ -96,7 +96,7 @@ class Toiletlid(Device):
     @command(
         default_output=format_output(
             "",
-            "Work: {result.work}\n"
+            "Work: {result.is_on}\n"
             "State: {result.work_state}\n"
             "Ambient Light: {result.ambient_light}\n"
             "Filter remaining: {result.filter_use_percentage}\n"
