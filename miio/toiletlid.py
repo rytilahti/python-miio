@@ -5,7 +5,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import command, format_output, EnumType
-from .device import Device
+from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +27,10 @@ class AmbientLightColor(enum.Enum):
     Red = "7"
 
 
+class AmbientLightException(DeviceException):
+    pass
+
+
 class ToiletlidStatus:
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
@@ -38,11 +42,6 @@ class ToiletlidStatus:
 
     @property
     def is_on(self) -> bool:
-        return self.work
-
-    @property
-    def work(self) -> bool:
-        """True if device is use on."""
         return self.work_state != 1
 
     @property
@@ -68,7 +67,7 @@ class ToiletlidStatus:
             "filter_use_percentage=%s, "
             "filter_remaining_time=%s>"
             % (
-                self.work,
+                self.is_on,
                 self.work_state,
                 self.ambient_light,
                 self.filter_use_percentage,
@@ -107,8 +106,6 @@ class Toiletlid(Device):
     def status(self) -> ToiletlidStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
-        _props_per_request = 15
-
         values = self.send("get_prop", properties)
         properties_count = len(properties)
         values_count = len(values)
@@ -139,9 +136,13 @@ class Toiletlid(Device):
 
     @command(default_output=format_output("Get the Ambient light color."))
     def get_ambient_light(self) -> str:
-        """Set Ambient light color."""
+        """Get Ambient light color."""
         color = self.send("get_aled_v_of_uid", [""])
-        if color:
+        try:
             return AmbientLightColor(color[0]).name
-        else:
-            return AmbientLightColor("0").name
+        except TypeError:
+            raise DeviceException(
+                "Get Ambient Light Operating Device Not Responding!"
+            ) from None
+        except ValueError as e:
+            raise AmbientLightException(e) from None
