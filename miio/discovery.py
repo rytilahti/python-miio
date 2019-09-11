@@ -10,7 +10,8 @@ import zeroconf
 from . import (Device, Vacuum, ChuangmiCamera, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh,
                Ceil, PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
                AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
-               Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera)
+               Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera,
+               PtxSwitch)
 
 from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
 from .airqualitymonitor import (MODEL_AIRQUALITYMONITOR_V1, MODEL_AIRQUALITYMONITOR_B1,
@@ -19,6 +20,9 @@ from .airhumidifier import (MODEL_HUMIDIFIER_CB1, MODEL_HUMIDIFIER_CA1, MODEL_HU
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V2, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, MODEL_CHUANGMI_PLUG_M3,
                             MODEL_CHUANGMI_PLUG_HMI205, )
+from .ptxswitch import (MODEL_PTX_SINGLE_WALL_SWITCH, MODEL_PTX_DUAL_WALL_SWITCH,
+                        MODEL_PTX_TRIPLE_WALL_SWITCH)
+
 
 from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA3,
                   MODEL_FAN_ZA4, MODEL_FAN_P5, )
@@ -28,6 +32,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 DEVICE_MAP = {
+    "090615.switch.switch01": partial(PtxSwitch, model=MODEL_PTX_SINGLE_WALL_SWITCH),
+    "090615.switch.switch02": partial(PtxSwitch, model=MODEL_PTX_DUAL_WALL_SWITCH),
+    "090615.switch.switch03": partial(PtxSwitch, model=MODEL_PTX_TRIPLE_WALL_SWITCH),
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
     "roborock-vacuum-m1s": Vacuum,
