@@ -29,6 +29,7 @@ class AmbientLightColor(enum.Enum):
 
 class ToiletlidStatus:
     def __init__(self, data: Dict[str, Any]) -> None:
+        # {"work_state": 1,"filter_use_flux": 100,"filter_use_time": 180, "ambient_light": "Red"}
         self.data = data
 
     @property
