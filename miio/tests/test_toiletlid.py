@@ -10,6 +10,17 @@ from miio.toiletlid import (
 )
 from .dummies import DummyDevice
 
+"""
+Response instance
+>> status
+
+Work: False
+State: 1
+Ambient Light: Yellow
+Filter remaining: 100%
+Filter remaining time: 180
+"""
+
 
 class DummyToiletlidV1(DummyDevice, Toiletlid):
     def __init__(self, *args, **kwargs):
