@@ -35,6 +35,7 @@ Supported devices
 -  :doc:`Yeelight light bulbs <yeelight>` (:class:`miio.yeelight`) (only a very rudimentary support, use `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__ for a more complete support)
 -  Xiaomi Mi Air Dehumidifier (:class:`miio.airdehumidifier`)
 -  Xiaomi Tinymu Smart Toilet Cover (:class:`miio.toiletlid`)
+-  Xiaomi 16 Relays Module (:class:`miio.pwzn_relay`)
 
 *Feel free to create a pull request to add support for new devices as
 well as additional features for supported devices.*
