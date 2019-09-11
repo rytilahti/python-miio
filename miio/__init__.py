@@ -18,6 +18,7 @@ from miio.philips_eyecare import PhilipsEyecare
 from miio.philips_moonlight import PhilipsMoonlight
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
+from miio.toiletlid import Toiletlid
 from miio.pwzn_relay import PwznRelay
 from miio.vacuum import Vacuum, VacuumException
 from miio.vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
