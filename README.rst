@@ -1,7 +1,7 @@
 python-miio
 ===========
 
-|PyPI version| |Build Status| |Code Health| |Coverage Status| |Docs| |Hound|
+|PyPI version| |Build Status| |Coverage Status| |Docs| |Hound|
 
 This library (and its accompanying cli tool) is used to interface with devices using Xiaomi's `miIO protocol <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__.
 
