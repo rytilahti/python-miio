@@ -3,7 +3,9 @@ from unittest import TestCase
 import pytest
 
 from miio import AirQualityMonitor
-from miio.airqualitymonitor import AirQualityMonitorStatus, MODEL_AIRQUALITYMONITOR_V1, MODEL_AIRQUALITYMONITOR_S1
+from miio.airqualitymonitor import (AirQualityMonitorStatus,
+                                    MODEL_AIRQUALITYMONITOR_V1,
+                                    MODEL_AIRQUALITYMONITOR_S1)
 from .dummies import DummyDevice
 
 
@@ -69,6 +71,7 @@ class TestAirQualityMonitorV1(TestCase):
         assert self.state().usb_power is (self.device.start_state["usb_state"] == 'on')
         assert self.state().display_clock is (self.device.start_state["time_state"] == 'on')
         assert self.state().night_mode is (self.device.start_state["night_state"] == 'on')
+
 
 class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
