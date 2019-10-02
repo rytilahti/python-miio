@@ -5,9 +5,11 @@ This release adds support for the following new devices:
 * Xiaomi Air Quality Monitor S1 \(cgllc.airmonitor.s1\)
 * Xiaomi Mi Dehumidifier V1 \(nwt.derh.wdh318efw1\)
 * Xiaomi Mi Roborock M1S and Mi Robot S1
-* Xiaomi Mijia 360 1080p camera (chuangmi.camera.ipc009)
-* Xiaomi Mi Smart Fan (zhimi.fan.za3, zhimi.fan.za4, dmaker.fan.p5)
-* Xiaomi Smartmi Pure Evaporative Air Humidifier (zhimi.humidifier.cb1)
+* Xiaomi Mijia 360 1080p camera \(chuangmi.camera.ipc009\)
+* Xiaomi Mi Smart Fan \(zhimi.fan.za3, zhimi.fan.za4, dmaker.fan.p5\)
+* Xiaomi Smartmi Pure Evaporative Air Humidifier \(zhimi.humidifier.cb1\)
+* Xiaomi Tinymu Smart Toilet Cover
+* Xiaomi 16 Relays Module
 
 Fixes & Enhancements:
 
@@ -20,6 +22,7 @@ Fixes & Enhancements:
 * Device: Add easily accessible properties to DeviceError exception
 * Always import DeviceError exception
 * Require click version \>=7
+* Remove pretty\_cron and typing dependencies from requirements.txt
 
 ## [0.4.6](https://github.com/rytilahti/python-miio/tree/0.4.6)
 
@@ -27,7 +30,9 @@ Fixes & Enhancements:
 
 **Closed issues:**
 
+- Roborock Vacuum Bin full [\#546](https://github.com/rytilahti/python-miio/issues/546)
 - Add support for Xiao AI Smart Alarm Clock [\#538](https://github.com/rytilahti/python-miio/issues/538)
+- rockrobo.vacuum.v1 Error: No response from the device [\#536](https://github.com/rytilahti/python-miio/issues/536)
 - Assistance [\#532](https://github.com/rytilahti/python-miio/issues/532)
 - Unsupported device found - roborock.vacuum.s5 [\#527](https://github.com/rytilahti/python-miio/issues/527)
 - Discovery mode to chuangmi\_camera. [\#522](https://github.com/rytilahti/python-miio/issues/522)
@@ -43,10 +48,14 @@ Fixes & Enhancements:
 - impossible to get the last version \(0.4.5\) or even the 0.4.4 [\#489](https://github.com/rytilahti/python-miio/issues/489)
 - Getting the token of Air Purifier Pro v7 [\#461](https://github.com/rytilahti/python-miio/issues/461)
 - Moonlight sync with HA [\#452](https://github.com/rytilahti/python-miio/issues/452)
+- Replace pretty-cron dependency with cron\_descriptor [\#423](https://github.com/rytilahti/python-miio/issues/423)
 
 **Merged pull requests:**
 
+- remove pretty\_cron and typing dependencies from requirements.txt [\#548](https://github.com/rytilahti/python-miio/pull/548) ([rytilahti](https://github.com/rytilahti))
+- Add tinymu smart toiletlid [\#544](https://github.com/rytilahti/python-miio/pull/544) ([scp10011](https://github.com/scp10011))
 - Add support for Air Quality Monitor S1 \(cgllc.airmonitor.s1\) [\#539](https://github.com/rytilahti/python-miio/pull/539) ([zhumuht](https://github.com/zhumuht))
+- Add pwzn relay [\#537](https://github.com/rytilahti/python-miio/pull/537) ([SchumyHao](https://github.com/SchumyHao))
 - add mi dehumidifier v1 \(nwt.derh.wdh318efw1\) [\#535](https://github.com/rytilahti/python-miio/pull/535) ([stkang](https://github.com/stkang))
 - add mi robot s1 \(m1s\) to discovery [\#531](https://github.com/rytilahti/python-miio/pull/531) ([rytilahti](https://github.com/rytilahti))
 - Add preliminary Roborock M1S / Mi Robot S1 support [\#526](https://github.com/rytilahti/python-miio/pull/526) ([syssi](https://github.com/syssi))
