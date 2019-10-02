@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from typing import Optional
 
 import click
 
@@ -104,29 +105,39 @@ class AirQualityMonitorStatus:
         return self.data["sensor_state"]
 
     @property
-    def co2(self) -> int:
+    def co2(self) -> Optional[int]:
         """Return co2 value (400...9999)ppm for MODEL_AIRQUALITYMONITOR_S1."""
-        return self.data["co2"]
+        if "co2" in self.data and self.data["co2"] is not None:
+            return self.data["co2"]
+        return None
 
     @property
-    def humidity(self) -> float:
+    def humidity(self) -> Optional[float]:
         """Return humidity value (0...100)% for MODEL_AIRQUALITYMONITOR_S1."""
-        return self.data["humidity"]
+        if "humidity" in self.data and self.data["humidity"] is not None:
+            return self.data["humidity"]
+        return None
 
     @property
-    def pm25(self) -> float:
+    def pm25(self) -> Optional[float]:
         """Return pm2.5 value (0...999)μg/m³ for MODEL_AIRQUALITYMONITOR_S1."""
-        return self.data["pm25"]
+        if "pm25" in self.data and self.data["pm25"] is not None:
+            return self.data["pm25"]
+        return None
 
     @property
-    def temperature(self) -> float:
+    def temperature(self) -> Optional[float]:
         """Return temperature value (-10...50)°C for MODEL_AIRQUALITYMONITOR_S1."""
-        return self.data["temperature"]
+        if "temperature" in self.data and self.data["temperature"] is not None:
+            return self.data["temperature"]
+        return None
 
     @property
-    def tvoc(self) -> int:
+    def tvoc(self) -> Optional[int]:
         """Return tvoc value for MODEL_AIRQUALITYMONITOR_S1."""
-        return self.data["tvoc"]
+        if "tvoc" in self.data and self.data["tvoc"] is not None:
+            return self.data["tvoc"]
+        return None
 
     def __repr__(self) -> str:
         s = "<AirQualityMonitorStatus power=%s, " \

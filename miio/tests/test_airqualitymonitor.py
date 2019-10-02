@@ -7,7 +7,7 @@ from miio.airqualitymonitor import AirQualityMonitorStatus, MODEL_AIRQUALITYMONI
 from .dummies import DummyDevice
 
 
-class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):
+class DummyAirQualityMonitorV1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_AIRQUALITYMONITOR_V1
         self.state = {
@@ -31,13 +31,13 @@ class DummyAirQualityMonitor(DummyDevice, AirQualityMonitor):
 
 
 @pytest.fixture(scope="class")
-def airqualitymonitor(request):
-    request.cls.device = DummyAirQualityMonitor()
+def airqualitymonitorv1(request):
+    request.cls.device = DummyAirQualityMonitorV1()
     # TODO add ability to test on a real device
 
 
-@pytest.mark.usefixtures("airqualitymonitor")
-class TestAirQualityMonitor(TestCase):
+@pytest.mark.usefixtures("airqualitymonitorv1")
+class TestAirQualityMonitorV1(TestCase):
     def is_on(self):
         return self.device.status().is_on
 
