@@ -126,7 +126,7 @@ class AirDehumidifierStatus:
     @property
     def tank_full(self) -> bool:
         """The remaining amount of water in percent."""
-        return self.data["tank_full"]
+        return self.data["tank_full"] == "on"
 
     @property
     def compressor_status(self) -> bool:

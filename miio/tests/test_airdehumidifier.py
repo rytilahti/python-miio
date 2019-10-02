@@ -51,13 +51,13 @@ class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):
 
         self.return_values = {
             'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
+            'set_power': lambda x: self._set_state("on_off", x),
             'set_mode': lambda x: self._set_state("mode", x),
             'set_led': lambda x: self._set_state("led", x),
             'set_buzzer': lambda x: self._set_state("buzzer", x),
             'set_child_lock': lambda x: self._set_state("child_lock", x),
             'set_fan_speed': lambda x: self._set_state("fan_st", x),
-            'set_target_humidity': lambda x: self._set_state("auto", x),
+            'set_auto': lambda x: self._set_state("auto", x),
             'miIO.info': self._get_device_info,
         }
         super().__init__(args, kwargs)
@@ -107,7 +107,7 @@ class TestAirDehumidifierV1(TestCase):
         assert self.state().temperature == self.device.start_state["temp"]
         assert self.state().humidity == self.device.start_state["humidity"]
         assert self.state().mode == OperationMode(self.device.start_state["mode"])
-        assert self.state().led == self.device.start_state["led"]
+        assert self.state().led == (self.device.start_state["led"] == 'on')
         assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
         assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
         assert self.state().target_humidity == self.device.start_state["auto"]
@@ -157,12 +157,6 @@ class TestAirDehumidifierV1(TestCase):
         self.device.state["temp"] = None
 
         assert self.state().temperature is None
-
-    def test_status_without_led(self):
-        self.device._reset_state()
-        self.device.state["led"] = None
-
-        assert self.state().led_brightness is None
 
     def test_set_target_humidity(self):
         def target_humidity():
