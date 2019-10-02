@@ -1,5 +1,80 @@
 # Change Log
 
+This release adds support for the following new devices:
+
+* Xiaomi Air Quality Monitor S1 \(cgllc.airmonitor.s1\)
+* Xiaomi Mi Dehumidifier V1 \(nwt.derh.wdh318efw1\)
+* Xiaomi Mi Roborock M1S and Mi Robot S1
+* Xiaomi Mijia 360 1080p camera \(chuangmi.camera.ipc009\)
+* Xiaomi Mi Smart Fan \(zhimi.fan.za3, zhimi.fan.za4, dmaker.fan.p5\)
+* Xiaomi Smartmi Pure Evaporative Air Humidifier \(zhimi.humidifier.cb1\)
+* Xiaomi Tinymu Smart Toilet Cover
+* Xiaomi 16 Relays Module
+
+Fixes & Enhancements:
+
+* Air Conditioning Companion: Add particular swing mode values of a chigo air conditioner
+* Air Humidifier: Handle poweroff exception on set\_mode
+* Chuangmi IR controller: Add indicator led support
+* Chuangmi IR controller: Add discovery of the Xiaomi IR remote 2gen \(chuangmi.remote.h102a03\)
+* Chuangmi Plug: Fix set\_wifi\_led cli command
+* Vacuum: Add state 18 as "segment cleaning"
+* Device: Add easily accessible properties to DeviceError exception
+* Always import DeviceError exception
+* Require click version \>=7
+* Remove pretty\_cron and typing dependencies from requirements.txt
+
+## [0.4.6](https://github.com/rytilahti/python-miio/tree/0.4.6)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.5...0.4.6)
+
+**Closed issues:**
+
+- Roborock Vacuum Bin full [\#546](https://github.com/rytilahti/python-miio/issues/546)
+- Add support for Xiao AI Smart Alarm Clock [\#538](https://github.com/rytilahti/python-miio/issues/538)
+- rockrobo.vacuum.v1 Error: No response from the device [\#536](https://github.com/rytilahti/python-miio/issues/536)
+- Assistance [\#532](https://github.com/rytilahti/python-miio/issues/532)
+- Unsupported device found - roborock.vacuum.s5 [\#527](https://github.com/rytilahti/python-miio/issues/527)
+- Discovery mode to chuangmi\_camera. [\#522](https://github.com/rytilahti/python-miio/issues/522)
+- 新款小米1X电风扇不支持 [\#520](https://github.com/rytilahti/python-miio/issues/520)
+- Add swing mode of a Chigo Air Conditioner [\#518](https://github.com/rytilahti/python-miio/issues/518)
+- Discover not working with Mi AirHumidifier CA1  [\#514](https://github.com/rytilahti/python-miio/issues/514)
+- Question about vacuum errors\_codes duration [\#511](https://github.com/rytilahti/python-miio/issues/511)
+- Support device model dmaker.fan.p5 [\#510](https://github.com/rytilahti/python-miio/issues/510)
+- Roborock S50: ERROR:miio.updater:No request was made.. [\#508](https://github.com/rytilahti/python-miio/issues/508)
+- Roborock S50: losing connection with mirobo [\#507](https://github.com/rytilahti/python-miio/issues/507)
+- Support for Xiaomi IR Remote \(chuangmi.remote.v2\) [\#506](https://github.com/rytilahti/python-miio/issues/506)
+- Support for Humidifier new model: zhimi.humidifier.cb1 [\#492](https://github.com/rytilahti/python-miio/issues/492)
+- impossible to get the last version \(0.4.5\) or even the 0.4.4 [\#489](https://github.com/rytilahti/python-miio/issues/489)
+- Getting the token of Air Purifier Pro v7 [\#461](https://github.com/rytilahti/python-miio/issues/461)
+- Moonlight sync with HA [\#452](https://github.com/rytilahti/python-miio/issues/452)
+- Replace pretty-cron dependency with cron\_descriptor [\#423](https://github.com/rytilahti/python-miio/issues/423)
+
+**Merged pull requests:**
+
+- remove pretty\_cron and typing dependencies from requirements.txt [\#548](https://github.com/rytilahti/python-miio/pull/548) ([rytilahti](https://github.com/rytilahti))
+- Add tinymu smart toiletlid [\#544](https://github.com/rytilahti/python-miio/pull/544) ([scp10011](https://github.com/scp10011))
+- Add support for Air Quality Monitor S1 \(cgllc.airmonitor.s1\) [\#539](https://github.com/rytilahti/python-miio/pull/539) ([zhumuht](https://github.com/zhumuht))
+- Add pwzn relay [\#537](https://github.com/rytilahti/python-miio/pull/537) ([SchumyHao](https://github.com/SchumyHao))
+- add mi dehumidifier v1 \(nwt.derh.wdh318efw1\) [\#535](https://github.com/rytilahti/python-miio/pull/535) ([stkang](https://github.com/stkang))
+- add mi robot s1 \(m1s\) to discovery [\#531](https://github.com/rytilahti/python-miio/pull/531) ([rytilahti](https://github.com/rytilahti))
+- Add preliminary Roborock M1S / Mi Robot S1 support [\#526](https://github.com/rytilahti/python-miio/pull/526) ([syssi](https://github.com/syssi))
+- Add state 18 as "segment cleaning" [\#525](https://github.com/rytilahti/python-miio/pull/525) ([syssi](https://github.com/syssi))
+- Add particular swing mode values of a chigo air conditioner [\#519](https://github.com/rytilahti/python-miio/pull/519) ([syssi](https://github.com/syssi))
+- Add chuangmi.camera.ipc009 support [\#516](https://github.com/rytilahti/python-miio/pull/516) ([impankratov](https://github.com/impankratov))
+- Add zhimi.fan.za3 support [\#515](https://github.com/rytilahti/python-miio/pull/515) ([syssi](https://github.com/syssi))
+- Add dmaker.fan.p5 support [\#513](https://github.com/rytilahti/python-miio/pull/513) ([syssi](https://github.com/syssi))
+- Add zhimi.fan.za4 support [\#512](https://github.com/rytilahti/python-miio/pull/512) ([syssi](https://github.com/syssi))
+- Require click version \>=7 [\#503](https://github.com/rytilahti/python-miio/pull/503) ([fvollmer](https://github.com/fvollmer))
+- Add indicator led support of the chuangmi.remote.h102a03 and chuangmi.remote.v2 [\#500](https://github.com/rytilahti/python-miio/pull/500) ([syssi](https://github.com/syssi))
+- Chuangmi Plug: Fix set\_wifi\_led cli command [\#499](https://github.com/rytilahti/python-miio/pull/499) ([syssi](https://github.com/syssi))
+- Add discovery of the Xiaomi IR remote 2gen \(chuangmi.remote.h102a03\) [\#497](https://github.com/rytilahti/python-miio/pull/497) ([syssi](https://github.com/syssi))
+- Air Humidifier: Handle poweroff exception on set\_mode [\#496](https://github.com/rytilahti/python-miio/pull/496) ([syssi](https://github.com/syssi))
+- Add zhimi.humidifier.cb1 support [\#493](https://github.com/rytilahti/python-miio/pull/493) ([antylama](https://github.com/antylama))
+- Add easily accessible properties to DeviceError exception [\#488](https://github.com/rytilahti/python-miio/pull/488) ([syssi](https://github.com/syssi))
+- Always import DeviceError exception [\#487](https://github.com/rytilahti/python-miio/pull/487) ([syssi](https://github.com/syssi))
+
+
 ## [0.4.5](https://github.com/rytilahti/python-miio/tree/0.4.5)
 
 This release adds support for the following new devices:
