@@ -55,9 +55,11 @@ class AirQualityMonitorStatus:
         self.data = data
 
     @property
-    def power(self) -> str:
+    def power(self) -> Optional[str]:
         """Current power state."""
-        return self.data["power"]
+        if "power" in self.data and self.data["power"] is not None:
+            return self.data["power"]
+        return None
 
     @property
     def is_on(self) -> bool:
@@ -65,14 +67,18 @@ class AirQualityMonitorStatus:
         return self.power == "on"
 
     @property
-    def usb_power(self) -> bool:
+    def usb_power(self) -> Optional[bool]:
         """Return True if the device's usb is on."""
-        return self.data["usb_state"] == "on"
+        if "usb_state" in self.data and self.data["usb_state"] is not None:
+            return self.data["usb_state"] == "on"
+        return None
 
     @property
-    def aqi(self) -> int:
+    def aqi(self) -> Optional[int]:
         """Air quality index value. (0...600)."""
-        return self.data["aqi"]
+        if "aqi" in self.data and self.data["aqi"] is not None:
+            return self.data["aqi"]
+        return None
 
     @property
     def battery(self) -> int:
@@ -80,29 +86,39 @@ class AirQualityMonitorStatus:
         return self.data["battery"]
 
     @property
-    def display_clock(self) -> bool:
+    def display_clock(self) -> Optional[bool]:
         """Display a clock instead the AQI."""
-        return self.data["time_state"] == "on"
+        if "time_state" in self.data and self.data["time_state"] is not None:
+            return self.data["time_state"] == "on"
+        return None
 
     @property
-    def night_mode(self) -> bool:
+    def night_mode(self) -> Optional[bool]:
         """Return True if the night mode is on."""
-        return self.data["night_state"] == "on"
+        if "night_state" in self.data and self.data["night_state"] is not None:
+            return self.data["night_state"] == "on"
+        return None
 
     @property
-    def night_time_begin(self) -> str:
+    def night_time_begin(self) -> Optional[str]:
         """Return the begin of the night time."""
-        return self.data["night_beg_time"]
+        if "night_beg_time" in self.data and self.data["night_beg_time"] is not None:
+            return self.data["night_beg_time"]
+        return None
 
     @property
-    def night_time_end(self) -> str:
+    def night_time_end(self) -> Optional[str]:
         """Return the end of the night time."""
-        return self.data["night_end_time"]
+        if "night_end_time" in self.data and self.data["night_end_time"] is not None:
+            return self.data["night_end_time"]
+        return None
 
     @property
-    def sensor_state(self) -> str:
+    def sensor_state(self) -> Optional[str]:
         """Sensor state."""
-        return self.data["sensor_state"]
+        if "sensor_state" in self.data and self.data["sensor_state"] is not None:
+            return self.data["sensor_state"]
+        return None
 
     @property
     def co2(self) -> Optional[int]:
