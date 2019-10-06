@@ -16,6 +16,7 @@ MODEL_CHUANGMI_PLUG_M1 = 'chuangmi.plug.m1'
 MODEL_CHUANGMI_PLUG_M3 = 'chuangmi.plug.m3'
 MODEL_CHUANGMI_PLUG_V2 = 'chuangmi.plug.v2'
 MODEL_CHUANGMI_PLUG_HMI205 = 'chuangmi.plug.hmi205'
+MODEL_CHUANGMI_PLUG_HMI206 = 'chuangmi.plug.hmi206'
 
 AVAILABLE_PROPERTIES = {
     MODEL_CHUANGMI_PLUG_V1: ['on', 'usb_on', 'temperature'],
@@ -24,6 +25,7 @@ AVAILABLE_PROPERTIES = {
     MODEL_CHUANGMI_PLUG_M3: ['power', 'temperature'],
     MODEL_CHUANGMI_PLUG_V2: ['power', 'temperature'],
     MODEL_CHUANGMI_PLUG_HMI205: ['power', 'temperature'],
+    MODEL_CHUANGMI_PLUG_HMI206: ['power', 'temperature'],
 }
 
 

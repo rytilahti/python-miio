@@ -19,7 +19,7 @@ from .airqualitymonitor import (MODEL_AIRQUALITYMONITOR_V1, MODEL_AIRQUALITYMONI
 from .airhumidifier import (MODEL_HUMIDIFIER_CB1, MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_V1, )
 from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V2, MODEL_CHUANGMI_PLUG_V3,
                             MODEL_CHUANGMI_PLUG_M1, MODEL_CHUANGMI_PLUG_M3,
-                            MODEL_CHUANGMI_PLUG_HMI205, )
+                            MODEL_CHUANGMI_PLUG_HMI205, MODEL_CHUANGMI_PLUG_HMI206, )
 
 from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA3,
                   MODEL_FAN_ZA4, MODEL_FAN_P5, )
@@ -39,6 +39,7 @@ DEVICE_MAP = {
     "chuangmi-plug-v2": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V2),
     "chuangmi-plug-v3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V3),
     "chuangmi-plug-hmi205": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_HMI205),
+    "chuangmi-plug-hmi206": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_HMI206),
     "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "qmi-powerstrip-v1": partial(PowerStrip, model=MODEL_POWER_STRIP_V1),
     "zimi-powerstrip-v2": partial(PowerStrip, model=MODEL_POWER_STRIP_V2),
