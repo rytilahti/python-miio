@@ -136,7 +136,7 @@ class AirHumidifierStatus:
             if self.trans_level == 90:
                 return True
 
-        elif self.firmware_version_minor > 25:
+        elif self.firmware_version_minor > 25 or self.firmware_version_minor == 0:
             return self.mode.value == "strong"
 
         return False
@@ -148,13 +148,16 @@ class AirHumidifierStatus:
 
     @property
     def firmware_version_major(self) -> str:
-        major, _ = self.firmware_version.rsplit('_', 1)
-        return major
+        parts = self.firmware_version.rsplit('_', 1)
+        return parts[0]
 
     @property
     def firmware_version_minor(self) -> int:
-        _, minor = self.firmware_version.rsplit('_', 1)
-        return int(minor)
+        parts = self.firmware_version.rsplit('_', 1)
+        try:
+            return int(parts[1])
+        except IndexError:
+            return 0
 
     @property
     def motor_speed(self) -> Optional[int]:

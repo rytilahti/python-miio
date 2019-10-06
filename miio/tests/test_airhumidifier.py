@@ -217,7 +217,7 @@ class DummyAirHumidifierCA1(DummyDevice, AirHumidifier):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_HUMIDIFIER_CA1
         self.dummy_device_info = {
-            'fw_ver': '1.2.9_5033',
+            'fw_ver': '1.6.6',
             'token': '68ffffffffffffffffffffffffffffff',
             'otu_stat': [101, 74, 5343, 0, 5327, 407],
             'mmfree': 228248,
@@ -324,7 +324,13 @@ class TestAirHumidifierCA1(TestCase):
 
         assert self.state().firmware_version == device_info.firmware_version
         assert self.state().firmware_version_major == device_info.firmware_version.rsplit('_', 1)[0]
-        assert self.state().firmware_version_minor == int(device_info.firmware_version.rsplit('_', 1)[1])
+
+        try:
+            version_minor = int(device_info.firmware_version.rsplit('_', 1)[1])
+        except IndexError:
+            version_minor = 0
+
+        assert self.state().firmware_version_minor == version_minor
         assert self.state().strong_mode_enabled is False
 
     def test_set_mode(self):
