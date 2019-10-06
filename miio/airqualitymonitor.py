@@ -122,44 +122,44 @@ class AirQualityMonitorStatus:
 
     @property
     def co2(self) -> Optional[int]:
-        """Return co2 value (400...9999)ppm for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return co2 value (400...9999ppm)."""
         if "co2" in self.data and self.data["co2"] is not None:
             return self.data["co2"]
         return None
 
     @property
     def humidity(self) -> Optional[float]:
-        """Return humidity value (0...100)% for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return humidity value (0...100%)."""
         if "humidity" in self.data and self.data["humidity"] is not None:
             return self.data["humidity"]
         return None
 
     @property
     def pm25(self) -> Optional[float]:
-        """Return pm2.5 value (0...999)μg/m³ for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return pm2.5 value (0...999μg/m³)."""
         if "pm25" in self.data and self.data["pm25"] is not None:
             return self.data["pm25"]
         return None
 
     @property
     def temperature(self) -> Optional[float]:
-        """Return temperature value (-10...50)°C for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return temperature value (-10...50°C)."""
         if "temperature" in self.data and self.data["temperature"] is not None:
             return self.data["temperature"]
         return None
 
     @property
     def tvoc(self) -> Optional[int]:
-        """Return tvoc value for MODEL_AIRQUALITYMONITOR_S1."""
+        """Return tvoc value."""
         if "tvoc" in self.data and self.data["tvoc"] is not None:
             return self.data["tvoc"]
         return None
 
     def __repr__(self) -> str:
         s = "<AirQualityMonitorStatus power=%s, " \
-            "aqi=%s, " \
-            "battery=%s, " \
             "usb_power=%s, " \
+            "battery=%s, " \
+            "aqi=%s, " \
             "temperature=%s, " \
             "humidity=%s, " \
             "co2=%s, " \
@@ -167,9 +167,9 @@ class AirQualityMonitorStatus:
             "tvoc=%s, " \
             "display_clock=%s>" % \
             (self.power,
-             self.aqi,
-             self.battery,
              self.usb_power,
+             self.battery,
+             self.aqi,
              self.temperature,
              self.humidity,
              self.co2,
@@ -186,12 +186,8 @@ class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
     def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
                  debug: int = 0, lazy_discover: bool = True,
-                 model: str = None) -> None:
+                 model: str = MODEL_AIRQUALITYMONITOR_V1) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        self.device_info = self.info()
-        if self.device_info and model is None:
-            model = self.device_info.model
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
@@ -204,8 +200,13 @@ class AirQualityMonitor(Device):
             "",
             "Power: {result.power}\n"
             "USB power: {result.usb_power}\n"
-            "AQI: {result.aqi}\n"
             "Battery: {result.battery}\n"
+            "AQI: {result.aqi}\n"
+            "Temperature: {result.temperature}\n"
+            "Humidity: {result.humidity}\n"
+            "CO2: {result.co2}\n"
+            "PM2.5: {result.pm25}\n"
+            "TVOC: {result.tvoc}\n"
             "Display clock: {result.display_clock}\n"
         )
     )
