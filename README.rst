@@ -36,6 +36,7 @@ Supported devices
 -  Xiaomi Mi Air Dehumidifier (:class:`miio.airdehumidifier`)
 -  Xiaomi Tinymu Smart Toilet Cover (:class:`miio.toiletlid`)
 -  Xiaomi 16 Relays Module (:class:`miio.pwzn_relay`)
+-  Xiaomi Xiao AI Smart Alarm Clock (:class:`miio.alarmclock`)
 
 *Feel free to create a pull request to add support for new devices as
 well as additional features for supported devices.*
