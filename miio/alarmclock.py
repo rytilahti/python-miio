@@ -47,12 +47,8 @@ class Nightmode:
         return self._end
 
     def __repr__(self):
-        return "<Nightmode enabled:%s %s-%s>" % (
-            self.enabled,
-            self.start,
-            self.end,
-        )
-        
+        return "<Nightmode enabled:%s %s-%s>" % (self.enabled, self.start, self.end)
+
 
 class RingTone:
     def __init__(self, data):
@@ -189,7 +185,6 @@ class AlarmClock(Device):
         """
         return self.send("get_near_wakeup_status")
 
-
     @command()
     def countdown(self):
         """
@@ -211,9 +206,7 @@ class AlarmClock(Device):
         """
         raise NotImplementedError()
 
-    @command(
-        click.argument("url")
-    )
+    @command(click.argument("url"))
     def start_countdown(self, url):
         """Start countdown timer playing the given media.
         
