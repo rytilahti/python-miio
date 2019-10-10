@@ -9,19 +9,23 @@ from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_AIRQUALITYMONITOR_V1 = 'zhimi.airmonitor.v1'
-MODEL_AIRQUALITYMONITOR_B1 = 'cgllc.airmonitor.b1'
-MODEL_AIRQUALITYMONITOR_S1 = 'cgllc.airmonitor.s1'
+MODEL_AIRQUALITYMONITOR_V1 = "zhimi.airmonitor.v1"
+MODEL_AIRQUALITYMONITOR_B1 = "cgllc.airmonitor.b1"
+MODEL_AIRQUALITYMONITOR_S1 = "cgllc.airmonitor.s1"
 
 AVAILABLE_PROPERTIES_COMMON = [
-    'power', 'aqi', 'battery', 'usb_state', 'time_state',
-    'night_state', 'night_beg_time', 'night_end_time',
-    'sensor_state'
+    "power",
+    "aqi",
+    "battery",
+    "usb_state",
+    "time_state",
+    "night_state",
+    "night_beg_time",
+    "night_end_time",
+    "sensor_state",
 ]
 
-AVAILABLE_PROPERTIES_S1 = [
-    'battery', 'co2', 'humidity', 'pm25', 'temperature', 'tvoc'
-]
+AVAILABLE_PROPERTIES_S1 = ["battery", "co2", "humidity", "pm25", "temperature", "tvoc"]
 
 AVAILABLE_PROPERTIES = {
     MODEL_AIRQUALITYMONITOR_V1: AVAILABLE_PROPERTIES_COMMON,
@@ -156,26 +160,30 @@ class AirQualityMonitorStatus:
         return None
 
     def __repr__(self) -> str:
-        s = "<AirQualityMonitorStatus power=%s, " \
-            "usb_power=%s, " \
-            "battery=%s, " \
-            "aqi=%s, " \
-            "temperature=%s, " \
-            "humidity=%s, " \
-            "co2=%s, " \
-            "pm2.5=%s, " \
-            "tvoc=%s, " \
-            "display_clock=%s>" % \
-            (self.power,
-             self.usb_power,
-             self.battery,
-             self.aqi,
-             self.temperature,
-             self.humidity,
-             self.co2,
-             self.pm25,
-             self.tvoc,
-             self.display_clock)
+        s = (
+            "<AirQualityMonitorStatus power=%s, "
+            "usb_power=%s, "
+            "battery=%s, "
+            "aqi=%s, "
+            "temperature=%s, "
+            "humidity=%s, "
+            "co2=%s, "
+            "pm2.5=%s, "
+            "tvoc=%s, "
+            "display_clock=%s>"
+            % (
+                self.power,
+                self.usb_power,
+                self.battery,
+                self.aqi,
+                self.temperature,
+                self.humidity,
+                self.co2,
+                self.pm25,
+                self.tvoc,
+                self.display_clock,
+            )
+        )
         return s
 
     def __json__(self):
@@ -184,16 +192,25 @@ class AirQualityMonitorStatus:
 
 class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_AIRQUALITYMONITOR_V1) -> None:
+
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_AIRQUALITYMONITOR_V1,
+    ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
         else:
             self.model = MODEL_AIRQUALITYMONITOR_V1
-            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+            _LOGGER.error(
+                "Device model %s unsupported. Falling back to %s.", model, self.model
+            )
 
     @command(
         default_output=format_output(
@@ -207,7 +224,7 @@ class AirQualityMonitor(Device):
             "CO2: {result.co2}\n"
             "PM2.5: {result.pm25}\n"
             "TVOC: {result.tvoc}\n"
-            "Display clock: {result.display_clock}\n"
+            "Display clock: {result.display_clock}\n",
         )
     )
     def status(self) -> AirQualityMonitorStatus:
@@ -215,10 +232,7 @@ class AirQualityMonitor(Device):
 
         properties = AVAILABLE_PROPERTIES[self.model]
 
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        values = self.send("get_prop", properties)
 
         properties_count = len(properties)
         values_count = len(values)
@@ -226,23 +240,23 @@ class AirQualityMonitor(Device):
             _LOGGER.debug(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         if self.model == MODEL_AIRQUALITYMONITOR_S1:
             return AirQualityMonitorStatus(defaultdict(lambda: None, values))
         else:
-            return AirQualityMonitorStatus(defaultdict(lambda: None, zip(properties, values)))
+            return AirQualityMonitorStatus(
+                defaultdict(lambda: None, zip(properties, values))
+            )
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
@@ -251,8 +265,9 @@ class AirQualityMonitor(Device):
         click.argument("display_clock", type=bool),
         default_output=format_output(
             lambda led: "Turning on display clock"
-            if led else "Turning off display clock"
-        )
+            if led
+            else "Turning off display clock"
+        ),
     )
     def set_display_clock(self, display_clock: bool):
         """Enable/disable displaying a clock instead the AQI."""
@@ -264,9 +279,8 @@ class AirQualityMonitor(Device):
     @command(
         click.argument("auto_close", type=bool),
         default_output=format_output(
-            lambda led: "Turning on auto close"
-            if led else "Turning off auto close"
-        )
+            lambda led: "Turning on auto close" if led else "Turning off auto close"
+        ),
     )
     def set_auto_close(self, auto_close: bool):
         """Purpose unknown."""
@@ -278,9 +292,8 @@ class AirQualityMonitor(Device):
     @command(
         click.argument("night_mode", type=bool),
         default_output=format_output(
-            lambda led: "Turning on night mode"
-            if led else "Turning off night mode"
-        )
+            lambda led: "Turning on night mode" if led else "Turning off night mode"
+        ),
     )
     def set_night_mode(self, night_mode: bool):
         """Decrease the brightness of the display."""
@@ -295,10 +308,12 @@ class AirQualityMonitor(Device):
         click.argument("end_hour", type=int),
         click.argument("end_minute", type=int),
         default_output=format_output(
-            "Setting night time to {begin_hour}:{begin_minute} - {end_hour}:{end_minute}")
+            "Setting night time to {begin_hour}:{begin_minute} - {end_hour}:{end_minute}"
+        ),
     )
-    def set_night_time(self, begin_hour: int, begin_minute: int,
-                       end_hour: int, end_minute: int):
+    def set_night_time(
+        self, begin_hour: int, begin_minute: int, end_hour: int, end_minute: int
+    ):
         """Enable night mode daily at bedtime."""
         begin = begin_hour * 3600 + begin_minute * 60
         end = end_hour * 3600 + end_minute * 60

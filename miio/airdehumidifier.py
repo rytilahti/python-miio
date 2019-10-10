@@ -10,7 +10,7 @@ from .device import Device, DeviceInfo, DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_DEHUMIDIFIER_V1 = 'nwt.derh.wdh318efw1'
+MODEL_DEHUMIDIFIER_V1 = "nwt.derh.wdh318efw1"
 
 AVAILABLE_PROPERTIES = {
     MODEL_DEHUMIDIFIER_V1: [
@@ -37,9 +37,9 @@ class AirDehumidifierException(DeviceException):
 
 
 class OperationMode(enum.Enum):
-    On = 'on'
-    Auto = 'auto'
-    DryCloth = 'dry_cloth'
+    On = "on"
+    Auto = "auto"
+    DryCloth = "dry_cloth"
 
 
 class FanSpeed(enum.Enum):
@@ -149,34 +149,38 @@ class AirDehumidifierStatus:
         return self.data["alarm"]
 
     def __repr__(self) -> str:
-        s = "<AirDehumidiferStatus power=%s, " \
-            "mode=%s, " \
-            "temperature=%s, " \
-            "humidity=%s%%, " \
-            "buzzer=%s, " \
-            "led=%s, " \
-            "child_lock=%s, " \
-            "target_humidity=%s%%, " \
-            "fan_speed=%s, " \
-            "tank_full=%s, " \
-            "compressor_status=%s, " \
-            "defrost_status=%s, " \
-            "fan_st=%s, " \
-            "alarm=%s, " % \
-            (self.power,
-             self.mode,
-             self.temperature,
-             self.humidity,
-             self.buzzer,
-             self.led,
-             self.child_lock,
-             self.target_humidity,
-             self.fan_speed,
-             self.tank_full,
-             self.compressor_status,
-             self.defrost_status,
-             self.fan_st,
-             self.alarm)
+        s = (
+            "<AirDehumidiferStatus power=%s, "
+            "mode=%s, "
+            "temperature=%s, "
+            "humidity=%s%%, "
+            "buzzer=%s, "
+            "led=%s, "
+            "child_lock=%s, "
+            "target_humidity=%s%%, "
+            "fan_speed=%s, "
+            "tank_full=%s, "
+            "compressor_status=%s, "
+            "defrost_status=%s, "
+            "fan_st=%s, "
+            "alarm=%s, "
+            % (
+                self.power,
+                self.mode,
+                self.temperature,
+                self.humidity,
+                self.buzzer,
+                self.led,
+                self.child_lock,
+                self.target_humidity,
+                self.fan_speed,
+                self.tank_full,
+                self.compressor_status,
+                self.defrost_status,
+                self.fan_st,
+                self.alarm,
+            )
+        )
         return s
 
     def __json__(self):
@@ -186,9 +190,15 @@ class AirDehumidifierStatus:
 class AirDehumidifier(Device):
     """Implementation of Xiaomi Mi Air Dehumidifier."""
 
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_DEHUMIDIFIER_V1) -> None:
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_DEHUMIDIFIER_V1,
+    ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
@@ -214,7 +224,7 @@ class AirDehumidifier(Device):
             "Compressor Status: {result.compressor_status}\n"
             "Defrost Status: {result.defrost_status}\n"
             "Fan st: {result.fan_st}\n"
-            "Alarm: {result.alarm}\n"
+            "Alarm: {result.alarm}\n",
         )
     )
     def status(self) -> AirDehumidifierStatus:
@@ -237,28 +247,27 @@ class AirDehumidifier(Device):
             _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         return AirDehumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values)), self.device_info)
+            defaultdict(lambda: None, zip(properties, values)), self.device_info
+        )
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
-        default_output=format_output("Setting mode to '{mode.value}'")
+        default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
@@ -273,7 +282,7 @@ class AirDehumidifier(Device):
 
     @command(
         click.argument("fan_speed", type=EnumType(FanSpeed, False)),
-        default_output=format_output("Setting fan level to {fan_level}")
+        default_output=format_output("Setting fan level to {fan_level}"),
     )
     def set_fan_speed(self, fan_speed: FanSpeed):
         """Set the fan speed."""
@@ -282,9 +291,8 @@ class AirDehumidifier(Device):
     @command(
         click.argument("led", type=bool),
         default_output=format_output(
-            lambda led: "Turning on LED"
-            if led else "Turning off LED"
-        )
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
@@ -296,9 +304,8 @@ class AirDehumidifier(Device):
     @command(
         click.argument("buzzer", type=bool),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer"
-            if buzzer else "Turning off buzzer"
-        )
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
@@ -310,9 +317,8 @@ class AirDehumidifier(Device):
     @command(
         click.argument("lock", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock"
-            if lock else "Turning off child lock"
-        )
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
@@ -323,12 +329,13 @@ class AirDehumidifier(Device):
 
     @command(
         click.argument("humidity", type=int),
-        default_output=format_output("Setting target humidity to {humidity}")
+        default_output=format_output("Setting target humidity to {humidity}"),
     )
     def set_target_humidity(self, humidity: int):
         """Set the auto target humidity."""
         if humidity not in [40, 50, 60]:
             raise AirDehumidifierException(
-                "Invalid auto target humidity: %s" % humidity)
+                "Invalid auto target humidity: %s" % humidity
+            )
 
         return self.send("set_auto", [humidity])

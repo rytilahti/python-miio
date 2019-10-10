@@ -10,27 +10,27 @@ from .dummies import DummyDevice
 class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
     def __init__(self, *args, **kwargs):
         self.state = {
-            'power': 'on',
-            'bright': 100,
-            'notifystatus': 'off',
-            'ambstatus': 'off',
-            'ambvalue': 100,
-            'eyecare': 'on',
-            'scene_num': 3,
-            'bls': 'on',
-            'dvalue': 0,
+            "power": "on",
+            "bright": 100,
+            "notifystatus": "off",
+            "ambstatus": "off",
+            "ambvalue": 100,
+            "eyecare": "on",
+            "scene_num": 3,
+            "bls": "on",
+            "dvalue": 0,
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_eyecare': lambda x: self._set_state("eyecare", x),
-            'set_bright': lambda x: self._set_state("bright", x),
-            'set_user_scene': lambda x: self._set_state("scene_num", x),
-            'delay_off': lambda x: self._set_state("dvalue", x),
-            'enable_bl': lambda x: self._set_state("bls", x),
-            'set_notifyuser': lambda x: self._set_state("notifystatus", x),
-            'enable_amb': lambda x: self._set_state("ambstatus", x),
-            'set_amb_bright': lambda x: self._set_state("ambvalue", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_eyecare": lambda x: self._set_state("eyecare", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "set_user_scene": lambda x: self._set_state("scene_num", x),
+            "delay_off": lambda x: self._set_state("dvalue", x),
+            "enable_bl": lambda x: self._set_state("bls", x),
+            "set_notifyuser": lambda x: self._set_state("notifystatus", x),
+            "enable_amb": lambda x: self._set_state("ambstatus", x),
+            "set_amb_bright": lambda x: self._set_state("ambvalue", x),
         }
         super().__init__(args, kwargs)
 
@@ -70,12 +70,16 @@ class TestPhilipsEyecare(TestCase):
 
         assert self.is_on() is True
         assert self.state().brightness == self.device.start_state["bright"]
-        assert self.state().reminder is (self.device.start_state["notifystatus"] == 'on')
-        assert self.state().ambient is (self.device.start_state["ambstatus"] == 'on')
+        assert self.state().reminder is (
+            self.device.start_state["notifystatus"] == "on"
+        )
+        assert self.state().ambient is (self.device.start_state["ambstatus"] == "on")
         assert self.state().ambient_brightness == self.device.start_state["ambvalue"]
-        assert self.state().eyecare is (self.device.start_state["eyecare"] == 'on')
+        assert self.state().eyecare is (self.device.start_state["eyecare"] == "on")
         assert self.state().scene == self.device.start_state["scene_num"]
-        assert self.state().smart_night_light is (self.device.start_state["bls"] == 'on')
+        assert self.state().smart_night_light is (
+            self.device.start_state["bls"] == "on"
+        )
         assert self.state().delay_off_countdown == self.device.start_state["dvalue"]
 
     def test_eyecare(self):

@@ -7,24 +7,68 @@ from typing import Union, Callable, Dict, Optional  # noqa: F401
 
 import zeroconf
 
-from . import (Device, Vacuum, ChuangmiCamera, ChuangmiPlug, PowerStrip, AirPurifier, AirFresh,
-               Ceil, PhilipsBulb, PhilipsEyecare, PhilipsMoonlight, ChuangmiIr,
-               AirHumidifier, WaterPurifier, WifiSpeaker, WifiRepeater,
-               Yeelight, Fan, Cooker, AirConditioningCompanion, AirQualityMonitor, AqaraCamera,
-               Toiletlid)
+from . import (
+    Device,
+    Vacuum,
+    ChuangmiCamera,
+    ChuangmiPlug,
+    PowerStrip,
+    AirPurifier,
+    AirFresh,
+    Ceil,
+    PhilipsBulb,
+    PhilipsEyecare,
+    PhilipsMoonlight,
+    ChuangmiIr,
+    AirHumidifier,
+    WaterPurifier,
+    WifiSpeaker,
+    WifiRepeater,
+    Yeelight,
+    Fan,
+    Cooker,
+    AirConditioningCompanion,
+    AirQualityMonitor,
+    AqaraCamera,
+    Toiletlid,
+)
 
-from .airconditioningcompanion import (MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3, )
-from .airqualitymonitor import (MODEL_AIRQUALITYMONITOR_V1, MODEL_AIRQUALITYMONITOR_B1,
-                                MODEL_AIRQUALITYMONITOR_S1, )
-from .airhumidifier import (MODEL_HUMIDIFIER_CB1, MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_V1, )
-from .chuangmi_plug import (MODEL_CHUANGMI_PLUG_V1, MODEL_CHUANGMI_PLUG_V2, MODEL_CHUANGMI_PLUG_V3,
-                            MODEL_CHUANGMI_PLUG_M1, MODEL_CHUANGMI_PLUG_M3,
-                            MODEL_CHUANGMI_PLUG_HMI205, MODEL_CHUANGMI_PLUG_HMI206, )
+from .airconditioningcompanion import (
+    MODEL_ACPARTNER_V1,
+    MODEL_ACPARTNER_V2,
+    MODEL_ACPARTNER_V3,
+)
+from .airqualitymonitor import (
+    MODEL_AIRQUALITYMONITOR_V1,
+    MODEL_AIRQUALITYMONITOR_B1,
+    MODEL_AIRQUALITYMONITOR_S1,
+)
+from .airhumidifier import (
+    MODEL_HUMIDIFIER_CB1,
+    MODEL_HUMIDIFIER_CA1,
+    MODEL_HUMIDIFIER_V1,
+)
+from .chuangmi_plug import (
+    MODEL_CHUANGMI_PLUG_V1,
+    MODEL_CHUANGMI_PLUG_V2,
+    MODEL_CHUANGMI_PLUG_V3,
+    MODEL_CHUANGMI_PLUG_M1,
+    MODEL_CHUANGMI_PLUG_M3,
+    MODEL_CHUANGMI_PLUG_HMI205,
+    MODEL_CHUANGMI_PLUG_HMI206,
+)
 
-from .fan import (MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA3,
-                  MODEL_FAN_ZA4, MODEL_FAN_P5, )
-from .powerstrip import (MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
-from .toiletlid import (MODEL_TOILETLID_V1, )
+from .fan import (
+    MODEL_FAN_V2,
+    MODEL_FAN_V3,
+    MODEL_FAN_SA1,
+    MODEL_FAN_ZA1,
+    MODEL_FAN_ZA3,
+    MODEL_FAN_ZA4,
+    MODEL_FAN_P5,
+)
+from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
+from .toiletlid import MODEL_TOILETLID_V1
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,18 +87,18 @@ DEVICE_MAP = {
     "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "qmi-powerstrip-v1": partial(PowerStrip, model=MODEL_POWER_STRIP_V1),
     "zimi-powerstrip-v2": partial(PowerStrip, model=MODEL_POWER_STRIP_V2),
-    "zhimi-airpurifier-m1": AirPurifier,   # mini model
-    "zhimi-airpurifier-m2": AirPurifier,   # mini model 2
+    "zhimi-airpurifier-m1": AirPurifier,  # mini model
+    "zhimi-airpurifier-m2": AirPurifier,  # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
     "zhimi-airpurifier-ma2": AirPurifier,  # ms model 2
     "zhimi-airpurifier-sa1": AirPurifier,  # super model
     "zhimi-airpurifier-sa2": AirPurifier,  # super model 2
-    "zhimi-airpurifier-v1": AirPurifier,   # v1
-    "zhimi-airpurifier-v2": AirPurifier,   # v2
-    "zhimi-airpurifier-v3": AirPurifier,   # v3
-    "zhimi-airpurifier-v5": AirPurifier,   # v5
-    "zhimi-airpurifier-v6": AirPurifier,   # v6
-    "zhimi-airpurifier-v7": AirPurifier,   # v7
+    "zhimi-airpurifier-v1": AirPurifier,  # v1
+    "zhimi-airpurifier-v2": AirPurifier,  # v2
+    "zhimi-airpurifier-v3": AirPurifier,  # v3
+    "zhimi-airpurifier-v5": AirPurifier,  # v5
+    "zhimi-airpurifier-v6": AirPurifier,  # v6
+    "zhimi-airpurifier-v7": AirPurifier,  # v7
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
     "chuangmi.camera.ipc009": ChuangmiCamera,
     "chuangmi-ir-v2": ChuangmiIr,
@@ -63,8 +107,8 @@ DEVICE_MAP = {
     "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),
     "yunmi-waterpuri-v2": WaterPurifier,
-    "philips-light-bulb": PhilipsBulb,     # cannot be discovered via mdns
-    "philips-light-candle": PhilipsBulb,   # cannot be discovered via mdns
+    "philips-light-bulb": PhilipsBulb,  # cannot be discovered via mdns
+    "philips-light-candle": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-candle2": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-ceiling": Ceil,
     "philips-light-zyceiling": Ceil,
@@ -98,35 +142,36 @@ DEVICE_MAP = {
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),
     "cgllc-airmonitor-s1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_S1),
     "lumi-gateway-": lambda x: other_package_info(
-        x, "https://github.com/Danielhiversen/PyXiaomiGateway")
+        x, "https://github.com/Danielhiversen/PyXiaomiGateway"
+    ),
 }  # type: Dict[str, Union[Callable, Device]]
 
 
 def pretty_token(token):
     """Return a pretty string presentation for a token."""
-    return codecs.encode(token, 'hex').decode()
+    return codecs.encode(token, "hex").decode()
 
 
 def other_package_info(info, desc):
     """Return information about another package supporting the device."""
-    return "%s @ %s, check %s" % (
-        info.name,
-        ipaddress.ip_address(info.address),
-        desc)
+    return "%s @ %s, check %s" % (info.name, ipaddress.ip_address(info.address), desc)
 
 
 def create_device(name: str, addr: str, device_cls: partial) -> Device:
     """Return a device object for a zeroconf entry."""
-    _LOGGER.debug("Found a supported '%s', using '%s' class",
-                  name, device_cls.func.__name__)
+    _LOGGER.debug(
+        "Found a supported '%s', using '%s' class", name, device_cls.func.__name__
+    )
 
     dev = device_cls(ip=addr)
     m = dev.do_discover()
     dev.token = m.checksum
-    _LOGGER.info("Found a supported '%s' at %s - token: %s",
-                 device_cls.func.__name__,
-                 addr,
-                 pretty_token(dev.token))
+    _LOGGER.info(
+        "Found a supported '%s' at %s - token: %s",
+        device_cls.func.__name__,
+        addr,
+        pretty_token(dev.token),
+    )
     return dev
 
 
@@ -148,12 +193,17 @@ class Listener:
                     return create_device(name, addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)
-                    _LOGGER.info("%s: token: %s",
-                                 v(info),
-                                 pretty_token(dev.do_discover().checksum))
+                    _LOGGER.info(
+                        "%s: token: %s",
+                        v(info),
+                        pretty_token(dev.do_discover().checksum),
+                    )
                     return None
-        _LOGGER.warning("Found unsupported device %s at %s, "
-                        "please report to developers", name, addr)
+        _LOGGER.warning(
+            "Found unsupported device %s at %s, " "please report to developers",
+            name,
+            addr,
+        )
         return None
 
     def add_service(self, zeroconf, type, name):
@@ -169,6 +219,7 @@ class Discovery:
     Calling :func:`discover_mdns` will cause this to subscribe for updates
     on ``_miio._udp.local`` until any key is pressed, after which a dict
     of detected devices is returned."""
+
     @staticmethod
     def discover_mdns() -> Dict[str, Device]:
         """Discover devices with mdns until """
@@ -176,7 +227,8 @@ class Discovery:
 
         listener = Listener()
         browser = zeroconf.ServiceBrowser(
-            zeroconf.Zeroconf(), "_miio._udp.local.", listener)
+            zeroconf.Zeroconf(), "_miio._udp.local.", listener
+        )
 
         input()  # to keep execution running until a key is pressed
         browser.cancel()

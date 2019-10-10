@@ -89,20 +89,21 @@ class CameraStatus:
         return self.data["mini_level"]
 
     def __repr__(self) -> str:
-        s = "<CameraStatus " \
-            "power=%s, " \
-            "motion_record=%s, " \
-            "light=%s, " \
-            "full_color=%s, " \
-            "flip=%s, " \
-            "improve_program=%s, " \
-            "wdr=%s, " \
-            "track=%s, " \
-            "watermark=%s, " \
-            "sdcard_status=%s, " \
-            "max_client=%s, " \
-            "night_mode=%s, " \
-            "mini_level=%s>" \
+        s = (
+            "<CameraStatus "
+            "power=%s, "
+            "motion_record=%s, "
+            "light=%s, "
+            "full_color=%s, "
+            "flip=%s, "
+            "improve_program=%s, "
+            "wdr=%s, "
+            "track=%s, "
+            "watermark=%s, "
+            "sdcard_status=%s, "
+            "max_client=%s, "
+            "night_mode=%s, "
+            "mini_level=%s>"
             % (
                 self.power,
                 self.motion_record,
@@ -118,6 +119,7 @@ class CameraStatus:
                 self.night_mode,
                 self.mini_level,
             )
+        )
         return s
 
     def __json__(self):
@@ -143,7 +145,7 @@ class ChuangmiCamera(Device):
             "Max client: {result.max_client}\n"
             "Night mode: {result.night_mode}\n"
             "Mini level: {result.mini_level}\n"
-            "\n"
+            "\n",
         )
     )
     def status(self) -> CameraStatus:
@@ -161,152 +163,109 @@ class ChuangmiCamera(Device):
             "watermark",
             "max_client",
             "night_mode",
-            "mini_level"
+            "mini_level",
         ]
 
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        values = self.send("get_prop", properties)
 
         return CameraStatus(dict(zip(properties, values)))
 
-    @command(
-        default_output=format_output("Power on"),
-    )
+    @command(default_output=format_output("Power on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Power off"),
-    )
+    @command(default_output=format_output("Power off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
-    @command(
-        default_output=format_output("MotionRecord on")
-    )
+    @command(default_output=format_output("MotionRecord on"))
     def motion_record_on(self):
         """Start recording when motion detected."""
         return self.send("set_motion_record", ["on"])
 
-    @command(
-        default_output=format_output("MotionRecord off")
-    )
+    @command(default_output=format_output("MotionRecord off"))
     def motion_record_off(self):
         """Motion record off, always record video."""
         return self.send("set_motion_record", ["off"])
 
-    @command(
-        default_output=format_output("MotionRecord stop")
-    )
+    @command(default_output=format_output("MotionRecord stop"))
     def motion_record_stop(self):
         """Motion record off, video recording stopped."""
         return self.send("set_motion_record", ["stop"])
 
-    @command(
-        default_output=format_output("Light on")
-    )
+    @command(default_output=format_output("Light on"))
     def light_on(self):
         """Light on."""
         return self.send("set_light", ["on"])
 
-    @command(
-        default_output=format_output("Light off")
-    )
+    @command(default_output=format_output("Light off"))
     def light_off(self):
         """Light off."""
         return self.send("set_light", ["off"])
 
-    @command(
-        default_output=format_output("FullColor on")
-    )
+    @command(default_output=format_output("FullColor on"))
     def full_color_on(self):
         """Full color on."""
         return self.send("set_full_color", ["on"])
 
-    @command(
-        default_output=format_output("FullColor off")
-    )
+    @command(default_output=format_output("FullColor off"))
     def full_color_off(self):
         """Full color off."""
         return self.send("set_full_color", ["off"])
 
-    @command(
-        default_output=format_output("Flip on")
-    )
+    @command(default_output=format_output("Flip on"))
     def flip_on(self):
         """Flip image 180 degrees on."""
         return self.send("set_flip", ["on"])
 
-    @command(
-        default_output=format_output("Flip off")
-    )
+    @command(default_output=format_output("Flip off"))
     def flip_off(self):
         """Flip image 180 degrees off."""
         return self.send("set_flip", ["off"])
 
-    @command(
-        default_output=format_output("ImproveProgram on")
-    )
+    @command(default_output=format_output("ImproveProgram on"))
     def improve_program_on(self):
         """Improve program on."""
         return self.send("set_improve_program", ["on"])
 
-    @command(
-        default_output=format_output("ImproveProgram off")
-    )
+    @command(default_output=format_output("ImproveProgram off"))
     def improve_program_off(self):
         """Improve program off."""
         return self.send("set_improve_program", ["off"])
 
-    @command(
-        default_output=format_output("Watermark on")
-    )
+    @command(default_output=format_output("Watermark on"))
     def watermark_on(self):
         """Watermark on."""
         return self.send("set_watermark", ["on"])
 
-    @command(
-        default_output=format_output("Watermark off")
-    )
+    @command(default_output=format_output("Watermark off"))
     def watermark_off(self):
         """Watermark off."""
         return self.send("set_watermark", ["off"])
 
-    @command(
-        default_output=format_output("WideDynamicRange on")
-    )
+    @command(default_output=format_output("WideDynamicRange on"))
     def wdr_on(self):
         """Wide dynamic range on."""
         return self.send("set_wdr", ["on"])
 
-    @command(
-        default_output=format_output("WideDynamicRange off")
-    )
+    @command(default_output=format_output("WideDynamicRange off"))
     def wdr_off(self):
         """Wide dynamic range off."""
         return self.send("set_wdr", ["off"])
 
-    @command(
-        default_output=format_output("NightMode auto")
-    )
+    @command(default_output=format_output("NightMode auto"))
     def night_mode_auto(self):
         """Auto switch to night mode."""
         return self.send("set_night_mode", [0])
 
-    @command(
-        default_output=format_output("NightMode off")
-    )
+    @command(default_output=format_output("NightMode off"))
     def night_mode_off(self):
         """Night mode off."""
         return self.send("set_night_mode", [1])
 
-    @command(
-        default_output=format_output("NightMode on")
-    )
+    @command(default_output=format_output("NightMode on"))
     def night_mode_on(self):
         """Night mode always on."""
         return self.send("set_night_mode", [2])

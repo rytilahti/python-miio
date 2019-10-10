@@ -76,17 +76,21 @@ class YeelightStatus:
         return self.data["name"]
 
     def __repr__(self):
-        s = "<Yeelight on=%s mode=%s brightness=%s color_temp=%s " \
-            "rgb=%s hsv=%s dev=%s save_state=%s name=%s>" % \
-            (self.is_on,
-             self.color_mode,
-             self.brightness,
-             self.color_temp,
-             self.rgb,
-             self.hsv,
-             self.developer_mode,
-             self.save_state_on_change,
-             self.name)
+        s = (
+            "<Yeelight on=%s mode=%s brightness=%s color_temp=%s "
+            "rgb=%s hsv=%s dev=%s save_state=%s name=%s>"
+            % (
+                self.is_on,
+                self.color_mode,
+                self.brightness,
+                self.color_temp,
+                self.rgb,
+                self.hsv,
+                self.developer_mode,
+                self.save_state_on_change,
+                self.name,
+            )
+        )
         return s
 
 
@@ -103,8 +107,10 @@ class Yeelight(Device):
     """
 
     def __init__(self, *args, **kwargs):
-        warnings.warn("Please consider using python-yeelight "
-                      "for more complete support.", stacklevel=2)
+        warnings.warn(
+            "Please consider using python-yeelight " "for more complete support.",
+            stacklevel=2,
+        )
         super().__init__(*args, **kwargs)
 
     @command(
@@ -119,7 +125,8 @@ class Yeelight(Device):
             "Temperature: {result.color_temp}\n"
             "Developer mode: {result.developer_mode}\n"
             "Update default on change: {result.save_state_on_change}\n"
-            "\n")
+            "\n",
+        )
     )
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
@@ -133,13 +140,10 @@ class Yeelight(Device):
             "color_mode",
             "name",
             "lan_ctrl",
-            "save_state"
+            "save_state",
         ]
 
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        values = self.send("get_prop", properties)
 
         return YeelightStatus(dict(zip(properties, values)))
 
@@ -177,7 +181,7 @@ class Yeelight(Device):
     @command(
         click.argument("level", type=int),
         click.option("--transition", type=int, required=False, default=0),
-        default_output=format_output("Setting brightness to {level}")
+        default_output=format_output("Setting brightness to {level}"),
     )
     def set_brightness(self, level, transition=0):
         """Set brightness."""
@@ -190,7 +194,7 @@ class Yeelight(Device):
     @command(
         click.argument("level", type=int),
         click.option("--transition", type=int, required=False, default=0),
-        default_output=format_output("Setting color temperature to {level}")
+        default_output=format_output("Setting color temperature to {level}"),
     )
     def set_color_temp(self, level, transition=500):
         """Set color temp in kelvin."""
@@ -204,7 +208,7 @@ class Yeelight(Device):
 
     @command(
         click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
-        default_output=format_output("Setting color to {rgb}")
+        default_output=format_output("Setting color to {rgb}"),
     )
     def set_rgb(self, rgb: Tuple[int, int, int]):
         """Set color in RGB."""
@@ -220,7 +224,7 @@ class Yeelight(Device):
 
     @command(
         click.argument("enable", type=bool),
-        default_output=format_output("Setting developer mode to {enable}")
+        default_output=format_output("Setting developer mode to {enable}"),
     )
     def set_developer_mode(self, enable: bool) -> bool:
         """Enable or disable the developer mode."""
@@ -228,7 +232,7 @@ class Yeelight(Device):
 
     @command(
         click.argument("enable", type=bool),
-        default_output=format_output("Setting save state on change {enable}")
+        default_output=format_output("Setting save state on change {enable}"),
     )
     def set_save_state_on_change(self, enable: bool) -> bool:
         """Enable or disable saving the state on changes."""
@@ -236,22 +240,18 @@ class Yeelight(Device):
 
     @command(
         click.argument("name", type=str),
-        default_output=format_output("Setting name to {name}")
+        default_output=format_output("Setting name to {name}"),
     )
     def set_name(self, name: str) -> bool:
         """Set an internal name for the bulb."""
         return self.send("set_name", [name])
 
-    @command(
-        default_output=format_output("Toggling the bulb"),
-    )
+    @command(default_output=format_output("Toggling the bulb"))
     def toggle(self):
         """Toggle bulb state."""
         return self.send("toggle")
 
-    @command(
-        default_output=format_output("Setting current settings to default"),
-    )
+    @command(default_output=format_output("Setting current settings to default"))
     def set_default(self):
         """Set current state as default."""
         return self.send("set_default")

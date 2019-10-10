@@ -20,6 +20,7 @@ class DummyDevice:
         }
 
     """
+
     def __init__(self, *args, **kwargs):
         self.start_state = self.state.copy()
 

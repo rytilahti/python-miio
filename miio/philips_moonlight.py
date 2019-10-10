@@ -88,16 +88,20 @@ class PhilipsMoonlightStatus:
         return self.data["wkp"]
 
     def __repr__(self) -> str:
-        s = "<PhilipsMoonlightStatus power=%s, " \
-            "brightness=%s, " \
-            "color_temperature=%s, " \
-            "rgb=%s, " \
-            "scene=%s>" % \
-            (self.power,
-             self.brightness,
-             self.color_temperature,
-             self.rgb,
-             self.scene)
+        s = (
+            "<PhilipsMoonlightStatus power=%s, "
+            "brightness=%s, "
+            "color_temperature=%s, "
+            "rgb=%s, "
+            "scene=%s>"
+            % (
+                self.power,
+                self.brightness,
+                self.color_temperature,
+                self.rgb,
+                self.scene,
+            )
+        )
         return s
 
     def __json__(self):
@@ -139,17 +143,27 @@ class PhilipsMoonlight(Device):
             "Brightness: {result.brightness}\n"
             "Color temperature: {result.color_temperature}\n"
             "RGB: {result.rgb}\n"
-            "Scene: {result.scene}\n"
+            "Scene: {result.scene}\n",
         )
     )
     def status(self) -> PhilipsMoonlightStatus:
         """Retrieve properties."""
-        properties = ['pow', 'sta', 'bri', 'rgb', 'cct', 'snm', 'spr', 'spt', 'wke', 'bl', 'ms',
-                      'mb', 'wkp']
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        properties = [
+            "pow",
+            "sta",
+            "bri",
+            "rgb",
+            "cct",
+            "snm",
+            "spr",
+            "spt",
+            "wke",
+            "bl",
+            "ms",
+            "mb",
+            "wkp",
+        ]
+        values = self.send("get_prop", properties)
 
         properties_count = len(properties)
         values_count = len(values)
@@ -157,28 +171,27 @@ class PhilipsMoonlight(Device):
             _LOGGER.debug(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         return PhilipsMoonlightStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+            defaultdict(lambda: None, zip(properties, values))
+        )
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
-        default_output=format_output("Setting color to {rgb}")
+        default_output=format_output("Setting color to {rgb}"),
     )
     def set_rgb(self, rgb: Tuple[int, int, int]):
         """Set color in RGB."""
@@ -190,7 +203,7 @@ class PhilipsMoonlight(Device):
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting brightness to {level}")
+        default_output=format_output("Setting brightness to {level}"),
     )
     def set_brightness(self, level: int):
         """Set brightness level."""
@@ -201,7 +214,7 @@ class PhilipsMoonlight(Device):
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting color temperature to {level}")
+        default_output=format_output("Setting color temperature to {level}"),
     )
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
@@ -214,7 +227,8 @@ class PhilipsMoonlight(Device):
         click.argument("brightness", type=int),
         click.argument("cct", type=int),
         default_output=format_output(
-            "Setting brightness to {brightness} and color temperature to {cct}")
+            "Setting brightness to {brightness} and color temperature to {cct}"
+        ),
     )
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
@@ -230,7 +244,8 @@ class PhilipsMoonlight(Device):
         click.argument("brightness", type=int),
         click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
         default_output=format_output(
-            "Setting brightness to {brightness} and color to {rgb}")
+            "Setting brightness to {brightness} and color to {rgb}"
+        ),
     )
     def set_brightness_and_rgb(self, brightness: int, rgb: Tuple[int, int, int]):
         """Set brightness level and the color."""
@@ -245,7 +260,7 @@ class PhilipsMoonlight(Device):
 
     @command(
         click.argument("number", type=int),
-        default_output=format_output("Setting fixed scene to {number}")
+        default_output=format_output("Setting fixed scene to {number}"),
     )
     def set_scene(self, number: int):
         """Set scene number."""

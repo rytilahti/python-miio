@@ -3,46 +3,51 @@ from unittest import TestCase
 import pytest
 
 from miio import AirFresh
-from miio.airfresh import (OperationMode, LedBrightness, AirFreshStatus, AirFreshException)
+from miio.airfresh import (
+    OperationMode,
+    LedBrightness,
+    AirFreshStatus,
+    AirFreshException,
+)
 from .dummies import DummyDevice
 
 
 class DummyAirFresh(DummyDevice, AirFresh):
     def __init__(self, *args, **kwargs):
         self.state = {
-            'power': 'on',
-            'temp_dec': 186,
-            'aqi': 10,
-            'average_aqi': 8,
-            'humidity': 62,
-            'co2': 350,
-            'buzzer': 'off',
-            'child_lock': 'off',
-            'led_level': 2,
-            'mode': 'auto',
-            'motor1_speed': 354,
-            'use_time': 2457000,
-            'ntcT': None,
-            'app_extra': 1,
-            'f1_hour_used': 682,
-            'filter_life': 80,
-            'f_hour': 3500,
-            'favorite_level': None,
-            'led': 'on',
+            "power": "on",
+            "temp_dec": 186,
+            "aqi": 10,
+            "average_aqi": 8,
+            "humidity": 62,
+            "co2": 350,
+            "buzzer": "off",
+            "child_lock": "off",
+            "led_level": 2,
+            "mode": "auto",
+            "motor1_speed": 354,
+            "use_time": 2457000,
+            "ntcT": None,
+            "app_extra": 1,
+            "f1_hour_used": 682,
+            "filter_life": 80,
+            "f_hour": 3500,
+            "favorite_level": None,
+            "led": "on",
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_mode': lambda x: self._set_state("mode", x),
-            'set_buzzer': lambda x: self._set_state("buzzer", x),
-            'set_child_lock': lambda x: self._set_state("child_lock", x),
-            'set_led': lambda x: self._set_state("led", x),
-            'set_led_level': lambda x: self._set_state("led_level", x),
-            'reset_filter1': lambda x: (
-                self._set_state('f1_hour_used', [0]),
-                self._set_state('filter_life', [100])
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_mode": lambda x: self._set_state("mode", x),
+            "set_buzzer": lambda x: self._set_state("buzzer", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
+            "set_led": lambda x: self._set_state("led", x),
+            "set_led_level": lambda x: self._set_state("led_level", x),
+            "reset_filter1": lambda x: (
+                self._set_state("f1_hour_used", [0]),
+                self._set_state("filter_life", [100]),
             ),
-            'set_app_extra': lambda x: self._set_state("app_extra", x),
+            "set_app_extra": lambda x: self._set_state("app_extra", x),
         }
         super().__init__(args, kwargs)
 
@@ -87,14 +92,20 @@ class TestAirFresh(TestCase):
         assert self.state().humidity == self.device.start_state["humidity"]
         assert self.state().co2 == self.device.start_state["co2"]
         assert self.state().mode == OperationMode(self.device.start_state["mode"])
-        assert self.state().filter_life_remaining == self.device.start_state["filter_life"]
+        assert (
+            self.state().filter_life_remaining == self.device.start_state["filter_life"]
+        )
         assert self.state().filter_hours_used == self.device.start_state["f1_hour_used"]
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().motor_speed == self.device.start_state["motor1_speed"]
-        assert self.state().led == (self.device.start_state["led"] == 'on')
-        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_level"])
-        assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
-        assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
+        assert self.state().led == (self.device.start_state["led"] == "on")
+        assert self.state().led_brightness == LedBrightness(
+            self.device.start_state["led_level"]
+        )
+        assert self.state().buzzer == (self.device.start_state["buzzer"] == "on")
+        assert self.state().child_lock == (
+            self.device.start_state["child_lock"] == "on"
+        )
         assert self.state().extra_features == self.device.start_state["app_extra"]
 
     def test_set_mode(self):

@@ -9,6 +9,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class SingleFileHandler(BaseHTTPRequestHandler):
     """A simplified handler just returning the contents of a buffer."""
+
     def __init__(self, request, client_address, server):
         self.payload = server.payload
         self.server = server
@@ -24,8 +25,8 @@ class SingleFileHandler(BaseHTTPRequestHandler):
             return
 
         self.send_response(200)
-        self.send_header('Content-type', 'application/octet-stream')
-        self.send_header('Content-Length', len(self.payload))
+        self.send_header("Content-type", "application/octet-stream")
+        self.send_header("Content-Length", len(self.payload))
         self.end_headers()
         self.wfile.write(self.payload)
 
@@ -35,19 +36,21 @@ class OneShotServer:
 
     The server will be started in an emphemeral port, and will only accept
     a single request to keep it simple."""
+
     def __init__(self, file, interface=None):
-        addr = ('', 0)
+        addr = ("", 0)
         self.server = HTTPServer(addr, SingleFileHandler)
         setattr(self.server, "got_request", False)
 
         self.addr, self.port = self.server.server_address
         self.server.timeout = 10
 
-        _LOGGER.info("Serving on %s:%s, timeout %s" % (self.addr, self.port,
-                                                       self.server.timeout))
+        _LOGGER.info(
+            "Serving on %s:%s, timeout %s" % (self.addr, self.port, self.server.timeout)
+        )
 
         self.file = basename(file)
-        with open(file, 'rb') as f:
+        with open(file, "rb") as f:
             self.payload = f.read()
             self.server.payload = self.payload
             self.md5 = hashlib.md5(self.payload).hexdigest()
@@ -55,8 +58,9 @@ class OneShotServer:
 
     @staticmethod
     def find_local_ip():
-        ifaces_without_lo = [x for x in netifaces.interfaces()
-                             if not x.startswith("lo")]
+        ifaces_without_lo = [
+            x for x in netifaces.interfaces() if not x.startswith("lo")
+        ]
         _LOGGER.debug("available interfaces: %s" % ifaces_without_lo)
 
         for iface in ifaces_without_lo:
@@ -65,8 +69,8 @@ class OneShotServer:
                 _LOGGER.debug("%s has no ipv4 addresses, skipping" % iface)
                 continue
             for entry in addresses[netifaces.AF_INET]:
-                _LOGGER.debug("Got addr: %s" % entry['addr'])
-                return entry['addr']
+                _LOGGER.debug("Got addr: %s" % entry["addr"])
+                return entry["addr"]
 
     def url(self, ip=None):
         if ip is None:

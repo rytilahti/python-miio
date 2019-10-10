@@ -7,4 +7,3 @@ def test_validate_token_empty():
 
 def test_validate_ip_empty():
     assert validate_ip(None, None, None) is None
-

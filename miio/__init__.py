@@ -21,8 +21,14 @@ from miio.protocol import Message, Utils
 from miio.toiletlid import Toiletlid
 from miio.pwzn_relay import PwznRelay
 from miio.vacuum import Vacuum, VacuumException
-from miio.vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
-                                   CleaningDetails, CleaningSummary, Timer, )
+from miio.vacuumcontainers import (
+    VacuumStatus,
+    ConsumableStatus,
+    DNDStatus,
+    CleaningDetails,
+    CleaningSummary,
+    Timer,
+)
 from miio.waterpurifier import WaterPurifier
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker

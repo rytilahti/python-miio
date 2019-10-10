@@ -3,8 +3,13 @@ from unittest import TestCase
 import pytest
 
 from miio import PowerStrip
-from miio.powerstrip import (PowerMode, PowerStripStatus, PowerStripException,
-                             MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2, )
+from miio.powerstrip import (
+    PowerMode,
+    PowerStripStatus,
+    PowerStripException,
+    MODEL_POWER_STRIP_V1,
+    MODEL_POWER_STRIP_V2,
+)
 from .dummies import DummyDevice
 
 
@@ -12,19 +17,19 @@ class DummyPowerStripV1(DummyDevice, PowerStrip):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_POWER_STRIP_V1
         self.state = {
-            'power': 'on',
-            'mode': 'normal',
-            'temperature': 32.5,
-            'current': 25.5,
-            'power_consume_rate': 12.5,
-            'voltage': 23057,
-            'power_factor': 12,
-            'elec_leakage': 8,
+            "power": "on",
+            "mode": "normal",
+            "temperature": 32.5,
+            "current": 25.5,
+            "power_consume_rate": 12.5,
+            "voltage": 23057,
+            "power_factor": 12,
+            "elec_leakage": 8,
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_power_mode': lambda x: self._set_state("mode", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_power_mode": lambda x: self._set_state("mode", x),
         }
         super().__init__(args, kwargs)
 
@@ -104,21 +109,21 @@ class DummyPowerStripV2(DummyDevice, PowerStrip):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_POWER_STRIP_V2
         self.state = {
-            'power': 'on',
-            'mode': 'normal',
-            'temperature': 32.5,
-            'current': 25.5,
-            'power_consume_rate': 12.5,
-            'wifi_led': 'off',
-            'power_price': 49,
+            "power": "on",
+            "mode": "normal",
+            "temperature": 32.5,
+            "current": 25.5,
+            "power_consume_rate": 12.5,
+            "wifi_led": "off",
+            "power_price": 49,
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_power_mode': lambda x: self._set_state("mode", x),
-            'set_wifi_led': lambda x: self._set_state("wifi_led", x),
-            'set_power_price': lambda x: self._set_state("power_price", x),
-            'set_rt_power': lambda x: True,
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_power_mode": lambda x: self._set_state("mode", x),
+            "set_wifi_led": lambda x: self._set_state("wifi_led", x),
+            "set_power_price": lambda x: self._set_state("power_price", x),
+            "set_rt_power": lambda x: True,
         }
         super().__init__(args, kwargs)
 

@@ -9,24 +9,18 @@ from .dummies import DummyDevice
 
 class DummyPhilipsBulb(DummyDevice, PhilipsBulb):
     def __init__(self, *args, **kwargs):
-        self.state = {
-            'power': 'on',
-            'bright': 100,
-            'cct': 10,
-            'snm': 0,
-            'dv': 0
-        }
+        self.state = {"power": "on", "bright": 100, "cct": 10, "snm": 0, "dv": 0}
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_bright': lambda x: self._set_state("bright", x),
-            'set_cct': lambda x: self._set_state("cct", x),
-            'delay_off': lambda x: self._set_state("dv", x),
-            'apply_fixed_scene': lambda x: self._set_state("snm", x),
-            'set_bricct': lambda x: (
-                self._set_state('bright', [x[0]]),
-                self._set_state('cct', [x[1]])
-            )
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "set_cct": lambda x: self._set_state("cct", x),
+            "delay_off": lambda x: self._set_state("dv", x),
+            "apply_fixed_scene": lambda x: self._set_state("snm", x),
+            "set_bricct": lambda x: (
+                self._set_state("bright", [x[0]]),
+                self._set_state("cct", [x[1]]),
+            ),
         }
         super().__init__(args, kwargs)
 

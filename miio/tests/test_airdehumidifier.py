@@ -3,9 +3,13 @@ from unittest import TestCase
 import pytest
 
 from miio import AirDehumidifier
-from miio.airdehumidifier import (OperationMode, FanSpeed,
-                                  AirDehumidifierStatus, AirDehumidifierException,
-                                  MODEL_DEHUMIDIFIER_V1)
+from miio.airdehumidifier import (
+    OperationMode,
+    FanSpeed,
+    AirDehumidifierStatus,
+    AirDehumidifierException,
+    MODEL_DEHUMIDIFIER_V1,
+)
 from .dummies import DummyDevice
 from miio.device import DeviceInfo
 
@@ -14,51 +18,53 @@ class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_DEHUMIDIFIER_V1
         self.dummy_device_info = {
-            'life': 348202,
-            'uid': 1759530000,
-            'model': 'nwt.derh.wdh318efw1',
-            'token': '68ffffffffffffffffffffffffffffff',
-            'fw_ver': '2.0.5',
-            'mcu_fw_ver': '0018',
-            'miio_ver': '0.0.5',
-            'hw_ver': 'esp32',
-            'mmfree': 65476,
-            'mac': '78:11:FF:FF:FF:FF',
-            'wifi_fw_ver': 'v3.1.4-56-g8ffb04960',
-            'netif': {'gw': '192.168.0.1',
-                      'localIp': '192.168.0.25',
-                      'mask': '255.255.255.0'},
+            "life": 348202,
+            "uid": 1759530000,
+            "model": "nwt.derh.wdh318efw1",
+            "token": "68ffffffffffffffffffffffffffffff",
+            "fw_ver": "2.0.5",
+            "mcu_fw_ver": "0018",
+            "miio_ver": "0.0.5",
+            "hw_ver": "esp32",
+            "mmfree": 65476,
+            "mac": "78:11:FF:FF:FF:FF",
+            "wifi_fw_ver": "v3.1.4-56-g8ffb04960",
+            "netif": {
+                "gw": "192.168.0.1",
+                "localIp": "192.168.0.25",
+                "mask": "255.255.255.0",
+            },
         }
 
         self.device_info = None
 
         self.state = {
-            'on_off': 'on',
-            'mode': 'auto',
-            'fan_st': 2,
-            'buzzer': 'off',
-            'led': 'on',
-            'child_lock': 'off',
-            'humidity': 48,
-            'temp': 34,
-            'compressor_status': 'off',
-            'fan_speed': 0,
-            'tank_full': 'off',
-            'defrost_status': 'off',
-            'alarm': 'ok',
-            'auto': 50
+            "on_off": "on",
+            "mode": "auto",
+            "fan_st": 2,
+            "buzzer": "off",
+            "led": "on",
+            "child_lock": "off",
+            "humidity": 48,
+            "temp": 34,
+            "compressor_status": "off",
+            "fan_speed": 0,
+            "tank_full": "off",
+            "defrost_status": "off",
+            "alarm": "ok",
+            "auto": 50,
         }
 
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("on_off", x),
-            'set_mode': lambda x: self._set_state("mode", x),
-            'set_led': lambda x: self._set_state("led", x),
-            'set_buzzer': lambda x: self._set_state("buzzer", x),
-            'set_child_lock': lambda x: self._set_state("child_lock", x),
-            'set_fan_speed': lambda x: self._set_state("fan_st", x),
-            'set_auto': lambda x: self._set_state("auto", x),
-            'miIO.info': self._get_device_info,
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("on_off", x),
+            "set_mode": lambda x: self._set_state("mode", x),
+            "set_led": lambda x: self._set_state("led", x),
+            "set_buzzer": lambda x: self._set_state("buzzer", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
+            "set_fan_speed": lambda x: self._set_state("fan_st", x),
+            "set_auto": lambda x: self._set_state("auto", x),
+            "miIO.info": self._get_device_info,
         }
         super().__init__(args, kwargs)
 
@@ -101,21 +107,27 @@ class TestAirDehumidifierV1(TestCase):
         device_info = DeviceInfo(self.device.dummy_device_info)
 
         assert repr(self.state()) == repr(
-            AirDehumidifierStatus(self.device.start_state, device_info))
+            AirDehumidifierStatus(self.device.start_state, device_info)
+        )
 
         assert self.is_on() is True
         assert self.state().temperature == self.device.start_state["temp"]
         assert self.state().humidity == self.device.start_state["humidity"]
         assert self.state().mode == OperationMode(self.device.start_state["mode"])
-        assert self.state().led == (self.device.start_state["led"] == 'on')
-        assert self.state().buzzer == (self.device.start_state["buzzer"] == 'on')
-        assert self.state().child_lock == (self.device.start_state["child_lock"] == 'on')
+        assert self.state().led == (self.device.start_state["led"] == "on")
+        assert self.state().buzzer == (self.device.start_state["buzzer"] == "on")
+        assert self.state().child_lock == (
+            self.device.start_state["child_lock"] == "on"
+        )
         assert self.state().target_humidity == self.device.start_state["auto"]
         assert self.state().fan_speed == FanSpeed(self.device.start_state["fan_speed"])
-        assert self.state().tank_full == (self.device.start_state["tank_full"] == 'on')
+        assert self.state().tank_full == (self.device.start_state["tank_full"] == "on")
         assert self.state().compressor_status == (
-                self.device.start_state["compressor_status"] == 'on')
-        assert self.state().defrost_status == (self.device.start_state["defrost_status"] == 'on')
+            self.device.start_state["compressor_status"] == "on"
+        )
+        assert self.state().defrost_status == (
+            self.device.start_state["defrost_status"] == "on"
+        )
         assert self.state().fan_st == self.device.start_state["fan_st"]
         assert self.state().alarm == self.device.start_state["alarm"]
 

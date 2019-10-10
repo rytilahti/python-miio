@@ -9,51 +9,51 @@ from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_FAN_V2 = 'zhimi.fan.v2'
-MODEL_FAN_V3 = 'zhimi.fan.v3'
-MODEL_FAN_SA1 = 'zhimi.fan.sa1'
-MODEL_FAN_ZA1 = 'zhimi.fan.za1'
-MODEL_FAN_ZA3 = 'zhimi.fan.za3'
-MODEL_FAN_ZA4 = 'zhimi.fan.za4'
-MODEL_FAN_P5 = 'dmaker.fan.p5'
+MODEL_FAN_V2 = "zhimi.fan.v2"
+MODEL_FAN_V3 = "zhimi.fan.v3"
+MODEL_FAN_SA1 = "zhimi.fan.sa1"
+MODEL_FAN_ZA1 = "zhimi.fan.za1"
+MODEL_FAN_ZA3 = "zhimi.fan.za3"
+MODEL_FAN_ZA4 = "zhimi.fan.za4"
+MODEL_FAN_P5 = "dmaker.fan.p5"
 
 AVAILABLE_PROPERTIES_COMMON = [
-    'angle',
-    'speed',
-    'poweroff_time',
-    'power',
-    'ac_power',
-    'angle_enable',
-    'speed_level',
-    'natural_level',
-    'child_lock',
-    'buzzer',
-    'led_b',
-    'use_time',
+    "angle",
+    "speed",
+    "poweroff_time",
+    "power",
+    "ac_power",
+    "angle_enable",
+    "speed_level",
+    "natural_level",
+    "child_lock",
+    "buzzer",
+    "led_b",
+    "use_time",
 ]
 
 AVAILABLE_PROPERTIES_COMMON_V2_V3 = [
-    'temp_dec',
-    'humidity',
-    'battery',
-    'bat_charge',
-    'button_pressed',
+    "temp_dec",
+    "humidity",
+    "battery",
+    "bat_charge",
+    "button_pressed",
 ] + AVAILABLE_PROPERTIES_COMMON
 
 AVAILABLE_PROPERTIES_P5 = [
-    'power',
-    'mode',
-    'speed',
-    'roll_enable',
-    'roll_angle',
-    'time_off',
-    'light',
-    'beep_sound',
-    'child_lock'
+    "power",
+    "mode",
+    "speed",
+    "roll_enable",
+    "roll_angle",
+    "time_off",
+    "light",
+    "beep_sound",
+    "child_lock",
 ]
 
 AVAILABLE_PROPERTIES = {
-    MODEL_FAN_V2: ['led', 'bat_state'] + AVAILABLE_PROPERTIES_COMMON_V2_V3,
+    MODEL_FAN_V2: ["led", "bat_state"] + AVAILABLE_PROPERTIES_COMMON_V2_V3,
     MODEL_FAN_V3: AVAILABLE_PROPERTIES_COMMON_V2_V3,
     MODEL_FAN_SA1: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_ZA1: AVAILABLE_PROPERTIES_COMMON,
@@ -68,8 +68,9 @@ class FanException(DeviceException):
 
 
 class OperationMode(enum.Enum):
-    Normal = 'normal'
-    Nature = 'nature'
+    Normal = "normal"
+    Nature = "nature"
+
 
 class LedBrightness(enum.Enum):
     Bright = 0
@@ -78,8 +79,8 @@ class LedBrightness(enum.Enum):
 
 
 class MoveDirection(enum.Enum):
-    Left = 'left'
-    Right = 'right'
+    Left = "left"
+    Right = "right"
 
 
 class FanStatus:
@@ -226,44 +227,48 @@ class FanStatus:
         return None
 
     def __repr__(self) -> str:
-        s = "<FanStatus power=%s, " \
-            "temperature=%s, " \
-            "humidity=%s, " \
-            "led=%s, " \
-            "led_brightness=%s, " \
-            "buzzer=%s, " \
-            "child_lock=%s, " \
-            "natural_speed=%s, " \
-            "direct_speed=%s, " \
-            "speed=%s, " \
-            "oscillate=%s, " \
-            "angle=%s, " \
-            "ac_power=%s, " \
-            "battery=%s, " \
-            "battery_charge=%s, " \
-            "battery_state=%s, " \
-            "use_time=%s, " \
-            "delay_off_countdown=%s, " \
-            "button_pressed=%s>" % \
-            (self.power,
-             self.temperature,
-             self.humidity,
-             self.led,
-             self.led_brightness,
-             self.buzzer,
-             self.child_lock,
-             self.natural_speed,
-             self.direct_speed,
-             self.speed,
-             self.oscillate,
-             self.angle,
-             self.ac_power,
-             self.battery,
-             self.battery_charge,
-             self.battery_state,
-             self.use_time,
-             self.delay_off_countdown,
-             self.button_pressed)
+        s = (
+            "<FanStatus power=%s, "
+            "temperature=%s, "
+            "humidity=%s, "
+            "led=%s, "
+            "led_brightness=%s, "
+            "buzzer=%s, "
+            "child_lock=%s, "
+            "natural_speed=%s, "
+            "direct_speed=%s, "
+            "speed=%s, "
+            "oscillate=%s, "
+            "angle=%s, "
+            "ac_power=%s, "
+            "battery=%s, "
+            "battery_charge=%s, "
+            "battery_state=%s, "
+            "use_time=%s, "
+            "delay_off_countdown=%s, "
+            "button_pressed=%s>"
+            % (
+                self.power,
+                self.temperature,
+                self.humidity,
+                self.led,
+                self.led_brightness,
+                self.buzzer,
+                self.child_lock,
+                self.natural_speed,
+                self.direct_speed,
+                self.speed,
+                self.oscillate,
+                self.angle,
+                self.ac_power,
+                self.battery,
+                self.battery_charge,
+                self.battery_state,
+                self.use_time,
+                self.delay_off_countdown,
+                self.button_pressed,
+            )
+        )
         return s
 
     def __json__(self):
@@ -285,7 +290,7 @@ class FanStatusP5:
     @property
     def power(self) -> str:
         """Power state."""
-        return 'on' if self.data["power"] else 'off'
+        return "on" if self.data["power"] else "off"
 
     @property
     def is_on(self) -> bool:
@@ -333,24 +338,28 @@ class FanStatusP5:
         return self.data["child_lock"]
 
     def __repr__(self) -> str:
-        s = "<FanStatus power=%s, " \
-            "mode=%s, " \
-            "speed=%s, " \
-            "oscillate=%s, " \
-            "angle=%s, " \
-            "led=%s, " \
-            "buzzer=%s, " \
-            "child_lock=%s, " \
-            "delay_off_countdown=%s>" % \
-            (self.power,
-             self.mode,
-             self.speed,
-             self.oscillate,
-             self.angle,
-             self.led,
-             self.buzzer,
-             self.child_lock,
-             self.delay_off_countdown)
+        s = (
+            "<FanStatus power=%s, "
+            "mode=%s, "
+            "speed=%s, "
+            "oscillate=%s, "
+            "angle=%s, "
+            "led=%s, "
+            "buzzer=%s, "
+            "child_lock=%s, "
+            "delay_off_countdown=%s>"
+            % (
+                self.power,
+                self.mode,
+                self.speed,
+                self.oscillate,
+                self.angle,
+                self.led,
+                self.buzzer,
+                self.child_lock,
+                self.delay_off_countdown,
+            )
+        )
         return s
 
     def __json__(self):
@@ -360,9 +369,15 @@ class FanStatusP5:
 class Fan(Device):
     """Main class representing the Xiaomi Mi Smart Pedestal Fan."""
 
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_FAN_V3) -> None:
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_FAN_V3,
+    ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
@@ -387,7 +402,7 @@ class Fan(Device):
             "Direct speed: {result.direct_speed}\n"
             "Oscillate: {result.oscillate}\n"
             "Power-off time: {result.delay_off_countdown}\n"
-            "Angle: {result.angle}\n"
+            "Angle: {result.angle}\n",
         )
     )
     def status(self) -> FanStatus:
@@ -414,28 +429,25 @@ class Fan(Device):
             _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         return FanStatus(dict(zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("speed", type=int),
-        default_output=format_output(
-            "Setting speed of the natural mode to {speed}")
+        default_output=format_output("Setting speed of the natural mode to {speed}"),
     )
     def set_natural_speed(self, speed: int):
         """Set natural level."""
@@ -446,8 +458,7 @@ class Fan(Device):
 
     @command(
         click.argument("speed", type=int),
-        default_output=format_output(
-            "Setting speed of the direct mode to {speed}")
+        default_output=format_output("Setting speed of the direct mode to {speed}"),
     )
     def set_direct_speed(self, speed: int):
         """Set speed of the direct mode."""
@@ -458,8 +469,7 @@ class Fan(Device):
 
     @command(
         click.argument("direction", type=EnumType(MoveDirection, False)),
-        default_output=format_output(
-            "Rotating the fan to the {direction}")
+        default_output=format_output("Rotating the fan to the {direction}"),
     )
     def set_rotate(self, direction: MoveDirection):
         """Rotate the fan by -5/+5 degrees left/right."""
@@ -467,7 +477,7 @@ class Fan(Device):
 
     @command(
         click.argument("angle", type=int),
-        default_output=format_output("Setting angle to {angle}")
+        default_output=format_output("Setting angle to {angle}"),
     )
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
@@ -480,8 +490,9 @@ class Fan(Device):
         click.argument("oscillate", type=bool),
         default_output=format_output(
             lambda oscillate: "Turning on oscillate"
-            if oscillate else "Turning off oscillate"
-        )
+            if oscillate
+            else "Turning off oscillate"
+        ),
     )
     def set_oscillate(self, oscillate: bool):
         """Set oscillate on/off."""
@@ -492,8 +503,7 @@ class Fan(Device):
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
-        default_output=format_output(
-            "Setting LED brightness to {brightness}")
+        default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
@@ -502,23 +512,21 @@ class Fan(Device):
     @command(
         click.argument("led", type=bool),
         default_output=format_output(
-            lambda led: "Turning on LED"
-            if led else "Turning off LED"
-        )
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
     )
     def set_led(self, led: bool):
         """Turn led on/off. Not supported by model SA1."""
         if led:
-            return self.send("set_led", ['on'])
+            return self.send("set_led", ["on"])
         else:
-            return self.send("set_led", ['off'])
+            return self.send("set_led", ["off"])
 
     @command(
         click.argument("buzzer", type=bool),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer"
-            if buzzer else "Turning off buzzer"
-        )
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
@@ -536,9 +544,8 @@ class Fan(Device):
     @command(
         click.argument("lock", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock"
-            if lock else "Turning off child lock"
-        )
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
@@ -549,58 +556,87 @@ class Fan(Device):
 
     @command(
         click.argument("seconds", type=int),
-        default_output=format_output(
-            "Setting delayed turn off to {seconds} seconds")
+        default_output=format_output("Setting delayed turn off to {seconds} seconds"),
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
 
         if seconds < 1:
-            raise FanException(
-                "Invalid value for a delayed turn off: %s" % seconds)
+            raise FanException("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("set_poweroff_time", [seconds])
 
 
 class FanV2(Fan):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_FAN_V2)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_V2)
 
 
 class FanSA1(Fan):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_FAN_SA1)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_SA1)
 
 
 class FanZA1(Fan):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_FAN_ZA1)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA1)
 
 
 class FanZA3(Fan):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_FAN_ZA3)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA3)
 
 
 class FanZA4(Fan):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_FAN_ZA4)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA4)
 
 
 class FanP5(Device):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_FAN_P5) -> None:
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_FAN_P5,
+    ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
@@ -619,7 +655,7 @@ class FanP5(Device):
             "LED: {result.led}\n"
             "Buzzer: {result.buzzer}\n"
             "Child lock: {result.child_lock}\n"
-            "Power-off time: {result.delay_off_countdown}\n"
+            "Power-off time: {result.delay_off_countdown}\n",
         )
     )
     def status(self) -> FanStatusP5:
@@ -641,27 +677,25 @@ class FanP5(Device):
             _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         return FanStatusP5(dict(zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("s_power", [True])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("s_power", [False])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
-        default_output=format_output("Setting mode to '{mode.value}'")
+        default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
@@ -669,8 +703,7 @@ class FanP5(Device):
 
     @command(
         click.argument("speed", type=int),
-        default_output=format_output(
-            "Setting speed to {speed}")
+        default_output=format_output("Setting speed to {speed}"),
     )
     def set_speed(self, speed: int):
         """Set speed."""
@@ -681,12 +714,14 @@ class FanP5(Device):
 
     @command(
         click.argument("angle", type=int),
-        default_output=format_output("Setting angle to {angle}")
+        default_output=format_output("Setting angle to {angle}"),
     )
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
         if angle not in [30, 60, 90, 120, 140]:
-            raise FanException("Unsupported angle. Supported values: 30, 60, 90, 120, 140")
+            raise FanException(
+                "Unsupported angle. Supported values: 30, 60, 90, 120, 140"
+            )
 
         return self.send("s_angle", [angle])
 
@@ -694,8 +729,9 @@ class FanP5(Device):
         click.argument("oscillate", type=bool),
         default_output=format_output(
             lambda oscillate: "Turning on oscillate"
-            if oscillate else "Turning off oscillate"
-        )
+            if oscillate
+            else "Turning off oscillate"
+        ),
     )
     def set_oscillate(self, oscillate: bool):
         """Set oscillate on/off."""
@@ -707,9 +743,8 @@ class FanP5(Device):
     @command(
         click.argument("led", type=bool),
         default_output=format_output(
-            lambda led: "Turning on LED"
-            if led else "Turning off LED"
-        )
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
@@ -721,9 +756,8 @@ class FanP5(Device):
     @command(
         click.argument("buzzer", type=bool),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer"
-            if buzzer else "Turning off buzzer"
-        )
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
@@ -735,9 +769,8 @@ class FanP5(Device):
     @command(
         click.argument("lock", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock"
-            if lock else "Turning off child lock"
-        )
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
@@ -748,22 +781,19 @@ class FanP5(Device):
 
     @command(
         click.argument("minutes", type=int),
-        default_output=format_output(
-            "Setting delayed turn off to {minutes} minutes")
+        default_output=format_output("Setting delayed turn off to {minutes} minutes"),
     )
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
 
         if minutes < 1:
-            raise FanException(
-                "Invalid value for a delayed turn off: %s" % minutes)
+            raise FanException("Invalid value for a delayed turn off: %s" % minutes)
 
         return self.send("s_t_off", [minutes])
 
     @command(
         click.argument("direction", type=EnumType(MoveDirection, False)),
-        default_output=format_output(
-            "Rotating the fan to the {direction}")
+        default_output=format_output("Rotating the fan to the {direction}"),
     )
     def set_rotate(self, direction: MoveDirection):
         """Rotate the fan by -5/+5 degrees left/right."""

@@ -9,29 +9,30 @@ from .dummies import DummyDevice
 
 class DummyCeil(DummyDevice, Ceil):
     def __init__(self, *args, **kwargs):
-        self.state = {'power': 'on',
-                      'bright': 50,
-                      'snm': 4,
-                      'dv': 0,
-                      'cctsw': [[0, 3], [0, 2], [0, 1]],
-                      'bl': 1,
-                      'mb': 1,
-                      'ac': 1,
-                      'mssw': 1,
-                      'cct': 99
-                      }
+        self.state = {
+            "power": "on",
+            "bright": 50,
+            "snm": 4,
+            "dv": 0,
+            "cctsw": [[0, 3], [0, 2], [0, 1]],
+            "bl": 1,
+            "mb": 1,
+            "ac": 1,
+            "mssw": 1,
+            "cct": 99,
+        }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_bright': lambda x: self._set_state("bright", x),
-            'apply_fixed_scene': lambda x: self._set_state("snm", x),
-            'delay_off': lambda x: self._set_state("dv", x),
-            'enable_bl': lambda x: self._set_state("bl", x),
-            'enable_ac': lambda x: self._set_state("ac", x),
-            'set_cct': lambda x: self._set_state("cct", x),
-            'set_bricct': lambda x: (
-                self._set_state('bright', [x[0]]),
-                self._set_state('cct', [x[1]])
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "apply_fixed_scene": lambda x: self._set_state("snm", x),
+            "delay_off": lambda x: self._set_state("dv", x),
+            "enable_bl": lambda x: self._set_state("bl", x),
+            "enable_ac": lambda x: self._set_state("ac", x),
+            "set_cct": lambda x: self._set_state("cct", x),
+            "set_bricct": lambda x: (
+                self._set_state("bright", [x[0]]),
+                self._set_state("cct", [x[1]]),
             ),
         }
         super().__init__(args, kwargs)
@@ -76,7 +77,9 @@ class TestCeil(TestCase):
         assert self.state().scene == self.device.start_state["snm"]
         assert self.state().delay_off_countdown == self.device.start_state["dv"]
         assert self.state().smart_night_light is (self.device.start_state["bl"] == 1)
-        assert self.state().automatic_color_temperature is (self.device.start_state["ac"] == 1)
+        assert self.state().automatic_color_temperature is (
+            self.device.start_state["ac"] == 1
+        )
 
     def test_set_brightness(self):
         def brightness():

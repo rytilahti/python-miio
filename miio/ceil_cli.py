@@ -5,8 +5,7 @@ import sys
 import click
 
 import miio  # noqa: E402
-from miio.click_common import (ExceptionHandlerGroup, validate_ip,
-                               validate_token, )
+from miio.click_common import ExceptionHandlerGroup, validate_ip, validate_token
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Ceil)
@@ -15,28 +14,28 @@ pass_dev = click.make_pass_decorator(miio.Ceil)
 def validate_percentage(ctx, param, value):
     value = int(value)
     if value < 1 or value > 100:
-        raise click.BadParameter('Should be a positive int between 1-100.')
+        raise click.BadParameter("Should be a positive int between 1-100.")
     return value
 
 
 def validate_seconds(ctx, param, value):
     value = int(value)
     if value < 0 or value > 21600:
-        raise click.BadParameter('Should be a positive int between 1-21600.')
+        raise click.BadParameter("Should be a positive int between 1-21600.")
     return value
 
 
 def validate_scene(ctx, param, value):
     value = int(value)
     if value < 1 or value > 4:
-        raise click.BadParameter('Should be a positive int between 1-4.')
+        raise click.BadParameter("Should be a positive int between 1-4.")
     return value
 
 
 @click.group(invoke_without_command=True, cls=ExceptionHandlerGroup)
-@click.option('--ip', envvar="DEVICE_IP", callback=validate_ip)
-@click.option('--token', envvar="DEVICE_TOKEN", callback=validate_token)
-@click.option('-d', '--debug', default=False, count=True)
+@click.option("--ip", envvar="DEVICE_IP", callback=validate_ip)
+@click.option("--token", envvar="DEVICE_TOKEN", callback=validate_token)
+@click.option("-d", "--debug", default=False, count=True)
 @click.pass_context
 def cli(ctx, ip: str, token: str, debug: int):
     """A tool to command Xiaomi Philips LED Ceiling Lamp."""
@@ -84,8 +83,9 @@ def status(dev: miio.Ceil):
     click.echo("Scene: %s" % res.scene)
     click.echo("Smart Night Light: %s" % res.smart_night_light)
     click.echo("Auto CCT: %s" % res.automatic_color_temperature)
-    click.echo("Countdown of the delayed turn off: %s seconds"
-               % res.delay_off_countdown)
+    click.echo(
+        "Countdown of the delayed turn off: %s seconds" % res.delay_off_countdown
+    )
 
 
 @cli.command()
@@ -103,7 +103,7 @@ def off(dev: miio.Ceil):
 
 
 @cli.command()
-@click.argument('level', callback=validate_percentage, required=True,)
+@click.argument("level", callback=validate_percentage, required=True)
 @pass_dev
 def set_brightness(dev: miio.Ceil, level):
     """Set brightness level."""
@@ -111,16 +111,15 @@ def set_brightness(dev: miio.Ceil, level):
 
 
 @cli.command()
-@click.argument('level', callback=validate_percentage, required=True,)
+@click.argument("level", callback=validate_percentage, required=True)
 @pass_dev
 def set_color_temperature(dev: miio.Ceil, level):
     """Set CCT level."""
-    click.echo("Color temperature level: %s" %
-               dev.set_color_temperature(level))
+    click.echo("Color temperature level: %s" % dev.set_color_temperature(level))
 
 
 @cli.command()
-@click.argument('seconds', callback=validate_seconds, required=True,)
+@click.argument("seconds", callback=validate_seconds, required=True)
 @pass_dev
 def delay_off(dev: miio.Ceil, seconds):
     """Set delay off in seconds."""
@@ -128,7 +127,7 @@ def delay_off(dev: miio.Ceil, seconds):
 
 
 @cli.command()
-@click.argument('scene', callback=validate_scene, required=True,)
+@click.argument("scene", callback=validate_scene, required=True)
 @pass_dev
 def set_scene(dev: miio.Ceil, scene):
     """Set scene number."""

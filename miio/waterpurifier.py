@@ -91,25 +91,27 @@ class WaterPurifierStatus:
         return self.data["elecval_state"]
 
     def __repr__(self) -> str:
-        return "<WaterPurifierStatus " \
-               "power=%s, " \
-               "mode=%s, " \
-               "tds=%s, " \
-               "filter_life_remaining=%s, " \
-               "filter_state=%s, " \
-               "filter2_life_remaining=%s, " \
-               "filter2_state=%s, " \
-               "life=%s, " \
-               "state=%s, " \
-               "level=%s, " \
-               "volume=%s, " \
-               "filter=%s, " \
-               "usage=%s, " \
-               "temperature=%s, " \
-               "uv_filter_life_remaining=%s, " \
-               "uv_filter_state=%s, " \
-               "valve=%s>" % \
-               (self.power,
+        return (
+            "<WaterPurifierStatus "
+            "power=%s, "
+            "mode=%s, "
+            "tds=%s, "
+            "filter_life_remaining=%s, "
+            "filter_state=%s, "
+            "filter2_life_remaining=%s, "
+            "filter2_state=%s, "
+            "life=%s, "
+            "state=%s, "
+            "level=%s, "
+            "volume=%s, "
+            "filter=%s, "
+            "usage=%s, "
+            "temperature=%s, "
+            "uv_filter_life_remaining=%s, "
+            "uv_filter_state=%s, "
+            "valve=%s>"
+            % (
+                self.power,
                 self.mode,
                 self.tds,
                 self.filter_life_remaining,
@@ -125,7 +127,9 @@ class WaterPurifierStatus:
                 self.temperature,
                 self.uv_filter_life_remaining,
                 self.uv_filter_state,
-                self.valve)
+                self.valve,
+            )
+        )
 
     def __json__(self):
         return self.data
@@ -153,16 +157,31 @@ class WaterPurifier(Device):
             "Temperature: {result.temperature}\n"
             "UV filter life remaining: {result.uv_filter_life_remaining}\n"
             "UV filter state: {result.uv_filter_state}\n"
-            "Valve: {result.valve}\n"
+            "Valve: {result.valve}\n",
         )
     )
     def status(self) -> WaterPurifierStatus:
         """Retrieve properties."""
 
-        properties = ['power', 'mode', 'tds', 'filter1_life', 'filter1_state',
-                      'filter_life', 'filter_state', 'life', 'state', 'level',
-                      'volume', 'filter', 'usage', 'temperature', 'uv_life',
-                      'uv_state', 'elecval_state']
+        properties = [
+            "power",
+            "mode",
+            "tds",
+            "filter1_life",
+            "filter1_state",
+            "filter_life",
+            "filter_state",
+            "life",
+            "state",
+            "level",
+            "volume",
+            "filter",
+            "usage",
+            "temperature",
+            "uv_life",
+            "uv_state",
+            "elecval_state",
+        ]
 
         _props_per_request = 1
         _props = properties.copy()
@@ -177,20 +196,18 @@ class WaterPurifier(Device):
             _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         return WaterPurifierStatus(dict(zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])

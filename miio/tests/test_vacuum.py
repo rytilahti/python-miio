@@ -18,30 +18,31 @@ class DummyVacuum(DummyDevice, Vacuum):
     STATE_ERROR = 12
     STATE_PAUSED = 10
     STATE_MANUAL = 7
+
     def __init__(self, *args, **kwargs):
         self.state = {
-            'state': 8,
-            'dnd_enabled': 1,
-            'clean_time': 0,
-            'msg_ver': 4,
-            'map_present': 1,
-            'error_code': 0,
-            'in_cleaning': 0,
-            'clean_area': 0,
-            'battery': 100,
-            'fan_power': 20,
-            'msg_seq': 320,
+            "state": 8,
+            "dnd_enabled": 1,
+            "clean_time": 0,
+            "msg_ver": 4,
+            "map_present": 1,
+            "error_code": 0,
+            "in_cleaning": 0,
+            "clean_area": 0,
+            "battery": 100,
+            "fan_power": 20,
+            "msg_seq": 320,
         }
 
         self.return_values = {
-            'get_status': self.vacuum_state,
-            'app_start': lambda x: self.change_mode("start"),
-            'app_stop': lambda x: self.change_mode("stop"),
-            'app_pause': lambda x: self.change_mode("pause"),
-            'app_spot': lambda x: self.change_mode("spot"),
-            'app_goto_target': lambda x: self.change_mode("goto"),
-            'app_zoned_clean': lambda x: self.change_mode("zoned clean"),
-            'app_charge': lambda x: self.change_mode("charge")
+            "get_status": self.vacuum_state,
+            "app_start": lambda x: self.change_mode("start"),
+            "app_stop": lambda x: self.change_mode("stop"),
+            "app_pause": lambda x: self.change_mode("pause"),
+            "app_spot": lambda x: self.change_mode("spot"),
+            "app_goto_target": lambda x: self.change_mode("goto"),
+            "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
+            "app_charge": lambda x: self.change_mode("charge"),
         }
 
         super().__init__(args, kwargs)
@@ -94,8 +95,7 @@ class TestVacuum(TestCase):
         assert status.battery == self.device.start_state["battery"]
 
     def test_status_with_errors(self):
-        errors = {5: "Clean main brush",
-                  19: "Unpowered charging station"}
+        errors = {5: "Clean main brush", 19: "Unpowered charging station"}
 
         for errcode, error in errors.items():
             self.device.state["state"] = self.device.STATE_ERROR
@@ -145,7 +145,9 @@ class TestVacuum(TestCase):
     def test_zoned_clean(self):
         self.device.start()
         assert self.status().is_on is True
-        self.device.zoned_clean([[25000, 25000, 25500, 25500, 3], [23000, 23000, 22500, 22500, 1]])
+        self.device.zoned_clean(
+            [[25000, 25000, 25500, 25500, 3], [23000, 23000, 22500, 22500, 1]]
+        )
         assert self.status().state_code == self.device.STATE_ZONED_CLEAN
 
     @pytest.mark.xfail

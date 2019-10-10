@@ -18,6 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 @attr.s
 class DeviceConfig:
     """A presentation of a device including its name, model, ip etc."""
+
     name = attr.ib()
     mac = attr.ib()
     ip = attr.ib()
@@ -37,16 +38,18 @@ def read_android_yeelight(db) -> Iterator[DeviceConfig]:
 
     for dev_elem in list(devicelist):
         dev = json.loads(dev_elem.text)
-        ip = dev['localip']
-        mac = dev['mac']
-        model = dev['model']
-        name = dev['name']
-        token = dev['token']
+        ip = dev["localip"]
+        mac = dev["mac"]
+        model = dev["model"]
+        name = dev["name"]
+        token = dev["token"]
 
-        config = DeviceConfig(name=name, ip=ip, mac=mac, model=model,
-                              token=token, everything=dev)
+        config = DeviceConfig(
+            name=name, ip=ip, mac=mac, model=model, token=token, everything=dev
+        )
 
         yield config
+
 
 class BackupDatabaseReader:
     """Main class for reading backup files.
@@ -59,6 +62,7 @@ class BackupDatabaseReader:
         for dev in devices:
             print("Got %s with token %s" % (dev.ip, dev.token)
     """
+
     def __init__(self, dump_raw=False):
         self.dump_raw = dump_raw
 
@@ -74,13 +78,11 @@ class BackupDatabaseReader:
         if ztoken is None or len(ztoken) <= 32:
             return str(ztoken)
 
-        keystring = '00000000000000000000000000000000'
+        keystring = "00000000000000000000000000000000"
         key = bytes.fromhex(keystring)
-        cipher = Cipher(algorithms.AES(key), modes.ECB(),
-                        backend=default_backend())
+        cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
         decryptor = cipher.decryptor()
-        token = decryptor.update(bytes.fromhex(ztoken[:64])) \
-                + decryptor.finalize()
+        token = decryptor.update(bytes.fromhex(ztoken[:64])) + decryptor.finalize()
 
         return token.decode()
 
@@ -91,14 +93,15 @@ class BackupDatabaseReader:
         for dev in c.fetchall():
             if self.dump_raw:
                 BackupDatabaseReader.dump_raw(dev)
-            ip = dev['ZLOCALIP']
-            mac = dev['ZMAC']
-            model = dev['ZMODEL']
-            name = dev['ZNAME']
-            token = BackupDatabaseReader.decrypt_ztoken(dev['ZTOKEN'])
+            ip = dev["ZLOCALIP"]
+            mac = dev["ZMAC"]
+            model = dev["ZMODEL"]
+            name = dev["ZNAME"]
+            token = BackupDatabaseReader.decrypt_ztoken(dev["ZTOKEN"])
 
-            config = DeviceConfig(name=name, mac=mac, ip=ip, model=model,
-                                  token=token, everything=dev)
+            config = DeviceConfig(
+                name=name, mac=mac, ip=ip, model=model, token=token, everything=dev
+            )
             yield config
 
     def read_android(self) -> Iterator[DeviceConfig]:
@@ -108,14 +111,15 @@ class BackupDatabaseReader:
         for dev in c.fetchall():
             if self.dump_raw:
                 BackupDatabaseReader.dump_raw(dev)
-            ip = dev['localIP']
-            mac = dev['mac']
-            model = dev['model']
-            name = dev['name']
-            token = dev['token']
+            ip = dev["localIP"]
+            mac = dev["mac"]
+            model = dev["model"]
+            name = dev["name"]
+            token = dev["token"]
 
-            config = DeviceConfig(name=name, ip=ip, mac=mac, model=model,
-                                  token=token, everything=dev)
+            config = DeviceConfig(
+                name=name, ip=ip, mac=mac, model=model, token=token, everything=dev
+            )
             yield config
 
     def read_tokens(self, db) -> Iterator[DeviceConfig]:
@@ -128,10 +132,18 @@ class BackupDatabaseReader:
 
         self.conn.row_factory = sqlite3.Row
         with self.conn:
-            is_android = self.conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='devicerecord';").fetchone() is not None
-            is_apple = self.conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='ZDEVICE'").fetchone() is not None
+            is_android = (
+                self.conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='devicerecord';"
+                ).fetchone()
+                is not None
+            )
+            is_apple = (
+                self.conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='ZDEVICE'"
+                ).fetchone()
+                is not None
+            )
             if is_android:
                 yield from self.read_android()
             elif is_apple:
@@ -141,14 +153,19 @@ class BackupDatabaseReader:
 
 
 @click.command()
-@click.argument('backup')
-@click.option('--write-to-disk', type=click.File('wb'),
-              help='writes sqlite3 db to a file for debugging')
-@click.option('--password', type=str,
-              help='password if the android database is encrypted')
-@click.option('--dump-all', is_flag=True, default=False,
-              help='dump devices without ip addresses')
-@click.option('--dump-raw', is_flag=True, help='dumps raw rows')
+@click.argument("backup")
+@click.option(
+    "--write-to-disk",
+    type=click.File("wb"),
+    help="writes sqlite3 db to a file for debugging",
+)
+@click.option(
+    "--password", type=str, help="password if the android database is encrypted"
+)
+@click.option(
+    "--dump-all", is_flag=True, default=False, help="dump devices without ip addresses"
+)
+@click.option("--dump-raw", is_flag=True, help="dumps raw rows")
 def main(backup, write_to_disk, password, dump_all, dump_raw):
     """Reads device information out from an sqlite3 DB.
      If the given file is an Android backup (.ab), the database
@@ -156,13 +173,13 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
      If the given file is an iOS backup, the tokens will be
      extracted (and decrypted if needed) automatically.
     """
+
     def read_miio_database(tar):
         DBFILE = "apps/com.xiaomi.smarthome/db/miio2.db"
         try:
             db = tar.extractfile(DBFILE)
         except KeyError as ex:
-            click.echo("Unable to find miio database file %s: %s" % (
-                DBFILE, ex))
+            click.echo("Unable to find miio database file %s: %s" % (DBFILE, ex))
             return []
         if write_to_disk:
             file = write_to_disk
@@ -180,8 +197,7 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
         try:
             db = tar.extractfile(DBFILE)
         except KeyError as ex:
-            click.echo("Unable to find yeelight database file %s: %s" % (
-                DBFILE, ex))
+            click.echo("Unable to find yeelight database file %s: %s" % (DBFILE, ex))
             return []
 
         return list(read_android_yeelight(db))
@@ -192,8 +208,10 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
         try:
             from android_backup import AndroidBackup
         except ModuleNotFoundError:
-            click.echo("You need to install android_backup to extract "
-                       "tokens from Android backup files.")
+            click.echo(
+                "You need to install android_backup to extract "
+                "tokens from Android backup files."
+            )
             return
 
         with AndroidBackup(backup, stream=False) as f:
@@ -207,12 +225,13 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
 
     for dev in devices:
         if dev.ip or dump_all:
-            click.echo("%s\n"
-                       "\tModel: %s\n"
-                       "\tIP address: %s\n"
-                       "\tToken: %s\n"
-                       "\tMAC: %s" % (dev.name, dev.model,
-                                      dev.ip, dev.token, dev.mac))
+            click.echo(
+                "%s\n"
+                "\tModel: %s\n"
+                "\tIP address: %s\n"
+                "\tToken: %s\n"
+                "\tMAC: %s" % (dev.name, dev.model, dev.ip, dev.token, dev.mac)
+            )
             if dump_raw:
                 click.echo(dev)
 

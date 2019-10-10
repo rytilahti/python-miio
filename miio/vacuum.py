@@ -12,13 +12,19 @@ import click
 import pytz
 from appdirs import user_cache_dir
 
-from .click_common import (
-    DeviceGroup, command, GlobalContextObject, LiteralParamType
-)
+from .click_common import DeviceGroup, command, GlobalContextObject, LiteralParamType
 from .device import Device, DeviceException
-from .vacuumcontainers import (VacuumStatus, ConsumableStatus, DNDStatus,
-                               CleaningSummary, CleaningDetails, Timer,
-                               SoundStatus, SoundInstallStatus, CarpetModeStatus)
+from .vacuumcontainers import (
+    VacuumStatus,
+    ConsumableStatus,
+    DNDStatus,
+    CleaningSummary,
+    CleaningDetails,
+    Timer,
+    SoundStatus,
+    SoundInstallStatus,
+    CarpetModeStatus,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,8 +48,9 @@ class Consumable(enum.Enum):
 class Vacuum(Device):
     """Main class representing the vacuum."""
 
-    def __init__(self, ip: str, token: str = None, start_id: int = 0,
-                 debug: int = 0) -> None:
+    def __init__(
+        self, ip: str, token: str = None, start_id: int = 0, debug: int = 0
+    ) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
 
@@ -86,19 +93,14 @@ class Vacuum(Device):
         self.send("app_pause")
         return self.send("app_charge")
 
-    @command(
-        click.argument("x_coord", type=int),
-        click.argument("y_coord", type=int),
-    )
+    @command(click.argument("x_coord", type=int), click.argument("y_coord", type=int))
     def goto(self, x_coord: int, y_coord: int):
         """Go to specific target.
         :param int x_coord: x coordinate
         :param int y_coord: y coordinate"""
         return self.send("app_goto_target", [x_coord, y_coord])
 
-    @command(
-        click.argument("zones", type=LiteralParamType(), required=True),
-    )
+    @command(click.argument("zones", type=LiteralParamType(), required=True))
     def zoned_clean(self, zones: List):
         """Clean zones.
         :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]"""
@@ -124,10 +126,9 @@ class Vacuum(Device):
     @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
-        click.argument("duration", type=int, required=False, default=1500)
+        click.argument("duration", type=int, required=False, default=1500),
     )
-    def manual_control_once(
-            self, rotation: int, velocity: float, duration: int=1500):
+    def manual_control_once(self, rotation: int, velocity: float, duration: int = 1500):
         """Starts the remote control mode and executes
         the action once before deactivating the mode."""
         number_of_tries = 3
@@ -145,23 +146,27 @@ class Vacuum(Device):
     @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
-        click.argument("duration", type=int, required=False, default=1500)
+        click.argument("duration", type=int, required=False, default=1500),
     )
-    def manual_control(self, rotation: int, velocity: float,
-                       duration: int=1500):
+    def manual_control(self, rotation: int, velocity: float, duration: int = 1500):
         """Give a command over manual control interface."""
         if rotation < -180 or rotation > 180:
-            raise DeviceException("Given rotation is invalid, should "
-                                  "be ]-180, 180[, was %s" % rotation)
+            raise DeviceException(
+                "Given rotation is invalid, should " "be ]-180, 180[, was %s" % rotation
+            )
         if velocity < -0.3 or velocity > 0.3:
-            raise DeviceException("Given velocity is invalid, should "
-                                  "be ]-0.3, 0.3[, was: %s" % velocity)
+            raise DeviceException(
+                "Given velocity is invalid, should "
+                "be ]-0.3, 0.3[, was: %s" % velocity
+            )
 
         self.manual_seqnum += 1
-        params = {"omega": round(math.radians(rotation), 1),
-                  "velocity": velocity,
-                  "duration": duration,
-                  "seqnum": self.manual_seqnum}
+        params = {
+            "omega": round(math.radians(rotation), 1),
+            "velocity": velocity,
+            "duration": duration,
+            "seqnum": self.manual_seqnum,
+        }
 
         self.send("app_rc_move", [params])
 
@@ -184,9 +189,7 @@ class Vacuum(Device):
         """Return information about consumables."""
         return ConsumableStatus(self.send("get_consumable")[0])
 
-    @command(
-        click.argument("consumable", type=Consumable),
-    )
+    @command(click.argument("consumable", type=Consumable))
     def consumable_reset(self, consumable: Consumable):
         """Reset consumable information."""
         return self.send("reset_consumable", [consumable.value])
@@ -197,9 +200,7 @@ class Vacuum(Device):
         # returns ['retry'] without internet
         return self.send("get_map_v1")
 
-    @command(
-        click.argument("start", type=bool)
-    )
+    @command(click.argument("start", type=bool))
     def edit_map(self, start):
         """Start map editing?"""
         if start:
@@ -207,9 +208,7 @@ class Vacuum(Device):
         else:
             return self.send("end_edit_map")[0] == "ok"
 
-    @command(
-        click.option("--version", default=1)
-    )
+    @command(click.option("--version", default=1))
     def fresh_map(self, version):
         """Return fresh map?"""
         if version == 1:
@@ -219,9 +218,7 @@ class Vacuum(Device):
         else:
             raise VacuumException("Unknown map version: %s" % version)
 
-    @command(
-        click.option("--version", default=1)
-    )
+    @command(click.option("--version", default=1))
     def persist_map(self, version):
         """Return fresh map?"""
         if version == 1:
@@ -273,15 +270,13 @@ class Vacuum(Device):
         payload = [0, x1, y1, x2, y2, x3, y3, x4, y4]
         return self.send("save_map", payload)[0] == "ok"
 
-    @command(
-        click.argument("enable", type=bool)
-    )
+    @command(click.argument("enable", type=bool))
     def enable_lab_mode(self, enable):
         """Enable persistent maps and software barriers.
 
         This is required to use create_nogo_zone and create_software_barrier
         commands."""
-        return self.send("set_lab_status", int(enable))['ok']
+        return self.send("set_lab_status", int(enable))["ok"]
 
     @command()
     def clean_history(self) -> CleaningSummary:
@@ -302,11 +297,11 @@ class Vacuum(Device):
 
     @command(
         click.argument("id_", type=int, metavar="ID"),
-        click.argument("return_list", type=bool, default=False)
+        click.argument("return_list", type=bool, default=False),
     )
-    def clean_details(self, id_: int, return_list=True) -> Union[
-            List[CleaningDetails],
-            Optional[CleaningDetails]]:
+    def clean_details(
+        self, id_: int, return_list=True
+    ) -> Union[List[CleaningDetails], Optional[CleaningDetails]]:
         """Return details about specific cleaning."""
         details = self.send("get_clean_record", [id_])
 
@@ -315,12 +310,14 @@ class Vacuum(Device):
             return None
 
         if return_list:
-            _LOGGER.warning("This method will be returning the details "
-                            "without wrapping them into a list in the "
-                            "near future. The current behavior can be "
-                            "kept by passing return_list=True and this "
-                            "warning will be removed when the default gets "
-                            "changed.")
+            _LOGGER.warning(
+                "This method will be returning the details "
+                "without wrapping them into a list in the "
+                "near future. The current behavior can be "
+                "kept by passing return_list=True and this "
+                "warning will be removed when the default gets "
+                "changed."
+            )
             return [CleaningDetails(entry) for entry in details]
 
         if len(details) > 1:
@@ -355,14 +352,11 @@ class Vacuum(Device):
         :param command: ignored by the vacuum.
         :param parameters: ignored by the vacuum."""
         import time
-        ts = int(round(time.time() * 1000))
-        return self.send("set_timer", [
-            [str(ts), [cron, [command, parameters]]]
-        ])
 
-    @command(
-        click.argument("timer_id", type=int),
-    )
+        ts = int(round(time.time() * 1000))
+        return self.send("set_timer", [[str(ts), [cron, [command, parameters]]]])
+
+    @command(click.argument("timer_id", type=int))
     def delete_timer(self, timer_id: int):
         """Delete a timer with given ID.
 
@@ -370,8 +364,7 @@ class Vacuum(Device):
         return self.send("del_timer", [str(timer_id)])
 
     @command(
-        click.argument("timer_id", type=int),
-        click.argument("mode", type=TimerState),
+        click.argument("timer_id", type=int), click.argument("mode", type=TimerState)
     )
     def update_timer(self, timer_id: int, mode: TimerState):
         """Update a timer with given ID.
@@ -395,25 +388,21 @@ class Vacuum(Device):
         click.argument("end_hr", type=int),
         click.argument("end_min", type=int),
     )
-    def set_dnd(self, start_hr: int, start_min: int,
-                end_hr: int, end_min: int):
+    def set_dnd(self, start_hr: int, start_min: int, end_hr: int, end_min: int):
         """Set do-not-disturb.
 
         :param int start_hr: Start hour
         :param int start_min: Start minute
         :param int end_hr: End hour
         :param int end_min: End minute"""
-        return self.send("set_dnd_timer",
-                         [start_hr, start_min, end_hr, end_min])
+        return self.send("set_dnd_timer", [start_hr, start_min, end_hr, end_min])
 
     @command()
     def disable_dnd(self):
         """Disable do-not-disturb."""
         return self.send("close_dnd_timer", [""])
 
-    @command(
-        click.argument("speed", type=int),
-    )
+    @command(click.argument("speed", type=int))
     def set_fan_speed(self, speed: int):
         """Set fan speed.
 
@@ -438,11 +427,7 @@ class Vacuum(Device):
     )
     def install_sound(self, url: str, md5sum: str, sound_id: int):
         """Install sound from the given url."""
-        payload = {
-            "url": url,
-            "md5": md5sum,
-            "sid": int(sound_id),
-        }
+        payload = {"url": url, "md5": md5sum, "sid": int(sound_id)}
         return SoundInstallStatus(self.send("dnld_install_sound", payload)[0])
 
     @command()
@@ -455,9 +440,7 @@ class Vacuum(Device):
         """Get sound volume."""
         return self.send("get_sound_volume")[0]
 
-    @command(
-        click.argument("vol", type=int),
-    )
+    @command(click.argument("vol", type=int))
     def set_sound_volume(self, vol: int):
         """Set sound volume [0-100]."""
         return self.send("change_sound_volume", [vol])
@@ -487,7 +470,7 @@ class Vacuum(Device):
 
     def set_timezone(self, new_zone):
         """Set the timezone."""
-        return self.send("set_timezone", [new_zone])[0] == 'ok'
+        return self.send("set_timezone", [new_zone])[0] == "ok"
 
     def configure_wifi(self, ssid, password, uid=0, timezone=None):
         """Configure the wifi settings."""
@@ -510,20 +493,26 @@ class Vacuum(Device):
         click.argument("stall_time", required=False, default=10, type=int),
         click.argument("low", required=False, default=400, type=int),
         click.argument("high", required=False, default=500, type=int),
-        click.argument("integral", required=False, default=450, type=int)
+        click.argument("integral", required=False, default=450, type=int),
     )
-    def set_carpet_mode(self, enabled: bool, stall_time: int = 10,
-                        low: int = 400, high: int = 500, integral: int = 450):
+    def set_carpet_mode(
+        self,
+        enabled: bool,
+        stall_time: int = 10,
+        low: int = 400,
+        high: int = 500,
+        integral: int = 450,
+    ):
         """Set the carpet mode."""
         click.echo("Setting carpet mode: %s" % enabled)
         data = {
-            'enable': int(enabled),
-            'stall_time': stall_time,
-            'current_low': low,
-            'current_high': high,
-            'current_integral': integral,
+            "enable": int(enabled),
+            "stall_time": stall_time,
+            "current_low": low,
+            "current_high": high,
+            "current_integral": integral,
         }
-        return self.send("set_carpet_mode", [data])[0] == 'ok'
+        return self.send("set_carpet_mode", [data])[0] == "ok"
 
     @command()
     def stop_zoned_clean(self):
@@ -540,9 +529,7 @@ class Vacuum(Device):
         """Resuming cleaning a segment."""
         return self.send("resume_segment_clean")
 
-    @command(
-        click.argument("segments", type=LiteralParamType(), required=True),
-    )
+    @command(click.argument("segments", type=LiteralParamType(), required=True))
     def segment_clean(self, segments: List):
         """Clean segments.
         :param List segments: List of segments to clean: [16,17,18]"""
@@ -572,16 +559,15 @@ class Vacuum(Device):
 
     @classmethod
     def get_device_group(cls):
-
         @click.pass_context
         def callback(ctx, *args, id_file, **kwargs):
             gco = ctx.find_object(GlobalContextObject)
             if gco:
-                kwargs['debug'] = gco.debug
+                kwargs["debug"] = gco.debug
 
             start_id = manual_seq = 0
             try:
-                with open(id_file, 'r') as f:
+                with open(id_file, "r") as f:
                     x = json.load(f)
                     start_id = x.get("seq", 0)
                     manual_seq = x.get("manual_seq", 0)
@@ -592,23 +578,28 @@ class Vacuum(Device):
             ctx.obj = cls(*args, start_id=start_id, **kwargs)
             ctx.obj.manual_seqnum = manual_seq
 
-        dg = DeviceGroup(cls, params=DeviceGroup.DEFAULT_PARAMS + [
-            click.Option(
-                ['--id-file'], type=click.Path(dir_okay=False, writable=True),
-                default=os.path.join(
-                    user_cache_dir('python-miio'),
-                    'python-mirobo.seq'
+        dg = DeviceGroup(
+            cls,
+            params=DeviceGroup.DEFAULT_PARAMS
+            + [
+                click.Option(
+                    ["--id-file"],
+                    type=click.Path(dir_okay=False, writable=True),
+                    default=os.path.join(
+                        user_cache_dir("python-miio"), "python-mirobo.seq"
+                    ),
                 )
-            ),
-        ], callback=callback)
+            ],
+            callback=callback,
+        )
 
         @dg.resultcallback()
         @dg.device_pass
         def cleanup(vac: Vacuum, *args, **kwargs):
             if vac.ip is None:  # dummy Device for discovery, skip teardown
                 return
-            id_file = kwargs['id_file']
-            seqs = {'seq': vac.raw_id, 'manual_seq': vac.manual_seqnum}
+            id_file = kwargs["id_file"]
+            seqs = {"seq": vac.raw_id, "manual_seq": vac.manual_seqnum}
             _LOGGER.debug("Writing %s to %s", seqs, id_file)
             path_obj = pathlib.Path(id_file)
             cache_dir = path_obj.parents[0]
@@ -616,7 +607,7 @@ class Vacuum(Device):
                 cache_dir.mkdir(parents=True)
             except FileExistsError:
                 pass  # after dropping py3.4 support, use exist_ok for mkdir
-            with open(id_file, 'w') as f:
+            with open(id_file, "w") as f:
                 json.dump(seqs, f)
 
         return dg
