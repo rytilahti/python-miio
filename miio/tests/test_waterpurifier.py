@@ -10,28 +10,27 @@ from .dummies import DummyDevice
 class DummyWaterPurifier(DummyDevice, WaterPurifier):
     def __init__(self, *args, **kwargs):
         self.state = {
-            'power': 'on',
-            'mode': 'unknown',
-            'tds': 'unknown',
-            'filter1_life': -1,
-            'filter1_state': -1,
-            'filter_life': -1,
-            'filter_state': -1,
-            'life': -1,
-            'state': -1,
-            'level': 'unknown',
-            'volume': 'unknown',
-            'filter': 'unknown',
-            'usage': 'unknown',
-            'temperature': 'unknown',
-            'uv_life': -1,
-            'uv_state': -1,
-            'elecval_state': 'unknown'
-
+            "power": "on",
+            "mode": "unknown",
+            "tds": "unknown",
+            "filter1_life": -1,
+            "filter1_state": -1,
+            "filter_life": -1,
+            "filter_state": -1,
+            "life": -1,
+            "state": -1,
+            "level": "unknown",
+            "volume": "unknown",
+            "filter": "unknown",
+            "usage": "unknown",
+            "temperature": "unknown",
+            "uv_life": -1,
+            "uv_state": -1,
+            "elecval_state": "unknown",
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
         }
         super().__init__(args, kwargs)
 

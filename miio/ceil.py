@@ -66,20 +66,24 @@ class CeilStatus:
         return self.data["ac"] == 1
 
     def __repr__(self) -> str:
-        s = "<CeilStatus power=%s, " \
-            "brightness=%s, " \
-            "color_temperature=%s, " \
-            "scene=%s, " \
-            "delay_off_countdown=%s, " \
-            "smart_night_light=%s, " \
-            "automatic_color_temperature=%s>" % \
-            (self.power,
-             self.brightness,
-             self.color_temperature,
-             self.scene,
-             self.delay_off_countdown,
-             self.smart_night_light,
-             self.automatic_color_temperature)
+        s = (
+            "<CeilStatus power=%s, "
+            "brightness=%s, "
+            "color_temperature=%s, "
+            "scene=%s, "
+            "delay_off_countdown=%s, "
+            "smart_night_light=%s, "
+            "automatic_color_temperature=%s>"
+            % (
+                self.power,
+                self.brightness,
+                self.color_temperature,
+                self.scene,
+                self.delay_off_countdown,
+                self.smart_night_light,
+                self.automatic_color_temperature,
+            )
+        )
         return s
 
     def __json__(self):
@@ -101,16 +105,13 @@ class Ceil(Device):
             "Scene: {result.scene}\n"
             "Delayed turn off: {result.delay_off_countdown}\n"
             "Smart night light: {result.smart_night_light}\n"
-            "Automatic color temperature: {result.automatic_color_temperature}\n"
+            "Automatic color temperature: {result.automatic_color_temperature}\n",
         )
     )
     def status(self) -> CeilStatus:
         """Retrieve properties."""
-        properties = ['power', 'bright', 'cct', 'snm', 'dv', 'bl', 'ac', ]
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        properties = ["power", "bright", "cct", "snm", "dv", "bl", "ac"]
+        values = self.send("get_prop", properties)
 
         properties_count = len(properties)
         values_count = len(values)
@@ -118,27 +119,25 @@ class Ceil(Device):
             _LOGGER.debug(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting brightness to {level}")
+        default_output=format_output("Setting brightness to {level}"),
     )
     def set_brightness(self, level: int):
         """Set brightness level."""
@@ -149,7 +148,7 @@ class Ceil(Device):
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting color temperature to {level}")
+        default_output=format_output("Setting color temperature to {level}"),
     )
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
@@ -162,7 +161,8 @@ class Ceil(Device):
         click.argument("brightness", type=int),
         click.argument("cct", type=int),
         default_output=format_output(
-            "Setting brightness to {brightness} and color temperature to {cct}")
+            "Setting brightness to {brightness} and color temperature to {cct}"
+        ),
     )
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
@@ -176,20 +176,19 @@ class Ceil(Device):
 
     @command(
         click.argument("seconds", type=int),
-        default_output=format_output("Setting delayed turn off to {seconds} seconds")
+        default_output=format_output("Setting delayed turn off to {seconds} seconds"),
     )
     def delay_off(self, seconds: int):
         """Turn off delay in seconds."""
 
         if seconds < 1:
-            raise CeilException(
-                "Invalid value for a delayed turn off: %s" % seconds)
+            raise CeilException("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("delay_off", [seconds])
 
     @command(
         click.argument("number", type=int),
-        default_output=format_output("Setting fixed scene to {number}")
+        default_output=format_output("Setting fixed scene to {number}"),
     )
     def set_scene(self, number: int):
         """Set a fixed scene. 4 fixed scenes are available (1-4)"""
@@ -198,30 +197,22 @@ class Ceil(Device):
 
         return self.send("apply_fixed_scene", [number])
 
-    @command(
-        default_output=format_output("Turning on smart night light"),
-    )
+    @command(default_output=format_output("Turning on smart night light"))
     def smart_night_light_on(self):
         """Smart Night Light On."""
         return self.send("enable_bl", [1])
 
-    @command(
-        default_output=format_output("Turning off smart night light"),
-    )
+    @command(default_output=format_output("Turning off smart night light"))
     def smart_night_light_off(self):
         """Smart Night Light off."""
         return self.send("enable_bl", [0])
 
-    @command(
-        default_output=format_output("Turning on automatic color temperature"),
-    )
+    @command(default_output=format_output("Turning on automatic color temperature"))
     def automatic_color_temperature_on(self):
         """Automatic color temperature on."""
         return self.send("enable_ac", [1])
 
-    @command(
-        default_output=format_output("Turning off automatic color temperature"),
-    )
+    @command(default_output=format_output("Turning off automatic color temperature"))
     def automatic_color_temperature_off(self):
         """Automatic color temperature off."""
         return self.send("enable_ac", [0])

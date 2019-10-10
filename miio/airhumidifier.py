@@ -10,26 +10,29 @@ from .device import Device, DeviceInfo, DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_HUMIDIFIER_V1 = 'zhimi.humidifier.v1'
-MODEL_HUMIDIFIER_CA1 = 'zhimi.humidifier.ca1'
-MODEL_HUMIDIFIER_CB1 = 'zhimi.humidifier.cb1'
+MODEL_HUMIDIFIER_V1 = "zhimi.humidifier.v1"
+MODEL_HUMIDIFIER_CA1 = "zhimi.humidifier.ca1"
+MODEL_HUMIDIFIER_CB1 = "zhimi.humidifier.cb1"
 
 AVAILABLE_PROPERTIES_COMMON = [
-    'power',
-    'mode',
-    'humidity',
-    'buzzer',
-    'led_b',
-    'child_lock',
-    'limit_hum',
-    'use_time',
-    'hw_version',
+    "power",
+    "mode",
+    "humidity",
+    "buzzer",
+    "led_b",
+    "child_lock",
+    "limit_hum",
+    "use_time",
+    "hw_version",
 ]
 
 AVAILABLE_PROPERTIES = {
-    MODEL_HUMIDIFIER_V1: AVAILABLE_PROPERTIES_COMMON + ['temp_dec', 'trans_level', 'button_pressed'],
-    MODEL_HUMIDIFIER_CA1: AVAILABLE_PROPERTIES_COMMON + ['temp_dec', 'speed', 'depth', 'dry'],
-    MODEL_HUMIDIFIER_CB1: AVAILABLE_PROPERTIES_COMMON + ['temperature', 'speed', 'depth', 'dry']
+    MODEL_HUMIDIFIER_V1: AVAILABLE_PROPERTIES_COMMON
+    + ["temp_dec", "trans_level", "button_pressed"],
+    MODEL_HUMIDIFIER_CA1: AVAILABLE_PROPERTIES_COMMON
+    + ["temp_dec", "speed", "depth", "dry"],
+    MODEL_HUMIDIFIER_CB1: AVAILABLE_PROPERTIES_COMMON
+    + ["temperature", "speed", "depth", "dry"],
 }
 
 
@@ -38,11 +41,11 @@ class AirHumidifierException(DeviceException):
 
 
 class OperationMode(enum.Enum):
-    Silent = 'silent'
-    Medium = 'medium'
-    High = 'high'
-    Auto = 'auto'
-    Strong = 'strong'
+    Silent = "silent"
+    Medium = "medium"
+    High = "high"
+    Auto = "auto"
+    Strong = "strong"
 
 
 class LedBrightness(enum.Enum):
@@ -148,12 +151,12 @@ class AirHumidifierStatus:
 
     @property
     def firmware_version_major(self) -> str:
-        parts = self.firmware_version.rsplit('_', 1)
+        parts = self.firmware_version.rsplit("_", 1)
         return parts[0]
 
     @property
     def firmware_version_minor(self) -> int:
-        parts = self.firmware_version.rsplit('_', 1)
+        parts = self.firmware_version.rsplit("_", 1)
         try:
             return int(parts[1])
         except IndexError:
@@ -202,42 +205,46 @@ class AirHumidifierStatus:
         return None
 
     def __repr__(self) -> str:
-        s = "<AirHumidiferStatus power=%s, " \
-            "mode=%s, " \
-            "temperature=%s, " \
-            "humidity=%s%%, " \
-            "led_brightness=%s, " \
-            "buzzer=%s, " \
-            "child_lock=%s, " \
-            "target_humidity=%s%%, " \
-            "trans_level=%s, " \
-            "motor_speed=%s, " \
-            "depth=%s, " \
-            "dry=%s, " \
-            "use_time=%s, " \
-            "hardware_version=%s, " \
-            "button_pressed=%s, " \
-            "strong_mode_enabled=%s, " \
-            "firmware_version_major=%s, " \
-            "firmware_version_minor=%s>" % \
-            (self.power,
-             self.mode,
-             self.temperature,
-             self.humidity,
-             self.led_brightness,
-             self.buzzer,
-             self.child_lock,
-             self.target_humidity,
-             self.trans_level,
-             self.motor_speed,
-             self.depth,
-             self.dry,
-             self.use_time,
-             self.hardware_version,
-             self.button_pressed,
-             self.strong_mode_enabled,
-             self.firmware_version_major,
-             self.firmware_version_minor)
+        s = (
+            "<AirHumidiferStatus power=%s, "
+            "mode=%s, "
+            "temperature=%s, "
+            "humidity=%s%%, "
+            "led_brightness=%s, "
+            "buzzer=%s, "
+            "child_lock=%s, "
+            "target_humidity=%s%%, "
+            "trans_level=%s, "
+            "motor_speed=%s, "
+            "depth=%s, "
+            "dry=%s, "
+            "use_time=%s, "
+            "hardware_version=%s, "
+            "button_pressed=%s, "
+            "strong_mode_enabled=%s, "
+            "firmware_version_major=%s, "
+            "firmware_version_minor=%s>"
+            % (
+                self.power,
+                self.mode,
+                self.temperature,
+                self.humidity,
+                self.led_brightness,
+                self.buzzer,
+                self.child_lock,
+                self.target_humidity,
+                self.trans_level,
+                self.motor_speed,
+                self.depth,
+                self.dry,
+                self.use_time,
+                self.hardware_version,
+                self.button_pressed,
+                self.strong_mode_enabled,
+                self.firmware_version_major,
+                self.firmware_version_minor,
+            )
+        )
         return s
 
     def __json__(self):
@@ -247,9 +254,15 @@ class AirHumidifierStatus:
 class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
 
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_HUMIDIFIER_V1) -> None:
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_HUMIDIFIER_V1,
+    ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
@@ -276,7 +289,7 @@ class AirHumidifier(Device):
             "Dry: {result.dry}\n"
             "Use time: {result.use_time}\n"
             "Hardware version: {result.hardware_version}\n"
-            "Button pressed: {result.button_pressed}\n"
+            "Button pressed: {result.button_pressed}\n",
         )
     )
     def status(self) -> AirHumidifierStatus:
@@ -307,28 +320,27 @@ class AirHumidifier(Device):
             _LOGGER.error(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         return AirHumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values)), self.device_info)
+            defaultdict(lambda: None, zip(properties, values)), self.device_info
+        )
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
-        default_output=format_output("Setting mode to '{mode.value}'")
+        default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
@@ -343,8 +355,7 @@ class AirHumidifier(Device):
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
-        default_output=format_output(
-            "Setting LED brightness to {brightness}")
+        default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
@@ -356,9 +367,8 @@ class AirHumidifier(Device):
     @command(
         click.argument("led", type=bool),
         default_output=format_output(
-            lambda led: "Turning on LED"
-            if led else "Turning off LED"
-        )
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
@@ -370,9 +380,8 @@ class AirHumidifier(Device):
     @command(
         click.argument("buzzer", type=bool),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer"
-            if buzzer else "Turning off buzzer"
-        )
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
@@ -384,9 +393,8 @@ class AirHumidifier(Device):
     @command(
         click.argument("lock", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock"
-            if lock else "Turning off child lock"
-        )
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
@@ -397,22 +405,20 @@ class AirHumidifier(Device):
 
     @command(
         click.argument("humidity", type=int),
-        default_output=format_output("Setting target humidity to {humidity}")
+        default_output=format_output("Setting target humidity to {humidity}"),
     )
     def set_target_humidity(self, humidity: int):
         """Set the target humidity."""
         if humidity not in [30, 40, 50, 60, 70, 80]:
-            raise AirHumidifierException(
-                "Invalid target humidity: %s" % humidity)
+            raise AirHumidifierException("Invalid target humidity: %s" % humidity)
 
         return self.send("set_limit_hum", [humidity])
 
     @command(
         click.argument("dry", type=bool),
         default_output=format_output(
-            lambda dry: "Turning on dry mode"
-            if dry else "Turning off dry mode"
-        )
+            lambda dry: "Turning on dry mode" if dry else "Turning off dry mode"
+        ),
     )
     def set_dry(self, dry: bool):
         """Set dry mode on/off."""
@@ -423,14 +429,28 @@ class AirHumidifier(Device):
 
 
 class AirHumidifierCA1(AirHumidifier):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_HUMIDIFIER_CA1)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CA1
+        )
 
 
 class AirHumidifierCB1(AirHumidifier):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_HUMIDIFIER_CB1)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CB1
+        )

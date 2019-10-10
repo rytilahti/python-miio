@@ -3,26 +3,25 @@ from unittest import TestCase
 import pytest
 
 from miio import ChuangmiPlug
-from miio.chuangmi_plug import (ChuangmiPlugStatus, MODEL_CHUANGMI_PLUG_V1,
-                                MODEL_CHUANGMI_PLUG_V3,
-                                MODEL_CHUANGMI_PLUG_M1, )
+from miio.chuangmi_plug import (
+    ChuangmiPlugStatus,
+    MODEL_CHUANGMI_PLUG_V1,
+    MODEL_CHUANGMI_PLUG_V3,
+    MODEL_CHUANGMI_PLUG_M1,
+)
 from .dummies import DummyDevice
 
 
 class DummyChuangmiPlugV1(DummyDevice, ChuangmiPlug):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_CHUANGMI_PLUG_V1
-        self.state = {
-            'on': True,
-            'usb_on': True,
-            'temperature': 32,
-        }
+        self.state = {"on": True, "usb_on": True, "temperature": 32}
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_on': lambda x: self._set_state_basic("on", True),
-            'set_off': lambda x: self._set_state_basic("on", False),
-            'set_usb_on': lambda x: self._set_state_basic("usb_on", True),
-            'set_usb_off': lambda x: self._set_state_basic("usb_on", False),
+            "get_prop": self._get_state,
+            "set_on": lambda x: self._set_state_basic("on", True),
+            "set_off": lambda x: self._set_state_basic("on", False),
+            "set_usb_on": lambda x: self._set_state_basic("usb_on", True),
+            "set_usb_off": lambda x: self._set_state_basic("usb_on", False),
         }
         self.start_state = self.state.copy()
 
@@ -62,13 +61,11 @@ class TestChuangmiPlugV1(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(
-            ChuangmiPlugStatus(self.device.start_state))
+        assert repr(self.state()) == repr(ChuangmiPlugStatus(self.device.start_state))
 
         assert self.is_on() is True
         assert self.state().usb_power is True
-        assert self.state().temperature == self.device.start_state[
-            "temperature"]
+        assert self.state().temperature == self.device.start_state["temperature"]
 
     def test_usb_on(self):
         self.device.usb_off()  # ensure off
@@ -88,19 +85,14 @@ class TestChuangmiPlugV1(TestCase):
 class DummyChuangmiPlugV3(DummyDevice, ChuangmiPlug):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_CHUANGMI_PLUG_V3
-        self.state = {
-            'on': True,
-            'usb_on': True,
-            'temperature': 32,
-            'wifi_led': 'off'
-        }
+        self.state = {"on": True, "usb_on": True, "temperature": 32, "wifi_led": "off"}
         self.return_values = {
-            'get_prop': self._get_state,
-            'get_power': self._get_load_power,
-            'set_power': lambda x: self._set_state_basic("on", x == ["on"]),
-            'set_usb_on': lambda x: self._set_state_basic("usb_on", True),
-            'set_usb_off': lambda x: self._set_state_basic("usb_on", False),
-            'set_wifi_led': lambda x: self._set_state("wifi_led", x),
+            "get_prop": self._get_state,
+            "get_power": self._get_load_power,
+            "set_power": lambda x: self._set_state_basic("on", x == ["on"]),
+            "set_usb_on": lambda x: self._set_state_basic("usb_on", True),
+            "set_usb_off": lambda x: self._set_state_basic("usb_on", False),
+            "set_wifi_led": lambda x: self._set_state("wifi_led", x),
         }
         self.start_state = self.state.copy()
 
@@ -147,14 +139,12 @@ class TestChuangmiPlugV3(TestCase):
         load_power = float(self.device._get_load_power().pop(0) * 0.01)
 
         start_state_extended = self.device.start_state.copy()
-        start_state_extended['load_power'] = load_power
-        assert repr(self.state()) == repr(
-            ChuangmiPlugStatus(start_state_extended))
+        start_state_extended["load_power"] = load_power
+        assert repr(self.state()) == repr(ChuangmiPlugStatus(start_state_extended))
 
         assert self.is_on() is True
         assert self.state().usb_power is True
-        assert self.state().temperature == self.device.start_state[
-            "temperature"]
+        assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().load_power == load_power
 
     def test_usb_on(self):
@@ -185,13 +175,10 @@ class TestChuangmiPlugV3(TestCase):
 class DummyChuangmiPlugM1(DummyDevice, ChuangmiPlug):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_CHUANGMI_PLUG_M1
-        self.state = {
-            'power': 'on',
-            'temperature': 32,
-        }
+        self.state = {"power": "on", "temperature": 32}
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
         }
         super().__init__(args, kwargs)
 

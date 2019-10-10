@@ -75,12 +75,12 @@ class TestToiletlidV1(TestCase):
         assert self.state().work_state == self.device.start_state["work_state"]
         assert self.state().ambient_light == self.device.start_state["ambient_light"]
         assert (
-                self.state().filter_use_percentage
-                == "%s%%" % self.device.start_state["filter_use_flux"]
+            self.state().filter_use_percentage
+            == "%s%%" % self.device.start_state["filter_use_flux"]
         )
         assert (
-                self.state().filter_remaining_time
-                == self.device.start_state["filter_use_time"]
+            self.state().filter_remaining_time
+            == self.device.start_state["filter_use_time"]
         )
 
     def test_set_ambient_light(self):

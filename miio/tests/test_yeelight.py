@@ -10,39 +10,36 @@ from .dummies import DummyDevice
 class DummyLight(DummyDevice, Yeelight):
     def __init__(self, *args, **kwargs):
         self.state = {
-            'power': 'off',
-            'bright': '100',
-            'ct': '3584',
-            'rgb': '16711680',
-            'hue': '359',
-            'sat': '100',
-            'color_mode': '2',
-            'name': 'test name',
-            'lan_ctrl': '1',
-            'save_state': '1'
+            "power": "off",
+            "bright": "100",
+            "ct": "3584",
+            "rgb": "16711680",
+            "hue": "359",
+            "sat": "100",
+            "color_mode": "2",
+            "name": "test name",
+            "lan_ctrl": "1",
+            "save_state": "1",
         }
 
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_bright': lambda x: self._set_state("bright", x),
-            'set_ct_abx': lambda x: self._set_state("ct", x),
-            'set_rgb': lambda x: self._set_state("rgb", x),
-            'set_hsv': lambda x: self._set_state("hsv", x),
-            'set_name': lambda x: self._set_state("name", x),
-            'set_ps': lambda x: self.set_config(x),
-            'toggle': self.toggle_power,
-            'set_default': lambda x: 'ok'
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "set_ct_abx": lambda x: self._set_state("ct", x),
+            "set_rgb": lambda x: self._set_state("rgb", x),
+            "set_hsv": lambda x: self._set_state("hsv", x),
+            "set_name": lambda x: self._set_state("name", x),
+            "set_ps": lambda x: self.set_config(x),
+            "toggle": self.toggle_power,
+            "set_default": lambda x: "ok",
         }
 
         super().__init__(*args, **kwargs)
 
     def set_config(self, x):
         key, value = x
-        config_mapping = {
-            'cfg_lan_ctrl': 'lan_ctrl',
-            'cfg_save_state': 'save_state'
-        }
+        config_mapping = {"cfg_lan_ctrl": "lan_ctrl", "cfg_save_state": "save_state"}
 
         self._set_state(config_mapping[key], [value])
 
@@ -130,7 +127,7 @@ class TestYeelight(TestCase):
             return self.device.status().rgb
 
         self.device._reset_state()
-        self.device._set_state('color_mode', [1])
+        self.device._set_state("color_mode", [1])
 
         assert rgb() == (255, 0, 0)
 

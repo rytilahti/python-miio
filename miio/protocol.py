@@ -18,9 +18,22 @@ import logging
 from typing import Any, Dict, Tuple
 
 import construct
-from construct import (Struct, Bytes, Const, Int16ub, Int32ub, GreedyBytes,
-                       Adapter, Checksum, RawCopy, Rebuild, IfThenElse,
-                       Default, Pointer, Hex, )
+from construct import (
+    Struct,
+    Bytes,
+    Const,
+    Int16ub,
+    Int32ub,
+    GreedyBytes,
+    Adapter,
+    Checksum,
+    RawCopy,
+    Rebuild,
+    IfThenElse,
+    Default,
+    Pointer,
+    Hex,
+)
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -67,8 +80,7 @@ class Utils:
         padder = padding.PKCS7(128).padder()
 
         padded_plaintext = padder.update(plaintext) + padder.finalize()
-        cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
-                        backend=default_backend())
+        cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
 
         encryptor = cipher.encryptor()
         return encryptor.update(padded_plaintext) + encryptor.finalize()
@@ -84,8 +96,7 @@ class Utils:
             raise TypeError("ciphertext requires bytes")
         Utils.verify_token(token)
         key, iv = Utils.key_iv(token)
-        cipher = Cipher(algorithms.AES(key), modes.CBC(iv),
-                        backend=default_backend())
+        cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
 
         decryptor = cipher.decryptor()
         padded_plaintext = decryptor.update(ciphertext) + decryptor.finalize()
@@ -116,16 +127,17 @@ class Utils:
     def is_hello(x) -> bool:
         """Return if packet is a hello packet."""
         # not very nice, but we know that hellos are 32b of length
-        if 'length' in x:
-            val = x['length']
+        if "length" in x:
+            val = x["length"]
         else:
-            val = x.header.value['length']
+            val = x.header.value["length"]
 
         return bool(val == 32)
 
 
 class TimeAdapter(Adapter):
     """Adapter for timestamp conversion."""
+
     def _encode(self, obj, context, path):
         return calendar.timegm(obj.timetuple())
 
@@ -135,13 +147,15 @@ class TimeAdapter(Adapter):
 
 class EncryptionAdapter(Adapter):
     """Adapter to handle communication encryption."""
+
     def _encode(self, obj, context, path):
         """Encrypt the given payload with the token stored in the context.
 
         :param obj: JSON object to encrypt"""
         # pp(context)
-        return Utils.encrypt(json.dumps(obj).encode('utf-8') + b'\x00',
-                             context['_']['token'])
+        return Utils.encrypt(
+            json.dumps(obj).encode("utf-8") + b"\x00", context["_"]["token"]
+        )
 
     def _decode(self, obj, context, path):
         """Decrypts the given payload with the token stored in the context.
@@ -149,7 +163,7 @@ class EncryptionAdapter(Adapter):
         :return str: JSON object"""
         try:
             # pp(context)
-            decrypted = Utils.decrypt(obj, context['_']['token'])
+            decrypted = Utils.decrypt(obj, context["_"]["token"])
             decrypted = decrypted.rstrip(b"\x00")
         except Exception:
             _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
@@ -161,17 +175,18 @@ class EncryptionAdapter(Adapter):
             lambda decrypted_bytes: decrypted_bytes,
             # powerstrip returns malformed JSON if the device is not
             # connected to the cloud, so we try to fix it here carefully.
-            lambda decrypted_bytes: decrypted_bytes.replace(b',,"otu_stat"', b',"otu_stat"'),
+            lambda decrypted_bytes: decrypted_bytes.replace(
+                b',,"otu_stat"', b',"otu_stat"'
+            ),
             # xiaomi cloud returns malformed json when answering _sync.batch_gen_room_up_url
             # command so try to sanitize it
-            lambda decrypted_bytes:
-                decrypted_bytes[:decrypted_bytes.rfind(b'\x00')]
-                if b'\x00' in decrypted_bytes
-                else decrypted_bytes
+            lambda decrypted_bytes: decrypted_bytes[: decrypted_bytes.rfind(b"\x00")]
+            if b"\x00" in decrypted_bytes
+            else decrypted_bytes,
         ]
 
         for i, quirk in enumerate(decrypted_quirks):
-            decoded = quirk(decrypted).decode('utf-8')
+            decoded = quirk(decrypted).decode("utf-8")
             try:
                 return json.loads(decoded)
             except Exception as ex:
@@ -186,17 +201,20 @@ class EncryptionAdapter(Adapter):
 Message = Struct(
     # for building we need data before anything else.
     "data" / Pointer(32, RawCopy(EncryptionAdapter(GreedyBytes))),
-    "header" / RawCopy(Struct(
-        Const(0x2131, Int16ub),
-        "length" / Rebuild(Int16ub, Utils.get_length),
-        "unknown" / Default(Int32ub, 0x00000000),
-        "device_id" / Hex(Bytes(4)),
-        "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.utcnow()))
-    )),
-    "checksum" / IfThenElse(
+    "header"
+    / RawCopy(
+        Struct(
+            Const(0x2131, Int16ub),
+            "length" / Rebuild(Int16ub, Utils.get_length),
+            "unknown" / Default(Int32ub, 0x00000000),
+            "device_id" / Hex(Bytes(4)),
+            "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.utcnow())),
+        )
+    ),
+    "checksum"
+    / IfThenElse(
         Utils.is_hello,
         Bytes(16),
-        Checksum(Bytes(16),
-                 Utils.md5,
-                 Utils.checksum_field_bytes)),
+        Checksum(Bytes(16), Utils.md5, Utils.checksum_field_bytes),
+    ),
 )

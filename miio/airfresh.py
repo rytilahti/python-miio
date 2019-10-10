@@ -17,12 +17,12 @@ class AirFreshException(DeviceException):
 
 class OperationMode(enum.Enum):
     # Supported modes of the Air Fresh VA2 (zhimi.airfresh.va2)
-    Auto = 'auto'
-    Silent = 'silent'
-    Interval = 'interval'
-    Low = 'low'
-    Middle = 'middle'
-    Strong = 'strong'
+    Auto = "auto"
+    Silent = "silent"
+    Interval = "interval"
+    Low = "low"
+    Middle = "middle"
+    Strong = "strong"
 
 
 class LedBrightness(enum.Enum):
@@ -92,7 +92,9 @@ class AirFreshStatus:
             try:
                 return LedBrightness(self.data["led_level"])
             except ValueError:
-                _LOGGER.error("Unsupported LED brightness discarded: %s", self.data["led_level"])
+                _LOGGER.error(
+                    "Unsupported LED brightness discarded: %s", self.data["led_level"]
+                )
                 return None
 
         return None
@@ -135,38 +137,42 @@ class AirFreshStatus:
         return self.data["app_extra"]
 
     def __repr__(self) -> str:
-        s = "<AirFreshStatus power=%s, " \
-            "aqi=%s, " \
-            "average_aqi=%s, " \
-            "temperature=%s, " \
-            "humidity=%s%%, " \
-            "co2=%s, " \
-            "mode=%s, " \
-            "led=%s, " \
-            "led_brightness=%s, " \
-            "buzzer=%s, " \
-            "child_lock=%s, " \
-            "filter_life_remaining=%s, " \
-            "filter_hours_used=%s, " \
-            "use_time=%s, " \
-            "motor_speed=%s, " \
-            "extra_features=%s>" % \
-            (self.power,
-             self.aqi,
-             self.average_aqi,
-             self.temperature,
-             self.humidity,
-             self.co2,
-             self.mode,
-             self.led,
-             self.led_brightness,
-             self.buzzer,
-             self.child_lock,
-             self.filter_life_remaining,
-             self.filter_hours_used,
-             self.use_time,
-             self.motor_speed,
-             self.extra_features)
+        s = (
+            "<AirFreshStatus power=%s, "
+            "aqi=%s, "
+            "average_aqi=%s, "
+            "temperature=%s, "
+            "humidity=%s%%, "
+            "co2=%s, "
+            "mode=%s, "
+            "led=%s, "
+            "led_brightness=%s, "
+            "buzzer=%s, "
+            "child_lock=%s, "
+            "filter_life_remaining=%s, "
+            "filter_hours_used=%s, "
+            "use_time=%s, "
+            "motor_speed=%s, "
+            "extra_features=%s>"
+            % (
+                self.power,
+                self.aqi,
+                self.average_aqi,
+                self.temperature,
+                self.humidity,
+                self.co2,
+                self.mode,
+                self.led,
+                self.led_brightness,
+                self.buzzer,
+                self.child_lock,
+                self.filter_life_remaining,
+                self.filter_hours_used,
+                self.use_time,
+                self.motor_speed,
+                self.extra_features,
+            )
+        )
         return s
 
     def __json__(self):
@@ -193,16 +199,33 @@ class AirFresh(Device):
             "Filter life remaining: {result.filter_life_remaining} %\n"
             "Filter hours used: {result.filter_hours_used}\n"
             "Use time: {result.use_time} s\n"
-            "Motor speed: {result.motor_speed} rpm\n"
+            "Motor speed: {result.motor_speed} rpm\n",
         )
     )
     def status(self) -> AirFreshStatus:
         """Retrieve properties."""
 
-        properties = ["power", "temp_dec", "aqi", "average_aqi", "co2", "buzzer", "child_lock",
-                      "humidity", "led_level",  "mode", "motor1_speed", "use_time",
-                      "ntcT", "app_extra", "f1_hour_used", "filter_life", "f_hour",
-                      "favorite_level", "led"]
+        properties = [
+            "power",
+            "temp_dec",
+            "aqi",
+            "average_aqi",
+            "co2",
+            "buzzer",
+            "child_lock",
+            "humidity",
+            "led_level",
+            "mode",
+            "motor1_speed",
+            "use_time",
+            "ntcT",
+            "app_extra",
+            "f1_hour_used",
+            "filter_life",
+            "f_hour",
+            "favorite_level",
+            "led",
+        ]
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
@@ -218,28 +241,25 @@ class AirFresh(Device):
             _LOGGER.debug(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
-        return AirFreshStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+        return AirFreshStatus(defaultdict(lambda: None, zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
-        default_output=format_output("Setting mode to '{mode.value}'")
+        default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
@@ -248,21 +268,19 @@ class AirFresh(Device):
     @command(
         click.argument("led", type=bool),
         default_output=format_output(
-            lambda led: "Turning on LED"
-            if led else "Turning off LED"
-        )
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
         if led:
-            return self.send("set_led", ['on'])
+            return self.send("set_led", ["on"])
         else:
-            return self.send("set_led", ['off'])
+            return self.send("set_led", ["off"])
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
-        default_output=format_output(
-            "Setting LED brightness to {brightness}")
+        default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
@@ -271,9 +289,8 @@ class AirFresh(Device):
     @command(
         click.argument("buzzer", type=bool),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer"
-            if buzzer else "Turning off buzzer"
-        )
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
@@ -285,9 +302,8 @@ class AirFresh(Device):
     @command(
         click.argument("lock", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock"
-            if lock else "Turning off child lock"
-        )
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
@@ -298,7 +314,7 @@ class AirFresh(Device):
 
     @command(
         click.argument("value", type=int),
-        default_output=format_output("Setting extra to {value}")
+        default_output=format_output("Setting extra to {value}"),
     )
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app."""
@@ -307,9 +323,7 @@ class AirFresh(Device):
 
         return self.send("set_app_extra", [value])
 
-    @command(
-        default_output=format_output("Resetting filter")
-    )
+    @command(default_output=format_output("Resetting filter"))
     def reset_filter(self):
         """Resets filter hours used and remaining life."""
-        return self.send('reset_filter1')
+        return self.send("reset_filter1")

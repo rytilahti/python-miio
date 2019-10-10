@@ -3,9 +3,11 @@ from unittest import TestCase
 import pytest
 
 from miio import AirQualityMonitor
-from miio.airqualitymonitor import (AirQualityMonitorStatus,
-                                    MODEL_AIRQUALITYMONITOR_V1,
-                                    MODEL_AIRQUALITYMONITOR_S1)
+from miio.airqualitymonitor import (
+    AirQualityMonitorStatus,
+    MODEL_AIRQUALITYMONITOR_V1,
+    MODEL_AIRQUALITYMONITOR_S1,
+)
 from .dummies import DummyDevice
 
 
@@ -13,21 +15,21 @@ class DummyAirQualityMonitorV1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_AIRQUALITYMONITOR_V1
         self.state = {
-            'power': 'on',
-            'aqi': 34,
-            'battery': 100,
-            'usb_state': 'off',
-            'time_state': 'on',
-            'night_state': 'on',
-            'night_beg_time': 'format unknown',
-            'night_end_time': 'format unknown',
-            'sensor_state': 'format unknown',
+            "power": "on",
+            "aqi": 34,
+            "battery": 100,
+            "usb_state": "off",
+            "time_state": "on",
+            "night_state": "on",
+            "night_beg_time": "format unknown",
+            "night_end_time": "format unknown",
+            "sensor_state": "format unknown",
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_time_state': lambda x: self._set_state("time_state", x),
-            'set_night_state': lambda x: self._set_state("night_state", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_time_state": lambda x: self._set_state("time_state", x),
+            "set_night_state": lambda x: self._set_state("night_state", x),
         }
         super().__init__(args, kwargs)
 
@@ -63,30 +65,34 @@ class TestAirQualityMonitorV1(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirQualityMonitorStatus(self.device.start_state))
+        assert repr(self.state()) == repr(
+            AirQualityMonitorStatus(self.device.start_state)
+        )
 
         assert self.is_on() is True
         assert self.state().aqi == self.device.start_state["aqi"]
         assert self.state().battery == self.device.start_state["battery"]
-        assert self.state().usb_power is (self.device.start_state["usb_state"] == 'on')
-        assert self.state().display_clock is (self.device.start_state["time_state"] == 'on')
-        assert self.state().night_mode is (self.device.start_state["night_state"] == 'on')
+        assert self.state().usb_power is (self.device.start_state["usb_state"] == "on")
+        assert self.state().display_clock is (
+            self.device.start_state["time_state"] == "on"
+        )
+        assert self.state().night_mode is (
+            self.device.start_state["night_state"] == "on"
+        )
 
 
 class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_AIRQUALITYMONITOR_S1
         self.state = {
-            'battery': 100,
-            'co2': 695,
-            'humidity': 62.1,
-            'pm25': 19.4,
-            'temperature': 27.4,
-            'tvoc': 254,
+            "battery": 100,
+            "co2": 695,
+            "humidity": 62.1,
+            "pm25": 19.4,
+            "temperature": 27.4,
+            "tvoc": 254,
         }
-        self.return_values = {
-            'get_prop': self._get_state,
-        }
+        self.return_values = {"get_prop": self._get_state}
         super().__init__(args, kwargs)
 
     def _get_state(self, props):
@@ -108,7 +114,9 @@ class TestAirQualityMonitorS1(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirQualityMonitorStatus(self.device.start_state))
+        assert repr(self.state()) == repr(
+            AirQualityMonitorStatus(self.device.start_state)
+        )
 
         assert self.state().battery == self.device.start_state["battery"]
         assert self.state().co2 == self.device.start_state["co2"]

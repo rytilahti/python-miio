@@ -18,21 +18,21 @@ class AirPurifierException(DeviceException):
 
 class OperationMode(enum.Enum):
     # Supported modes of the Air Purifier Pro, 2, V3
-    Auto = 'auto'
-    Silent = 'silent'
-    Favorite = 'favorite'
+    Auto = "auto"
+    Silent = "silent"
+    Favorite = "favorite"
     # Additional supported modes of the Air Purifier 2 and V3
-    Idle = 'idle'
+    Idle = "idle"
     # Additional supported modes of the Air Purifier V3
-    Medium = 'medium'
-    High = 'high'
-    Strong = 'strong'
+    Medium = "medium"
+    High = "high"
+    Strong = "strong"
 
 
 class SleepMode(enum.Enum):
-    Off = 'poweroff'
-    Silent = 'silent'
-    Idle = 'idle'
+    Off = "poweroff"
+    Silent = "silent"
+    Idle = "idle"
 
 
 class LedBrightness(enum.Enum):
@@ -42,16 +42,16 @@ class LedBrightness(enum.Enum):
 
 
 class FilterType(enum.Enum):
-    Regular = 'regular'
-    AntiBacterial = 'anti-bacterial'
-    AntiFormaldehyde = 'anti-formaldehyde'
-    Unknown = 'unknown'
+    Regular = "regular"
+    AntiBacterial = "anti-bacterial"
+    AntiFormaldehyde = "anti-formaldehyde"
+    Unknown = "unknown"
 
 
 FILTER_TYPE_RE = (
-    (re.compile(r'^\d+:\d+:41:30$'), FilterType.AntiBacterial),
-    (re.compile(r'^\d+:\d+:(30|0|00):31$'), FilterType.AntiFormaldehyde),
-    (re.compile(r'.*'), FilterType.Regular),
+    (re.compile(r"^\d+:\d+:41:30$"), FilterType.AntiBacterial),
+    (re.compile(r"^\d+:\d+:(30|0|00):31$"), FilterType.AntiFormaldehyde),
+    (re.compile(r".*"), FilterType.Regular),
 )
 
 
@@ -240,7 +240,7 @@ class AirPurifierStatus:
         """Type of installed filter."""
         if self.filter_rfid_tag is None:
             return None
-        if self.filter_rfid_tag == '0:0:0:0:0:0:0':
+        if self.filter_rfid_tag == "0:0:0:0:0:0:0":
             return FilterType.Unknown
         if self.filter_rfid_product_id is None:
             return FilterType.Regular
@@ -294,66 +294,70 @@ class AirPurifierStatus:
         return ft
 
     def __repr__(self) -> str:
-        s = "<AirPurifierStatus power=%s, " \
-            "aqi=%s, " \
-            "average_aqi=%s, " \
-            "temperature=%s, " \
-            "humidity=%s%%, " \
-            "mode=%s, " \
-            "led=%s, " \
-            "led_brightness=%s, " \
-            "illuminance=%s, " \
-            "buzzer=%s, " \
-            "child_lock=%s, " \
-            "favorite_level=%s, " \
-            "filter_life_remaining=%s, " \
-            "filter_hours_used=%s, " \
-            "use_time=%s, " \
-            "purify_volume=%s, " \
-            "motor_speed=%s, " \
-            "motor2_speed=%s, " \
-            "volume=%s, " \
-            "filter_rfid_product_id=%s, " \
-            "filter_rfid_tag=%s, " \
-            "filter_type=%s, " \
-            "learn_mode=%s, " \
-            "sleep_mode=%s, " \
-            "sleep_time=%s, " \
-            "sleep_mode_learn_count=%s, " \
-            "extra_features=%s, " \
-            "turbo_mode_supported=%s, " \
-            "auto_detect=%s, " \
-            "button_pressed=%s>" % \
-            (self.power,
-             self.aqi,
-             self.average_aqi,
-             self.temperature,
-             self.humidity,
-             self.mode,
-             self.led,
-             self.led_brightness,
-             self.illuminance,
-             self.buzzer,
-             self.child_lock,
-             self.favorite_level,
-             self.filter_life_remaining,
-             self.filter_hours_used,
-             self.use_time,
-             self.purify_volume,
-             self.motor_speed,
-             self.motor2_speed,
-             self.volume,
-             self.filter_rfid_product_id,
-             self.filter_rfid_tag,
-             self.filter_type,
-             self.learn_mode,
-             self.sleep_mode,
-             self.sleep_time,
-             self.sleep_mode_learn_count,
-             self.extra_features,
-             self.turbo_mode_supported,
-             self.auto_detect,
-             self.button_pressed)
+        s = (
+            "<AirPurifierStatus power=%s, "
+            "aqi=%s, "
+            "average_aqi=%s, "
+            "temperature=%s, "
+            "humidity=%s%%, "
+            "mode=%s, "
+            "led=%s, "
+            "led_brightness=%s, "
+            "illuminance=%s, "
+            "buzzer=%s, "
+            "child_lock=%s, "
+            "favorite_level=%s, "
+            "filter_life_remaining=%s, "
+            "filter_hours_used=%s, "
+            "use_time=%s, "
+            "purify_volume=%s, "
+            "motor_speed=%s, "
+            "motor2_speed=%s, "
+            "volume=%s, "
+            "filter_rfid_product_id=%s, "
+            "filter_rfid_tag=%s, "
+            "filter_type=%s, "
+            "learn_mode=%s, "
+            "sleep_mode=%s, "
+            "sleep_time=%s, "
+            "sleep_mode_learn_count=%s, "
+            "extra_features=%s, "
+            "turbo_mode_supported=%s, "
+            "auto_detect=%s, "
+            "button_pressed=%s>"
+            % (
+                self.power,
+                self.aqi,
+                self.average_aqi,
+                self.temperature,
+                self.humidity,
+                self.mode,
+                self.led,
+                self.led_brightness,
+                self.illuminance,
+                self.buzzer,
+                self.child_lock,
+                self.favorite_level,
+                self.filter_life_remaining,
+                self.filter_hours_used,
+                self.use_time,
+                self.purify_volume,
+                self.motor_speed,
+                self.motor2_speed,
+                self.volume,
+                self.filter_rfid_product_id,
+                self.filter_rfid_tag,
+                self.filter_type,
+                self.learn_mode,
+                self.sleep_mode,
+                self.sleep_time,
+                self.sleep_mode_learn_count,
+                self.extra_features,
+                self.turbo_mode_supported,
+                self.auto_detect,
+                self.button_pressed,
+            )
+        )
         return s
 
     def __json__(self):
@@ -392,21 +396,44 @@ class AirPurifier(Device):
             "Sleep mode: {result.sleep_mode}\n"
             "Sleep time: {result.sleep_time}\n"
             "Sleep mode learn count: {result.sleep_mode_learn_count}\n"
-            "AQI sensor enabled on power off: {result.auto_detect}\n"
+            "AQI sensor enabled on power off: {result.auto_detect}\n",
         )
     )
     def status(self) -> AirPurifierStatus:
         """Retrieve properties."""
 
-        properties = ['power', 'aqi', 'average_aqi', 'humidity', 'temp_dec',
-                      'mode', 'favorite_level', 'filter1_life', 'f1_hour_used',
-                      'use_time', 'motor1_speed', 'motor2_speed',
-                      'purify_volume', 'f1_hour', 'led',
-                      # Second request
-                      'led_b', 'bright', 'buzzer', 'child_lock', 'volume',
-                      'rfid_product_id', 'rfid_tag', 'act_sleep', 'sleep_mode',
-                      'sleep_time', 'sleep_data_num', 'app_extra', 'act_det',
-                      'button_pressed']
+        properties = [
+            "power",
+            "aqi",
+            "average_aqi",
+            "humidity",
+            "temp_dec",
+            "mode",
+            "favorite_level",
+            "filter1_life",
+            "f1_hour_used",
+            "use_time",
+            "motor1_speed",
+            "motor2_speed",
+            "purify_volume",
+            "f1_hour",
+            "led",
+            # Second request
+            "led_b",
+            "bright",
+            "buzzer",
+            "child_lock",
+            "volume",
+            "rfid_product_id",
+            "rfid_tag",
+            "act_sleep",
+            "sleep_mode",
+            "sleep_time",
+            "sleep_data_num",
+            "app_extra",
+            "act_det",
+            "button_pressed",
+        ]
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
@@ -422,28 +449,25 @@ class AirPurifier(Device):
             _LOGGER.debug(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
-        return AirPurifierStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+        return AirPurifierStatus(defaultdict(lambda: None, zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
-        default_output=format_output("Setting mode to '{mode.value}'")
+        default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
@@ -451,7 +475,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting favorite level to {level}")
+        default_output=format_output("Setting favorite level to {level}"),
     )
     def set_favorite_level(self, level: int):
         """Set favorite level."""
@@ -466,8 +490,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
-        default_output=format_output(
-            "Setting LED brightness to {brightness}")
+        default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
@@ -476,23 +499,21 @@ class AirPurifier(Device):
     @command(
         click.argument("led", type=bool),
         default_output=format_output(
-            lambda led: "Turning on LED"
-            if led else "Turning off LED"
-        )
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
         if led:
-            return self.send("set_led", ['on'])
+            return self.send("set_led", ["on"])
         else:
-            return self.send("set_led", ['off'])
+            return self.send("set_led", ["off"])
 
     @command(
         click.argument("buzzer", type=bool),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer"
-            if buzzer else "Turning off buzzer"
-        )
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
@@ -504,9 +525,8 @@ class AirPurifier(Device):
     @command(
         click.argument("lock", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock"
-            if lock else "Turning off child lock"
-        )
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
@@ -517,7 +537,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("volume", type=int),
-        default_output=format_output("Setting favorite level to {volume}")
+        default_output=format_output("Setting favorite level to {volume}"),
     )
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
@@ -530,8 +550,9 @@ class AirPurifier(Device):
         click.argument("learn_mode", type=bool),
         default_output=format_output(
             lambda learn_mode: "Turning on learn mode"
-            if learn_mode else "Turning off learn mode"
-        )
+            if learn_mode
+            else "Turning off learn mode"
+        ),
     )
     def set_learn_mode(self, learn_mode: bool):
         """Set the Learn Mode on/off."""
@@ -544,8 +565,9 @@ class AirPurifier(Device):
         click.argument("auto_detect", type=bool),
         default_output=format_output(
             lambda auto_detect: "Turning on auto detect"
-            if auto_detect else "Turning off auto detect"
-        )
+            if auto_detect
+            else "Turning off auto detect"
+        ),
     )
     def set_auto_detect(self, auto_detect: bool):
         """Set auto detect on/off. It's a feature of the AirPurifier V1 & V3"""
@@ -556,7 +578,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("value", type=int),
-        default_output=format_output("Setting extra to {value}")
+        default_output=format_output("Setting extra to {value}"),
     )
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app.
@@ -568,9 +590,7 @@ class AirPurifier(Device):
 
         return self.send("set_app_extra", [value])
 
-    @command(
-        default_output=format_output("Resetting filter")
-    )
+    @command(default_output=format_output("Resetting filter"))
     def reset_filter(self):
         """Resets filter hours used and remaining life."""
-        return self.send('reset_filter1')
+        return self.send("reset_filter1")

@@ -3,8 +3,18 @@ from unittest import TestCase
 import pytest
 
 from miio import Fan, FanP5
-from miio.fan import (MoveDirection, LedBrightness, OperationMode, FanStatus, FanStatusP5,
-                      FanException, MODEL_FAN_V2, MODEL_FAN_V3, MODEL_FAN_SA1, MODEL_FAN_P5, )
+from miio.fan import (
+    MoveDirection,
+    LedBrightness,
+    OperationMode,
+    FanStatus,
+    FanStatusP5,
+    FanException,
+    MODEL_FAN_V2,
+    MODEL_FAN_V3,
+    MODEL_FAN_SA1,
+    MODEL_FAN_P5,
+)
 from .dummies import DummyDevice
 
 
@@ -13,40 +23,40 @@ class DummyFanV2(DummyDevice, Fan):
         self.model = MODEL_FAN_V2
         # This example response is just a guess. Please update!
         self.state = {
-            'temp_dec': 232,
-            'humidity': 46,
-            'angle': 118,
-            'speed': 298,
-            'poweroff_time': 0,
-            'power': 'on',
-            'ac_power': 'off',
-            'battery': 98,
-            'angle_enable': 'off',
-            'speed_level': 1,
-            'natural_level': 0,
-            'child_lock': 'off',
-            'buzzer': 'on',
-            'led_b': 1,
-            'led': 'on',
-            'natural_enable': None,
-            'use_time': 0,
-            'bat_charge': 'complete',
-            'bat_state': None,
-            'button_pressed': 'speed'
+            "temp_dec": 232,
+            "humidity": 46,
+            "angle": 118,
+            "speed": 298,
+            "poweroff_time": 0,
+            "power": "on",
+            "ac_power": "off",
+            "battery": 98,
+            "angle_enable": "off",
+            "speed_level": 1,
+            "natural_level": 0,
+            "child_lock": "off",
+            "buzzer": "on",
+            "led_b": 1,
+            "led": "on",
+            "natural_enable": None,
+            "use_time": 0,
+            "bat_charge": "complete",
+            "bat_state": None,
+            "button_pressed": "speed",
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_speed_level': lambda x: self._set_state("speed_level", x),
-            'set_natural_level': lambda x: self._set_state("natural_level", x),
-            'set_move': lambda x: True,
-            'set_angle': lambda x: self._set_state("angle", x),
-            'set_angle_enable': lambda x: self._set_state("angle_enable", x),
-            'set_led_b': lambda x: self._set_state("led_b", x),
-            'set_led': lambda x: self._set_state("led", x),
-            'set_buzzer': lambda x: self._set_state("buzzer", x),
-            'set_child_lock': lambda x: self._set_state("child_lock", x),
-            'set_poweroff_time': lambda x: self._set_state("poweroff_time", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_speed_level": lambda x: self._set_state("speed_level", x),
+            "set_natural_level": lambda x: self._set_state("natural_level", x),
+            "set_move": lambda x: True,
+            "set_angle": lambda x: self._set_state("angle", x),
+            "set_angle_enable": lambda x: self._set_state("angle_enable", x),
+            "set_led_b": lambda x: self._set_state("led_b", x),
+            "set_led": lambda x: self._set_state("led", x),
+            "set_buzzer": lambda x: self._set_state("buzzer", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
+            "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
         }
         super().__init__(args, kwargs)
 
@@ -89,15 +99,23 @@ class TestFanV2(TestCase):
         assert self.state().humidity == self.device.start_state["humidity"]
         assert self.state().angle == self.device.start_state["angle"]
         assert self.state().speed == self.device.start_state["speed"]
-        assert self.state().delay_off_countdown == self.device.start_state["poweroff_time"]
-        assert self.state().ac_power is (self.device.start_state["ac_power"] == 'on')
+        assert (
+            self.state().delay_off_countdown == self.device.start_state["poweroff_time"]
+        )
+        assert self.state().ac_power is (self.device.start_state["ac_power"] == "on")
         assert self.state().battery == self.device.start_state["battery"]
-        assert self.state().oscillate is (self.device.start_state["angle_enable"] == 'on')
+        assert self.state().oscillate is (
+            self.device.start_state["angle_enable"] == "on"
+        )
         assert self.state().direct_speed == self.device.start_state["speed_level"]
         assert self.state().natural_speed == self.device.start_state["natural_level"]
-        assert self.state().child_lock is (self.device.start_state["child_lock"] == 'on')
-        assert self.state().buzzer is (self.device.start_state["buzzer"] == 'on')
-        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
+        assert self.state().child_lock is (
+            self.device.start_state["child_lock"] == "on"
+        )
+        assert self.state().buzzer is (self.device.start_state["buzzer"] == "on")
+        assert self.state().led_brightness == LedBrightness(
+            self.device.start_state["led_b"]
+        )
         assert self.state().led is (self.device.start_state["led"] == "on")
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().battery_charge == self.device.start_state["bat_charge"]
@@ -166,6 +184,7 @@ class TestFanV2(TestCase):
         The property "angle" doesn't provide the current setting.
         It's a measurement of the current position probably.
         """
+
         def angle():
             return self.device.status().angle
 
@@ -251,40 +270,40 @@ class DummyFanV3(DummyDevice, Fan):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_FAN_V3
         self.state = {
-            'temp_dec': 232,
-            'humidity': 46,
-            'angle': 118,
-            'speed': 298,
-            'poweroff_time': 0,
-            'power': 'on',
-            'ac_power': 'off',
-            'battery': 98,
-            'angle_enable': 'off',
-            'speed_level': 1,
-            'natural_level': 0,
-            'child_lock': 'off',
-            'buzzer': 'on',
-            'led_b': 1,
-            'led': None,
-            'natural_enable': None,
-            'use_time': 0,
-            'bat_charge': 'complete',
-            'bat_state': None,
-            'button_pressed': 'speed'
+            "temp_dec": 232,
+            "humidity": 46,
+            "angle": 118,
+            "speed": 298,
+            "poweroff_time": 0,
+            "power": "on",
+            "ac_power": "off",
+            "battery": 98,
+            "angle_enable": "off",
+            "speed_level": 1,
+            "natural_level": 0,
+            "child_lock": "off",
+            "buzzer": "on",
+            "led_b": 1,
+            "led": None,
+            "natural_enable": None,
+            "use_time": 0,
+            "bat_charge": "complete",
+            "bat_state": None,
+            "button_pressed": "speed",
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_speed_level': lambda x: self._set_state("speed_level", x),
-            'set_natural_level': lambda x: self._set_state("natural_level", x),
-            'set_move': lambda x: True,
-            'set_angle': lambda x: self._set_state("angle", x),
-            'set_angle_enable': lambda x: self._set_state("angle_enable", x),
-            'set_led_b': lambda x: self._set_state("led_b", x),
-            'set_led': lambda x: self._set_state("led", x),
-            'set_buzzer': lambda x: self._set_state("buzzer", x),
-            'set_child_lock': lambda x: self._set_state("child_lock", x),
-            'set_poweroff_time': lambda x: self._set_state("poweroff_time", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_speed_level": lambda x: self._set_state("speed_level", x),
+            "set_natural_level": lambda x: self._set_state("natural_level", x),
+            "set_move": lambda x: True,
+            "set_angle": lambda x: self._set_state("angle", x),
+            "set_angle_enable": lambda x: self._set_state("angle_enable", x),
+            "set_led_b": lambda x: self._set_state("led_b", x),
+            "set_led": lambda x: self._set_state("led", x),
+            "set_buzzer": lambda x: self._set_state("buzzer", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
+            "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
         }
         super().__init__(args, kwargs)
 
@@ -327,15 +346,23 @@ class TestFanV3(TestCase):
         assert self.state().humidity == self.device.start_state["humidity"]
         assert self.state().angle == self.device.start_state["angle"]
         assert self.state().speed == self.device.start_state["speed"]
-        assert self.state().delay_off_countdown == self.device.start_state["poweroff_time"]
-        assert self.state().ac_power is (self.device.start_state["ac_power"] == 'on')
+        assert (
+            self.state().delay_off_countdown == self.device.start_state["poweroff_time"]
+        )
+        assert self.state().ac_power is (self.device.start_state["ac_power"] == "on")
         assert self.state().battery == self.device.start_state["battery"]
-        assert self.state().oscillate is (self.device.start_state["angle_enable"] == 'on')
+        assert self.state().oscillate is (
+            self.device.start_state["angle_enable"] == "on"
+        )
         assert self.state().direct_speed == self.device.start_state["speed_level"]
         assert self.state().natural_speed == self.device.start_state["natural_level"]
-        assert self.state().child_lock is (self.device.start_state["child_lock"] == 'on')
-        assert self.state().buzzer is (self.device.start_state["buzzer"] == 'on')
-        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
+        assert self.state().child_lock is (
+            self.device.start_state["child_lock"] == "on"
+        )
+        assert self.state().buzzer is (self.device.start_state["buzzer"] == "on")
+        assert self.state().led_brightness == LedBrightness(
+            self.device.start_state["led_b"]
+        )
         assert self.state().led is None
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().battery_charge == self.device.start_state["bat_charge"]
@@ -411,6 +438,7 @@ class TestFanV3(TestCase):
         The property "angle" doesn't provide the current setting.
         It's a measurement of the current position probably.
         """
+
         def angle():
             return self.device.status().angle
 
@@ -496,32 +524,32 @@ class DummyFanSA1(DummyDevice, Fan):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_FAN_SA1
         self.state = {
-            'angle': 120,
-            'speed': 277,
-            'poweroff_time': 0,
-            'power': 'on',
-            'ac_power': 'on',
-            'angle_enable': 'off',
-            'speed_level': 1,
-            'natural_level': 2,
-            'child_lock': 'off',
-            'buzzer': 0,
-            'led_b': 0,
-            'use_time': 2318
+            "angle": 120,
+            "speed": 277,
+            "poweroff_time": 0,
+            "power": "on",
+            "ac_power": "on",
+            "angle_enable": "off",
+            "speed_level": 1,
+            "natural_level": 2,
+            "child_lock": "off",
+            "buzzer": 0,
+            "led_b": 0,
+            "use_time": 2318,
         }
 
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("power", x),
-            'set_speed_level': lambda x: self._set_state("speed_level", x),
-            'set_natural_level': lambda x: self._set_state("natural_level", x),
-            'set_move': lambda x: True,
-            'set_angle': lambda x: self._set_state("angle", x),
-            'set_angle_enable': lambda x: self._set_state("angle_enable", x),
-            'set_led_b': lambda x: self._set_state("led_b", x),
-            'set_buzzer': lambda x: self._set_state("buzzer", x),
-            'set_child_lock': lambda x: self._set_state("child_lock", x),
-            'set_poweroff_time': lambda x: self._set_state("poweroff_time", x),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_speed_level": lambda x: self._set_state("speed_level", x),
+            "set_natural_level": lambda x: self._set_state("natural_level", x),
+            "set_move": lambda x: True,
+            "set_angle": lambda x: self._set_state("angle", x),
+            "set_angle_enable": lambda x: self._set_state("angle_enable", x),
+            "set_led_b": lambda x: self._set_state("led_b", x),
+            "set_buzzer": lambda x: self._set_state("buzzer", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
+            "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
         }
         super().__init__(args, kwargs)
 
@@ -562,14 +590,22 @@ class TestFanSA1(TestCase):
         assert self.is_on() is True
         assert self.state().angle == self.device.start_state["angle"]
         assert self.state().speed == self.device.start_state["speed"]
-        assert self.state().delay_off_countdown == self.device.start_state["poweroff_time"]
-        assert self.state().ac_power is (self.device.start_state["ac_power"] == 'on')
-        assert self.state().oscillate is (self.device.start_state["angle_enable"] == 'on')
+        assert (
+            self.state().delay_off_countdown == self.device.start_state["poweroff_time"]
+        )
+        assert self.state().ac_power is (self.device.start_state["ac_power"] == "on")
+        assert self.state().oscillate is (
+            self.device.start_state["angle_enable"] == "on"
+        )
         assert self.state().direct_speed == self.device.start_state["speed_level"]
         assert self.state().natural_speed == self.device.start_state["natural_level"]
-        assert self.state().child_lock is (self.device.start_state["child_lock"] == 'on')
-        assert self.state().buzzer is (self.device.start_state["buzzer"] == 'on')
-        assert self.state().led_brightness == LedBrightness(self.device.start_state["led_b"])
+        assert self.state().child_lock is (
+            self.device.start_state["child_lock"] == "on"
+        )
+        assert self.state().buzzer is (self.device.start_state["buzzer"] == "on")
+        assert self.state().led_brightness == LedBrightness(
+            self.device.start_state["led_b"]
+        )
         assert self.state().led is None
         assert self.state().use_time == self.device.start_state["use_time"]
 
@@ -618,6 +654,7 @@ class TestFanSA1(TestCase):
         The property "angle" doesn't provide the current setting.
         It's a measurement of the current position probably.
         """
+
         def angle():
             return self.device.status().angle
 
@@ -703,28 +740,28 @@ class DummyFanP5(DummyDevice, FanP5):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_FAN_P5
         self.state = {
-            'power': True,
-            'mode': 'normal',
-            'speed': 35,
-            'roll_enable': False,
-            'roll_angle': 140,
-            'time_off': 0,
-            'light': True,
-            'beep_sound': False,
-            'child_lock': False,
+            "power": True,
+            "mode": "normal",
+            "speed": 35,
+            "roll_enable": False,
+            "roll_angle": 140,
+            "time_off": 0,
+            "light": True,
+            "beep_sound": False,
+            "child_lock": False,
         }
 
         self.return_values = {
-            'get_prop': self._get_state,
-            's_power': lambda x: self._set_state("power", x),
-            's_mode': lambda x: self._set_state("mode", x),
-            's_speed': lambda x: self._set_state("speed", x),
-            's_roll': lambda x: self._set_state("roll_enable", x),
-            's_angle': lambda x: self._set_state("roll_angle", x),
-            's_t_off': lambda x: self._set_state("time_off", x),
-            's_light': lambda x: self._set_state("light", x),
-            's_sound': lambda x: self._set_state("beep_sound", x),
-            's_lock': lambda x: self._set_state("child_lock", x),
+            "get_prop": self._get_state,
+            "s_power": lambda x: self._set_state("power", x),
+            "s_mode": lambda x: self._set_state("mode", x),
+            "s_speed": lambda x: self._set_state("speed", x),
+            "s_roll": lambda x: self._set_state("roll_enable", x),
+            "s_angle": lambda x: self._set_state("roll_angle", x),
+            "s_t_off": lambda x: self._set_state("time_off", x),
+            "s_light": lambda x: self._set_state("light", x),
+            "s_sound": lambda x: self._set_state("beep_sound", x),
+            "s_lock": lambda x: self._set_state("child_lock", x),
         }
         super().__init__(args, kwargs)
 

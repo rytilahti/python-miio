@@ -14,8 +14,12 @@ from appdirs import user_cache_dir
 from tqdm import tqdm
 
 import miio  # noqa: E402
-from miio.click_common import (ExceptionHandlerGroup, validate_ip,
-                               validate_token, LiteralParamType)
+from miio.click_common import (
+    ExceptionHandlerGroup,
+    validate_ip,
+    validate_token,
+    LiteralParamType,
+)
 from .device import UpdateState
 from .updater import OneShotServer
 
@@ -24,11 +28,14 @@ pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
 
 
 @click.group(invoke_without_command=True, cls=ExceptionHandlerGroup)
-@click.option('--ip', envvar="MIROBO_IP", callback=validate_ip)
-@click.option('--token', envvar="MIROBO_TOKEN", callback=validate_token)
-@click.option('-d', '--debug', default=False, count=True)
-@click.option('--id-file', type=click.Path(dir_okay=False, writable=True),
-              default=user_cache_dir('python-miio') + '/python-mirobo.seq')
+@click.option("--ip", envvar="MIROBO_IP", callback=validate_ip)
+@click.option("--token", envvar="MIROBO_TOKEN", callback=validate_token)
+@click.option("-d", "--debug", default=False, count=True)
+@click.option(
+    "--id-file",
+    type=click.Path(dir_okay=False, writable=True),
+    default=user_cache_dir("python-miio") + "/python-mirobo.seq",
+)
 @click.version_option()
 @click.pass_context
 def cli(ctx, ip: str, token: str, debug: int, id_file: str):
@@ -50,7 +57,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 
     start_id = manual_seq = 0
     try:
-        with open(id_file, 'r') as f:
+        with open(id_file, "r") as f:
             x = json.load(f)
             start_id = x.get("seq", 0)
             manual_seq = x.get("manual_seq", 0)
@@ -75,8 +82,8 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 def cleanup(vac: miio.Vacuum, *args, **kwargs):
     if vac.ip is None:  # dummy Device for discovery, skip teardown
         return
-    id_file = kwargs['id_file']
-    seqs = {'seq': vac.raw_id, 'manual_seq': vac.manual_seqnum}
+    id_file = kwargs["id_file"]
+    seqs = {"seq": vac.raw_id, "manual_seq": vac.manual_seqnum}
     _LOGGER.debug("Writing %s to %s", seqs, id_file)
     path_obj = pathlib.Path(id_file)
     dir = path_obj.parents[0]
@@ -84,12 +91,12 @@ def cleanup(vac: miio.Vacuum, *args, **kwargs):
         dir.mkdir(parents=True)
     except FileExistsError:
         pass  # after dropping py3.4 support, use exist_ok for mkdir
-    with open(id_file, 'w') as f:
+    with open(id_file, "w") as f:
         json.dump(seqs, f)
 
 
 @cli.command()
-@click.option('--handshake', type=bool, default=False)
+@click.option("--handshake", type=bool, default=False)
 def discover(handshake):
     """Search for robots in the network."""
     if handshake:
@@ -107,8 +114,7 @@ def status(vac: miio.Vacuum):
         return  # bail out
 
     if res.error_code:
-        click.echo(click.style("Error: %s !" % res.error,
-                               bold=True, fg='red'))
+        click.echo(click.style("Error: %s !" % res.error, bold=True, fg="red"))
     click.echo(click.style("State: %s" % res.state, bold=True))
     click.echo("Battery: %s %%" % res.battery)
     click.echo("Fanspeed: %s %%" % res.fanspeed)
@@ -124,18 +130,14 @@ def status(vac: miio.Vacuum):
 def consumables(vac: miio.Vacuum):
     """Return consumables status."""
     res = vac.consumable_status()
-    click.echo("Main brush:   %s (left %s)" % (res.main_brush,
-                                               res.main_brush_left))
-    click.echo("Side brush:   %s (left %s)" % (res.side_brush,
-                                               res.side_brush_left))
-    click.echo("Filter:       %s (left %s)" % (res.filter,
-                                               res.filter_left))
-    click.echo("Sensor dirty: %s (left %s)" % (res.sensor_dirty,
-                                               res.sensor_dirty_left))
+    click.echo("Main brush:   %s (left %s)" % (res.main_brush, res.main_brush_left))
+    click.echo("Side brush:   %s (left %s)" % (res.side_brush, res.side_brush_left))
+    click.echo("Filter:       %s (left %s)" % (res.filter, res.filter_left))
+    click.echo("Sensor dirty: %s (left %s)" % (res.sensor_dirty, res.sensor_dirty_left))
 
 
 @cli.command()
-@click.argument('name', type=str, required=True)
+@click.argument("name", type=str, required=True)
 @pass_dev
 def reset_consumable(vac: miio.Vacuum, name):
     """Reset consumable state.
@@ -143,22 +145,22 @@ def reset_consumable(vac: miio.Vacuum, name):
     Allowed values: main_brush, side_brush, filter, sensor_dirty
     """
     from miio.vacuum import Consumable
-    if name == 'main_brush':
+
+    if name == "main_brush":
         consumable = Consumable.MainBrush
-    elif name == 'side_brush':
+    elif name == "side_brush":
         consumable = Consumable.SideBrush
-    elif name == 'filter':
+    elif name == "filter":
         consumable = Consumable.Filter
-    elif name == 'sensor_dirty':
+    elif name == "sensor_dirty":
         consumable = Consumable.SensorDirty
     else:
         click.echo("Unexpected state name: %s" % name)
         return
 
-    click.echo("Resetting consumable '%s': %s" % (
-        name,
-        vac.consumable_reset(consumable)
-    ))
+    click.echo(
+        "Resetting consumable '%s': %s" % (name, vac.consumable_reset(consumable))
+    )
 
 
 @cli.command()
@@ -198,8 +200,8 @@ def home(vac: miio.Vacuum):
 
 @cli.command()
 @pass_dev
-@click.argument('x_coord', type=int)
-@click.argument('y_coord', type=int)
+@click.argument("x_coord", type=int)
+@click.argument("y_coord", type=int)
 def goto(vac: miio.Vacuum, x_coord: int, y_coord: int):
     """Go to specific target."""
     click.echo("Going to target : %s" % vac.goto(x_coord, y_coord))
@@ -212,16 +214,17 @@ def zoned_clean(vac: miio.Vacuum, zones: List):
     """Clean zone."""
     click.echo("Cleaning zone(s) : %s" % vac.zoned_clean(zones))
 
+
 @cli.group()
 @pass_dev
 # @click.argument('command', required=False)
 def manual(vac: miio.Vacuum):
     """Control the robot manually."""
-    command = ''
-    if command == 'start':
+    command = ""
+    if command == "start":
         click.echo("Starting manual control")
         return vac.manual_start()
-    if command == 'stop':
+    if command == "stop":
         click.echo("Stopping manual control")
         return vac.manual_stop()
     # if not vac.manual_mode and command :
@@ -245,7 +248,7 @@ def stop(vac: miio.Vacuum):
 
 @manual.command()
 @pass_dev
-@click.argument('degrees', type=int)
+@click.argument("degrees", type=int)
 def left(vac: miio.Vacuum, degrees: int):
     """Turn to left."""
     click.echo("Turning %s degrees left" % degrees)
@@ -254,7 +257,7 @@ def left(vac: miio.Vacuum, degrees: int):
 
 @manual.command()
 @pass_dev
-@click.argument('degrees', type=int)
+@click.argument("degrees", type=int)
 def right(vac: miio.Vacuum, degrees: int):
     """Turn to right."""
     click.echo("Turning right")
@@ -262,7 +265,7 @@ def right(vac: miio.Vacuum, degrees: int):
 
 
 @manual.command()
-@click.argument('amount', type=float)
+@click.argument("amount", type=float)
 @pass_dev
 def forward(vac: miio.Vacuum, amount: float):
     """Run forwards."""
@@ -271,7 +274,7 @@ def forward(vac: miio.Vacuum, amount: float):
 
 
 @manual.command()
-@click.argument('amount', type=float)
+@click.argument("amount", type=float)
 @pass_dev
 def backward(vac: miio.Vacuum, amount: float):
     """Run backwards."""
@@ -281,40 +284,45 @@ def backward(vac: miio.Vacuum, amount: float):
 
 @manual.command()
 @pass_dev
-@click.argument('rotation', type=float)
-@click.argument('velocity', type=float)
-@click.argument('duration', type=int)
+@click.argument("rotation", type=float)
+@click.argument("velocity", type=float)
+@click.argument("duration", type=int)
 def move(vac: miio.Vacuum, rotation: int, velocity: float, duration: int):
     """Pass raw manual values"""
     return vac.manual_control(rotation, velocity, duration)
 
 
 @cli.command()
-@click.argument('cmd', required=False)
-@click.argument('start_hr', type=int, required=False)
-@click.argument('start_min', type=int, required=False)
-@click.argument('end_hr', type=int, required=False)
-@click.argument('end_min', type=int, required=False)
+@click.argument("cmd", required=False)
+@click.argument("start_hr", type=int, required=False)
+@click.argument("start_min", type=int, required=False)
+@click.argument("end_hr", type=int, required=False)
+@click.argument("end_min", type=int, required=False)
 @pass_dev
-def dnd(vac: miio.Vacuum, cmd: str,
-        start_hr: int, start_min: int,
-        end_hr: int, end_min: int):
+def dnd(
+    vac: miio.Vacuum, cmd: str, start_hr: int, start_min: int, end_hr: int, end_min: int
+):
     """Query and adjust do-not-disturb mode."""
     if cmd == "off":
         click.echo("Disabling DND..")
         print(vac.disable_dnd())
     elif cmd == "on":
-        click.echo("Enabling DND %s:%s to %s:%s" % (start_hr, start_min,
-                                                    end_hr, end_min))
+        click.echo(
+            "Enabling DND %s:%s to %s:%s" % (start_hr, start_min, end_hr, end_min)
+        )
         click.echo(vac.set_dnd(start_hr, start_min, end_hr, end_min))
     else:
         x = vac.dnd_status()
-        click.echo(click.style("Between %s and %s (enabled: %s)" % (
-            x.start, x.end, x.enabled), bold=x.enabled))
+        click.echo(
+            click.style(
+                "Between %s and %s (enabled: %s)" % (x.start, x.end, x.enabled),
+                bold=x.enabled,
+            )
+        )
 
 
 @cli.command()
-@click.argument('speed', type=int, required=False)
+@click.argument("speed", type=int, required=False)
 @pass_dev
 def fanspeed(vac: miio.Vacuum, speed):
     """Query and adjust the fan speed."""
@@ -336,18 +344,23 @@ def timer(ctx, vac: miio.Vacuum):
     click.echo("Timezone: %s\n" % vac.timezone())
     for idx, timer in enumerate(timers):
         color = "green" if timer.enabled else "yellow"
-        click.echo(click.style("Timer #%s, id %s (ts: %s)" % (
-            idx, timer.id, timer.ts), bold=True, fg=color))
+        click.echo(
+            click.style(
+                "Timer #%s, id %s (ts: %s)" % (idx, timer.id, timer.ts),
+                bold=True,
+                fg=color,
+            )
+        )
         click.echo("  %s" % timer.cron)
-        min, hr, x, y, days = timer.cron.split(' ')
+        min, hr, x, y, days = timer.cron.split(" ")
         cron = "%s %s %s %s %s" % (min, hr, x, y, days)
         click.echo("  %s" % cron)
 
 
 @timer.command()
-@click.option('--cron')
-@click.option('--command', default='', required=False)
-@click.option('--params', default='', required=False)
+@click.option("--cron")
+@click.option("--command", default="", required=False)
+@click.option("--params", default="", required=False)
 @pass_dev
 def add(vac: miio.Vacuum, cron, command, params):
     """Add a timer."""
@@ -355,7 +368,7 @@ def add(vac: miio.Vacuum, cron, command, params):
 
 
 @timer.command()
-@click.argument('timer_id', type=int, required=True)
+@click.argument("timer_id", type=int, required=True)
 @pass_dev
 def delete(vac: miio.Vacuum, timer_id):
     """Delete a timer."""
@@ -363,13 +376,14 @@ def delete(vac: miio.Vacuum, timer_id):
 
 
 @timer.command()
-@click.argument('timer_id', type=int, required=True)
-@click.option('--enable', is_flag=True)
-@click.option('--disable', is_flag=True)
+@click.argument("timer_id", type=int, required=True)
+@click.option("--enable", is_flag=True)
+@click.option("--disable", is_flag=True)
 @pass_dev
 def update(vac: miio.Vacuum, timer_id, enable, disable):
     """Enable/disable a timer."""
     from miio.vacuum import TimerState
+
     if enable and not disable:
         vac.update_timer(timer_id, TimerState.On)
     elif disable and not enable:
@@ -403,8 +417,10 @@ def info(vac: miio.Vacuum):
         click.echo("%s" % res)
         _LOGGER.debug("Full response: %s", pf(res.raw))
     except TypeError:
-        click.echo("Unable to fetch info, this can happen when the vacuum "
-                   "is not connected to the Xiaomi cloud.")
+        click.echo(
+            "Unable to fetch info, this can happen when the vacuum "
+            "is not connected to the Xiaomi cloud."
+        )
 
 
 @cli.command()
@@ -413,24 +429,27 @@ def cleaning_history(vac: miio.Vacuum):
     """Query the cleaning history."""
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
-    click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration,
-                                                  res.total_area))
+    click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration, res.total_area))
     click.echo()
     for idx, id_ in enumerate(res.ids):
         details = vac.clean_details(id_, return_list=False)
         color = "green" if details.complete else "yellow"
-        click.echo(click.style(
-            "Clean #%s: %s-%s (complete: %s, error: %s)" % (
-                idx, details.start, details.end, details.complete, details.error),
-            bold=True, fg=color))
+        click.echo(
+            click.style(
+                "Clean #%s: %s-%s (complete: %s, error: %s)"
+                % (idx, details.start, details.end, details.complete, details.error),
+                bold=True,
+                fg=color,
+            )
+        )
         click.echo("  Area cleaned: %s m²" % details.area)
         click.echo("  Duration: (%s)" % details.duration)
         click.echo()
 
 
 @cli.command()
-@click.argument('volume', type=int, required=False)
-@click.option('--test', 'test_mode', is_flag=True, help="play a test tune")
+@click.argument("volume", type=int, required=False)
+@click.option("--test", "test_mode", is_flag=True, help="play a test tune")
 @pass_dev
 def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
     """Query and change sound settings."""
@@ -445,10 +464,10 @@ def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
 
 
 @cli.command()
-@click.argument('url')
-@click.argument('md5sum', required=False, default=None)
-@click.option('--sid', type=int, required=False, default=10000)
-@click.option('--ip', required=False)
+@click.argument("url")
+@click.argument("md5sum", required=False, default=None)
+@click.option("--sid", type=int, required=False, default=10000)
+@click.option("--ip", required=False)
 @pass_dev
 def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int, ip: str):
     """Install a sound.
@@ -497,6 +516,7 @@ def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int, ip: str):
     if server is not None:
         t.join()
 
+
 @cli.command()
 @pass_dev
 def serial_number(vac: miio.Vacuum):
@@ -505,7 +525,7 @@ def serial_number(vac: miio.Vacuum):
 
 
 @cli.command()
-@click.argument('tz', required=False)
+@click.argument("tz", required=False)
 @pass_dev
 def timezone(vac: miio.Vacuum, tz=None):
     """Query or set the timezone."""
@@ -517,7 +537,7 @@ def timezone(vac: miio.Vacuum, tz=None):
 
 
 @cli.command()
-@click.argument('enabled', required=False, type=bool)
+@click.argument("enabled", required=False, type=bool)
 @pass_dev
 def carpet_mode(vac: miio.Vacuum, enabled=None):
     """Query or set the carpet mode."""
@@ -526,14 +546,14 @@ def carpet_mode(vac: miio.Vacuum, enabled=None):
     else:
         click.echo(vac.set_carpet_mode(enabled))
 
+
 @cli.command()
-@click.argument('ssid', required=True)
-@click.argument('password', required=True)
-@click.argument('uid', type=int, required=False)
-@click.option('--timezone', type=str, required=False, default=None)
+@click.argument("ssid", required=True)
+@click.argument("password", required=True)
+@click.argument("uid", type=int, required=False)
+@click.option("--timezone", type=str, required=False, default=None)
 @pass_dev
-def configure_wifi(vac: miio.Vacuum, ssid: str, password: str,
-                   uid: int, timezone: str):
+def configure_wifi(vac: miio.Vacuum, ssid: str, password: str, uid: int, timezone: str):
     """Configure the wifi settings.
 
     Note that some newer firmwares may expect you to define the timezone
@@ -554,9 +574,9 @@ def update_status(vac: miio.Vacuum):
 
 
 @cli.command()
-@click.argument('url', required=True)
-@click.argument('md5', required=False, default=None)
-@click.option('--ip', required=False)
+@click.argument("url", required=True)
+@click.argument("md5", required=False, default=None)
+@click.option("--ip", required=False)
 @pass_dev
 def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
     """Update device firmware.
@@ -611,8 +631,8 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
 
 
 @cli.command()
-@click.argument('cmd', required=True)
-@click.argument('parameters', required=False)
+@click.argument("cmd", required=True)
+@click.argument("parameters", required=False)
 @pass_dev
 def raw_command(vac: miio.Vacuum, cmd, parameters):
     """Run a raw command."""

@@ -27,6 +27,7 @@ class CameraException(DeviceException):
 @attr.s
 class CameraOffset:
     """Container for camera offset data."""
+
     x = attr.ib()
     y = attr.ib()
     radius = attr.ib()
@@ -35,6 +36,7 @@ class CameraOffset:
 @attr.s
 class ArmStatus:
     """Container for arm statuses."""
+
     is_armed = attr.ib(converter=bool)
     arm_wait_time = attr.ib(converter=int)
     alarm_volume = attr.ib(converter=int)
@@ -42,6 +44,7 @@ class ArmStatus:
 
 class SDCardStatus(IntEnum):
     """State of the SD card."""
+
     NoCardInserted = 0
     Ok = 1
     FormatRequired = 2
@@ -52,6 +55,7 @@ class MotionDetectionSensitivity(IntEnum):
     """'Default' values for md sensitivity.
     Currently unused as the value can also be set arbitrarily.
     """
+
     High = 6000000
     Medium = 10000000
     Low = 11000000
@@ -116,9 +120,11 @@ class CameraStatus:
     @property
     def offsets(self) -> CameraOffset:
         """Camera offset information."""
-        return CameraOffset(x=self.data["offset_x"],
-                            y=self.data["offset_y"],
-                            radius=self.data["offset_radius"])
+        return CameraOffset(
+            x=self.data["offset_x"],
+            y=self.data["offset_y"],
+            radius=self.data["offset_radius"],
+        )
 
     @property
     def channel_id(self) -> int:
@@ -146,25 +152,28 @@ class CameraStatus:
         return self.data["avPass"]
 
     def __repr__(self) -> str:
-        s = "<CameraStatus is_on=%s, " \
-            "type=%s, " \
-            "offset=%s, " \
-            "ir=%s, " \
-            "md=%s, " \
-            "md_sensitivity=%s, " \
-            "led=%s, " \
-            "flip=%s, " \
-            "fullstop=%s>" \
-            % (self.is_on,
-               self.type,
-               self.offsets,
-               self.ir,
-               self.md,
-               self.md_sensitivity,
-               self.led,
-               self.flipped,
-               self.fullstop
-               )
+        s = (
+            "<CameraStatus is_on=%s, "
+            "type=%s, "
+            "offset=%s, "
+            "ir=%s, "
+            "md=%s, "
+            "md_sensitivity=%s, "
+            "led=%s, "
+            "flip=%s, "
+            "fullstop=%s>"
+            % (
+                self.is_on,
+                self.type,
+                self.offsets,
+                self.ir,
+                self.md,
+                self.md_sensitivity,
+                self.led,
+                self.flipped,
+                self.fullstop,
+            )
+        )
         return s
 
     def __json__(self):
@@ -188,112 +197,85 @@ class AqaraCamera(Device):
             "P2P ID: {result.p2p_id}\n"
             "AV ID: {result.av_id}\n"
             "AV password: {result.av_password}\n"
-            "\n"
+            "\n",
         )
     )
     def status(self) -> CameraStatus:
         """Camera status."""
         return CameraStatus(self.send("get_ipcprop", ["all"]))
 
-    @command(
-        default_output=format_output("Camera on"),
-    )
+    @command(default_output=format_output("Camera on"))
     def on(self):
         """Camera on."""
         return self.send("set_video", ["on"])
 
-    @command(
-        default_output=format_output("Camera off"),
-    )
+    @command(default_output=format_output("Camera off"))
     def off(self):
         """Camera off."""
         return self.send("set_video", ["off"])
 
-    @command(
-        default_output=format_output("IR on")
-    )
+    @command(default_output=format_output("IR on"))
     def ir_on(self):
         """IR on."""
         return self.send("set_ir", ["on"])
 
-    @command(
-        default_output=format_output("IR off")
-    )
+    @command(default_output=format_output("IR off"))
     def ir_off(self):
         """IR off."""
         return self.send("set_ir", ["off"])
 
-    @command(
-        default_output=format_output("MD on")
-    )
+    @command(default_output=format_output("MD on"))
     def md_on(self):
         """IR on."""
         return self.send("set_md", ["on"])
 
-    @command(
-        default_output=format_output("MD off")
-    )
+    @command(default_output=format_output("MD off"))
     def md_off(self):
         """MD off."""
         return self.send("set_md", ["off"])
 
-    @command(
-        click.argument("sensitivity", type=int, required=False)
-    )
+    @command(click.argument("sensitivity", type=int, required=False))
     def md_sensitivity(self, sensitivity):
         """Get or set the motion detection sensitivity."""
         if sensitivity:
             click.echo("Setting MD sensitivity to %s" % sensitivity)
-            return self.send("set_mdsensitivity", [sensitivity])[0] == 'ok'
+            return self.send("set_mdsensitivity", [sensitivity])[0] == "ok"
         else:
             return self.send("get_mdsensitivity")
 
-    @command(
-        default_output=format_output("LED on")
-    )
+    @command(default_output=format_output("LED on"))
     def led_on(self):
         """LED on."""
         return self.send("set_led", ["on"])
 
-    @command(
-        default_output=format_output("LED off")
-    )
+    @command(default_output=format_output("LED off"))
     def led_off(self):
         """LED off."""
         return self.send("set_led", ["off"])
 
-    @command(
-        default_output=format_output("Flip on")
-    )
+    @command(default_output=format_output("Flip on"))
     def flip_on(self):
         """Flip on."""
         return self.send("set_flip", ["on"])
 
-    @command(
-        default_output=format_output("Flip off")
-    )
+    @command(default_output=format_output("Flip off"))
     def flip_off(self):
         """Flip off."""
         return self.send("set_flip", ["off"])
 
-    @command(
-        default_output=format_output("Fullstop on")
-    )
+    @command(default_output=format_output("Fullstop on"))
     def fullstop_on(self):
         """Fullstop on."""
         return self.send("set_fullstop", ["on"])
 
-    @command(
-        default_output=format_output("Fullstop off")
-    )
+    @command(default_output=format_output("Fullstop off"))
     def fullstop_off(self):
         """Fullstop off."""
         return self.send("set_fullstop", ["off"])
 
     @command(
         click.argument("time", type=int, default=30),
-        default_output=format_output(
-            "Start pairing for {time} seconds")
+        default_output=format_output("Start pairing for {time} seconds"),
     )
     def pair(self, timeout: int):
         """Start (or stop with "0") pairing."""
@@ -322,25 +304,23 @@ class AqaraCamera(Device):
         arm_wait_time = self.send("get_arm_wait_time")
         alarm_volume = self.send("get_alarming_volume")
 
-        return ArmStatus(is_armed=bool(is_armed),
-                         arm_wait_time=arm_wait_time,
-                         alarm_volume=alarm_volume)
+        return ArmStatus(
+            is_armed=bool(is_armed),
+            arm_wait_time=arm_wait_time,
+            alarm_volume=alarm_volume,
+        )
 
     @command(
         click.argument("volume", type=int, default=100),
-        default_output=format_output(
-            "Setting alarm volume to {volume}"
-        )
+        default_output=format_output("Setting alarm volume to {volume}"),
     )
     def set_alarm_volume(self, volume):
         """Set alarm volume."""
         if volume < 0 or volume > 100:
             raise CameraException("Volume has to be [0,100], was %s" % volume)
-        return self.send("set_alarming_volume", [volume])[0] == 'ok'
+        return self.send("set_alarming_volume", [volume])[0] == "ok"
 
-    @command(
-        click.argument("sound_id", type=str, required=False, default=None)
-    )
+    @command(click.argument("sound_id", type=str, required=False, default=None))
     def alarm_sound(self, sound_id):
         """List or set the alarm sound."""
         if id is None:
@@ -356,18 +336,14 @@ class AqaraCamera(Device):
             return sound_status
 
         click.echo("Setting alarm sound to %s" % sound_id)
-        return self.send("set_default_music", [0, sound_id])[0] == 'ok'
+        return self.send("set_default_music", [0, sound_id])[0] == "ok"
 
-    @command(
-        default_output=format_output("Arming")
-    )
+    @command(default_output=format_output("Arming"))
     def arm(self):
         """Arm the camera?"""
         return self.send("set_arming", ["on"])
 
-    @command(
-        default_output=format_output("Disarming")
-    )
+    @command(default_output=format_output("Disarming"))
     def disarm(self):
         """Disarm the camera?"""
         return self.send("set_arming", ["off"])

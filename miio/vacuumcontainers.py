@@ -39,6 +39,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 
 class VacuumStatus:
     """Container for status reports from the vacuum."""
+
     def __init__(self, data: Dict[str, Any]) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
@@ -66,26 +67,26 @@ class VacuumStatus:
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
         states = {
-            1: 'Starting',
-            2: 'Charger disconnected',
-            3: 'Idle',
-            4: 'Remote control active',
-            5: 'Cleaning',
-            6: 'Returning home',
-            7: 'Manual mode',
-            8: 'Charging',
-            9: 'Charging problem',
-            10: 'Paused',
-            11: 'Spot cleaning',
-            12: 'Error',
-            13: 'Shutting down',
-            14: 'Updating',
-            15: 'Docking',
-            16: 'Going to target',
-            17: 'Zoned cleaning',
-            18: 'Segment cleaning',
-            100: 'Charging complete',
-            101: 'Device offline',
+            1: "Starting",
+            2: "Charger disconnected",
+            3: "Idle",
+            4: "Remote control active",
+            5: "Cleaning",
+            6: "Returning home",
+            7: "Manual mode",
+            8: "Charging",
+            9: "Charging problem",
+            10: "Paused",
+            11: "Spot cleaning",
+            12: "Error",
+            13: "Shutting down",
+            14: "Updating",
+            15: "Docking",
+            16: "Going to target",
+            17: "Zoned cleaning",
+            18: "Segment cleaning",
+            100: "Charging complete",
+            101: "Device offline",
         }
         try:
             return states[int(self.state_code)]
@@ -158,10 +159,12 @@ class VacuumStatus:
     def is_on(self) -> bool:
         """True if device is currently cleaning (either automatic, manual,
          spot, or zone)."""
-        return (self.state_code == 5 or
-                self.state_code == 7 or
-                self.state_code == 11 or
-                self.state_code == 17)
+        return (
+            self.state_code == 5
+            or self.state_code == 7
+            or self.state_code == 11
+            or self.state_code == 17
+        )
 
     @property
     def got_error(self) -> bool:
@@ -180,6 +183,7 @@ class VacuumStatus:
 
 class CleaningSummary:
     """Contains summarized information about available cleaning runs."""
+
     def __init__(self, data: List[Any]) -> None:
         # total duration, total area, amount of cleans
         # [ list, of, ids ]
@@ -210,11 +214,10 @@ class CleaningSummary:
         return list(self.data[3])
 
     def __repr__(self) -> str:
-        return "<CleaningSummary: %s times, total time: %s, total area: %s, ids: %s>" % (  # noqa: E501
-            self.count,
-            self.total_duration,
-            self.total_area,
-            self.ids)
+        return (
+            "<CleaningSummary: %s times, total time: %s, total area: %s, ids: %s>"
+            % (self.count, self.total_duration, self.total_area, self.ids)  # noqa: E501
+        )
 
     def __json__(self):
         return self.data
@@ -222,6 +225,7 @@ class CleaningSummary:
 
 class CleaningDetails:
     """Contains details about a specific cleaning run."""
+
     def __init__(self, data: List[Any]) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
@@ -266,7 +270,10 @@ class CleaningDetails:
 
     def __repr__(self) -> str:
         return "<CleaningDetails: %s (duration: %s, done: %s), area: %s>" % (
-            self.start, self.duration, self.complete, self.area
+            self.start,
+            self.duration,
+            self.complete,
+            self.area,
         )
 
     def __json__(self):
@@ -283,6 +290,7 @@ class ConsumableStatus:
     - Side brush: 200 hours
     - Filter: 150 hours
     """
+
     def __init__(self, data: Dict[str, Any]) -> None:
         # {'id': 1, 'result': [{'filter_work_time': 32454,
         #  'sensor_dirty_time': 3798,
@@ -334,8 +342,15 @@ class ConsumableStatus:
         return self.sensor_dirty_total - self.sensor_dirty
 
     def __repr__(self) -> str:
-        return "<ConsumableStatus main: %s, side: %s, filter: %s, sensor dirty: %s>" % (  # noqa: E501
-            self.main_brush, self.side_brush, self.filter, self.sensor_dirty)
+        return (
+            "<ConsumableStatus main: %s, side: %s, filter: %s, sensor dirty: %s>"
+            % (  # noqa: E501
+                self.main_brush,
+                self.side_brush,
+                self.filter,
+                self.sensor_dirty,
+            )
+        )
 
     def __json__(self):
         return self.data
@@ -343,6 +358,7 @@ class ConsumableStatus:
 
 class DNDStatus:
     """A container for the do-not-disturb status."""
+
     def __init__(self, data: Dict[str, Any]):
         # {'end_minute': 0, 'enabled': 1, 'start_minute': 0,
         #  'start_hour': 22, 'end_hour': 8}
@@ -356,20 +372,19 @@ class DNDStatus:
     @property
     def start(self) -> time:
         """Start time of DnD."""
-        return time(hour=self.data["start_hour"],
-                    minute=self.data["start_minute"])
+        return time(hour=self.data["start_hour"], minute=self.data["start_minute"])
 
     @property
     def end(self) -> time:
         """End time of DnD."""
-        return time(hour=self.data["end_hour"],
-                    minute=self.data["end_minute"])
+        return time(hour=self.data["end_hour"], minute=self.data["end_minute"])
 
     def __repr__(self):
         return "<DNDStatus enabled: %s - between %s and %s>" % (
             self.enabled,
             self.start,
-            self.end)
+            self.end,
+        )
 
     def __json__(self):
         return self.data
@@ -379,6 +394,7 @@ class Timer:
     """A container for scheduling.
     The timers are accessed using an integer ID, which is based on the unix
     timestamp of the creation time."""
+
     def __init__(self, data: List[Any]) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
@@ -399,7 +415,7 @@ class Timer:
     @property
     def enabled(self) -> bool:
         """True if the timer is active."""
-        return bool(self.data[1] == 'on')
+        return bool(self.data[1] == "on")
 
     @property
     def cron(self) -> str:
@@ -413,8 +429,12 @@ class Timer:
         return str(self.data[2][1])
 
     def __repr__(self) -> str:
-        return "<Timer %s: %s - enabled: %s - cron: %s>" % (self.id, self.ts,
-                                                            self.enabled, self.cron)
+        return "<Timer %s: %s - enabled: %s - cron: %s>" % (
+            self.id,
+            self.ts,
+            self.enabled,
+            self.cron,
+        )
 
     def __json__(self):
         return self.data
@@ -422,22 +442,24 @@ class Timer:
 
 class SoundStatus:
     """Container for sound status."""
+
     def __init__(self, data):
         # {'sid_in_progress': 0, 'sid_in_use': 1004}
         self.data = data
 
     @property
     def current(self):
-        return self.data['sid_in_use']
+        return self.data["sid_in_use"]
 
     @property
     def being_installed(self):
-        return self.data['sid_in_progress']
+        return self.data["sid_in_progress"]
 
     def __repr__(self):
         return "<SoundStatus current: %s installing: %s>" % (
             self.current,
-            self.being_installed)
+            self.being_installed,
+        )
 
     def __json__(self):
         return self.data
@@ -453,6 +475,7 @@ class SoundInstallState(IntEnum):
 
 class SoundInstallStatus:
     """Container for sound installation status."""
+
     def __init__(self, data):
         # {'progress': 0, 'sid_in_progress': 0, 'state': 0, 'error': 0}
         # error 0 = no error
@@ -466,29 +489,31 @@ class SoundInstallStatus:
     @property
     def state(self) -> SoundInstallState:
         """Installation state."""
-        return SoundInstallState(self.data['state'])
+        return SoundInstallState(self.data["state"])
 
     @property
     def progress(self) -> int:
         """Progress in percentages."""
-        return self.data['progress']
+        return self.data["progress"]
 
     @property
     def sid(self) -> int:
         """Sound ID for the sound being installed."""
         # this is missing on install confirmation, so let's use get
-        return self.data.get('sid_in_progress', None)
+        return self.data.get("sid_in_progress", None)
 
     @property
     def error(self) -> int:
         """Error code, 0 is no error, other values unknown."""
-        return self.data['error']
+        return self.data["error"]
 
     @property
     def is_installing(self) -> bool:
         """True if install is in progress."""
-        return (self.state == SoundInstallState.Downloading or
-                self.state == SoundInstallState.Installing)
+        return (
+            self.state == SoundInstallState.Downloading
+            or self.state == SoundInstallState.Installing
+        )
 
     @property
     def is_errored(self) -> bool:
@@ -496,9 +521,10 @@ class SoundInstallStatus:
         return self.state == SoundInstallState.Error
 
     def __repr__(self) -> str:
-        return "<SoundInstallStatus sid: %s (state: %s, error: %s)" \
-               " - progress: %s>" % (self.sid, self.state,
-                                     self.error, self.progress)
+        return (
+            "<SoundInstallStatus sid: %s (state: %s, error: %s)"
+            " - progress: %s>" % (self.sid, self.state, self.error, self.progress)
+        )
 
     def __json__(self):
         return self.data
@@ -506,6 +532,7 @@ class SoundInstallStatus:
 
 class CarpetModeStatus:
     """Container for carpet mode status."""
+
     def __init__(self, data):
         # {'current_high': 500, 'enable': 1, 'current_integral': 450,
         #  'current_low': 400, 'stall_time': 10}
@@ -514,32 +541,37 @@ class CarpetModeStatus:
     @property
     def enabled(self) -> bool:
         """True if carpet mode is enabled."""
-        return self.data['enable'] == 1
+        return self.data["enable"] == 1
 
     @property
     def stall_time(self) -> int:
-        return self.data['stall_time']
+        return self.data["stall_time"]
 
     @property
     def current_low(self) -> int:
-        return self.data['current_low']
+        return self.data["current_low"]
 
     @property
     def current_high(self) -> int:
-        return self.data['current_high']
+        return self.data["current_high"]
 
     @property
     def current_integral(self) -> int:
-        return self.data['current_integral']
+        return self.data["current_integral"]
 
     def __repr__(self):
-        return "<CarpetModeStatus enabled=%s, " \
-               "stall_time: %s, " \
-               "current (low, high, integral): (%s, %s, %s)>" % (self.enabled,
-                                                                 self.stall_time,
-                                                                 self.current_low,
-                                                                 self.current_high,
-                                                                 self.current_integral)
+        return (
+            "<CarpetModeStatus enabled=%s, "
+            "stall_time: %s, "
+            "current (low, high, integral): (%s, %s, %s)>"
+            % (
+                self.enabled,
+                self.stall_time,
+                self.current_low,
+                self.current_high,
+                self.current_integral,
+            )
+        )
 
     def __json__(self):
         return self.data

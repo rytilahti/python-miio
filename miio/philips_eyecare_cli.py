@@ -5,8 +5,7 @@ import sys
 import click
 
 import miio  # noqa: E402
-from miio.click_common import (ExceptionHandlerGroup, validate_ip,
-                               validate_token, )
+from miio.click_common import ExceptionHandlerGroup, validate_ip, validate_token
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.PhilipsEyecare)
@@ -15,28 +14,28 @@ pass_dev = click.make_pass_decorator(miio.PhilipsEyecare)
 def validate_brightness(ctx, param, value):
     value = int(value)
     if value < 1 or value > 100:
-        raise click.BadParameter('Should be a positive int between 1-100.')
+        raise click.BadParameter("Should be a positive int between 1-100.")
     return value
 
 
 def validate_minutes(ctx, param, value):
     value = int(value)
     if value < 0 or value > 60:
-        raise click.BadParameter('Should be a positive int between 1-60.')
+        raise click.BadParameter("Should be a positive int between 1-60.")
     return value
 
 
 def validate_scene(ctx, param, value):
     value = int(value)
     if value < 1 or value > 3:
-        raise click.BadParameter('Should be a positive int between 1-3.')
+        raise click.BadParameter("Should be a positive int between 1-3.")
     return value
 
 
 @click.group(invoke_without_command=True, cls=ExceptionHandlerGroup)
-@click.option('--ip', envvar="DEVICE_IP", callback=validate_ip)
-@click.option('--token', envvar="DEVICE_TOKEN", callback=validate_token)
-@click.option('-d', '--debug', default=False, count=True)
+@click.option("--ip", envvar="DEVICE_IP", callback=validate_ip)
+@click.option("--token", envvar="DEVICE_TOKEN", callback=validate_token)
+@click.option("-d", "--debug", default=False, count=True)
 @click.pass_context
 def cli(ctx, ip: str, token: str, debug: int):
     """A tool to command Xiaomi Philips Eyecare Smart Lamp 2."""
@@ -86,8 +85,9 @@ def status(dev: miio.PhilipsEyecare):
     click.echo("Eyecare Mode: %s" % res.eyecare)
     click.echo("Eyecare Scene: %s" % res.scene)
     click.echo("Night Light: %s " % res.smart_night_light)
-    click.echo("Countdown of the delayed turn off: %s minutes"
-               % res.delay_off_countdown)
+    click.echo(
+        "Countdown of the delayed turn off: %s minutes" % res.delay_off_countdown
+    )
 
 
 @cli.command()
@@ -105,7 +105,7 @@ def off(dev: miio.PhilipsEyecare):
 
 
 @cli.command()
-@click.argument('level', callback=validate_brightness, required=True,)
+@click.argument("level", callback=validate_brightness, required=True)
 @pass_dev
 def set_brightness(dev: miio.PhilipsEyecare, level):
     """Set brightness level."""
@@ -113,7 +113,7 @@ def set_brightness(dev: miio.PhilipsEyecare, level):
 
 
 @cli.command()
-@click.argument('scene', callback=validate_scene, required=True,)
+@click.argument("scene", callback=validate_scene, required=True)
 @pass_dev
 def set_scene(dev: miio.PhilipsEyecare, scene):
     """Set eyecare scene number."""
@@ -121,7 +121,7 @@ def set_scene(dev: miio.PhilipsEyecare, scene):
 
 
 @cli.command()
-@click.argument('minutes', callback=validate_minutes, required=True,)
+@click.argument("minutes", callback=validate_minutes, required=True)
 @pass_dev
 def delay_off(dev: miio.PhilipsEyecare, minutes):
     """Set delay off in minutes."""
@@ -171,12 +171,11 @@ def ambient_off(dev: miio.PhilipsEyecare):
 
 
 @cli.command()
-@click.argument('level', callback=validate_brightness, required=True,)
+@click.argument("level", callback=validate_brightness, required=True)
 @pass_dev
 def set_ambient_brightness(dev: miio.PhilipsEyecare, level):
     """Set Ambient Light brightness level."""
-    click.echo("Ambient Light Brightness: %s" %
-               dev.set_ambient_brightness(level))
+    click.echo("Ambient Light Brightness: %s" % dev.set_ambient_brightness(level))
 
 
 if __name__ == "__main__":

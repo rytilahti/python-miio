@@ -10,22 +10,22 @@ from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
-MODEL_CHUANGMI_PLUG_V3 = 'chuangmi.plug.v3'
-MODEL_CHUANGMI_PLUG_V1 = 'chuangmi.plug.v1'
-MODEL_CHUANGMI_PLUG_M1 = 'chuangmi.plug.m1'
-MODEL_CHUANGMI_PLUG_M3 = 'chuangmi.plug.m3'
-MODEL_CHUANGMI_PLUG_V2 = 'chuangmi.plug.v2'
-MODEL_CHUANGMI_PLUG_HMI205 = 'chuangmi.plug.hmi205'
-MODEL_CHUANGMI_PLUG_HMI206 = 'chuangmi.plug.hmi206'
+MODEL_CHUANGMI_PLUG_V3 = "chuangmi.plug.v3"
+MODEL_CHUANGMI_PLUG_V1 = "chuangmi.plug.v1"
+MODEL_CHUANGMI_PLUG_M1 = "chuangmi.plug.m1"
+MODEL_CHUANGMI_PLUG_M3 = "chuangmi.plug.m3"
+MODEL_CHUANGMI_PLUG_V2 = "chuangmi.plug.v2"
+MODEL_CHUANGMI_PLUG_HMI205 = "chuangmi.plug.hmi205"
+MODEL_CHUANGMI_PLUG_HMI206 = "chuangmi.plug.hmi206"
 
 AVAILABLE_PROPERTIES = {
-    MODEL_CHUANGMI_PLUG_V1: ['on', 'usb_on', 'temperature'],
-    MODEL_CHUANGMI_PLUG_V3: ['on', 'usb_on', 'temperature', 'wifi_led'],
-    MODEL_CHUANGMI_PLUG_M1: ['power', 'temperature'],
-    MODEL_CHUANGMI_PLUG_M3: ['power', 'temperature'],
-    MODEL_CHUANGMI_PLUG_V2: ['power', 'temperature'],
-    MODEL_CHUANGMI_PLUG_HMI205: ['power', 'temperature'],
-    MODEL_CHUANGMI_PLUG_HMI206: ['power', 'temperature'],
+    MODEL_CHUANGMI_PLUG_V1: ["on", "usb_on", "temperature"],
+    MODEL_CHUANGMI_PLUG_V3: ["on", "usb_on", "temperature", "wifi_led"],
+    MODEL_CHUANGMI_PLUG_M1: ["power", "temperature"],
+    MODEL_CHUANGMI_PLUG_M3: ["power", "temperature"],
+    MODEL_CHUANGMI_PLUG_V2: ["power", "temperature"],
+    MODEL_CHUANGMI_PLUG_HMI205: ["power", "temperature"],
+    MODEL_CHUANGMI_PLUG_HMI206: ["power", "temperature"],
 }
 
 
@@ -48,7 +48,7 @@ class ChuangmiPlugStatus:
         if "on" in self.data:
             return self.data["on"]
         if "power" in self.data:
-            return self.data["power"] == 'on'
+            return self.data["power"] == "on"
 
     @property
     def is_on(self) -> bool:
@@ -81,17 +81,21 @@ class ChuangmiPlugStatus:
         return None
 
     def __repr__(self) -> str:
-        s = "<ChuangmiPlugStatus " \
-            "power=%s, " \
-            "usb_power=%s, " \
-            "temperature=%s, " \
-            "load_power=%s, " \
-            "wifi_led=%s>" % \
-            (self.power,
-             self.usb_power,
-             self.temperature,
-             self.load_power,
-             self.wifi_led)
+        s = (
+            "<ChuangmiPlugStatus "
+            "power=%s, "
+            "usb_power=%s, "
+            "temperature=%s, "
+            "load_power=%s, "
+            "wifi_led=%s>"
+            % (
+                self.power,
+                self.usb_power,
+                self.temperature,
+                self.load_power,
+                self.wifi_led,
+            )
+        )
         return s
 
     def __json__(self):
@@ -101,9 +105,15 @@ class ChuangmiPlugStatus:
 class ChuangmiPlug(Device):
     """Main class representing the Chuangmi Plug."""
 
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True,
-                 model: str = MODEL_CHUANGMI_PLUG_M1) -> None:
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_CHUANGMI_PLUG_M1,
+    ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
@@ -118,15 +128,13 @@ class ChuangmiPlug(Device):
             "USB Power: {result.usb_power}\n"
             "Temperature: {result.temperature} °C\n"
             "Load power: {result.load_power}\n"
-            "WiFi LED: {result.wifi_led}\n")
+            "WiFi LED: {result.wifi_led}\n",
+        )
     )
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model].copy()
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        values = self.send("get_prop", properties)
 
         properties_count = len(properties)
         values_count = len(values)
@@ -134,20 +142,19 @@ class ChuangmiPlug(Device):
             _LOGGER.debug(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
         if self.model == MODEL_CHUANGMI_PLUG_V3:
             load_power = self.send("get_power")  # Response: [300]
             if len(load_power) == 1:
-                properties.append('load_power')
+                properties.append("load_power")
                 values.append(load_power[0] * 0.01)
 
-        return ChuangmiPlugStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+        return ChuangmiPlugStatus(defaultdict(lambda: None, zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         if self.model == MODEL_CHUANGMI_PLUG_V1:
@@ -155,9 +162,7 @@ class ChuangmiPlug(Device):
 
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         if self.model == MODEL_CHUANGMI_PLUG_V1:
@@ -165,16 +170,12 @@ class ChuangmiPlug(Device):
 
         return self.send("set_power", ["off"])
 
-    @command(
-        default_output=format_output("Powering USB on"),
-    )
+    @command(default_output=format_output("Powering USB on"))
     def usb_on(self):
         """Power on."""
         return self.send("set_usb_on")
 
-    @command(
-        default_output=format_output("Powering USB off"),
-    )
+    @command(default_output=format_output("Powering USB off"))
     def usb_off(self):
         """Power off."""
         return self.send("set_usb_off")
@@ -183,8 +184,9 @@ class ChuangmiPlug(Device):
         click.argument("wifi_led", type=bool),
         default_output=format_output(
             lambda wifi_led: "Turning on WiFi LED"
-            if wifi_led else "Turning off WiFi LED"
-        )
+            if wifi_led
+            else "Turning off WiFi LED"
+        ),
     )
     def set_wifi_led(self, wifi_led: bool):
         """Set the wifi led on/off."""
@@ -194,28 +196,55 @@ class ChuangmiPlug(Device):
             return self.send("set_wifi_led", ["off"])
 
 
-@deprecated("This device class is deprecated. Please use the ChuangmiPlug "
-            "class in future and select a model by parameter 'model'.")
+@deprecated(
+    "This device class is deprecated. Please use the ChuangmiPlug "
+    "class in future and select a model by parameter 'model'."
+)
 class Plug(ChuangmiPlug):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_CHUANGMI_PLUG_M1)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, model=MODEL_CHUANGMI_PLUG_M1
+        )
 
 
-@deprecated("This device class is deprecated. Please use the ChuangmiPlug "
-            "class in future and select a model by parameter 'model'.")
+@deprecated(
+    "This device class is deprecated. Please use the ChuangmiPlug "
+    "class in future and select a model by parameter 'model'."
+)
 class PlugV1(ChuangmiPlug):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_CHUANGMI_PLUG_V1)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, model=MODEL_CHUANGMI_PLUG_V1
+        )
 
 
-@deprecated("This device class is deprecated. Please use the ChuangmiPlug "
-            "class in future and select a model by parameter 'model'.")
+@deprecated(
+    "This device class is deprecated. Please use the ChuangmiPlug "
+    "class in future and select a model by parameter 'model'."
+)
 class PlugV3(ChuangmiPlug):
-    def __init__(self, ip: str = None, token: str = None, start_id: int = 0,
-                 debug: int = 0, lazy_discover: bool = True) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover,
-                         model=MODEL_CHUANGMI_PLUG_V3)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, model=MODEL_CHUANGMI_PLUG_V3
+        )

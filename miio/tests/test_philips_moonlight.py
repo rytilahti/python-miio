@@ -11,36 +11,36 @@ from .dummies import DummyDevice
 class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
     def __init__(self, *args, **kwargs):
         self.state = {
-            'pow': 'on',
-            'sta': 0,
-            'bri': 1,
-            'rgb': 16741971,
-            'cct': 1,
-            'snm': 0,
-            'spr': 0,
-            'spt': 15,
-            'wke': 0,
-            'bl': 1,
-            'ms': 1,
-            'mb': 1,
-            'wkp': [0, 24, 0]
+            "pow": "on",
+            "sta": 0,
+            "bri": 1,
+            "rgb": 16741971,
+            "cct": 1,
+            "snm": 0,
+            "spr": 0,
+            "spt": 15,
+            "wke": 0,
+            "bl": 1,
+            "ms": 1,
+            "mb": 1,
+            "wkp": [0, 24, 0],
         }
         self.return_values = {
-            'get_prop': self._get_state,
-            'set_power': lambda x: self._set_state("pow", x),
-            'set_bright': lambda x: self._set_state("bri", x),
-            'set_cct': lambda x: self._set_state("cct", x),
-            'set_rgb': lambda x: self._set_state("rgb", [rgb_to_int(x)]),
-            'apply_fixed_scene': lambda x: self._set_state("snm", x),
-            'go_night': lambda x: self._set_state("snm", [6]),
-            'set_bricct': lambda x: (
-                self._set_state('bri', [x[0]]),
-                self._set_state('cct', [x[1]]),
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("pow", x),
+            "set_bright": lambda x: self._set_state("bri", x),
+            "set_cct": lambda x: self._set_state("cct", x),
+            "set_rgb": lambda x: self._set_state("rgb", [rgb_to_int(x)]),
+            "apply_fixed_scene": lambda x: self._set_state("snm", x),
+            "go_night": lambda x: self._set_state("snm", [6]),
+            "set_bricct": lambda x: (
+                self._set_state("bri", [x[0]]),
+                self._set_state("cct", [x[1]]),
             ),
-            'set_brirgb': lambda x: (
-                self._set_state('rgb', [rgb_to_int((x[0], x[1], x[2]))]),
-                self._set_state('bri', [x[3]]),
-            )
+            "set_brirgb": lambda x: (
+                self._set_state("rgb", [rgb_to_int((x[0], x[1], x[2]))]),
+                self._set_state("bri", [x[3]]),
+            ),
         }
         super().__init__(args, kwargs)
 
@@ -76,7 +76,9 @@ class TestPhilipsMoonlight(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(PhilipsMoonlightStatus(self.device.start_state))
+        assert repr(self.state()) == repr(
+            PhilipsMoonlightStatus(self.device.start_state)
+        )
 
         assert self.is_on() is True
         assert self.state().brightness == self.device.start_state["bri"]

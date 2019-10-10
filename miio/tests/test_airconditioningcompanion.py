@@ -6,23 +6,27 @@ from unittest import TestCase
 import pytest
 
 from miio import AirConditioningCompanion, AirConditioningCompanionV3
-from miio.airconditioningcompanion import (OperationMode, FanSpeed, Power,
-                                           SwingMode, Led,
-                                           AirConditioningCompanionStatus,
-                                           AirConditioningCompanionException,
-                                           STORAGE_SLOT_ID,
-                                           MODEL_ACPARTNER_V3,
-                                           )
+from miio.airconditioningcompanion import (
+    OperationMode,
+    FanSpeed,
+    Power,
+    SwingMode,
+    Led,
+    AirConditioningCompanionStatus,
+    AirConditioningCompanionException,
+    STORAGE_SLOT_ID,
+    MODEL_ACPARTNER_V3,
+)
 
-STATE_ON = ['on']
-STATE_OFF = ['off']
+STATE_ON = ["on"]
+STATE_OFF = ["off"]
 
 PUBLIC_ENUMS = {
-    'OperationMode': OperationMode,
-    'FanSpeed': FanSpeed,
-    'Power': Power,
-    'SwingMode': SwingMode,
-    'Led': Led,
+    "OperationMode": OperationMode,
+    "FanSpeed": FanSpeed,
+    "Power": Power,
+    "SwingMode": SwingMode,
+    "Led": Led,
 }
 
 
@@ -34,8 +38,9 @@ def as_enum(d):
         return d
 
 
-with open(os.path.join(os.path.dirname(__file__),
-                       'test_airconditioningcompanion.json')) as inp:
+with open(
+    os.path.join(os.path.dirname(__file__), "test_airconditioningcompanion.json")
+) as inp:
     test_data = json.load(inp, object_hook=as_enum)
 
 
@@ -48,17 +53,17 @@ class EnumEncoder(json.JSONEncoder):
 
 class DummyAirConditioningCompanion(AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
-        self.state = ['010500978022222102', '01020119A280222221', '2']
+        self.state = ["010500978022222102", "01020119A280222221", "2"]
         self.last_ir_played = None
 
         self.return_values = {
-            'get_model_and_state': self._get_state,
-            'start_ir_learn': lambda x: True,
-            'end_ir_learn': lambda x: True,
-            'get_ir_learn_result': lambda x: True,
-            'send_ir_code': lambda x: self._send_input_validation(x),
-            'send_cmd': lambda x: self._send_input_validation(x),
-            'set_power': lambda x: self._set_power(x),
+            "get_model_and_state": self._get_state,
+            "start_ir_learn": lambda x: True,
+            "end_ir_learn": lambda x: True,
+            "get_ir_learn_result": lambda x: True,
+            "send_ir_code": lambda x: self._send_input_validation(x),
+            "send_cmd": lambda x: self._send_input_validation(x),
+            "set_power": lambda x: self._set_power(x),
         }
         self.start_state = self.state.copy()
 
@@ -77,10 +82,10 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
     def _set_power(self, value: str):
         """Set the requested power state"""
         if value == STATE_ON:
-            self.state[1] = self.state[1][:2] + '1' + self.state[1][3:]
+            self.state[1] = self.state[1][:2] + "1" + self.state[1][3:]
 
         if value == STATE_OFF:
-            self.state[1] = self.state[1][:2] + '0' + self.state[1][3:]
+            self.state[1] = self.state[1][:2] + "0" + self.state[1][3:]
 
     @staticmethod
     def _hex_input_validation(payload):
@@ -128,20 +133,22 @@ class TestAirConditioningCompanion(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(
-            model_and_state=self.device.start_state)))
+        assert repr(self.state()) == repr(
+            AirConditioningCompanionStatus(
+                dict(model_and_state=self.device.start_state)
+            )
+        )
 
         assert self.is_on() is False
         assert self.state().power_socket is None
         assert self.state().load_power == 2
-        assert self.state().air_condition_model == \
-            bytes.fromhex('010500978022222102')
+        assert self.state().air_condition_model == bytes.fromhex("010500978022222102")
         assert self.state().model_format == 1
         assert self.state().device_type == 5
-        assert self.state().air_condition_brand == int('0097', 16)
-        assert self.state().air_condition_remote == int('80222221', 16)
+        assert self.state().air_condition_brand == int("0097", 16)
+        assert self.state().air_condition_remote == int("80222221", 16)
         assert self.state().state_format == 2
-        assert self.state().air_condition_configuration == '020119A2'
+        assert self.state().air_condition_configuration == "020119A2"
         assert self.state().target_temperature == 25
         assert self.state().swing_mode == SwingMode.Off
         assert self.state().fan_speed == FanSpeed.Low
@@ -180,45 +187,39 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.learn_stop() is True
 
     def test_send_ir_code(self):
-        for args in test_data['test_send_ir_code_ok']:
+        for args in test_data["test_send_ir_code_ok"]:
             with self.subTest():
                 self.device._reset_state()
-                self.assertTrue(self.device.send_ir_code(*args['in']))
-                self.assertSequenceEqual(
-                    self.device.get_last_ir_played(),
-                    args['out']
-                )
+                self.assertTrue(self.device.send_ir_code(*args["in"]))
+                self.assertSequenceEqual(self.device.get_last_ir_played(), args["out"])
 
-        for args in test_data['test_send_ir_code_exception']:
+        for args in test_data["test_send_ir_code_exception"]:
             with pytest.raises(AirConditioningCompanionException):
-                self.device.send_ir_code(*args['in'])
+                self.device.send_ir_code(*args["in"])
 
     def test_send_command(self):
-        assert self.device.send_command('0000000') is True
+        assert self.device.send_command("0000000") is True
 
     def test_send_configuration(self):
 
-        for args in test_data['test_send_configuration_ok']:
+        for args in test_data["test_send_configuration_ok"]:
             with self.subTest():
                 self.device._reset_state()
-                self.assertTrue(self.device.send_configuration(*args['in']))
-                self.assertSequenceEqual(
-                    self.device.get_last_ir_played(),
-                    args['out']
-                )
+                self.assertTrue(self.device.send_configuration(*args["in"]))
+                self.assertSequenceEqual(self.device.get_last_ir_played(), args["out"])
 
 
 class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
     def __init__(self, *args, **kwargs):
-        self.state = ['010507950000257301', '011001160100002573', '807']
-        self.device_prop = {'lumi.0': {'plug_state': ['on']}}
+        self.state = ["010507950000257301", "011001160100002573", "807"]
+        self.device_prop = {"lumi.0": {"plug_state": ["on"]}}
         self.model = MODEL_ACPARTNER_V3
         self.last_ir_played = None
 
         self.return_values = {
-            'get_model_and_state': self._get_state,
-            'get_device_prop': self._get_device_prop,
-            'toggle_plug': self._toggle_plug,
+            "get_model_and_state": self._get_state,
+            "get_device_prop": self._get_device_prop,
+            "toggle_plug": self._toggle_plug,
         }
         self.start_state = self.state.copy()
         self.start_device_prop = self.device_prop.copy()
@@ -241,7 +242,7 @@ class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
 
     def _toggle_plug(self, props):
         """Toggle the lumi.0 plug state"""
-        self.device_prop['lumi.0']['plug_state'] = [props.pop()]
+        self.device_prop["lumi.0"]["plug_state"] = [props.pop()]
 
 
 @pytest.fixture(scope="class")
@@ -260,37 +261,42 @@ class TestAirConditioningCompanionV3(TestCase):
 
     def test_socket_on(self):
         self.device.socket_off()  # ensure off
-        assert self.state().power_socket == 'off'
+        assert self.state().power_socket == "off"
 
         self.device.socket_on()
-        assert self.state().power_socket == 'on'
+        assert self.state().power_socket == "on"
 
     def test_socket_off(self):
         self.device.socket_on()  # ensure on
-        assert self.state().power_socket == 'on'
+        assert self.state().power_socket == "on"
 
         self.device.socket_off()
-        assert self.state().power_socket == 'off'
+        assert self.state().power_socket == "off"
 
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirConditioningCompanionStatus(dict(
-            model_and_state=self.device.start_state,
-            power_socket=self.device.start_device_prop['lumi.0']['plug_state'][0])
-        ))
+        assert repr(self.state()) == repr(
+            AirConditioningCompanionStatus(
+                dict(
+                    model_and_state=self.device.start_state,
+                    power_socket=self.device.start_device_prop["lumi.0"]["plug_state"][
+                        0
+                    ],
+                )
+            )
+        )
 
         assert self.is_on() is True
-        assert self.state().power_socket == 'on'
+        assert self.state().power_socket == "on"
         assert self.state().load_power == 807
-        assert self.state().air_condition_model == \
-            bytes.fromhex('010507950000257301')
+        assert self.state().air_condition_model == bytes.fromhex("010507950000257301")
         assert self.state().model_format == 1
         assert self.state().device_type == 5
-        assert self.state().air_condition_brand == int('0795', 16)
-        assert self.state().air_condition_remote == int('00002573', 16)
+        assert self.state().air_condition_brand == int("0795", 16)
+        assert self.state().air_condition_remote == int("00002573", 16)
         assert self.state().state_format == 1
-        assert self.state().air_condition_configuration == '10011601'
+        assert self.state().air_condition_configuration == "10011601"
         assert self.state().target_temperature == 22
         assert self.state().swing_mode == SwingMode.Off
         assert self.state().fan_speed == FanSpeed.Low

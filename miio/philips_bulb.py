@@ -46,10 +46,17 @@ class PhilipsBulbStatus:
         return self.data["dv"]
 
     def __repr__(self) -> str:
-        s = "<PhilipsBulbStatus power=%s, brightness=%s, " \
-            "color_temperature=%s, scene=%s, delay_off_countdown=%s>" % \
-            (self.power, self.brightness,
-             self.color_temperature, self.scene, self.delay_off_countdown)
+        s = (
+            "<PhilipsBulbStatus power=%s, brightness=%s, "
+            "color_temperature=%s, scene=%s, delay_off_countdown=%s>"
+            % (
+                self.power,
+                self.brightness,
+                self.color_temperature,
+                self.scene,
+                self.delay_off_countdown,
+            )
+        )
         return s
 
     def __json__(self):
@@ -66,16 +73,13 @@ class PhilipsBulb(Device):
             "Brightness: {result.brightness}\n"
             "Color temperature: {result.color_temperature}\n"
             "Scene: {result.scene}\n"
-            "Delayed turn off: {result.delay_off_countdown}\n"
+            "Delayed turn off: {result.delay_off_countdown}\n",
         )
     )
     def status(self) -> PhilipsBulbStatus:
         """Retrieve properties."""
-        properties = ['power', 'bright', 'cct', 'snm', 'dv', ]
-        values = self.send(
-            "get_prop",
-            properties
-        )
+        properties = ["power", "bright", "cct", "snm", "dv"]
+        values = self.send("get_prop", properties)
 
         properties_count = len(properties)
         values_count = len(values)
@@ -83,28 +87,25 @@ class PhilipsBulb(Device):
             _LOGGER.debug(
                 "Count (%s) of requested properties does not match the "
                 "count (%s) of received values.",
-                properties_count, values_count)
+                properties_count,
+                values_count,
+            )
 
-        return PhilipsBulbStatus(
-            defaultdict(lambda: None, zip(properties, values)))
+        return PhilipsBulbStatus(defaultdict(lambda: None, zip(properties, values)))
 
-    @command(
-        default_output=format_output("Powering on"),
-    )
+    @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
         return self.send("set_power", ["on"])
 
-    @command(
-        default_output=format_output("Powering off"),
-    )
+    @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting brightness to {level}")
+        default_output=format_output("Setting brightness to {level}"),
     )
     def set_brightness(self, level: int):
         """Set brightness level."""
@@ -115,7 +116,7 @@ class PhilipsBulb(Device):
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting color temperature to {level}")
+        default_output=format_output("Setting color temperature to {level}"),
     )
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
@@ -128,7 +129,8 @@ class PhilipsBulb(Device):
         click.argument("brightness", type=int),
         click.argument("cct", type=int),
         default_output=format_output(
-            "Setting brightness to {brightness} and color temperature to {cct}")
+            "Setting brightness to {brightness} and color temperature to {cct}"
+        ),
     )
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
@@ -142,20 +144,21 @@ class PhilipsBulb(Device):
 
     @command(
         click.argument("seconds", type=int),
-        default_output=format_output("Setting delayed turn off to {seconds} seconds")
+        default_output=format_output("Setting delayed turn off to {seconds} seconds"),
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
 
         if seconds < 1:
             raise PhilipsBulbException(
-                "Invalid value for a delayed turn off: %s" % seconds)
+                "Invalid value for a delayed turn off: %s" % seconds
+            )
 
         return self.send("delay_off", [seconds])
 
     @command(
         click.argument("number", type=int),
-        default_output=format_output("Setting fixed scene to {number}")
+        default_output=format_output("Setting fixed scene to {number}"),
     )
     def set_scene(self, number: int):
         """Set scene number."""
