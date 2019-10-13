@@ -25,11 +25,19 @@ AVAILABLE_PROPERTIES_COMMON = [
     "sensor_state",
 ]
 
+AVAILABLE_PROPERTIES_B1 = [
+    "co2e", 
+    "humidity", 
+    "pm25", 
+    "temperature", 
+    "tvoc"
+]
+
 AVAILABLE_PROPERTIES_S1 = ["battery", "co2", "humidity", "pm25", "temperature", "tvoc"]
 
 AVAILABLE_PROPERTIES = {
     MODEL_AIRQUALITYMONITOR_V1: AVAILABLE_PROPERTIES_COMMON,
-    MODEL_AIRQUALITYMONITOR_B1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_AIRQUALITYMONITOR_B1: AVAILABLE_PROPERTIES_B1,
     MODEL_AIRQUALITYMONITOR_S1: AVAILABLE_PROPERTIES_S1,
 }
 
@@ -49,7 +57,8 @@ class AirQualityMonitorStatus:
 
         Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.b1):
 
-        unknown.
+        {'co2e': 1466, 'humidity': 59.79999923706055, 'pm25': 2, 'temperature': 19.799999237060547, 
+         'temperature_unit': 'c', 'tvoc': 1.3948699235916138, 'tvoc_unit': 'mg_m3'}
 
         Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.s1):
 
@@ -85,9 +94,11 @@ class AirQualityMonitorStatus:
         return None
 
     @property
-    def battery(self) -> int:
+    def battery(self) -> Optional[int]:
         """Current battery level (0...100)."""
-        return self.data["battery"]
+        if "battery" in self.data and self.data["battery"] is not None:
+            return self.data["battery"]
+        return None
 
     @property
     def display_clock(self) -> Optional[bool]:
@@ -200,17 +211,19 @@ class AirQualityMonitor(Device):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        model: str = MODEL_AIRQUALITYMONITOR_V1,
+        model: str = None,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model == None:
+            info = self.info()
+            model = info.model
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
         else:
             self.model = MODEL_AIRQUALITYMONITOR_V1
-            _LOGGER.error(
-                "Device model %s unsupported. Falling back to %s.", model, self.model
-            )
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
 
     @command(
         default_output=format_output(
@@ -232,7 +245,23 @@ class AirQualityMonitor(Device):
 
         properties = AVAILABLE_PROPERTIES[self.model]
 
-        values = self.send("get_prop", properties)
+        if self.model != "cgllc.airmonitor.b1":
+            values = self.send("get_prop", properties)
+        else:
+            values = self.send("get_air_data")
+            """
+            Format like on the display of the unit
+            In the current situation tvoc_unit and temperature_unit does not translate the tvoc/temperature values
+            """
+            values['co2']              = round(values['co2e'],1)
+            # Replace key co2e by just co2
+            values.pop('co2e', None)
+            values['humidity']         = round(values['humidity'],1)
+            values['pm25']             = round(values['pm25'],1)
+            values['temperature']      = round(values['temperature'],1)
+            values.pop('temperature_unit', None)
+            values['tvoc']             = round(values['tvoc'],3)
+            values.pop('tvoc_unit', None)
 
         properties_count = len(properties)
         values_count = len(values)
@@ -244,7 +273,7 @@ class AirQualityMonitor(Device):
                 values_count,
             )
 
-        if self.model == MODEL_AIRQUALITYMONITOR_S1:
+        if self.model == MODEL_AIRQUALITYMONITOR_S1 or self.model == MODEL_AIRQUALITYMONITOR_B1:
             return AirQualityMonitorStatus(defaultdict(lambda: None, values))
         else:
             return AirQualityMonitorStatus(
