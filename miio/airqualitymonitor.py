@@ -211,13 +211,9 @@ class AirQualityMonitor(Device):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        model: str = None,
+        model: str = MODEL_AIRQUALITYMONITOR_V1,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model == None:
-            info = self.info()
-            model = info.model
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
@@ -242,6 +238,10 @@ class AirQualityMonitor(Device):
     )
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
+
+        if info.model == None:
+            info = self.info()
+            self.model = info.model
 
         properties = AVAILABLE_PROPERTIES[self.model]
 
