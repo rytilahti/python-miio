@@ -181,7 +181,7 @@ class AirQualityMonitorStatus:
         """Return tvoc value."""
         if "tvoc" in self.data and self.data["tvoc"] is not None:
             return self.data["tvoc"]
-            
+
         return None
 
     def __repr__(self) -> str:
@@ -253,7 +253,7 @@ class AirQualityMonitor(Device):
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
-        if info.model is None:
+        if self.model is None:
             info = self.info()
             self.model = info.model
 
