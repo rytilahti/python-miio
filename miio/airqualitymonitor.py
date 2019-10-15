@@ -241,9 +241,12 @@ class AirQualityMonitor(Device):
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
-        else:
+        elif model is not None:
             self.model = MODEL_AIRQUALITYMONITOR_V1
             _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+        else: 
+            """Force autodetection"""
+            self.model = None
 
     @command(
         default_output=format_output(
@@ -265,6 +268,7 @@ class AirQualityMonitor(Device):
         """Return device status."""
 
         if self.model is None:
+            """Autodetection"""
             info = self.info()
             self.model = info.model
 
