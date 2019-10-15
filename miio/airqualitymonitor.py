@@ -72,6 +72,7 @@ class AirQualityMonitorStatus:
         """Current power state."""
         if "power" in self.data and self.data["power"] is not None:
             return self.data["power"]
+
         return None
 
     @property
@@ -84,6 +85,7 @@ class AirQualityMonitorStatus:
         """Return True if the device's usb is on."""
         if "usb_state" in self.data and self.data["usb_state"] is not None:
             return self.data["usb_state"] == "on"
+
         return None
 
     @property
@@ -91,6 +93,7 @@ class AirQualityMonitorStatus:
         """Air quality index value. (0...600)."""
         if "aqi" in self.data and self.data["aqi"] is not None:
             return self.data["aqi"]
+
         return None
 
     @property
@@ -98,6 +101,7 @@ class AirQualityMonitorStatus:
         """Current battery level (0...100)."""
         if "battery" in self.data and self.data["battery"] is not None:
             return self.data["battery"]
+
         return None
 
     @property
@@ -105,6 +109,7 @@ class AirQualityMonitorStatus:
         """Display a clock instead the AQI."""
         if "time_state" in self.data and self.data["time_state"] is not None:
             return self.data["time_state"] == "on"
+
         return None
 
     @property
@@ -112,6 +117,7 @@ class AirQualityMonitorStatus:
         """Return True if the night mode is on."""
         if "night_state" in self.data and self.data["night_state"] is not None:
             return self.data["night_state"] == "on"
+
         return None
 
     @property
@@ -119,6 +125,7 @@ class AirQualityMonitorStatus:
         """Return the begin of the night time."""
         if "night_beg_time" in self.data and self.data["night_beg_time"] is not None:
             return self.data["night_beg_time"]
+
         return None
 
     @property
@@ -126,6 +133,7 @@ class AirQualityMonitorStatus:
         """Return the end of the night time."""
         if "night_end_time" in self.data and self.data["night_end_time"] is not None:
             return self.data["night_end_time"]
+
         return None
 
     @property
@@ -133,6 +141,7 @@ class AirQualityMonitorStatus:
         """Sensor state."""
         if "sensor_state" in self.data and self.data["sensor_state"] is not None:
             return self.data["sensor_state"]
+
         return None
 
     @property
@@ -140,6 +149,7 @@ class AirQualityMonitorStatus:
         """Return co2 value (400...9999ppm)."""
         if "co2" in self.data and self.data["co2"] is not None:
             return self.data["co2"]
+
         return None
 
     @property
@@ -147,6 +157,7 @@ class AirQualityMonitorStatus:
         """Return humidity value (0...100%)."""
         if "humidity" in self.data and self.data["humidity"] is not None:
             return self.data["humidity"]
+
         return None
 
     @property
@@ -154,6 +165,7 @@ class AirQualityMonitorStatus:
         """Return pm2.5 value (0...999μg/m³)."""
         if "pm25" in self.data and self.data["pm25"] is not None:
             return self.data["pm25"]
+
         return None
 
     @property
@@ -161,6 +173,7 @@ class AirQualityMonitorStatus:
         """Return temperature value (-10...50°C)."""
         if "temperature" in self.data and self.data["temperature"] is not None:
             return self.data["temperature"]
+
         return None
 
     @property
@@ -168,6 +181,7 @@ class AirQualityMonitorStatus:
         """Return tvoc value."""
         if "tvoc" in self.data and self.data["tvoc"] is not None:
             return self.data["tvoc"]
+            
         return None
 
     def __repr__(self) -> str:
