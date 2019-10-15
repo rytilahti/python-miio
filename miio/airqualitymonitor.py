@@ -153,6 +153,14 @@ class AirQualityMonitorStatus:
         return None
 
     @property
+    def co2e(self) -> Optional[int]:
+        """Return co2e value (400...9999ppm)."""
+        if "co2e" in self.data and self.data["co2e"] is not None:
+            return self.data["co2e"]
+
+        return None
+
+    @property
     def humidity(self) -> Optional[float]:
         """Return humidity value (0...100%)."""
         if "humidity" in self.data and self.data["humidity"] is not None:
@@ -193,6 +201,7 @@ class AirQualityMonitorStatus:
             "temperature=%s, "
             "humidity=%s, "
             "co2=%s, "
+            "co2e=%s, "
             "pm2.5=%s, "
             "tvoc=%s, "
             "display_clock=%s>"
@@ -204,6 +213,7 @@ class AirQualityMonitorStatus:
                 self.temperature,
                 self.humidity,
                 self.co2,
+                self.co2e,
                 self.pm25,
                 self.tvoc,
                 self.display_clock,
@@ -245,6 +255,7 @@ class AirQualityMonitor(Device):
             "Temperature: {result.temperature}\n"
             "Humidity: {result.humidity}\n"
             "CO2: {result.co2}\n"
+            "CO2e: {result.co2e}\n"
             "PM2.5: {result.pm25}\n"
             "TVOC: {result.tvoc}\n"
             "Display clock: {result.display_clock}\n",
