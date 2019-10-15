@@ -239,29 +239,16 @@ class AirQualityMonitor(Device):
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
-        if info.model == None:
+        if info.model is None:
             info = self.info()
             self.model = info.model
 
         properties = AVAILABLE_PROPERTIES[self.model]
 
-        if self.model != "cgllc.airmonitor.b1":
-            values = self.send("get_prop", properties)
-        else:
+        if self.model == MODEL_AIRQUALITYMONITOR_B1:
             values = self.send("get_air_data")
-            """
-            Format like on the display of the unit
-            In the current situation tvoc_unit and temperature_unit does not translate the tvoc/temperature values
-            """
-            values['co2']              = round(values['co2e'],1)
-            # Replace key co2e by just co2
-            values.pop('co2e', None)
-            values['humidity']         = round(values['humidity'],1)
-            values['pm25']             = round(values['pm25'],1)
-            values['temperature']      = round(values['temperature'],1)
-            values.pop('temperature_unit', None)
-            values['tvoc']             = round(values['tvoc'],3)
-            values.pop('tvoc_unit', None)
+        else:
+            values = self.send("get_prop", properties)
 
         properties_count = len(properties)
         values_count = len(values)
