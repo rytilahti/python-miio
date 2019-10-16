@@ -271,6 +271,9 @@ class AirQualityMonitor(Device):
             """Autodetection"""
             info = self.info()
             self.model = info.model
+            self.mac_address = info.mac_address
+            self.firmware_version = info.firmware_version
+            self.hardware_version = info.hardware_version
 
         properties = AVAILABLE_PROPERTIES[self.model]
 
