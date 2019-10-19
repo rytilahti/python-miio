@@ -3,7 +3,7 @@ import time
 import click
 
 from .device import Device
-from .click_common import command, format_output, EnumType
+from .click_common import command, EnumType
 
 
 class HourlySystem(enum.Enum):
@@ -112,7 +112,7 @@ class AlarmClock(Device):
     @command()
     def volume(self) -> int:
         """Return the volume.
-        
+
         ->  192.168.0.128 data= {"id":251,"method":"set_volume","params":[17]}
         <-  192.168.0.57 data= {"result":["OK"],"id":251}
         """
@@ -140,8 +140,9 @@ class AlarmClock(Device):
     )
     def set_ring(self, alarm_type: AlarmType, ring: RingTone):
         """Set alarm tone.
-        
-         ->  192.168.0.128 data= {"id":236,"method":"set_ring","params":[{"ringtone":"a1.mp3","smart_clock":"","type":"alarm"}]}
+
+         ->  192.168.0.128 data= {"id":236,"method":"set_ring",
+            "params":[{"ringtone":"a1.mp3","smart_clock":"","type":"alarm"}]}
          <-  192.168.0.57 data= {"result":["OK"],"id":236}
         """
         raise NotImplementedError()
@@ -150,7 +151,7 @@ class AlarmClock(Device):
     @command()
     def night_mode(self):
         """Get night mode status.
-        
+
         ->  192.168.0.128 data= {"id":234,"method":"get_night_mode","params":[]}
         <-  192.168.0.57 data= {"result":[0],"id":234}
         """
@@ -159,13 +160,15 @@ class AlarmClock(Device):
     @command()
     def set_night_mode(self):
         """Set the night mode.
-        
+
         # enable
-        ->  192.168.0.128 data= {"id":248,"method":"set_night_mode","params":[1,"21:00","6:00"]}
+        ->  192.168.0.128 data= {"id":248,"method":"set_night_mode",
+            "params":[1,"21:00","6:00"]}
         <-  192.168.0.57 data= {"result":["OK"],"id":248}
-        
+
         # disable
-        ->  192.168.0.128 data= {"id":249,"method":"set_night_mode","params":[0,"21:00","6:00"]}
+        ->  192.168.0.128 data= {"id":249,"method":"set_night_mode",
+            "params":[0,"21:00","6:00"]}
         <-  192.168.0.57 data= {"result":["OK"],"id":249}
         """
         raise NotImplementedError()
@@ -173,14 +176,18 @@ class AlarmClock(Device):
     @command()
     def near_wakeup(self):
         """Status for near wakeup.
-        
-        ->  192.168.0.128 data= {"id":235,"method":"get_near_wakeup_status","params":[]}
+
+        ->  192.168.0.128 data= {"id":235,"method":"get_near_wakeup_status",
+            "params":[]}
         <-  192.168.0.57 data= {"result":["disable"],"id":235}
 
-        ->  192.168.0.128 data= {"id":254,"method":"set_near_wakeup_status","params":["enable"]}
+        # setters
+        ->  192.168.0.128 data= {"id":254,"method":"set_near_wakeup_status",
+            "params":["enable"]}
         <-  192.168.0.57 data= {"result":["OK"],"id":254}
 
-        ->  192.168.0.128 data= {"id":255,"method":"set_near_wakeup_status","params":["disable"]}
+        ->  192.168.0.128 data= {"id":255,"method":"set_near_wakeup_status",
+            "params":["disable"]}
         <-  192.168.0.57 data= {"result":["OK"],"id":255}
         """
         return self.send("get_near_wakeup_status")
@@ -195,25 +202,45 @@ class AlarmClock(Device):
     @command()
     def alarmops(self):
         """
-        ->  192.168.0.128 data= {"id":263,"method":"alarm_ops","params":{"operation":"create","data":[{"type":"alarm","event":"testlabel","reminder":"","smart_clock":0,"ringtone":"a2.mp3","volume":100,"circle":"once","status":"on","repeat_ringing":0,"delete_datetime":1564291980000,"disable_datetime":"","circle_extra":"","datetime":1564291980000}],"update_datetime":1564205639326}}
+        NOTE: the alarm_ops method is the one used to create, query and delete
+        all types of alarms (reminders, alarms, countdowns).
+        ->  192.168.0.128 data= {"id":263,"method":"alarm_ops",
+            "params":{"operation":"create","data":[
+                {"type":"alarm","event":"testlabel","reminder":"","smart_clock":0,
+                "ringtone":"a2.mp3","volume":100,"circle":"once","status":"on",
+                "repeat_ringing":0,"delete_datetime":1564291980000,
+                "disable_datetime":"","circle_extra":"",
+                "datetime":1564291980000}
+                ],"update_datetime":1564205639326}}
         <-  192.168.0.57 data= {"result":[{"id":1,"ack":"OK"}],"id":263}
-        ->  192.168.0.128 data= {"id":264,"method":"alarm_ops","params":{"operation":"query","req_type":"alarm","update_datetime":1564205639593,"index":0}}
-        <-  192.168.0.57 data= {"result":[0,[{"i":"1","c":"once","d":"2019-07-28T13:33:00+0800","s":"on","n":"testlabel","a":"a2.mp3","dd":1}],"America\/New_York"],"id":264}
-        ->  192.168.0.128 data= {"id":227,"method":"alarm_ops","params":{"operation":"query","index":0,"update_datetime":1564205198413,"req_type":"reminder"}}
-        <-  192.168.0.57 data= {"result":[0,[],"America\/New_York"],"id":227}
-        ->  192.168.0.128 data= {"id":265,"method":"alarm_ops","params":{"operation":"query","index":0,"update_datetime":1564205639596,"req_type":"reminder"}}
-        <-  192.168.0.57 data= {"result":[0,[],"America\/New_York"],"id":265}
+
+        # query per index, starts from 0 instead of 1 as the ids it seems
+        ->  192.168.0.128 data= {"id":264,"method":"alarm_ops",
+            "params":{"operation":"query","req_type":"alarm",
+                "update_datetime":1564205639593,"index":0}}
+        <-  192.168.0.57 data= {"result":
+            [0,[
+                {"i":"1","c":"once","d":"2019-07-28T13:33:00+0800","s":"on",
+                "n":"testlabel","a":"a2.mp3","dd":1}
+               ], "America/New_York"
+            ],"id":264}
+
+        # result [code, list of alarms, timezone]
+        ->  192.168.0.128 data= {"id":265,"method":"alarm_ops",
+            "params":{"operation":"query","index":0,"update_datetime":1564205639596,
+                "req_type":"reminder"}}
+        <-  192.168.0.57 data= {"result":[0,[],"America/New_York"],"id":265}
         """
         raise NotImplementedError()
 
     @command(click.argument("url"))
     def start_countdown(self, url):
         """Start countdown timer playing the given media.
-        
+
         {"id":354,"method":"alarm_ops",
         "params":{"operation":"create","update_datetime":1564206432733,
         "data":[{"type":"timer",
-          "background":"http:\/\/cdn.cnbj0.fds.api.mi-img.com\/miio.files\/commonfile_mp3_31c368c4d476d5e1eb8bfb31e6f07cd4.mp3",
+          "background":"http://host.invalid/testfile.mp3",
           "offset":1800,
           "circle":"once",
           "volume":100,
@@ -257,7 +284,7 @@ class AlarmClock(Device):
     @command()
     def cancel(self):
         """Cancel alarm of the defined type.
-        
+
         "params":{"operation":"cancel","update_datetime":1564206332603,"data":[{"type":"timer"}]}}
         """
         import time
