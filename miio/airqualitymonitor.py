@@ -219,6 +219,7 @@ class AirQualityMonitor(Device):
             "Display clock: {result.display_clock}\n",
         )
     )
+
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
@@ -253,6 +254,26 @@ class AirQualityMonitor(Device):
             return AirQualityMonitorStatus(
                 defaultdict(lambda: None, zip(properties, values))
             )
+
+    @property
+    def model(self) -> Optional[int]:
+        """Return model."""
+        return self._model
+
+    @property
+    def mac_address(self) -> Optional[int]:
+        """Return mac address."""
+        return self._mac_address
+
+    @property
+    def firmware_version(self) -> Optional[int]:
+        """Return the firmware version."""
+        return self._firmware_version
+
+    @property
+    def hardware_version(self) -> Optional[int]:
+        """Return the hardware version."""
+        return self._hardware_version
 
     @command(default_output=format_output("Powering on"))
     def on(self):
