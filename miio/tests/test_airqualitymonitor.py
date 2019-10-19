@@ -13,7 +13,7 @@ from .dummies import DummyDevice
 
 class DummyAirQualityMonitorV1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_AIRQUALITYMONITOR_V1
+        self._model = MODEL_AIRQUALITYMONITOR_V1
         self.state = {
             "power": "on",
             "aqi": 34,
@@ -83,7 +83,7 @@ class TestAirQualityMonitorV1(TestCase):
 
 class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_AIRQUALITYMONITOR_S1
+        self._model = MODEL_AIRQUALITYMONITOR_S1
         self.state = {
             "battery": 100,
             "co2": 695,
