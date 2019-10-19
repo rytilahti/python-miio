@@ -80,7 +80,10 @@ class AirQualityMonitorStatus:
     @property
     def usb_power(self) -> Optional[bool]:
         """Return True if the device's usb is on."""
-        return self.data.get("usb_state", None) == "on"
+        if self.data.get("usb_state", None) == "on":
+            return "on"
+        else:
+            return None
 
     @property
     def aqi(self) -> Optional[int]:
@@ -95,12 +98,18 @@ class AirQualityMonitorStatus:
     @property
     def display_clock(self) -> Optional[bool]:
         """Display a clock instead the AQI."""
-        return self.data.get("time_state", None) == "on"
+        if self.data.get("time_state", None) == "on":
+            return "on"
+        else:
+            return None
 
     @property
     def night_mode(self) -> Optional[bool]:
         """Return True if the night mode is on."""
-        return self.data.get("night_state", None) == "on"
+        if self.data.get("night_state", None) == "on":
+            return "on"
+        else:
+            return None
 
     @property
     def night_time_begin(self) -> Optional[str]:
