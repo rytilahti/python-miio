@@ -48,6 +48,7 @@ from .airhumidifier import (
     MODEL_HUMIDIFIER_CA1,
     MODEL_HUMIDIFIER_V1,
 )
+from .alarmclock import AlarmClock
 from .chuangmi_plug import (
     MODEL_CHUANGMI_PLUG_V1,
     MODEL_CHUANGMI_PLUG_V2,
@@ -87,6 +88,7 @@ DEVICE_MAP = {
     "chuangmi-plug_": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
     "qmi-powerstrip-v1": partial(PowerStrip, model=MODEL_POWER_STRIP_V1),
     "zimi-powerstrip-v2": partial(PowerStrip, model=MODEL_POWER_STRIP_V2),
+    "zimi-clock-myk01": AlarmClock,
     "zhimi-airpurifier-m1": AirPurifier,  # mini model
     "zhimi-airpurifier-m2": AirPurifier,  # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
