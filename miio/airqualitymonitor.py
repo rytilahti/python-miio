@@ -233,9 +233,6 @@ class AirQualityMonitor(Device):
             """Autodetection"""
             info = self.info()
             self._model = info.model
-            self._mac_address = info.mac_address
-            self._firmware_version = info.firmware_version
-            self._hardware_version = info.hardware_version
 
         properties = AVAILABLE_PROPERTIES[self._model]
 
@@ -265,21 +262,6 @@ class AirQualityMonitor(Device):
     def model(self) -> Optional[int]:
         """Return model."""
         return self._model
-
-    @property
-    def mac_address(self) -> Optional[int]:
-        """Return mac address."""
-        return self._mac_address
-
-    @property
-    def firmware_version(self) -> Optional[int]:
-        """Return the firmware version."""
-        return self._firmware_version
-
-    @property
-    def hardware_version(self) -> Optional[int]:
-        """Return the hardware version."""
-        return self._hardware_version
 
     @command(default_output=format_output("Powering on"))
     def on(self):
