@@ -174,10 +174,9 @@ class TestAirQualityMonitorB1(TestCase):
         assert self.state().aqi is None
         assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().humidity == self.device.start_state["humidity"]
-        assert self.state().co2 == None
+        assert self.state().co2 is None
         assert self.state().co2e == self.device.start_state["co2e"]
         assert self.state().pm25 == self.device.start_state["pm25"]
         assert self.state().tvoc == self.device.start_state["tvoc"]
         assert self.state().display_clock is None
         assert self.state().night_mode is None
-        
