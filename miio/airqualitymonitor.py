@@ -26,10 +26,10 @@ AVAILABLE_PROPERTIES_COMMON = [
 ]
 
 AVAILABLE_PROPERTIES_B1 = [
-    "co2e", 
-    "humidity", 
-    "pm25", 
-    "temperature", 
+    "co2e",
+    "humidity",
+    "pm25",
+    "temperature",
     "tvoc"
 ]
 
@@ -57,7 +57,7 @@ class AirQualityMonitorStatus:
 
         Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.b1):
 
-        {'co2e': 1466, 'humidity': 59.79999923706055, 'pm25': 2, 'temperature': 19.799999237060547, 
+        {'co2e': 1466, 'humidity': 59.79999923706055, 'pm25': 2, 'temperature': 19.799999237060547,
          'temperature_unit': 'c', 'tvoc': 1.3948699235916138, 'tvoc_unit': 'mg_m3'}
 
         Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.s1):
@@ -201,13 +201,13 @@ class AirQualityMonitor(Device):
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
-            self._model = model
+            self.model = model
         elif model is not None:
-            self._model = MODEL_AIRQUALITYMONITOR_V1
-            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self._model)
-        else: 
+            self.model = MODEL_AIRQUALITYMONITOR_V1
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+        else:
             """Force autodetection"""
-            self._model = None
+            self.model = None
 
     @command(
         default_output=format_output(
@@ -225,18 +225,17 @@ class AirQualityMonitor(Device):
             "Display clock: {result.display_clock}\n",
         )
     )
-
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
-        if self._model is None:
+        if self.model is None:
             """Autodetection"""
             info = self.info()
-            self._model = info.model
+            self.model = info.model
 
-        properties = AVAILABLE_PROPERTIES[self._model]
+        properties = AVAILABLE_PROPERTIES[self.model]
 
-        if self._model == MODEL_AIRQUALITYMONITOR_B1:
+        if self.model == MODEL_AIRQUALITYMONITOR_B1:
             values = self.send("get_air_data")
         else:
             values = self.send("get_prop", properties)
@@ -251,17 +250,12 @@ class AirQualityMonitor(Device):
                 values_count,
             )
 
-        if self._model == MODEL_AIRQUALITYMONITOR_S1 or self._model == MODEL_AIRQUALITYMONITOR_B1:
+        if self.model == MODEL_AIRQUALITYMONITOR_S1 or self.model == MODEL_AIRQUALITYMONITOR_B1:
             return AirQualityMonitorStatus(defaultdict(lambda: None, values))
         else:
             return AirQualityMonitorStatus(
                 defaultdict(lambda: None, zip(properties, values))
             )
-
-    @property
-    def model(self) -> Optional[int]:
-        """Return model."""
-        return self._model
 
     @command(default_output=format_output("Powering on"))
     def on(self):
