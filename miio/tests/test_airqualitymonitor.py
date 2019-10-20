@@ -7,6 +7,7 @@ from miio.airqualitymonitor import (
     AirQualityMonitorStatus,
     MODEL_AIRQUALITYMONITOR_V1,
     MODEL_AIRQUALITYMONITOR_S1,
+    MODEL_AIRQUALITYMONITOR_B1,
 )
 from .dummies import DummyDevice
 
@@ -126,5 +127,56 @@ class TestAirQualityMonitorS1(TestCase):
         assert self.state().tvoc == self.device.start_state["tvoc"]
         assert self.state().aqi is None
         assert self.state().usb_power is None
+        assert self.state().display_clock is None
+        assert self.state().night_mode is None
+
+
+class DummyAirQualityMonitorB1(DummyDevice, AirQualityMonitor):
+    def __init__(self, *args, **kwargs):
+        self.model = MODEL_AIRQUALITYMONITOR_B1
+        self.state = {
+            "co2e": 1466,
+            "humidity": 59.79999923706055,
+            "pm25": 2,
+            "temperature": 19.799999237060547,
+            "temperature_unit": "c",
+            "tvoc": 1.3948699235916138,
+            "tvoc_unit": "mg_m3"}
+        self.return_values = {"get_air_data": self._get_state}
+        super().__init__(args, kwargs)
+
+    def _get_state(self, props):
+        """Return wanted properties"""
+        return self.state
+
+
+@pytest.fixture(scope="class")
+def airqualitymonitorb1(request):
+    request.cls.device = DummyAirQualityMonitorB1()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("airqualitymonitorb1")
+class TestAirQualityMonitorB1(TestCase):
+    def state(self):
+        return self.device.status()
+
+    def test_status(self):
+        self.device._reset_state()
+
+        assert repr(self.state()) == repr(
+            AirQualityMonitorStatus(self.device.start_state)
+        )
+
+        assert self.state().power is None
+        assert self.state().usb_power is None
+        assert self.state().battery is None
+        assert self.state().aqi is None
+        assert self.state().temperature == self.device.start_state["temperature"]
+        assert self.state().humidity == self.device.start_state["humidity"]
+        assert self.state().co2 is None
+        assert self.state().co2e == self.device.start_state["co2e"]
+        assert self.state().pm25 == self.device.start_state["pm25"]
+        assert self.state().tvoc == self.device.start_state["tvoc"]
         assert self.state().display_clock is None
         assert self.state().night_mode is None

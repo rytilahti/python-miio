@@ -25,11 +25,19 @@ AVAILABLE_PROPERTIES_COMMON = [
     "sensor_state",
 ]
 
+AVAILABLE_PROPERTIES_B1 = [
+    "co2e",
+    "humidity",
+    "pm25",
+    "temperature",
+    "tvoc"
+]
+
 AVAILABLE_PROPERTIES_S1 = ["battery", "co2", "humidity", "pm25", "temperature", "tvoc"]
 
 AVAILABLE_PROPERTIES = {
     MODEL_AIRQUALITYMONITOR_V1: AVAILABLE_PROPERTIES_COMMON,
-    MODEL_AIRQUALITYMONITOR_B1: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_AIRQUALITYMONITOR_B1: AVAILABLE_PROPERTIES_B1,
     MODEL_AIRQUALITYMONITOR_S1: AVAILABLE_PROPERTIES_S1,
 }
 
@@ -49,7 +57,8 @@ class AirQualityMonitorStatus:
 
         Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.b1):
 
-        unknown.
+        {'co2e': 1466, 'humidity': 59.79999923706055, 'pm25': 2, 'temperature': 19.799999237060547,
+         'temperature_unit': 'c', 'tvoc': 1.3948699235916138, 'tvoc_unit': 'mg_m3'}
 
         Response of a Xiaomi Air Quality Monitor (cgllc.airmonitor.s1):
 
@@ -61,9 +70,7 @@ class AirQualityMonitorStatus:
     @property
     def power(self) -> Optional[str]:
         """Current power state."""
-        if "power" in self.data and self.data["power"] is not None:
-            return self.data["power"]
-        return None
+        return self.data.get("power", None)
 
     @property
     def is_on(self) -> bool:
@@ -80,14 +87,12 @@ class AirQualityMonitorStatus:
     @property
     def aqi(self) -> Optional[int]:
         """Air quality index value. (0...600)."""
-        if "aqi" in self.data and self.data["aqi"] is not None:
-            return self.data["aqi"]
-        return None
+        return self.data.get("aqi", None)
 
     @property
-    def battery(self) -> int:
+    def battery(self) -> Optional[int]:
         """Current battery level (0...100)."""
-        return self.data["battery"]
+        return self.data.get("battery", None)
 
     @property
     def display_clock(self) -> Optional[bool]:
@@ -106,58 +111,47 @@ class AirQualityMonitorStatus:
     @property
     def night_time_begin(self) -> Optional[str]:
         """Return the begin of the night time."""
-        if "night_beg_time" in self.data and self.data["night_beg_time"] is not None:
-            return self.data["night_beg_time"]
-        return None
+        return self.data.get("night_beg_time", None)
 
     @property
     def night_time_end(self) -> Optional[str]:
         """Return the end of the night time."""
-        if "night_end_time" in self.data and self.data["night_end_time"] is not None:
-            return self.data["night_end_time"]
-        return None
+        return self.data.get("night_end_time", None)
 
     @property
     def sensor_state(self) -> Optional[str]:
         """Sensor state."""
-        if "sensor_state" in self.data and self.data["sensor_state"] is not None:
-            return self.data["sensor_state"]
-        return None
+        return self.data.get("sensor_state", None)
 
     @property
     def co2(self) -> Optional[int]:
         """Return co2 value (400...9999ppm)."""
-        if "co2" in self.data and self.data["co2"] is not None:
-            return self.data["co2"]
-        return None
+        return self.data.get("co2", None)
+
+    @property
+    def co2e(self) -> Optional[int]:
+        """Return co2e value (400...9999ppm)."""
+        return self.data.get("co2e", None)
 
     @property
     def humidity(self) -> Optional[float]:
         """Return humidity value (0...100%)."""
-        if "humidity" in self.data and self.data["humidity"] is not None:
-            return self.data["humidity"]
-        return None
+        return self.data.get("humidity", None)
 
     @property
     def pm25(self) -> Optional[float]:
         """Return pm2.5 value (0...999μg/m³)."""
-        if "pm25" in self.data and self.data["pm25"] is not None:
-            return self.data["pm25"]
-        return None
+        return self.data.get("pm25", None)
 
     @property
     def temperature(self) -> Optional[float]:
         """Return temperature value (-10...50°C)."""
-        if "temperature" in self.data and self.data["temperature"] is not None:
-            return self.data["temperature"]
-        return None
+        return self.data.get("temperature", None)
 
     @property
     def tvoc(self) -> Optional[int]:
         """Return tvoc value."""
-        if "tvoc" in self.data and self.data["tvoc"] is not None:
-            return self.data["tvoc"]
-        return None
+        return self.data.get("tvoc", None)
 
     def __repr__(self) -> str:
         s = (
@@ -168,6 +162,7 @@ class AirQualityMonitorStatus:
             "temperature=%s, "
             "humidity=%s, "
             "co2=%s, "
+            "co2e=%s, "
             "pm2.5=%s, "
             "tvoc=%s, "
             "display_clock=%s>"
@@ -179,6 +174,7 @@ class AirQualityMonitorStatus:
                 self.temperature,
                 self.humidity,
                 self.co2,
+                self.co2e,
                 self.pm25,
                 self.tvoc,
                 self.display_clock,
@@ -206,11 +202,12 @@ class AirQualityMonitor(Device):
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
-        else:
+        elif model is not None:
             self.model = MODEL_AIRQUALITYMONITOR_V1
-            _LOGGER.error(
-                "Device model %s unsupported. Falling back to %s.", model, self.model
-            )
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+        else:
+            """Force autodetection"""
+            self.model = None
 
     @command(
         default_output=format_output(
@@ -222,6 +219,7 @@ class AirQualityMonitor(Device):
             "Temperature: {result.temperature}\n"
             "Humidity: {result.humidity}\n"
             "CO2: {result.co2}\n"
+            "CO2e: {result.co2e}\n"
             "PM2.5: {result.pm25}\n"
             "TVOC: {result.tvoc}\n"
             "Display clock: {result.display_clock}\n",
@@ -230,9 +228,17 @@ class AirQualityMonitor(Device):
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
 
+        if self.model is None:
+            """Autodetection"""
+            info = self.info()
+            self.model = info.model
+
         properties = AVAILABLE_PROPERTIES[self.model]
 
-        values = self.send("get_prop", properties)
+        if self.model == MODEL_AIRQUALITYMONITOR_B1:
+            values = self.send("get_air_data")
+        else:
+            values = self.send("get_prop", properties)
 
         properties_count = len(properties)
         values_count = len(values)
@@ -244,7 +250,7 @@ class AirQualityMonitor(Device):
                 values_count,
             )
 
-        if self.model == MODEL_AIRQUALITYMONITOR_S1:
+        if self.model == MODEL_AIRQUALITYMONITOR_S1 or self.model == MODEL_AIRQUALITYMONITOR_B1:
             return AirQualityMonitorStatus(defaultdict(lambda: None, values))
         else:
             return AirQualityMonitorStatus(
