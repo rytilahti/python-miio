@@ -1,5 +1,55 @@
 # Change Log
 
+## [0.4.7](https://github.com/rytilahti/python-miio/tree/0.4.7)
+
+This release adds support for the following new devices:
+
+* Widetech WDH318EFW1 dehumidifier \(nwt.derh.wdh318efw1\)
+* Xiaomi Xiao AI Smart Alarm Clock \(zimi.clock.myk01\)
+* Xiaomi Air Quality Monitor 2gen \(cgllc.airmonitor.b1\)
+* Xiaomi ZNCZ05CM EU Smart Socket \(chuangmi.plug.hmi206\)
+
+Fixes & Enhancements:
+
+* Air Humidifier: Parsing of the firmware version improved
+* Add travis build for python 3.7
+* Use black for source code formatting
+* Require python \>=3.6
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.6...0.4.7)
+
+**Implemented enhancements:**
+
+- Add support for WIDETECH WDH318EFW1 dehumidifier \(nwt.derh.wdh318efw1\) [\#534](https://github.com/rytilahti/python-miio/issues/534)
+- Support for Xiaomi Xiao AI Smart Alarm Clock \(zimi.clock.myk01\) [\#505](https://github.com/rytilahti/python-miio/issues/505)
+- Add support for the cgllc.airmonitor.b1 [\#562](https://github.com/rytilahti/python-miio/pull/562) ([fwestenberg](https://github.com/fwestenberg))
+
+**Fixed bugs:**
+
+- Air Humidifier [\#529](https://github.com/rytilahti/python-miio/issues/529)
+
+**Closed issues:**
+
+- mirobo updater -- No request was made [\#557](https://github.com/rytilahti/python-miio/issues/557)
+- What‘s the plan to release 0.4.6? [\#553](https://github.com/rytilahti/python-miio/issues/553)
+- does this support aqara water leak sensor? [\#551](https://github.com/rytilahti/python-miio/issues/551)
+- Unsupported device chuangmi.plug.hmi206 [\#545](https://github.com/rytilahti/python-miio/issues/545)
+- python-miio not compatible with Python \<=3.5.1 [\#494](https://github.com/rytilahti/python-miio/issues/494)
+- Support for Xiaomi Air Quality Monitor 2gen [\#419](https://github.com/rytilahti/python-miio/issues/419)
+
+**Merged pull requests:**
+
+- Add travis build for python 3.7 [\#561](https://github.com/rytilahti/python-miio/pull/561) ([syssi](https://github.com/syssi))
+- bump required python version to 3.6+ [\#560](https://github.com/rytilahti/python-miio/pull/560) ([rytilahti](https://github.com/rytilahti))
+- Use black for source code formatting [\#559](https://github.com/rytilahti/python-miio/pull/559) ([rytilahti](https://github.com/rytilahti))
+- Add initial support for Xiao AI Smart Alarm Clock \(zimi.clock.myk01\) [\#558](https://github.com/rytilahti/python-miio/pull/558) ([rytilahti](https://github.com/rytilahti))
+- Improve firmware version parser of the Air Humidifier \(Closes: \#529\) [\#556](https://github.com/rytilahti/python-miio/pull/556) ([syssi](https://github.com/syssi))
+- Bring cgllc.airmonitor.s1 into line [\#555](https://github.com/rytilahti/python-miio/pull/555) ([syssi](https://github.com/syssi))
+- Add Xiaomi ZNCZ05CM EU Smart Socket \(chuangmi.plug.hmi206\) support [\#554](https://github.com/rytilahti/python-miio/pull/554) ([syssi](https://github.com/syssi))
+
+
+## [0.4.6](https://github.com/rytilahti/python-miio/tree/0.4.6)
+
 This release adds support for the following new devices:
 
 * Xiaomi Air Quality Monitor S1 \(cgllc.airmonitor.s1\)
@@ -23,8 +73,6 @@ Fixes & Enhancements:
 * Always import DeviceError exception
 * Require click version \>=7
 * Remove pretty\_cron and typing dependencies from requirements.txt
-
-## [0.4.6](https://github.com/rytilahti/python-miio/tree/0.4.6)
 
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.5...0.4.6)
 
