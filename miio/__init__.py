@@ -15,7 +15,6 @@ from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.device import Device, DeviceError, DeviceException
-from miio.discovery import Discovery
 from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
 from miio.philips_bulb import PhilipsBulb
 from miio.philips_eyecare import PhilipsEyecare
@@ -37,3 +36,5 @@ from miio.waterpurifier import WaterPurifier
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
+
+from miio.discovery import Discovery
