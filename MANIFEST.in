@@ -1,6 +1,7 @@
 include *.md
 include *.txt
-include .flake8.ini
+include *.yaml
+include *.yml
 include LICENSE
 include tox.ini
 recursive-include docs *.py

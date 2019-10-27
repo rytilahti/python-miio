@@ -1,0 +1,47 @@
+trigger:
+- master
+pr:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+strategy:
+  matrix:
+    Python36:
+      python.version: '3.6'
+    Python37:
+      python.version: '3.7'
+#    Python38:
+#      python.version: '3.8'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+    pip install pytest pytest-azurepipelines pytest-cov
+  displayName: 'Install dependencies'
+
+- script: |
+    pre-commit run black --all-files
+  displayName: 'Code formating (black)'
+
+- script: |
+    pre-commit run flake8 --all-files
+  displayName: 'Code formating (flake8)'
+
+#- script: |
+#    pre-commit run mypy --all-files
+#  displayName: 'Typing checks (mypy)'
+
+- script: |
+    pre-commit run isort --all-files
+  displayName: 'Order of imports (isort)'
+
+- script: |
+    pytest --cov miio --cov-report html
+  displayName: 'Tests'

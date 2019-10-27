@@ -3,7 +3,8 @@ from unittest import TestCase
 import pytest
 
 from miio import PhilipsBulb
-from miio.philips_bulb import PhilipsBulbStatus, PhilipsBulbException
+from miio.philips_bulb import PhilipsBulbException, PhilipsBulbStatus
+
 from .dummies import DummyDevice
 
 

@@ -1,4 +1,5 @@
 import re
+
 from setuptools import setup
 
 with open("miio/version.py") as f:
@@ -15,7 +16,7 @@ def readme():
 
 setup(
     name="python-miio",
-    version=__version__,
+    version=__version__,  # type: ignore # noqa: F821
     description="Python library for interfacing with Xiaomi smart appliances",
     long_description=readme(),
     url="https://github.com/rytilahti/python-miio",

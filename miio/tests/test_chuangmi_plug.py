@@ -4,11 +4,12 @@ import pytest
 
 from miio import ChuangmiPlug
 from miio.chuangmi_plug import (
-    ChuangmiPlugStatus,
+    MODEL_CHUANGMI_PLUG_M1,
     MODEL_CHUANGMI_PLUG_V1,
     MODEL_CHUANGMI_PLUG_V3,
-    MODEL_CHUANGMI_PLUG_M1,
+    ChuangmiPlugStatus,
 )
+
 from .dummies import DummyDevice
 
 

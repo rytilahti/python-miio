@@ -7,6 +7,7 @@ import pytest
 
 from miio import ChuangmiIr
 from miio.chuangmi_ir import ChuangmiIrException
+
 from .dummies import DummyDevice
 
 with open(os.path.join(os.path.dirname(__file__), "test_chuangmi_ir.json")) as inp:

@@ -3,12 +3,14 @@ from unittest import TestCase
 import pytest
 
 from miio.toiletlid import (
+    MODEL_TOILETLID_V1,
+    AmbientLightColor,
     Toiletlid,
     ToiletlidStatus,
-    AmbientLightColor,
-    MODEL_TOILETLID_V1,
 )
+
 from .dummies import DummyDevice
+
 
 """
 Response instance

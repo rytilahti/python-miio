@@ -3,19 +3,19 @@ import re
 
 import click
 from construct import (
-    Struct,
-    Const,
-    Rebuild,
-    this,
-    len_,
     Adapter,
+    Array,
+    BitsInteger,
+    BitStruct,
     Computed,
+    Const,
+    Int16ub,
     Int16ul,
     Int32ul,
-    Int16ub,
-    Array,
-    BitStruct,
-    BitsInteger,
+    Rebuild,
+    Struct,
+    len_,
+    this,
 )
 
 from .click_common import command, format_output

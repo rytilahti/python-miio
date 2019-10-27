@@ -3,7 +3,8 @@ from unittest import TestCase
 import pytest
 
 from miio import PhilipsEyecare
-from miio.philips_eyecare import PhilipsEyecareStatus, PhilipsEyecareException
+from miio.philips_eyecare import PhilipsEyecareException, PhilipsEyecareStatus
+
 from .dummies import DummyDevice
 
 

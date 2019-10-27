@@ -4,8 +4,8 @@ import logging
 import click
 
 from miio.click_common import (
-    ExceptionHandlerGroup,
     DeviceGroupMeta,
+    ExceptionHandlerGroup,
     GlobalContextObject,
     json_output,
 )

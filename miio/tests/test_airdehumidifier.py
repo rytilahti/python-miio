@@ -4,14 +4,15 @@ import pytest
 
 from miio import AirDehumidifier
 from miio.airdehumidifier import (
-    OperationMode,
-    FanSpeed,
-    AirDehumidifierStatus,
-    AirDehumidifierException,
     MODEL_DEHUMIDIFIER_V1,
+    AirDehumidifierException,
+    AirDehumidifierStatus,
+    FanSpeed,
+    OperationMode,
 )
-from .dummies import DummyDevice
 from miio.device import DeviceInfo
+
+from .dummies import DummyDevice
 
 
 class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):

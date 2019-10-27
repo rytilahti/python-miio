@@ -4,6 +4,7 @@ from unittest import TestCase
 import pytest
 
 from miio import Vacuum, VacuumStatus
+
 from .dummies import DummyDevice
 
 

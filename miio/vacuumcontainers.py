@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*#
-from datetime import datetime, timedelta, time
+from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List
 
-from .utils import deprecated, pretty_time, pretty_seconds
+from .utils import deprecated, pretty_seconds, pretty_time
 
 
 def pretty_area(x: float) -> float:

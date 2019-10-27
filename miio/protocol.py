@@ -17,22 +17,21 @@ import json
 import logging
 from typing import Any, Dict, Tuple
 
-import construct
 from construct import (
-    Struct,
+    Adapter,
     Bytes,
+    Checksum,
     Const,
+    Default,
+    GreedyBytes,
+    Hex,
+    IfThenElse,
     Int16ub,
     Int32ub,
-    GreedyBytes,
-    Adapter,
-    Checksum,
+    Pointer,
     RawCopy,
     Rebuild,
-    IfThenElse,
-    Default,
-    Pointer,
-    Hex,
+    Struct,
 )
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding

@@ -3,23 +3,25 @@
 This file contains common functions for cli tools.
 """
 import ast
+import ipaddress
+import json
+import logging
+import re
 import sys
+from functools import partial, wraps
+from typing import Union
+
+import click
+
+import miio
+
+from .exceptions import DeviceError
 
 if sys.version_info < (3, 5):
     print(
         "To use this script you need python 3.5 or newer, got %s" % (sys.version_info,)
     )
     sys.exit(1)
-import click
-import ipaddress
-import miio
-import logging
-import json
-import re
-from typing import Union
-from functools import wraps
-from functools import partial
-from .exceptions import DeviceError
 
 
 _LOGGER = logging.getLogger(__name__)

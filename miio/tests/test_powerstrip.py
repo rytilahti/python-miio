@@ -4,12 +4,13 @@ import pytest
 
 from miio import PowerStrip
 from miio.powerstrip import (
-    PowerMode,
-    PowerStripStatus,
-    PowerStripException,
     MODEL_POWER_STRIP_V1,
     MODEL_POWER_STRIP_V2,
+    PowerMode,
+    PowerStripException,
+    PowerStripStatus,
 )
+
 from .dummies import DummyDevice
 
 

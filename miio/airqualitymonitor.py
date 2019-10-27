@@ -25,13 +25,7 @@ AVAILABLE_PROPERTIES_COMMON = [
     "sensor_state",
 ]
 
-AVAILABLE_PROPERTIES_B1 = [
-    "co2e",
-    "humidity",
-    "pm25",
-    "temperature",
-    "tvoc"
-]
+AVAILABLE_PROPERTIES_B1 = ["co2e", "humidity", "pm25", "temperature", "tvoc"]
 
 AVAILABLE_PROPERTIES_S1 = ["battery", "co2", "humidity", "pm25", "temperature", "tvoc"]
 
@@ -204,7 +198,9 @@ class AirQualityMonitor(Device):
             self.model = model
         elif model is not None:
             self.model = MODEL_AIRQUALITYMONITOR_V1
-            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+            _LOGGER.error(
+                "Device model %s unsupported. Falling back to %s.", model, self.model
+            )
         else:
             """Force autodetection"""
             self.model = None
@@ -250,7 +246,10 @@ class AirQualityMonitor(Device):
                 values_count,
             )
 
-        if self.model == MODEL_AIRQUALITYMONITOR_S1 or self.model == MODEL_AIRQUALITYMONITOR_B1:
+        if (
+            self.model == MODEL_AIRQUALITYMONITOR_S1
+            or self.model == MODEL_AIRQUALITYMONITOR_B1
+        ):
             return AirQualityMonitorStatus(defaultdict(lambda: None, values))
         else:
             return AirQualityMonitorStatus(

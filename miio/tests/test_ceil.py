@@ -3,7 +3,8 @@ from unittest import TestCase
 import pytest
 
 from miio import Ceil
-from miio.ceil import CeilStatus, CeilException
+from miio.ceil import CeilException, CeilStatus
+
 from .dummies import DummyDevice
 
 
