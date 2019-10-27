@@ -23,8 +23,7 @@ steps:
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
-    pip install pytest pytest-azurepipelines
-    pre-commit install-hooks
+    pip install pytest pytest-azurepipelines pytest-cov
   displayName: 'Install dependencies'
 
 - script: |
@@ -44,5 +43,5 @@ steps:
   displayName: 'Order of imports (isort)'
 
 - script: |
-    pytest
+    pytest --cov
   displayName: 'Tests'
