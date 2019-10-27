@@ -35,9 +35,9 @@ steps:
     pre-commit run flake8 --all-files
   displayName: 'Code formating (flake8)'
 
-- script: |
-    pre-commit run mypy --all-files
-  displayName: 'Typing checks (mypy)'
+#- script: |
+#    pre-commit run mypy --all-files
+#  displayName: 'Typing checks (mypy)'
 
 - script: |
     pre-commit run isort --all-files
