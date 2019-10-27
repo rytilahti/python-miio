@@ -1,10 +1,10 @@
+import json
 import logging
 import sqlite3
 import tempfile
-import json
+import xml.etree.ElementTree as ET
 from pprint import pformat as pf
 from typing import Iterator
-import xml.etree.ElementTree as ET
 
 import attr
 import click

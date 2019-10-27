@@ -4,17 +4,18 @@ import pytest
 
 from miio import Fan, FanP5
 from miio.fan import (
-    MoveDirection,
-    LedBrightness,
-    OperationMode,
-    FanStatus,
-    FanStatusP5,
-    FanException,
+    MODEL_FAN_P5,
+    MODEL_FAN_SA1,
     MODEL_FAN_V2,
     MODEL_FAN_V3,
-    MODEL_FAN_SA1,
-    MODEL_FAN_P5,
+    FanException,
+    FanStatus,
+    FanStatusP5,
+    LedBrightness,
+    MoveDirection,
+    OperationMode,
 )
+
 from .dummies import DummyDevice
 
 

@@ -6,7 +6,7 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceException
-from .utils import int_to_rgb, rgb_to_int
+from .utils import int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
 

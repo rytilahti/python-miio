@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Dict, Any
+from typing import Any, Dict
 
 import click
 

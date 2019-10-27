@@ -1,7 +1,8 @@
 import warnings
-import click
 from enum import IntEnum
-from typing import Tuple, Optional
+from typing import Optional, Tuple
+
+import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceException

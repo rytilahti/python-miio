@@ -5,8 +5,8 @@ from typing import Any, Dict, Optional
 
 import click
 
-from .click_common import command, format_output, EnumType
-from .device import Device, DeviceInfo, DeviceError, DeviceException
+from .click_common import EnumType, command, format_output
+from .device import Device, DeviceError, DeviceException, DeviceInfo
 
 _LOGGER = logging.getLogger(__name__)
 

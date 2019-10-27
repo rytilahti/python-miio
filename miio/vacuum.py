@@ -12,18 +12,18 @@ import click
 import pytz
 from appdirs import user_cache_dir
 
-from .click_common import DeviceGroup, command, GlobalContextObject, LiteralParamType
+from .click_common import DeviceGroup, GlobalContextObject, LiteralParamType, command
 from .device import Device, DeviceException
 from .vacuumcontainers import (
-    VacuumStatus,
+    CarpetModeStatus,
+    CleaningDetails,
+    CleaningSummary,
     ConsumableStatus,
     DNDStatus,
-    CleaningSummary,
-    CleaningDetails,
-    Timer,
-    SoundStatus,
     SoundInstallStatus,
-    CarpetModeStatus,
+    SoundStatus,
+    Timer,
+    VacuumStatus,
 )
 
 _LOGGER = logging.getLogger(__name__)

@@ -1,4 +1,4 @@
-from miio.click_common import validate_token, validate_ip
+from miio.click_common import validate_ip, validate_token
 
 
 def test_validate_token_empty():

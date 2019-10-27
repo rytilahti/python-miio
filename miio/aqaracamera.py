@@ -7,11 +7,11 @@ TODO: add alarm/sound parts (get_music_info, {get,set}_alarming_volume,
 TODO: add sdcard status & fix all TODOS
 TODO: add tests
 """
-import attr
 import logging
-from typing import Any, Dict
 from enum import IntEnum
+from typing import Any, Dict
 
+import attr
 import click
 
 from .click_common import command, format_output

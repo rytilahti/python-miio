@@ -4,16 +4,17 @@ import pytest
 
 from miio import AirHumidifier
 from miio.airhumidifier import (
-    OperationMode,
-    LedBrightness,
-    AirHumidifierStatus,
-    AirHumidifierException,
-    MODEL_HUMIDIFIER_V1,
     MODEL_HUMIDIFIER_CA1,
     MODEL_HUMIDIFIER_CB1,
+    MODEL_HUMIDIFIER_V1,
+    AirHumidifierException,
+    AirHumidifierStatus,
+    LedBrightness,
+    OperationMode,
 )
-from .dummies import DummyDevice
 from miio.device import DeviceInfo
+
+from .dummies import DummyDevice
 
 
 class DummyAirHumidifierV1(DummyDevice, AirHumidifier):

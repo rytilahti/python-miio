@@ -4,11 +4,12 @@ import pytest
 
 from miio import AirQualityMonitor
 from miio.airqualitymonitor import (
-    AirQualityMonitorStatus,
-    MODEL_AIRQUALITYMONITOR_V1,
-    MODEL_AIRQUALITYMONITOR_S1,
     MODEL_AIRQUALITYMONITOR_B1,
+    MODEL_AIRQUALITYMONITOR_S1,
+    MODEL_AIRQUALITYMONITOR_V1,
+    AirQualityMonitorStatus,
 )
+
 from .dummies import DummyDevice
 
 
@@ -141,7 +142,8 @@ class DummyAirQualityMonitorB1(DummyDevice, AirQualityMonitor):
             "temperature": 19.799999237060547,
             "temperature_unit": "c",
             "tvoc": 1.3948699235916138,
-            "tvoc_unit": "mg_m3"}
+            "tvoc_unit": "mg_m3",
+        }
         self.return_values = {"get_air_data": self._get_state}
         super().__init__(args, kwargs)
 

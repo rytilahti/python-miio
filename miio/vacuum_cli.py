@@ -16,10 +16,11 @@ from tqdm import tqdm
 import miio  # noqa: E402
 from miio.click_common import (
     ExceptionHandlerGroup,
+    LiteralParamType,
     validate_ip,
     validate_token,
-    LiteralParamType,
 )
+
 from .device import UpdateState
 from .updater import OneShotServer
 
@@ -618,7 +619,7 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
             try:
                 state = vac.update_state()
                 progress = vac.update_progress()
-            except:  # we may not get our messages through during upload
+            except:  # we may not get our messages through during upload # noqa
                 continue
 
             if state == UpdateState.Installing:

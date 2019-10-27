@@ -4,11 +4,12 @@ import pytest
 
 from miio import AirFresh
 from miio.airfresh import (
-    OperationMode,
-    LedBrightness,
-    AirFreshStatus,
     AirFreshException,
+    AirFreshStatus,
+    LedBrightness,
+    OperationMode,
 )
+
 from .dummies import DummyDevice
 
 

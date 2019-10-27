@@ -1,9 +1,10 @@
 import enum
 import time
+
 import click
 
+from .click_common import EnumType, command
 from .device import Device
-from .click_common import command, EnumType
 
 
 class HourlySystem(enum.Enum):

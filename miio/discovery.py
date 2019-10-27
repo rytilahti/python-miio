@@ -3,70 +3,68 @@ import inspect
 import ipaddress
 import logging
 from functools import partial
-from typing import Union, Callable, Dict, Optional  # noqa: F401
+from typing import Callable, Dict, Optional, Union  # noqa: F401
 
 import zeroconf
 
 from . import (
-    Device,
-    Vacuum,
-    ChuangmiCamera,
-    ChuangmiPlug,
-    PowerStrip,
-    AirPurifier,
+    AirConditioningCompanion,
     AirFresh,
+    AirHumidifier,
+    AirPurifier,
+    AirQualityMonitor,
+    AqaraCamera,
     Ceil,
+    ChuangmiCamera,
+    ChuangmiIr,
+    ChuangmiPlug,
+    Cooker,
+    Device,
+    Fan,
     PhilipsBulb,
     PhilipsEyecare,
     PhilipsMoonlight,
-    ChuangmiIr,
-    AirHumidifier,
-    WaterPurifier,
-    WifiSpeaker,
-    WifiRepeater,
-    Yeelight,
-    Fan,
-    Cooker,
-    AirConditioningCompanion,
-    AirQualityMonitor,
-    AqaraCamera,
+    PowerStrip,
     Toiletlid,
+    Vacuum,
+    WaterPurifier,
+    WifiRepeater,
+    WifiSpeaker,
+    Yeelight,
 )
-
 from .airconditioningcompanion import (
     MODEL_ACPARTNER_V1,
     MODEL_ACPARTNER_V2,
     MODEL_ACPARTNER_V3,
 )
+from .airhumidifier import (
+    MODEL_HUMIDIFIER_CA1,
+    MODEL_HUMIDIFIER_CB1,
+    MODEL_HUMIDIFIER_V1,
+)
 from .airqualitymonitor import (
-    MODEL_AIRQUALITYMONITOR_V1,
     MODEL_AIRQUALITYMONITOR_B1,
     MODEL_AIRQUALITYMONITOR_S1,
-)
-from .airhumidifier import (
-    MODEL_HUMIDIFIER_CB1,
-    MODEL_HUMIDIFIER_CA1,
-    MODEL_HUMIDIFIER_V1,
+    MODEL_AIRQUALITYMONITOR_V1,
 )
 from .alarmclock import AlarmClock
 from .chuangmi_plug import (
+    MODEL_CHUANGMI_PLUG_HMI205,
+    MODEL_CHUANGMI_PLUG_HMI206,
+    MODEL_CHUANGMI_PLUG_M1,
+    MODEL_CHUANGMI_PLUG_M3,
     MODEL_CHUANGMI_PLUG_V1,
     MODEL_CHUANGMI_PLUG_V2,
     MODEL_CHUANGMI_PLUG_V3,
-    MODEL_CHUANGMI_PLUG_M1,
-    MODEL_CHUANGMI_PLUG_M3,
-    MODEL_CHUANGMI_PLUG_HMI205,
-    MODEL_CHUANGMI_PLUG_HMI206,
 )
-
 from .fan import (
+    MODEL_FAN_P5,
+    MODEL_FAN_SA1,
     MODEL_FAN_V2,
     MODEL_FAN_V3,
-    MODEL_FAN_SA1,
     MODEL_FAN_ZA1,
     MODEL_FAN_ZA3,
     MODEL_FAN_ZA4,
-    MODEL_FAN_P5,
 )
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1

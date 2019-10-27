@@ -4,6 +4,7 @@ import pytest
 
 from miio import WaterPurifier
 from miio.waterpurifier import WaterPurifierStatus
+
 from .dummies import DummyDevice
 
 

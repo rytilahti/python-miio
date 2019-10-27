@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 import click
 
-from .click_common import command, format_output, EnumType
+from .click_common import EnumType, command, format_output
 from .device import Device
 
 _LOGGER = logging.getLogger(__name__)

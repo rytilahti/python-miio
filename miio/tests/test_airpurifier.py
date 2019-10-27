@@ -4,13 +4,14 @@ import pytest
 
 from miio import AirPurifier
 from miio.airpurifier import (
-    OperationMode,
-    LedBrightness,
-    FilterType,
-    SleepMode,
-    AirPurifierStatus,
     AirPurifierException,
+    AirPurifierStatus,
+    FilterType,
+    LedBrightness,
+    OperationMode,
+    SleepMode,
 )
+
 from .dummies import DummyDevice
 
 

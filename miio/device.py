@@ -9,8 +9,8 @@ from typing import Any, List, Optional  # noqa: F401
 import click
 import construct
 
-from .click_common import DeviceGroupMeta, command, format_output, LiteralParamType
-from .exceptions import DeviceException, DeviceError, RecoverableError
+from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
+from .exceptions import DeviceError, DeviceException, RecoverableError
 from .protocol import Message
 
 _LOGGER = logging.getLogger(__name__)

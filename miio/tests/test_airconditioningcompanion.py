@@ -1,21 +1,21 @@
-import string
 import json
 import os
+import string
 from unittest import TestCase
 
 import pytest
 
 from miio import AirConditioningCompanion, AirConditioningCompanionV3
 from miio.airconditioningcompanion import (
-    OperationMode,
+    MODEL_ACPARTNER_V3,
+    STORAGE_SLOT_ID,
+    AirConditioningCompanionException,
+    AirConditioningCompanionStatus,
     FanSpeed,
+    Led,
+    OperationMode,
     Power,
     SwingMode,
-    Led,
-    AirConditioningCompanionStatus,
-    AirConditioningCompanionException,
-    STORAGE_SLOT_ID,
-    MODEL_ACPARTNER_V3,
 )
 
 STATE_ON = ["on"]
