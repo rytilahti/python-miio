@@ -43,5 +43,5 @@ steps:
   displayName: 'Order of imports (isort)'
 
 - script: |
-    pytest --cov
+    pytest --cov miio --cov-report html
   displayName: 'Tests'
