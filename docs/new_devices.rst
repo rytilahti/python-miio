@@ -1,8 +1,68 @@
 Contributing
 ************
 
-Contributions of any sort are very welcome,
-here is some information to get you started.
+Contributions of any sort are more than welcome,
+so we hope this short introduction will help you to get started!
+Shortly put: we use black_ to format our code, isort_ to sort our imports, pytest_ to test our code,
+flake8_ to do its checks, and doc8_ for documentation checks.
+
+Development environment
+-----------------------
+
+This section will shortly go through how to get you started with a working development environment.
+We assume that you are familiar with virtualenv_ and are using it somehow (be it a manual setup, pipenv_, ..).
+The easiest way to start is to use pip_ to install dependencies::
+
+    pip install -r requirements.txt
+
+followed by installing the package in `development mode <https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs>`__ ::
+
+    pip install -e .
+
+To verify the installation, simply launch tox_ to run all the checks::
+
+    tox
+
+In order to make feedback loops faster, we automate our code checks by using precommit_ hooks.
+Therefore the first step after setting up the development environment is to install them::
+
+    pre-commit install
+
+You can always `execute the checks <#code-checks>`_ also without doing a commit.
+
+Code checks
+~~~~~~~~~~~
+
+Instead of running all available checks during development,
+it is also possible to execute only the code checks by calling.
+This will execute the same checks that would be done automatically by precommit_ when you make a commit::
+
+    tox -e lint
+
+Tests
+~~~~~
+
+We prefer to have tests for our code, so we use pytest_ you can also use by executing::
+
+    pytest miio
+
+When adding support for a new device or extending an already existing one,
+please do not forget to create tests for your code.
+
+Generating documentation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+To install necessary packages to compile the documentation, run::
+
+    pip install -r requirements_docs.txt
+
+After that, you can compile the documentation and open it locally in your browser::
+
+    cd docs
+    make html
+    $BROWSER _build/html/index.html
+
+Replace `$BROWSER` with your preferred browser if the environment variable is not set.
 
 Adding support for new devices
 ------------------------------
@@ -32,3 +92,14 @@ Documentation
     Describe how to write documentation.
     This part of documentation needs your help!
     Please consider submitting a pull request to update this.
+
+.. _virtualenv: https://virtualenv.pypa.io
+.. _isort: https://github.com/timothycrosley/isort
+.. _pipenv: https://github.com/pypa/pipenv
+.. _tox: https://tox.readthedocs.io
+.. _pytest: https://docs.pytest.org
+.. _black: https://github.com/psf/black
+.. _pip: https://pypi.org/project/pip/
+.. _precommit: https://pre-commit.com
+.. _flake8: http://flake8.pycqa.org
+.. _doc8: https://pypi.org/project/doc8/

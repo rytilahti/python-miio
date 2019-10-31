@@ -20,7 +20,6 @@ miio\.airfresh module
     :show-inheritance:
     :undoc-members:
 
-
 miio\.airhumidifier module
 --------------------------
 
@@ -63,7 +62,7 @@ miio\.ceil module
     :undoc-members:
 
 miio\.chuangmi\_camera module
--------------------------
+-----------------------------
 
 .. automodule:: miio.chuangmi_camera
     :members:
