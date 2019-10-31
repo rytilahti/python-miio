@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 import ast
 import logging
 import sys
