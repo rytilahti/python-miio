@@ -2,10 +2,10 @@
 
 Support for lumi.camera.aq1
 
-TODO: add alarm/sound parts (get_music_info, {get,set}_alarming_volume,
-      set_default_music, play_music_new, set_sound_playing)
-TODO: add sdcard status & fix all TODOS
-TODO: add tests
+.. todo:: add alarm/sound parts (get_music_info, {get,set}_alarming_volume,
+          set_default_music, play_music_new, set_sound_playing)
+.. todo:: add sdcard status & fix all TODOS
+.. todo:: add tests
 """
 import logging
 from enum import IntEnum

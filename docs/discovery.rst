@@ -135,7 +135,7 @@ Mi Home app.
 After the setup is completed, and the device has been connected to the Wi-Fi
 network of your choice, it is necessary to downgrade the Mi Home app to some
 version equal or below 5.0.19. As explained `here <https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token.md#method-3---obtain-mi-home-device-token-for-devices-that-hide-their-tokens-after-setup>`_
-and `here <https://github.com/rytilahti/python-miio/issues/185>`_, newer versions
+and `in github issue #185 <https://github.com/rytilahti/python-miio/issues/185>`_, newer versions
 of the app do not download the token into the local database, which means that
 we can't retrieve the token from the backup. You can find older versions of the
 Mi Home app in `apkmirror <https://www.apkmirror.com/apk/xiaomi-inc/mihome/>`_.
@@ -175,7 +175,7 @@ please continue to :ref:`token_extraction`.
 Apple
 ~~~~~
 
-Create a new unencrypted iOS backup to your computer. 
+Create a new unencrypted iOS backup to your computer.
 To do that you've to follow these steps:
 
 - Connect your iOS device to the computer
