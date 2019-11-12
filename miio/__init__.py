@@ -32,6 +32,7 @@ from miio.vacuumcontainers import (
     Timer,
     VacuumStatus,
 )
+from miio.viomivacuum import ViomiVacuum
 from miio.waterpurifier import WaterPurifier
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
