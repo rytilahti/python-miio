@@ -167,6 +167,7 @@ class ViomiVacuum(Device):
 
     @command(click.argument("speed", type=str))
     def set_fan_speed(self, speed: str):
+        """Set fanspeed [silent, standard, medium, turbo]."""
         self.send("set_suction", [ViomiVacuumSpeed(speed.capitalize()).value])
 
     @command()
