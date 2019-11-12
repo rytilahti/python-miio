@@ -14,6 +14,7 @@ Supported devices
 -  Xiaomi Mi Air Purifier
 -  Xiaomi Aqara Camera
 -  Xiaomi Mijia 360 1080p
+-  Xiaomi Mijia STYJ02YM (Viomi)
 -  Xiaomi Mi Smart WiFi Socket
 -  Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port)
 -  Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports)
