@@ -11,7 +11,6 @@ from miio.toiletlid import (
 
 from .dummies import DummyDevice
 
-
 """
 Response instance
 >> status
@@ -30,10 +29,12 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
         self.state = {
             "is_on": False,
             "work_state": 1,
+            "work_mode": "Vacant",
             "ambient_light": "Yellow",
             "filter_use_flux": "100",
             "filter_use_time": "180",
         }
+        self.users = {}
 
         self.return_values = {
             "get_prop": self._get_state,
@@ -43,15 +44,44 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
         }
         super().__init__(args, kwargs)
 
-    def set_aled_v_of_uid(self, x):
-        uid, color = x
-        return self._set_state("ambient_light", [AmbientLightColor(color).name])
+    def set_aled_v_of_uid(self, uid, color):
+        if uid:
+            if uid in self.users:
+                self.users.setdefault("ambient_light", AmbientLightColor(color).name)
+            else:
+                raise ValueError("This user is not bind.")
+        else:
+            return self._set_state("ambient_light", [AmbientLightColor(color).name])
 
     def get_aled_v_of_uid(self, uid):
-        color = self._get_state(["ambient_light"])
+        if uid:
+            if uid in self.users:
+                color = self.users.get("ambient_light")
+            else:
+                raise ValueError("This user is not bind.")
+        else:
+            color = self._get_state(["ambient_light"])
         if not AmbientLightColor._member_map_.get(color[0]):
             raise ValueError(color)
         return AmbientLightColor._member_map_.get(color[0]).value
+
+    def uid_mac_op(self, xiaomi_id, band_mac, alias, operating):
+        if operating == "bind":
+            info = self.users.setdefault(
+                xiaomi_id, {"rssi": -50, "set": "3-0-2-2-0-0-5-5"}
+            )
+            info.update(mac=band_mac, name=alias)
+        elif operating == "unbind":
+            self.users.pop(xiaomi_id)
+        else:
+            raise ValueError("operating error")
+
+    def get_all_user_info(self):
+        users = {}
+        for index, xiaomi_id, info in enumerate(self.users.items(), start=1):
+            user_id = "user%s" % index
+            users[user_id] = {"uid": xiaomi_id, **info}
+        return users
 
 
 @pytest.fixture(scope="class")
@@ -62,6 +92,15 @@ def toiletlidv1(request):
 
 @pytest.mark.usefixtures("toiletlidv1")
 class TestToiletlidV1(TestCase):
+    MOCK_USER = {
+        "11111111": {
+            "mac": "ff:ff:ff:ff:ff:ff",
+            "name": "myband",
+            "rssi": -50,
+            "set": "3-0-2-2-0-0-5-5",
+        }
+    }
+
     def is_on(self):
         return self.device.status().is_on
 
@@ -94,3 +133,21 @@ class TestToiletlidV1(TestCase):
         self.device.nozzle_clean()
         assert self.is_on() is True
         self.device._reset_state()
+
+    def test_get_all_user_info(self):
+        users = self.device.get_all_user_info()
+        for name, info in users.items():
+            assert info["uid"] in self.MOCK_USER
+            data = self.MOCK_USER[info["uid"]]
+            assert info["name"] == data["name"]
+            assert info["mac"] == data["mac"]
+
+    def test_bind_xiaomi_band(self):
+        for xiaomi_id, info in self.MOCK_USER.items():
+            self.device.bind_xiaomi_band(xiaomi_id, info["mac"], info["name"])
+        assert self.device.users == self.MOCK_USER
+
+    def test_unbind_xiaomi_band(self):
+        for xiaomi_id, info in self.MOCK_USER.items():
+            self.device.bind_xiaomi_band(xiaomi_id, info["mac"])
+        assert self.device.users == {}
