@@ -11,6 +11,7 @@ from miio.toiletlid import (
 
 from .dummies import DummyDevice
 
+
 """
 Response instance
 >> status
