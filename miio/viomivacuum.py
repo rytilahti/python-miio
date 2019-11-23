@@ -20,6 +20,7 @@ class ViomiVacuumSpeed(Enum):
 
 
 class ViomiVacuumState(Enum):
+    IdleNotDocked = 0
     Idle = 1
     Idle2 = 2
     Cleaning = 3
