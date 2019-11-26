@@ -42,10 +42,13 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
             "nozzle_clean": lambda x: self._set_state("work_state", [97]),
             "set_aled_v_of_uid": self.set_aled_v_of_uid,
             "get_aled_v_of_uid": self.get_aled_v_of_uid,
+            "uid_mac_op": self.uid_mac_op,
+            "get_all_user_info": self.get_all_user_info,
         }
         super().__init__(args, kwargs)
 
-    def set_aled_v_of_uid(self, uid, color):
+    def set_aled_v_of_uid(self, args):
+        uid, color = args
         if uid:
             if uid in self.users:
                 self.users.setdefault("ambient_light", AmbientLightColor(color).name)
@@ -54,7 +57,8 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
         else:
             return self._set_state("ambient_light", [AmbientLightColor(color).name])
 
-    def get_aled_v_of_uid(self, uid):
+    def get_aled_v_of_uid(self, args):
+        uid = args[0]
         if uid:
             if uid in self.users:
                 color = self.users.get("ambient_light")
@@ -66,7 +70,8 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
             raise ValueError(color)
         return AmbientLightColor._member_map_.get(color[0]).value
 
-    def uid_mac_op(self, xiaomi_id, band_mac, alias, operating):
+    def uid_mac_op(self, args):
+        xiaomi_id, band_mac, alias, operating = args
         if operating == "bind":
             info = self.users.setdefault(
                 xiaomi_id, {"rssi": -50, "set": "3-0-2-2-0-0-5-5"}
@@ -79,7 +84,7 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
 
     def get_all_user_info(self):
         users = {}
-        for index, xiaomi_id, info in enumerate(self.users.items(), start=1):
+        for index, (xiaomi_id, info) in enumerate(self.users.items(), start=1):
             user_id = "user%s" % index
             users[user_id] = {"uid": xiaomi_id, **info}
         return users
@@ -150,5 +155,5 @@ class TestToiletlidV1(TestCase):
 
     def test_unbind_xiaomi_band(self):
         for xiaomi_id, info in self.MOCK_USER.items():
-            self.device.bind_xiaomi_band(xiaomi_id, info["mac"])
+            self.device.unbind_xiaomi_band(xiaomi_id, info["mac"])
         assert self.device.users == {}
