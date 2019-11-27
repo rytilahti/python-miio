@@ -8,6 +8,7 @@ from miio.airfresh import AirFresh
 from miio.airhumidifier import AirHumidifier, AirHumidifierCA1, AirHumidifierCB1
 from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airpurifier import AirPurifier
+from miio.airpurifier_miot import AirPurifierMiot
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.aqaracamera import AqaraCamera
 from miio.ceil import Ceil

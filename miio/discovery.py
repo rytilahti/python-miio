@@ -13,6 +13,7 @@ from . import (
     AirHumidifier,
     AirHumidifierMjjsq,
     AirPurifier,
+    AirPurifierMiot,
     AirQualityMonitor,
     AqaraCamera,
     Ceil,
@@ -105,6 +106,8 @@ DEVICE_MAP = {
     "zhimi-airpurifier-v6": AirPurifier,  # v6
     "zhimi-airpurifier-v7": AirPurifier,  # v7
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
+    "zhimi-airpurifier-mb3": AirPurifierMiot,  # mb3 (3/3H)
+    "zhimi-airpurifier-ma4": AirPurifierMiot,  # ma4 (3)
     "chuangmi.camera.ipc009": ChuangmiCamera,
     "chuangmi-ir-v2": ChuangmiIr,
     "chuangmi-remote-h102a03_": ChuangmiIr,
