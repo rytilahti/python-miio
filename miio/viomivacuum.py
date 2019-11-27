@@ -5,9 +5,10 @@ from enum import Enum
 
 import click
 
-from .click_common import command, format_output
+from .click_common import EnumType, command, format_output
 from .device import Device
 from .utils import pretty_seconds
+from .vacuumcontainers import DNDStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +27,16 @@ class ViomiVacuumState(Enum):
     Cleaning = 3
     Returning = 4
     Docked = 5
+
+
+class ViomiLanguage(Enum):
+    CN = 1  # Chinese (default)
+    EN = 2  # English
+
+
+class ViomiLedState(Enum):
+    Off = 0
+    On = 1
 
 
 class ViomiVacuumStatus:
@@ -175,3 +186,42 @@ class ViomiVacuum(Device):
     def home(self):
         """Return to home."""
         self.send("set_charge", [1])
+
+    @command()
+    def dnd_status(self):
+        """Returns do-not-disturb status."""
+        status = self.send("get_notdisturb")
+        return DNDStatus(dict(
+            enabled=status[0],
+            start_hour=status[1], start_minute=status[2],
+            end_hour=status[3], end_minute=status[4]))
+
+    @command(
+        click.option("--disable", is_flag=True),
+        click.argument("start_hr", type=int),
+        click.argument("start_min", type=int),
+        click.argument("end_hr", type=int),
+        click.argument("end_min", type=int),
+    )
+    def set_dnd(self, disable: bool, start_hr: int, start_min: int, end_hr: int, end_min: int):
+        """Set do-not-disturb.
+
+        :param int start_hr: Start hour
+        :param int start_min: Start minute
+        :param int end_hr: End hour
+        :param int end_min: End minute"""
+        return self.send("set_notdisturb", [0 if disable else 1, start_hr, start_min, end_hr, end_min])
+
+    @command(
+        click.argument('language', type=EnumType(ViomiLanguage, False))
+    )
+    def set_language(self, language: ViomiLanguage):
+        """Set the device's audio language."""
+        return self.send("set_language", [language.value])
+
+    @command(
+        click.argument('state', type=EnumType(ViomiLedState, False))
+    )
+    def led(self, state: ViomiLedState):
+        """Switch the button leds on or off."""
+        return self.send("set_light", [state.value])
