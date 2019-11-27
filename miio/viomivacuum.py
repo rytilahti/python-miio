@@ -34,6 +34,11 @@ class ViomiLanguage(Enum):
     EN = 2  # English
 
 
+class ViomiLedState(Enum):
+    Off = 0
+    On = 1
+
+
 class ViomiVacuumStatus:
     def __init__(self, data):
         # ["run_state","mode","err_state","battary_life","box_type","mop_type","s_time","s_area",
@@ -213,3 +218,10 @@ class ViomiVacuum(Device):
     def set_language(self, language: ViomiLanguage):
         """Set the device's audio language."""
         return self.send("set_language", [language.value])
+
+    @command(
+        click.argument('state', type=EnumType(ViomiLedState, False))
+    )
+    def led(self, state: ViomiLedState):
+        """Switch the button leds on or off."""
+        return self.send("set_light", [state.value])
