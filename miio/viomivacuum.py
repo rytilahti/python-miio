@@ -5,7 +5,7 @@ from enum import Enum
 
 import click
 
-from .click_common import command, format_output
+from .click_common import EnumType, command, format_output
 from .device import Device
 from .utils import pretty_seconds
 from .vacuumcontainers import DNDStatus
@@ -27,6 +27,11 @@ class ViomiVacuumState(Enum):
     Cleaning = 3
     Returning = 4
     Docked = 5
+
+
+class ViomiLanguage(Enum):
+    CN = 1  # Chinese (default)
+    EN = 2  # English
 
 
 class ViomiVacuumStatus:
@@ -201,3 +206,10 @@ class ViomiVacuum(Device):
         :param int end_hr: End hour
         :param int end_min: End minute"""
         return self.send("set_notdisturb", [0 if disable else 1, start_hr, start_min, end_hr, end_min])
+
+    @command(
+        click.argument('language', type=EnumType(ViomiLanguage, False))
+    )
+    def set_language(self, language: ViomiLanguage):
+        """Set the device's audio language."""
+        return self.send("set_language", [language.value])
