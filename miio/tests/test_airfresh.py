@@ -10,7 +10,7 @@ from miio.airfresh import (
     OperationMode,
 )
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyAirFresh(DummyDevice, AirFresh):
@@ -36,20 +36,22 @@ class DummyAirFresh(DummyDevice, AirFresh):
             "favorite_level": None,
             "led": "on",
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_mode": lambda x: self._set_state("mode", x),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_led": lambda x: self._set_state("led", x),
-            "set_led_level": lambda x: self._set_state("led_level", x),
-            "reset_filter1": lambda x: (
-                self._set_state("f1_hour_used", [0]),
-                self._set_state("filter_life", [100]),
-            ),
-            "set_app_extra": lambda x: self._set_state("app_extra", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_mode": lambda x: self._set_state("mode", x),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_led": lambda x: self._set_state("led", x),
+                "set_led_level": lambda x: self._set_state("led_level", x),
+                "reset_filter1": lambda x: (
+                    self._set_state("f1_hour_used", [0]),
+                    self._set_state("filter_life", [100]),
+                ),
+                "set_app_extra": lambda x: self._set_state("app_extra", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 

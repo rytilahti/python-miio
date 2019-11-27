@@ -175,7 +175,7 @@ def create_device(name: str, addr: str, device_cls: partial) -> Device:
     )
 
     dev = device_cls(ip=addr)
-    m = dev.do_discover()
+    m = dev.command_sender.do_discover()
     dev.token = m.checksum
     _LOGGER.info(
         "Found a supported '%s' at %s - token: %s",
@@ -207,7 +207,7 @@ class Listener:
                     _LOGGER.info(
                         "%s: token: %s",
                         v(info),
-                        pretty_token(dev.do_discover().checksum),
+                        pretty_token(dev.command_sender.do_discover().checksum),
                     )
                     return None
         _LOGGER.warning(

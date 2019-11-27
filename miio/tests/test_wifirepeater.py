@@ -3,6 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import WifiRepeater
+from miio.tests.dummies import DummyCommandSender
 from miio.wifirepeater import WifiRepeaterConfiguration, WifiRepeaterStatus
 
 
@@ -63,20 +64,18 @@ class DummyWifiRepeater(WifiRepeater):
             },
         }
 
-        self.return_values = {
-            "miIO.get_repeater_sta_info": self._get_state,
-            "miIO.get_repeater_ap_info": self._get_configuration,
-            "miIO.switch_wifi_explorer": self._set_wifi_explorer,
-            "miIO.switch_wifi_ssid": self._set_configuration,
-            "miIO.info": self._get_info,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "miIO.get_repeater_sta_info": self._get_state,
+                "miIO.get_repeater_ap_info": self._get_configuration,
+                "miIO.switch_wifi_explorer": self._set_wifi_explorer,
+                "miIO.switch_wifi_ssid": self._set_configuration,
+                "miIO.info": self._get_info,
+            }
+        )
         self.start_state = self.state.copy()
         self.start_config = self.config.copy()
         self.start_device_info = self.device_info.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
 
     def _reset_state(self):
         """Revert back to the original state."""

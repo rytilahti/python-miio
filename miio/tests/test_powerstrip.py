@@ -11,7 +11,7 @@ from miio.powerstrip import (
     PowerStripStatus,
 )
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyPowerStripV1(DummyDevice, PowerStrip):
@@ -27,11 +27,13 @@ class DummyPowerStripV1(DummyDevice, PowerStrip):
             "power_factor": 12,
             "elec_leakage": 8,
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_power_mode": lambda x: self._set_state("mode", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_power_mode": lambda x: self._set_state("mode", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 
@@ -118,14 +120,16 @@ class DummyPowerStripV2(DummyDevice, PowerStrip):
             "wifi_led": "off",
             "power_price": 49,
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_power_mode": lambda x: self._set_state("mode", x),
-            "set_wifi_led": lambda x: self._set_state("wifi_led", x),
-            "set_power_price": lambda x: self._set_state("power_price", x),
-            "set_rt_power": lambda x: True,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_power_mode": lambda x: self._set_state("mode", x),
+                "set_wifi_led": lambda x: self._set_state("wifi_led", x),
+                "set_power_price": lambda x: self._set_state("power_price", x),
+                "set_rt_power": lambda x: True,
+            }
+        )
         super().__init__(args, kwargs)
 
 

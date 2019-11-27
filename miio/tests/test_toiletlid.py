@@ -9,7 +9,7 @@ from miio.toiletlid import (
     ToiletlidStatus,
 )
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 """
@@ -37,14 +37,16 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
         }
         self.users = {}
 
-        self.return_values = {
-            "get_prop": self._get_state,
-            "nozzle_clean": lambda x: self._set_state("work_state", [97]),
-            "set_aled_v_of_uid": self.set_aled_v_of_uid,
-            "get_aled_v_of_uid": self.get_aled_v_of_uid,
-            "uid_mac_op": self.uid_mac_op,
-            "get_all_user_info": self.get_all_user_info,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "nozzle_clean": lambda x: self._set_state("work_state", [97]),
+                "set_aled_v_of_uid": self.set_aled_v_of_uid,
+                "get_aled_v_of_uid": self.get_aled_v_of_uid,
+                "uid_mac_op": self.uid_mac_op,
+                "get_all_user_info": self.get_all_user_info,
+            }
+        )
         super().__init__(args, kwargs)
 
     def set_aled_v_of_uid(self, args):

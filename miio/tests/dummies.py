@@ -1,3 +1,16 @@
+class DummyCommandSender:
+    """
+    DummyCommandSender allows you mock CommandSender.
+    """
+
+    def __init__(self, return_values):
+        self.return_values = return_values
+
+    def send(self, command: str, parameters=None, retry_count=3):
+        """Overridden send() to return values from `self.return_values`."""
+        return self.return_values[command](parameters)
+
+
 class DummyDevice:
     """DummyDevice base class, you should inherit from this and call
     `super().__init__(args, kwargs)` to save the original state.
@@ -23,10 +36,6 @@ class DummyDevice:
 
     def __init__(self, *args, **kwargs):
         self.start_state = self.state.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
 
     def _reset_state(self):
         """Revert back to the original state."""

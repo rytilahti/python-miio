@@ -5,7 +5,7 @@ import pytest
 
 from miio import Vacuum, VacuumStatus
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyVacuum(DummyDevice, Vacuum):
@@ -35,16 +35,18 @@ class DummyVacuum(DummyDevice, Vacuum):
             "msg_seq": 320,
         }
 
-        self.return_values = {
-            "get_status": self.vacuum_state,
-            "app_start": lambda x: self.change_mode("start"),
-            "app_stop": lambda x: self.change_mode("stop"),
-            "app_pause": lambda x: self.change_mode("pause"),
-            "app_spot": lambda x: self.change_mode("spot"),
-            "app_goto_target": lambda x: self.change_mode("goto"),
-            "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
-            "app_charge": lambda x: self.change_mode("charge"),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_status": self.vacuum_state,
+                "app_start": lambda x: self.change_mode("start"),
+                "app_stop": lambda x: self.change_mode("stop"),
+                "app_pause": lambda x: self.change_mode("pause"),
+                "app_spot": lambda x: self.change_mode("spot"),
+                "app_goto_target": lambda x: self.change_mode("goto"),
+                "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
+                "app_charge": lambda x: self.change_mode("charge"),
+            }
+        )
 
         super().__init__(args, kwargs)
 

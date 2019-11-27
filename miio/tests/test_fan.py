@@ -16,7 +16,7 @@ from miio.fan import (
     OperationMode,
 )
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyFanV2(DummyDevice, Fan):
@@ -45,20 +45,22 @@ class DummyFanV2(DummyDevice, Fan):
             "bat_state": None,
             "button_pressed": "speed",
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_speed_level": lambda x: self._set_state("speed_level", x),
-            "set_natural_level": lambda x: self._set_state("natural_level", x),
-            "set_move": lambda x: True,
-            "set_angle": lambda x: self._set_state("angle", x),
-            "set_angle_enable": lambda x: self._set_state("angle_enable", x),
-            "set_led_b": lambda x: self._set_state("led_b", x),
-            "set_led": lambda x: self._set_state("led", x),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_speed_level": lambda x: self._set_state("speed_level", x),
+                "set_natural_level": lambda x: self._set_state("natural_level", x),
+                "set_move": lambda x: True,
+                "set_angle": lambda x: self._set_state("angle", x),
+                "set_angle_enable": lambda x: self._set_state("angle_enable", x),
+                "set_led_b": lambda x: self._set_state("led_b", x),
+                "set_led": lambda x: self._set_state("led", x),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 
@@ -292,20 +294,22 @@ class DummyFanV3(DummyDevice, Fan):
             "bat_state": None,
             "button_pressed": "speed",
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_speed_level": lambda x: self._set_state("speed_level", x),
-            "set_natural_level": lambda x: self._set_state("natural_level", x),
-            "set_move": lambda x: True,
-            "set_angle": lambda x: self._set_state("angle", x),
-            "set_angle_enable": lambda x: self._set_state("angle_enable", x),
-            "set_led_b": lambda x: self._set_state("led_b", x),
-            "set_led": lambda x: self._set_state("led", x),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_speed_level": lambda x: self._set_state("speed_level", x),
+                "set_natural_level": lambda x: self._set_state("natural_level", x),
+                "set_move": lambda x: True,
+                "set_angle": lambda x: self._set_state("angle", x),
+                "set_angle_enable": lambda x: self._set_state("angle_enable", x),
+                "set_led_b": lambda x: self._set_state("led_b", x),
+                "set_led": lambda x: self._set_state("led", x),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 
@@ -539,19 +543,21 @@ class DummyFanSA1(DummyDevice, Fan):
             "use_time": 2318,
         }
 
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_speed_level": lambda x: self._set_state("speed_level", x),
-            "set_natural_level": lambda x: self._set_state("natural_level", x),
-            "set_move": lambda x: True,
-            "set_angle": lambda x: self._set_state("angle", x),
-            "set_angle_enable": lambda x: self._set_state("angle_enable", x),
-            "set_led_b": lambda x: self._set_state("led_b", x),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_speed_level": lambda x: self._set_state("speed_level", x),
+                "set_natural_level": lambda x: self._set_state("natural_level", x),
+                "set_move": lambda x: True,
+                "set_angle": lambda x: self._set_state("angle", x),
+                "set_angle_enable": lambda x: self._set_state("angle_enable", x),
+                "set_led_b": lambda x: self._set_state("led_b", x),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 
@@ -752,18 +758,20 @@ class DummyFanP5(DummyDevice, FanP5):
             "child_lock": False,
         }
 
-        self.return_values = {
-            "get_prop": self._get_state,
-            "s_power": lambda x: self._set_state("power", x),
-            "s_mode": lambda x: self._set_state("mode", x),
-            "s_speed": lambda x: self._set_state("speed", x),
-            "s_roll": lambda x: self._set_state("roll_enable", x),
-            "s_angle": lambda x: self._set_state("roll_angle", x),
-            "s_t_off": lambda x: self._set_state("time_off", x),
-            "s_light": lambda x: self._set_state("light", x),
-            "s_sound": lambda x: self._set_state("beep_sound", x),
-            "s_lock": lambda x: self._set_state("child_lock", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "s_power": lambda x: self._set_state("power", x),
+                "s_mode": lambda x: self._set_state("mode", x),
+                "s_speed": lambda x: self._set_state("speed", x),
+                "s_roll": lambda x: self._set_state("roll_enable", x),
+                "s_angle": lambda x: self._set_state("roll_angle", x),
+                "s_t_off": lambda x: self._set_state("time_off", x),
+                "s_light": lambda x: self._set_state("light", x),
+                "s_sound": lambda x: self._set_state("beep_sound", x),
+                "s_lock": lambda x: self._set_state("child_lock", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 

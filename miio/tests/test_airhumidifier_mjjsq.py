@@ -10,7 +10,7 @@ from miio.airhumidifier_mjjsq import (
     OperationMode,
 )
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyAirHumidifierMjjsq(DummyDevice, AirHumidifierMjjsq):
@@ -27,14 +27,16 @@ class DummyAirHumidifierMjjsq(DummyDevice, AirHumidifierMjjsq):
             "waterstatus": 1,
             "watertankstatus": 1,
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "Set_OnOff": lambda x: self._set_state("OnOff_State", x),
-            "Set_HumidifierGears": lambda x: self._set_state("Humidifier_Gear", x),
-            "SetLedState": lambda x: self._set_state("Led_State", x),
-            "SetTipSound_Status": lambda x: self._set_state("TipSound_State", x),
-            "Set_HumiValue": lambda x: self._set_state("HumiSet_Value", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "Set_OnOff": lambda x: self._set_state("OnOff_State", x),
+                "Set_HumidifierGears": lambda x: self._set_state("Humidifier_Gear", x),
+                "SetLedState": lambda x: self._set_state("Led_State", x),
+                "SetTipSound_Status": lambda x: self._set_state("TipSound_State", x),
+                "Set_HumiValue": lambda x: self._set_state("HumiSet_Value", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 

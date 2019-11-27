@@ -6,7 +6,8 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceError, DeviceException, DeviceInfo
+from .device import Device, DeviceInfo
+from .exceptions import DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -119,7 +120,7 @@ class AirHumidifierStatus:
 
     @property
     def target_humidity(self) -> int:
-        """Target humiditiy. Can be either 30, 40, 50, 60, 70, 80 percent."""
+        """Target humidity. Can be either 30, 40, 50, 60, 70, 80 percent."""
         return self.data["limit_hum"]
 
     @property

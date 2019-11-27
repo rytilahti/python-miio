@@ -5,7 +5,8 @@ from typing import Any, Dict, Tuple
 import click
 
 from .click_common import command, format_output
-from .device import Device, DeviceException
+from .device import Device
+from .exceptions import DeviceException
 from .utils import int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)

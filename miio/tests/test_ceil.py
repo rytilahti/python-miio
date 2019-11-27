@@ -5,7 +5,7 @@ import pytest
 from miio import Ceil
 from miio.ceil import CeilException, CeilStatus
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyCeil(DummyDevice, Ceil):
@@ -22,20 +22,22 @@ class DummyCeil(DummyDevice, Ceil):
             "mssw": 1,
             "cct": 99,
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_bright": lambda x: self._set_state("bright", x),
-            "apply_fixed_scene": lambda x: self._set_state("snm", x),
-            "delay_off": lambda x: self._set_state("dv", x),
-            "enable_bl": lambda x: self._set_state("bl", x),
-            "enable_ac": lambda x: self._set_state("ac", x),
-            "set_cct": lambda x: self._set_state("cct", x),
-            "set_bricct": lambda x: (
-                self._set_state("bright", [x[0]]),
-                self._set_state("cct", [x[1]]),
-            ),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_bright": lambda x: self._set_state("bright", x),
+                "apply_fixed_scene": lambda x: self._set_state("snm", x),
+                "delay_off": lambda x: self._set_state("dv", x),
+                "enable_bl": lambda x: self._set_state("bl", x),
+                "enable_ac": lambda x: self._set_state("ac", x),
+                "set_cct": lambda x: self._set_state("cct", x),
+                "set_bricct": lambda x: (
+                    self._set_state("bright", [x[0]]),
+                    self._set_state("cct", [x[1]]),
+                ),
+            }
+        )
         super().__init__(args, kwargs)
 
 
