@@ -46,9 +46,9 @@ class ToiletlidStatus:
         return self.data["work_state"]
 
     @property
-    def work_mode(self) -> str:
+    def work_mode(self) -> ToiletlidOperatingMode:
         """Device working mode"""
-        return ToiletlidOperatingMode((self.work_state - 1) // 16).name
+        return ToiletlidOperatingMode((self.work_state - 1) // 16)
 
     @property
     def is_on(self) -> bool:
@@ -178,7 +178,7 @@ class Toiletlid(Device):
     def bind_xiaomi_band(self, xiaomi_id: str, band_mac: str, alias: str):
 
         """Bind xiaomi band to xiaomi id."""
-        self.send("uid_mac_op", [xiaomi_id, band_mac, alias, "bind"])
+        return self.send("uid_mac_op", [xiaomi_id, band_mac, alias, "bind"])
 
     @command(
         click.argument("xiaomi_id", type=str),
@@ -187,4 +187,4 @@ class Toiletlid(Device):
     )
     def unbind_xiaomi_band(self, xiaomi_id: str, band_mac: str):
         """Unbind xiaomi band to xiaomi id."""
-        self.send("uid_mac_op", [xiaomi_id, band_mac, "", "unbind"])
+        return self.send("uid_mac_op", [xiaomi_id, band_mac, "", "unbind"])
