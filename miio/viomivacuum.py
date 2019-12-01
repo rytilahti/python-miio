@@ -29,6 +29,12 @@ class ViomiVacuumState(Enum):
     Docked = 5
 
 
+class ViomiMopMode(Enum):
+    Off = 0  # No Mop, Vacuum only
+    Mixed = 1
+    MopOnly = 2
+
+
 class ViomiLanguage(Enum):
     CN = 1  # Chinese (default)
     EN = 2  # English
@@ -140,9 +146,8 @@ class ViomiVacuumStatus:
         return bool(self.data["has_newmap"])
 
     @property
-    def is_mop(self) -> bool:
-        """True if mopping."""
-        return bool(self.data["is_mop"])
+    def is_mop(self) -> ViomiMopMode:
+        return ViomiMopMode(self.data["is_mop"])
 
 
 class ViomiVacuum(Device):
@@ -215,6 +220,11 @@ class ViomiVacuum(Device):
     def home(self):
         """Return to home."""
         self.send("set_charge", [1])
+
+    @command(click.argument("mode", type=EnumType(ViomiMopMode, False)))
+    def mop_mode(self, mode):
+        """Set mopping mode."""
+        self.send("set_mop", [mode.value])
 
     @command()
     def dnd_status(self):
