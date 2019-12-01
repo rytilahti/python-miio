@@ -1,9 +1,10 @@
+import click
 import logging
+import time
+
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
-
-import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device
@@ -49,6 +50,15 @@ class ViomiCarpetTurbo(Enum):
     Off = 0
     Medium = 1
     Turbo = 2
+
+
+class ViomiMovementDirection(Enum):
+    Forward = 1
+    Left = 2  # Rotate
+    Right = 3  # Rotate
+    Backward = 4
+    Stop = 5
+    # 10 is unknown
 
 
 class ViomiVacuumStatus:
@@ -220,6 +230,18 @@ class ViomiVacuum(Device):
     def home(self):
         """Return to home."""
         self.send("set_charge", [1])
+
+    @command(
+        click.argument("direction", type=EnumType(ViomiMovementDirection, False)),
+        click.option('--duration', type=float, default=.5, help='number of seconds to perform this movement'),
+    )
+    def move(self, direction, duration=.5):
+        """Manual movement."""
+        start = time.time()
+        while time.time() - start < duration:
+          self.send("set_direction", [direction.value])
+          time.sleep(.1)
+        self.send("set_direction", [ViomiMovementDirection.Stop.value])
 
     @command(click.argument("mode", type=EnumType(ViomiMopMode, False)))
     def mop_mode(self, mode):
