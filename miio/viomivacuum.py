@@ -211,10 +211,10 @@ class ViomiVacuum(Device):
         """Pause cleaning."""
         self.send("set_mode_withroom", [0, 2, 0])
 
-    @command(click.argument("speed", type=str))
-    def set_fan_speed(self, speed: str):
+    @command(click.argument("speed", type=EnumType(ViomiVacuumSpeed, False)))
+    def set_fan_speed(self, speed: ViomiVacuumSpeed):
         """Set fanspeed [silent, standard, medium, turbo]."""
-        self.send("set_suction", [ViomiVacuumSpeed(speed.capitalize()).value])
+        self.send("set_suction", [speed.value])
 
     @command()
     def home(self):
