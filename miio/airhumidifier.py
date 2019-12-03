@@ -521,13 +521,23 @@ class AirHumidifierMjjsqStatus:
 
     @property
     def led(self) -> bool:
-        """LED on/off."""
+        """True if LED is turned on."""
         return self.data["Led_State"] == 1
 
     @property
     def target_humidity(self) -> int:
         """Target humiditiy."""
         return self.data["HumiSet_Value"]
+
+    @property
+    def water(self) -> bool:
+        """Water?."""
+        return self.data["waterstatus"]
+
+    @property
+    def water_tank(self) -> bool:
+        """Water tank?."""
+        return self.data["watertankstatus"]
 
     def __repr__(self) -> str:
         s = (
@@ -537,7 +547,9 @@ class AirHumidifierMjjsqStatus:
             "humidity=%s%%, "
             "led_brightness=%s, "
             "buzzer=%s, "
-            "target_humidity=%s%%>"
+            "target_humidity=%s%%, "
+            "water=%s, "
+            "water_tank=%s>"
             % (
                 self.power,
                 self.mode,
@@ -546,6 +558,8 @@ class AirHumidifierMjjsqStatus:
                 self.led,
                 self.buzzer,
                 self.target_humidity,
+                self.water,
+                self.water_tank,
             )
         )
         return s
