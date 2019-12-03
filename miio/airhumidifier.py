@@ -44,7 +44,7 @@ AVAILABLE_PROPERTIES = {
         "TipSound_State",
         "waterstatus",
         "watertankstatus",
-    ]
+    ],
 }
 
 
@@ -578,9 +578,7 @@ class AirHumidifierMjjsq(Device):
         lazy_discover: bool = True,
         model: str = MODEL_HUMIDIFIER_MJJSQ,
     ) -> None:
-        super().__init__(
-            ip, token, start_id, debug, lazy_discover
-        )
+        super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
             self.model = model
@@ -598,7 +596,7 @@ class AirHumidifierMjjsq(Device):
             "Buzzer: {result.buzzer}\n"
             "Target humidity: {result.target_humidity} %\n"
             "Water: {result.water}\n"
-            "Water tank: {result.water_tank}\n"
+            "Water tank: {result.water_tank}\n",
         )
     )
     def status(self) -> AirHumidifierMjjsqStatus:
