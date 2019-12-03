@@ -59,6 +59,7 @@ class OperationMode(enum.Enum):
     Auto = "auto"
     Strong = "strong"
 
+
 class OperationModeMjjsq(enum.Enum):
     Low = 1
     Medium = 2
