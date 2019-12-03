@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from .airfilter import FilterType, FilterTypeUtil
+from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
 from .device import DeviceException
 from .miot_device import MiotDevice
