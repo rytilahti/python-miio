@@ -13,6 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_HUMIDIFIER_V1 = "zhimi.humidifier.v1"
 MODEL_HUMIDIFIER_CA1 = "zhimi.humidifier.ca1"
 MODEL_HUMIDIFIER_CB1 = "zhimi.humidifier.cb1"
+MODEL_HUMIDIFIER_MJJSQ = "deerma.humidifier.mjjsq"
 
 AVAILABLE_PROPERTIES_COMMON = [
     "power",
@@ -33,6 +34,17 @@ AVAILABLE_PROPERTIES = {
     + ["temp_dec", "speed", "depth", "dry"],
     MODEL_HUMIDIFIER_CB1: AVAILABLE_PROPERTIES_COMMON
     + ["temperature", "speed", "depth", "dry"],
+    MODEL_HUMIDIFIER_MJJSQ: [
+        "OnOff_State",
+        "TemperatureValue",
+        "Humidity_Value",
+        "HumiSet_Value",
+        "Humidifier_Gear",
+        "Led_State",
+        "TipSound_State",
+        "waterstatus",
+        "watertankstatus",
+    ]
 }
 
 
@@ -46,6 +58,12 @@ class OperationMode(enum.Enum):
     High = "high"
     Auto = "auto"
     Strong = "strong"
+
+class OperationModeMjjsq(enum.Enum):
+    Low = 1
+    Medium = 2
+    High = 3
+    Humidity = 4
 
 
 class LedBrightness(enum.Enum):
@@ -453,4 +471,141 @@ class AirHumidifierCB1(AirHumidifier):
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CB1
+        )
+
+
+class AirHumidifierMjjsqStatus:
+    """Container for status reports from the air humidifier mjjsq."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response of a Air Humidifier (deerma.humidifier.mjjsq):
+
+        {'Humidifier_Gear': 4, 'Humidity_Value': 44, 'HumiSet_Value': 54,
+         'Led_State': 1, 'OnOff_State': 0, 'TemperatureValue': 21,
+         'TipSound_State': 1, 'waterstatus': 1, 'watertankstatus': 1}
+        """
+
+        self.data = data
+
+    @property
+    def power(self) -> str:
+        """Power state."""
+        return "on" if self.data["OnOff_State"] == 1 else "off"
+
+    @property
+    def is_on(self) -> bool:
+        """True if device is turned on."""
+        return self.power == "on"
+
+    @property
+    def mode(self) -> OperationModeMjjsq:
+        """Operation mode. Can be either low, medium, high or humidity."""
+        return OperationModeMjjsq(self.data["Humidifier_Gear"])
+
+    @property
+    def temperature(self) -> int:
+        """Current temperature."""
+        return self.data["TemperatureValue"]
+
+    @property
+    def humidity(self) -> int:
+        """Current humidity."""
+        return self.data["Humidity_Value"]
+
+    @property
+    def buzzer(self) -> bool:
+        """True if buzzer is turned on."""
+        return self.data["TipSound_State"] == 1
+
+    @property
+    def led(self) -> bool:
+        """LED on/off."""
+        return self.data["Led_State"] == 1
+
+    @property
+    def target_humidity(self) -> int:
+        """Target humiditiy."""
+        return self.data["HumiSet_Value"]
+
+    def __repr__(self) -> str:
+        s = (
+            "<AirHumidiferStatusMjjsq power=%s, "
+            "mode=%s, "
+            "temperature=%s, "
+            "humidity=%s%%, "
+            "led_brightness=%s, "
+            "buzzer=%s, "
+            "target_humidity=%s%%>"
+            % (
+                self.power,
+                self.mode,
+                self.temperature,
+                self.humidity,
+                self.led,
+                self.buzzer,
+                self.target_humidity,
+            )
+        )
+        return s
+
+    def __json__(self):
+        return self.data
+
+
+class AirHumidifierMjjsq(Device):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_HUMIDIFIER_MJJSQ,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover
+        )
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_HUMIDIFIER_MJJSQ
+
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Mode: {result.mode}\n"
+            "Temperature: {result.temperature} °C\n"
+            "Humidity: {result.humidity} %\n"
+            "LED: {result.led_brightness}\n"
+            "Buzzer: {result.buzzer}\n"
+            "Target humidity: {result.target_humidity} %\n"
+            "Water: {result.water}\n"
+            "Water tank: {result.water_tank}\n"
+        )
+    )
+    def status(self) -> AirHumidifierMjjsqStatus:
+        """Retrieve properties."""
+
+        properties = AVAILABLE_PROPERTIES[self.model]
+        _props = properties.copy()
+        values = []
+        while _props:
+            values.extend(self.send("get_prop", _props[:1]))
+            _props[:] = _props[1:]
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.error(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count,
+                values_count,
+            )
+
+        return AirHumidifierMjjsqStatus(
+            defaultdict(lambda: None, zip(properties, values))
         )
