@@ -624,3 +624,52 @@ class AirHumidifierMjjsq(Device):
         return AirHumidifierMjjsqStatus(
             defaultdict(lambda: None, zip(properties, values))
         )
+
+    @command(default_output=format_output("Powering on"))
+    def on(self):
+        """Power on."""
+        return self.send("Set_OnOff", [1])
+
+    @command(default_output=format_output("Powering off"))
+    def off(self):
+        """Power off."""
+        return self.send("Set_OnOff", [0])
+
+    @command(
+        click.argument("mode", type=EnumType(OperationModeMjjsq, False)),
+        default_output=format_output("Setting mode to '{mode.value}'"),
+    )
+    def set_mode(self, mode: OperationModeMjjsq):
+        """Set mode."""
+        return self.send("Set_HumidifierGears", [mode.value])
+
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
+    )
+    def set_led(self, led: bool):
+        """Turn led on/off."""
+        return self.send("SetLedState", [int(led)])
+
+    @command(
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
+    )
+    def set_buzzer(self, buzzer: bool):
+        """Set buzzer on/off."""
+        return self.send("SetTipSound_Status", [int(buzzer)])
+
+    @command(
+        click.argument("humidity", type=int),
+        default_output=format_output("Setting target humidity to {humidity}"),
+    )
+    def set_target_humidity(self, humidity: int):
+        """Set the target humidity."""
+        if 0 < humidity < 100:
+            raise AirHumidifierException("Invalid target humidity: %s" % humidity)
+
+        return self.send("HumiSet_Value", [humidity])
