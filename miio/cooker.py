@@ -8,7 +8,8 @@ from typing import List, Optional
 import click
 
 from .click_common import command, format_output
-from .device import Device, DeviceException
+from .device import Device
+from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 

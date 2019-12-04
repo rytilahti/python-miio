@@ -6,7 +6,7 @@ from miio import PhilipsMoonlight
 from miio.philips_moonlight import PhilipsMoonlightException, PhilipsMoonlightStatus
 from miio.utils import int_to_rgb, rgb_to_int
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
@@ -26,23 +26,25 @@ class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
             "mb": 1,
             "wkp": [0, 24, 0],
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("pow", x),
-            "set_bright": lambda x: self._set_state("bri", x),
-            "set_cct": lambda x: self._set_state("cct", x),
-            "set_rgb": lambda x: self._set_state("rgb", [rgb_to_int(x)]),
-            "apply_fixed_scene": lambda x: self._set_state("snm", x),
-            "go_night": lambda x: self._set_state("snm", [6]),
-            "set_bricct": lambda x: (
-                self._set_state("bri", [x[0]]),
-                self._set_state("cct", [x[1]]),
-            ),
-            "set_brirgb": lambda x: (
-                self._set_state("rgb", [rgb_to_int((x[0], x[1], x[2]))]),
-                self._set_state("bri", [x[3]]),
-            ),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("pow", x),
+                "set_bright": lambda x: self._set_state("bri", x),
+                "set_cct": lambda x: self._set_state("cct", x),
+                "set_rgb": lambda x: self._set_state("rgb", [rgb_to_int(x)]),
+                "apply_fixed_scene": lambda x: self._set_state("snm", x),
+                "go_night": lambda x: self._set_state("snm", [6]),
+                "set_bricct": lambda x: (
+                    self._set_state("bri", [x[0]]),
+                    self._set_state("cct", [x[1]]),
+                ),
+                "set_brirgb": lambda x: (
+                    self._set_state("rgb", [rgb_to_int((x[0], x[1], x[2]))]),
+                    self._set_state("bri", [x[3]]),
+                ),
+            }
+        )
         super().__init__(args, kwargs)
 
 

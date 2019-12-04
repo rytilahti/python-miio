@@ -19,6 +19,7 @@ from miio.click_common import (
     validate_ip,
     validate_token,
 )
+from miio.command_sender import CommandSender
 
 from .device import UpdateState
 from .updater import OneShotServer
@@ -80,10 +81,10 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 @cli.resultcallback()
 @pass_dev
 def cleanup(vac: miio.Vacuum, *args, **kwargs):
-    if vac.ip is None:  # dummy Device for discovery, skip teardown
+    if vac.command_sender.ip is None:  # dummy Device for discovery, skip teardown
         return
     id_file = kwargs["id_file"]
-    seqs = {"seq": vac.raw_id, "manual_seq": vac.manual_seqnum}
+    seqs = {"seq": vac.command_sender.raw_id, "manual_seq": vac.manual_seqnum}
     _LOGGER.debug("Writing %s to %s", seqs, id_file)
     path_obj = pathlib.Path(id_file)
     dir = path_obj.parents[0]
@@ -100,7 +101,7 @@ def cleanup(vac: miio.Vacuum, *args, **kwargs):
 def discover(handshake):
     """Search for robots in the network."""
     if handshake:
-        miio.Vacuum.discover()
+        CommandSender.discover()
     else:
         miio.Discovery.discover_mdns()
 

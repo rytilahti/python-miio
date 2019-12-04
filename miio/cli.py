@@ -37,6 +37,7 @@ def cli(ctx, debug: int, output: str):
 
 
 for device_class in DeviceGroupMeta.device_classes:
+    # _LOGGER.warn(device_class)
     cli.add_command(device_class.get_device_group())
 
 

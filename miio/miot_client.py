@@ -1,24 +1,14 @@
 import logging
 
-from .device import Device
+from miio.command_sender import CommandSender
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class MiotDevice(Device):
-    """Main class representing a MIoT device."""
-
-    def __init__(
-        self,
-        mapping: dict,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
+class MiotClient:
+    def __init__(self, mapping: dict, command_sender: CommandSender) -> None:
         self.mapping = mapping
-        super().__init__(ip, token, start_id, debug, lazy_discover)
+        self.command_sender = command_sender
 
     def get_properties(self) -> list:
         """Retrieve raw properties based on mapping."""
@@ -31,7 +21,7 @@ class MiotDevice(Device):
         _props = properties.copy()
         values = []
         while _props:
-            values.extend(self.send("get_properties", _props[:15]))
+            values.extend(self.command_sender.send("get_properties", _props[:15]))
             _props[:] = _props[15:]
 
         properties_count = len(properties)
@@ -47,7 +37,7 @@ class MiotDevice(Device):
         return values
 
     def set_property(self, property_key: str, value):
-        return self.send(
+        return self.command_sender.send(
             "set_properties",
             [{"did": property_key, **self.mapping[property_key], "value": value}],
         )

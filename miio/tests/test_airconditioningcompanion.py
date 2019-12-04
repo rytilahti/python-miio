@@ -17,6 +17,7 @@ from miio.airconditioningcompanion import (
     Power,
     SwingMode,
 )
+from miio.tests.dummies import DummyCommandSender
 
 STATE_ON = ["on"]
 STATE_OFF = ["off"]
@@ -56,20 +57,18 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
         self.state = ["010500978022222102", "01020119A280222221", "2"]
         self.last_ir_played = None
 
-        self.return_values = {
-            "get_model_and_state": self._get_state,
-            "start_ir_learn": lambda x: True,
-            "end_ir_learn": lambda x: True,
-            "get_ir_learn_result": lambda x: True,
-            "send_ir_code": lambda x: self._send_input_validation(x),
-            "send_cmd": lambda x: self._send_input_validation(x),
-            "set_power": lambda x: self._set_power(x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_model_and_state": self._get_state,
+                "start_ir_learn": lambda x: True,
+                "end_ir_learn": lambda x: True,
+                "get_ir_learn_result": lambda x: True,
+                "send_ir_code": lambda x: self._send_input_validation(x),
+                "send_cmd": lambda x: self._send_input_validation(x),
+                "set_power": lambda x: self._set_power(x),
+            }
+        )
         self.start_state = self.state.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
 
     def _reset_state(self):
         """Revert back to the original state."""
@@ -216,17 +215,15 @@ class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
         self.model = MODEL_ACPARTNER_V3
         self.last_ir_played = None
 
-        self.return_values = {
-            "get_model_and_state": self._get_state,
-            "get_device_prop": self._get_device_prop,
-            "toggle_plug": self._toggle_plug,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_model_and_state": self._get_state,
+                "get_device_prop": self._get_device_prop,
+                "toggle_plug": self._toggle_plug,
+            }
+        )
         self.start_state = self.state.copy()
         self.start_device_prop = self.device_prop.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
 
     def _reset_state(self):
         """Revert back to the original state."""

@@ -12,7 +12,7 @@ from miio.airdehumidifier import (
 )
 from miio.device import DeviceInfo
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):
@@ -56,17 +56,19 @@ class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):
             "auto": 50,
         }
 
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("on_off", x),
-            "set_mode": lambda x: self._set_state("mode", x),
-            "set_led": lambda x: self._set_state("led", x),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_fan_speed": lambda x: self._set_state("fan_st", x),
-            "set_auto": lambda x: self._set_state("auto", x),
-            "miIO.info": self._get_device_info,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("on_off", x),
+                "set_mode": lambda x: self._set_state("mode", x),
+                "set_led": lambda x: self._set_state("led", x),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_fan_speed": lambda x: self._set_state("fan_st", x),
+                "set_auto": lambda x: self._set_state("auto", x),
+                "miIO.info": self._get_device_info,
+            }
+        )
         super().__init__(args, kwargs)
 
     def _get_device_info(self, _):

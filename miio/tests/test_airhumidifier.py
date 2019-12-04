@@ -14,7 +14,7 @@ from miio.airhumidifier import (
 )
 from miio.device import DeviceInfo
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyAirHumidifierV1(DummyDevice, AirHumidifier):
@@ -56,16 +56,18 @@ class DummyAirHumidifierV1(DummyDevice, AirHumidifier):
             "button_pressed": "led",
             "hw_version": 0,
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_mode": lambda x: self._set_state("mode", x),
-            "set_led_b": lambda x: self._set_state("led_b", x),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_limit_hum": lambda x: self._set_state("limit_hum", x),
-            "miIO.info": self._get_device_info,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_mode": lambda x: self._set_state("mode", x),
+                "set_led_b": lambda x: self._set_state("led_b", x),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_limit_hum": lambda x: self._set_state("limit_hum", x),
+                "miIO.info": self._get_device_info,
+            }
+        )
         super().__init__(args, kwargs)
 
     def _get_device_info(self, _):
@@ -273,17 +275,19 @@ class DummyAirHumidifierCA1(DummyDevice, AirHumidifier):
             "depth": 1,
             "dry": "off",
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_mode": lambda x: self._set_state("mode", x),
-            "set_led_b": lambda x: self._set_state("led_b", [int(x[0])]),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_limit_hum": lambda x: self._set_state("limit_hum", x),
-            "set_dry": lambda x: self._set_state("dry", x),
-            "miIO.info": self._get_device_info,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_mode": lambda x: self._set_state("mode", x),
+                "set_led_b": lambda x: self._set_state("led_b", [int(x[0])]),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_limit_hum": lambda x: self._set_state("limit_hum", x),
+                "set_dry": lambda x: self._set_state("dry", x),
+                "miIO.info": self._get_device_info,
+            }
+        )
         super().__init__(args, kwargs)
 
     def _get_device_info(self, _):
@@ -505,17 +509,19 @@ class DummyAirHumidifierCB1(DummyDevice, AirHumidifier):
             "depth": 1,
             "dry": "off",
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-            "set_mode": lambda x: self._set_state("mode", x),
-            "set_led_b": lambda x: self._set_state("led_b", [int(x[0])]),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_limit_hum": lambda x: self._set_state("limit_hum", x),
-            "set_dry": lambda x: self._set_state("dry", x),
-            "miIO.info": self._get_device_info,
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+                "set_mode": lambda x: self._set_state("mode", x),
+                "set_led_b": lambda x: self._set_state("led_b", [int(x[0])]),
+                "set_buzzer": lambda x: self._set_state("buzzer", x),
+                "set_child_lock": lambda x: self._set_state("child_lock", x),
+                "set_limit_hum": lambda x: self._set_state("limit_hum", x),
+                "set_dry": lambda x: self._set_state("dry", x),
+                "miIO.info": self._get_device_info,
+            }
+        )
         super().__init__(args, kwargs)
 
     def _get_device_info(self, _):

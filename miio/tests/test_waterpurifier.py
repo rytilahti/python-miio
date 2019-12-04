@@ -5,7 +5,7 @@ import pytest
 from miio import WaterPurifier
 from miio.waterpurifier import WaterPurifierStatus
 
-from .dummies import DummyDevice
+from .dummies import DummyCommandSender, DummyDevice
 
 
 class DummyWaterPurifier(DummyDevice, WaterPurifier):
@@ -29,10 +29,12 @@ class DummyWaterPurifier(DummyDevice, WaterPurifier):
             "uv_state": -1,
             "elecval_state": "unknown",
         }
-        self.return_values = {
-            "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", x),
-        }
+        self.command_sender = DummyCommandSender(
+            {
+                "get_prop": self._get_state,
+                "set_power": lambda x: self._set_state("power", x),
+            }
+        )
         super().__init__(args, kwargs)
 
 

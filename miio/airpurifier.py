@@ -7,7 +7,8 @@ import click
 
 from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceException
+from .device import Device
+from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -5,7 +5,8 @@ from typing import Optional, Tuple
 import click
 
 from .click_common import command, format_output
-from .device import Device, DeviceException
+from .device import Device
+from .exceptions import DeviceException
 from .utils import int_to_rgb, rgb_to_int
 
 
@@ -263,4 +264,7 @@ class Yeelight(Device):
         # return self.send("set_scene", [scene, *vals])
 
     def __str__(self):
-        return "<Yeelight at %s: %s>" % (self.ip, self.token)
+        return "<Yeelight at %s: %s>" % (
+            self.command_sender.ip,
+            self.command_sender.token,
+        )

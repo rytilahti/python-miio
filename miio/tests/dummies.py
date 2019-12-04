@@ -1,3 +1,35 @@
+from miio.miot_client import MiotClient
+
+
+class DummyMiotClient(MiotClient):
+    # noinspection PyMissingConstructor
+    def __init__(self, state):
+        # {prop["did"]: prop["value"] for prop in self.miot_client.get_properties()}
+        self.state = [{"did": k, "value": v} for k, v in state.items()]
+
+    def get_properties(self):
+        return self.state
+
+    def set_property(self, property_key: str, value):
+        for prop in self.state:
+            if prop["did"] == property_key:
+                prop["value"] = value
+        return None
+
+
+class DummyCommandSender:
+    """
+    DummyCommandSender allows you test your devi
+    """
+
+    def __init__(self, return_values):
+        self.return_values = return_values
+
+    def send(self, command: str, parameters=None, retry_count=3):
+        """Overridden send() to return values from `self.return_values`."""
+        return self.return_values[command](parameters)
+
+
 class DummyDevice:
     """DummyDevice base class, you should inherit from this and call
     `super().__init__(args, kwargs)` to save the original state.
@@ -23,10 +55,6 @@ class DummyDevice:
 
     def __init__(self, *args, **kwargs):
         self.start_state = self.state.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
 
     def _reset_state(self):
         """Revert back to the original state."""
