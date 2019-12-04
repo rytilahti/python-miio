@@ -69,12 +69,12 @@ class AirHumidifierMjjsqStatus:
 
     @property
     def temperature(self) -> int:
-        """Current temperature."""
+        """Current temperature in degree celsius."""
         return self.data["TemperatureValue"]
 
     @property
     def humidity(self) -> int:
-        """Current humidity."""
+        """Current humidity in percent."""
         return self.data["Humidity_Value"]
 
     @property
@@ -89,7 +89,7 @@ class AirHumidifierMjjsqStatus:
 
     @property
     def target_humidity(self) -> int:
-        """Target humiditiy."""
+        """Target humiditiy in percent."""
         return self.data["HumiSet_Value"]
 
     @property
@@ -229,7 +229,7 @@ class AirHumidifierMjjsq(Device):
         default_output=format_output("Setting target humidity to {humidity}"),
     )
     def set_target_humidity(self, humidity: int):
-        """Set the target humidity."""
+        """Set the target humidity in percent."""
         if humidity < 0 or humidity > 99:
             raise AirHumidifierMjjsqException("Invalid target humidity: %s" % humidity)
 
