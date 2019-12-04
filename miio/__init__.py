@@ -5,12 +5,9 @@ from miio.airconditioningcompanion import (
 )
 from miio.airdehumidifier import AirDehumidifier
 from miio.airfresh import AirFresh
-from miio.airhumidifier import (
-    AirHumidifier,
-    AirHumidifierCA1,
-    AirHumidifierCB1,
-    AirHumidifierMjjsq,
-)
+from miio.airhumidifier import AirHumidifier, AirHumidifierCA1, AirHumidifierCB1
+
+from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airdehumidifier import AirDehumidifier
 from miio.airpurifier import AirPurifier
 from miio.airqualitymonitor import AirQualityMonitor
