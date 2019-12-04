@@ -11,6 +11,7 @@ from . import (
     AirConditioningCompanion,
     AirFresh,
     AirHumidifier,
+    AirHumidifierMjjsq,
     AirPurifier,
     AirQualityMonitor,
     AqaraCamera,
@@ -42,6 +43,7 @@ from .airhumidifier import (
     MODEL_HUMIDIFIER_CB1,
     MODEL_HUMIDIFIER_V1,
 )
+from .airhumidifier_mjjsq import MODEL_HUMIDIFIER_MJJSQ
 from .airqualitymonitor import (
     MODEL_AIRQUALITYMONITOR_B1,
     MODEL_AIRQUALITYMONITOR_S1,
@@ -106,6 +108,9 @@ DEVICE_MAP = {
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
     "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),
+    "deerma-humidifier-mjjsq": partial(
+        AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
+    ),
     "yunmi-waterpuri-v2": WaterPurifier,
     "philips-light-bulb": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-candle": PhilipsBulb,  # cannot be discovered via mdns
