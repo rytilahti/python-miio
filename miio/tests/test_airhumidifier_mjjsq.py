@@ -9,6 +9,7 @@ from miio.airhumidifier_mjjsq import (
     AirHumidifierMjjsqStatus,
     OperationModeMjjsq,
 )
+
 from .dummies import DummyDevice
 
 
