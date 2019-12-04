@@ -530,14 +530,14 @@ class AirHumidifierMjjsqStatus:
         return self.data["HumiSet_Value"]
 
     @property
-    def water(self) -> bool:
-        """Water?."""
-        return self.data["waterstatus"]
+    def no_water(self) -> bool:
+        """True if the water tank is empty."""
+        return self.data["waterstatus"] == 0
 
     @property
-    def water_tank(self) -> bool:
-        """Water tank?."""
-        return self.data["watertankstatus"]
+    def water_tank_detached(self) -> bool:
+        """True if the water tank is detached."""
+        return self.data["watertankstatus"] == 0
 
     def __repr__(self) -> str:
         s = (
@@ -548,8 +548,8 @@ class AirHumidifierMjjsqStatus:
             "led_brightness=%s, "
             "buzzer=%s, "
             "target_humidity=%s%%, "
-            "water=%s, "
-            "water_tank=%s>"
+            "no_water=%s, "
+            "water_tank_detached=%s>"
             % (
                 self.power,
                 self.mode,
@@ -558,8 +558,8 @@ class AirHumidifierMjjsqStatus:
                 self.led,
                 self.buzzer,
                 self.target_humidity,
-                self.water,
-                self.water_tank,
+                self.no_water,
+                self.water_tank_detached,
             )
         )
         return s
@@ -595,8 +595,8 @@ class AirHumidifierMjjsq(Device):
             "LED: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
             "Target humidity: {result.target_humidity} %\n"
-            "Water: {result.water}\n"
-            "Water tank: {result.water_tank}\n",
+            "No water: {result.no_water}\n"
+            "Water tank detached: {result.water_tank_detached}\n",
         )
     )
     def status(self) -> AirHumidifierMjjsqStatus:
@@ -667,7 +667,7 @@ class AirHumidifierMjjsq(Device):
     )
     def set_target_humidity(self, humidity: int):
         """Set the target humidity."""
-        if 0 < humidity < 100:
+        if humidity < 0 or humidity > 99:
             raise AirHumidifierException("Invalid target humidity: %s" % humidity)
 
-        return self.send("HumiSet_Value", [humidity])
+        return self.send("Set_HumiValue", [humidity])
