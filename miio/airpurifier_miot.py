@@ -6,10 +6,45 @@ import click
 
 from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
-from .device import DeviceException
+from .exceptions import DeviceException
 from .miot_device import MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
+_MAPPING = {
+    # Air Purifier (siid=2)
+    "power": {"siid": 2, "piid": 2},
+    "fan_level": {"siid": 2, "piid": 4},
+    "mode": {"siid": 2, "piid": 5},
+    # Environment (siid=3)
+    "humidity": {"siid": 3, "piid": 7},
+    "temperature": {"siid": 3, "piid": 8},
+    "aqi": {"siid": 3, "piid": 6},
+    # Filter (siid=4)
+    "filter_life_remaining": {"siid": 4, "piid": 3},
+    "filter_hours_used": {"siid": 4, "piid": 5},
+    # Alarm (siid=5)
+    "buzzer": {"siid": 5, "piid": 1},
+    # Indicator Light (siid=6)
+    "led_brightness": {"siid": 6, "piid": 1},
+    "led": {"siid": 6, "piid": 6},
+    # Physical Control Locked (siid=7)
+    "child_lock": {"siid": 7, "piid": 1},
+    # Button (siid=8)
+    "button_pressed": {"siid": 8, "piid": 1},
+    # Motor Speed (siid=10)
+    "favorite_level": {"siid": 10, "piid": 10},
+    "motor_speed": {"siid": 10, "piid": 8},
+    # Use time (siid=12)
+    "use_time": {"siid": 12, "piid": 1},
+    # AQI (siid=13)
+    "purify_volume": {"siid": 13, "piid": 1},
+    "average_aqi": {"siid": 13, "piid": 2},
+    # RFID (siid=14)
+    "filter_rfid_tag": {"siid": 14, "piid": 1},
+    "filter_rfid_product_id": {"siid": 14, "piid": 3},
+    # Other (siid=15)
+    "app_extra": {"siid": 15, "piid": 1},
+}
 
 
 class AirPurifierMiotException(DeviceException):
@@ -186,7 +221,8 @@ class AirPurifierMiotStatus:
             "motor_speed=%s, "
             "filter_rfid_product_id=%s, "
             "filter_rfid_tag=%s, "
-            "filter_type=%s>"
+            "filter_type=%s, "
+            "button_pressed=%s>"
             % (
                 self.power,
                 self.aqi,
@@ -208,6 +244,7 @@ class AirPurifierMiotStatus:
                 self.filter_rfid_product_id,
                 self.filter_rfid_tag,
                 self.filter_type,
+                self.button_pressed,
             )
         )
         return s
@@ -227,46 +264,7 @@ class AirPurifierMiot(MiotDevice):
         debug: int = 0,
         lazy_discover: bool = True,
     ) -> None:
-        super().__init__(
-            {
-                # Air Purifier (siid=2)
-                "power": {"siid": 2, "piid": 2},
-                "fan_level": {"siid": 2, "piid": 4},
-                "mode": {"siid": 2, "piid": 5},
-                # Environment (siid=3)
-                "humidity": {"siid": 3, "piid": 7},
-                "temperature": {"siid": 3, "piid": 8},
-                "aqi": {"siid": 3, "piid": 6},
-                # Filter (siid=4)
-                "filter_life_remaining": {"siid": 4, "piid": 3},
-                "filter_hours_used": {"siid": 4, "piid": 5},
-                # Alarm (siid=5)
-                "buzzer": {"siid": 5, "piid": 1},
-                # Indicator Light (siid=6)
-                "led_brightness": {"siid": 6, "piid": 1},
-                "led": {"siid": 6, "piid": 6},
-                # Physical Control Locked (siid=7)
-                "child_lock": {"siid": 7, "piid": 1},
-                # Motor Speed (siid=10)
-                "favorite_level": {"siid": 10, "piid": 10},
-                "motor_speed": {"siid": 10, "piid": 8},
-                # Use time (siid=12)
-                "use_time": {"siid": 12, "piid": 1},
-                # AQI (siid=13)
-                "purify_volume": {"siid": 13, "piid": 1},
-                "average_aqi": {"siid": 13, "piid": 2},
-                # RFID (siid=14)
-                "filter_rfid_tag": {"siid": 14, "piid": 1},
-                "filter_rfid_product_id": {"siid": 14, "piid": 3},
-                # Other (siid=15)
-                "app_extra": {"siid": 15, "piid": 1},
-            },
-            ip,
-            token,
-            start_id,
-            debug,
-            lazy_discover,
-        )
+        super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
 
     @command(
         default_output=format_output(
@@ -290,7 +288,8 @@ class AirPurifierMiot(MiotDevice):
             "Motor speed: {result.motor_speed} rpm\n"
             "Filter RFID product id: {result.filter_rfid_product_id}\n"
             "Filter RFID tag: {result.filter_rfid_tag}\n"
-            "Filter type: {result.filter_type}\n",
+            "Filter type: {result.filter_type}\n"
+            "Last button pressed: {result.button_pressed}\n",
         )
     )
     def status(self) -> AirPurifierMiotStatus:
