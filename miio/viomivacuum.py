@@ -39,6 +39,12 @@ class ViomiLedState(Enum):
     On = 1
 
 
+class ViomiCarpetTurbo(Enum):
+    Off = 0
+    Medium = 1
+    Turbo = 2
+
+
 class ViomiVacuumStatus:
     def __init__(self, data):
         # ["run_state","mode","err_state","battary_life","box_type","mop_type","s_time","s_area",
@@ -49,6 +55,7 @@ class ViomiVacuumStatus:
 
     @property
     def state(self):
+        """State of the vacuum."""
         return ViomiVacuumState(self.data["run_state"])
 
     @property
@@ -58,12 +65,18 @@ class ViomiVacuumStatus:
 
     @property
     def mode(self):
-        """TODO: unknown values"""
+        """Active mode.
+
+        TODO: unknown values
+        """
         return self.data["mode"]
 
     @property
     def error(self):
-        """TODO: unknown values"""
+        """Error code.
+
+        TODO: unknown values
+        """
         return self.data["error_state"]
 
     @property
@@ -73,46 +86,62 @@ class ViomiVacuumStatus:
 
     @property
     def box_type(self):
-        """TODO: unknown values"""
+        """Box type.
+
+        TODO: unknown values"""
         return self.data["box_type"]
 
     @property
     def mop_type(self):
-        """TODO: unknown values"""
+        """Mop type.
+
+        TODO: unknown values"""
         return self.data["mop_type"]
 
     @property
     def clean_time(self) -> timedelta:
+        """Cleaning time."""
         return pretty_seconds(self.data["s_time"])
 
     @property
     def clean_area(self) -> float:
-        """TODO: unknown values"""
+        """Cleaned area.
+
+        TODO: unknown values
+        """
         return self.data["s_area"]
 
     @property
-    def fanspeed(self):
+    def fanspeed(self) -> ViomiVacuumSpeed:
+        """Current fan speed."""
         return ViomiVacuumSpeed(self.data["suction_grade"])
 
     @property
     def water_level(self):
-        """TODO: unknown values, percentage?"""
+        """Tank's water level.
+
+        TODO: unknown values, percentage?
+        """
         return self.data["water_grade"]
 
     @property
     def remember_map(self) -> bool:
+        """True to remember the map."""
         return bool(self.data["remember_map"])
 
     @property
     def has_map(self) -> bool:
+        """True if device has map?"""
         return bool(self.data["has_map"])
 
     @property
     def has_new_map(self) -> bool:
+        """TODO: unknown"""
         return bool(self.data["has_newmap"])
 
     @property
     def is_mop(self) -> bool:
+        """True if mopping."""
         return bool(self.data["is_mop"])
 
 
@@ -191,10 +220,15 @@ class ViomiVacuum(Device):
     def dnd_status(self):
         """Returns do-not-disturb status."""
         status = self.send("get_notdisturb")
-        return DNDStatus(dict(
-            enabled=status[0],
-            start_hour=status[1], start_minute=status[2],
-            end_hour=status[3], end_minute=status[4]))
+        return DNDStatus(
+            dict(
+                enabled=status[0],
+                start_hour=status[1],
+                start_minute=status[2],
+                end_hour=status[3],
+                end_minute=status[4],
+            )
+        )
 
     @command(
         click.option("--disable", is_flag=True),
@@ -203,25 +237,31 @@ class ViomiVacuum(Device):
         click.argument("end_hr", type=int),
         click.argument("end_min", type=int),
     )
-    def set_dnd(self, disable: bool, start_hr: int, start_min: int, end_hr: int, end_min: int):
+    def set_dnd(
+        self, disable: bool, start_hr: int, start_min: int, end_hr: int, end_min: int
+    ):
         """Set do-not-disturb.
 
         :param int start_hr: Start hour
         :param int start_min: Start minute
         :param int end_hr: End hour
         :param int end_min: End minute"""
-        return self.send("set_notdisturb", [0 if disable else 1, start_hr, start_min, end_hr, end_min])
+        return self.send(
+            "set_notdisturb",
+            [0 if disable else 1, start_hr, start_min, end_hr, end_min],
+        )
 
-    @command(
-        click.argument('language', type=EnumType(ViomiLanguage, False))
-    )
+    @command(click.argument("language", type=EnumType(ViomiLanguage, False)))
     def set_language(self, language: ViomiLanguage):
         """Set the device's audio language."""
         return self.send("set_language", [language.value])
 
-    @command(
-        click.argument('state', type=EnumType(ViomiLedState, False))
-    )
+    @command(click.argument("state", type=EnumType(ViomiLedState, False)))
     def led(self, state: ViomiLedState):
         """Switch the button leds on or off."""
         return self.send("set_light", [state.value])
+
+    @command(click.argument("mode", type=EnumType(ViomiCarpetTurbo)))
+    def carpet_mode(self, mode: ViomiCarpetTurbo):
+        """Set the carpet mode."""
+        return self.send("set_carpetturbo", [mode.value])
