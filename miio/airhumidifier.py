@@ -592,7 +592,7 @@ class AirHumidifierMjjsq(Device):
             "Mode: {result.mode}\n"
             "Temperature: {result.temperature} °C\n"
             "Humidity: {result.humidity} %\n"
-            "LED: {result.led_brightness}\n"
+            "LED: {result.led}\n"
             "Buzzer: {result.buzzer}\n"
             "Target humidity: {result.target_humidity} %\n"
             "No water: {result.no_water}\n"
