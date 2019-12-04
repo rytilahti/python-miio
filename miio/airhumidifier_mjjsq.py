@@ -27,18 +27,18 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class AirHumidifierMjjsqException(DeviceException):
+class AirHumidifierException(DeviceException):
     pass
 
 
-class OperationModeMjjsq(enum.Enum):
+class OperationMode(enum.Enum):
     Low = 1
     Medium = 2
     High = 3
     Humidity = 4
 
 
-class AirHumidifierMjjsqStatus:
+class AirHumidifierStatus:
     """Container for status reports from the air humidifier mjjsq."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -63,9 +63,9 @@ class AirHumidifierMjjsqStatus:
         return self.power == "on"
 
     @property
-    def mode(self) -> OperationModeMjjsq:
+    def mode(self) -> OperationMode:
         """Operation mode. Can be either low, medium, high or humidity."""
-        return OperationModeMjjsq(self.data["Humidifier_Gear"])
+        return OperationMode(self.data["Humidifier_Gear"])
 
     @property
     def temperature(self) -> int:
@@ -104,7 +104,7 @@ class AirHumidifierMjjsqStatus:
 
     def __repr__(self) -> str:
         s = (
-            "<AirHumidiferStatusMjjsq power=%s, "
+            "<AirHumidiferStatus power=%s, "
             "mode=%s, "
             "temperature=%s, "
             "humidity=%s%%, "
@@ -162,7 +162,7 @@ class AirHumidifierMjjsq(Device):
             "Water tank detached: {result.water_tank_detached}\n",
         )
     )
-    def status(self) -> AirHumidifierMjjsqStatus:
+    def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
 
         properties = AVAILABLE_PROPERTIES[self.model]
@@ -182,9 +182,7 @@ class AirHumidifierMjjsq(Device):
                 values_count,
             )
 
-        return AirHumidifierMjjsqStatus(
-            defaultdict(lambda: None, zip(properties, values))
-        )
+        return AirHumidifierStatus(defaultdict(lambda: None, zip(properties, values)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -197,10 +195,10 @@ class AirHumidifierMjjsq(Device):
         return self.send("Set_OnOff", [0])
 
     @command(
-        click.argument("mode", type=EnumType(OperationModeMjjsq, False)),
+        click.argument("mode", type=EnumType(OperationMode, False)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
-    def set_mode(self, mode: OperationModeMjjsq):
+    def set_mode(self, mode: OperationMode):
         """Set mode."""
         return self.send("Set_HumidifierGears", [mode.value])
 
@@ -231,6 +229,6 @@ class AirHumidifierMjjsq(Device):
     def set_target_humidity(self, humidity: int):
         """Set the target humidity in percent."""
         if humidity < 0 or humidity > 99:
-            raise AirHumidifierMjjsqException("Invalid target humidity: %s" % humidity)
+            raise AirHumidifierException("Invalid target humidity: %s" % humidity)
 
         return self.send("Set_HumiValue", [humidity])

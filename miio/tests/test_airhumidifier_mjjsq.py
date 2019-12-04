@@ -5,9 +5,9 @@ import pytest
 from miio import AirHumidifierMjjsq
 from miio.airhumidifier_mjjsq import (
     MODEL_HUMIDIFIER_MJJSQ,
-    AirHumidifierMjjsqException,
-    AirHumidifierMjjsqStatus,
-    OperationModeMjjsq,
+    AirHumidifierException,
+    AirHumidifierStatus,
+    OperationMode,
 )
 
 from .dummies import DummyDevice
@@ -69,13 +69,11 @@ class TestAirHumidifierMjjsq(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(
-            AirHumidifierMjjsqStatus(self.device.start_state)
-        )
+        assert repr(self.state()) == repr(AirHumidifierStatus(self.device.start_state))
         assert self.is_on() is True
         assert self.state().temperature == self.device.start_state["TemperatureValue"]
         assert self.state().humidity == self.device.start_state["Humidity_Value"]
-        assert self.state().mode == OperationModeMjjsq(
+        assert self.state().mode == OperationMode(
             self.device.start_state["Humidifier_Gear"]
         )
         assert self.state().led is (self.device.start_state["Led_State"] == 1)
@@ -90,17 +88,17 @@ class TestAirHumidifierMjjsq(TestCase):
         def mode():
             return self.device.status().mode
 
-        self.device.set_mode(OperationModeMjjsq.Low)
-        assert mode() == OperationModeMjjsq.Low
+        self.device.set_mode(OperationMode.Low)
+        assert mode() == OperationMode.Low
 
-        self.device.set_mode(OperationModeMjjsq.Medium)
-        assert mode() == OperationModeMjjsq.Medium
+        self.device.set_mode(OperationMode.Medium)
+        assert mode() == OperationMode.Medium
 
-        self.device.set_mode(OperationModeMjjsq.High)
-        assert mode() == OperationModeMjjsq.High
+        self.device.set_mode(OperationMode.High)
+        assert mode() == OperationMode.High
 
-        self.device.set_mode(OperationModeMjjsq.Humidity)
-        assert mode() == OperationModeMjjsq.Humidity
+        self.device.set_mode(OperationMode.Humidity)
+        assert mode() == OperationMode.Humidity
 
     def test_set_led(self):
         def led():
@@ -133,11 +131,11 @@ class TestAirHumidifierMjjsq(TestCase):
         self.device.set_target_humidity(99)
         assert target_humidity() == 99
 
-        with pytest.raises(AirHumidifierMjjsqException):
+        with pytest.raises(AirHumidifierException):
             self.device.set_target_humidity(-1)
 
-        with pytest.raises(AirHumidifierMjjsqException):
+        with pytest.raises(AirHumidifierException):
             self.device.set_target_humidity(100)
 
-        with pytest.raises(AirHumidifierMjjsqException):
+        with pytest.raises(AirHumidifierException):
             self.device.set_target_humidity(101)
