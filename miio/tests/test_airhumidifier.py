@@ -757,12 +757,16 @@ class TestAirHumidifierMjjsq(TestCase):
         assert self.is_on() is True
         assert self.state().temperature == self.device.start_state["TemperatureValue"]
         assert self.state().humidity == self.device.start_state["Humidity_Value"]
-        assert self.state().mode == OperationModeMjjsq(self.device.start_state["Humidifier_Gear"])
+        assert self.state().mode == OperationModeMjjsq(
+            self.device.start_state["Humidifier_Gear"]
+        )
         assert self.state().led is (self.device.start_state["Led_State"] == 1)
         assert self.state().buzzer is (self.device.start_state["TipSound_State"] == 1)
         assert self.state().target_humidity == self.device.start_state["HumiSet_Value"]
         assert self.state().no_water is (self.device.start_state["waterstatus"] == 0)
-        assert self.state().water_tank_detached is (self.device.start_state["watertankstatus"] == 0)
+        assert self.state().water_tank_detached is (
+            self.device.start_state["watertankstatus"] == 0
+        )
 
     def test_set_mode(self):
         def mode():
