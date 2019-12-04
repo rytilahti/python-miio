@@ -21,7 +21,8 @@ Supported devices
 -  Xiaomi Smart Power Strip V1 and V2 (WiFi, 6 Ports)
 -  Xiaomi Philips Eyecare Smart Lamp 2
 -  Xiaomi Philips LED Ceiling Lamp
--  Xiaomi Philips LED Ball Lamp
+-  Xiaomi Philips LED Ball Lamp (philips.light.bulb)
+-  Xiaomi Philips LED Ball Lamp White (philips.light.hbulb)
 -  Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp
 -  Xiaomi Philips Zhirui Bedroom Smart Lamp
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR)

@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -8,6 +8,19 @@ from .click_common import command, format_output
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
+
+MODEL_PHILIPS_LIGHT_BULB = "philips.light.bulb"
+MODEL_PHILIPS_LIGHT_HBULB = "philips.light.hbulb"
+
+AVAILABLE_PROPERTIES_COMMON = [
+    "power",
+    "dv",
+]
+
+AVAILABLE_PROPERTIES = {
+    MODEL_PHILIPS_LIGHT_HBULB: AVAILABLE_PROPERTIES_COMMON + ["bri"],
+    MODEL_PHILIPS_LIGHT_BULB: AVAILABLE_PROPERTIES_COMMON + ["bright", "cct", "snm"],
+}
 
 
 class PhilipsBulbException(DeviceException):
@@ -30,16 +43,24 @@ class PhilipsBulbStatus:
         return self.power == "on"
 
     @property
-    def brightness(self) -> int:
-        return self.data["bright"]
+    def brightness(self) -> Optional[int]:
+        if "bright" in self.data:
+            return self.data["bright"]
+        if "bri" in self.data:
+            return self.data["bri"]
+        return None
 
     @property
-    def color_temperature(self) -> int:
-        return self.data["cct"]
+    def color_temperature(self) -> Optional[int]:
+        if "cct" in self.data:
+            return self.data["cct"]
+        return None
 
     @property
-    def scene(self) -> int:
-        return self.data["snm"]
+    def scene(self) -> Optional[int]:
+        if "snm" in self.data:
+            return self.data["snm"]
+        return None
 
     @property
     def delay_off_countdown(self) -> int:
@@ -47,14 +68,17 @@ class PhilipsBulbStatus:
 
     def __repr__(self) -> str:
         s = (
-            "<PhilipsBulbStatus power=%s, brightness=%s, "
-            "color_temperature=%s, scene=%s, delay_off_countdown=%s>"
+            "<PhilipsBulbStatus power=%s, "
+            "brightness=%s, "
+            "delay_off_countdown=%s, "
+            "color_temperature=%s, "
+            "scene=%s>"
             % (
                 self.power,
                 self.brightness,
+                self.delay_off_countdown,
                 self.color_temperature,
                 self.scene,
-                self.delay_off_countdown,
             )
         )
         return s
@@ -63,22 +87,39 @@ class PhilipsBulbStatus:
         return self.data
 
 
-class PhilipsBulb(Device):
-    """Main class representing Xiaomi Philips LED Ball Lamp."""
+class PhilipsWhiteBulb(Device):
+    """Main class representing Xiaomi Philips White LED Ball Lamp."""
+
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_PHILIPS_LIGHT_HBULB,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_PHILIPS_LIGHT_HBULB
 
     @command(
         default_output=format_output(
             "",
             "Power: {result.power}\n"
             "Brightness: {result.brightness}\n"
+            "Delayed turn off: {result.delay_off_countdown}\n"
             "Color temperature: {result.color_temperature}\n"
-            "Scene: {result.scene}\n"
-            "Delayed turn off: {result.delay_off_countdown}\n",
+            "Scene: {result.scene}\n",
         )
     )
     def status(self) -> PhilipsBulbStatus:
         """Retrieve properties."""
-        properties = ["power", "bright", "cct", "snm", "dv"]
+
+        properties = AVAILABLE_PROPERTIES[self.model]
         values = self.send("get_prop", properties)
 
         properties_count = len(properties)
@@ -115,6 +156,38 @@ class PhilipsBulb(Device):
         return self.send("set_bright", [level])
 
     @command(
+        click.argument("seconds", type=int),
+        default_output=format_output("Setting delayed turn off to {seconds} seconds"),
+    )
+    def delay_off(self, seconds: int):
+        """Set delay off seconds."""
+
+        if seconds < 1:
+            raise PhilipsBulbException(
+                "Invalid value for a delayed turn off: %s" % seconds
+            )
+
+        return self.send("delay_off", [seconds])
+
+
+class PhilipsBulb(PhilipsWhiteBulb):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_PHILIPS_LIGHT_BULB,
+    ) -> None:
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_PHILIPS_LIGHT_BULB
+
+        super().__init__(ip, token, start_id, debug, lazy_discover, self.model)
+
+    @command(
         click.argument("level", type=int),
         default_output=format_output("Setting color temperature to {level}"),
     )
@@ -141,20 +214,6 @@ class PhilipsBulb(Device):
             raise PhilipsBulbException("Invalid color temperature: %s" % cct)
 
         return self.send("set_bricct", [brightness, cct])
-
-    @command(
-        click.argument("seconds", type=int),
-        default_output=format_output("Setting delayed turn off to {seconds} seconds"),
-    )
-    def delay_off(self, seconds: int):
-        """Set delay off seconds."""
-
-        if seconds < 1:
-            raise PhilipsBulbException(
-                "Invalid value for a delayed turn off: %s" % seconds
-            )
-
-        return self.send("delay_off", [seconds])
 
     @command(
         click.argument("number", type=int),

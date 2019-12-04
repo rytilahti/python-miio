@@ -25,6 +25,7 @@ from . import (
     PhilipsBulb,
     PhilipsEyecare,
     PhilipsMoonlight,
+    PhilipsWhiteBulb,
     PowerStrip,
     Toiletlid,
     Vacuum,
@@ -114,6 +115,7 @@ DEVICE_MAP = {
     ),
     "yunmi-waterpuri-v2": WaterPurifier,
     "philips-light-bulb": PhilipsBulb,  # cannot be discovered via mdns
+    "philips-light-hbulb": PhilipsWhiteBulb,  # cannot be discovered via mdns
     "philips-light-candle": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-candle2": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-ceiling": Ceil,

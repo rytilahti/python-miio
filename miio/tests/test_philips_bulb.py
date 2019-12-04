@@ -2,14 +2,20 @@ from unittest import TestCase
 
 import pytest
 
-from miio import PhilipsBulb
-from miio.philips_bulb import PhilipsBulbException, PhilipsBulbStatus
+from miio import PhilipsBulb, PhilipsWhiteBulb
+from miio.philips_bulb import (
+    MODEL_PHILIPS_LIGHT_BULB,
+    MODEL_PHILIPS_LIGHT_HBULB,
+    PhilipsBulbException,
+    PhilipsBulbStatus,
+)
 
 from .dummies import DummyDevice
 
 
 class DummyPhilipsBulb(DummyDevice, PhilipsBulb):
     def __init__(self, *args, **kwargs):
+        self.model = MODEL_PHILIPS_LIGHT_BULB
         self.state = {"power": "on", "bright": 100, "cct": 10, "snm": 0, "dv": 0}
         self.return_values = {
             "get_prop": self._get_state,
@@ -170,3 +176,90 @@ class TestPhilipsBulb(TestCase):
 
         with pytest.raises(PhilipsBulbException):
             self.device.set_scene(5)
+
+
+class DummyPhilipsWhiteBulb(DummyDevice, PhilipsWhiteBulb):
+    def __init__(self, *args, **kwargs):
+        self.model = MODEL_PHILIPS_LIGHT_HBULB
+        self.state = {"power": "on", "bri": 100, "dv": 0}
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bri", x),
+            "delay_off": lambda x: self._set_state("dv", x),
+        }
+        super().__init__(args, kwargs)
+
+
+@pytest.fixture(scope="class")
+def philips_white_bulb(request):
+    request.cls.device = DummyPhilipsWhiteBulb()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("philips_white_bulb")
+class TestPhilipsWhiteBulb(TestCase):
+    def is_on(self):
+        return self.device.status().is_on
+
+    def state(self):
+        return self.device.status()
+
+    def test_on(self):
+        self.device.off()  # ensure off
+        assert self.is_on() is False
+
+        self.device.on()
+        assert self.is_on() is True
+
+    def test_off(self):
+        self.device.on()  # ensure on
+        assert self.is_on() is True
+
+        self.device.off()
+        assert self.is_on() is False
+
+    def test_status(self):
+        self.device._reset_state()
+
+        assert repr(self.state()) == repr(PhilipsBulbStatus(self.device.start_state))
+
+        assert self.is_on() is True
+        assert self.state().brightness == self.device.start_state["bri"]
+        assert self.state().delay_off_countdown == self.device.start_state["dv"]
+        assert self.state().color_temperature is None
+        assert self.state().scene is None
+
+    def test_set_brightness(self):
+        def brightness():
+            return self.device.status().brightness
+
+        self.device.set_brightness(1)
+        assert brightness() == 1
+        self.device.set_brightness(50)
+        assert brightness() == 50
+        self.device.set_brightness(100)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_brightness(-1)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_brightness(0)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.set_brightness(101)
+
+    def test_delay_off(self):
+        def delay_off_countdown():
+            return self.device.status().delay_off_countdown
+
+        self.device.delay_off(100)
+        assert delay_off_countdown() == 100
+        self.device.delay_off(200)
+        assert delay_off_countdown() == 200
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.delay_off(-1)
+
+        with pytest.raises(PhilipsBulbException):
+            self.device.delay_off(0)
