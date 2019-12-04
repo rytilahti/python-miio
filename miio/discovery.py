@@ -28,6 +28,7 @@ from . import (
     PowerStrip,
     Toiletlid,
     Vacuum,
+    ViomiVacuum,
     WaterPurifier,
     WifiRepeater,
     WifiSpeaker,
@@ -149,6 +150,7 @@ DEVICE_MAP = {
     "lumi-gateway-": lambda x: other_package_info(
         x, "https://github.com/Danielhiversen/PyXiaomiGateway"
     ),
+    "viomi-vacuum-v7": ViomiVacuum,
 }  # type: Dict[str, Union[Callable, Device]]
 
 
