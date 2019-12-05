@@ -1,10 +1,11 @@
+import enum
 import logging
 from collections import defaultdict
 from typing import Any, Dict
 
 import click
 
-from .click_common import command, format_output
+from .click_common import EnumType, command, format_output
 from .device import Device, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -18,6 +19,12 @@ AVAILABLE_PROPERTIES = {
 
 class PhilipsRwreadException(DeviceException):
     pass
+
+
+class MotionDetectionSensitivity(enum.Enum):
+    Low = 1
+    Medium = 2
+    High = 3
 
 
 class PhilipsRwreadStatus:
@@ -63,9 +70,9 @@ class PhilipsRwreadStatus:
         return self.data["flm"] == 1
 
     @property
-    def motion_detection_sensitivity(self) -> int:
-        """The sensitivity of the motion detection."""
-        return self.data["flmv"]
+    def motion_detection_sensitivity(self) -> MotionDetectionSensitivity:
+        """LED brightness if available."""
+        return MotionDetectionSensitivity(self.data["flmv"])
 
     @property
     def child_lock(self) -> bool:
@@ -203,18 +210,14 @@ class PhilipsRwread(Device):
         return self.send("enable_flm", [int(motion_detection)])
 
     @command(
-        click.argument("value", type=int),
-        default_output=format_output("Setting motion detection sensitivity to {value}"),
+        click.argument("sensitivity", type=EnumType(MotionDetectionSensitivity, False)),
+        default_output=format_output(
+            "Setting motion detection sensitivity to {sensitivity}"
+        ),
     )
-    def set_motion_detection_sensitivity(self, value: int):
+    def set_motion_detection_sensitivity(self, sensitivity: MotionDetectionSensitivity):
         """Set motion detection sensitivity."""
-
-        if value < 0:
-            raise PhilipsRwreadException(
-                "Invalid value for a delayed turn off: %s" % value
-            )
-
-        return self.send("set_flmvalue", [value])
+        return self.send("set_flmvalue", [sensitivity.value])
 
     @command(
         click.argument("lock", type=bool),
