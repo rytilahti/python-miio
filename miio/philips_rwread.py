@@ -71,7 +71,7 @@ class PhilipsRwreadStatus:
 
     @property
     def motion_detection_sensitivity(self) -> MotionDetectionSensitivity:
-        """LED brightness if available."""
+        """The sensitivity of the motion detection."""
         return MotionDetectionSensitivity(self.data["flmv"])
 
     @property
