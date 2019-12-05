@@ -20,6 +20,7 @@ Supported devices
 -  Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports)
 -  Xiaomi Smart Power Strip V1 and V2 (WiFi, 6 Ports)
 -  Xiaomi Philips Eyecare Smart Lamp 2
+-  Xiaomi Philips RW Read (philips.light.rwread)
 -  Xiaomi Philips LED Ceiling Lamp
 -  Xiaomi Philips LED Ball Lamp (philips.light.bulb)
 -  Xiaomi Philips LED Ball Lamp White (philips.light.hbulb)
