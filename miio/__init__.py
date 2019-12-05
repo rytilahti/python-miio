@@ -20,6 +20,7 @@ from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
 from miio.philips_eyecare import PhilipsEyecare
 from miio.philips_moonlight import PhilipsMoonlight
+from miio.philips_rwread import PhilipsRwread
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.pwzn_relay import PwznRelay

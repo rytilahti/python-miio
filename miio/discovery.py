@@ -25,6 +25,7 @@ from . import (
     PhilipsBulb,
     PhilipsEyecare,
     PhilipsMoonlight,
+    PhilipsRwread,
     PhilipsWhiteBulb,
     PowerStrip,
     Toiletlid,
@@ -122,6 +123,7 @@ DEVICE_MAP = {
     "philips-light-zyceiling": Ceil,
     "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
     "philips-light-moonlight": PhilipsMoonlight,  # name needs to be checked
+    "philips-light-rwread": PhilipsRwread,  # name needs to be checked
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
