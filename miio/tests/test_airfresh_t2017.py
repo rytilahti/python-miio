@@ -7,7 +7,9 @@ from miio.airfresh_t2017 import (
     MODEL_AIRFRESH_T2017,
     AirFreshException,
     AirFreshStatus,
+    DisplayOrientation,
     OperationMode,
+    PtcLevel,
 )
 
 from .dummies import DummyDevice
@@ -181,20 +183,44 @@ class TestAirFreshT2017(TestCase):
         def favorite_speed():
             return self.device.status().favorite_speed
 
-        self.device.set_speed(60)
+        self.device.set_favorite_speed(60)
         assert favorite_speed() == 60
-        self.device.set_speed(120)
+        self.device.set_favorite_speed(120)
         assert favorite_speed() == 120
-        self.device.set_speed(240)
+        self.device.set_favorite_speed(240)
         assert favorite_speed() == 240
-        self.device.set_speed(300)
+        self.device.set_favorite_speed(300)
         assert favorite_speed() == 300
 
         with pytest.raises(AirFreshException):
-            self.device.set_speed(-1)
+            self.device.set_favorite_speed(-1)
 
         with pytest.raises(AirFreshException):
-            self.device.set_speed(59)
+            self.device.set_favorite_speed(59)
 
         with pytest.raises(AirFreshException):
-            self.device.set_speed(301)
+            self.device.set_favorite_speed(301)
+
+    def test_set_ptc_level(self):
+        def ptc_level():
+            return self.device.status().ptc_level
+
+        self.device.set_ptc_level(PtcLevel.Off)
+        assert ptc_level() == PtcLevel.Off
+        self.device.set_ptc_level(PtcLevel.Low)
+        assert ptc_level() == PtcLevel.Low
+        self.device.set_ptc_level(PtcLevel.Medium)
+        assert ptc_level() == PtcLevel.Medium
+        self.device.set_ptc_level(PtcLevel.High)
+        assert ptc_level() == PtcLevel.High
+
+    def test_set_display_orientation(self):
+        def display_orientation():
+            return self.device.status().display_orientation
+
+        self.device.set_display_orientation(DisplayOrientation.Portrait)
+        assert display_orientation() == DisplayOrientation.Portrait
+        self.device.set_display_orientation(DisplayOrientation.LandscapeLeft)
+        assert display_orientation() == DisplayOrientation.LandscapeLeft
+        self.device.set_display_orientation(DisplayOrientation.LandscapeRight)
+        assert display_orientation() == DisplayOrientation.LandscapeRight

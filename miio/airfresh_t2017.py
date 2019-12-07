@@ -389,7 +389,7 @@ class AirFreshT2017(Device):
     )
     def set_favorite_speed(self, speed: int):
         """Storage register to enable extra features at the app."""
-        if 60 > speed > 300:
+        if speed < 60 or speed > 300:
             raise AirFreshException("Invalid favorite speed: %s" % speed)
 
         return self.send("set_favourite_speed", [speed])
