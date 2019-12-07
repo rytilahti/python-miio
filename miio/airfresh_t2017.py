@@ -137,8 +137,8 @@ class AirFreshStatus:
         return self.data["filter_intermediate"]
 
     @property
-    def dust_filter_days_used(self) -> int:
-        """How long the dust filter has been in use in days."""
+    def dust_filter_life_remaining_days(self) -> int:
+        """Remaining dust filter life in days."""
         return self.data["filter_inter_day"]
 
     @property
@@ -147,8 +147,8 @@ class AirFreshStatus:
         return self.data["filter_efficient"]
 
     @property
-    def upper_filter_days_used(self) -> int:
-        """How long the upper filter has been in use in days."""
+    def upper_filter_life_remaining_days(self) -> int:
+        """Remaining upper filter life in days."""
         return self.data["filter_effi_day"]
 
     @property
@@ -196,9 +196,9 @@ class AirFreshStatus:
             "favorite_speed=%s, "
             "control_speed=%s, "
             "dust_filter_life_remaining=%s, "
-            "dust_filter_days_used=%s, "
+            "dust_filter_life_remaining_days=%s, "
             "upper_filter_life_remaining=%s, "
-            "upper_filter_days_used=%s, "
+            "upper_filter_life_remaining_days=%s, "
             "ptc=%s, "
             "ptc_level=%s, "
             "ptc_status=%s, "
@@ -215,9 +215,9 @@ class AirFreshStatus:
                 self.favorite_speed,
                 self.control_speed,
                 self.dust_filter_life_remaining,
-                self.dust_filter_days_used,
+                self.dust_filter_life_remaining_days,
                 self.upper_filter_life_remaining,
-                self.upper_filter_days_used,
+                self.upper_filter_life_remaining_days,
                 self.ptc,
                 self.ptc_level,
                 self.ptc_status,
@@ -262,10 +262,10 @@ class AirFreshT2017(Device):
             "Temperature: {result.temperature}\n"
             "Favorite speed: {result.favorite_speed}\n"
             "Control speed: {result.control_speed}\n"
-            "Dust filter life remaining: {result.dust_filter_life_remaining}\n"
-            "Dust filter days used: {result.dust_filter_days_used}\n"
-            "Upper filter life remaining: {result.upper_filter_life_remaining}\n"
-            "Upper filter days used: {result.upper_filter_days_used}\n"
+            "Dust filter life: {result.dust_filter_life_remaining} %, "
+            "{result.dust_filter_life_remaining_days} days\n"
+            "Upper filter life remaining: {result.upper_filter_life_remaining} %, "
+            "{result.upper_filter_life_remaining_days} days\n"
             "PTC: {result.ptc}\n"
             "PTC level: {result.ptc_level}\n"
             "PTC status: {result.ptc_status}\n"
@@ -375,12 +375,12 @@ class AirFreshT2017(Device):
 
     @command(default_output=format_output("Resetting upper filter"))
     def reset_upper_filter(self):
-        """Resets filter days used and remaining life of the upper filter."""
+        """Resets filter lifetime of the upper filter."""
         return self.send("set_filter_reset", ["efficient"])
 
     @command(default_output=format_output("Resetting dust filter"))
     def reset_dust_filter(self):
-        """Resets filter days used and remaining life of the dust filter."""
+        """Resets filter lifetime of the dust filter."""
         return self.send("set_filter_reset", ["intermediate"])
 
     @command(
