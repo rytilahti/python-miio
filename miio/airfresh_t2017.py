@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import click
 
@@ -41,27 +41,65 @@ class AirFreshException(DeviceException):
 
 
 class OperationMode(enum.Enum):
-    Off = 'off'
-    Auto = 'auto'
-    Sleep = 'sleep'
-    Favorite = 'favourite'
+    Off = "off"
+    Auto = "auto"
+    Sleep = "sleep"
+    Favorite = "favourite"
+
+
+class PtcLevel(enum.Enum):
+    Off = "off"
+    Low = "low"
+    Medium = "medium"
+    High = "high"
+
+
+class ScreenOrientation(enum.Enum):
+    Portrait = "forward"
+    LandscapeLeft = "left"
+    LandscapeRight = "right"
 
 
 class AirFreshStatus:
     """Container for status reports from the air fresh t2017."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response of a Air Airfresh T2017 (dmaker.airfresh.t2017):
+
+        {
+            'power': true,
+            'mode': "favourite",
+            'pm25': 1,
+            'co2': 550,
+            'temperature_outside': 24,
+            'favourite_speed': 241,
+            'control_speed': 241,
+            'filter_intermediate': 100,
+            'filter_inter_day': 90,
+            'filter_efficient': 100,
+            'filter_effi_day': 180,
+            'ptc_on': false,
+            'ptc_level': "low",
+            'ptc_status': false,
+            'child_lock': false,
+            'sound': true,
+            'display': false,
+            'screen_direction': "forward",
+        }
+        """
+
         self.data = data
 
     @property
     def power(self) -> str:
         """Power state."""
-        return self.data["power"]
+        return "on" if self.data["power"] else "off"
 
     @property
     def is_on(self) -> bool:
         """Return True if device is on."""
-        return self.power == "on"
+        return self.data["power"]
 
     @property
     def mode(self) -> OperationMode:
@@ -79,7 +117,7 @@ class AirFreshStatus:
         return self.data["co2"]
 
     @property
-    def temperature(self) -> float:
+    def temperature(self) -> int:
         """Current temperature, if available."""
         return self.data["temperature_outside"]
 
@@ -112,78 +150,78 @@ class AirFreshStatus:
     @property
     def ptc(self) -> bool:
         """Return True if PTC is on."""
-        return self.data["ptc_on"] == "on"
+        return self.data["ptc_on"]
 
     @property
     def ptc_level(self) -> int:
         """PTC level."""
-        return self.data["ptc_level"]
+        return PtcLevel(self.data["ptc_level"])
 
     @property
-    def ptc_status(self) -> int:
-        """PTC status."""
+    def ptc_status(self) -> bool:
+        """Return true if PTC status is on."""
         return self.data["ptc_status"]
 
     @property
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
-        return self.data["child_lock"] == "on"
+        return self.data["child_lock"]
 
     @property
     def buzzer(self) -> bool:
         """Return True if sound is on."""
-        return self.data["sound"] == "on"
+        return self.data["sound"]
 
     @property
     def display(self) -> bool:
         """Return True if the display is on."""
-        return self.data["display"] == "on" // FIXME
+        return self.data["display"]
 
     @property
-    def screen_direction(self) -> int:
-        """Screen direction."""
-        return self.data["screen_direction"] // FIXME
+    def screen_orientation(self) -> int:
+        """Screen orientation."""
+        return ScreenOrientation(self.data["screen_direction"])
 
     def __repr__(self) -> str:
         s = (
-                "<AirFreshStatus power=%s, "
-                "mode=%s, "
-                "pm25=%s, "
-                "co2=%s, "
-                "temperature=%s °C, "
-                "favorite_speed=%s, "
-                "control_speed=%s, "
-                "filter_intermediate=%s, "
-                "filter_intermediate_day=%s, "
-                "filter_efficient=%s, "
-                "filter_efficient_day=%s, "
-                "ptc=%s, "
-                "ptc_level=%s, "
-                "ptc_status=%s, "
-                "child_lock=%s, "
-                "buzzer=%s, "
-                "display=%s, "
-                "screen_direction=%s>"
-                % (
-                    self.power,
-                    self.mode,
-                    self.pm25,
-                    self.co2,
-                    self.temperature,
-                    self.favorite_speed,
-                    self.control_speed,
-                    self.filter_intermediate,
-                    self.filter_intermediate_day,
-                    self.filter_efficient,
-                    self.filter_efficient_day,
-                    self.ptc,
-                    self.ptc_level,
-                    self.ptc_status,
-                    self.child_lock,
-                    self.buzzer,
-                    self.display,
-                    self.screen_direction,
-                )
+            "<AirFreshStatus power=%s, "
+            "mode=%s, "
+            "pm25=%s, "
+            "co2=%s, "
+            "temperature=%s °C, "
+            "favorite_speed=%s, "
+            "control_speed=%s, "
+            "filter_intermediate=%s, "
+            "filter_intermediate_day=%s, "
+            "filter_efficient=%s, "
+            "filter_efficient_day=%s, "
+            "ptc=%s, "
+            "ptc_level=%s, "
+            "ptc_status=%s, "
+            "child_lock=%s, "
+            "buzzer=%s, "
+            "display=%s, "
+            "screen_orientation=%s>"
+            % (
+                self.power,
+                self.mode,
+                self.pm25,
+                self.co2,
+                self.temperature,
+                self.favorite_speed,
+                self.control_speed,
+                self.filter_intermediate,
+                self.filter_intermediate_day,
+                self.filter_efficient,
+                self.filter_efficient_day,
+                self.ptc,
+                self.ptc_level,
+                self.ptc_status,
+                self.child_lock,
+                self.buzzer,
+                self.display,
+                self.screen_orientation,
+            )
         )
         return s
 
@@ -193,6 +231,7 @@ class AirFreshStatus:
 
 class AirFreshT2017(Device):
     """Main class representing the air fresh t2017."""
+
     def __init__(
         self,
         ip: str = None,
@@ -229,7 +268,7 @@ class AirFreshT2017(Device):
             "Child lock: {result.child_lock}\n"
             "Buzzer: {result.buzzer}\n"
             "Display: {result.display}\n"
-            "Screen direction: {result.screen_direction}\n",
+            "Screen orientation: {result.screen_orientation}\n",
         )
     )
     def status(self) -> AirFreshStatus:
