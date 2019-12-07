@@ -314,3 +314,12 @@ class AirFreshT2017(Device):
         else:
             return self.send("set_child_lock", ["off"])
 
+    @command(default_output=format_output("Resetting filter efficient statistic"))
+    def reset_filter_efficient(self):
+        """Resets filter efficient statistic"."""
+        return self.send("set_filter_reset", ["efficient"])
+
+    @command(default_output=format_output("Resetting filter intermediate statistic"))
+    def reset_filter_intermediate(self):
+        """Resets filter intermediate statistic"."""
+        return self.send("set_filter_reset", ["intermediate"])
