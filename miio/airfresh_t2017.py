@@ -118,7 +118,7 @@ class AirFreshStatus:
 
     @property
     def temperature(self) -> int:
-        """Current temperature, if available."""
+        """Current temperature in degree celsions."""
         return self.data["temperature_outside"]
 
     @property
