@@ -132,19 +132,23 @@ class AirFreshStatus:
         return self.data["control_speed"]
 
     @property
-    def filter_intermediate(self) -> int:
+    def dust_filter_life_remaining(self) -> int:
+        """Remaining dust filter life in percent."""
         return self.data["filter_intermediate"]
 
     @property
-    def filter_intermediate_day(self) -> int:
+    def dust_filter_days_used(self) -> int:
+        """How long the dust filter has been in use in days."""
         return self.data["filter_inter_day"]
 
     @property
-    def filter_efficient(self) -> int:
+    def upper_filter_life_remaining(self) -> int:
+        """Remaining upper filter life in percent."""
         return self.data["filter_efficient"]
 
     @property
-    def filter_efficient_day(self) -> int:
+    def upper_filter_days_used(self) -> int:
+        """How long the upper filter has been in use in days."""
         return self.data["filter_effi_day"]
 
     @property
@@ -191,10 +195,10 @@ class AirFreshStatus:
             "temperature=%s °C, "
             "favorite_speed=%s, "
             "control_speed=%s, "
-            "filter_intermediate=%s, "
-            "filter_intermediate_day=%s, "
-            "filter_efficient=%s, "
-            "filter_efficient_day=%s, "
+            "dust_filter_life_remaining=%s, "
+            "dust_filter_days_used=%s, "
+            "upper_filter_life_remaining=%s, "
+            "upper_filter_days_used=%s, "
             "ptc=%s, "
             "ptc_level=%s, "
             "ptc_status=%s, "
@@ -210,10 +214,10 @@ class AirFreshStatus:
                 self.temperature,
                 self.favorite_speed,
                 self.control_speed,
-                self.filter_intermediate,
-                self.filter_intermediate_day,
-                self.filter_efficient,
-                self.filter_efficient_day,
+                self.dust_filter_life_remaining,
+                self.dust_filter_days_used,
+                self.upper_filter_life_remaining,
+                self.upper_filter_days_used,
                 self.ptc,
                 self.ptc_level,
                 self.ptc_status,
@@ -258,10 +262,10 @@ class AirFreshT2017(Device):
             "Temperature: {result.temperature}\n"
             "Favorite speed: {result.favorite_speed}\n"
             "Control speed: {result.control_speed}\n"
-            "Filter intermediate: {result.filter_intermediate}\n"
-            "Filter intermediate day: {result.filter_intermediate_day}\n"
-            "Filter efficient: {result.filter_efficient}\n"
-            "Filter efficient day: {result.filter_efficient_day}\n"
+            "Dust filter life remaining: {result.dust_filter_life_remaining}\n"
+            "Dust filter days used: {result.dust_filter_days_used}\n"
+            "Upper filter life remaining: {result.upper_filter_life_remaining}\n"
+            "Upper filter days used: {result.upper_filter_days_used}\n"
             "PTC: {result.ptc}\n"
             "PTC level: {result.ptc_level}\n"
             "PTC status: {result.ptc_status}\n"
