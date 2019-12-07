@@ -54,7 +54,7 @@ class PtcLevel(enum.Enum):
     High = "high"
 
 
-class ScreenOrientation(enum.Enum):
+class DisplayOrientation(enum.Enum):
     Portrait = "forward"
     LandscapeLeft = "left"
     LandscapeRight = "right"
@@ -182,9 +182,9 @@ class AirFreshStatus:
         return self.data["display"]
 
     @property
-    def screen_orientation(self) -> int:
-        """Screen orientation."""
-        return ScreenOrientation(self.data["screen_direction"])
+    def display_orientation(self) -> int:
+        """Display orientation."""
+        return DisplayOrientation(self.data["screen_direction"])
 
     def __repr__(self) -> str:
         s = (
@@ -205,7 +205,7 @@ class AirFreshStatus:
             "child_lock=%s, "
             "buzzer=%s, "
             "display=%s, "
-            "screen_orientation=%s>"
+            "display_orientation=%s>"
             % (
                 self.power,
                 self.mode,
@@ -224,7 +224,7 @@ class AirFreshStatus:
                 self.child_lock,
                 self.buzzer,
                 self.display,
-                self.screen_orientation,
+                self.display_orientation,
             )
         )
         return s
@@ -272,7 +272,7 @@ class AirFreshT2017(Device):
             "Child lock: {result.child_lock}\n"
             "Buzzer: {result.buzzer}\n"
             "Display: {result.display}\n"
-            "Screen orientation: {result.screen_orientation}\n",
+            "Display orientation: {result.display_orientation}\n",
         )
     )
     def status(self) -> AirFreshStatus:
@@ -332,6 +332,22 @@ class AirFreshT2017(Device):
             return self.send("set_display", ["off"])
 
     @command(
+        click.argument("orientation", type=EnumType(DisplayOrientation, False)),
+        default_output=format_output("Setting orientation to '{orientation.value}'"),
+    )
+    def set_display_orientation(self, orientation: DisplayOrientation):
+        """Set display orientation."""
+        return self.send("set_screen_direction", [orientation.value])
+
+    @command(
+        click.argument("level", type=EnumType(PtcLevel, False)),
+        default_output=format_output("Setting ptc level to '{level.value}'"),
+    )
+    def set_ptc_level(self, level: PtcLevel):
+        """Set PTC level."""
+        return self.send("set_ptc_level", [level.value])
+
+    @command(
         click.argument("buzzer", type=bool),
         default_output=format_output(
             lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
@@ -366,3 +382,37 @@ class AirFreshT2017(Device):
     def reset_dust_filter(self):
         """Resets filter days used and remaining life of the dust filter."""
         return self.send("set_filter_reset", ["intermediate"])
+
+    @command(
+        click.argument("speed", type=int),
+        default_output=format_output("Setting favorite speed to {speed}"),
+    )
+    def set_favorite_speed(self, speed: int):
+        """Storage register to enable extra features at the app."""
+        if 60 > speed > 300:
+            raise AirFreshException("Invalid favorite speed: %s" % speed)
+
+        return self.send("set_favourite_speed", [speed])
+
+    @command()
+    def set_ptc_timer(self):
+        """
+        value = time.index + '-' +
+            time.hexSum + '-' +
+            time.startTime + '-' +
+            time.ptcTimer.endTime + '-' +
+            time.level + '-' +
+            time.status;
+        return self.send("set_ptc_timer", [value])
+        """
+        raise NotImplementedError()
+
+    @command()
+    def get_ptc_timer(self):
+        """Returns a list of PTC timers. Response unknown."""
+        return self.send("get_ptc_timer")
+
+    @command()
+    def get_timer(self):
+        """Response unknown."""
+        return self.send("get_timer")
