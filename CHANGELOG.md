@@ -13,7 +13,7 @@ This release adds support for the following new devices:
 Fixes & Enhancements:
 
 * Improve Xiaomi Tinymu Smart Toilet Cover support
-* Remove UTF-8 encoding comment
+* Remove UTF-8 encoding definition from source files
 * Azure pipeline for tests
 * Pre-commit hook to enforce black, flake8 and isort
 * Pre-commit hook to check-manifest, check for pypi-description, flake8-docstrings
