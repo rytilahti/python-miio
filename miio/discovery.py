@@ -10,6 +10,7 @@ import zeroconf
 from . import (
     AirConditioningCompanion,
     AirFresh,
+    AirFreshT2017,
     AirHumidifier,
     AirHumidifierMjjsq,
     AirPurifier,
@@ -148,6 +149,7 @@ DEVICE_MAP = {
     "dmaker-fan-p5": partial(Fan, model=MODEL_FAN_P5),
     "tinymu-toiletlid-v1": partial(Toiletlid, model=MODEL_TOILETLID_V1),
     "zhimi-airfresh-va2": AirFresh,
+    "dmaker-airfresh-t2017": AirFreshT2017,
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),
     "cgllc-airmonitor-s1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_S1),
