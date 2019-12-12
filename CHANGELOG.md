@@ -1,5 +1,53 @@
 # Change Log
 
+## [0.4.8](https://github.com/rytilahti/python-miio/tree/0.4.8)
+
+This release adds support for the following new devices:
+
+* Xiaomi Mijia STYJ02YM vacuum \(viomi.vacuum.v7\)
+* Xiaomi Mi Smart Humidifier \(deerma.humidifier.mjjsq\)
+* Xiaomi Mi Fresh Air Ventilator \(dmaker.airfresh.t2017\)
+* Xiaomi Philips Desk Lamp RW Read \(philips.light.rwread\)
+* Xiaomi Philips LED Ball Lamp White \(philips.light.hbulb\)
+
+Fixes & Enhancements:
+
+* Improve Xiaomi Tinymu Smart Toilet Cover support
+* Remove UTF-8 encoding comment
+* Azure pipeline for tests
+* Pre-commit hook to enforce black, flake8 and isort
+* Pre-commit hook to check-manifest, check for pypi-description, flake8-docstrings
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.7...0.4.8)
+
+**Implemented enhancements:**
+
+- Support for new vaccum Xiaomi Mijia STYJ02YM  [\#550](https://github.com/rytilahti/python-miio/issues/550)
+- Support for Mi Smart Humidifier \(deerma.humidifier.mjjsq\) [\#533](https://github.com/rytilahti/python-miio/issues/533)
+- Support for Mi Fresh Air Ventilator dmaker.airfresh.t2017 [\#502](https://github.com/rytilahti/python-miio/issues/502)
+
+**Closed issues:**
+
+- The voice pack does not change in Xiaomi Vacuum 1S [\#583](https://github.com/rytilahti/python-miio/issues/583)
+- Support for chuangmi.plug.hmi206 [\#574](https://github.com/rytilahti/python-miio/issues/574)
+- miplug crash in macos catalina 10.15.1 [\#573](https://github.com/rytilahti/python-miio/issues/573)
+- Roborock S50 not responding to handshake anymore [\#572](https://github.com/rytilahti/python-miio/issues/572)
+- Cannot control my Roborock S50 through my home wifi network [\#570](https://github.com/rytilahti/python-miio/issues/570)
+- I can not get load\_power with my set is Xiaomi Smart WiFi with two usb \(chuangmi.plug.v3\) [\#549](https://github.com/rytilahti/python-miio/issues/549)
+
+**Merged pull requests:**
+
+- Add Xiaomi Mi Fresh Air \(dmaker.airfresh.t2017\) support [\#591](https://github.com/rytilahti/python-miio/pull/591) ([syssi](https://github.com/syssi))
+- Add philips.light.rwread support [\#589](https://github.com/rytilahti/python-miio/pull/589) ([syssi](https://github.com/syssi))
+- Add philips.light.hbulb support [\#587](https://github.com/rytilahti/python-miio/pull/587) ([syssi](https://github.com/syssi))
+- Add support for deerma.humidifier.mjjsq [\#586](https://github.com/rytilahti/python-miio/pull/586) ([syssi](https://github.com/syssi))
+- Improve toiletlid various parameters [\#579](https://github.com/rytilahti/python-miio/pull/579) ([scp10011](https://github.com/scp10011))
+- Add support for Xiaomi Mijia STYJ02YM \(viomi.vacuum.v7\) [\#576](https://github.com/rytilahti/python-miio/pull/576) ([rytilahti](https://github.com/rytilahti))
+- Add check-manifest, check for pypi-description, flake8-docstrings [\#575](https://github.com/rytilahti/python-miio/pull/575) ([rytilahti](https://github.com/rytilahti))
+- Remove UTF-8 encoding comment [\#569](https://github.com/rytilahti/python-miio/pull/569) ([quamilek](https://github.com/quamilek))
+- Improve the contribution process with better checks and docs [\#568](https://github.com/rytilahti/python-miio/pull/568) ([rytilahti](https://github.com/rytilahti))
+- add azure pipeline for tests, and enforce black, flake8 and isort for commits [\#566](https://github.com/rytilahti/python-miio/pull/566) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.4.7](https://github.com/rytilahti/python-miio/tree/0.4.7)
 
 This release adds support for the following new devices:
