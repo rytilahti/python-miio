@@ -322,14 +322,14 @@ class AirPurifierMiot(MiotDevice):
 
     @command(
         click.argument("rpm", type=int),
-        default_output=format_output("Setting motor speed '{rpm}' rpm"),
+        default_output=format_output("Setting favorite motor speed '{rpm}' rpm"),
     )
     def set_favorite_rpm(self, rpm: int):
-        """Set motor speed."""
+        """Set favorite motor speed."""
         # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
         if rpm < 300 or rpm > 2300 or rpm % 10 != 0:
             raise AirPurifierMiotException(
-                "Invalid motor speed: %s. Must be between 300 and 2300 and divisible by 10"
+                "Invalid favorite motor speed: %s. Must be between 300 and 2300 and divisible by 10"
                 % rpm
             )
         return self.set_property("set_favorite_rpm", rpm)
