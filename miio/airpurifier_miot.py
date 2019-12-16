@@ -33,6 +33,7 @@ _MAPPING = {
     "button_pressed": {"siid": 8, "piid": 1},
     # Motor Speed (siid=10)
     "favorite_level": {"siid": 10, "piid": 10},
+    "set_favorite_rpm": {"siid": 10, "piid": 7},
     "motor_speed": {"siid": 10, "piid": 8},
     # Use time (siid=12)
     "use_time": {"siid": 12, "piid": 1},
@@ -318,6 +319,20 @@ class AirPurifierMiot(MiotDevice):
         if level < 1 or level > 3:
             raise AirPurifierMiotException("Invalid fan level: %s" % level)
         return self.set_property("fan_level", level)
+
+    @command(
+        click.argument("rpm", type=int),
+        default_output=format_output("Setting motor speed '{rpm}' rpm"),
+    )
+    def set_favorite_rpm(self, rpm: int):
+        """Set motor speed."""
+        # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
+        if rpm < 300 or rpm > 2300 or rpm % 10 != 0:
+            raise AirPurifierMiotException(
+                "Invalid motor speed: %s. Must be between 300 and 2300 and divisible by 10"
+                % rpm
+            )
+        return self.set_property("set_favorite_rpm", rpm)
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
