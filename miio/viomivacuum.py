@@ -234,14 +234,19 @@ class ViomiVacuum(Device):
 
     @command(
         click.argument("direction", type=EnumType(ViomiMovementDirection, False)),
-        click.option('--duration', type=float, default=.5, help='number of seconds to perform this movement'),
+        click.option(
+            "--duration",
+            type=float,
+            default=0.5,
+            help="number of seconds to perform this movement",
+        ),
     )
-    def move(self, direction, duration=.5):
+    def move(self, direction, duration=0.5):
         """Manual movement."""
         start = time.time()
         while time.time() - start < duration:
-          self.send("set_direction", [direction.value])
-          time.sleep(.1)
+            self.send("set_direction", [direction.value])
+            time.sleep(0.1)
         self.send("set_direction", [ViomiMovementDirection.Stop.value])
 
     @command(click.argument("mode", type=EnumType(ViomiMopMode, False)))
