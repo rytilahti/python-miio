@@ -156,7 +156,8 @@ class ViomiVacuumStatus:
         return bool(self.data["has_newmap"])
 
     @property
-    def is_mop(self) -> ViomiMopMode:
+    def mop_mode(self) -> ViomiMopMode:
+        """Whether mopping is enabled and if so which mode"""
         return ViomiMopMode(self.data["is_mop"])
 
 
@@ -179,7 +180,7 @@ class ViomiVacuum(Device):
             "Remember map: {result.remember_map}\n"
             "Has map: {result.has_map}\n"
             "Has new map: {result.has_new_map}\n"
-            "Is mop: {result.is_mop}\n",
+            "Mop mode: {result.mop_mode}\n",
         )
     )
     def status(self) -> ViomiVacuumStatus:
