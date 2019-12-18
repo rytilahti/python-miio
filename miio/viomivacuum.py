@@ -1,10 +1,10 @@
-import click
 import logging
 import time
-
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
+
+import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device
