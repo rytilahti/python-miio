@@ -117,6 +117,8 @@ class Device(metaclass=DeviceGroupMeta):
         debug: int = 0,
         lazy_discover: bool = True,
     ) -> None:
+        self.ip = ip
+        self.token = token
         self.protocol = Protocol(ip, token, start_id, debug, lazy_discover)
 
     @deprecated(reason="Use self.protocol.send() instead")

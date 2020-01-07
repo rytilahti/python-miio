@@ -264,4 +264,4 @@ class Yeelight(Device):
         # return self.send("set_scene", [scene, *vals])
 
     def __str__(self):
-        return "<Yeelight at %s: %s>" % (self.protocol.ip, self.protocol.token)
+        return "<Yeelight at %s: %s>" % (self.ip, self.token)
