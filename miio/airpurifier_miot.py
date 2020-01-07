@@ -29,8 +29,6 @@ _MAPPING = {
     "led": {"siid": 6, "piid": 6},
     # Physical Control Locked (siid=7)
     "child_lock": {"siid": 7, "piid": 1},
-    # Button (siid=8)
-    "button_pressed": {"siid": 8, "piid": 1},
     # Motor Speed (siid=10)
     "favorite_level": {"siid": 10, "piid": 10},
     "set_favorite_rpm": {"siid": 10, "piid": 7},
@@ -196,11 +194,6 @@ class AirPurifierMiotStatus:
             return FilterType.Regular
         return self.filter_type_util.determine_filter_type(self.filter_rfid_product_id)
 
-    @property
-    def button_pressed(self) -> Optional[str]:
-        """Last pressed button."""
-        return self.data["button_pressed"]
-
     def __repr__(self) -> str:
         s = (
             "<AirPurifierMiotStatus power=%s, "
@@ -222,8 +215,7 @@ class AirPurifierMiotStatus:
             "motor_speed=%s, "
             "filter_rfid_product_id=%s, "
             "filter_rfid_tag=%s, "
-            "filter_type=%s, "
-            "button_pressed=%s>"
+            "filter_type=%s>"
             % (
                 self.power,
                 self.aqi,
@@ -245,7 +237,6 @@ class AirPurifierMiotStatus:
                 self.filter_rfid_product_id,
                 self.filter_rfid_tag,
                 self.filter_type,
-                self.button_pressed,
             )
         )
         return s
@@ -289,8 +280,7 @@ class AirPurifierMiot(MiotDevice):
             "Motor speed: {result.motor_speed} rpm\n"
             "Filter RFID product id: {result.filter_rfid_product_id}\n"
             "Filter RFID tag: {result.filter_rfid_tag}\n"
-            "Filter type: {result.filter_type}\n"
-            "Last button pressed: {result.button_pressed}\n",
+            "Filter type: {result.filter_type}\n",
         )
     )
     def status(self) -> AirPurifierMiotStatus:
