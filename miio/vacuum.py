@@ -597,12 +597,10 @@ class Vacuum(Device):
         @dg.resultcallback()
         @dg.device_pass
         def cleanup(vac: Vacuum, *args, **kwargs):
-            if (
-                vac.command_sender.ip is None
-            ):  # dummy Device for discovery, skip teardown
+            if vac.protocol.ip is None:  # dummy Device for discovery, skip teardown
                 return
             id_file = kwargs["id_file"]
-            seqs = {"seq": vac.command_sender.raw_id, "manual_seq": vac.manual_seqnum}
+            seqs = {"seq": vac.protocol.raw_id, "manual_seq": vac.manual_seqnum}
             _LOGGER.debug("Writing %s to %s", seqs, id_file)
             path_obj = pathlib.Path(id_file)
             cache_dir = path_obj.parents[0]

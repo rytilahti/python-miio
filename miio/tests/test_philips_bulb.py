@@ -10,14 +10,14 @@ from miio.philips_bulb import (
     PhilipsBulbStatus,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyPhilipsBulb(DummyDevice, PhilipsBulb):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_PHILIPS_LIGHT_BULB
         self.state = {"power": "on", "bright": 100, "cct": 10, "snm": 0, "dv": 0}
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -184,7 +184,7 @@ class DummyPhilipsWhiteBulb(DummyDevice, PhilipsWhiteBulb):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_PHILIPS_LIGHT_HBULB
         self.state = {"power": "on", "bri": 100, "dv": 0}
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),

@@ -8,7 +8,7 @@ import pytest
 from miio import ChuangmiIr
 from miio.chuangmi_ir import ChuangmiIrException
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 with open(os.path.join(os.path.dirname(__file__), "test_chuangmi_ir.json")) as inp:
     test_data = json.load(inp)
@@ -17,7 +17,7 @@ with open(os.path.join(os.path.dirname(__file__), "test_chuangmi_ir.json")) as i
 class DummyChuangmiIr(DummyDevice, ChuangmiIr):
     def __init__(self, *args, **kwargs):
         self.state = {"last_ir_played": None}
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "miIO.ir_learn": lambda x: True,
                 "miIO.ir_read": lambda x: True,

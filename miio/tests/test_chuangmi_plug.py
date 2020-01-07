@@ -10,14 +10,14 @@ from miio.chuangmi_plug import (
     ChuangmiPlugStatus,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyChuangmiPlugV1(DummyDevice, ChuangmiPlug):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_CHUANGMI_PLUG_V1
         self.state = {"on": True, "usb_on": True, "temperature": 32}
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_on": lambda x: self._set_state_basic("on", True),
@@ -89,7 +89,7 @@ class DummyChuangmiPlugV3(DummyDevice, ChuangmiPlug):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_CHUANGMI_PLUG_V3
         self.state = {"on": True, "usb_on": True, "temperature": 32, "wifi_led": "off"}
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "get_power": self._get_load_power,
@@ -181,7 +181,7 @@ class DummyChuangmiPlugM1(DummyDevice, ChuangmiPlug):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_CHUANGMI_PLUG_M1
         self.state = {"power": "on", "temperature": 32}
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),

@@ -17,7 +17,7 @@ from miio.airconditioningcompanion import (
     Power,
     SwingMode,
 )
-from miio.tests.dummies import DummyCommandSender
+from miio.tests.dummies import DummyProtocol
 
 STATE_ON = ["on"]
 STATE_OFF = ["off"]
@@ -57,7 +57,7 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
         self.state = ["010500978022222102", "01020119A280222221", "2"]
         self.last_ir_played = None
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_model_and_state": self._get_state,
                 "start_ir_learn": lambda x: True,
@@ -215,7 +215,7 @@ class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
         self.model = MODEL_ACPARTNER_V3
         self.last_ir_played = None
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_model_and_state": self._get_state,
                 "get_device_prop": self._get_device_prop,

@@ -6,7 +6,7 @@ from miio import PhilipsMoonlight
 from miio.philips_moonlight import PhilipsMoonlightException, PhilipsMoonlightStatus
 from miio.utils import int_to_rgb, rgb_to_int
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
@@ -26,7 +26,7 @@ class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
             "mb": 1,
             "wkp": [0, 24, 0],
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("pow", x),

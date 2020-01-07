@@ -1,6 +1,6 @@
-class DummyCommandSender:
+class DummyProtocol:
     """
-    DummyCommandSender allows you mock CommandSender.
+    DummyProtocol allows you mock Protocol.
     """
 
     def __init__(self, return_values):

@@ -12,7 +12,7 @@ from miio.airdehumidifier import (
 )
 from miio.device import DeviceInfo
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):
@@ -56,7 +56,7 @@ class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):
             "auto": 50,
         }
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("on_off", x),

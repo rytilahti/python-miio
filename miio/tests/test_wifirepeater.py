@@ -3,7 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import WifiRepeater
-from miio.tests.dummies import DummyCommandSender
+from miio.tests.dummies import DummyProtocol
 from miio.wifirepeater import WifiRepeaterConfiguration, WifiRepeaterStatus
 
 
@@ -64,7 +64,7 @@ class DummyWifiRepeater(WifiRepeater):
             },
         }
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "miIO.get_repeater_sta_info": self._get_state,
                 "miIO.get_repeater_ap_info": self._get_configuration,

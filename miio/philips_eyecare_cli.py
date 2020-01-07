@@ -5,7 +5,7 @@ import click
 
 import miio  # noqa: E402
 from miio.click_common import ExceptionHandlerGroup, validate_ip, validate_token
-from miio.command_sender import CommandSender
+from miio.protocol import Protocol
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.PhilipsEyecare)
@@ -66,7 +66,7 @@ def cli(ctx, ip: str, token: str, debug: int):
 @cli.command()
 def discover():
     """Search for plugs in the network."""
-    CommandSender.discover()
+    Protocol.discover()
 
 
 @cli.command()

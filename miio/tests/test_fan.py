@@ -16,7 +16,7 @@ from miio.fan import (
     OperationMode,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyFanV2(DummyDevice, Fan):
@@ -45,7 +45,7 @@ class DummyFanV2(DummyDevice, Fan):
             "bat_state": None,
             "button_pressed": "speed",
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -294,7 +294,7 @@ class DummyFanV3(DummyDevice, Fan):
             "bat_state": None,
             "button_pressed": "speed",
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -543,7 +543,7 @@ class DummyFanSA1(DummyDevice, Fan):
             "use_time": 2318,
         }
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -758,7 +758,7 @@ class DummyFanP5(DummyDevice, FanP5):
             "child_lock": False,
         }
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "s_power": lambda x: self._set_state("power", x),

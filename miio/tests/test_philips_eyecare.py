@@ -5,7 +5,7 @@ import pytest
 from miio import PhilipsEyecare
 from miio.philips_eyecare import PhilipsEyecareException, PhilipsEyecareStatus
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
@@ -21,7 +21,7 @@ class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
             "bls": "on",
             "dvalue": 0,
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),

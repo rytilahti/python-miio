@@ -5,7 +5,7 @@ import pytest
 from miio import Ceil
 from miio.ceil import CeilException, CeilStatus
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyCeil(DummyDevice, Ceil):
@@ -22,7 +22,7 @@ class DummyCeil(DummyDevice, Ceil):
             "mssw": 1,
             "cct": 99,
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),

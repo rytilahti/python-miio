@@ -12,7 +12,7 @@ from miio.airpurifier import (
     SleepMode,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyAirPurifier(DummyDevice, AirPurifier):
@@ -48,7 +48,7 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             "act_det": "off",
             "button_pressed": "power",
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),

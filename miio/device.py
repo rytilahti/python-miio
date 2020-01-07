@@ -5,7 +5,7 @@ from typing import Any, Optional  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
-from .command_sender import CommandSender
+from .protocol import Protocol
 from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -117,11 +117,14 @@ class Device(metaclass=DeviceGroupMeta):
         debug: int = 0,
         lazy_discover: bool = True,
     ) -> None:
-        self.command_sender = CommandSender(ip, token, start_id, debug, lazy_discover)
+        self.protocol = Protocol(ip, token, start_id, debug, lazy_discover)
 
-    @deprecated(reason="Use self.command_sender.send() instead")
+    @deprecated(reason="Use self.protocol.send() instead")
     def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
-        return self.command_sender.send(command, parameters, retry_count)
+        return self.protocol.send(command, parameters, retry_count)
+
+    def send_handshake(self):
+        return self.protocol.send_handshake()
 
     @command(
         click.argument("command", type=str, required=True),
@@ -134,7 +137,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         :param str command: Command to send
         :param dict parameters: Parameters to send"""
-        return self.command_sender.send(command, parameters)
+        return self.protocol.send(command, parameters)
 
     @command(
         default_output=format_output(
@@ -150,7 +153,7 @@ class Device(metaclass=DeviceGroupMeta):
         """Get miIO protocol information from the device.
         This includes information about connected wlan network,
         and hardware and software versions."""
-        return DeviceInfo(self.command_sender.send("miIO.info"))
+        return DeviceInfo(self.protocol.send("miIO.info"))
 
     def update(self, url: str, md5: str):
         """Start an OTA update."""
@@ -161,15 +164,15 @@ class Device(metaclass=DeviceGroupMeta):
             "file_md5": md5,
             "proc": "dnld install",
         }
-        return self.command_sender.send("miIO.ota", payload)[0] == "ok"
+        return self.protocol.send("miIO.ota", payload)[0] == "ok"
 
     def update_progress(self) -> int:
         """Return current update progress [0-100]."""
-        return self.command_sender.send("miIO.get_ota_progress")[0]
+        return self.protocol.send("miIO.get_ota_progress")[0]
 
     def update_state(self):
         """Return current update state."""
-        return UpdateState(self.command_sender.send("miIO.get_ota_state")[0])
+        return UpdateState(self.protocol.send("miIO.get_ota_state")[0])
 
     def configure_wifi(self, ssid, password, uid=0, extra_params=None):
         """Configure the wifi settings."""
@@ -177,4 +180,4 @@ class Device(metaclass=DeviceGroupMeta):
             extra_params = {}
         params = {"ssid": ssid, "passwd": password, "uid": uid, **extra_params}
 
-        return self.command_sender.send("miIO.config_router", params)[0]
+        return self.protocol.send("miIO.config_router", params)[0]

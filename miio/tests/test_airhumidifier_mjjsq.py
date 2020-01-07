@@ -10,7 +10,7 @@ from miio.airhumidifier_mjjsq import (
     OperationMode,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyAirHumidifierMjjsq(DummyDevice, AirHumidifierMjjsq):
@@ -27,7 +27,7 @@ class DummyAirHumidifierMjjsq(DummyDevice, AirHumidifierMjjsq):
             "waterstatus": 1,
             "watertankstatus": 1,
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "Set_OnOff": lambda x: self._set_state("OnOff_State", x),

@@ -5,7 +5,7 @@ import pytest
 
 from miio import Vacuum, VacuumStatus
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyVacuum(DummyDevice, Vacuum):
@@ -35,7 +35,7 @@ class DummyVacuum(DummyDevice, Vacuum):
             "msg_seq": 320,
         }
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_status": self.vacuum_state,
                 "app_start": lambda x: self.change_mode("start"),

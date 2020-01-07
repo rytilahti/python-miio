@@ -14,7 +14,7 @@ from miio.airhumidifier import (
 )
 from miio.device import DeviceInfo
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyAirHumidifierV1(DummyDevice, AirHumidifier):
@@ -56,7 +56,7 @@ class DummyAirHumidifierV1(DummyDevice, AirHumidifier):
             "button_pressed": "led",
             "hw_version": 0,
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -275,7 +275,7 @@ class DummyAirHumidifierCA1(DummyDevice, AirHumidifier):
             "depth": 1,
             "dry": "off",
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -509,7 +509,7 @@ class DummyAirHumidifierCB1(DummyDevice, AirHumidifier):
             "depth": 1,
             "dry": "off",
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),

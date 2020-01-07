@@ -11,7 +11,7 @@ from miio.powerstrip import (
     PowerStripStatus,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyPowerStripV1(DummyDevice, PowerStrip):
@@ -27,7 +27,7 @@ class DummyPowerStripV1(DummyDevice, PowerStrip):
             "power_factor": 12,
             "elec_leakage": 8,
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -120,7 +120,7 @@ class DummyPowerStripV2(DummyDevice, PowerStrip):
             "wifi_led": "off",
             "power_price": 49,
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),

@@ -10,7 +10,7 @@ from miio.airqualitymonitor import (
     AirQualityMonitorStatus,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 class DummyAirQualityMonitorV1(DummyDevice, AirQualityMonitor):
@@ -27,7 +27,7 @@ class DummyAirQualityMonitorV1(DummyDevice, AirQualityMonitor):
             "night_end_time": "format unknown",
             "sensor_state": "format unknown",
         }
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "set_power": lambda x: self._set_state("power", x),
@@ -96,7 +96,7 @@ class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
             "temperature": 27.4,
             "tvoc": 254,
         }
-        self.command_sender = DummyCommandSender({"get_prop": self._get_state})
+        self.protocol = DummyProtocol({"get_prop": self._get_state})
         super().__init__(args, kwargs)
 
     def _get_state(self, props):
@@ -146,7 +146,7 @@ class DummyAirQualityMonitorB1(DummyDevice, AirQualityMonitor):
             "tvoc": 1.3948699235916138,
             "tvoc_unit": "mg_m3",
         }
-        self.command_sender = DummyCommandSender({"get_air_data": self._get_state})
+        self.protocol = DummyProtocol({"get_air_data": self._get_state})
         super().__init__(args, kwargs)
 
     def _get_state(self, props):

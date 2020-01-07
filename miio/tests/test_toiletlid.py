@@ -9,7 +9,7 @@ from miio.toiletlid import (
     ToiletlidStatus,
 )
 
-from .dummies import DummyCommandSender, DummyDevice
+from .dummies import DummyDevice, DummyProtocol
 
 
 """
@@ -37,7 +37,7 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
         }
         self.users = {}
 
-        self.command_sender = DummyCommandSender(
+        self.protocol = DummyProtocol(
             {
                 "get_prop": self._get_state,
                 "nozzle_clean": lambda x: self._set_state("work_state", [97]),
