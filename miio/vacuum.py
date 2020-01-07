@@ -541,18 +541,15 @@ class Vacuum(Device):
         return self.send("get_room_mapping")
 
     @command()
-    def get_recover_maps(self):
-        """Get recover maps."""
+    def get_backup_maps(self):
+        """Get backup maps."""
         return self.send("get_recover_maps")
 
-    @command(
-        click.argument("id"), click.argument("map"),
-    )
-    def use_recover_map(self, id: int, map: int):
-        """Set recover map."""
-        payload = [int(id), int(map)]
-        click.echo("Setting the map %s as active" % payload)
-        return self.send("recover_map", payload)[0]
+    @command(click.argument("id", type=int))
+    def use_backup_map(self, id: int):
+        """Set backup map."""
+        click.echo("Setting the map %s as active" % id)
+        return self.send("recover_map", [id])
 
     @command()
     def get_segment_status(self):
