@@ -1,4 +1,5 @@
 import logging
+import time
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
@@ -29,6 +30,12 @@ class ViomiVacuumState(Enum):
     Docked = 5
 
 
+class ViomiMopMode(Enum):
+    Off = 0  # No Mop, Vacuum only
+    Mixed = 1
+    MopOnly = 2
+
+
 class ViomiLanguage(Enum):
     CN = 1  # Chinese (default)
     EN = 2  # English
@@ -43,6 +50,15 @@ class ViomiCarpetTurbo(Enum):
     Off = 0
     Medium = 1
     Turbo = 2
+
+
+class ViomiMovementDirection(Enum):
+    Forward = 1
+    Left = 2  # Rotate
+    Right = 3  # Rotate
+    Backward = 4
+    Stop = 5
+    # 10 is unknown
 
 
 class ViomiVacuumStatus:
@@ -140,9 +156,9 @@ class ViomiVacuumStatus:
         return bool(self.data["has_newmap"])
 
     @property
-    def is_mop(self) -> bool:
-        """True if mopping."""
-        return bool(self.data["is_mop"])
+    def mop_mode(self) -> ViomiMopMode:
+        """Whether mopping is enabled and if so which mode"""
+        return ViomiMopMode(self.data["is_mop"])
 
 
 class ViomiVacuum(Device):
@@ -164,7 +180,7 @@ class ViomiVacuum(Device):
             "Remember map: {result.remember_map}\n"
             "Has map: {result.has_map}\n"
             "Has new map: {result.has_new_map}\n"
-            "Is mop: {result.is_mop}\n",
+            "Mop mode: {result.mop_mode}\n",
         )
     )
     def status(self) -> ViomiVacuumStatus:
@@ -206,15 +222,37 @@ class ViomiVacuum(Device):
         """Pause cleaning."""
         self.send("set_mode_withroom", [0, 2, 0])
 
-    @command(click.argument("speed", type=str))
-    def set_fan_speed(self, speed: str):
+    @command(click.argument("speed", type=EnumType(ViomiVacuumSpeed, False)))
+    def set_fan_speed(self, speed: ViomiVacuumSpeed):
         """Set fanspeed [silent, standard, medium, turbo]."""
-        self.send("set_suction", [ViomiVacuumSpeed(speed.capitalize()).value])
+        self.send("set_suction", [speed.value])
 
     @command()
     def home(self):
         """Return to home."""
         self.send("set_charge", [1])
+
+    @command(
+        click.argument("direction", type=EnumType(ViomiMovementDirection, False)),
+        click.option(
+            "--duration",
+            type=float,
+            default=0.5,
+            help="number of seconds to perform this movement",
+        ),
+    )
+    def move(self, direction, duration=0.5):
+        """Manual movement."""
+        start = time.time()
+        while time.time() - start < duration:
+            self.send("set_direction", [direction.value])
+            time.sleep(0.1)
+        self.send("set_direction", [ViomiMovementDirection.Stop.value])
+
+    @command(click.argument("mode", type=EnumType(ViomiMopMode, False)))
+    def mop_mode(self, mode):
+        """Set mopping mode."""
+        self.send("set_mop", [mode.value])
 
     @command()
     def dnd_status(self):
