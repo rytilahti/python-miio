@@ -10,27 +10,25 @@ from miio.philips_bulb import (
     PhilipsBulbStatus,
 )
 
-from .dummies import DummyDevice, DummyProtocol
+from .dummies import DummyDevice
 
 
 class DummyPhilipsBulb(DummyDevice, PhilipsBulb):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_PHILIPS_LIGHT_BULB
         self.state = {"power": "on", "bright": 100, "cct": 10, "snm": 0, "dv": 0}
-        self.protocol = DummyProtocol(
-            {
-                "get_prop": self._get_state,
-                "set_power": lambda x: self._set_state("power", x),
-                "set_bright": lambda x: self._set_state("bright", x),
-                "set_cct": lambda x: self._set_state("cct", x),
-                "delay_off": lambda x: self._set_state("dv", x),
-                "apply_fixed_scene": lambda x: self._set_state("snm", x),
-                "set_bricct": lambda x: (
-                    self._set_state("bright", [x[0]]),
-                    self._set_state("cct", [x[1]]),
-                ),
-            }
-        )
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "set_cct": lambda x: self._set_state("cct", x),
+            "delay_off": lambda x: self._set_state("dv", x),
+            "apply_fixed_scene": lambda x: self._set_state("snm", x),
+            "set_bricct": lambda x: (
+                self._set_state("bright", [x[0]]),
+                self._set_state("cct", [x[1]]),
+            ),
+        }
         super().__init__(args, kwargs)
 
 
@@ -184,14 +182,12 @@ class DummyPhilipsWhiteBulb(DummyDevice, PhilipsWhiteBulb):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_PHILIPS_LIGHT_HBULB
         self.state = {"power": "on", "bri": 100, "dv": 0}
-        self.protocol = DummyProtocol(
-            {
-                "get_prop": self._get_state,
-                "set_power": lambda x: self._set_state("power", x),
-                "set_bright": lambda x: self._set_state("bri", x),
-                "delay_off": lambda x: self._set_state("dv", x),
-            }
-        )
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bri", x),
+            "delay_off": lambda x: self._set_state("dv", x),
+        }
         super().__init__(args, kwargs)
 
 

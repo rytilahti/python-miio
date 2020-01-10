@@ -10,7 +10,7 @@ from miio.philips_rwread import (
     PhilipsRwreadStatus,
 )
 
-from .dummies import DummyDevice, DummyProtocol
+from .dummies import DummyDevice
 
 
 class DummyPhilipsRwread(DummyDevice, PhilipsRwread):
@@ -25,18 +25,16 @@ class DummyPhilipsRwread(DummyDevice, PhilipsRwread):
             "flmv": 2,
             "chl": 0,
         }
-        self.protocol = DummyProtocol(
-            {
-                "get_prop": self._get_state,
-                "set_power": lambda x: self._set_state("power", x),
-                "set_bright": lambda x: self._set_state("bright", x),
-                "apply_fixed_scene": lambda x: self._set_state("snm", x),
-                "delay_off": lambda x: self._set_state("dv", x),
-                "enable_flm": lambda x: self._set_state("flm", x),
-                "set_flmvalue": lambda x: self._set_state("flmv", x),
-                "enable_chl": lambda x: self._set_state("chl", x),
-            }
-        )
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "apply_fixed_scene": lambda x: self._set_state("snm", x),
+            "delay_off": lambda x: self._set_state("dv", x),
+            "enable_flm": lambda x: self._set_state("flm", x),
+            "set_flmvalue": lambda x: self._set_state("flmv", x),
+            "enable_chl": lambda x: self._set_state("chl", x),
+        }
         super().__init__(args, kwargs)
 
 

@@ -5,7 +5,7 @@ import pytest
 from miio import Yeelight
 from miio.yeelight import YeelightException, YeelightMode, YeelightStatus
 
-from .dummies import DummyDevice, DummyProtocol
+from .dummies import DummyDevice
 
 
 class DummyLight(DummyDevice, Yeelight):
@@ -23,20 +23,18 @@ class DummyLight(DummyDevice, Yeelight):
             "save_state": "1",
         }
 
-        self.protocol = DummyProtocol(
-            {
-                "get_prop": self._get_state,
-                "set_power": lambda x: self._set_state("power", x),
-                "set_bright": lambda x: self._set_state("bright", x),
-                "set_ct_abx": lambda x: self._set_state("ct", x),
-                "set_rgb": lambda x: self._set_state("rgb", x),
-                "set_hsv": lambda x: self._set_state("hsv", x),
-                "set_name": lambda x: self._set_state("name", x),
-                "set_ps": lambda x: self.set_config(x),
-                "toggle": self.toggle_power,
-                "set_default": lambda x: "ok",
-            }
-        )
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "set_ct_abx": lambda x: self._set_state("ct", x),
+            "set_rgb": lambda x: self._set_state("rgb", x),
+            "set_hsv": lambda x: self._set_state("hsv", x),
+            "set_name": lambda x: self._set_state("name", x),
+            "set_ps": lambda x: self.set_config(x),
+            "toggle": self.toggle_power,
+            "set_default": lambda x: "ok",
+        }
 
         super().__init__(*args, **kwargs)
 

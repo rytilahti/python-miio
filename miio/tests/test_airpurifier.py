@@ -12,7 +12,7 @@ from miio.airpurifier import (
     SleepMode,
 )
 
-from .dummies import DummyDevice, DummyProtocol
+from .dummies import DummyDevice
 
 
 class DummyAirPurifier(DummyDevice, AirPurifier):
@@ -48,26 +48,24 @@ class DummyAirPurifier(DummyDevice, AirPurifier):
             "act_det": "off",
             "button_pressed": "power",
         }
-        self.protocol = DummyProtocol(
-            {
-                "get_prop": self._get_state,
-                "set_power": lambda x: self._set_state("power", x),
-                "set_mode": lambda x: self._set_state("mode", x),
-                "set_led": lambda x: self._set_state("led", x),
-                "set_buzzer": lambda x: self._set_state("buzzer", x),
-                "set_child_lock": lambda x: self._set_state("child_lock", x),
-                "set_level_favorite": lambda x: self._set_state("favorite_level", x),
-                "set_led_b": lambda x: self._set_state("led_b", x),
-                "set_volume": lambda x: self._set_state("volume", x),
-                "set_act_sleep": lambda x: self._set_state("act_sleep", x),
-                "reset_filter1": lambda x: (
-                    self._set_state("f1_hour_used", [0]),
-                    self._set_state("filter1_life", [100]),
-                ),
-                "set_act_det": lambda x: self._set_state("act_det", x),
-                "set_app_extra": lambda x: self._set_state("app_extra", x),
-            }
-        )
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_mode": lambda x: self._set_state("mode", x),
+            "set_led": lambda x: self._set_state("led", x),
+            "set_buzzer": lambda x: self._set_state("buzzer", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
+            "set_level_favorite": lambda x: self._set_state("favorite_level", x),
+            "set_led_b": lambda x: self._set_state("led_b", x),
+            "set_volume": lambda x: self._set_state("volume", x),
+            "set_act_sleep": lambda x: self._set_state("act_sleep", x),
+            "reset_filter1": lambda x: (
+                self._set_state("f1_hour_used", [0]),
+                self._set_state("filter1_life", [100]),
+            ),
+            "set_act_det": lambda x: self._set_state("act_det", x),
+            "set_app_extra": lambda x: self._set_state("app_extra", x),
+        }
         super().__init__(args, kwargs)
 
 

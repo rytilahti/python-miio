@@ -5,7 +5,7 @@ import pytest
 from miio import PhilipsEyecare
 from miio.philips_eyecare import PhilipsEyecareException, PhilipsEyecareStatus
 
-from .dummies import DummyDevice, DummyProtocol
+from .dummies import DummyDevice
 
 
 class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
@@ -21,20 +21,18 @@ class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
             "bls": "on",
             "dvalue": 0,
         }
-        self.protocol = DummyProtocol(
-            {
-                "get_prop": self._get_state,
-                "set_power": lambda x: self._set_state("power", x),
-                "set_eyecare": lambda x: self._set_state("eyecare", x),
-                "set_bright": lambda x: self._set_state("bright", x),
-                "set_user_scene": lambda x: self._set_state("scene_num", x),
-                "delay_off": lambda x: self._set_state("dvalue", x),
-                "enable_bl": lambda x: self._set_state("bls", x),
-                "set_notifyuser": lambda x: self._set_state("notifystatus", x),
-                "enable_amb": lambda x: self._set_state("ambstatus", x),
-                "set_amb_bright": lambda x: self._set_state("ambvalue", x),
-            }
-        )
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_eyecare": lambda x: self._set_state("eyecare", x),
+            "set_bright": lambda x: self._set_state("bright", x),
+            "set_user_scene": lambda x: self._set_state("scene_num", x),
+            "delay_off": lambda x: self._set_state("dvalue", x),
+            "enable_bl": lambda x: self._set_state("bls", x),
+            "set_notifyuser": lambda x: self._set_state("notifystatus", x),
+            "enable_amb": lambda x: self._set_state("ambstatus", x),
+            "set_amb_bright": lambda x: self._set_state("ambvalue", x),
+        }
         super().__init__(args, kwargs)
 
 

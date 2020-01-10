@@ -3,11 +3,11 @@ from unittest import TestCase
 import pytest
 
 from miio import WifiRepeater
-from miio.tests.dummies import DummyProtocol
+from miio.tests.dummies import DummyDevice
 from miio.wifirepeater import WifiRepeaterConfiguration, WifiRepeaterStatus
 
 
-class DummyWifiRepeater(WifiRepeater):
+class DummyWifiRepeater(DummyDevice, WifiRepeater):
     def __init__(self, *args, **kwargs):
         self.state = {
             "sta": {"count": 2, "access_policy": 0},
@@ -64,18 +64,17 @@ class DummyWifiRepeater(WifiRepeater):
             },
         }
 
-        self.protocol = DummyProtocol(
-            {
-                "miIO.get_repeater_sta_info": self._get_state,
-                "miIO.get_repeater_ap_info": self._get_configuration,
-                "miIO.switch_wifi_explorer": self._set_wifi_explorer,
-                "miIO.switch_wifi_ssid": self._set_configuration,
-                "miIO.info": self._get_info,
-            }
-        )
+        self.return_values = {
+            "miIO.get_repeater_sta_info": self._get_state,
+            "miIO.get_repeater_ap_info": self._get_configuration,
+            "miIO.switch_wifi_explorer": self._set_wifi_explorer,
+            "miIO.switch_wifi_ssid": self._set_configuration,
+            "miIO.info": self._get_info,
+        }
         self.start_state = self.state.copy()
         self.start_config = self.config.copy()
         self.start_device_info = self.device_info.copy()
+        super().__init__(args, kwargs)
 
     def _reset_state(self):
         """Revert back to the original state."""

@@ -12,7 +12,7 @@ from miio.airfresh_t2017 import (
     PtcLevel,
 )
 
-from .dummies import DummyDevice, DummyProtocol
+from .dummies import DummyDevice
 
 
 class DummyAirFreshT2017(DummyDevice, AirFreshT2017):
@@ -38,24 +38,18 @@ class DummyAirFreshT2017(DummyDevice, AirFreshT2017):
             "display": False,
             "screen_direction": "forward",
         }
-        self.protocol = DummyProtocol(
-            {
-                "get_prop": self._get_state,
-                "set_power": lambda x: self._set_state("power", [(x[0] == "on")]),
-                "set_mode": lambda x: self._set_state("mode", x),
-                "set_sound": lambda x: self._set_state("sound", [(x[0] == "on")]),
-                "set_child_lock": lambda x: self._set_state(
-                    "child_lock", [(x[0] == "on")]
-                ),
-                "set_display": lambda x: self._set_state("display", [(x[0] == "on")]),
-                "set_screen_direction": lambda x: self._set_state(
-                    "screen_direction", x
-                ),
-                "set_ptc_level": lambda x: self._set_state("ptc_level", x),
-                "set_favourite_speed": lambda x: self._set_state("favourite_speed", x),
-                "set_filter_reset": lambda x: self._set_filter_reset(x),
-            }
-        )
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", [(x[0] == "on")]),
+            "set_mode": lambda x: self._set_state("mode", x),
+            "set_sound": lambda x: self._set_state("sound", [(x[0] == "on")]),
+            "set_child_lock": lambda x: self._set_state("child_lock", [(x[0] == "on")]),
+            "set_display": lambda x: self._set_state("display", [(x[0] == "on")]),
+            "set_screen_direction": lambda x: self._set_state("screen_direction", x),
+            "set_ptc_level": lambda x: self._set_state("ptc_level", x),
+            "set_favourite_speed": lambda x: self._set_state("favourite_speed", x),
+            "set_filter_reset": lambda x: self._set_filter_reset(x),
+        }
         super().__init__(args, kwargs)
 
     def _set_filter_reset(self, value: str):

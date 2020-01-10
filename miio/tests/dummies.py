@@ -3,12 +3,14 @@ class DummyProtocol:
     DummyProtocol allows you mock Protocol.
     """
 
-    def __init__(self, return_values):
-        self.return_values = return_values
+    def __init__(self, dummy_device):
+        # TODO: Ideally, return_values should be passed in here. Passing in dummy_device (which must have
+        #       return_values) is a temporary workaround to minimize diff size.
+        self.dummy_device = dummy_device
 
     def send(self, command: str, parameters=None, retry_count=3):
         """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
+        return self.dummy_device.return_values[command](parameters)
 
 
 class DummyDevice:
@@ -36,6 +38,7 @@ class DummyDevice:
 
     def __init__(self, *args, **kwargs):
         self.start_state = self.state.copy()
+        self.protocol = DummyProtocol(self)
 
     def _reset_state(self):
         """Revert back to the original state."""

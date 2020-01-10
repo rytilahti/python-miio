@@ -17,7 +17,7 @@ from miio.airconditioningcompanion import (
     Power,
     SwingMode,
 )
-from miio.tests.dummies import DummyProtocol
+from miio.tests.dummies import DummyDevice
 
 STATE_ON = ["on"]
 STATE_OFF = ["off"]
@@ -52,23 +52,22 @@ class EnumEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class DummyAirConditioningCompanion(AirConditioningCompanion):
+class DummyAirConditioningCompanion(DummyDevice, AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
         self.state = ["010500978022222102", "01020119A280222221", "2"]
         self.last_ir_played = None
 
-        self.protocol = DummyProtocol(
-            {
-                "get_model_and_state": self._get_state,
-                "start_ir_learn": lambda x: True,
-                "end_ir_learn": lambda x: True,
-                "get_ir_learn_result": lambda x: True,
-                "send_ir_code": lambda x: self._send_input_validation(x),
-                "send_cmd": lambda x: self._send_input_validation(x),
-                "set_power": lambda x: self._set_power(x),
-            }
-        )
+        self.return_values = {
+            "get_model_and_state": self._get_state,
+            "start_ir_learn": lambda x: True,
+            "end_ir_learn": lambda x: True,
+            "get_ir_learn_result": lambda x: True,
+            "send_ir_code": lambda x: self._send_input_validation(x),
+            "send_cmd": lambda x: self._send_input_validation(x),
+            "set_power": lambda x: self._set_power(x),
+        }
         self.start_state = self.state.copy()
+        super().__init__(args, kwargs)
 
     def _reset_state(self):
         """Revert back to the original state."""
@@ -208,22 +207,21 @@ class TestAirConditioningCompanion(TestCase):
                 self.assertSequenceEqual(self.device.get_last_ir_played(), args["out"])
 
 
-class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
+class DummyAirConditioningCompanionV3(DummyDevice, AirConditioningCompanionV3):
     def __init__(self, *args, **kwargs):
         self.state = ["010507950000257301", "011001160100002573", "807"]
         self.device_prop = {"lumi.0": {"plug_state": ["on"]}}
         self.model = MODEL_ACPARTNER_V3
         self.last_ir_played = None
 
-        self.protocol = DummyProtocol(
-            {
-                "get_model_and_state": self._get_state,
-                "get_device_prop": self._get_device_prop,
-                "toggle_plug": self._toggle_plug,
-            }
-        )
+        self.return_values = {
+            "get_model_and_state": self._get_state,
+            "get_device_prop": self._get_device_prop,
+            "toggle_plug": self._toggle_plug,
+        }
         self.start_state = self.state.copy()
         self.start_device_prop = self.device_prop.copy()
+        super().__init__(args, kwargs)
 
     def _reset_state(self):
         """Revert back to the original state."""
