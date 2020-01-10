@@ -121,7 +121,7 @@ class Device(metaclass=DeviceGroupMeta):
         self.token = token
         self.protocol = Protocol(ip, token, start_id, debug, lazy_discover)
 
-    @deprecated(reason="Use self.protocol.send() instead")
+    @deprecated(reason="Use self.raw_command() instead")
     def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
         return self.protocol.send(command, parameters, retry_count)
 
