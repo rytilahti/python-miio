@@ -38,7 +38,7 @@ class DummyDevice:
 
     def __init__(self, *args, **kwargs):
         self.start_state = self.state.copy()
-        self.protocol = DummyProtocol(self)
+        self._protocol = DummyProtocol(self)
 
     def _reset_state(self):
         """Revert back to the original state."""

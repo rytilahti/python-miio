@@ -1,14 +1,16 @@
 """miIO protocol implementation
 
 This module contains the implementation of the routines to encrypt and decrypt
-miIO payloads with a device-specific token.
+miIO payloads with a device-specific token (Utils) and implementation of
+routines to send handshakes, send commands and discover devices (Protocol).
 
-The payloads to be encrypted (to be passed to a device) are expected to be
-JSON objects, the same applies for decryption where they are converted
-automatically to JSON objects.
+The payloads to be encrypted (to be passed to a device) are expected to be JSON
+objects, the same applies for decryption where they are converted automatically
+to JSON objects.
 If the decryption fails, raw bytes as returned by the device are returned.
 
-An usage example can be seen in the source of :func:`miio.Device.send`.
+An usage example of encryption/decryption (using the Message struct) be seen in
+the source of :func:`miio.Protocol.send`.
 """
 import binascii
 import calendar
