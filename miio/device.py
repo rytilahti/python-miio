@@ -5,7 +5,7 @@ from typing import Any, Optional  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
-from .protocol import Protocol
+from .miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -118,7 +118,7 @@ class Device(metaclass=DeviceGroupMeta):
     ) -> None:
         self.ip = ip
         self.token = token
-        self._protocol = Protocol(ip, token, start_id, debug, lazy_discover)
+        self._protocol = MiIOProtocol(ip, token, start_id, debug, lazy_discover)
 
     def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
         return self._protocol.send(command, parameters, retry_count)

@@ -20,7 +20,7 @@ from miio.click_common import (
     validate_token,
 )
 from miio.device import UpdateState
-from miio.protocol import Protocol
+from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
 
 _LOGGER = logging.getLogger(__name__)
@@ -100,7 +100,7 @@ def cleanup(vac: miio.Vacuum, *args, **kwargs):
 def discover(handshake):
     """Search for robots in the network."""
     if handshake:
-        Protocol.discover()
+        MiIOProtocol.discover()
     else:
         miio.Discovery.discover_mdns()
 

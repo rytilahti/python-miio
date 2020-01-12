@@ -1,6 +1,6 @@
-class DummyProtocol:
+class DummyMiIOProtocol:
     """
-    DummyProtocol allows you mock Protocol.
+    DummyProtocol allows you mock MiIOProtocol.
     """
 
     def __init__(self, dummy_device):
@@ -38,7 +38,7 @@ class DummyDevice:
 
     def __init__(self, *args, **kwargs):
         self.start_state = self.state.copy()
-        self._protocol = DummyProtocol(self)
+        self._protocol = DummyMiIOProtocol(self)
 
     def _reset_state(self):
         """Revert back to the original state."""
