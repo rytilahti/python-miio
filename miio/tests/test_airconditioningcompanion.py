@@ -17,6 +17,7 @@ from miio.airconditioningcompanion import (
     Power,
     SwingMode,
 )
+from miio.tests.dummies import DummyDevice
 
 STATE_ON = ["on"]
 STATE_OFF = ["off"]
@@ -51,7 +52,7 @@ class EnumEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class DummyAirConditioningCompanion(AirConditioningCompanion):
+class DummyAirConditioningCompanion(DummyDevice, AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
         self.state = ["010500978022222102", "01020119A280222221", "2"]
         self.last_ir_played = None
@@ -66,10 +67,7 @@ class DummyAirConditioningCompanion(AirConditioningCompanion):
             "set_power": lambda x: self._set_power(x),
         }
         self.start_state = self.state.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
+        super().__init__(args, kwargs)
 
     def _reset_state(self):
         """Revert back to the original state."""
@@ -209,7 +207,7 @@ class TestAirConditioningCompanion(TestCase):
                 self.assertSequenceEqual(self.device.get_last_ir_played(), args["out"])
 
 
-class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
+class DummyAirConditioningCompanionV3(DummyDevice, AirConditioningCompanionV3):
     def __init__(self, *args, **kwargs):
         self.state = ["010507950000257301", "011001160100002573", "807"]
         self.device_prop = {"lumi.0": {"plug_state": ["on"]}}
@@ -223,10 +221,7 @@ class DummyAirConditioningCompanionV3(AirConditioningCompanionV3):
         }
         self.start_state = self.state.copy()
         self.start_device_prop = self.device_prop.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
+        super().__init__(args, kwargs)
 
     def _reset_state(self):
         """Revert back to the original state."""

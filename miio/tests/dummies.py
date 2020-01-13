@@ -1,3 +1,18 @@
+class DummyMiIOProtocol:
+    """
+    DummyProtocol allows you mock MiIOProtocol.
+    """
+
+    def __init__(self, dummy_device):
+        # TODO: Ideally, return_values should be passed in here. Passing in dummy_device (which must have
+        #       return_values) is a temporary workaround to minimize diff size.
+        self.dummy_device = dummy_device
+
+    def send(self, command: str, parameters=None, retry_count=3):
+        """Overridden send() to return values from `self.return_values`."""
+        return self.dummy_device.return_values[command](parameters)
+
+
 class DummyDevice:
     """DummyDevice base class, you should inherit from this and call
     `super().__init__(args, kwargs)` to save the original state.
@@ -23,10 +38,7 @@ class DummyDevice:
 
     def __init__(self, *args, **kwargs):
         self.start_state = self.state.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
+        self._protocol = DummyMiIOProtocol(self)
 
     def _reset_state(self):
         """Revert back to the original state."""

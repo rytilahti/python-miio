@@ -3,12 +3,13 @@
 This module contains the implementation of the routines to encrypt and decrypt
 miIO payloads with a device-specific token.
 
-The payloads to be encrypted (to be passed to a device) are excpected to be
+The payloads to be encrypted (to be passed to a device) are expected to be
 JSON objects, the same applies for decryption where they are converted
 automatically to JSON objects.
 If the decryption fails, raw bytes as returned by the device are returned.
 
 An usage example can be seen in the source of :func:`miio.Device.send`.
+If the decryption fails, raw bytes as returned by the device are returned.
 """
 import calendar
 import datetime

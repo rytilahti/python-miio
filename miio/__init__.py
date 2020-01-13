@@ -16,7 +16,8 @@ from miio.chuangmi_camera import ChuangmiCamera
 from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
-from miio.device import Device, DeviceError, DeviceException
+from miio.device import Device
+from miio.exceptions import DeviceError, DeviceException
 from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
 from miio.philips_eyecare import PhilipsEyecare

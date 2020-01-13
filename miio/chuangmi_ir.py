@@ -19,7 +19,8 @@ from construct import (
 )
 
 from .click_common import command, format_output
-from .device import Device, DeviceException
+from .device import Device
+from .exceptions import DeviceException
 
 
 class ChuangmiIrException(DeviceException):

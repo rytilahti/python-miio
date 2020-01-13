@@ -13,7 +13,8 @@ import pytz
 from appdirs import user_cache_dir
 
 from .click_common import DeviceGroup, GlobalContextObject, LiteralParamType, command
-from .device import Device, DeviceException
+from .device import Device
+from .exceptions import DeviceException
 from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,
@@ -556,6 +557,10 @@ class Vacuum(Device):
         """Get the status of a segment."""
         return self.send("get_segment_status")
 
+    @property
+    def raw_id(self):
+        return self._protocol.raw_id
+
     def name_segment(self):
         raise NotImplementedError("unknown parameters")
         # return self.send("name_segment")
@@ -610,7 +615,7 @@ class Vacuum(Device):
             if vac.ip is None:  # dummy Device for discovery, skip teardown
                 return
             id_file = kwargs["id_file"]
-            seqs = {"seq": vac.raw_id, "manual_seq": vac.manual_seqnum}
+            seqs = {"seq": vac._protocol.raw_id, "manual_seq": vac.manual_seqnum}
             _LOGGER.debug("Writing %s to %s", seqs, id_file)
             path_obj = pathlib.Path(id_file)
             cache_dir = path_obj.parents[0]

@@ -25,6 +25,7 @@ class DummyChuangmiPlugV1(DummyDevice, ChuangmiPlug):
             "set_usb_off": lambda x: self._set_state_basic("usb_on", False),
         }
         self.start_state = self.state.copy()
+        super().__init__(args, kwargs)
 
     def _set_state_basic(self, var, value):
         """Set a state of a variable"""
@@ -96,6 +97,7 @@ class DummyChuangmiPlugV3(DummyDevice, ChuangmiPlug):
             "set_wifi_led": lambda x: self._set_state("wifi_led", x),
         }
         self.start_state = self.state.copy()
+        super().__init__(args, kwargs)
 
     def _set_state_basic(self, var, value):
         """Set a state of a variable"""

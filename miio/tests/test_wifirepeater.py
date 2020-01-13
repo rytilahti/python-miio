@@ -3,10 +3,11 @@ from unittest import TestCase
 import pytest
 
 from miio import WifiRepeater
+from miio.tests.dummies import DummyDevice
 from miio.wifirepeater import WifiRepeaterConfiguration, WifiRepeaterStatus
 
 
-class DummyWifiRepeater(WifiRepeater):
+class DummyWifiRepeater(DummyDevice, WifiRepeater):
     def __init__(self, *args, **kwargs):
         self.state = {
             "sta": {"count": 2, "access_policy": 0},
@@ -73,10 +74,7 @@ class DummyWifiRepeater(WifiRepeater):
         self.start_state = self.state.copy()
         self.start_config = self.config.copy()
         self.start_device_info = self.device_info.copy()
-
-    def send(self, command: str, parameters=None, retry_count=3):
-        """Overridden send() to return values from `self.return_values`."""
-        return self.return_values[command](parameters)
+        super().__init__(args, kwargs)
 
     def _reset_state(self):
         """Revert back to the original state."""
