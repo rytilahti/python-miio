@@ -5,8 +5,21 @@ from datetime import datetime
 
 from .device import Device
 from .click_common import command
+from .utils import int_to_rgb, int_to_brightness, rgb_to_int, brightness_and_color_to_int
 
 _LOGGER = logging.getLogger(__name__)
+
+color_map = {
+            "red": (255, 0, 0),
+            "green": (0, 255, 0),
+            "blue": (0, 0, 255),
+            "white": (255, 255, 255),
+            "yellow": (255, 255, 0),
+            "orange": (255, 165, 0),
+            "aqua": (0, 255, 255),
+            "olive": (128, 128, 0),
+            "purple": (128, 0, 128)
+        }
 
 
 from enum import IntEnum
@@ -234,6 +247,51 @@ class Gateway(Device):
         # {'method': 'props', 'params': {'light': 'on', 'from.light': '4,,,'}, 'id': 88457} ?!
         return self.send("get_night_light_rgb")
 
+    @command(
+        click.argument("color_name", type=str)
+    )
+    def set_night_light_color(self, color_name):
+        """Set night light color using color name (red, green, etc)."""
+        if color_name not in color_map.keys():
+            raise Exception(f'Cannot find {color_name} in {color_map.keys()}')
+        current_brightness = int_to_brightness(self.send("get_night_light_rgb")[0])
+        brightness_and_color = brightness_and_color_to_int(current_brightness, color_map[color_name])
+        return self.send('set_night_light_rgb', [brightness_and_color])
+
+    @command(
+        click.argument("color_name", type=str)
+    )
+    def set_color(self, color_name):
+        """Set gateway lamp color using color name (red, green, etc)."""
+        if color_name not in color_map.keys():
+            raise Exception(f'Cannot find {color_name} in {color_map.keys()}')
+        current_brightness = int_to_brightness(self.send("get_rgb")[0])
+        brightness_and_color = brightness_and_color_to_int(current_brightness, color_map[color_name])
+        return self.send('set_rgb', [brightness_and_color])
+
+    @command(
+        click.argument("brightness", type=int)
+    )
+    def set_brightness(self, brightness):
+        """Set gateway lamp brightness (0-100)."""
+        if 100 < brightness < 0:
+            raise Exception(f'Brightness must be between 0 and 100')
+        current_color = int_to_rgb(self.send("get_rgb")[0])
+        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
+        return self.send('set_rgb', [brightness_and_color])
+
+    @command(
+        click.argument("brightness", type=int)
+    )
+    def set_night_light_brightness(self, brightness):
+        """Set night light brightness (0-100)."""
+        if 100 < brightness < 0:
+            raise Exception(f'Brightness must be between 0 and 100')
+        current_color = int_to_rgb(self.send("get_night_light_rgb")[0])
+        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
+        print(brightness, current_color)
+        return self.send('set_night_light_rgb', [brightness_and_color])
+
     # Arming
 
     @command()
@@ -384,11 +442,6 @@ class Gateway(Device):
     def download_user_music(self):
         """params unknown"""
         return self.send("download_user_music")
-
-    @command()
-    def delete_music(self):
-        """delete user music"""
-        return self.send("delete_user_music")
 
     @command()
     def get_download_progress(self):
