@@ -292,6 +292,19 @@ class Gateway(Device):
         print(brightness, current_color)
         return self.send('set_night_light_rgb', [brightness_and_color])
 
+    @command(
+        click.argument("color_name", type=str),
+        click.argument("brightness", type=int)
+    )
+    def set_light(self, color_name, brightness):
+        """Set color (using color name) and brightness (0-100)."""
+        if 100 < brightness < 0:
+            raise Exception(f'Brightness must be between 0 and 100')
+        if color_name not in color_map.keys():
+            raise Exception(f'Cannot find {color_name} in {color_map.keys()}')
+        brightness_and_color = brightness_and_color_to_int(brightness, color_map[color_name])
+        return self.send('set_rgb', [brightness_and_color])
+
     # Arming
 
     @command()
