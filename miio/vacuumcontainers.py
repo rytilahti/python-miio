@@ -34,6 +34,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     21: "Laser disance sensor blocked",
     22: "Clean the dock charging contacts",
     23: "Docking station not reachable",
+    24: "No-go zone or invisible wall detected",
 }
 
 
