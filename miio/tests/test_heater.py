@@ -3,7 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import Heater
-from miio.heater import MODEL_HEATER_ZA1, HeaterException, HeaterStatus, Brightness
+from miio.heater import MODEL_HEATER_ZA1, Brightness, HeaterException, HeaterStatus
 
 from .dummies import DummyDevice
 
