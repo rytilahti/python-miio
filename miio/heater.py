@@ -22,14 +22,8 @@ AVAILABLE_PROPERTIES_COMMON = [
     "temperature",
     "use_time",
 ]
-AVAILABLE_PROPERTIES_ZA1 = [
-    "poweroff_time",
-    "relative_humidity",
-]
-AVAILABLE_PROPERTIES_MA1 = [
-    "poweroff_level",
-    "poweroff_value",
-]
+AVAILABLE_PROPERTIES_ZA1 = ["poweroff_time", "relative_humidity"]
+AVAILABLE_PROPERTIES_MA1 = ["poweroff_level", "poweroff_value"]
 
 AVAILABLE_PROPERTIES = {
     MODEL_HEATER_ZA1: AVAILABLE_PROPERTIES_COMMON + AVAILABLE_PROPERTIES_ZA1,
@@ -72,7 +66,10 @@ class HeaterStatus:
     @property
     def humidity(self) -> Optional[int]:
         """Current humidity."""
-        if "relative_humidity" in self.data and self.data["relative_humidity"] is not None:
+        if (
+            "relative_humidity" in self.data
+            and self.data["relative_humidity"] is not None
+        ):
             return self.data["relative_humidity"]
         return None
 
@@ -270,12 +267,12 @@ class Heater(Device):
     def delay_off(self, hours: int):
         """Set delay off hours."""
         if self.model == MODEL_HEATER_ZA1:
-            if (hours < 0 or hours > 9):
+            if hours < 0 or hours > 9:
                 raise HeaterException("Invalid delay time: %s" % hours)
             return self.send("set_poweroff_time", [hours])
 
         elif self.model == MODEL_HEATER_MA1:
-            if (hours < 0 or hours > 5):
+            if hours < 0 or hours > 5:
                 raise HeaterException("Invalid delay time: %s" % hours)
             return self.send("set_poweroff_level", [hours])
 

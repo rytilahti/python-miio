@@ -3,12 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import Heater
-from miio.heater import (
-    MODEL_HEATER_ZA1,
-    HeaterException,
-    HeaterStatus,
-    Brightness,
-)
+from miio.heater import MODEL_HEATER_ZA1, HeaterException, HeaterStatus, Brightness
 
 from .dummies import DummyDevice
 
@@ -31,7 +26,9 @@ class DummyHeater(DummyDevice, Heater):
         self.return_values = {
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),
-            "set_target_temperature": lambda x: self._set_state("target_temperature", x),
+            "set_target_temperature": lambda x: self._set_state(
+                "target_temperature", x
+            ),
             "set_brightness": lambda x: self._set_state("brightness", x),
             "set_buzzer": lambda x: self._set_state("buzzer", x),
             "set_child_lock": lambda x: self._set_state("child_lock", x),
@@ -74,7 +71,10 @@ class TestHeater(TestCase):
         assert repr(self.state()) == repr(HeaterStatus(self.device.start_state))
 
         assert self.is_on() is True
-        assert self.state().target_temperature == self.device.start_state["target_temperature"]
+        assert (
+            self.state().target_temperature
+            == self.device.start_state["target_temperature"]
+        )
         assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().humidity == self.device.start_state["relative_humidity"]
         assert (
