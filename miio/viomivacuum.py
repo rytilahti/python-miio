@@ -30,10 +30,10 @@ class ViomiVacuumState(Enum):
     Docked = 5
 
 
-class ViomiMode(Enum):
-    Vacuum = 0  # No Mop, Vacuum only
-    VacuumAndMop = 1
-    Mop = 2
+class ViomiMopMode(Enum):
+    Off = 0  # No Mop, Vacuum only
+    Mixed = 1
+    MopOnly = 2
 
 
 class ViomiLanguage(Enum):
@@ -58,19 +58,7 @@ class ViomiMovementDirection(Enum):
     Right = 3  # Rotate
     Backward = 4
     Stop = 5
-    Unknown = 10
-
-
-class ViomiBinType(Enum):
-    Vacuum = 1
-    Water = 2
-    VacuumAndWater = 3
-
-
-class ViomiWaterGrade(Enum):
-    Low = 11
-    Medium = 12
-    High = 13
+    # 10 is unknown
 
 
 class ViomiVacuumStatus:
@@ -95,9 +83,9 @@ class ViomiVacuumStatus:
     def mode(self):
         """Active mode.
 
-        TODO: is this same as mop_type property?
+        TODO: unknown values
         """
-        return ViomiMode(self.data["mode"])
+        return self.data["mode"]
 
     @property
     def error(self):
@@ -113,9 +101,18 @@ class ViomiVacuumStatus:
         return self.data["battary_life"]
 
     @property
-    def bin_type(self) -> ViomiBinType:
-        """Type of the inserted bin."""
-        return ViomiBinType(self.data["box_type"])
+    def box_type(self):
+        """Box type.
+
+        TODO: unknown values"""
+        return self.data["box_type"]
+
+    @property
+    def mop_type(self):
+        """Mop type.
+
+        TODO: unknown values"""
+        return self.data["mop_type"]
 
     @property
     def clean_time(self) -> timedelta:
@@ -124,7 +121,10 @@ class ViomiVacuumStatus:
 
     @property
     def clean_area(self) -> float:
-        """Cleaned area in square meters."""
+        """Cleaned area.
+
+        TODO: unknown values
+        """
         return self.data["s_area"]
 
     @property
@@ -133,9 +133,12 @@ class ViomiVacuumStatus:
         return ViomiVacuumSpeed(self.data["suction_grade"])
 
     @property
-    def water_grade(self) -> ViomiWaterGrade:
-        """Water grade."""
-        return ViomiWaterGrade(self.data["water_grade"])
+    def water_level(self):
+        """Tank's water level.
+
+        TODO: unknown values, percentage?
+        """
+        return self.data["water_grade"]
 
     @property
     def remember_map(self) -> bool:
@@ -153,12 +156,9 @@ class ViomiVacuumStatus:
         return bool(self.data["has_newmap"])
 
     @property
-    def mop_mode(self) -> ViomiMode:
-        """Whether mopping is enabled and if so which mode
-
-        TODO: is this really the same as mode?
-        """
-        return ViomiMode(self.data["is_mop"])
+    def mop_mode(self) -> ViomiMopMode:
+        """Whether mopping is enabled and if so which mode"""
+        return ViomiMopMode(self.data["is_mop"])
 
 
 class ViomiVacuum(Device):
@@ -227,11 +227,6 @@ class ViomiVacuum(Device):
         """Set fanspeed [silent, standard, medium, turbo]."""
         self.send("set_suction", [speed.value])
 
-    @command(click.argument("watergrade"))
-    def set_water_grade(self, watergrade: ViomiWaterGrade):
-        """Set water grade [low, medium, high]."""
-        self.send("set_suction", [watergrade.value])
-
     @command()
     def home(self):
         """Return to home."""
@@ -254,7 +249,7 @@ class ViomiVacuum(Device):
             time.sleep(0.1)
         self.send("set_direction", [ViomiMovementDirection.Stop.value])
 
-    @command(click.argument("mode", type=EnumType(ViomiMode, False)))
+    @command(click.argument("mode", type=EnumType(ViomiMopMode, False)))
     def mop_mode(self, mode):
         """Set mopping mode."""
         self.send("set_mop", [mode.value])
