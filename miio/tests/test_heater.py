@@ -152,4 +152,4 @@ class TestHeater(TestCase):
             self.device.delay_off(-1)
 
         with pytest.raises(HeaterException):
-            self.device.delay_off(10)
+            self.device.delay_off(9 * 3600 + 1)

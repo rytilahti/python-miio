@@ -261,19 +261,19 @@ class Heater(Device):
             return self.send("set_child_lock", ["off"])
 
     @command(
-        click.argument("hours", type=int),
-        default_output=format_output("Setting delayed turn off to {hours} hours"),
+        click.argument("seconds", type=int),
+        default_output=format_output("Setting delayed turn off to {seconds} seconds"),
     )
-    def delay_off(self, hours: int):
-        """Set delay off hours."""
+    def delay_off(self, seconds: int):
+        """Set delay off seconds."""
         if self.model == MODEL_HEATER_ZA1:
-            if hours < 0 or hours > 9:
-                raise HeaterException("Invalid delay time: %s" % hours)
-            return self.send("set_poweroff_time", [hours])
+            if seconds < 0 or seconds > 9 * 3600:
+                raise HeaterException("Invalid delay time: %s" % seconds)
+            return self.send("set_poweroff_time", [seconds])
 
         elif self.model == MODEL_HEATER_MA1:
-            if hours < 0 or hours > 5:
-                raise HeaterException("Invalid delay time: %s" % hours)
-            return self.send("set_poweroff_level", [hours])
+            if seconds < 0 or seconds > 5 * 3600:
+                raise HeaterException("Invalid delay time: %s" % seconds)
+            return self.send("set_poweroff_level", [seconds // 3600])
 
         return None
