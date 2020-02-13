@@ -23,6 +23,7 @@ from . import (
     Cooker,
     Device,
     Fan,
+    Heater,
     PhilipsBulb,
     PhilipsEyecare,
     PhilipsMoonlight,
@@ -72,6 +73,7 @@ from .fan import (
     MODEL_FAN_ZA3,
     MODEL_FAN_ZA4,
 )
+from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
 
@@ -157,6 +159,8 @@ DEVICE_MAP = {
         x, "https://github.com/Danielhiversen/PyXiaomiGateway"
     ),
     "viomi-vacuum-v7": ViomiVacuum,
+    "zhimi.heater.za1": partial(Heater, model=MODEL_HEATER_ZA1),
+    "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
 }  # type: Dict[str, Union[Callable, Device]]
 
 
