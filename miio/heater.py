@@ -79,6 +79,7 @@ class HeaterStatus:
             and self.data["relative_humidity"] is not None
         ):
             return self.data["relative_humidity"]
+
         return None
 
     @property
@@ -116,8 +117,10 @@ class HeaterStatus:
         """Countdown until turning off in seconds."""
         if "poweroff_time" in self.data and self.data["poweroff_time"] is not None:
             return self.data["poweroff_time"]
+
         if "poweroff_level" in self.data and self.data["poweroff_level"] is not None:
             return self.data["poweroff_level"]
+
         return None
 
     def __repr__(self) -> str:
@@ -230,6 +233,7 @@ class Heater(Device):
         min_temp, max_temp = SUPPORTED_MODELS[self.model]["temperature_range"]
         if not min_temp <= temperature <= max_temp:
             raise HeaterException("Invalid target temperature: %s" % temperature)
+
         return self.send("set_target_temperature", [temperature])
 
     @command(
@@ -275,8 +279,10 @@ class Heater(Device):
         min_delay, max_delay = SUPPORTED_MODELS[self.model]["delay_off_range"]
         if not min_delay <= seconds <= max_delay:
             raise HeaterException("Invalid delay time: %s" % seconds)
+
         if self.model == MODEL_HEATER_ZA1:
             return self.send("set_poweroff_time", [seconds])
         elif self.model == MODEL_HEATER_MA1:
             return self.send("set_poweroff_level", [seconds // 3600])
+
         return None

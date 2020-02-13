@@ -40,6 +40,8 @@ Supported devices
 -  Xiaomi Tinymu Smart Toilet Cover
 -  Xiaomi 16 Relays Module
 -  Xiaomi Xiao AI Smart Alarm Clock
+-  Smartmi Radiant Heater Smart Version (ZA1 version)
+-  Xiaomi Mi Smart Space Heater
 
 *Feel free to create a pull request to add support for new devices as
 well as additional features for supported devices.*
