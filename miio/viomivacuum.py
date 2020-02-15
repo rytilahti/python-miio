@@ -14,6 +14,32 @@ from .vacuumcontainers import DNDStatus
 _LOGGER = logging.getLogger(__name__)
 
 
+ERROR_CODES = {
+    500: "Radar timed out",
+    501: "Wheels stuck",
+    502: "Low battery",
+    503: "Dust bin missing",
+    508: "Uneven ground",
+    509: "Cliff sensor error",
+    510: "Collision sensor error",
+    511: "Could not return to dock",
+    512: "Could not return to dock",
+    513: "Could not navigate",
+    514: "Vacuum stuck",
+    515: "Charging error",
+    516: "Mop temperature error",
+    521: "Water tank is not installed",
+    522: "Mop is not installed",
+    525: "Insufficient water in water tank",
+    527: "Remove mop",
+    528: "Dust bin missing",
+    529: "Mop and water tank missing",
+    530: "Mop and water tank missing",
+    531: "Water tank is not installed",
+    2101: "Unsufficient battery, continuing cleaning after recharge",
+}
+
+
 class ViomiVacuumSpeed(Enum):
     Silent = 0
     Standard = 1
@@ -100,12 +126,16 @@ class ViomiVacuumStatus:
         return ViomiMode(self.data["mode"])
 
     @property
-    def error(self):
-        """Error code.
+    def error_code(self) -> int:
+        """Error code from vacuum."""
 
-        TODO: unknown values
-        """
         return self.data["error_state"]
+
+    @property
+    def error(self) -> str:
+        """String presentation for the error code."""
+
+        return ERROR_CODES.get(self.error_code, f"Unknown error {self.error_code}")
 
     @property
     def battery(self) -> int:
