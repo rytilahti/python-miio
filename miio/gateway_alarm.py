@@ -17,6 +17,7 @@ class XiaomiGatewayAlarm(Device):
         """Fetch alarm status from the device."""
         # Response: ['on'], ['off'], ['oning']
         alarm_status = self._device.send("get_arming")
+        alarm_status = alarm_status.pop()
 
         return alarm_status
 
