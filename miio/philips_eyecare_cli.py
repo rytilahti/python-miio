@@ -107,14 +107,14 @@ def off(dev: miio.PhilipsEyecare):
 @cli.command()
 @pass_dev
 def eyecare_on(dev: miio.PhilipsEyecare):
-    """Eyecare on."""
+    """Turn eyecare on."""
     click.echo("Eyecare on: %s" % dev.eyecare_on())
 
 
 @cli.command()
 @pass_dev
 def eyecare_off(dev: miio.PhilipsEyecare):
-    """Eyecare off."""
+    """Turn eyecare off."""
     click.echo("Eyecare off: %s" % dev.eyecare_off())
 
 
