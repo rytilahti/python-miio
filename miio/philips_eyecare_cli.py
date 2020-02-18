@@ -105,6 +105,20 @@ def off(dev: miio.PhilipsEyecare):
 
 
 @cli.command()
+@pass_dev
+def eyecare_on(dev: miio.PhilipsEyecare):
+    """Turn eyecare on."""
+    click.echo("Eyecare on: %s" % dev.eyecare_on())
+
+
+@cli.command()
+@pass_dev
+def eyecare_off(dev: miio.PhilipsEyecare):
+    """Turn eyecare off."""
+    click.echo("Eyecare off: %s" % dev.eyecare_off())
+
+
+@cli.command()
 @click.argument("level", callback=validate_brightness, required=True)
 @pass_dev
 def set_brightness(dev: miio.PhilipsEyecare, level):
