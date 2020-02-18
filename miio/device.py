@@ -221,20 +221,24 @@ class Device(metaclass=DeviceGroupMeta):
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
 
-    def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
+    def send(self, command: str, parameters: Any = None, sid: str = None, retry_count=3) -> Any:
         """Build and send the given command.
         Note that this will implicitly call :func:`do_discover` to do a handshake,
         and will re-try in case of errors while incrementing the `_id` by 100.
 
         :param str command: Command to send
         :param dict parameters: Parameters to send, or an empty list FIXME
+        :param str sid: SID For to send a command to a child zigbee device connected to the XiaomiGateway
         :param retry_count: How many times to retry in case of failure
         :raises DeviceException: if an error has occured during communication."""
 
         if not self.lazy_discover or not self._discovered:
             self.do_discover()
 
-        cmd = {"id": self._id, "method": command}
+        if sid is not None:
+            cmd = {"id": self._id, "sid": sid, "method": command}
+        else:
+            cmd = {"id": self._id, "method": command}
 
         if parameters is not None:
             cmd["params"] = parameters
@@ -307,7 +311,7 @@ class Device(metaclass=DeviceGroupMeta):
                 )
                 self.__id += 100
                 self._discovered = False
-                return self.send(command, parameters, retry_count - 1)
+                return self.send(command, parameters, sid, retry_count - 1)
 
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("No response from the device") from ex
@@ -317,7 +321,7 @@ class Device(metaclass=DeviceGroupMeta):
                 _LOGGER.debug(
                     "Retrying to send failed command, retries left: %s", retry_count
                 )
-                return self.send(command, parameters, retry_count - 1)
+                return self.send(command, parameters, sid, retry_count - 1)
 
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("Unable to recover failed command") from ex
