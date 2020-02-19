@@ -121,8 +121,6 @@ class Listener:
     def __init__(self):
         self.found_devices = {}  # type: Dict[str, Device]
 
-    # TODO add win32 check/ubuntu on windows check, as it doesn't support mdns
-
     def check_and_create_device(self, info, addr) -> Optional[Device]:
         """Create a corresponding :class:`Device` implementation
          for a given info and address.."""
