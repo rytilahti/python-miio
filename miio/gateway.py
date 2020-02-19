@@ -153,8 +153,8 @@ class GatewayAlarm(Device):
         return self._device.send("set_alarming_volume", [volume])
 
     @command()
-    def alarm_last_status_change_time(self) -> datetime.datetime:
-        """Return the last time the alarm changed status"""
+    def alarm_last_status_change_time(self):
+        """Return the last time the alarm changed status, type datetime.datetime"""
         return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
 
 
