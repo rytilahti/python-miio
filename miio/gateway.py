@@ -89,7 +89,7 @@ class GatewayAlarm(Device):
         self._device = Device
 
     @command(default_output=format_output("[alarm_status]"))
-    def alarm_status(self) -> string:
+    def alarm_status(self) -> str:
         """Return the alarm status from the device."""
         # Response: 'on', 'off', 'oning'
         return self._device.send("get_arming").pop()
@@ -153,7 +153,7 @@ class GatewayAlarm(Device):
         return self._device.send("set_alarming_volume", [volume])
 
     @command()
-    def alarm_last_status_change_time(self) -> datatime:
+    def alarm_last_status_change_time(self) -> datetime.datetime:
         """Return the last time the alarm changed status"""
         return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
 
