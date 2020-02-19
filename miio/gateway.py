@@ -89,8 +89,8 @@ class GatewayAlarm(Device):
         self._device = Device
 
     @command(default_output=format_output("[alarm_status]"))
-    def alarm_status(self):
-        """Returns the alarm status from the device."""
+    def alarm_status(self) -> string:
+        """Return the alarm status from the device."""
         # Response: 'on', 'off', 'oning'
         return self._device.send("get_arming").pop()
 
@@ -106,55 +106,55 @@ class GatewayAlarm(Device):
 
     @command()
     def alarm_arming_time(self) -> int:
-        """Returns time in seconds the alarm stays at oning before beeing on"""
+        """Return time in seconds the alarm stays 'oning' before transitioning to 'on'"""
         # Response: 5, 15, 30, 60
         return self._device.send("get_arm_wait_time").pop()
 
     @command(click.argument("seconds"))
     def alarm_set_arming_time(self, seconds):
-        """Sets time the alarm stays at oning before beeing on"""
+        """Set time the alarm stays at 'oning' before transitioning to 'on'"""
         return self._device.send("set_arm_wait_time", [seconds])
 
     @command()
-    def alarm_triggering_time(self):
-        """Returns the time in seconds the alarm is going off when triggered"""
+    def alarm_triggering_time(self) -> int:
+        """Return the time in seconds the alarm is going off when triggered"""
         # Response: 30, 60, etc.
         return self._device.send("get_device_prop", ["lumi.0", "alarm_time_len"]).pop()
 
     @command(click.argument("seconds"))
     def set_alarm_triggering_time(self, seconds):
-        """Sets the time in seconds the alarm is going off when triggered"""
+        """Set the time in seconds the alarm is going off when triggered"""
         return self._device.send(
             "set_device_prop", {"sid": "lumi.0", "alarm_time_len": seconds}
         )
 
     @command()
-    def alarm_triggering_light(self):
-        """Returns the time the gateway light blinks when the alarm is triggerd"""
+    def alarm_triggering_light(self) -> int:
+        """Return the time the gateway light blinks when the alarm is triggerd"""
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._device.send("get_device_prop", ["lumi.0", "en_alarm_light"]).pop()
 
     @command(click.argument("seconds"))
     def alarm_set_triggering_light(self, seconds):
-        """Sets the time the gateway light blinks when the alarm is triggerd"""
+        """Set the time the gateway light blinks when the alarm is triggerd"""
         # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._device.send(
             "set_device_prop", {"sid": "lumi.0", "en_alarm_light": seconds}
         )
 
     @command()
-    def alarm_triggering_volume(self):
-        """Returns the volume level at which alarms go off [0-100]"""
+    def alarm_triggering_volume(self) -> int:
+        """Return the volume level at which alarms go off [0-100]"""
         return self._device.send("get_alarming_volume").pop()
 
     @command(click.argument("volume"))
     def alarm_set_triggering_volume(self, volume):
-        """Sets the volume level at which alarms go off [0-100]"""
+        """Set the volume level at which alarms go off [0-100]"""
         return self._device.send("set_alarming_volume", [volume])
 
     @command()
-    def alarm_last_status_change_time(self):
-        """Returns the last time the alarm changed status"""
+    def alarm_last_status_change_time(self) -> datatime:
+        """Return the last time the alarm changed status"""
         return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
 
 
