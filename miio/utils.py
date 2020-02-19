@@ -106,7 +106,6 @@ def rgb_to_int(x: Tuple[int, int, int]) -> int:
 
 def int_to_brightness(x: int) -> int:
     """"Return brightness (0-100) from integer."""
-    print(x)
     return x >> 24
 
 
