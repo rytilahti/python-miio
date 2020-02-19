@@ -176,7 +176,7 @@ class Gateway(Device):
         # from https://github.com/aholstenson/miio/issues/26
         devices_raw = self.send("get_device_prop", ["lumi.0", "device_list"])
         devices = [
-            SubDevice(self, *devices_raw[x : x + 5])
+            SubDevice(self, *devices_raw[x : x + 5]) # noqa: E203
             for x in range(0, len(devices_raw), 5)
         ]
         for dev in devices:
