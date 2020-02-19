@@ -105,7 +105,7 @@ class GatewayAlarm(Device):
         return self._device.send("set_arming", ["off"])
 
     @command()
-    def alarm_arming_time(self):
+    def alarm_arming_time(self) -> int:
         """Returns time in seconds the alarm stays at oning before beeing on"""
         # Response: 5, 15, 30, 60
         return self._device.send("get_arm_wait_time").pop()
