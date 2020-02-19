@@ -96,7 +96,7 @@ class GatewayAlarm(Device):
 
     @command(default_output=format_output("Turning alarm on"))
     def alarm_on(self):
-        """Turning alarm on."""
+        """Turn alarm on."""
         return self._device.send("set_arming", ["on"])
 
     @command(default_output=format_output("Turning alarm off"))
