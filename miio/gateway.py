@@ -124,7 +124,9 @@ class GatewayAlarm(Device):
     @command(click.argument("seconds"))
     def set_alarm_triggering_time(self, seconds):
         """Sets the time in seconds the alarm is going off when triggered"""
-        return self._device.send("set_device_prop", {"sid": "lumi.0", "alarm_time_len": seconds})
+        return self._device.send(
+            "set_device_prop", {"sid": "lumi.0", "alarm_time_len": seconds}
+        )
 
     @command()
     def alarm_triggering_light(self):
@@ -136,7 +138,9 @@ class GatewayAlarm(Device):
     def alarm_set_triggering_light(self, seconds):
         """Sets the time the gateway light blinks when the alarm is triggerd"""
         # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._device.send("set_device_prop", {"sid": "lumi.0", "en_alarm_light": seconds})
+        return self._device.send(
+            "set_device_prop", {"sid": "lumi.0", "en_alarm_light": seconds}
+        )
 
     @command()
     def alarm_triggering_volume(self):
