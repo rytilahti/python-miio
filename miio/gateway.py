@@ -41,124 +41,19 @@ class DeviceType(IntEnum):
     AqaraMagnet = 53
 
 
-class SubDevice:
-    def __init__(self, gw, sid, type_, _, __, ___):
-        self.gw = gw
-        self.sid = sid
-        self.type = DeviceType(type_)
-
-    def unpair(self):
-        return self.gw.send("remove_device", [self.sid])
-
-    def battery(self):
-        return self.gw.send("get_battery", [self.sid])[0]
-
-    def get_firmware_version(self) -> Optional[int]:
-        """Returns firmware version"""
-        try:
-            return self.gw.send("get_device_prop", [self.sid, "fw_ver"])[0]
-        except Exception as ex:
-            _LOGGER.debug(
-                "Got an exception while fetching fw_ver: %s", ex, exc_info=True
-            )
-            return None
-
-    def __repr__(self):
-        return "<Subdevice %s: %s fw: %s bat: %s>" % (
-            self.type,
-            self.sid,
-            self.get_firmware_version(),
-            self.battery(),
-        )
-
-
-class SensorHT(SubDevice):
-    accessor = "get_prop_sensor_ht"
-    properties = ["temperature", "humidity"]
-
-
-class Plug(SubDevice):
-    accessor = "get_prop_plug"
-    properties = ["power", "neutral_0"]
-
-
-class GatewayAlarm(Device):
-    """Main class representing the Xiaomi Gateway Alarm."""
+class Gateway(Device):
+    """Main class representing the Xiaomi Gateway."""
 
     def __init__(self, Device) -> None:
         self._device = Device
+        self._alarm = GatewayAlarm(Device)
 
-    @command(default_output=format_output("[alarm_status]"))
-    def alarm_status(self) -> str:
-        """Return the alarm status from the device."""
-        # Response: 'on', 'off', 'oning'
-        return self._device.send("get_arming").pop()
+    @property
+    def alarm(self):
+        """Returns initialized GatewayAlarm class with all its functions."""
+        # example: gateway.alarm.on()
+        return self._alarm
 
-    @command(default_output=format_output("Turning alarm on"))
-    def alarm_on(self):
-        """Turn alarm on."""
-        return self._device.send("set_arming", ["on"])
-
-    @command(default_output=format_output("Turning alarm off"))
-    def alarm_off(self):
-        """Turn alarm off."""
-        return self._device.send("set_arming", ["off"])
-
-    @command()
-    def alarm_arming_time(self) -> int:
-        """Return time in seconds the alarm stays 'oning' before transitioning to 'on'"""
-        # Response: 5, 15, 30, 60
-        return self._device.send("get_arm_wait_time").pop()
-
-    @command(click.argument("seconds"))
-    def alarm_set_arming_time(self, seconds):
-        """Set time the alarm stays at 'oning' before transitioning to 'on'"""
-        return self._device.send("set_arm_wait_time", [seconds])
-
-    @command()
-    def alarm_triggering_time(self) -> int:
-        """Return the time in seconds the alarm is going off when triggered"""
-        # Response: 30, 60, etc.
-        return self._device.send("get_device_prop", ["lumi.0", "alarm_time_len"]).pop()
-
-    @command(click.argument("seconds"))
-    def set_alarm_triggering_time(self, seconds):
-        """Set the time in seconds the alarm is going off when triggered"""
-        return self._device.send(
-            "set_device_prop", {"sid": "lumi.0", "alarm_time_len": seconds}
-        )
-
-    @command()
-    def alarm_triggering_light(self) -> int:
-        """Return the time the gateway light blinks when the alarm is triggerd"""
-        # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._device.send("get_device_prop", ["lumi.0", "en_alarm_light"]).pop()
-
-    @command(click.argument("seconds"))
-    def alarm_set_triggering_light(self, seconds):
-        """Set the time the gateway light blinks when the alarm is triggerd"""
-        # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._device.send(
-            "set_device_prop", {"sid": "lumi.0", "en_alarm_light": seconds}
-        )
-
-    @command()
-    def alarm_triggering_volume(self) -> int:
-        """Return the volume level at which alarms go off [0-100]"""
-        return self._device.send("get_alarming_volume").pop()
-
-    @command(click.argument("volume"))
-    def alarm_set_triggering_volume(self, volume):
-        """Set the volume level at which alarms go off [0-100]"""
-        return self._device.send("set_alarming_volume", [volume])
-
-    @command()
-    def alarm_last_status_change_time(self):
-        """Return the last time the alarm changed status, type datetime.datetime"""
-        return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
-
-
-class Gateway(Device):
     @command()
     def test3(self):
         return self.send(
@@ -663,3 +558,120 @@ class Gateway(Device):
     def get_illumination(self):
         """lux?"""
         return self.send("get_illumination")[0]
+
+
+class GatewayAlarm(Device):
+    """Class representing the Xiaomi Gateway Alarm."""
+
+    def __init__(self, Device) -> None:
+        self._device = Device
+
+    @command(default_output=format_output("[alarm_status]"))
+    def status(self) -> str:
+        """Return the alarm status from the device."""
+        # Response: 'on', 'off', 'oning'
+        return self._device.send("get_arming").pop()
+
+    @command(default_output=format_output("Turning alarm on"))
+    def on(self):
+        """Turn alarm on."""
+        return self._device.send("set_arming", ["on"])
+
+    @command(default_output=format_output("Turning alarm off"))
+    def off(self):
+        """Turn alarm off."""
+        return self._device.send("set_arming", ["off"])
+
+    @command()
+    def arming_time(self) -> int:
+        """Return time in seconds the alarm stays 'oning' before transitioning to 'on'"""
+        # Response: 5, 15, 30, 60
+        return self._device.send("get_arm_wait_time").pop()
+
+    @command(click.argument("seconds"))
+    def set_arming_time(self, seconds):
+        """Set time the alarm stays at 'oning' before transitioning to 'on'"""
+        return self._device.send("set_arm_wait_time", [seconds])
+
+    @command()
+    def triggering_time(self) -> int:
+        """Return the time in seconds the alarm is going off when triggered"""
+        # Response: 30, 60, etc.
+        return self._device.send("get_device_prop", ["lumi.0", "alarm_time_len"]).pop()
+
+    @command(click.argument("seconds"))
+    def set_triggering_time(self, seconds):
+        """Set the time in seconds the alarm is going off when triggered"""
+        return self._device.send(
+            "set_device_prop", {"sid": "lumi.0", "alarm_time_len": seconds}
+        )
+
+    @command()
+    def triggering_light(self) -> int:
+        """Return the time the gateway light blinks when the alarm is triggerd"""
+        # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
+        return self._device.send("get_device_prop", ["lumi.0", "en_alarm_light"]).pop()
+
+    @command(click.argument("seconds"))
+    def set_triggering_light(self, seconds):
+        """Set the time the gateway light blinks when the alarm is triggerd"""
+        # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
+        return self._device.send(
+            "set_device_prop", {"sid": "lumi.0", "en_alarm_light": seconds}
+        )
+
+    @command()
+    def triggering_volume(self) -> int:
+        """Return the volume level at which alarms go off [0-100]"""
+        return self._device.send("get_alarming_volume").pop()
+
+    @command(click.argument("volume"))
+    def set_triggering_volume(self, volume):
+        """Set the volume level at which alarms go off [0-100]"""
+        return self._device.send("set_alarming_volume", [volume])
+
+    @command()
+    def last_status_change_time(self):
+        """Return the last time the alarm changed status, type datetime.datetime"""
+        return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
+
+
+class SubDevice:
+    def __init__(self, gw, sid, type_, _, __, ___):
+        self.gw = gw
+        self.sid = sid
+        self.type = DeviceType(type_)
+
+    def unpair(self):
+        return self.gw.send("remove_device", [self.sid])
+
+    def battery(self):
+        return self.gw.send("get_battery", [self.sid])[0]
+
+    def get_firmware_version(self) -> Optional[int]:
+        """Returns firmware version"""
+        try:
+            return self.gw.send("get_device_prop", [self.sid, "fw_ver"])[0]
+        except Exception as ex:
+            _LOGGER.debug(
+                "Got an exception while fetching fw_ver: %s", ex, exc_info=True
+            )
+            return None
+
+    def __repr__(self):
+        return "<Subdevice %s: %s fw: %s bat: %s>" % (
+            self.type,
+            self.sid,
+            self.get_firmware_version(),
+            self.battery(),
+        )
+
+
+class SensorHT(SubDevice):
+    accessor = "get_prop_sensor_ht"
+    properties = ["temperature", "humidity"]
+
+
+class Plug(SubDevice):
+    accessor = "get_prop_plug"
+    properties = ["power", "neutral_0"]
