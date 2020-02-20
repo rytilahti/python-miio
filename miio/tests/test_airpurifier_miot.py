@@ -6,7 +6,7 @@ from miio import AirPurifierMiot
 from miio.airfilter_util import FilterType
 from miio.airpurifier_miot import AirPurifierMiotException, LedBrightness, OperationMode
 
-from .dummies import DummyDevice, DummyMiotDevice
+from .dummies import DummyMiotDevice
 
 _INITIAL_STATE = {
     "power": True,
@@ -98,7 +98,6 @@ class TestAirPurifier(TestCase):
         assert status.motor_speed == _INITIAL_STATE["motor_speed"]
         assert status.filter_rfid_product_id == _INITIAL_STATE["filter_rfid_product_id"]
         assert status.filter_type == FilterType.AntiBacterial
-        assert status.button_pressed == _INITIAL_STATE["button_pressed"]
 
     def test_set_fan_level(self):
         def fan_level():
