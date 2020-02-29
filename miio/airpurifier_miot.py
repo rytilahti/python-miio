@@ -24,6 +24,7 @@ _MAPPING = {
     "filter_hours_used": {"siid": 4, "piid": 5},
     # Alarm (siid=5)
     "buzzer": {"siid": 5, "piid": 1},
+    "buzzer_volume": {"siid": 5, "piid": 2},
     # Indicator Light (siid=6)
     "led_brightness": {"siid": 6, "piid": 1},
     "led": {"siid": 6, "piid": 6},
@@ -31,7 +32,7 @@ _MAPPING = {
     "child_lock": {"siid": 7, "piid": 1},
     # Motor Speed (siid=10)
     "favorite_level": {"siid": 10, "piid": 10},
-    "set_favorite_rpm": {"siid": 10, "piid": 7},
+    "favorite_rpm": {"siid": 10, "piid": 7},
     "motor_speed": {"siid": 10, "piid": 8},
     # Use time (siid=12)
     "use_time": {"siid": 12, "piid": 1},
@@ -138,6 +139,14 @@ class AirPurifierMiotStatus:
         return None
 
     @property
+    def buzzer_volume(self) -> Optional[int]:
+        """Return buzzer volume."""
+        if self.data["buzzer_volume"] is not None:
+            return self.data["buzzer_volume"]
+
+        return None
+
+    @property
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"]
@@ -206,6 +215,7 @@ class AirPurifierMiotStatus:
             "led=%s, "
             "led_brightness=%s, "
             "buzzer=%s, "
+            "buzzer_volume=%s, "
             "child_lock=%s, "
             "favorite_level=%s, "
             "filter_life_remaining=%s, "
@@ -227,6 +237,7 @@ class AirPurifierMiotStatus:
                 self.led,
                 self.led_brightness,
                 self.buzzer,
+                self.buzzer_volume,
                 self.child_lock,
                 self.favorite_level,
                 self.filter_life_remaining,
@@ -271,6 +282,7 @@ class AirPurifierMiot(MiotDevice):
             "LED: {result.led}\n"
             "LED brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
+            "Buzzer vol.: {result.buzzer_volume}\n"
             "Child lock: {result.child_lock}\n"
             "Favorite level: {result.favorite_level}\n"
             "Filter life remaining: {result.filter_life_remaining} %\n"
@@ -287,7 +299,10 @@ class AirPurifierMiot(MiotDevice):
         """Retrieve properties."""
 
         return AirPurifierMiotStatus(
-            {prop["did"]: prop["value"] for prop in self.get_properties()}
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties()
+            }
         )
 
     @command(default_output=format_output("Powering on"))
@@ -322,7 +337,20 @@ class AirPurifierMiot(MiotDevice):
                 "Invalid favorite motor speed: %s. Must be between 300 and 2300 and divisible by 10"
                 % rpm
             )
-        return self.set_property("set_favorite_rpm", rpm)
+        return self.set_property("favorite_rpm", rpm)
+
+    @command(
+        click.argument("volume", type=int),
+        default_output=format_output("Setting buzzer volume '{volume}'"),
+    )
+    def set_buzzer_volume(self, volume: int):
+        """Set favorite motor speed."""
+        # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
+        if volume < 0 or volume > 100:
+            raise AirPurifierMiotException(
+                "Invalid buzzer volume: %s. Must be between 0 and 100" % volume
+            )
+        return self.set_property("buzzer_volume", volume)
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),

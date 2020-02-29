@@ -60,7 +60,7 @@ class DummyMiotDevice(DummyDevice):
 
     def __init__(self, *args, **kwargs):
         # {prop["did"]: prop["value"] for prop in self.miot_client.get_properties()}
-        self.state = [{"did": k, "value": v} for k, v in self.state.items()]
+        self.state = [{"did": k, "value": v, "code": 0} for k, v in self.state.items()]
         super().__init__(*args, **kwargs)
 
     def get_properties(self):

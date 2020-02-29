@@ -19,6 +19,7 @@ _INITIAL_STATE = {
     "led": True,
     "led_brightness": 1,
     "buzzer": False,
+    "buzzer_volume": 0,
     "child_lock": False,
     "favorite_level": 10,
     "filter_life_remaining": 80,
