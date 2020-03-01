@@ -515,7 +515,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("volume", type=int),
-        default_output=format_output("Setting favorite level to {volume}"),
+        default_output=format_output("Setting sound volume to {volume}"),
     )
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""

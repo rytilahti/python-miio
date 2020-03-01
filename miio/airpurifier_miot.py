@@ -341,14 +341,13 @@ class AirPurifierMiot(MiotDevice):
 
     @command(
         click.argument("volume", type=int),
-        default_output=format_output("Setting buzzer volume '{volume}'"),
+        default_output=format_output("Setting sound volume to {volume}"),
     )
-    def set_buzzer_volume(self, volume: int):
+    def set_volume(self, volume: int):
         """Set favorite motor speed."""
-        # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
         if volume < 0 or volume > 100:
             raise AirPurifierMiotException(
-                "Invalid buzzer volume: %s. Must be between 0 and 100" % volume
+                "Invalid volume: %s. Must be between 0 and 100" % volume
             )
         return self.set_property("buzzer_volume", volume)
 
