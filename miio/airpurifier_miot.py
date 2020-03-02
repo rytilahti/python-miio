@@ -344,7 +344,7 @@ class AirPurifierMiot(MiotDevice):
         default_output=format_output("Setting sound volume to {volume}"),
     )
     def set_volume(self, volume: int):
-        """Set favorite motor speed."""
+        """Set buzzer volume."""
         if volume < 0 or volume > 100:
             raise AirPurifierMiotException(
                 "Invalid volume: %s. Must be between 0 and 100" % volume
