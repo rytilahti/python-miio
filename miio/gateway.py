@@ -44,9 +44,9 @@ class DeviceType(IntEnum):
 class Gateway(Device):
     """Main class representing the Xiaomi Gateway."""
 
-    def __init__(self, Device) -> None:
-        self._device = Device
-        self._alarm = GatewayAlarm(Device)
+    def __init__(self, ip: str = None, token: str = None,) -> None:
+        super().__init__(ip, token)
+        self._alarm = GatewayAlarm(self)
 
     @property
     def alarm(self):
@@ -563,8 +563,8 @@ class Gateway(Device):
 class GatewayAlarm(Device):
     """Class representing the Xiaomi Gateway Alarm."""
 
-    def __init__(self, Device) -> None:
-        self._device = Device
+    def __init__(self, parent) -> None:
+        self._device = parent
 
     @command(default_output=format_output("[alarm_status]"))
     def status(self) -> str:
