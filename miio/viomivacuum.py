@@ -14,6 +14,32 @@ from .vacuumcontainers import DNDStatus
 _LOGGER = logging.getLogger(__name__)
 
 
+ERROR_CODES = {
+    500: "Radar timed out",
+    501: "Wheels stuck",
+    502: "Low battery",
+    503: "Dust bin missing",
+    508: "Uneven ground",
+    509: "Cliff sensor error",
+    510: "Collision sensor error",
+    511: "Could not return to dock",
+    512: "Could not return to dock",
+    513: "Could not navigate",
+    514: "Vacuum stuck",
+    515: "Charging error",
+    516: "Mop temperature error",
+    521: "Water tank is not installed",
+    522: "Mop is not installed",
+    525: "Insufficient water in water tank",
+    527: "Remove mop",
+    528: "Dust bin missing",
+    529: "Mop and water tank missing",
+    530: "Mop and water tank missing",
+    531: "Water tank is not installed",
+    2101: "Unsufficient battery, continuing cleaning after recharge",
+}
+
+
 class ViomiVacuumSpeed(Enum):
     Silent = 0
     Standard = 1
@@ -30,10 +56,10 @@ class ViomiVacuumState(Enum):
     Docked = 5
 
 
-class ViomiMopMode(Enum):
-    Off = 0  # No Mop, Vacuum only
-    Mixed = 1
-    MopOnly = 2
+class ViomiMode(Enum):
+    Vacuum = 0  # No Mop, Vacuum only
+    VacuumAndMop = 1
+    Mop = 2
 
 
 class ViomiLanguage(Enum):
@@ -58,7 +84,19 @@ class ViomiMovementDirection(Enum):
     Right = 3  # Rotate
     Backward = 4
     Stop = 5
-    # 10 is unknown
+    Unknown = 10
+
+
+class ViomiBinType(Enum):
+    Vacuum = 1
+    Water = 2
+    VacuumAndWater = 3
+
+
+class ViomiWaterGrade(Enum):
+    Low = 11
+    Medium = 12
+    High = 13
 
 
 class ViomiVacuumStatus:
@@ -83,17 +121,21 @@ class ViomiVacuumStatus:
     def mode(self):
         """Active mode.
 
-        TODO: unknown values
+        TODO: is this same as mop_type property?
         """
-        return self.data["mode"]
+        return ViomiMode(self.data["mode"])
 
     @property
-    def error(self):
-        """Error code.
+    def error_code(self) -> int:
+        """Error code from vacuum."""
 
-        TODO: unknown values
-        """
         return self.data["error_state"]
+
+    @property
+    def error(self) -> str:
+        """String presentation for the error code."""
+
+        return ERROR_CODES.get(self.error_code, f"Unknown error {self.error_code}")
 
     @property
     def battery(self) -> int:
@@ -101,18 +143,9 @@ class ViomiVacuumStatus:
         return self.data["battary_life"]
 
     @property
-    def box_type(self):
-        """Box type.
-
-        TODO: unknown values"""
-        return self.data["box_type"]
-
-    @property
-    def mop_type(self):
-        """Mop type.
-
-        TODO: unknown values"""
-        return self.data["mop_type"]
+    def bin_type(self) -> ViomiBinType:
+        """Type of the inserted bin."""
+        return ViomiBinType(self.data["box_type"])
 
     @property
     def clean_time(self) -> timedelta:
@@ -121,10 +154,7 @@ class ViomiVacuumStatus:
 
     @property
     def clean_area(self) -> float:
-        """Cleaned area.
-
-        TODO: unknown values
-        """
+        """Cleaned area in square meters."""
         return self.data["s_area"]
 
     @property
@@ -133,12 +163,9 @@ class ViomiVacuumStatus:
         return ViomiVacuumSpeed(self.data["suction_grade"])
 
     @property
-    def water_level(self):
-        """Tank's water level.
-
-        TODO: unknown values, percentage?
-        """
-        return self.data["water_grade"]
+    def water_grade(self) -> ViomiWaterGrade:
+        """Water grade."""
+        return ViomiWaterGrade(self.data["water_grade"])
 
     @property
     def remember_map(self) -> bool:
@@ -156,9 +183,12 @@ class ViomiVacuumStatus:
         return bool(self.data["has_newmap"])
 
     @property
-    def mop_mode(self) -> ViomiMopMode:
-        """Whether mopping is enabled and if so which mode"""
-        return ViomiMopMode(self.data["is_mop"])
+    def mop_mode(self) -> ViomiMode:
+        """Whether mopping is enabled and if so which mode
+
+        TODO: is this really the same as mode?
+        """
+        return ViomiMode(self.data["is_mop"])
 
 
 class ViomiVacuum(Device):
@@ -227,6 +257,11 @@ class ViomiVacuum(Device):
         """Set fanspeed [silent, standard, medium, turbo]."""
         self.send("set_suction", [speed.value])
 
+    @command(click.argument("watergrade"))
+    def set_water_grade(self, watergrade: ViomiWaterGrade):
+        """Set water grade [low, medium, high]."""
+        self.send("set_suction", [watergrade.value])
+
     @command()
     def home(self):
         """Return to home."""
@@ -249,7 +284,7 @@ class ViomiVacuum(Device):
             time.sleep(0.1)
         self.send("set_direction", [ViomiMovementDirection.Stop.value])
 
-    @command(click.argument("mode", type=EnumType(ViomiMopMode, False)))
+    @command(click.argument("mode", type=EnumType(ViomiMode, False)))
     def mop_mode(self, mode):
         """Set mopping mode."""
         self.send("set_mop", [mode.value])
