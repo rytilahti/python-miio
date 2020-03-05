@@ -12,7 +12,8 @@ Supported devices
 -  :doc:`Xiaomi Mi Robot Vacuum <vacuum>` (:class:`miio.vacuum`)
 -  Xiaomi Mi Home Air Conditioner Companion (:class:`miio.airconditioningcompanion`)
 -  Xiaomi Mi Air Purifier (:class:`miio.airpurifier`)
--  Xiaomi Aqara Camera (:class:`miia.aqaracamera`)
+-  Xiaomi Aqara Camera (:class:`miio.aqaracamera`)
+-  Xiaomi Aqara Gateway (:class:`miio.gateway`)
 -  :doc:`Xiaomi Mi Smart WiFi Socket <plug>` (:class:`miio.chuangmi_plug`)
 -  :doc:`Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port) <plug>` (:class:`miio.chuangmi_plug`)
 -  :doc:`Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports) <plug>` (:class:`miio.chuangmi_plug`)
@@ -52,6 +53,7 @@ Home Assistant support
 -  `Xiaomi Smart WiFi Socket and Smart Power Strip <https://home-assistant.io/components/switch.xiaomi_miio/>`__
 -  `Xiaomi Universal IR Remote Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__
 -  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__
+-  `Xiaomi Aqara Gateway Alarm <https://home-assistant.io/components/alarm_control_panel.xiaomi_miio/>`__
 -  `Xiaomi Mi Home Air Conditioner Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
 -  `Xiaomi Mi WiFi Repeater 2 <https://www.home-assistant.io/components/device_tracker.xiaomi_miio/>`__
 -  `Xiaomi Mi Smart Pedestal Fan <https://github.com/syssi/xiaomi_fan>`__
