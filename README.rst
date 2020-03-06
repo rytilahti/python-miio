@@ -13,6 +13,7 @@ Supported devices
 -  Xiaomi Mi Home Air Conditioner Companion
 -  Xiaomi Mi Air Purifier
 -  Xiaomi Aqara Camera
+-  Xiaomi Aqara Gateway (basic implementation, alarm, lights)
 -  Xiaomi Mijia 360 1080p
 -  Xiaomi Mijia STYJ02YM (Viomi)
 -  Xiaomi Mi Smart WiFi Socket
@@ -43,6 +44,7 @@ Supported devices
 -  Smartmi Radiant Heater Smart Version (ZA1 version)
 -  Xiaomi Mi Smart Space Heater
 
+
 *Feel free to create a pull request to add support for new devices as
 well as additional features for supported devices.*
 
@@ -69,6 +71,7 @@ Home Assistant support
 -  `Xiaomi Smart WiFi Socket and Smart Power Strip <https://home-assistant.io/components/switch.xiaomi_miio/>`__
 -  `Xiaomi Universal IR Remote Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__
 -  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__
+-  `Xiaomi Aqara Gateway Alarm <https://home-assistant.io/components/alarm_control_panel.xiaomi_miio/>`__
 -  `Xiaomi Mi Home Air Conditioner Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
 -  `Xiaomi Mi WiFi Repeater 2 <https://www.home-assistant.io/components/device_tracker.xiaomi_miio/>`__
 -  `Xiaomi Mi Smart Pedestal Fan <https://github.com/syssi/xiaomi_fan>`__

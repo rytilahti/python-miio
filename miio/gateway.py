@@ -4,8 +4,9 @@ from typing import Optional
 from datetime import datetime
 
 from .device import Device
-from .click_common import command
+from .click_common import command, format_output
 from .utils import int_to_rgb, int_to_brightness, brightness_and_color_to_int
+from enum import IntEnum
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,7 +23,6 @@ color_map = {
 }
 
 
-from enum import IntEnum
 class DeviceType(IntEnum):
     Gateway = 0
     Switch = 1
@@ -41,55 +41,24 @@ class DeviceType(IntEnum):
     AqaraMagnet = 53
 
 
-class SubDevice:
-    def __init__(self, gw, sid, type_, _, __, ___):
-        self.gw = gw
-        self.sid = sid
-        self.type = DeviceType(type_)
-
-    def unpair(self):
-        return self.gw.send("remove_device", [self.sid])
-
-    def battery(self):
-        return self.gw.send("get_battery", [self.sid])[0]
-
-    def get_firmware_version(self) -> Optional[int]:
-        """Returns firmware version"""
-        try:
-            return self.gw.send("get_device_prop", [self.sid, "fw_ver"])[0]
-        except Exception as ex:
-            _LOGGER.debug("Got an exception while fetching fw_ver: %s", ex, exc_info=True)
-            return None
-
-    def __repr__(self):
-        return "<Subdevice %s: %s fw: %s bat: %s>" % (self.type, self.sid, self.get_firmware_version(), self.battery())
-
-
-class SensorHT(SubDevice):
-    accessor = "get_prop_sensor_ht"
-    properties = ["temperature", "humidity"]
-
-
-class Plug(SubDevice):
-    accessor = "get_prop_plug"
-    properties = ["power", "neutral_0"]
-
-
 class Gateway(Device):
+    """Main class representing the Xiaomi Gateway."""
+
+    def __init__(self, ip: str = None, token: str = None,) -> None:
+        super().__init__(ip, token)
+        self._alarm = GatewayAlarm(self)
+
+    @property
+    def alarm(self):
+        """Returns initialized GatewayAlarm class with all its functions."""
+        # example: gateway.alarm.on()
+        return self._alarm
+
     @command()
     def test3(self):
-        return self.send("get_device_prop_exp", [["lumi.0", "alarm_time_len", "status", "tzone_sec"]])
-
-    @command()
-    def alarm_length(self):
-        """whaat?"""
-        return self.send("get_device_prop", ["lumi.0", "alarm_time_len"])
-        # lumi.0 "voltage"
-
-    @command()
-    def alarm_light(self):
-        """hmhm"""
-        return self.send("get_device_prop", ["lumi.0", "en_alarm_light"])
+        return self.send(
+            "get_device_prop_exp", [["lumi.0", "alarm_time_len", "status", "tzone_sec"]]
+        )
 
     @command()
     def gw_timezone(self):
@@ -100,38 +69,46 @@ class Gateway(Device):
     @command()
     def devices(self):
         # from https://github.com/aholstenson/miio/issues/26
-        devices_raw = self.send("get_device_prop", ['lumi.0', 'device_list'])
-        devices = [SubDevice(self, *devices_raw[x:x + 5]) for x in range(0, len(devices_raw), 5)]
+        devices_raw = self.send("get_device_prop", ["lumi.0", "device_list"])
+        devices = [
+            SubDevice(self, *devices_raw[x : x + 5])  # noqa: E203
+            for x in range(0, len(devices_raw), 5)
+        ]
         for dev in devices:
             try:
                 print(dev)
                 # TEMP 10000 = unavailable, humidity stays at 0 then
-                print("temperature and humidity: %s" %
-                      self.send("get_prop_sensor_ht",
-                                ["temperature", "humidity"],
-                                extra_params={'sid': dev.sid}))
+                print(
+                    "temperature and humidity: %s"
+                    % self.send(
+                        "get_prop_sensor_ht",
+                        ["temperature", "humidity"],
+                        extra_params={"sid": dev.sid},
+                    )
+                )
             except Exception as ex:
-                _LOGGER.error("Unable to read device properties: %s",
-                              ex, exc_info=True)
+                _LOGGER.error("Unable to read device properties: %s", ex, exc_info=True)
                 continue
 
     @command()
     def test(self):
         raise Exception("just for testing purposes, sid needs to be changed.")
-        return self.send("get_prop_sensor_ht",
-                         ["battery", "voltage", "temperature", "humidity", "lqi"],
-                         extra_params={'sid': 'lumi.158d00012db273'})
+        return self.send(
+            "get_prop_sensor_ht",
+            ["battery", "voltage", "temperature", "humidity", "lqi"],
+            extra_params={"sid": "lumi.158d00012db273"},
+        )
 
     @command()
     def get_radio_info(self):
         """Radio play info."""
         return self.send("get_prop_fm")
 
-    @command(
-        click.argument("sid")
-    )
+    @command(click.argument("sid"))
     def get_plug_prop(self, sid):
-        return self.send("get_prop_plug", ["power", "neutral_0"], extra_params={'sid': sid})
+        return self.send(
+            "get_prop_plug", ["power", "neutral_0"], extra_params={"sid": sid}
+        )
         # {"method":"props","params":{"power":"on"},
         # :{"neutral_0":"off"}
         # {"load_power":0.00,"load_voltage":234000}
@@ -142,24 +119,16 @@ class Gateway(Device):
         return self.send("get_prop_sensor_ht")
 
     @command(
-        click.argument("sid"),
-        click.argument("property"),
+        click.argument("sid"), click.argument("property"),
     )
     def get_device_prop(self, sid, property):
         """props? returns empty array w/o params"""
         return self.send("get_device_prop")
 
-    @command(
-        click.argument("length"),
-    )
-    def set_alarm_time_length(self, length):
-        # is this a typo for set?
-        return self.send("get_device_prop", {'alarm_time_len': length, 'sid': 'lumi.0'})
-
     @command()
-    def set_device_prop(self, sid, prop):
-        """props? returns empty array w/o params"""
-        return self.send("set_device_prop", [sid, prop])
+    def set_device_prop(self, sid, prop, prop_val):
+        """set a device property, sid="lumi.0" for the gateway"""
+        return self.send("set_device_prop", {"sid": sid, prop: prop_val})
 
     @command()
     def get_device_prop_exp(self):
@@ -179,9 +148,7 @@ class Gateway(Device):
         return self.send("ctrl_device_prop")
 
     # Radio
-    @command(
-        click.argument("volume")
-    )
+    @command(click.argument("volume"))
     def set_radio_volume(self, volume):
         """Set radio volume"""
         return self.send("set_fm_volume", [volume])
@@ -247,111 +214,74 @@ class Gateway(Device):
         # {'method': 'props', 'params': {'light': 'on', 'from.light': '4,,,'}, 'id': 88457} ?!
         return self.send("get_night_light_rgb")
 
-    @command(
-        click.argument("color_name", type=str)
-    )
+    @command(click.argument("color_name", type=str))
     def set_night_light_color(self, color_name):
         """Set night light color using color name (red, green, etc)."""
         if color_name not in color_map.keys():
-            raise Exception('Cannot find {color} in {colors}'.format(
-                color=color_name,
-                colors=color_map.keys()))
+            raise Exception(
+                "Cannot find {color} in {colors}".format(
+                    color=color_name, colors=color_map.keys()
+                )
+            )
         current_brightness = int_to_brightness(self.send("get_night_light_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(
-            current_brightness, color_map[color_name])
-        return self.send('set_night_light_rgb', [brightness_and_color])
+            current_brightness, color_map[color_name]
+        )
+        return self.send("set_night_light_rgb", [brightness_and_color])
 
-    @command(
-        click.argument("color_name", type=str)
-    )
+    @command(click.argument("color_name", type=str))
     def set_color(self, color_name):
         """Set gateway lamp color using color name (red, green, etc)."""
         if color_name not in color_map.keys():
-            raise Exception('Cannot find {color} in {colors}'.format(
-                color=color_name,
-                colors=color_map.keys()))
+            raise Exception(
+                "Cannot find {color} in {colors}".format(
+                    color=color_name, colors=color_map.keys()
+                )
+            )
         current_brightness = int_to_brightness(self.send("get_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(
-            current_brightness, color_map[color_name])
-        return self.send('set_rgb', [brightness_and_color])
+            current_brightness, color_map[color_name]
+        )
+        return self.send("set_rgb", [brightness_and_color])
 
-    @command(
-        click.argument("brightness", type=int)
-    )
+    @command(click.argument("brightness", type=int))
     def set_brightness(self, brightness):
         """Set gateway lamp brightness (0-100)."""
         if 100 < brightness < 0:
-            raise Exception('Brightness must be between 0 and 100')
+            raise Exception("Brightness must be between 0 and 100")
         current_color = int_to_rgb(self.send("get_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(brightness, current_color)
-        return self.send('set_rgb', [brightness_and_color])
+        return self.send("set_rgb", [brightness_and_color])
 
-    @command(
-        click.argument("brightness", type=int)
-    )
+    @command(click.argument("brightness", type=int))
     def set_night_light_brightness(self, brightness):
         """Set night light brightness (0-100)."""
         if 100 < brightness < 0:
-            raise Exception('Brightness must be between 0 and 100')
+            raise Exception("Brightness must be between 0 and 100")
         current_color = int_to_rgb(self.send("get_night_light_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(brightness, current_color)
         print(brightness, current_color)
-        return self.send('set_night_light_rgb', [brightness_and_color])
+        return self.send("set_night_light_rgb", [brightness_and_color])
 
     @command(
-        click.argument("color_name", type=str),
-        click.argument("brightness", type=int)
+        click.argument("color_name", type=str), click.argument("brightness", type=int)
     )
     def set_light(self, color_name, brightness):
         """Set color (using color name) and brightness (0-100)."""
         if 100 < brightness < 0:
-            raise Exception('Brightness must be between 0 and 100')
+            raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
-            raise Exception('Cannot find {color} in {colors}'.format(
-                color=color_name,
-                colors=color_map.keys()))
-        brightness_and_color = brightness_and_color_to_int(brightness, color_map[color_name])
-        return self.send('set_rgb', [brightness_and_color])
+            raise Exception(
+                "Cannot find {color} in {colors}".format(
+                    color=color_name, colors=color_map.keys()
+                )
+            )
+        brightness_and_color = brightness_and_color_to_int(
+            brightness, color_map[color_name]
+        )
+        return self.send("set_rgb", [brightness_and_color])
 
-    # Arming
-
-    @command()
-    def disarm(self):
-        """Disable alarm? dis_alarm"""
-        return self.send("dis_alarm") == ['ok']
-
-    def is_armed(self):
-        return self.send("get_arming") == ['on']
-
-    def get_arm_wait_time(self):
-        """Returns time before armed?"""
-        return self.send("get_arm_wait_time", [])[0]
-
-    @command(
-        click.argument("seconds")
-    )
-    def set_arm_wait_time(self, seconds):
-        """Sets time before armed, params unknown"""
-        return self.send("set_arm_wait_time", [seconds])
-
-    def get_arming_time(self):
-        """Gets time of arm?"""
-        return datetime.fromtimestamp(self.send("get_arming_time")[0])
-
-    @command()
-    def set_arming_time(self):
-        """Sets time to arm?"""
-        return self.send("set_arming_time")
-
-    @command()
-    def arm(self):
-        """Returns [on,off] whether being armed?"""
-        click.echo("Is armed: %s" % self.is_armed())
-        click.echo("Arming time: %s" % self.get_arming_time())
-        click.echo("Arm wait time: %s" % self.get_arm_wait_time())
-
-    # Alarm clock?
-
+    # Clock
     @command()
     def clock(self):
         """Alarm clock? Arming?"""
@@ -384,7 +314,6 @@ class Gateway(Device):
     def volume(self):
         """All volume settings."""
         click.echo("Gateway volume: %s" % self.get_gateway_volume())
-        click.echo("Alarm volume: %s" % self.get_alarm_volume())
         click.echo("Doorbell volume: %s" % self.get_doorbell_volume())
 
     def get_gateway_volume(self):
@@ -395,17 +324,6 @@ class Gateway(Device):
         """Set gateway volume."""
         return self.send("set_gateway_volume")[0]
 
-    def get_alarm_volume(self):
-        """Current alarm volume? Returns 0"""
-        return self.send("get_alarming_volume")[0]
-
-    @command(
-        click.argument("volume")
-    )
-    def set_alarm_volume(self, volume):
-        """Sets current volume [0-100]"""
-        return self.send("set_alarming_volume", [volume])
-
     @command()
     def doorbell(self):
         click.echo("Volume: %s" % self.get_doorbell_volume())
@@ -415,16 +333,14 @@ class Gateway(Device):
         """Doorbell volume"""
         return self.send("get_doorbell_volume")[0]
 
-    @command(
-        click.argument("volume")
-    )
+    @command(click.argument("volume"))
     def set_doorbell_volume(self, volume):
         """Sets current volume [0-100]"""
         return self.send("set_doorbell_volume", [volume])
 
     def get_doorbell_push(self):
         """Push doorbells to mobile?"""
-        return self.send("get_doorbell_push") == 'on'
+        return self.send("get_doorbell_push") == "on"
 
     def set_doorbell_push(self):
         """Set push doorbells to mobile?"""
@@ -486,7 +402,7 @@ class Gateway(Device):
     @command()
     def set_sound_playing(self):
         """stop playing?"""
-        return self.send("set_sound_playing", ['off'])
+        return self.send("set_sound_playing", ["off"])
 
     @command()
     def set_default_music(self):
@@ -501,12 +417,12 @@ class Gateway(Device):
 
     def get_corridor_light_status(self):
         """get_corridor_light, gateway light [on,off]?"""
-        return self.send("get_corridor_light")[0] == 'on'
+        return self.send("get_corridor_light")[0] == "on"
 
     @command()
     def set_corridor_light(self):
         """set_corridor_light, no idea.."""
-        return self.send("set_corridor_light", ['off'])
+        return self.send("set_corridor_light", ["off"])
 
     def get_corridor_on_time(self):
         """time shall be kept on?"""
@@ -529,9 +445,7 @@ class Gateway(Device):
 
         return self.send("set_lumi_dpf_aes_key", [key])
 
-    @command(
-        click.argument("key", required=False)
-    )
+    @command(click.argument("key", required=False))
     def developer_key(self, key):
         if key is not None:
             return self.set_developer_key(key)
@@ -548,9 +462,7 @@ class Gateway(Device):
         """timeouts on device"""
         return self.send("get_zigbee_device_version")
 
-    @command(
-        click.argument("channel")
-    )
+    @command(click.argument("channel"))
     def set_zigbee_channel(self, channel):
         """Set zigbee channel."""
         return self.send("set_zigbee_channel", [channel])
@@ -559,9 +471,7 @@ class Gateway(Device):
         """Return currently used zigbee channel."""
         return self.send("get_zigbee_channel")[0]
 
-    @command(
-        click.argument("timeout", type=int)
-    )
+    @command(click.argument("timeout", type=int))
     def zigbee_pair(self, timeout):
         """Start pairing, use 0 to disable"""
         return self.send("start_zigbee_join", [timeout])
@@ -591,9 +501,7 @@ class Gateway(Device):
         """Unpair all devices."""
         return self.send("remove_all_device")
 
-    @command(
-        click.argument("sid")
-    )
+    @command(click.argument("sid"))
     def zigbee_unpair(self, sid):
         """Unpair a device."""
         # get a device obj an call dev.unpair()
@@ -650,3 +558,120 @@ class Gateway(Device):
     def get_illumination(self):
         """lux?"""
         return self.send("get_illumination")[0]
+
+
+class GatewayAlarm(Device):
+    """Class representing the Xiaomi Gateway Alarm."""
+
+    def __init__(self, parent) -> None:
+        self._device = parent
+
+    @command(default_output=format_output("[alarm_status]"))
+    def status(self) -> str:
+        """Return the alarm status from the device."""
+        # Response: 'on', 'off', 'oning'
+        return self._device.send("get_arming").pop()
+
+    @command(default_output=format_output("Turning alarm on"))
+    def on(self):
+        """Turn alarm on."""
+        return self._device.send("set_arming", ["on"])
+
+    @command(default_output=format_output("Turning alarm off"))
+    def off(self):
+        """Turn alarm off."""
+        return self._device.send("set_arming", ["off"])
+
+    @command()
+    def arming_time(self) -> int:
+        """Return time in seconds the alarm stays 'oning' before transitioning to 'on'"""
+        # Response: 5, 15, 30, 60
+        return self._device.send("get_arm_wait_time").pop()
+
+    @command(click.argument("seconds"))
+    def set_arming_time(self, seconds):
+        """Set time the alarm stays at 'oning' before transitioning to 'on'"""
+        return self._device.send("set_arm_wait_time", [seconds])
+
+    @command()
+    def triggering_time(self) -> int:
+        """Return the time in seconds the alarm is going off when triggered"""
+        # Response: 30, 60, etc.
+        return self._device.send("get_device_prop", ["lumi.0", "alarm_time_len"]).pop()
+
+    @command(click.argument("seconds"))
+    def set_triggering_time(self, seconds):
+        """Set the time in seconds the alarm is going off when triggered"""
+        return self._device.send(
+            "set_device_prop", {"sid": "lumi.0", "alarm_time_len": seconds}
+        )
+
+    @command()
+    def triggering_light(self) -> int:
+        """Return the time the gateway light blinks when the alarm is triggerd"""
+        # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
+        return self._device.send("get_device_prop", ["lumi.0", "en_alarm_light"]).pop()
+
+    @command(click.argument("seconds"))
+    def set_triggering_light(self, seconds):
+        """Set the time the gateway light blinks when the alarm is triggerd"""
+        # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
+        return self._device.send(
+            "set_device_prop", {"sid": "lumi.0", "en_alarm_light": seconds}
+        )
+
+    @command()
+    def triggering_volume(self) -> int:
+        """Return the volume level at which alarms go off [0-100]"""
+        return self._device.send("get_alarming_volume").pop()
+
+    @command(click.argument("volume"))
+    def set_triggering_volume(self, volume):
+        """Set the volume level at which alarms go off [0-100]"""
+        return self._device.send("set_alarming_volume", [volume])
+
+    @command()
+    def last_status_change_time(self):
+        """Return the last time the alarm changed status, type datetime.datetime"""
+        return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
+
+
+class SubDevice:
+    def __init__(self, gw, sid, type_, _, __, ___):
+        self.gw = gw
+        self.sid = sid
+        self.type = DeviceType(type_)
+
+    def unpair(self):
+        return self.gw.send("remove_device", [self.sid])
+
+    def battery(self):
+        return self.gw.send("get_battery", [self.sid])[0]
+
+    def get_firmware_version(self) -> Optional[int]:
+        """Returns firmware version"""
+        try:
+            return self.gw.send("get_device_prop", [self.sid, "fw_ver"])[0]
+        except Exception as ex:
+            _LOGGER.debug(
+                "Got an exception while fetching fw_ver: %s", ex, exc_info=True
+            )
+            return None
+
+    def __repr__(self):
+        return "<Subdevice %s: %s fw: %s bat: %s>" % (
+            self.type,
+            self.sid,
+            self.get_firmware_version(),
+            self.battery(),
+        )
+
+
+class SensorHT(SubDevice):
+    accessor = "get_prop_sensor_ht"
+    properties = ["temperature", "humidity"]
+
+
+class Plug(SubDevice):
+    accessor = "get_prop_plug"
+    properties = ["power", "neutral_0"]
