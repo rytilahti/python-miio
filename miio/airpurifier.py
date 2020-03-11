@@ -226,13 +226,9 @@ class AirPurifierStatus:
     @property
     def filter_type(self) -> Optional[FilterType]:
         """Type of installed filter."""
-        if self.filter_rfid_tag is None:
-            return None
-        if self.filter_rfid_tag == "0:0:0:0:0:0:0":
-            return FilterType.Unknown
-        if self.filter_rfid_product_id is None:
-            return FilterType.Regular
-        return self.filter_type_util.determine_filter_type(self.filter_rfid_product_id)
+        return self.filter_type_util.determine_filter_type(
+            self.filter_rfid_tag, self.filter_rfid_product_id
+        )
 
     @property
     def learn_mode(self) -> bool:

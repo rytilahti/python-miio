@@ -12,15 +12,25 @@ def airfilter_util(request):
 
 @pytest.mark.usefixtures("airfilter_util")
 class TestAirFilterUtil(TestCase):
+    def test_determine_filter_type__recognises_unknown_filter(self):
+        assert (
+            self.filter_type_util.determine_filter_type("0:0:0:0:0:0:0", None)
+            is FilterType.Unknown
+        )
+
     def test_determine_filter_type__recognises_antibacterial_filter(self):
         assert (
-            self.filter_type_util.determine_filter_type("12:34:41:30")
+            self.filter_type_util.determine_filter_type(
+                "80:64:d1:ba:4f:5f:4", "12:34:41:30"
+            )
             is FilterType.AntiBacterial
         )
 
     def test_determine_filter_type__recognises_antiformaldehyde_filter(self):
         assert (
-            self.filter_type_util.determine_filter_type("12:34:00:31")
+            self.filter_type_util.determine_filter_type(
+                "80:64:d1:ba:4f:5f:4", "12:34:00:31"
+            )
             is FilterType.AntiFormaldehyde
         )
 
@@ -30,9 +40,12 @@ class TestAirFilterUtil(TestCase):
             "12:34:56:31",
             "12:34:56:31:11:11",
             "CO:FF:FF:EE",
+            None,
         ]
         for product_id in regular_filters:
             assert (
-                self.filter_type_util.determine_filter_type(product_id)
+                self.filter_type_util.determine_filter_type(
+                    "80:64:d1:ba:4f:5f:4", product_id
+                )
                 is FilterType.Regular
             )
