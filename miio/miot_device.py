@@ -47,6 +47,8 @@ class MiotDevice(Device):
         return values
 
     def set_property(self, property_key: str, value):
+        """Sets property value."""
+
         return self.send(
             "set_properties",
             [{"did": property_key, **self.mapping[property_key], "value": value}],
