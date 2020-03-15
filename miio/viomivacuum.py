@@ -341,6 +341,6 @@ class ViomiVacuum(Device):
         return self.send("set_carpetturbo", [mode.value])
 
     @command()
-    def supported_fanspeeds(self) -> Dict[str, int]:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return dictionary containing supported fanspeeds."""
         return {x.name: x.value for x in list(ViomiVacuumSpeed)}

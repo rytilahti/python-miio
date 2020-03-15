@@ -470,8 +470,8 @@ class Vacuum(Device):
         )
 
     @command()
-    def supported_fanspeeds(self) -> Dict[str, int]:
-        """Return dictionary containing supported fanspeeds."""
+    def fan_speed_presets(self) -> Dict[str, int]:
+        """Return dictionary containing supported fan speeds."""
         if self.model is None:
             self._autodetect_model()
 
@@ -680,10 +680,7 @@ class Vacuum(Device):
             _LOGGER.debug("Writing %s to %s", seqs, id_file)
             path_obj = pathlib.Path(id_file)
             cache_dir = path_obj.parents[0]
-            try:
-                cache_dir.mkdir(parents=True)
-            except FileExistsError:
-                pass  # after dropping py3.4 support, use exist_ok for mkdir
+            cache_dir.mkdir(parents=True, exist_ok=True)
             with open(id_file, "w") as f:
                 json.dump(seqs, f)
 
