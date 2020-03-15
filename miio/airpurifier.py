@@ -1,11 +1,11 @@
 import enum
 import logging
-import re
 from collections import defaultdict
 from typing import Any, Dict, Optional
 
 import click
 
+from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .exceptions import DeviceException
@@ -40,20 +40,6 @@ class LedBrightness(enum.Enum):
     Bright = 0
     Dim = 1
     Off = 2
-
-
-class FilterType(enum.Enum):
-    Regular = "regular"
-    AntiBacterial = "anti-bacterial"
-    AntiFormaldehyde = "anti-formaldehyde"
-    Unknown = "unknown"
-
-
-FILTER_TYPE_RE = (
-    (re.compile(r"^\d+:\d+:41:30$"), FilterType.AntiBacterial),
-    (re.compile(r"^\d+:\d+:(30|0|00):31$"), FilterType.AntiFormaldehyde),
-    (re.compile(r".*"), FilterType.Regular),
-)
 
 
 class AirPurifierStatus:
@@ -102,6 +88,7 @@ class AirPurifierStatus:
         A request is limited to 16 properties.
         """
 
+        self.filter_type_util = FilterTypeUtil()
         self.data = data
 
     @property
@@ -239,13 +226,9 @@ class AirPurifierStatus:
     @property
     def filter_type(self) -> Optional[FilterType]:
         """Type of installed filter."""
-        if self.filter_rfid_tag is None:
-            return None
-        if self.filter_rfid_tag == "0:0:0:0:0:0:0":
-            return FilterType.Unknown
-        if self.filter_rfid_product_id is None:
-            return FilterType.Regular
-        return self._get_filter_type(self.filter_rfid_product_id)
+        return self.filter_type_util.determine_filter_type(
+            self.filter_rfid_tag, self.filter_rfid_product_id
+        )
 
     @property
     def learn_mode(self) -> bool:
@@ -283,16 +266,6 @@ class AirPurifierStatus:
     def button_pressed(self) -> Optional[str]:
         """Last pressed button."""
         return self.data["button_pressed"]
-
-    @classmethod
-    def _get_filter_type(cls, product_id: str) -> FilterType:
-        ft = cls._filter_type_cache.get(product_id, None)
-        if ft is None:
-            for filter_re, filter_type in FILTER_TYPE_RE:
-                if filter_re.match(product_id):
-                    ft = cls._filter_type_cache[product_id] = filter_type
-                    break
-        return ft
 
     def __repr__(self) -> str:
         s = (
@@ -538,7 +511,7 @@ class AirPurifier(Device):
 
     @command(
         click.argument("volume", type=int),
-        default_output=format_output("Setting favorite level to {volume}"),
+        default_output=format_output("Setting sound volume to {volume}"),
     )
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""

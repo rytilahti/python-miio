@@ -36,6 +36,14 @@ miio\.airpurifier module
     :show-inheritance:
     :undoc-members:
 
+miio\.airpurifier_miot module
+-----------------------------
+
+.. automodule:: miio.airpurifier_miot
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
 miio\.airqualitymonitor module
 ------------------------------
 
@@ -89,6 +97,14 @@ miio\.device module
 -------------------
 
 .. automodule:: miio.device
+    :members:
+    :show-inheritance:
+    :undoc-members:
+
+miio\.miot_device module
+------------------------
+
+.. automodule:: miio.miot_device
     :members:
     :show-inheritance:
     :undoc-members:

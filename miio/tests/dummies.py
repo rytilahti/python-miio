@@ -53,3 +53,21 @@ class DummyDevice:
     def _get_state(self, props):
         """Return wanted properties"""
         return [self.state[x] for x in props if x in self.state]
+
+
+class DummyMiotDevice(DummyDevice):
+    """Main class representing a MIoT device."""
+
+    def __init__(self, *args, **kwargs):
+        # {prop["did"]: prop["value"] for prop in self.miot_client.get_properties()}
+        self.state = [{"did": k, "value": v, "code": 0} for k, v in self.state.items()]
+        super().__init__(*args, **kwargs)
+
+    def get_properties(self):
+        return self.state
+
+    def set_property(self, property_key: str, value):
+        for prop in self.state:
+            if prop["did"] == property_key:
+                prop["value"] = value
+        return None
