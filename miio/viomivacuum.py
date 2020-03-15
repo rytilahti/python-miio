@@ -3,6 +3,7 @@ import time
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
+from typing import Dict
 
 import click
 
@@ -338,3 +339,8 @@ class ViomiVacuum(Device):
     def carpet_mode(self, mode: ViomiCarpetTurbo):
         """Set the carpet mode."""
         return self.send("set_carpetturbo", [mode.value])
+
+    @command()
+    def supported_fanspeeds(self) -> Dict[str, int]:
+        """Return dictionary containing supported fanspeeds."""
+        return {x.name: x.value for x in list(ViomiVacuumSpeed)}

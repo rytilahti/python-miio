@@ -6,7 +6,7 @@ import math
 import os
 import pathlib
 import time
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import click
 import pytz
@@ -46,6 +46,24 @@ class Consumable(enum.Enum):
     SensorDirty = "sensor_dirty_time"
 
 
+class FanspeedV1(enum.Enum):
+    Silent = 38
+    Standard = 60
+    Medium = 77
+    Turbo = 90
+
+
+class FanspeedV2(enum.Enum):
+    Silent = 101
+    Standard = 102
+    Medium = 103
+    Turbo = 104
+    Gentle = 105
+
+
+ROCKROBO_V1 = "rockrobo.vacuum.v1"
+
+
 class Vacuum(Device):
     """Main class representing the vacuum."""
 
@@ -54,6 +72,8 @@ class Vacuum(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
+        self.model = None
+        self._fanspeeds = FanspeedV1
 
     @command()
     def start(self):
@@ -415,6 +435,47 @@ class Vacuum(Device):
     def fan_speed(self):
         """Return fan speed."""
         return self.send("get_custom_mode")[0]
+
+    def _autodetect_model(self):
+        """Detect the model of the vacuum.
+
+        For the moment this is used only for the fanspeeds,
+        but that could be extended to cover other supported features."""
+        # cloud-blocked vacuums will not return proper payloads
+        try:
+            info = self.info()
+            self.model = info.model
+        except TypeError:
+            self._fanspeeds = FanspeedV1
+            self.model = ROCKROBO_V1
+            _LOGGER.debug("Unable to query model, falling back to %s", self._fanspeeds)
+            return
+
+        _LOGGER.info("model: %s", self.model)
+
+        if info.model == ROCKROBO_V1:
+            _LOGGER.info("Got robov1, checking for firmware version")
+            fw_version = info.firmware_version
+            version, build = fw_version.split("_")
+            version = tuple(map(int, version.split(".")))
+            if version >= (3, 5, 7):
+                self._fanspeeds = FanspeedV2
+            else:
+                self._fanspeeds = FanspeedV1
+        else:
+            self._fanspeeds = FanspeedV2
+
+        _LOGGER.debug(
+            "Using new fanspeed mapping %s for %s", self._fanspeeds, info.model
+        )
+
+    @command()
+    def supported_fanspeeds(self) -> Dict[str, int]:
+        """Return dictionary containing supported fanspeeds."""
+        if self.model is None:
+            self._autodetect_model()
+
+        return {x.name: x.value for x in list(self._fanspeeds)}
 
     @command()
     def sound_info(self):
