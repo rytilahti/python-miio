@@ -441,11 +441,11 @@ class Vacuum(Device):
 
         For the moment this is used only for the fanspeeds,
         but that could be extended to cover other supported features."""
-        # cloud-blocked vacuums will not return proper payloads
         try:
             info = self.info()
             self.model = info.model
         except TypeError:
+            # cloud-blocked vacuums will not return proper payloads
             self._fanspeeds = FanspeedV1
             self.model = ROCKROBO_V1
             _LOGGER.debug("Unable to query model, falling back to %s", self._fanspeeds)
@@ -454,7 +454,7 @@ class Vacuum(Device):
         _LOGGER.info("model: %s", self.model)
 
         if info.model == ROCKROBO_V1:
-            _LOGGER.info("Got robov1, checking for firmware version")
+            _LOGGER.debug("Got robov1, checking for firmware version")
             fw_version = info.firmware_version
             version, build = fw_version.split("_")
             version = tuple(map(int, version.split(".")))
