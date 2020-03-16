@@ -102,3 +102,12 @@ def int_to_rgb(x: int) -> Tuple[int, int, int]:
 def rgb_to_int(x: Tuple[int, int, int]) -> int:
     """Return an integer from RGB tuple."""
     return int(x[0] << 16 | x[1] << 8 | x[2])
+
+
+def int_to_brightness(x: int) -> int:
+    """"Return brightness (0-100) from integer."""
+    return x >> 24
+
+
+def brightness_and_color_to_int(brightness: int, color: Tuple[int, int, int]) -> int:
+    return int(brightness << 24 | color[0] << 16 | color[1] << 8 | color[2])
