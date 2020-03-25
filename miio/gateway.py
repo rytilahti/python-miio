@@ -85,7 +85,7 @@ class Gateway(Device):
         start_id: int = 0,
         debug: int = 0,
     ) -> None:
-        super().__init__(ip, token)
+        super().__init__(ip, token, start_id)
         self._alarm = GatewayAlarm(self)
         self._radio = GatewayRadio(self)
         self._zigbee = GatewayZigbee(self)
