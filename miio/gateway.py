@@ -122,6 +122,11 @@ class Gateway(Device):
         """Get the value of a property for given sid."""
         return self.send("get_device_prop", [sid, property])
 
+    @command(click.argument("sid"), click.argument("properties", nargs=-1))
+    def get_device_prop_exp(self, sid, properties):
+        """Get the value of a bunch of properties for given sid."""
+        return self.send("get_device_prop_exp", [[sid] + list(properties)])
+
     @command(click.argument("sid"), click.argument("property"), click.argument("value"))
     def set_device_prop(self, sid, property, value):
         """Set the device property."""
