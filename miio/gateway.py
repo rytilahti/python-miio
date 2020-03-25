@@ -40,7 +40,8 @@ class DeviceType(IntEnum):
     AqaraSwitch = 51
     AqaraMotion = 52
     AqaraMagnet = 53
-
+    AqaraRelay = 54
+    AqaraSwitch2 = 135
 
 class Gateway(Device):
     """Main class representing the Xiaomi Gateway.
@@ -77,7 +78,13 @@ class Gateway(Device):
     ## scene
     * get_lumi_bind ["scene", <page number>] for rooms/devices"""
 
-    def __init__(self, ip: str = None, token: str = None) -> None:
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+    ) -> None:
         super().__init__(ip, token)
         self._alarm = GatewayAlarm(self)
         self._radio = GatewayRadio(self)
