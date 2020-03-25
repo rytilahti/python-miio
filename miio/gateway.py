@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 
-from .click_common import command, format_output
+from .click_common import LiteralParamType, command, format_output
 from .device import Device
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
@@ -138,6 +138,22 @@ class Gateway(Device):
     def set_device_prop(self, sid, property, value):
         """Set the device property."""
         return self.send("set_device_prop", {"sid": sid, property: value})
+
+    @command(
+        click.argument("sid"),
+        click.argument("command", type=str, required=True),
+        click.argument("parameters", type=LiteralParamType(), required=False),
+    )
+    def raw_child_command(self, sid, command, parameters):
+        """Send a raw command to a child device.
+        This is mostly useful when trying out commands which are not
+        implemented by a given device instance.
+
+        :param str sid: SID of child device
+        :param str command: Command to send
+        :param dict parameters: Parameters to send"""
+        self._protocol.sid = sid;
+        return self.send(command, parameters)
 
     @command()
     def clock(self):
