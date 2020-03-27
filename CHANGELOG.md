@@ -1,5 +1,9 @@
 # Change Log
 
+This release adds support for the following new devices:
+
+* Xiaomi Zero Fog Humidifier \(shuii.humidifier.jsq001\)
+
 ## [0.4.8](https://github.com/rytilahti/python-miio/tree/0.4.8)
 
 This release adds support for the following new devices:
