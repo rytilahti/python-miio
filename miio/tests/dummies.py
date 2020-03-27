@@ -8,7 +8,7 @@ class DummyMiIOProtocol:
         #       return_values) is a temporary workaround to minimize diff size.
         self.dummy_device = dummy_device
 
-    def send(self, command: str, parameters=None, retry_count=3):
+    def send(self, command: str, parameters=None, retry_count=3, extra_parameters=None):
         """Overridden send() to return values from `self.return_values`."""
         return self.dummy_device.return_values[command](parameters)
 
