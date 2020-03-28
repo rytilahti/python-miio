@@ -7,6 +7,7 @@ from miio.airdehumidifier import AirDehumidifier
 from miio.airfresh import AirFresh
 from miio.airfresh_t2017 import AirFreshT2017
 from miio.airhumidifier import AirHumidifier, AirHumidifierCA1, AirHumidifierCB1
+from miio.airhumidifier_jsq import AirHumidifierJsq
 from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airpurifier import AirPurifier
 from miio.airpurifier_miot import AirPurifierMiot

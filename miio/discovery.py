@@ -12,6 +12,7 @@ from . import (
     AirFresh,
     AirFreshT2017,
     AirHumidifier,
+    AirHumidifierJsq,
     AirHumidifierMjjsq,
     AirPurifier,
     AirPurifierMiot,
@@ -117,6 +118,7 @@ DEVICE_MAP = {
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
     "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),
+    "shuii-humidifier-jsq001": partial(AirHumidifierJsq, model=MODEL_HUMIDIFIER_MJJSQ),
     "deerma-humidifier-mjjsq": partial(
         AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
     ),
