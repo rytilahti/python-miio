@@ -108,6 +108,11 @@ class AirHumidifierStatus:
         return brightness
 
     @property
+    def led(self) -> bool:
+        """True if LED is turned on."""
+        return self.led_brightness is not LedBrightness.Off
+
+    @property
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == 1
