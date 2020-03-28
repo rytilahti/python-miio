@@ -11,7 +11,6 @@ from miio.airhumidifier_jsq import (
     LedBrightness,
     OperationMode,
 )
-from miio.device import DeviceInfo
 
 from .dummies import DummyDevice
 
@@ -113,10 +112,7 @@ class TestAirHumidifierJsq(TestCase):
     def test_status(self):
         self.device._reset_state()
 
-        device_info = DeviceInfo(self.device.dummy_device_info)
-        assert repr(self.state()) == repr(
-            AirHumidifierStatus(self.device.start_state, device_info)
-        )
+        assert repr(self.state()) == repr(AirHumidifierStatus(self.device.start_state))
 
         assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().humidity == self.device.start_state["humidity"]
@@ -129,8 +125,6 @@ class TestAirHumidifierJsq(TestCase):
         assert self.is_on() is True
         assert self.state().no_water == (self.device.start_state["no_water"] == 1)
         assert self.state().lid_opened == (self.device.start_state["lid_opened"] == 1)
-        assert self.state().hardware_version == self.device.dummy_device_info["hw_ver"]
-        assert self.state().firmware_version == self.device.dummy_device_info["fw_ver"]
 
     def test_status_wrong_input(self):
         def mode():

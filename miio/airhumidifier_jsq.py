@@ -6,7 +6,7 @@ import click
 
 from .airhumidifier import AirHumidifierException
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceInfo, Optional
+from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class LedBrightness(enum.Enum):
 class AirHumidifierStatus:
     """Container for status reports from the air humidifier jsq."""
 
-    def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
+    def __init__(self, data: Dict[str, Any]) -> None:
         """
         Status of an Air Humidifier (shuii.humidifier.jsq001):
             [24, 30, 1, 1, 0, 2, 0, 0, 0]
@@ -57,7 +57,6 @@ class AirHumidifierStatus:
               'lid_opened': 0}
         """
         self.data = data
-        self.device_info = device_info
 
     @property
     def power(self) -> str:
@@ -127,16 +126,6 @@ class AirHumidifierStatus:
         """True if the water tank is detached."""
         return self.data["lid_opened"] == 1
 
-    @property
-    def firmware_version(self) -> str:
-        """Returns the fw_ver of miIO.info. For example 1.3.9."""
-        return self.device_info.firmware_version
-
-    @property
-    def hardware_version(self) -> Optional[str]:
-        """The hardware version."""
-        return self.device_info.hardware_version
-
     def __repr__(self) -> str:
         s = (
             "<AirHumidiferStatus power=%s, "
@@ -147,9 +136,7 @@ class AirHumidifierStatus:
             "buzzer=%s, "
             "child_lock=%s, "
             "no_water=%s, "
-            "lid_opened=%s, "
-            "hardware_version=%s, "
-            "firmware_version=%s>"
+            "lid_opened=%s>"
             % (
                 self.power,
                 self.mode,
@@ -160,8 +147,6 @@ class AirHumidifierStatus:
                 self.child_lock,
                 self.no_water,
                 self.lid_opened,
-                self.firmware_version,
-                self.hardware_version,
             )
         )
         return s
@@ -187,7 +172,6 @@ class AirHumidifierJsq(Device):
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         self.model = model if model in AVAILABLE_PROPERTIES else MODEL_HUMIDIFIER_JSQ001
-        self.device_info = None
 
     @command(
         default_output=format_output(
@@ -200,16 +184,11 @@ class AirHumidifierJsq(Device):
             "LED brightness: {result.led_brightness}\n"
             "Child lock: {result.child_lock}\n"
             "No water: {result.no_water}\n"
-            "Lid opened: {result.lid_opened}\n"
-            "Firmware version: {result.firmware_version}\n"
-            "Hardware version: {result.hardware_version}\n",
+            "Lid opened: {result.lid_opened}\n",
         )
     )
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
-
-        if self.device_info is None:
-            self.device_info = self.info()
 
         values = self.send("get_props")
 
@@ -237,9 +216,7 @@ class AirHumidifierJsq(Device):
                 values,
             )
 
-        return AirHumidifierStatus(
-            {k: v for k, v in zip(properties, values)}, self.device_info
-        )
+        return AirHumidifierStatus({k: v for k, v in zip(properties, values)})
 
     @command(default_output=format_output("Powering on"))
     def on(self):
