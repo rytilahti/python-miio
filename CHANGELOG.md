@@ -2,7 +2,7 @@
 
 ## [0.5.0](https://github.com/rytilahti/python-miio/tree/0.5.0)
 
-Xiaomi is slowly moving to use new protocol dubbed MiOT on the newer devices. To celebrate the integration of initial support for this protocol, it is time to jump from 0.4 to 0.5 series!
+Xiaomi is slowly moving to use new protocol dubbed MiOT on the newer devices. To celebrate the integration of initial support for this protocol, it is time to jump from 0.4 to 0.5 series! Shout-out to @rezmus for the insightful notes, links, clarifications on #543 to help to understand how the protocol works!
 
 Special thanks go to both @petrkotek (for initial support) and @foxel (for polishing it for this release) for making this possible. The ground work they did will make adding support for other new miot devices possible.
 
