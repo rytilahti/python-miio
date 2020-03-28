@@ -152,8 +152,7 @@ class Gateway(Device):
         :param str sid: SID of child device
         :param str command: Command to send
         :param dict parameters: Parameters to send"""
-        self._protocol.sid = sid;
-        return self.send(command, parameters)
+        return self.send(command, parameters, extra_parameters={"sid": sid})
 
     @command()
     def clock(self):
