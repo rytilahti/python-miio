@@ -189,7 +189,7 @@ class MiIOProtocol:
                 "%s:%s (ts: %s, id: %s) << %s",
                 self.ip,
                 self.port,
-                payload.ts,
+                m.header.value.ts,
                 payload["id"],
                 payload,
             )
