@@ -13,10 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_PHILIPS_LIGHT_BULB = "philips.light.bulb"
 MODEL_PHILIPS_LIGHT_HBULB = "philips.light.hbulb"
 
-AVAILABLE_PROPERTIES_COMMON = [
-    "power",
-    "dv",
-]
+AVAILABLE_PROPERTIES_COMMON = ["power", "dv"]
 
 AVAILABLE_PROPERTIES = {
     MODEL_PHILIPS_LIGHT_HBULB: AVAILABLE_PROPERTIES_COMMON + ["bri"],
@@ -121,17 +118,7 @@ class PhilipsWhiteBulb(Device):
         """Retrieve properties."""
 
         properties = AVAILABLE_PROPERTIES[self.model]
-        values = self.send("get_prop", properties)
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
+        values = self.get_properties(properties)
 
         return PhilipsBulbStatus(defaultdict(lambda: None, zip(properties, values)))
 

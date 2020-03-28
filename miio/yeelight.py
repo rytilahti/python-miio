@@ -145,7 +145,7 @@ class Yeelight(Device):
             "save_state",
         ]
 
-        values = self.send("get_prop", properties)
+        values = self.get_properties(properties)
 
         return YeelightStatus(dict(zip(properties, values)))
 

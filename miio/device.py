@@ -181,3 +181,36 @@ class Device(metaclass=DeviceGroupMeta):
         params = {"ssid": ssid, "passwd": password, "uid": uid, **extra_params}
 
         return self._protocol.send("miIO.config_router", params)[0]
+
+    def get_properties(self, properties, *, max_properties=None):
+        """Request properties in slices based on given max_properties.
+
+        This is necessary as some devices have limitation on how many
+        properties can be queried at once.
+
+        If `max_properties` is None, all properties are requested at once.
+
+        :param list properties: List of properties to query from the device.
+        :param int max_properties: Number of properties that can be requested at once.
+        :return List of property values.
+        """
+        _props = properties.copy()
+        values = []
+        while _props:
+            values.extend(self.send("get_prop", _props[:max_properties]))
+            if max_properties is None:
+                break
+
+            _props[:] = _props[max_properties:]
+
+        properties_count = len(properties)
+        values_count = len(values)
+        if properties_count != values_count:
+            _LOGGER.debug(
+                "Count (%s) of requested properties does not match the "
+                "count (%s) of received values.",
+                properties_count,
+                values_count,
+            )
+
+        return values

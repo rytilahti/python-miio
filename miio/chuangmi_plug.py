@@ -134,17 +134,7 @@ class ChuangmiPlug(Device):
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model].copy()
-        values = self.send("get_prop", properties)
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
+        values = self.get_properties(properties)
 
         if self.model == MODEL_CHUANGMI_PLUG_V3:
             load_power = self.send("get_power")  # Response: [300]

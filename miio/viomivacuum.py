@@ -233,7 +233,7 @@ class ViomiVacuum(Device):
             "has_newmap",
         ]
 
-        values = self.send("get_prop", properties)
+        values = self.get_properties(properties)
 
         return ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
 

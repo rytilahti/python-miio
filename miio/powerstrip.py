@@ -198,17 +198,7 @@ class PowerStrip(Device):
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
-        values = self.send("get_prop", properties)
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
+        values = self.get_properties(properties)
 
         return PowerStripStatus(defaultdict(lambda: None, zip(properties, values)))
 

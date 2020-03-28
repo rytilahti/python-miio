@@ -119,16 +119,8 @@ class Toiletlid(Device):
     def status(self) -> ToiletlidStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
-        values = self.send("get_prop", properties)
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.error(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
+        values = self.get_properties(properties)
+
         color = self.get_ambient_light()
         return ToiletlidStatus(dict(zip(properties, values), ambient_light=color))
 
