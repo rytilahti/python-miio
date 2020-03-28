@@ -10,7 +10,7 @@ For those who are interested in adding support to new MiOT devices can check out
 
 This release adds support for the following new devices:
 * Air purifier 3/3H support (zhimi.airpurifier.mb3, zhimi.airpurifier.ma4)
-* Xiaomi Gateway devices (basic support)
+* Xiaomi Gateway devices (lumi.gateway.v3, basic support)
 * SmartMi Zhimi Heaters (zhimi.heater.za2)
 * Xiaomi Zero Fog Humidifier (shuii.humidifier.jsq001)
 
