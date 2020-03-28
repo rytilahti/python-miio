@@ -243,6 +243,26 @@ class TestAirHumidifierJsq(TestCase):
         self.device.set_buzzer(False)
         assert buzzer() is False
 
+        # if user uses wrong type for buzzer value
+        self.device.set_buzzer(1)
+        assert buzzer() is True
+
+        self.device.set_buzzer(0)
+        assert buzzer() is False
+
+        self.device.set_buzzer("not_empty_str")
+        assert buzzer() is True
+
+        self.device.set_buzzer("on")
+        assert buzzer() is True
+
+        # all string values are considered to by True, even "off"
+        self.device.set_buzzer("off")
+        assert buzzer() is True
+
+        self.device.set_buzzer("")
+        assert buzzer() is False
+
     def test_status_without_temperature(self):
         self.device._reset_state()
         self.device.state["temperature"] = None
@@ -269,4 +289,24 @@ class TestAirHumidifierJsq(TestCase):
         assert child_lock() is True
 
         self.device.set_child_lock(False)
+        assert child_lock() is False
+
+        # if user uses wrong type for buzzer value
+        self.device.set_child_lock(1)
+        assert child_lock() is True
+
+        self.device.set_child_lock(0)
+        assert child_lock() is False
+
+        self.device.set_child_lock("not_empty_str")
+        assert child_lock() is True
+
+        self.device.set_child_lock("on")
+        assert child_lock() is True
+
+        # all string values are considered to by True, even "off"
+        self.device.set_child_lock("off")
+        assert child_lock() is True
+
+        self.device.set_child_lock("")
         assert child_lock() is False

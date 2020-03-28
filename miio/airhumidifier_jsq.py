@@ -167,9 +167,8 @@ class AirHumidifierStatus:
 
 class AirHumidifierJsq(Device):
     """
-    Implementation of Xiaomi The fog free of humidifier:
-      shuii.humidifier.jsq001
-     """
+    Implementation of Xiaomi Zero Fog Humidifier: shuii.humidifier.jsq001
+    """
 
     def __init__(
         self,
@@ -182,11 +181,7 @@ class AirHumidifierJsq(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_HUMIDIFIER_JSQ001
-
+        self.model = model if model in AVAILABLE_PROPERTIES else MODEL_HUMIDIFIER_JSQ001
         self.device_info = None
 
     @command(
@@ -258,16 +253,7 @@ class AirHumidifierJsq(Device):
     def set_mode(self, mode: OperationMode):
         """Set mode."""
         value = mode.value
-        if value not in (
-            e.value
-            for e in [
-                OperationMode.Intelligent,
-                OperationMode.Level1,
-                OperationMode.Level2,
-                OperationMode.Level3,
-                OperationMode.Level4,
-            ]
-        ):
+        if value not in (om.value for om in OperationMode):
             raise AirHumidifierException(
                 "{} is not a valid OperationMode value".format(value)
             )
@@ -281,9 +267,7 @@ class AirHumidifierJsq(Device):
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         value = brightness.value
-        if value not in (
-            e.value for e in [LedBrightness.Off, LedBrightness.Low, LedBrightness.High]
-        ):
+        if value not in (lb.value for lb in LedBrightness):
             raise AirHumidifierException(
                 "{} is not a valid LedBrightness value".format(value)
             )
@@ -298,10 +282,8 @@ class AirHumidifierJsq(Device):
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
-        if led:
-            return self.set_led_brightness(LedBrightness.High)
-        else:
-            return self.set_led_brightness(LedBrightness.Off)
+        brightness = LedBrightness.High if led else LedBrightness.Off
+        return self.set_led_brightness(brightness)
 
     @command(
         click.argument("buzzer", type=bool),
@@ -311,10 +293,7 @@ class AirHumidifierJsq(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        if buzzer:
-            return self.send("set_buzzer", [1])
-        else:
-            return self.send("set_buzzer", [0])
+        return self.send("set_buzzer", [int(bool(buzzer))])
 
     @command(
         click.argument("lock", type=bool),
@@ -324,7 +303,4 @@ class AirHumidifierJsq(Device):
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
-        if lock:
-            return self.send("set_lock", [1])
-        else:
-            return self.send("set_lock", [0])
+        return self.send("set_lock", [int(bool(lock))])
