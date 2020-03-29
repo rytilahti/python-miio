@@ -1,5 +1,26 @@
 # Change Log
 
+## [0.5.0.1](https://github.com/rytilahti/python-miio/tree/0.5.0.1)
+
+Due to a mistake during the release process, some changes were completely left out from the release.
+This release simply bases itself on the current master to fix that.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.0...0.5.0.1)
+
+**Closed issues:**
+
+- Xiaomi Mijia Smart Sterilization Humidifier \(SCK0A45\) error - DEBUG:miio.protocol:Unable to decrypt, returning raw bytes: b'' [\#649](https://github.com/rytilahti/python-miio/issues/649)
+
+**Merged pull requests:**
+
+- Prepare for 0.5.0 [\#658](https://github.com/rytilahti/python-miio/pull/658) ([rytilahti](https://github.com/rytilahti))
+- Add miottemplate tool to simplify adding support for new miot devices [\#656](https://github.com/rytilahti/python-miio/pull/656) ([rytilahti](https://github.com/rytilahti))
+- Add Xiaomi Zero Fog Humidifier \(shuii.humidifier.jsq001\) support \(\#642\) [\#654](https://github.com/rytilahti/python-miio/pull/654) ([iromeo](https://github.com/iromeo))
+- Gateway get\_device\_prop\_exp command [\#652](https://github.com/rytilahti/python-miio/pull/652) ([fsalomon](https://github.com/fsalomon))
+- Add fan\_speed\_presets\(\) for querying available fan speeds [\#643](https://github.com/rytilahti/python-miio/pull/643) ([rytilahti](https://github.com/rytilahti))
+- Initial support for xiaomi gateway devices [\#470](https://github.com/rytilahti/python-miio/pull/470) ([rytilahti](https://github.com/rytilahti))
+
+
 ## [0.5.0](https://github.com/rytilahti/python-miio/tree/0.5.0)
 
 Xiaomi is slowly moving to use new protocol dubbed MiOT on the newer devices. To celebrate the integration of initial support for this protocol, it is time to jump from 0.4 to 0.5 series! Shout-out to @rezmus for the insightful notes, links, clarifications on #543 to help to understand how the protocol works!
