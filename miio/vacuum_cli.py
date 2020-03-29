@@ -230,17 +230,17 @@ def manual(vac: miio.Vacuum):
     # if not vac.manual_mode and command :
 
 
-@manual.command()  # noqa: F811  # redefinition of start
+@manual.command()
 @pass_dev
-def start(vac: miio.Vacuum):
+def start(vac: miio.Vacuum):  # noqa: F811  # redef of start
     """Activate the manual mode."""
     click.echo("Activating manual controls")
     return vac.manual_start()
 
 
-@manual.command()  # noqa: F811  # redefinition of stop
+@manual.command()
 @pass_dev
-def stop(vac: miio.Vacuum):
+def stop(vac: miio.Vacuum):  # noqa: F811  # redef of stop
     """Deactivate the manual mode."""
     click.echo("Deactivating manual controls")
     return vac.manual_stop()
