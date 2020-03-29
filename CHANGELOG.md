@@ -1,5 +1,74 @@
 # Change Log
 
+## [0.5.0](https://github.com/rytilahti/python-miio/tree/0.5.0)
+
+Xiaomi is slowly moving to use new protocol dubbed MiOT on the newer devices. To celebrate the integration of initial support for this protocol, it is time to jump from 0.4 to 0.5 series! Shout-out to @rezmus for the insightful notes, links, clarifications on #543 to help to understand how the protocol works!
+
+Special thanks go to both @petrkotek (for initial support) and @foxel (for polishing it for this release) for making this possible. The ground work they did will make adding support for other new miot devices possible.
+
+For those who are interested in adding support to new MiOT devices can check out devtools directory in the git repository, which now hosts a tool to simplify the process. As always, contributions are  welcome!
+
+This release adds support for the following new devices:
+* Air purifier 3/3H support (zhimi.airpurifier.mb3, zhimi.airpurifier.ma4)
+* Xiaomi Gateway devices (lumi.gateway.v3, basic support)
+* SmartMi Zhimi Heaters (zhimi.heater.za2)
+* Xiaomi Zero Fog Humidifier (shuii.humidifier.jsq001)
+
+Fixes & Enhancements:
+* Vacuum objects can now be queried for supported fanspeeds
+* Several improvements to Viomi vacuums
+* Roborock S6: recovery map controls
+* And some other fixes, see the full changelog!
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.4.8...0.5.0)
+
+**Closed issues:**
+
+- viomi.vacuum.v7 and zhimi.airpurifier.mb3 support homeassistain yet? [\#645](https://github.com/rytilahti/python-miio/issues/645)
+- subcon should be a Construct field [\#641](https://github.com/rytilahti/python-miio/issues/641)
+- Roborock S6 - only reachable from different subnet [\#640](https://github.com/rytilahti/python-miio/issues/640)
+- Python 3.7 error [\#639](https://github.com/rytilahti/python-miio/issues/639)
+- Posibillity for local push instead of poll? [\#638](https://github.com/rytilahti/python-miio/issues/638)
+- Xiaomi STYJ02YM discovered but not responding [\#628](https://github.com/rytilahti/python-miio/issues/628)
+- miplug module is not working from python scrips [\#621](https://github.com/rytilahti/python-miio/issues/621)
+- Unsupported device found: zhimi.humidifier.v1 [\#620](https://github.com/rytilahti/python-miio/issues/620)
+- Support for Smartmi Radiant Heater Smart Version \(zhimi.heater.za2\) [\#615](https://github.com/rytilahti/python-miio/issues/615)
+- Support for Xiaomi Qingping Bluetooth Alarm Clock? [\#614](https://github.com/rytilahti/python-miio/issues/614)
+- How to connect a device to WIFI without MiHome app  |  Can I connect a device to WIFI using Raspberry Pi?  \#help wanted \#Support [\#609](https://github.com/rytilahti/python-miio/issues/609)
+- Additional commands for vacuum [\#607](https://github.com/rytilahti/python-miio/issues/607)
+- "cgllc.airmonitor.b1"   No response from the device [\#603](https://github.com/rytilahti/python-miio/issues/603)
+- Xiao AI Smart Alarm Clock Time [\#600](https://github.com/rytilahti/python-miio/issues/600)
+- Support new device \(yeelink.light.lamp4\) [\#598](https://github.com/rytilahti/python-miio/issues/598)
+- Errors not shown for S6 [\#595](https://github.com/rytilahti/python-miio/issues/595)
+- Fully charged state not shown [\#594](https://github.com/rytilahti/python-miio/issues/594)
+- Support for Roborock S6/T6 [\#593](https://github.com/rytilahti/python-miio/issues/593)
+- Pi3 b python error [\#588](https://github.com/rytilahti/python-miio/issues/588)
+- Support for Xiaomi Air Purifier 3 \(zhimi.airpurifier.ma4\) [\#577](https://github.com/rytilahti/python-miio/issues/577)
+- Updater: Uses wrong local IP address for HTTP server [\#571](https://github.com/rytilahti/python-miio/issues/571)
+- How to deal with getDeviceWifi\(\).subscribe [\#528](https://github.com/rytilahti/python-miio/issues/528)
+- Move Roborock when in error [\#524](https://github.com/rytilahti/python-miio/issues/524)
+- Roborock v2 zoned\_clean\(\) doesn't work [\#490](https://github.com/rytilahti/python-miio/issues/490)
+- \[ADD\] Xiaomi Mijia Caméra IP WiFi 1080P Panoramique [\#484](https://github.com/rytilahti/python-miio/issues/484)
+- Add unit tests [\#88](https://github.com/rytilahti/python-miio/issues/88)
+- Get the map from Mi Vacuum V1? [\#356](https://github.com/rytilahti/python-miio/issues/356)
+
+**Merged pull requests:**
+
+- Add miottemplate tool to simplify adding support for new miot devices [\#656](https://github.com/rytilahti/python-miio/pull/656) ([rytilahti](https://github.com/rytilahti))
+- Add Xiaomi Zero Fog Humidifier \(shuii.humidifier.jsq001\) support \(\#642\) [\#654](https://github.com/rytilahti/python-miio/pull/654) ([iromeo](https://github.com/iromeo))
+- Gateway get\_device\_prop\_exp command [\#652](https://github.com/rytilahti/python-miio/pull/652) ([fsalomon](https://github.com/fsalomon))
+- Add fan\_speed\_presets\(\) for querying available fan speeds [\#643](https://github.com/rytilahti/python-miio/pull/643) ([rytilahti](https://github.com/rytilahti))
+- Air purifier 3/3H support \(remastered\) [\#634](https://github.com/rytilahti/python-miio/pull/634) ([foxel](https://github.com/foxel))
+- Add eyecare on/off to philips\_eyecare\_cli [\#631](https://github.com/rytilahti/python-miio/pull/631) ([hhrsscc](https://github.com/hhrsscc))
+- Extend viomi vacuum support [\#626](https://github.com/rytilahti/python-miio/pull/626) ([rytilahti](https://github.com/rytilahti))
+- Add support for SmartMi Zhimi Heaters [\#625](https://github.com/rytilahti/python-miio/pull/625) ([bazuchan](https://github.com/bazuchan))
+- Add error code 24 definition \("No-go zone or invisible wall detected"\) [\#623](https://github.com/rytilahti/python-miio/pull/623) ([insajd](https://github.com/insajd))
+- s6: two new commands for map handling [\#608](https://github.com/rytilahti/python-miio/pull/608) ([glompfine](https://github.com/glompfine))
+- Refactoring: Split Device class into Device+Protocol [\#592](https://github.com/rytilahti/python-miio/pull/592) ([petrkotek](https://github.com/petrkotek))
+- STYJ02YM: Manual movement and mop mode support [\#590](https://github.com/rytilahti/python-miio/pull/590) ([rumpeltux](https://github.com/rumpeltux))
+- Initial support for xiaomi gateway devices [\#470](https://github.com/rytilahti/python-miio/pull/470) ([rytilahti](https://github.com/rytilahti))
+
+
 ## [0.4.8](https://github.com/rytilahti/python-miio/tree/0.4.8)
 
 This release adds support for the following new devices:
