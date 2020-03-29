@@ -59,9 +59,10 @@ class MiIOProtocol:
 
         :raises DeviceException: if the device could not be discovered."""
         m = MiIOProtocol.discover(self.ip)
+        header = m.header.value
         if m is not None:
-            self._device_id = m.header.value.device_id
-            self._device_ts = m.header.value.ts
+            self._device_id = header.device_id
+            self._device_ts = header.ts
             self._discovered = True
             if self.debug > 1:
                 _LOGGER.debug(m)
@@ -179,17 +180,21 @@ class MiIOProtocol:
         try:
             data, addr = s.recvfrom(1024)
             m = Message.parse(data, token=self.token)
-            self._device_ts = m.header.value.ts
+
+            header = m.header.value
+            payload = m.data.value
+
+            self.__id = payload["id"]
+            self._device_ts = header.ts
+
             if self.debug > 1:
                 _LOGGER.debug("recv from %s: %s", addr[0], m)
 
-            payload = m.data.value
-            self.__id = payload["id"]
             _LOGGER.debug(
                 "%s:%s (ts: %s, id: %s) << %s",
                 self.ip,
                 self.port,
-                payload.ts,
+                header.ts,
                 payload["id"],
                 payload,
             )
