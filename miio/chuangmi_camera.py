@@ -1,4 +1,4 @@
-"""Xiaomi Chuangmi camera (chuangmi.camera.ipc009) support."""
+"""Xiaomi Chuangmi camera (chuangmi.camera.ipc009, ipc019) support."""
 
 import enum
 import logging
