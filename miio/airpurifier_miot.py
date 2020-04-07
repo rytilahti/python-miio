@@ -297,7 +297,7 @@ class AirPurifierMiot(MiotDevice):
         return AirPurifierMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties()
+                for prop in self.get_properties_for_mapping()
             }
         )
 

@@ -20,31 +20,13 @@ class MiotDevice(Device):
         self.mapping = mapping
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-    def get_properties(self) -> list:
+    def get_properties_for_mapping(self) -> list:
         """Retrieve raw properties based on mapping."""
 
         # We send property key in "did" because it's sent back via response and we can identify the property.
         properties = [{"did": k, **v} for k, v in self.mapping.items()]
 
-        # A single request is limited to 16 properties. Therefore the
-        # properties are divided into multiple requests
-        _props = properties.copy()
-        values = []
-        while _props:
-            values.extend(self.send("get_properties", _props[:15]))
-            _props[:] = _props[15:]
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.debug(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
-
-        return values
+        return self.get_properties(properties, max_properties=15)
 
     def set_property(self, property_key: str, value):
         """Sets property value."""
