@@ -46,7 +46,7 @@ class ChuangmiPlugStatus:
     def power(self) -> bool:
         """Current power state."""
         if "on" in self.data:
-            return self.data["on"] == True or self.data["on"] == "on"
+            return self.data["on"] or self.data["on"] == "on"
         if "power" in self.data:
             return self.data["power"] == "on"
 
