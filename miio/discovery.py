@@ -164,6 +164,7 @@ DEVICE_MAP = {
         x, "https://github.com/Danielhiversen/PyXiaomiGateway"
     ),
     "viomi-vacuum-v7": ViomiVacuum,
+    "viomi-vacuum-v8": ViomiVacuum,
     "zhimi.heater.za1": partial(Heater, model=MODEL_HEATER_ZA1),
     "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
 }  # type: Dict[str, Union[Callable, Device]]
