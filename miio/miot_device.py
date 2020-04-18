@@ -78,10 +78,10 @@ class MiotDevice(Device):
 
         return self.get_properties(properties, max_properties=max_properties)
 
-    def set_property(self, property_key: str, value):
+    def set_property(self, property_mapping, property_key: str, value):
         """Sets property value."""
 
         return self.send(
             "set_properties",
-            [{"did": property_key, **self.mapping[property_key], "value": value}],
+            [{"did": property_key, **property_mapping[property_key], "value": value}],
         )
