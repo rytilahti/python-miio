@@ -1016,7 +1016,7 @@ New supported devices:
 * Xiaomi Water Purifier
 * Xiaomi Air Humidifier
 * Xiaomi Smart Wifi Speaker (incomplete, help wanted)
-    
+
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.2.0...0.3.0)
 
 **Implemented enhancements:**
@@ -1056,7 +1056,7 @@ Considering how far this project has evolved from being just an interface for th
 
 This release brings support to a couple of new devices, and contains fixes for some already supported ones.
 All thanks for the improvements in this release go to syssi!
-    
+
 * Extended mDNS discovery to support more devices (@syssi)
 * Improved support for the following devices:
     * Air purifier (@syssi)
@@ -1120,7 +1120,7 @@ Fix dependencies
     * Xiaomi Philips LED Ball Lamp (@kuduka)
 
 * Discovery now uses mDNS instead of handshake protocol. Old behavior still available with `--handshake true`
-    
+
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.1.2...0.1.3)
 
 **Closed issues:**

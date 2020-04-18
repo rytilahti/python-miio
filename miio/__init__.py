@@ -1,4 +1,5 @@
 # flake8: noqa
+from importlib_metadata import version  # type: ignore
 from miio.airconditioningcompanion import (
     AirConditioningCompanion,
     AirConditioningCompanionV3,
@@ -47,3 +48,5 @@ from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
 
 from miio.discovery import Discovery
+
+__version__ = version("python-miio")

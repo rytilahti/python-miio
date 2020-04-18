@@ -45,7 +45,3 @@ steps:
 - script: |
     pytest --cov miio --cov-report html
   displayName: 'Tests'
-
-- script: |
-    pre-commit run check-manifest --all-files
-  displayName: 'Check MANIFEST.in'
