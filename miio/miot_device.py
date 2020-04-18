@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from .click_common import command
 from .device import Device
+from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ class MiotInfo:
     """Container for common MiotInfo service."""
 
     _siid = 1
-    _max_properties = 1
+    _max_properties = 1  # some devices respond with broken json otherwise
 
     manufacturer: str = field(metadata={"piid": 1})
     model: str = field(metadata={"piid": 2})
@@ -45,8 +46,17 @@ class MiotDevice(Device):
 
         for field_name in fields:
             field_meta = fields[field_name].metadata
-            siid = field_meta.get("siid", cls._siid)
+
+            if "piid" not in field_meta:
+                continue
             piid = field_meta["piid"]
+
+            siid = field_meta.get("siid", getattr(cls, "_siid", None))
+            if siid is None:
+                raise DeviceException(
+                    f"no siid defined for {field_name} or for class {cls}"
+                )
+
             property_mapping[field_name] = {"siid": siid, "piid": piid}
 
         response = {
