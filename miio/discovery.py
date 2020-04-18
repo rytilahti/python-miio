@@ -113,6 +113,7 @@ DEVICE_MAP = {
     "zhimi-airpurifier-mb3": AirPurifierMiot,  # mb3 (3/3H)
     "zhimi-airpurifier-ma4": AirPurifierMiot,  # ma4 (3)
     "chuangmi.camera.ipc009": ChuangmiCamera,
+    "chuangmi.camera.ipc019": ChuangmiCamera,
     "chuangmi-ir-v2": ChuangmiIr,
     "chuangmi-remote-h102a03_": ChuangmiIr,
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
