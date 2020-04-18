@@ -1,0 +1,94 @@
+[tool.poetry]
+name = "python-miio"
+version = "0.5.0.1"
+description = "Python library for interfacing with Xiaomi smart appliances"
+authors = ["Teemu R <tpr@iki.fi>"]
+repository = "https://github.com/rytilahti/python-miio"
+documentation = "https://python-miio.readthedocs.io"
+license = "GPL-3.0-only"
+readme = "README.rst"
+packages = [
+  { include = "miio" }
+]
+keywords = ["xiaomi", "miio", "miot", "smart home"]
+
+[tool.poetry.scripts]
+mirobo = "miio.vacuum_cli:cli"
+miplug = "miio.plug_cli:cli"
+miceil = "miio.ceil_cli:cli"
+mieye = "miio.philips_eyecare_cli:cli"
+miio-extract-tokens = "miio.extract_tokens:main"
+miiocli = "miio.cli:create_cli"
+
+[tool.poetry.dependencies]
+python = "^3.6.5"
+click = "^7.1.1"
+cryptography = "^2.9"
+construct = "^2.10.56"
+zeroconf = "^0.25.1"
+attrs = "^19.3.0"
+pytz = "^2019.3"
+appdirs = "^1.4.3"
+tqdm = "^4.45.0"
+netifaces = "^0.10.9"
+android_backup = { version = "^0.2", optional = true }
+importlib_metadata = "^1.6.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.1"
+pytest-cov = "^2.8.1"
+pytest-mock = "^3.1.0"
+voluptuous = "^0.11.7"
+pre-commit = "^2.2.0"
+sphinx = "^3.0.1"
+doc8 = "^0.8.0"
+restructuredtext_lint = "^1.3.0"
+sphinx-autodoc-typehints = "^1.10.3"
+sphinx-click = "^2.3.2"
+tox = "^3.14.6"
+isort = "^4.3.21"
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 88
+forced_separate = "miio.discover"
+known_first_party = "miio"
+known_third_party = ["appdirs",
+  "attr",
+  "click",
+  "construct",
+  "cryptography",
+  "netifaces",
+  "pytest",
+  "pytz",
+  "setuptools",
+  "tqdm",
+  "zeroconf"
+]
+
+
+[tool.coverage.run]
+source = ["miio"]
+branch = true
+omit = ["miio/*cli.py",
+  "miio/extract_tokens.py",
+  "miio/tests/*",
+  "miio/version.py"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  # ignore abstract methods
+  "raise NotImplementedError",
+  "def __repr__"
+]
+
+[tool.check-manifest]
+ignore = ["devtools/*"]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
