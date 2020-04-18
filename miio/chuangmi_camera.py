@@ -166,7 +166,7 @@ class ChuangmiCamera(Device):
             "mini_level",
         ]
 
-        values = self.send("get_prop", properties)
+        values = self.get_properties(properties)
 
         return CameraStatus(dict(zip(properties, values)))
 

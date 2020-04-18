@@ -167,21 +167,7 @@ class AirHumidifierMjjsq(Device):
         """Retrieve properties."""
 
         properties = AVAILABLE_PROPERTIES[self.model]
-        _props = properties.copy()
-        values = []
-        while _props:
-            values.extend(self.send("get_prop", _props[:1]))
-            _props[:] = _props[1:]
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.error(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
+        values = self.get_properties(properties, max_properties=1)
 
         return AirHumidifierStatus(defaultdict(lambda: None, zip(properties, values)))
 

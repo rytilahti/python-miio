@@ -418,21 +418,7 @@ class Fan(Device):
         if self.model in [MODEL_FAN_SA1, MODEL_FAN_ZA1, MODEL_FAN_ZA3, MODEL_FAN_ZA4]:
             _props_per_request = 1
 
-        _props = properties.copy()
-        values = []
-        while _props:
-            values.extend(self.send("get_prop", _props[:_props_per_request]))
-            _props[:] = _props[_props_per_request:]
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.error(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
+        values = self.get_properties(properties, max_properties=_props_per_request)
 
         return FanStatus(dict(zip(properties, values)))
 
@@ -662,25 +648,7 @@ class FanP5(Device):
     def status(self) -> FanStatusP5:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]
-
-        # A single request is limited to 16 properties. Therefore the
-        # properties are divided into multiple requests
-        _props_per_request = 15
-        _props = properties.copy()
-        values = []
-        while _props:
-            values.extend(self.send("get_prop", _props[:_props_per_request]))
-            _props[:] = _props[_props_per_request:]
-
-        properties_count = len(properties)
-        values_count = len(values)
-        if properties_count != values_count:
-            _LOGGER.error(
-                "Count (%s) of requested properties does not match the "
-                "count (%s) of received values.",
-                properties_count,
-                values_count,
-            )
+        values = self.get_properties(properties, max_properties=15)
 
         return FanStatusP5(dict(zip(properties, values)))
 
