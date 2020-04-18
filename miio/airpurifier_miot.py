@@ -294,12 +294,12 @@ class AirPurifierMiot(MiotDevice):
     @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
-        return self.set_property(_MAPPING, "power", True)
+        return self.set_property_from_mapping(_MAPPING, "power", True)
 
     @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
-        return self.set_property(_MAPPING, "power", False)
+        return self.set_property_from_mapping(_MAPPING, "power", False)
 
     @command(
         click.argument("level", type=int),
@@ -309,7 +309,7 @@ class AirPurifierMiot(MiotDevice):
         """Set fan level."""
         if level < 1 or level > 3:
             raise AirPurifierMiotException("Invalid fan level: %s" % level)
-        return self.set_property(_MAPPING, "fan_level", level)
+        return self.set_property_from_mapping(_MAPPING, "fan_level", level)
 
     @command(
         click.argument("rpm", type=int),
@@ -323,7 +323,7 @@ class AirPurifierMiot(MiotDevice):
                 "Invalid favorite motor speed: %s. Must be between 300 and 2300 and divisible by 10"
                 % rpm
             )
-        return self.set_property(_MAPPING, "favorite_rpm", rpm)
+        return self.set_property_from_mapping(_MAPPING, "favorite_rpm", rpm)
 
     @command(
         click.argument("volume", type=int),
@@ -335,7 +335,7 @@ class AirPurifierMiot(MiotDevice):
             raise AirPurifierMiotException(
                 "Invalid volume: %s. Must be between 0 and 100" % volume
             )
-        return self.set_property(_MAPPING, "buzzer_volume", volume)
+        return self.set_property_from_mapping(_MAPPING, "buzzer_volume", volume)
 
     @command(
         click.argument("mode", type=EnumType(OperationMode, False)),
@@ -343,7 +343,7 @@ class AirPurifierMiot(MiotDevice):
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
-        return self.set_property(_MAPPING, "mode", mode.value)
+        return self.set_property_from_mapping(_MAPPING, "mode", mode.value)
 
     @command(
         click.argument("level", type=int),
@@ -356,7 +356,7 @@ class AirPurifierMiot(MiotDevice):
         if level < 0 or level > 14:
             raise AirPurifierMiotException("Invalid favorite level: %s" % level)
 
-        return self.set_property(_MAPPING, "favorite_level", level)
+        return self.set_property_from_mapping(_MAPPING, "favorite_level", level)
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
@@ -364,7 +364,9 @@ class AirPurifierMiot(MiotDevice):
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
-        return self.set_property(_MAPPING, "led_brightness", brightness.value)
+        return self.set_property_from_mapping(
+            _MAPPING, "led_brightness", brightness.value
+        )
 
     @command(
         click.argument("led", type=bool),
@@ -374,7 +376,7 @@ class AirPurifierMiot(MiotDevice):
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
-        return self.set_property(_MAPPING, "led", led)
+        return self.set_property_from_mapping(_MAPPING, "led", led)
 
     @command(
         click.argument("buzzer", type=bool),
@@ -384,7 +386,7 @@ class AirPurifierMiot(MiotDevice):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        return self.set_property(_MAPPING, "buzzer", buzzer)
+        return self.set_property_from_mapping(_MAPPING, "buzzer", buzzer)
 
     @command(
         click.argument("lock", type=bool),
@@ -394,4 +396,4 @@ class AirPurifierMiot(MiotDevice):
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
-        return self.set_property(_MAPPING, "child_lock", lock)
+        return self.set_property_from_mapping(_MAPPING, "child_lock", lock)

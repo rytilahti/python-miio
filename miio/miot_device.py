@@ -68,6 +68,54 @@ class MiotDevice(Device):
 
         return cls(**response)
 
+    def set_property(self, **kwargs):
+        """Helper to set properties using the device specific mapping."""
+        if getattr(self, "_MAPPING") is None:
+            raise DeviceException("Device class does not have _MAPPING")
+
+        return self.set_properties_from_dataclass(self._MAPPING(**kwargs))
+
+    def set_properties_from_dataclass(self, obj):
+        """Set properties as defined in the given dataclass object."""
+        # TODO: this needs cleanup.
+        fields = obj.__dataclass_fields__
+        properties_to_set = []
+
+        for field_name in fields:
+            field_meta = fields[field_name].metadata
+
+            if "piid" not in field_meta:
+                continue
+
+            piid = field_meta["piid"]
+
+            siid = field_meta.get("siid", getattr(obj, "_siid", None))
+            if siid is None:
+                raise DeviceException(
+                    f"no siid defined for {field_name} or for class {obj.__class__}"
+                )
+
+            value = obj.__getattribute__(field_name)
+            if value is None:
+                continue
+
+            property_set = {
+                "siid": siid,
+                "piid": piid,
+                "did": field_name,
+                "value": value,
+            }
+
+            properties_to_set.append(property_set)
+
+        if not properties_to_set:
+            raise DeviceException("No values to set!")
+
+        # TODO: handle splitting based on _max_properties
+
+        _LOGGER.debug("Going to set %s" % properties_to_set)
+        return self.send("set_properties", properties_to_set)
+
     def get_properties_for_mapping(
         self, property_mapping, *, max_properties=15
     ) -> list:
@@ -78,7 +126,7 @@ class MiotDevice(Device):
 
         return self.get_properties(properties, max_properties=max_properties)
 
-    def set_property(self, property_mapping, property_key: str, value):
+    def set_property_from_mapping(self, property_mapping, property_key: str, value):
         """Sets property value."""
 
         return self.send(
