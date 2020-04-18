@@ -255,16 +255,6 @@ class AirPurifierMiotStatus:
 class AirPurifierMiot(MiotDevice):
     """Main class representing the air purifier which uses MIoT protocol."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
-
     @command(
         default_output=format_output(
             "",
@@ -297,7 +287,7 @@ class AirPurifierMiot(MiotDevice):
         return AirPurifierMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping()
+                for prop in self.get_properties_for_mapping(_MAPPING)
             }
         )
 
