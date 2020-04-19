@@ -168,6 +168,11 @@ class VacuumStatus:
         )
 
     @property
+    def is_water_box_attached(self) -> int:
+        """Return True is water box is installed."""
+        return self.data["water_box_status"] == 1
+
+    @property
     def got_error(self) -> bool:
         """True if an error has occured."""
         return self.error_code != 0
