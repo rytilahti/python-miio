@@ -168,7 +168,7 @@ class VacuumStatus:
         )
 
     @property
-    def is_water_box_attached(self) -> int:
+    def is_water_box_attached(self) -> bool:
         """Return True is water box is installed."""
         return "water_box_status" in self.data and self.data["water_box_status"] == 1
 
