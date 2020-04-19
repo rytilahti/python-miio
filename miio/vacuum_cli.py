@@ -123,6 +123,7 @@ def status(vac: miio.Vacuum):
     # click.echo("DND enabled: %s" % res.dnd)
     # click.echo("Map present: %s" % res.map)
     # click.echo("in_cleaning: %s" % res.in_cleaning)
+    click.echo("Water box attached: %s" % res.is_water_box_attached)
 
 
 @cli.command()

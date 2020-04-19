@@ -30,9 +30,7 @@ Status reporting
     Fanspeed: 60
     Cleaning since: 0:00:00
     Cleaned area: 0.0 m²
-    DND enabled: 0
-    Map present: 1
-    in_cleaning: 0
+    Water box attached: False
 
 Start cleaning
 ~~~~~~~~~~~~~~
