@@ -1,12 +1,24 @@
-"""Xiaomi Chuangmi camera (chuangmi.camera.ipc009) support."""
+"""Xiaomi Chuangmi camera (chuangmi.camera.ipc009, ipc019) support."""
 
+import enum
 import logging
 from typing import Any, Dict
 
-from .click_common import command, format_output
+import click
+
+from .click_common import EnumType, command, format_output
 from .device import Device
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class Direction(enum.Enum):
+    """Rotation direction."""
+
+    Left = 1
+    Right = 2
+    Up = 3
+    Down = 4
 
 
 class CameraStatus:
@@ -269,3 +281,16 @@ class ChuangmiCamera(Device):
     def night_mode_on(self):
         """Night mode always on."""
         return self.send("set_night_mode", [2])
+
+    @command(
+        click.argument("mode", type=EnumType(Direction, False)),
+        default_output=format_output("Rotating to direction '{direction.name}'"),
+    )
+    def rotate(self, direction: Direction):
+        """Rotate camera to given direction (left, right, up, down)."""
+        return self.send("set_motor", {"operation": direction.value})
+
+    @command()
+    def alarm(self):
+        """Sound a loud alarm for 10 seconds."""
+        return self.send("alarm_sound")

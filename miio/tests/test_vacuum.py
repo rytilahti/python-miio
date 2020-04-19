@@ -33,6 +33,7 @@ class DummyVacuum(DummyDevice, Vacuum):
             "battery": 100,
             "fan_power": 20,
             "msg_seq": 320,
+            "water_box_status": 1,
         }
 
         self.return_values = {
@@ -94,6 +95,7 @@ class TestVacuum(TestCase):
         assert status.error == "No error"
         assert status.fanspeed == self.device.start_state["fan_power"]
         assert status.battery == self.device.start_state["battery"]
+        assert status.is_water_box_attached is True
 
     def test_status_with_errors(self):
         errors = {5: "Clean main brush", 19: "Unpowered charging station"}

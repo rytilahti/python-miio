@@ -30,7 +30,8 @@ Status reporting
     Fanspeed: 60
     Cleaning since: 0:00:00
     Cleaned area: 0.0 m²
-
+    Water box attached: False
+    
 Start cleaning
 ~~~~~~~~~~~~~~
 

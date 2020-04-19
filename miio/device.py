@@ -120,10 +120,34 @@ class Device(metaclass=DeviceGroupMeta):
         self.token = token
         self._protocol = MiIOProtocol(ip, token, start_id, debug, lazy_discover)
 
-    def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
-        return self._protocol.send(command, parameters, retry_count)
+    def send(
+        self,
+        command: str,
+        parameters: Any = None,
+        retry_count=3,
+        *,
+        extra_parameters=None
+    ) -> Any:
+        """Send a command to the device.
+
+        Basic format of the request:
+        {"id": 1234, "method": command, "parameters": parameters}
+
+        `extra_parameters` allows passing elements to the top-level of the request.
+        This is necessary for some devices, such as gateway devices, which expect
+        the sub-device identifier to be on the top-level.
+
+        :param str command: Command to send
+        :param dict parameters: Parameters to send
+        :param int retry_count: How many times to retry on error
+        :param dict extra_parameters: Extra top-level parameters
+        """
+        return self._protocol.send(
+            command, parameters, retry_count, extra_parameters=extra_parameters
+        )
 
     def send_handshake(self):
+        """Send initial handshake to the device."""
         return self._protocol.send_handshake()
 
     @command(
