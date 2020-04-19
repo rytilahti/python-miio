@@ -24,15 +24,12 @@ Status reporting
 
 ::
 
-    $ mirobo
+    $ mirobo --ip <Vacuum IP> --token <Token>
     State: Charging
     Battery: 100
     Fanspeed: 60
     Cleaning since: 0:00:00
     Cleaned area: 0.0 m²
-    DND enabled: 0
-    Map present: 1
-    in_cleaning: 0
 
 Start cleaning
 ~~~~~~~~~~~~~~
@@ -64,8 +61,11 @@ State of consumables
 ::
 
     $ mirobo consumables
-    main: 9:24:48, side: 9:24:48, filter: 9:24:48, sensor dirty: 1:27:12
-
+    Main brush:   2 days, 16:14:00 (left 9 days, 19:46:00)
+    Side brush:   2 days, 16:14:00 (left 5 days, 15:46:00)
+    Filter:       2 days, 16:14:00 (left 3 days, 13:46:00)
+    Sensor dirty: 2:37:48 (left 1 day, 3:22:12)
+    
 Schedule information
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -120,13 +120,12 @@ Cleaning history
 
     $ mirobo cleaning-history
     Total clean count: 43
-    Clean #0: 2017-03-05 19:09:40-2017-03-05 19:09:50 (complete: False, unknown: 0)
+    Clean #0: 2017-03-05 19:09:40-2017-03-05 19:09:50 (complete: False, error: No error)
       Area cleaned: 0.0 m²
       Duration: (0:00:00)
-    Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, unknown: 0)
+    Clean #1: 2017-03-05 16:17:52-2017-03-05 17:14:59 (complete: False, error: No error)
       Area cleaned: 32.16 m²
       Duration: (0:23:54)
-
 
 Sounds
 ~~~~~~
@@ -191,6 +190,11 @@ and updating from an URL requires you to pass the md5 hash of the file.
 
 DND functionality
 ~~~~~~~~~~~~~~~~~
+To get current status:
+
+::
+
+    mirobo dnd
 
 To disable:
 
