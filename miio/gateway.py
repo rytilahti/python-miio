@@ -77,8 +77,15 @@ class Gateway(Device):
     ## scene
     * get_lumi_bind ["scene", <page number>] for rooms/devices"""
 
-    def __init__(self, ip: str = None, token: str = None) -> None:
-        super().__init__(ip, token)
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
         self._alarm = GatewayAlarm(self)
         self._radio = GatewayRadio(self)
         self._zigbee = GatewayZigbee(self)
