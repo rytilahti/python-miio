@@ -15,8 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 class Direction(enum.Enum):
     """Rotation direction."""
 
-    Right = 1
-    Left = 2
+    Left = 1
+    Right = 2
     Up = 3
     Down = 4
 
@@ -287,4 +287,10 @@ class ChuangmiCamera(Device):
         default_output=format_output("Rotating to direction '{direction.name}'"),
     )
     def rotate(self, direction: Direction):
+        """Rotate camera to given direction (left, right, up, down)."""
         return self.send("set_motor", {"operation": direction.value})
+
+    @command()
+    def alarm(self):
+        """Sound a loud alarm for 10 seconds."""
+        return self.send("alarm_sound")
