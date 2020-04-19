@@ -8,7 +8,7 @@ import codecs
 import datetime
 import logging
 import socket
-from typing import Any, List
+from typing import Any, Dict, List
 
 import construct
 
@@ -59,9 +59,10 @@ class MiIOProtocol:
 
         :raises DeviceException: if the device could not be discovered."""
         m = MiIOProtocol.discover(self.ip)
+        header = m.header.value
         if m is not None:
-            self._device_id = m.header.value.device_id
-            self._device_ts = m.header.value.ts
+            self._device_id = header.device_id
+            self._device_ts = header.ts
             self._discovered = True
             if self.debug > 1:
                 _LOGGER.debug(m)
@@ -126,25 +127,28 @@ class MiIOProtocol:
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
 
-    def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
+    def send(
+        self,
+        command: str,
+        parameters: Any = None,
+        retry_count: int = 3,
+        *,
+        extra_parameters: Dict = None
+    ) -> Any:
         """Build and send the given command.
         Note that this will implicitly call :func:`send_handshake` to do a handshake,
         and will re-try in case of errors while incrementing the `_id` by 100.
 
         :param str command: Command to send
-        :param dict parameters: Parameters to send, or an empty list FIXME
+        :param dict parameters: Parameters to send, or an empty list
         :param retry_count: How many times to retry in case of failure
+        :param dict extra_parameters: Extra top-level parameters
         :raises DeviceException: if an error has occurred during communication."""
 
         if not self.lazy_discover or not self._discovered:
             self.send_handshake()
 
-        cmd = {"id": self._id, "method": command}
-
-        if parameters is not None:
-            cmd["params"] = parameters
-        else:
-            cmd["params"] = []
+        request = self._create_request(command, parameters, extra_parameters)
 
         send_ts = self._device_ts + datetime.timedelta(seconds=1)
         header = {
@@ -154,9 +158,9 @@ class MiIOProtocol:
             "ts": send_ts,
         }
 
-        msg = {"data": {"value": cmd}, "header": {"value": header}, "checksum": 0}
+        msg = {"data": {"value": request}, "header": {"value": header}, "checksum": 0}
         m = Message.build(msg, token=self.token)
-        _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, cmd)
+        _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, request)
         if self.debug > 1:
             _LOGGER.debug(
                 "send (timeout %s): %s",
@@ -176,29 +180,31 @@ class MiIOProtocol:
         try:
             data, addr = s.recvfrom(1024)
             m = Message.parse(data, token=self.token)
-            self._device_ts = m.header.value.ts
+
+            header = m.header.value
+            payload = m.data.value
+
+            self.__id = payload["id"]
+            self._device_ts = header.ts
+
             if self.debug > 1:
                 _LOGGER.debug("recv from %s: %s", addr[0], m)
 
-            self.__id = m.data.value["id"]
             _LOGGER.debug(
                 "%s:%s (ts: %s, id: %s) << %s",
                 self.ip,
                 self.port,
-                m.header.value.ts,
-                m.data.value["id"],
-                m.data.value,
+                header.ts,
+                payload["id"],
+                payload,
             )
-            if "error" in m.data.value:
-                error = m.data.value["error"]
-                if "code" in error and error["code"] == -30001:
-                    raise RecoverableError(error)
-                raise DeviceError(error)
+            if "error" in payload:
+                self._handle_error(payload["error"])
 
             try:
-                return m.data.value["result"]
+                return payload["result"]
             except KeyError:
-                return m.data.value
+                return payload
         except construct.core.ChecksumError as ex:
             raise DeviceException(
                 "Got checksum error which indicates use "
@@ -212,7 +218,12 @@ class MiIOProtocol:
                 )
                 self.__id += 100
                 self._discovered = False
-                return self.send(command, parameters, retry_count - 1)
+                return self.send(
+                    command,
+                    parameters,
+                    retry_count - 1,
+                    extra_parameters=extra_parameters,
+                )
 
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("No response from the device") from ex
@@ -222,7 +233,12 @@ class MiIOProtocol:
                 _LOGGER.debug(
                     "Retrying to send failed command, retries left: %s", retry_count
                 )
-                return self.send(command, parameters, retry_count - 1)
+                return self.send(
+                    command,
+                    parameters,
+                    retry_count - 1,
+                    extra_parameters=extra_parameters,
+                )
 
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("Unable to recover failed command") from ex
@@ -238,3 +254,25 @@ class MiIOProtocol:
     @property
     def raw_id(self):
         return self.__id
+
+    def _handle_error(self, error):
+        """Raise exception based on the given error code."""
+        if "code" in error and error["code"] == -30001:
+            raise RecoverableError(error)
+        raise DeviceError(error)
+
+    def _create_request(
+        self, command: str, parameters: Any, extra_parameters: Dict = None
+    ):
+        """Create request payload."""
+        request = {"id": self._id, "method": command}
+
+        if parameters is not None:
+            request["params"] = parameters
+        else:
+            request["params"] = []
+
+        if extra_parameters is not None:
+            request = {**request, **extra_parameters}
+
+        return request
