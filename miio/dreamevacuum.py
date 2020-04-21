@@ -92,27 +92,43 @@ class DreameStatus:
     )
     # siid 18: (clean): 16 props, 2 actions
     # piid: 1 (工作模式): (int32, unit: none) (acc: ['read', 'notify'], value-list: [], value-range: [0, 17, 1])
-    # 工作模式: int = field(metadata={'siid': 18, 'piid': 1, 'access': ['read', 'notify']})
+    clean_unknown_1: int = field(
+        metadata={"siid": 18, "piid": 1, "access": ["read", "notify"]}
+    )
     # piid: 4 (area): (string, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
     area: str = field(metadata={"siid": 18, "piid": 4, "access": ["read", "write"]})
     # piid: 5 (timer): (string, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
     timer: str = field(metadata={"siid": 18, "piid": 5, "access": ["read", "write"]})
     # piid: 6 (清扫模式): (int32, unit: none) (acc: ['read', 'write', 'notify'], value-list: [{'value': 0, 'description': '安静'}, {'value': 1, 'description': '标准'}, {'value': 2, 'description': '中档'}, {'value': 3, 'description': '强力'}], value-range: None)
-    # 清扫模式: int = field(metadata={'siid': 18, 'piid': 6, 'access': ['read', 'write', 'notify']})
+    clean_unknown_6: int = field(
+        metadata={"siid": 18, "piid": 6, "access": ["read", "write", "notify"]}
+    )
     # piid: 8 (delete-timer): (int32, unit: None) (acc: ['write'], value-list: [], value-range: [0, 100, 1])
     # delete_timer: int = field(metadata={"siid": 18, "piid": 8, "access": ["write"]})
     # piid: 13 (): (uint32, unit: minutes) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    #: int = field(metadata={'siid': 18, 'piid': 13, 'access': ['read', 'notify']})
+    clean_unknown_13: int = field(
+        metadata={"siid": 18, "piid": 13, "access": ["read", "notify"]}
+    )
     # piid: 14 (): (uint32, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    #: int = field(metadata={'siid': 18, 'piid': 14, 'access': ['read', 'notify']})
+    clean_unknown_14: int = field(
+        metadata={"siid": 18, "piid": 14, "access": ["read", "notify"]}
+    )
     # piid: 15 (): (uint32, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    #: int = field(metadata={'siid': 18, 'piid': 15, 'access': ['read', 'notify']})
+    clean_unknown_15: int = field(
+        metadata={"siid": 18, "piid": 15, "access": ["read", "notify"]}
+    )
     # piid: 16 (): (uint32, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    #: int = field(metadata={'siid': 18, 'piid': 16, 'access': ['read', 'notify']})
+    clean_unknown_16: int = field(
+        metadata={"siid": 18, "piid": 16, "access": ["read", "notify"]}
+    )
     # piid: 17 (): (uint16, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 100, 1])
-    #: int = field(metadata={'siid': 18, 'piid': 17, 'access': ['read', 'notify']})
+    clean_unknown_17: int = field(
+        metadata={"siid": 18, "piid": 17, "access": ["read", "notify"]}
+    )
     # piid: 18 (): (uint8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 0, 'description': ''}, {'value': 1, 'description': ''}], value-range: None)
-    #: int = field(metadata={'siid': 18, 'piid': 18, 'access': ['read', 'notify']})
+    clean_unknown_18: int = field(
+        metadata={"siid": 18, "piid": 18, "access": ["read", "notify"]}
+    )
     # siid 19: (consumable): 3 props, 0 actions
     # piid: 1 (life-sieve): (string, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
     life_sieve: str = field(
@@ -156,10 +172,14 @@ class DreameStatus:
         metadata={"siid": 24, "piid": 1, "access": ["read", "write", "notify"]}
     )
     # piid: 3 (语音包ID): (string, unit: none) (acc: ['read', 'write'], value-list: [], value-range: None)
-    # 语音包id: str = field(metadata={'siid': 24, 'piid': 3, 'access': ['read', 'write']})
+    unknown_24_3: str = field(
+        metadata={"siid": 24, "piid": 3, "access": ["read", "write"]}
+    )
     # siid 25: (): 1 props, 0 actions
     # piid: 1 (): (string, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: None)
-    # : str = field(metadata={'siid': 25, 'piid': 1, 'access': ['read', 'notify']})
+    unknown_25_1: str = field(
+        metadata={"siid": 25, "piid": 1, "access": ["read", "notify"]}
+    )
 
 
 class DreameVacuum(MiotDevice):
