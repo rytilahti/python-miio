@@ -100,7 +100,7 @@ class DreameStatus:
     # piid: 6 (清扫模式): (int32, unit: none) (acc: ['read', 'write', 'notify'], value-list: [{'value': 0, 'description': '安静'}, {'value': 1, 'description': '标准'}, {'value': 2, 'description': '中档'}, {'value': 3, 'description': '强力'}], value-range: None)
     # 清扫模式: int = field(metadata={'siid': 18, 'piid': 6, 'access': ['read', 'write', 'notify']})
     # piid: 8 (delete-timer): (int32, unit: None) (acc: ['write'], value-list: [], value-range: [0, 100, 1])
-    delete_timer: int = field(metadata={"siid": 18, "piid": 8, "access": ["write"]})
+    # delete_timer: int = field(metadata={"siid": 18, "piid": 8, "access": ["write"]})
     # piid: 13 (): (uint32, unit: minutes) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
     #: int = field(metadata={'siid': 18, 'piid': 13, 'access': ['read', 'notify']})
     # piid: 14 (): (uint32, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
@@ -139,9 +139,9 @@ class DreameStatus:
     )
     # siid 21: (remote): 2 props, 3 actions
     # piid: 1 (deg): (string, unit: None) (acc: ['write'], value-list: [], value-range: None)
-    deg: str = field(metadata={"siid": 21, "piid": 1, "access": ["write"]})
+    # deg: str = field(metadata={"siid": 21, "piid": 1, "access": ["write"]})
     # piid: 2 (speed): (string, unit: None) (acc: ['write'], value-list: [], value-range: None)
-    speed: str = field(metadata={"siid": 21, "piid": 2, "access": ["write"]})
+    # speed: str = field(metadata={"siid": 21, "piid": 2, "access": ["write"]})
     # siid 22: (warn): 1 props, 0 actions
     # siid 23: (map): 3 props, 1 actions
     # piid: 1 (map-view): (string, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: None)
@@ -149,7 +149,7 @@ class DreameStatus:
         metadata={"siid": 23, "piid": 1, "access": ["read", "notify"]}
     )
     # piid: 2 (frame-info): (string, unit: None) (acc: ['write'], value-list: [], value-range: None)
-    frame_info: str = field(metadata={"siid": 23, "piid": 2, "access": ["write"]})
+    # frame_info: str = field(metadata={"siid": 23, "piid": 2, "access": ["write"]})
     # siid 24: (audio): 2 props, 3 actions
     # piid: 1 (volume): (int32, unit: None) (acc: ['read', 'write', 'notify'], value-list: [], value-range: [0, 100, 1])
     volume: int = field(
