@@ -40,21 +40,6 @@ class DreameStatus:
     charging_state: int = field(
         metadata={"siid": 2, "piid": 2, "access": ["read", "notify"]}
     )
-    # siid 1: (Device Information): 4 props, 0 actions
-    # piid: 4 (Current Firmware Version): (string, unit: None) (acc: ['read'], value-list: [], value-range: None)
-    current_firmware_version: str = field(
-        metadata={"siid": 1, "piid": 4, "access": ["read"]}
-    )
-    # piid: 1 (Device Manufacturer): (string, unit: None) (acc: ['read'], value-list: [], value-range: None)
-    device_manufacturer: str = field(
-        metadata={"siid": 1, "piid": 1, "access": ["read"]}
-    )
-    # piid: 2 (Device Model): (string, unit: None) (acc: ['read'], value-list: [], value-range: None)
-    device_model: str = field(metadata={"siid": 1, "piid": 2, "access": ["read"]})
-    # piid: 3 (Device Serial Number): (string, unit: None) (acc: ['read'], value-list: [], value-range: None)
-    device_serial_number: str = field(
-        metadata={"siid": 1, "piid": 3, "access": ["read"]}
-    )
     # siid 3: (Robot Cleaner): 2 props, 2 actions
     # piid: 1 (Device Fault): (uint8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 0, 'description': 'No faults'}], value-range: None)
     device_fault: int = field(
