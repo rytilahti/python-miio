@@ -5,9 +5,17 @@ from typing import Any, Optional  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
+from .exceptions import DeviceException
 from .miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class DeviceType(Enum):
+    """Device type changes the used methods for property getting."""
+
+    MiIO = 0
+    MiOT = 1
 
 
 class UpdateState(Enum):
@@ -119,6 +127,7 @@ class Device(metaclass=DeviceGroupMeta):
         self.ip = ip
         self.token = token
         self._protocol = MiIOProtocol(ip, token, start_id, debug, lazy_discover)
+        self.device_type = DeviceType.MiIO
 
     def send(self, command: str, parameters: Any = None, retry_count=3) -> Any:
         return self._protocol.send(command, parameters, retry_count)
@@ -194,13 +203,20 @@ class Device(metaclass=DeviceGroupMeta):
         :param int max_properties: Number of properties that can be requested at once.
         :return List of property values.
         """
+        if self.device_type == DeviceType.MiOT:
+            get_property_method = "get_properties"
+        else:
+            get_property_method = "get_prop"
+
         _props = properties.copy()
         values = []
         while _props:
             try:
-                values.extend(self.send("get_prop", _props[:max_properties]))
-            except:  # noqa: E722
-                values.append("request-failed")
+                properties_to_request = _props[:max_properties]
+                values.extend(self.send(get_property_method, properties_to_request))
+            except DeviceException:
+                _LOGGER.error("Unable to request properties %s", properties_to_request)
+                values.append(["request-failed"] * max_properties)
             if max_properties is None:
                 break
 

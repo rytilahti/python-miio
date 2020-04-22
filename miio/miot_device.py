@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass, field
 
 from .click_common import command
-from .device import Device
+from .device import Device, DeviceType
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ class MiotDevice(Device):
         lazy_discover: bool = True,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
+        self.device_type = DeviceType.MiOT
 
     @command()
     def miot_info(self) -> MiotInfo:
