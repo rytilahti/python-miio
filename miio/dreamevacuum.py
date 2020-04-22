@@ -28,25 +28,42 @@ class VacuumStatus(Enum):
     Charging = 6
 
 
+class VacuumSpeed(Enum):
+    """Fan speeds, same as for ViomiVacuum."""
+
+    Silent = 0
+    Standard = 1
+    Medium = 2
+    Turbo = 3
+
+
 @dataclass
 class DreameStatus:
-    _max_properties = 1  # TODO: amount unknown, 9 should still work tho
+    _max_properties = 14
     # siid 2: (Battery): 2 props, 1 actions
     # piid: 1 (Battery Level): (uint8, unit: percentage) (acc: ['read', 'notify'], value-list: [], value-range: [0, 100, 1])
-    battery_level: int = field(
-        metadata={"siid": 2, "piid": 1, "access": ["read", "notify"]}
-    )
+    battery: int = field(metadata={"siid": 2, "piid": 1, "access": ["read", "notify"]})
     # piid: 2 (Charging State): (uint8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 1, 'description': 'Charging'}, {'value': 2, 'description': 'Not Charging'}, {'value': 4, 'description': 'Charging'}, {'value': 5, 'description': 'Go Charging'}], value-range: None)
-    charging_state: int = field(
-        metadata={"siid": 2, "piid": 2, "access": ["read", "notify"]}
+    state: int = field(
+        metadata={
+            "siid": 2,
+            "piid": 2,
+            "access": ["read", "notify"],
+            "enum": ChargeStatus,
+        }
     )
     # siid 3: (Robot Cleaner): 2 props, 2 actions
     # piid: 1 (Device Fault): (uint8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 0, 'description': 'No faults'}], value-range: None)
-    device_fault: int = field(
-        metadata={"siid": 3, "piid": 1, "access": ["read", "notify"]}
-    )
+    error: int = field(metadata={"siid": 3, "piid": 1, "access": ["read", "notify"]})
     # piid: 2 (Status): (int8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 1, 'description': 'Sweeping'}, {'value': 2, 'description': 'Idle'}, {'value': 3, 'description': 'Paused'}, {'value': 4, 'description': 'Error'}, {'value': 5, 'description': 'Go Charging'}, {'value': 6, 'description': 'Charging'}], value-range: None)
-    status: int = field(metadata={"siid": 3, "piid": 2, "access": ["read", "notify"]})
+    status: int = field(
+        metadata={
+            "siid": 3,
+            "piid": 2,
+            "access": ["read", "notify"],
+            "enum": VacuumStatus,
+        }
+    )
     # siid 17: (Identify): 0 props, 1 actions
     # siid 26: (Main Cleaning Brush): 2 props, 1 actions
     # piid: 1 (Brush Left Time): (uint16, unit: hour) (acc: ['read', 'notify'], value-list: [], value-range: [0, 300, 1])
@@ -85,8 +102,13 @@ class DreameStatus:
     # piid: 5 (timer): (string, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
     timer: str = field(metadata={"siid": 18, "piid": 5, "access": ["read", "write"]})
     # piid: 6 (清扫模式): (int32, unit: none) (acc: ['read', 'write', 'notify'], value-list: [{'value': 0, 'description': '安静'}, {'value': 1, 'description': '标准'}, {'value': 2, 'description': '中档'}, {'value': 3, 'description': '强力'}], value-range: None)
-    clean_unknown_6: int = field(
-        metadata={"siid": 18, "piid": 6, "access": ["read", "write", "notify"]}
+    fan_speed: int = field(
+        metadata={
+            "siid": 18,
+            "piid": 6,
+            "access": ["read", "write", "notify"],
+            "enum": VacuumSpeed,
+        }
     )
     # piid: 8 (delete-timer): (int32, unit: None) (acc: ['write'], value-list: [], value-range: [0, 100, 1])
     # delete_timer: int = field(metadata={"siid": 18, "piid": 8, "access": ["write"]})
@@ -129,13 +151,15 @@ class DreameStatus:
     )
     # siid 20: (annoy): 3 props, 0 actions
     # piid: 1 (enable): (bool, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
-    enable: bool = field(metadata={"siid": 20, "piid": 1, "access": ["read", "write"]})
+    dnd_enabled: bool = field(
+        metadata={"siid": 20, "piid": 1, "access": ["read", "write"]}
+    )
     # piid: 2 (start-time): (string, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
-    start_time: str = field(
+    dnd_start_time: str = field(
         metadata={"siid": 20, "piid": 2, "access": ["read", "write"]}
     )
     # piid: 3 (stop-time): (string, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
-    stop_time: str = field(
+    dnd_stop_time: str = field(
         metadata={"siid": 20, "piid": 3, "access": ["read", "write"]}
     )
     # siid 21: (remote): 2 props, 3 actions
@@ -153,16 +177,16 @@ class DreameStatus:
     # frame_info: str = field(metadata={"siid": 23, "piid": 2, "access": ["write"]})
     # siid 24: (audio): 2 props, 3 actions
     # piid: 1 (volume): (int32, unit: None) (acc: ['read', 'write', 'notify'], value-list: [], value-range: [0, 100, 1])
-    volume: int = field(
+    audio_volume: int = field(
         metadata={"siid": 24, "piid": 1, "access": ["read", "write", "notify"]}
     )
     # piid: 3 (语音包ID): (string, unit: none) (acc: ['read', 'write'], value-list: [], value-range: None)
-    unknown_24_3: str = field(
+    audio_language: str = field(
         metadata={"siid": 24, "piid": 3, "access": ["read", "write"]}
     )
     # siid 25: (): 1 props, 0 actions
     # piid: 1 (): (string, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: None)
-    unknown_25_1: str = field(
+    timezone: str = field(
         metadata={"siid": 25, "piid": 1, "access": ["read", "notify"]}
     )
 
