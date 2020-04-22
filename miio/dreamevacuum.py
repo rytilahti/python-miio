@@ -15,8 +15,36 @@ class ChargeStatus(Enum):
     Go_charging = 5
 
 
-class FaultStatus(Enum):
-    No_faults = 0
+class Error(Enum):
+    NoError = 0
+    Drop = 1
+    Cliff = 2
+    Bumper = 3
+    Gesture = 4
+    Bumper_repeat = 5
+    Drop_repeat = 6
+    Optical_flow = 7
+    No_box = 8
+    No_tankbox = 9
+    Waterbox_empty = 10
+    Box_full = 11
+    Brush = 12
+    Side_brush = 13
+    Fan = 14
+    Left_wheel_motor = 15
+    Right_wheel_motor = 16
+    Turn_suffocate = 17
+    Forward_suffocate = 18
+    Charger_get = 19
+    Battery_low = 20
+    Charge_fault = 21
+    Battery_percentage = 22
+    Heart = 23
+    Camera_occlusion = 24
+    Camera_fault = 25
+    Event_battery = 26
+    Forward_looking = 27
+    Gyroscope = 28
 
 
 class VacuumStatus(Enum):
@@ -54,7 +82,9 @@ class DreameStatus:
     )
     # siid 3: (Robot Cleaner): 2 props, 2 actions
     # piid: 1 (Device Fault): (uint8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 0, 'description': 'No faults'}], value-range: None)
-    error: int = field(metadata={"siid": 3, "piid": 1, "access": ["read", "notify"]})
+    error: int = field(
+        metadata={"siid": 3, "piid": 1, "access": ["read", "notify"], "enum": Error}
+    )
     # piid: 2 (Status): (int8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 1, 'description': 'Sweeping'}, {'value': 2, 'description': 'Idle'}, {'value': 3, 'description': 'Paused'}, {'value': 4, 'description': 'Error'}, {'value': 5, 'description': 'Go Charging'}, {'value': 6, 'description': 'Charging'}], value-range: None)
     status: int = field(
         metadata={
@@ -265,6 +295,7 @@ class DreameVacuum(MiotDevice):
     @command()
     def start(self) -> None:
         """Start cleaning."""
+        # TODO: find out other values
         payload = [{"piid": 1, "value": 2}]
         return self.call_action(18, 1, payload)
 
