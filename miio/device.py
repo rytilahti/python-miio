@@ -197,7 +197,10 @@ class Device(metaclass=DeviceGroupMeta):
         _props = properties.copy()
         values = []
         while _props:
-            values.extend(self.send("get_prop", _props[:max_properties]))
+            try:
+                values.extend(self.send("get_prop", _props[:max_properties]))
+            except:  # noqa: E722
+                values.append("request-failed")
             if max_properties is None:
                 break
 

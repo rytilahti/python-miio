@@ -30,7 +30,7 @@ class VacuumStatus(Enum):
 
 @dataclass
 class DreameStatus:
-    _max_properties = 9  # TODO: amount unknown, 9 should still work tho
+    _max_properties = 1  # TODO: amount unknown, 9 should still work tho
     # siid 2: (Battery): 2 props, 1 actions
     # piid: 1 (Battery Level): (uint8, unit: percentage) (acc: ['read', 'notify'], value-list: [], value-range: [0, 100, 1])
     battery_level: int = field(
