@@ -94,7 +94,7 @@ class DreameStatus:
     )
     # siid 18: (clean): 16 props, 2 actions
     # piid: 1 (工作模式): (int32, unit: none) (acc: ['read', 'notify'], value-list: [], value-range: [0, 17, 1])
-    clean_unknown_1: int = field(
+    operating_mode: int = field(
         metadata={"siid": 18, "piid": 1, "access": ["read", "notify"]}
     )
     # piid: 4 (area): (string, unit: None) (acc: ['read', 'write'], value-list: [], value-range: None)
@@ -215,7 +215,7 @@ class DreameVacuum(MiotDevice):
     # siid 2: (Battery): 2 props, 1 actions
     # aiid 1 Start Charge: in: [] -> out: []
     @command()
-    def start_charge(self) -> None:
+    def return_home(self) -> None:
         """aiid 1 Start Charge: in: [] -> out: []"""
         return self.call_action(2, 1)
 
@@ -263,13 +263,14 @@ class DreameVacuum(MiotDevice):
     # siid 18: (clean): 16 props, 2 actions
     # aiid 1 开始清扫: in: [] -> out: []
     @command()
-    def 开始清扫(self) -> None:
-        """aiid 1 开始清扫: in: [] -> out: []"""
-        return self.call_action(18, 1)
+    def start(self) -> None:
+        """Start cleaning."""
+        payload = [{"piid": 1, "value": 2}]
+        return self.call_action(18, 1, payload)
 
     # aiid 2 stop-clean: in: [] -> out: []
     @command()
-    def stop_clean(self) -> None:
+    def stop(self) -> None:
         """aiid 2 stop-clean: in: [] -> out: []"""
         return self.call_action(18, 2)
 
