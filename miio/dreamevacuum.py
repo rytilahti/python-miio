@@ -143,27 +143,27 @@ class DreameStatus:
     # piid: 8 (delete-timer): (int32, unit: None) (acc: ['write'], value-list: [], value-range: [0, 100, 1])
     # delete_timer: int = field(metadata={"siid": 18, "piid": 8, "access": ["write"]})
     # piid: 13 (): (uint32, unit: minutes) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    clean_unknown_13: int = field(
+    last_clean: int = field(
         metadata={"siid": 18, "piid": 13, "access": ["read", "notify"]}
     )
     # piid: 14 (): (uint32, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    clean_unknown_14: int = field(
+    total_clean_count: int = field(
         metadata={"siid": 18, "piid": 14, "access": ["read", "notify"]}
     )
     # piid: 15 (): (uint32, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    clean_unknown_15: int = field(
+    total_area: int = field(
         metadata={"siid": 18, "piid": 15, "access": ["read", "notify"]}
     )
     # piid: 16 (): (uint32, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 4294967295, 1])
-    clean_unknown_16: int = field(
+    total_log_start: int = field(
         metadata={"siid": 18, "piid": 16, "access": ["read", "notify"]}
     )
     # piid: 17 (): (uint16, unit: None) (acc: ['read', 'notify'], value-list: [], value-range: [0, 100, 1])
-    clean_unknown_17: int = field(
+    button_led: int = field(
         metadata={"siid": 18, "piid": 17, "access": ["read", "notify"]}
     )
     # piid: 18 (): (uint8, unit: None) (acc: ['read', 'notify'], value-list: [{'value': 0, 'description': ''}, {'value': 1, 'description': ''}], value-range: None)
-    clean_unknown_18: int = field(
+    clean_success: int = field(
         metadata={"siid": 18, "piid": 18, "access": ["read", "notify"]}
     )
     # siid 19: (consumable): 3 props, 0 actions
@@ -265,8 +265,8 @@ class DreameVacuum(MiotDevice):
     # siid 17: (Identify): 0 props, 1 actions
     # aiid 1 Identify: in: [] -> out: []
     @command()
-    def identify(self) -> None:
-        """aiid 1 Identify: in: [] -> out: []"""
+    def find(self) -> None:
+        """Find the robot."""
         return self.call_action(17, 1)
 
     # siid 26: (Main Cleaning Brush): 2 props, 1 actions
@@ -302,7 +302,7 @@ class DreameVacuum(MiotDevice):
     # aiid 2 stop-clean: in: [] -> out: []
     @command()
     def stop(self) -> None:
-        """aiid 2 stop-clean: in: [] -> out: []"""
+        """Stop cleaning."""
         return self.call_action(18, 2)
 
     # siid 21: (remote): 2 props, 3 actions
@@ -327,25 +327,31 @@ class DreameVacuum(MiotDevice):
     # siid 23: (map): 3 props, 1 actions
     # aiid 1 map-req: in: [2] -> out: []
     @command()
-    def map_req(self, _) -> None:
+    def map_req(self) -> None:
         """aiid 1 map-req: in: [2] -> out: []"""
         return self.call_action(23, 1)
 
     # siid 24: (audio): 2 props, 3 actions
     # aiid 1 : in: [] -> out: []
     @command()
-    def UNKNOWN(self) -> None:
-        """aiid 1 : in: [] -> out: []"""
+    def audio_position(self) -> None:
+        """TODO"""
         return self.call_action(24, 1)
 
     # aiid 2 : in: [] -> out: []
     @command()
-    def UNKNOWN2(self) -> None:
-        """aiid 2 : in: [] -> out: []"""
-        return self.call_action(24, 2)
+    def install_voice_pack(self) -> None:
+        """Install given voice pack."""
+        payload = [
+            {"piid": 3, "value": "EN"},  # language code
+            {"piid": 4, "value": "http://url"},
+            {"piid": 5, "value": "md5sum for the pack"},
+            {"piid": 6, "value": "size of the pack"},
+        ]
+        return self.call_action(24, 2, payload)
 
     # aiid 3 : in: [] -> out: []
     @command()
-    def UNKNOWN3(self) -> None:
+    def test_sound(self) -> None:
         """aiid 3 : in: [] -> out: []"""
         return self.call_action(24, 3)
