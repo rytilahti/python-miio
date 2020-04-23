@@ -5,6 +5,7 @@ from typing import Any, Optional  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
+from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 from .miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
@@ -177,7 +178,12 @@ class Device(metaclass=DeviceGroupMeta):
         """Get miIO protocol information from the device.
         This includes information about connected wlan network,
         and hardware and software versions."""
-        return DeviceInfo(self._protocol.send("miIO.info"))
+        try:
+            return DeviceInfo(self._protocol.send("miIO.info"))
+        except PayloadDecodeException as ex:
+            raise DeviceInfoUnavailableException(
+                "Unable to request miIO.info from the device"
+            ) from ex
 
     def update(self, url: str, md5: str):
         """Start an OTA update."""
