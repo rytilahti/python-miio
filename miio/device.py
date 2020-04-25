@@ -162,7 +162,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         :param str command: Command to send
         :param dict parameters: Parameters to send"""
-        return self._protocol.send(command, parameters)
+        return self.send(command, parameters)
 
     @command(
         default_output=format_output(
@@ -179,7 +179,7 @@ class Device(metaclass=DeviceGroupMeta):
         This includes information about connected wlan network,
         and hardware and software versions."""
         try:
-            return DeviceInfo(self._protocol.send("miIO.info"))
+            return DeviceInfo(self.send("miIO.info"))
         except PayloadDecodeException as ex:
             raise DeviceInfoUnavailableException(
                 "Unable to request miIO.info from the device"
@@ -194,15 +194,15 @@ class Device(metaclass=DeviceGroupMeta):
             "file_md5": md5,
             "proc": "dnld install",
         }
-        return self._protocol.send("miIO.ota", payload)[0] == "ok"
+        return self.send("miIO.ota", payload)[0] == "ok"
 
     def update_progress(self) -> int:
         """Return current update progress [0-100]."""
-        return self._protocol.send("miIO.get_ota_progress")[0]
+        return self.send("miIO.get_ota_progress")[0]
 
     def update_state(self):
         """Return current update state."""
-        return UpdateState(self._protocol.send("miIO.get_ota_state")[0])
+        return UpdateState(self.send("miIO.get_ota_state")[0])
 
     def configure_wifi(self, ssid, password, uid=0, extra_params=None):
         """Configure the wifi settings."""
@@ -210,7 +210,7 @@ class Device(metaclass=DeviceGroupMeta):
             extra_params = {}
         params = {"ssid": ssid, "passwd": password, "uid": uid, **extra_params}
 
-        return self._protocol.send("miIO.config_router", params)[0]
+        return self.send("miIO.config_router", params)[0]
 
     def get_properties(self, properties, *, max_properties=None):
         """Request properties in slices based on given max_properties.
