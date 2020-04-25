@@ -1,9 +1,85 @@
 python-miio
 ===========
 
-|PyPI version| |Build Status| |Coverage Status| |Docs| |Black| |Hound|
+|Chat| |PyPI version| |Build Status| |Coverage Status| |Docs| |Black| |Hound|
 
-This library (and its accompanying cli tool) is used to interface with devices using Xiaomi's `miIO protocol <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__.
+This library (and its accompanying cli tool) can be used to interface with devices using Xiaomi's `miIO <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__ and miOT protocols.
+
+
+Getting started
+---------------
+
+If you already have a token for your device and the device type, you can directly start using `miiocli` tool.
+If you don't have a token for your device, refer to `Getting started <https://python-miio.readthedocs.io/en/latest/discovery.html>`__ section of `the manual <https://python-miio.readthedocs.io>`__ for instructions how to obtain it.
+
+The `miiocli` is the main way to execute commands from command line.
+You can always use `--help` to get more information about the available commands.
+For example, executing it without any extra arguments will print out options and available commands::
+
+    $ miiocli --help
+    Usage: miiocli [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      -d, --debug
+      -o, --output [default|json|json_pretty]
+      --help                          Show this message and exit.
+
+    Commands:
+      airconditioningcompanion
+      ..
+
+You can get some information from any miIO/miOT device, including its device model, using the `info` command::
+
+    miiocli device --ip <ip> --token <token> info
+    
+    Model: some.device.model1
+    Hardware version: esp8285
+    Firmware version: 1.0.1_0012
+    Network: {'localIp': '<ip>', 'mask': '255.255.255.0', 'gw': '<ip>'}
+    AP: {'rssi': -73, 'ssid': '<nnetwork>', 'primary': 11, 'bssid': '<bssid>'}
+
+Each different device type is supported by their corresponding module (e.g., `vacuum` or `fan`).
+You can get the list of available commands for any given module by passing `--help` argument to it::
+
+    $ miiocli vacuum --help
+    
+    Usage: miiocli vacuum [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      --ip TEXT       [required]
+      --token TEXT    [required]
+      --id-file FILE
+      --help          Show this message and exit.
+
+    Commands:
+      add_timer                Add a timer.
+      ..
+
+API usage
+---------
+All functionality is accessible through the `miio` module::
+
+    from miio import Vacuum
+    
+    vac = Vacuum("<ip address>", "<token>")
+    vac.start()
+    
+Each separate device type inherits from `miio.Device` (and in case of miOT devices, `miio.MiotDevice`) which provides common API.
+
+Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/miio.html>`__ for more information.
+
+
+Troubleshooting
+---------------
+You can find some solutions for the most common problems can be found in `Troubleshooting <https://python-miio.readthedocs.io/en/latest/troubleshooting.html>`__ section.
+
+If you have any questions, or simply want to join up for a chat, check `our Matrix room <https://matrix.to/#/#python-miio-chat:matrix.org>`__.
+
+Contributing
+------------
+
+We welcome all sorts of contributions from patches to add improvements or fixing bugs to improving the documentation.
+To ease the process of setting up a development environment we have prepared `a short guide <https://python-miio.readthedocs.io/en/latest/new_devices.html>`__ for getting you started.
 
 
 Supported devices
@@ -49,19 +125,6 @@ Supported devices
 well as additional features for supported devices.*
 
 
-Getting started
----------------
-
-Refer `the manual <https://python-miio.readthedocs.io>`__ for getting started.
-
-
-Contributing
-------------
-
-We welcome all sorts of contributions from patches to add improvements or fixing bugs to improving the documentation.
-To ease the process of setting up a development environment we have prepared `a short guide <https://python-miio.readthedocs.io/en/latest/new_devices.html>`__ for getting you started.
-
-
 Home Assistant support
 ----------------------
 
@@ -79,6 +142,8 @@ Home Assistant support
 -  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
 
 
+.. |Chat| image:: https://matrix.to/img/matrix-badge.svg
+   :target: https://matrix.to/#/#python-miio-chat:matrix.org
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
    :target: https://badge.fury.io/py/python-miio
 .. |Build Status| image:: https://travis-ci.org/rytilahti/python-miio.svg?branch=master
