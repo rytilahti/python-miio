@@ -7,7 +7,7 @@ pr:
 stages:
 - stage: "Linting"
   jobs:
-  - job: "Run pre-commit checks"
+  - job: "LintChecks"
     pool:
       vmImage: "ubuntu-latest"
     strategy:
@@ -43,7 +43,7 @@ stages:
 
 - stage: "Tests"
   jobs:
-  - job: "Run tests"
+  - job: "Tests"
     strategy:
       matrix:
         Python 3.6 Ubuntu:
