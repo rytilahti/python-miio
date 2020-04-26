@@ -3,16 +3,42 @@ trigger:
 pr:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
 strategy:
   matrix:
-    Python36:
+    Python 3.6 Ubuntu:
       python.version: '3.6'
-    Python37:
+      vmImage: 'ubuntu-latest'
+    Python 3.7 Ubuntu:
       python.version: '3.7'
-#    Python38:
-#      python.version: '3.8'
+      vmImage: 'ubuntu-latest'
+    Python 3.8 Ubuntu:
+      python.version: '3.8'
+      vmImage: 'ubuntu-latest'
+    PyPy Ubuntu:
+      python.version: pypy3
+      vmImage: 'ubuntu-latest'
+    Python 3.6 Windows:
+      python.version: '3.6'
+      vmImage: 'windows-latest'
+    Python 3.7 Windows:
+      python.version: '3.7'
+      vmImage: 'windows-latest'
+    Python 3.8 Windows:
+      python.version: '3.8'
+      vmImage: 'windows-latest'
+    Python 3.6 OSX:
+      python.version: '3.6'
+      vmImage: 'macOS-latest'
+    Python 3.7 OSX:
+      python.version: '3.7'
+      vmImage: 'macOS-latest'
+    Python 3.8 OSX:
+      python.version: '3.8'
+      vmImage: 'macOS-latest'
+
+pool:
+      vmImage: $(vmImage)
+
 
 steps:
 - task: UsePythonVersion@0
