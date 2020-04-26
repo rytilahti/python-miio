@@ -26,11 +26,11 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    pre-commit run black --all-files
+    poetry run pre-commit run black --all-files
   displayName: 'Code formating (black)'
 
 - script: |
-    pre-commit run flake8 --all-files
+    poetry run pre-commit run flake8 --all-files
   displayName: 'Code formating (flake8)'
 
 #- script: |
@@ -38,9 +38,9 @@ steps:
 #  displayName: 'Typing checks (mypy)'
 
 - script: |
-    pre-commit run isort --all-files
+    poetry run pre-commit run isort --all-files
   displayName: 'Order of imports (isort)'
 
 - script: |
-    pytest --cov miio --cov-report html
+    poetry run pytest --cov miio --cov-report html
   displayName: 'Tests'
