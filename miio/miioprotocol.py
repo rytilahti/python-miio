@@ -102,7 +102,8 @@ class MiIOProtocol:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(timeout)
-        s.sendto(helobytes, (addr, 54321))
+        for _ in range(3):
+            s.sendto(helobytes, (addr, 54321))
         while True:
             try:
                 data, addr = s.recvfrom(1024)
@@ -141,7 +142,7 @@ class MiIOProtocol:
 
         :param str command: Command to send
         :param dict parameters: Parameters to send, or an empty list
-        :param retry_count: How many times to retry in case of failure
+        :param retry_count: How many times to retry in case of failure, how many handshakes to send
         :param dict extra_parameters: Extra top-level parameters
         :raises DeviceException: if an error has occurred during communication."""
 
