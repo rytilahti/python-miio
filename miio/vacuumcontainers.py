@@ -158,8 +158,7 @@ class VacuumStatus:
 
     @property
     def is_on(self) -> bool:
-        """True if device is currently cleaning (either automatic, manual,
-         spot, or zone)."""
+        """True if device is currently cleaning in any mode."""
         return (
             self.state_code == 5
             or self.state_code == 7
