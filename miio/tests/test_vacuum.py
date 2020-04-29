@@ -89,7 +89,6 @@ class TestVacuum(TestCase):
 
         status = self.status()
         assert status.is_on is False
-        assert status.dnd is True
         assert status.clean_time == datetime.timedelta()
         assert status.error_code == 0
         assert status.error == "No error"

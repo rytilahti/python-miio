@@ -3,7 +3,7 @@ from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List
 
-from .utils import deprecated, pretty_seconds, pretty_time
+from .utils import pretty_seconds, pretty_time
 
 
 def pretty_area(x: float) -> float:
@@ -57,6 +57,15 @@ class VacuumStatus:
         # "dnd_enabled":0,"begin_time":1534333389,"clean_time":21,
         # "clean_area":202500,"clean_trigger":2,"back_trigger":0,
         # "completed":0,"clean_strategy":1}
+
+        # Example of S6 in the segment cleaning mode
+        # new items: in_fresh_state, water_box_status, lab_status, map_status, lock_status
+        #
+        # [{'msg_ver': 2, 'msg_seq': 28, 'state': 18, 'battery': 95,
+        # 'clean_time': 606, 'clean_area': 8115000, 'error_code': 0,
+        # 'map_present': 1, 'in_cleaning': 3, 'in_returning': 0,
+        # 'in_fresh_state': 0, 'lab_status': 1, 'water_box_status': 0,
+        # 'fan_power': 102, 'dnd_enabled': 0, 'map_status': 3, 'lock_status': 0}]
         self.data = data
 
     @property
@@ -128,28 +137,19 @@ class VacuumStatus:
         return pretty_area(self.data["clean_area"])
 
     @property
-    @deprecated("Use vacuum's dnd_status() instead, which is more accurate")
-    def dnd(self) -> bool:
-        """DnD status. Use :func:`vacuum.dnd_status` instead of this."""
-        return bool(self.data["dnd_enabled"])
-
-    @property
     def map(self) -> bool:
         """Map token."""
         return bool(self.data["map_present"])
 
     @property
-    @deprecated("See is_on")
-    def in_cleaning(self) -> bool:
-        """True if currently cleaning. Please use :func:`is_on` instead of this."""
-        return self.is_on
-        # we are not using in_cleaning as it does not seem to work properly.
-        # return bool(self.data["in_cleaning"])
-
-    @property
     def in_zone_cleaning(self) -> bool:
         """Return True if the vacuum is in zone cleaning mode."""
         return self.data["in_cleaning"] == 2
+
+    @property
+    def in_segment_cleaning(self) -> bool:
+        """Return True if the vacuum is in segment cleaning mode."""
+        return self.data["in_cleaning"] == 3
 
     @property
     def is_paused(self) -> bool:
@@ -158,13 +158,13 @@ class VacuumStatus:
 
     @property
     def is_on(self) -> bool:
-        """True if device is currently cleaning (either automatic, manual,
-         spot, or zone)."""
+        """True if device is currently cleaning in any mode."""
         return (
             self.state_code == 5
             or self.state_code == 7
             or self.state_code == 11
             or self.state_code == 17
+            or self.state_code == 18
         )
 
     @property
