@@ -2,7 +2,7 @@ import binascii
 
 import pytest
 
-from miio.exceptions import DeviceError, RecoverableError
+from miio.exceptions import DeviceError, PayloadDecodeException, RecoverableError
 
 from .. import Utils
 from ..miioprotocol import MiIOProtocol
@@ -15,6 +15,28 @@ PARAMS = "params"
 @pytest.fixture
 def proto() -> MiIOProtocol:
     return MiIOProtocol()
+
+
+@pytest.fixture
+def token() -> bytes:
+    return bytes.fromhex(32 * "0")
+
+
+def build_msg(data, token):
+    encrypted_data = Utils.encrypt(data, token)
+
+    # header
+    magic = binascii.unhexlify(b"2131")
+    length = (32 + len(encrypted_data)).to_bytes(2, byteorder="big")
+    unknown = binascii.unhexlify(b"00000000")
+    did = binascii.unhexlify(b"01234567")
+    epoch = binascii.unhexlify(b"00000000")
+
+    checksum = Utils.md5(
+        magic + length + unknown + did + epoch + token + encrypted_data
+    )
+
+    return magic + length + unknown + did + epoch + checksum + encrypted_data
 
 
 def test_incrementing_id(proto):
@@ -62,18 +84,16 @@ def test_device_error_handling(proto: MiIOProtocol):
         proto._handle_error({"code": 1234})
 
 
-def test_non_bytes_payload():
+def test_non_bytes_payload(token):
     payload = "hello world"
-    valid_token = 32 * b"0"
     with pytest.raises(TypeError):
-        Utils.encrypt(payload, valid_token)
+        Utils.encrypt(payload, token)
     with pytest.raises(TypeError):
-        Utils.decrypt(payload, valid_token)
+        Utils.decrypt(payload, token)
 
 
-def test_encrypt():
+def test_encrypt(token):
     payload = b"hello world"
-    token = bytes.fromhex(32 * "0")
 
     encrypted = Utils.encrypt(payload, token)
     decrypted = Utils.decrypt(encrypted, token)
@@ -95,46 +115,46 @@ def test_invalid_token():
         Utils.decrypt(payload, wrong_length)
 
 
-def test_decode_json_payload():
-    token = bytes.fromhex(32 * "0")
+def test_decode_json_payload(token):
     ctx = {"token": token}
 
-    def build_msg(data):
-        encrypted_data = Utils.encrypt(data, token)
-
-        # header
-        magic = binascii.unhexlify(b"2131")
-        length = (32 + len(encrypted_data)).to_bytes(2, byteorder="big")
-        unknown = binascii.unhexlify(b"00000000")
-        did = binascii.unhexlify(b"01234567")
-        epoch = binascii.unhexlify(b"00000000")
-
-        checksum = Utils.md5(
-            magic + length + unknown + did + epoch + token + encrypted_data
-        )
-
-        return magic + length + unknown + did + epoch + checksum + encrypted_data
-
     # can parse message with valid json
-    serialized_msg = build_msg(b'{"id": 123456}')
+    serialized_msg = build_msg(b'{"id": 123456}', token)
     parsed_msg = Message.parse(serialized_msg, **ctx)
     assert parsed_msg.data.value
     assert isinstance(parsed_msg.data.value, dict)
     assert parsed_msg.data.value["id"] == 123456
 
+
+def test_decode_json_quirk_powerstrip(token):
+    ctx = {"token": token}
+
     # can parse message with invalid json for edge case powerstrip
     # when not connected to cloud
-    serialized_msg = build_msg(b'{"id": 123456,,"otu_stat":0}')
+    serialized_msg = build_msg(b'{"id": 123456,,"otu_stat":0}', token)
     parsed_msg = Message.parse(serialized_msg, **ctx)
     assert parsed_msg.data.value
     assert isinstance(parsed_msg.data.value, dict)
     assert parsed_msg.data.value["id"] == 123456
     assert parsed_msg.data.value["otu_stat"] == 0
 
+
+def test_decode_json_quirk_cloud(token):
+    ctx = {"token": token}
+
     # can parse message with invalid json for edge case xiaomi cloud
     # reply to _sync.batch_gen_room_up_url
-    serialized_msg = build_msg(b'{"id": 123456}\x00k')
+    serialized_msg = build_msg(b'{"id": 123456}\x00k', token)
     parsed_msg = Message.parse(serialized_msg, **ctx)
     assert parsed_msg.data.value
     assert isinstance(parsed_msg.data.value, dict)
     assert parsed_msg.data.value["id"] == 123456
+
+
+def test_decode_json_raises_for_invalid_json(token):
+    ctx = {"token": token}
+
+    # make sure PayloadDecodeDexception is raised for invalid json
+    serialized_msg = build_msg(b'{"id": 123456,,"otu_stat":0', token)
+    with pytest.raises(PayloadDecodeException):
+        Message.parse(serialized_msg, **ctx)

@@ -38,6 +38,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
+from miio.exceptions import PayloadDecodeException
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -193,7 +195,10 @@ class EncryptionAdapter(Adapter):
                 # log the error when decrypted bytes couldn't be loaded
                 # after trying all quirk adaptions
                 if i == len(decrypted_quirks) - 1:
-                    _LOGGER.error("unable to parse json '%s': %s", decoded, ex)
+                    _LOGGER.debug("Unable to parse json '%s': %s", decoded, ex)
+                    raise PayloadDecodeException(
+                        "Unable to parse message payload"
+                    ) from ex
 
         return None
 
