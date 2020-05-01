@@ -10,14 +10,9 @@ Development environment
 -----------------------
 
 This section will shortly go through how to get you started with a working development environment.
-We assume that you are familiar with virtualenv_ and are using it somehow (be it a manual setup, pipenv_, ..).
-The easiest way to start is to use pip_ to install dependencies::
+We use `poetry <https://python-poetry.org/>`__ for managing the dependencies and packaging, so simply execute:
 
-    pip install -r requirements.txt
-
-followed by installing the package in `development mode <https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs>`__ ::
-
-    pip install -e .
+    poetry install
 
 To verify the installation, simply launch tox_ to run all the checks::
 
@@ -52,17 +47,12 @@ please do not forget to create tests for your code.
 Generating documentation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To install necessary packages to compile the documentation, run::
+You can compile the documentation and open it locally in your browser::
 
-    pip install -r requirements_docs.txt
+    sphinx docs/ generated_docs
+    $BROWSER generated_docs/index.html
 
-After that, you can compile the documentation and open it locally in your browser::
-
-    cd docs
-    make html
-    $BROWSER _build/html/index.html
-
-Replace `$BROWSER` with your preferred browser if the environment variable is not set.
+Replace `$BROWSER` with your preferred browser, if the environment variable is not set.
 
 Adding support for new devices
 ------------------------------

@@ -1,3 +1,15 @@
+"""Unit tests for toilet lid.
+
+Response instance
+>> status
+
+Work: False
+State: 1
+Ambient Light: Yellow
+Filter remaining: 100%
+Filter remaining time: 180
+
+"""
 from unittest import TestCase
 
 import pytest
@@ -10,18 +22,6 @@ from miio.toiletlid import (
 )
 
 from .dummies import DummyDevice
-
-
-"""
-Response instance
->> status
-
-Work: False
-State: 1
-Ambient Light: Yellow
-Filter remaining: 100%
-Filter remaining time: 180
-"""
 
 
 class DummyToiletlidV1(DummyDevice, Toiletlid):
