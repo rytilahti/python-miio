@@ -47,6 +47,7 @@ sphinx-autodoc-typehints = "^1.10.3"
 sphinx-click = "^2.3.2"
 tox = "^3.14.6"
 isort = "^4.3.21"
+cffi = "^1.14.0"
 
 [tool.isort]
 multi_line_output = 3
