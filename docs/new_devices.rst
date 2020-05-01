@@ -49,11 +49,10 @@ Generating documentation
 
 You can compile the documentation and open it locally in your browser::
 
-    cd docs
-    make html
-    $BROWSER _build/html/index.html
+    sphinx docs/ generated_docs
+    $BROWSER generated_docs/index.html
 
-Replace `$BROWSER` with your preferred browser if the environment variable is not set.
+Replace `$BROWSER` with your preferred browser, if the environment variable is not set.
 
 Adding support for new devices
 ------------------------------

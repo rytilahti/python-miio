@@ -17,22 +17,6 @@ do this on Debian-based systems (like Rasperry Pi) with
 
     apt-get install libffi-dev libssl-dev
 
-Depending on your installation, the setuptools version may be too old
-for some dependencies so before reporting an issue please try to update
-the setuptools package with
-
-.. code-block:: bash
-
-    pip3 install -U setuptools
-
-In case you get an error similar like
-``ImportError: No module named 'packaging'`` during the installation,
-you need to upgrade pip and setuptools:
-
-.. code-block:: bash
-
-    pip3 install -U pip setuptools
-
 Device discovery
 ================
 Devices already connected on the same network where the command-line tool

@@ -41,6 +41,10 @@ stages:
         poetry run pre-commit run isort --all-files
       displayName: 'Order of imports (isort)'
 
+    - script: |
+        sphinx-build docs/ generated_docs
+      display: 'Documentation build (sphinx)'
+
 - stage: "Tests"
   jobs:
   - job: "Tests"
