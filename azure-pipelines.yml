@@ -43,7 +43,7 @@ stages:
 
     - script: |
         sphinx-build docs/ generated_docs
-      display: 'Documentation build (sphinx)'
+      displayName: 'Documentation build (sphinx)'
 
 - stage: "Tests"
   jobs:
