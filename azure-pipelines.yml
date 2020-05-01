@@ -42,7 +42,7 @@ stages:
       displayName: 'Order of imports (isort)'
 
     - script: |
-        sphinx-build docs/ generated_docs
+        poetry run sphinx-build docs/ generated_docs
       displayName: 'Documentation build (sphinx)'
 
 - stage: "Tests"
