@@ -40,6 +40,8 @@ class DeviceType(IntEnum):
     AqaraSwitch = 51
     AqaraMotion = 52
     AqaraMagnet = 53
+    AqaraSwitchOneChannel = 63
+    AqaraSwitchTwoChannels = 64
 
 
 class Gateway(Device):
@@ -525,9 +527,17 @@ class SubDevice:
 
 class SensorHT(SubDevice):
     accessor = "get_prop_sensor_ht"
-    properties = ["temperature", "humidity"]
+    properties = ["temperature", "humidity", "pressure"]
 
 
 class Plug(SubDevice):
     accessor = "get_prop_plug"
-    properties = ["power", "neutral_0"]
+    properties = ["power", "neutral_0", "load_power"]
+
+
+class AqaraSwitchOneChannel(SubDevice):
+    properties = ["load_power", "neutral_0", "neutral_1"]
+
+
+class AqaraSwitchTwoChannels(SubDevice):
+    properties = ["load_power", "neutral_0", "neutral_1"]
