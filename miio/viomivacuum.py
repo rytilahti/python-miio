@@ -203,7 +203,7 @@ class ViomiVacuum(Device):
             "Error: {result.error}\n"
             "Battery: {result.battery}\n"
             "Fan speed: {result.fanspeed}\n"
-            "Box type: {result.box_type}\n"
+            "Box type: {result.bin_type}\n"
             "Mop type: {result.mop_type}\n"
             "Clean time: {result.clean_time}\n"
             "Clean area: {result.clean_area}\n"
