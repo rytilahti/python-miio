@@ -1,11 +1,11 @@
 import logging
 from datetime import datetime
-from enum import IntEnum
+from enum import Enum, IntEnum
 from typing import Optional
 
 import click
 
-from .click_common import command, format_output
+from .click_common import EnumType, command, format_output
 from .device import Device
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
@@ -34,12 +34,26 @@ class DeviceType(IntEnum):
     SwitchOneChannel = 9
     SensorHT = 10
     Plug = 11
+    SensorSmoke = 15
     AqaraHT = 19
     SwitchLiveOneChannel = 20
     SwitchLiveTwoChannels = 21
     AqaraSwitch = 51
     AqaraMotion = 52
     AqaraMagnet = 53
+    AqaraRelayTwoChannels = 54
+    AqaraSquareButton = 62
+
+
+class AqaraRelayToggleValue(Enum):
+    toggle = "toggle"
+    on = "on"
+    off = "off"
+
+
+class AqaraRelayChannel(Enum):
+    first = "channel_0"
+    second = "channel_1"
 
 
 class Gateway(Device):
@@ -138,6 +152,32 @@ class Gateway(Device):
     def set_device_prop(self, sid, property, value):
         """Set the device property."""
         return self.send("set_device_prop", {"sid": sid, property: value})
+
+    @command(
+        click.argument("sid"),
+        click.argument("channel", type=EnumType(AqaraRelayChannel)),
+        click.argument("value", type=EnumType(AqaraRelayToggleValue)),
+    )
+    def relay_toggle(self, sid, channel, value):
+        """Toggle Aqara Wireless Relay 2ch"""
+        return self.send(
+            "toggle_ctrl_neutral",
+            [channel.value, value.value],
+            extra_parameters={"sid": sid},
+        )[0]
+
+    @command(
+        click.argument("sid"),
+        click.argument("channel", type=EnumType(AqaraRelayChannel)),
+    )
+    def relay_get_state(self, sid, channel):
+        """Get the state of Aqara Wireless Relay 2ch for given sid"""
+        return self.send("get_device_prop_exp", [[sid, channel.value]])[0][0]
+
+    @command(click.argument("sid"))
+    def relay_get_load_power(self, sid):
+        """Get the the load power of Aqara Wireless Relay 2ch for given sid"""
+        return self.send("get_device_prop_exp", [[sid, "load_power"]])[0][0]
 
     @command()
     def clock(self):

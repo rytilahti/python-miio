@@ -163,12 +163,12 @@ class Service(DataClassJsonMixin):
     def as_code(self):
         s = ""
         s += f"class {pretty_name(self.description)}(MiOTService):\n"
-        s += f'    """\n'
+        s += '    """\n'
         s += f"    {self.description} ({self.type}) (siid: {self.iid})\n"
         s += f"    Events: {len(self.events)}\n"
         s += f"    Properties: {len(self.properties)}\n"
         s += f"    Actions: {len(self.actions)}\n"
-        s += f'    """\n\n'
+        s += '    """\n\n'
         s += "#### PROPERTIES ####\n"
         for property in self.properties:
             s += indent(property.as_code(self.iid))
@@ -188,10 +188,10 @@ class Device(DataClassJsonMixin):
 
     def as_code(self):
         s = ""
-        s += f'"""'
+        s += '"""'
         s += f"Support template for {self.description} ({self.type})\n\n"
         s += f"Contains {len(self.services)} services\n"
-        s += f'"""\n\n'
+        s += '"""\n\n'
 
         for serv in self.services:
             s += serv.as_code()
