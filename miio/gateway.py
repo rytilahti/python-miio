@@ -156,11 +156,15 @@ class Gateway(Device):
     @command(
         click.argument("sid"),
         click.argument("channel", type=EnumType(AqaraRelayChannel)),
-        click.argument("value", type=EnumType(AqaraRelayToggleValue))
+        click.argument("value", type=EnumType(AqaraRelayToggleValue)),
     )
     def relay_toggle(self, sid, channel, value):
         """Toggle Aqara Wireless Relay 2ch"""
-        return self.send('toggle_ctrl_neutral', [channel.value, value.value], extra_parameters={'sid': sid})[0]
+        return self.send(
+            "toggle_ctrl_neutral",
+            [channel.value, value.value],
+            extra_parameters={"sid": sid},
+        )[0]
 
     @command(
         click.argument("sid"),
@@ -168,12 +172,12 @@ class Gateway(Device):
     )
     def relay_get_state(self, sid, channel):
         """Get the state of Aqara Wireless Relay 2ch for given sid"""
-        return self.send('get_device_prop_exp', [[sid, channel.value]])[0][0]
+        return self.send("get_device_prop_exp", [[sid, channel.value]])[0][0]
 
     @command(click.argument("sid"))
     def relay_get_load_power(self, sid):
         """Get the the load power of Aqara Wireless Relay 2ch for given sid"""
-        return self.send('get_device_prop_exp', [[sid, 'load_power']])[0][0]
+        return self.send("get_device_prop_exp", [[sid, "load_power"]])[0][0]
 
     @command()
     def clock(self):
