@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from enum import IntEnum, Enum
+from enum import Enum, IntEnum
 from typing import Optional
 
 import click
