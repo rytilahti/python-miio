@@ -42,7 +42,7 @@ class DeviceType(IntEnum):
     AqaraMotion = 52
     AqaraMagnet = 53
     AqaraRelayTwoChannels = 54
-    AqaraSqaureButton = 62
+    AqaraSquareButton = 62
 
 
 class AqaraRelayToggleValue(Enum):
