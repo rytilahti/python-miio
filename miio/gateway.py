@@ -153,6 +153,36 @@ class Gateway(Device):
         """Set the device property."""
         return self.send("set_device_prop", {"sid": sid, property: value})
 
+    @command(click.argument("id"))
+    def radio_select_channel(self, id):
+        """Select channel"""
+        return self.send("play_specify_fm", [int(id)])
+
+    @command(click.argument("volume"))
+    def radio_volume(self, volume):
+        """Set radio volume"""
+        return self.send("set_fm_volume", [int(volume)])
+
+    @command()
+    def radio_info(self):
+        """Radio info."""
+        return self.send("get_prop_fm")
+
+    @command()
+    def radio_play(self):
+        """Radio play."""
+        return self.send('play_fm', ['on'])
+
+    @command()
+    def radio_stop(self):
+        """Radio stop."""
+        return self.send('play_fm', ['off'])
+
+    @command()
+    def radio_channels(self):
+        """List of channels stored on device."""
+        return self.send("get_channels", {"start": 0})
+
     @command(
         click.argument("sid"),
         click.argument("channel", type=EnumType(AqaraRelayChannel)),
@@ -349,16 +379,6 @@ class GatewayRadio(Device):
     def __init__(self, parent) -> None:
         self._device = parent
 
-    @command()
-    def get_radio_info(self):
-        """Radio play info."""
-        return self._device.send("get_prop_fm")
-
-    @command(click.argument("volume"))
-    def set_radio_volume(self, volume):
-        """Set radio volume"""
-        return self._device.send("set_fm_volume", [volume])
-
     def play_music_new(self):
         """Unknown."""
         # {'from': '4', 'id': 9514, 'method': 'set_default_music', 'params': [2, '21']}
@@ -371,17 +391,6 @@ class GatewayRadio(Device):
         # {"from": "4", "id": 65055, "method": "play_specify_fm",
         # "params": {"id": 764, "type": 0, "url": "http://live.xmcdn.com/live/764/64.m3u8"}}
         return self._device.send("play_specify_fm")
-
-    def play_fm(self):
-        """radio on/off?"""
-        raise NotImplementedError()
-        # play_fm","params":["off"]}
-        return self._device.send("play_fm")
-
-    def volume_ctrl_fm(self):
-        """Unknown."""
-        raise NotImplementedError()
-        return self._device.send("volume_ctrl_fm")
 
     def get_channels(self):
         """Unknown."""
