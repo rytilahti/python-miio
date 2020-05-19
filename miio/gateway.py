@@ -171,12 +171,12 @@ class Gateway(Device):
     @command()
     def radio_play(self):
         """Radio play."""
-        return self.send('play_fm', ['on'])
+        return self.send("play_fm", ["on"])
 
     @command()
     def radio_stop(self):
         """Radio stop."""
-        return self.send('play_fm', ['off'])
+        return self.send("play_fm", ["off"])
 
     @command()
     def radio_channels(self):
