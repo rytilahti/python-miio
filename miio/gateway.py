@@ -1,4 +1,5 @@
 import logging
+import sys
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Optional
@@ -25,6 +26,7 @@ color_map = {
 
 
 class DeviceType(IntEnum):
+    Unknown = -1
     Gateway = 0
     Switch = 1
     Motion = 2
@@ -43,18 +45,6 @@ class DeviceType(IntEnum):
     AqaraMagnet = 53
     AqaraRelayTwoChannels = 54
     AqaraSquareButton = 62
-
-
-class AqaraRelayToggleValue(Enum):
-    toggle = "toggle"
-    on = "on"
-    off = "off"
-
-
-class AqaraRelayChannel(Enum):
-    first = "channel_0"
-    second = "channel_1"
-
 
 class Gateway(Device):
     """Main class representing the Xiaomi Gateway.
@@ -104,6 +94,7 @@ class Gateway(Device):
         self._radio = GatewayRadio(self)
         self._zigbee = GatewayZigbee(self)
         self._light = GatewayLight(self)
+        self._devices = []
 
     @property
     def alarm(self) -> "GatewayAlarm":
@@ -126,58 +117,48 @@ class Gateway(Device):
         """Return light control interface."""
         return self._light
 
-    @command()
+    @property
     def devices(self):
-        """Return list of devices."""
+        """Return a list of the already discovered devices."""
+        return self._devices
+
+    @command()
+    def discover_devices(self):
+        """Discovers SubDevices and returns a list of the discovered devices."""
         # from https://github.com/aholstenson/miio/issues/26
-        devices_raw = self.send("get_device_prop", ["lumi.0", "device_list"])
-        devices = [
-            SubDevice(self, *devices_raw[x : x + 5])  # noqa: E203
-            for x in range(0, len(devices_raw), 5)
-        ]
+        devices_raw = self.get_gateway_prop("device_list")
+        self._devices = []
+        thismodule = sys.modules[__name__]
+        
+        for x in range(0, len(devices_raw), 5):
+            try:
+                Device_name = DeviceType(devices_raw[x+1]).name
+            except ValueError:
+                _LOGGER.warning("Unknown subdevice type '%i' discovered, of Xiaomi gateway with ip: %s", devices_raw[x+1], self.ip)
+                Device_name = DeviceType(-1).name
+            
+            SubDeviceClass = getattr(thismodule, Device_name, SubDevice)
+            if SubDeviceClass == SubDevice and Device_name != DeviceType(-1).name:
+                _LOGGER.warning("Gateway device type '%s' does not have device specific methods defined, only basic default methods will be available", Device_name)
+            
+            self._devices.append(SubDeviceClass(self, *devices_raw[x : x + 5]))
+        
+        return self._devices
 
-        return devices
-
-    @command(click.argument("sid"), click.argument("property"))
-    def get_device_prop(self, sid, property):
+    @command(click.argument("property"))
+    def get_gateway_prop(self, property):
         """Get the value of a property for given sid."""
-        return self.send("get_device_prop", [sid, property])
+        return self.send("get_device_prop", ["lumi.0", property])
 
-    @command(click.argument("sid"), click.argument("properties", nargs=-1))
-    def get_device_prop_exp(self, sid, properties):
+    @command(click.argument("properties", nargs=-1))
+    def get_gateway_prop_exp(self, properties):
         """Get the value of a bunch of properties for given sid."""
-        return self.send("get_device_prop_exp", [[sid] + list(properties)])
+        return self.send("get_device_prop_exp", [["lumi.0"] + list(properties)])
 
-    @command(click.argument("sid"), click.argument("property"), click.argument("value"))
-    def set_device_prop(self, sid, property, value):
+    @command(click.argument("property"), click.argument("value"))
+    def set_gateway_prop(self, property, value):
         """Set the device property."""
-        return self.send("set_device_prop", {"sid": sid, property: value})
-
-    @command(
-        click.argument("sid"),
-        click.argument("channel", type=EnumType(AqaraRelayChannel)),
-        click.argument("value", type=EnumType(AqaraRelayToggleValue)),
-    )
-    def relay_toggle(self, sid, channel, value):
-        """Toggle Aqara Wireless Relay 2ch"""
-        return self.send(
-            "toggle_ctrl_neutral",
-            [channel.value, value.value],
-            extra_parameters={"sid": sid},
-        )[0]
-
-    @command(
-        click.argument("sid"),
-        click.argument("channel", type=EnumType(AqaraRelayChannel)),
-    )
-    def relay_get_state(self, sid, channel):
-        """Get the state of Aqara Wireless Relay 2ch for given sid"""
-        return self.send("get_device_prop_exp", [[sid, channel.value]])[0][0]
-
-    @command(click.argument("sid"))
-    def relay_get_load_power(self, sid):
-        """Get the the load power of Aqara Wireless Relay 2ch for given sid"""
-        return self.send("get_device_prop_exp", [[sid, "load_power"]])[0][0]
+        return self.send("set_device_prop", {"sid": "lumi.0", property: value})
 
     @command()
     def clock(self):
@@ -202,12 +183,12 @@ class Gateway(Device):
     @command()
     def timezone(self):
         """Get current timezone."""
-        return self.send("get_device_prop", ["lumi.0", "tzone_sec"])
+        return self.get_gateway_prop("tzone_sec")
 
     @command()
     def get_illumination(self):
         """Get illumination. In lux?"""
-        return self.send("get_illumination")[0]
+        return self.send("get_illumination").pop()
 
 
 class GatewayAlarm(Device):
@@ -247,28 +228,24 @@ class GatewayAlarm(Device):
     def triggering_time(self) -> int:
         """Return the time in seconds the alarm is going off when triggered"""
         # Response: 30, 60, etc.
-        return self._device.send("get_device_prop", ["lumi.0", "alarm_time_len"]).pop()
+        return self._device.get_gateway_prop("alarm_time_len").pop()
 
     @command(click.argument("seconds"))
     def set_triggering_time(self, seconds):
         """Set the time in seconds the alarm is going off when triggered"""
-        return self._device.send(
-            "set_device_prop", {"sid": "lumi.0", "alarm_time_len": seconds}
-        )
+        return self._device.set_gateway_prop("alarm_time_len", seconds)
 
     @command()
     def triggering_light(self) -> int:
         """Return the time the gateway light blinks when the alarm is triggerd"""
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._device.send("get_device_prop", ["lumi.0", "en_alarm_light"]).pop()
+        return self._device.get_gateway_prop("en_alarm_light").pop()
 
     @command(click.argument("seconds"))
     def set_triggering_light(self, seconds):
         """Set the time the gateway light blinks when the alarm is triggerd"""
         # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._device.send(
-            "set_device_prop", {"sid": "lumi.0", "en_alarm_light": seconds}
-        )
+        return self._device.set_gateway_prop("en_alarm_light", seconds)
 
     @command()
     def triggering_volume(self) -> int:
@@ -536,38 +513,216 @@ class SubDevice:
     def __init__(self, gw, sid, type_, _, __, ___):
         self.gw = gw
         self.sid = sid
-        self.type = DeviceType(type_)
-
-    def unpair(self):
-        return self.gw.send("remove_device", [self.sid])
-
-    def battery(self):
-        return self.gw.send("get_battery", [self.sid])[0]
-
-    def get_firmware_version(self) -> Optional[int]:
-        """Returns firmware version"""
+        self._battery = None
         try:
-            return self.gw.send("get_device_prop", [self.sid, "fw_ver"])[0]
-        except Exception as ex:
-            _LOGGER.debug(
-                "Got an exception while fetching fw_ver: %s", ex, exc_info=True
-            )
-            return None
+            self.type = DeviceType(type_)
+        except ValueError:
+            self.type = DeviceType(-1)
 
     def __repr__(self):
         return "<Subdevice %s: %s fw: %s bat: %s>" % (
-            self.type,
+            self.device_type,
             self.sid,
             self.get_firmware_version(),
-            self.battery(),
+            self.get_battery(),
         )
+
+    @property
+    def device_type(self):
+        return self.type.name
+
+    @property
+    def battery(self):
+        return self._battery
+
+    @command()
+    def subdevice_send(self, command):
+        """Send a command/query to the subdevice"""
+        try:
+            return self.gw.send(command, [self.sid])
+        except Exception as ex:
+            _LOGGER.error(
+                "Got an exception while sending command %s: %s", command, ex, exc_info=True
+            )
+            return None
+
+    @command()
+    def subdevice_send_arg(self, command, arguments):
+        """Send a command/query including arguments to the subdevice"""
+        try:
+            return self.gw.send(command, arguments, extra_parameters={"sid": self.sid})
+        except Exception as ex:
+            _LOGGER.error(
+                "Got an exception while sending command '%s' with arguments '%s': %s", command, str(arguments), ex, exc_info=True
+            )
+            return None
+
+    @command(click.argument("property"))
+    def get_subdevice_prop(self, property):
+        """Get the value of a property of the subdevice."""
+        try:
+            return self.gw.send("get_device_prop", [self.sid, property])
+        except Exception as ex:
+            _LOGGER.debug(
+                "Got an exception while fetching property %s: %s", property, ex, exc_info=True
+            )
+            return None
+
+    @command(click.argument("properties", nargs=-1))
+    def get_subdevice_prop_exp(self, properties):
+        """Get the value of a bunch of properties of the subdevice."""
+        try:
+            return self.gw.send("get_device_prop_exp", [[self.sid] + list(properties)]).pop()
+        except Exception as ex:
+            _LOGGER.debug(
+                "Got an exception while fetching properties %s: %s", properties, ex, exc_info=True
+            )
+            return None
+
+    @command(click.argument("property"), click.argument("value"))
+    def set_subdevice_prop(self, property, value):
+        """Set a device property of the subdevice."""
+        try:
+            return self.gw.send("set_device_prop", {"sid": self.sid, property: value})
+        except Exception as ex:
+            _LOGGER.debug(
+                "Got an exception while setting propertie %s to value %s: %s", property, str(value), ex, exc_info=True
+            )
+            return None
+
+    @command()
+    def unpair(self):
+        return self.subdevice_send("remove_device")
+
+    @command()
+    def get_battery(self):
+        self._battery = self.subdevice_send("get_battery").pop()
+        return self._battery
+
+    @command()
+    def get_firmware_version(self) -> Optional[int]:
+        """Returns firmware version"""
+        return self.get_subdevice_prop("fw_ver").pop()
+
+
+class AqaraHT(SubDevice):
+    _temperature = None
+    _humidity = None
+    _pressure = None
+
+    @property
+    def temperature(self):
+        """Return the temperature in degrees celsius"""
+        return self._temperature
+
+    @property
+    def humidity(self):
+        """Return the humidity in %"""
+        return self._humidity
+
+    @property
+    def pressure(self):
+        """Return the pressure in hPa"""
+        return self._pressure
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_subdevice_prop_exp(["temperature", "humidity", "pressure"])
+        if len(values) == 3:
+            self._temperature = values[0]/100
+            self._humidity = values[1]/100
+            self._pressure = values[2]/100
+        return
 
 
 class SensorHT(SubDevice):
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity"]
+    _temperature = None
+    _humidity = None
 
+    @property
+    def temperature(self):
+        return self._temperature
+
+    @property
+    def humidity(self):
+        return self._humidity
+    
+    @command()
+    def update(self):
+        values = self.get_subdevice_prop_exp(properties)
+        if len(values) == 2:
+            self._temperature = values[0]
+            self._humidity = values[1]
+        return
 
 class Plug(SubDevice):
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0"]
+    _power = None
+    _status = None
+
+    @property
+    def power(self):
+        return self._power
+
+    @property
+    def status(self):
+        return self._status
+    
+    @command()
+    def update(self):
+        values = self.get_subdevice_prop_exp(properties)
+        if len(values) == 2:
+            self._power = values[0]
+            self._status = values[1]
+        return
+
+class AqaraRelayTwoChannels(SubDevice):
+    _status_ch0 = None
+    _status_ch1 = None
+    _load_power = None
+
+    class AqaraRelayToggleValue(Enum):
+        toggle = "toggle"
+        on = "on"
+        off = "off"
+
+    class AqaraRelayChannel(Enum):
+        first = "channel_0"
+        second = "channel_1"
+
+    @property
+    def status_ch0(self):
+        """Return the state of channel 0"""
+        return self._status_ch0
+
+    @property
+    def status_ch1(self):
+        """Return the state of channel 1"""
+        return self._status_ch1
+
+    @property
+    def load_power(self):
+        """Return the load power"""
+        return self._load_power
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_subdevice_prop_exp(["load_power", "channel_0", "channel_1"])
+        if len(values) == 3:
+            self._load_power = values[0]
+            self._status_ch0 = values[1]
+            self._status_ch1 = values[2]
+        return
+
+    @command(
+        click.argument("channel", type=EnumType(AqaraRelayChannel)),
+        click.argument("value", type=EnumType(AqaraRelayToggleValue)),
+    )
+    def toggle(self, sid, channel, value):
+        """Toggle Aqara Wireless Relay 2ch"""
+        return self.subdevice_send_arg("toggle_ctrl_neutral", [channel.value, value.value]).pop()
