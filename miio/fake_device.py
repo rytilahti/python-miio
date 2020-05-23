@@ -1,9 +1,10 @@
-import socket
-from miio.protocol import Message
-import datetime
 import calendar
-import struct
+import datetime
 import logging
+import socket
+import struct
+
+from miio.protocol import Message
 
 _LOGGER = logging.getLogger(__name__)
 

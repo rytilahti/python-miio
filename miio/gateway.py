@@ -1,16 +1,16 @@
 import logging
 from datetime import datetime
 from enum import Enum, IntEnum
-from typing import Optional
 from functools import reduce
+from typing import Optional
 
-import ifaddr
 import click
+import ifaddr
 
 from .click_common import EnumType, command, format_output
 from .device import Device
+from .gateway_scripts import action_id, build_move, build_rotate, tokens
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
-from .gateway_scripts import tokens, build_move, build_rotate, action_id
 
 _LOGGER = logging.getLogger(__name__)
 
