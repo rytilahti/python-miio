@@ -217,11 +217,6 @@ class Gateway(Device):
         """Set the device property."""
         return self.send("set_device_prop", {"sid": sid, property: value})
 
-    @command()
-    def radio_channels(self):
-        """List of channels stored on device."""
-        return self.send("get_channels", {"start": 0})
-
     @command(
         click.argument("sid"),
         click.argument("channel", type=EnumType(AqaraRelayChannel)),
@@ -354,6 +349,15 @@ class GatewayAlarm(Device):
         """Return the last time the alarm changed status, type datetime.datetime"""
         return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
 
+    @command()
+    def get_radio_info(self):
+        """Radio play info."""
+        return self._device.send("get_prop_fm")
+
+    @command(click.argument("volume"))
+    def set_radio_volume(self, volume):
+        """Set radio volume"""
+        return self._device.send("set_fm_volume", [volume])
 
 class GatewayZigbee(Device):
     """Zigbee controls."""
@@ -417,6 +421,17 @@ class GatewayRadio(Device):
 
     def __init__(self, parent) -> None:
         self._device = parent
+
+    def play_fm(self):
+        """radio on/off?"""
+        raise NotImplementedError()
+        # play_fm","params":["off"]}
+        return self._device.send("play_fm")
+
+    def volume_ctrl_fm(self):
+        """Unknown."""
+        raise NotImplementedError()
+        return self._device.send("volume_ctrl_fm")
 
     def play_music_new(self):
         """Unknown."""
