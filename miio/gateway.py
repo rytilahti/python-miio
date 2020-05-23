@@ -10,7 +10,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
-from .gateway_scripts import tokens, build_move, build_rotate
+from .gateway_scripts import tokens, build_move, build_rotate, action_id
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -170,15 +170,24 @@ class Gateway(Device):
         return self.send("miIO.xdel", [script_id])
 
     @command(click.argument("sid"))
-    def install_cube_move_script(self, sid):
-        """Get the value of a property for given sid."""
+    def uninstall_scripts(self, sid):
+        result = {}
+        return dict(
+            map(
+                lambda action: (
+                    action,
+                    (action_id[action](sid), self.x_del(action_id[action](sid))),
+                ),
+                action_id.keys(),
+            )
+        )
 
+    def install_cube_script(self, sid, action, builder):
         addresses = ipv4_nonloop_ips()
-        my_ip = addresses[0]
-        _LOGGER.info("Using address %s for callbacks of %s", my_ip, addresses)
-        data_tkn = tokens['data_tkn']
-        source = build_move(sid, my_ip)
-
+        my_ip = addresses[0]  # Taking forst public IP ;(
+        _LOGGER.info("Using address %s for action %s of %s", my_ip, action, sid)
+        data_tkn = tokens["data_tkn"]
+        source = builder(sid, my_ip)
         return self.send(
             "send_data_frame",
             {
@@ -191,25 +200,12 @@ class Gateway(Device):
         )
 
     @command(click.argument("sid"))
+    def install_cube_move_script(self, sid):
+        return self.install_cube_script(sid, "move", build_move)
+
+    @command(click.argument("sid"))
     def install_cube_rotate_script(self, sid):
-        """Get the value of a property for given sid."""
-
-        addresses = ipv4_nonloop_ips()
-        my_ip = addresses[0]
-        _LOGGER.info("Using address %s for callbacks of %s", my_ip, addresses)
-        data_tkn = tokens['data_tkn']
-        source = build_rotate(sid, my_ip)
-
-        return self.send(
-            "send_data_frame",
-            {
-                "cur": 0,
-                "data": source,
-                "data_tkn": data_tkn,
-                "total": 1,
-                "type": "scene",
-            },
-        )
+        return self.install_cube_script(sid, "rotate", build_rotate)
 
     @command(click.argument("sid"), click.argument("properties", nargs=-1))
     def get_device_prop_exp(self, sid, properties):

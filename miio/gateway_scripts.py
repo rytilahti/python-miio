@@ -1,5 +1,4 @@
 from json import dumps as dumps_orig, loads
-
 from functools import reduce
 
 separators = (",", ":")
@@ -10,17 +9,27 @@ dumps = lambda data: dumps_orig(data, separators=separators)
 tokens = {
     "real": "9bc7c7ce6291d3e443fd7708608b9892",
     "encoded": "79cf21b08fb051499389f23c113477a4",
-    "data_tkn": 48724
+    "data_tkn": 48724,
 }
 
 fake_device_id = "120009025"
 fake_device_model = "chuangmi.plug.v3"
 
+
+def sid_to_num(sid):
+    lumi, hex_id = sid.split(".")
+    num_id = int.from_bytes(bytes.fromhex(hex_id), byteorder="big")
+    return str(num_id)
+
+
 action_prefix = "x.scene."
+
+# Keeping action script tail decimal int it might be used as index in some db
 action_id = {
-    "move": action_prefix + "2732711973",
-    "rotate": action_prefix + "2732711975",
+    "move": lambda sid: action_prefix + "1" + sid_to_num(sid),
+    "rotate": lambda sid: action_prefix + "2" + sid_to_num(sid),
 }
+
 
 def build_move(
     source_sid,
@@ -31,9 +40,12 @@ def build_move(
     message_id=0,
 ):
 
+    lumi, source_id = source_sid.split(".")
+    method_name = f"move_{source_id}"
+
     move = [
         [
-            action_id["move"],
+            action_id["move"](source_sid),
             [
                 "1.0",
                 1590158059,
@@ -51,7 +63,7 @@ def build_move(
                 ],
                 [
                     {
-                        "command": target_model + ".move",
+                        "command": target_model + "." + method_name,
                         "did": target_id,
                         "extra": "",
                         "id": message_id,
@@ -77,9 +89,12 @@ def build_rotate(
     message_id=0,
 ):
 
+    lumi, source_id = source_sid.split(".")
+    method_name = f"rotate_{source_id}"
+
     rotate = [
         [
-            action_id["rotate"],
+            action_id["rotate"](source_sid),
             [
                 "1.0",  # version??
                 1590161094,  # id of automation in mi home database??
@@ -101,7 +116,8 @@ def build_rotate(
                 [
                     {
                         "command": target_model
-                        + ".rotate",  # part after last dot (rotate) will be used as miio method in gateway callback
+                        + "."
+                        + method_name,  # part after last dot (rotate) will be used as miio method in gateway callback
                         "did": target_id,  # device identifier used in all responses of device
                         "extra": "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",  # ???
                         "id": 0,

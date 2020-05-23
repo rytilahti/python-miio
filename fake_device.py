@@ -6,9 +6,12 @@ import binascii
 import calendar
 import binascii
 import struct
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 
-def run(device_id, token, callbacks, address="0.0.0.0"):
+def run(device_id, token, callback, address="0.0.0.0"):
     def build_ack(device: int):
         # Iriginal devices are using year 1970, but it seems current datetime is fine
         timestamp = calendar.timegm(datetime.datetime.now().timetuple())
@@ -22,22 +25,30 @@ def run(device_id, token, callbacks, address="0.0.0.0"):
     sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     # Gateway interacts only with port 54321
     sock.bind((address, 54321))
-    print(
-        f"fake miio device started with  address={address} device_id={device_id} callbacks={list(callbacks.keys())} token=****"
+    _LOGGER.info(
+        "fake miio device started with  address=%s device_id=%s callback=%s token=****",
+        address,
+        device_id,
+        callback,
     )
 
     while True:
         data, [host, port] = sock.recvfrom(1024)
         if data == helobytes:
-            print(f"{host}:{port}=>PING")
+            _LOGGER.debug("%s:%s=>PING", host, port)
             m = build_ack(device_id)
             sock.sendto(m, (host, port))
-            print(f"{host}:{port}<=ACK(device_id={device_id})")
+            _LOGGER.debug("%s:%s<=ACK(device_id=%s)", host, port, device_id)
         else:
             request = Message.parse(data, token=token)
-            print(f"{host}:{port}=>{request.data.value}")
             value = request.data.value
-            result = callbacks[value["method"]](value["id"], value["params"])
+            _LOGGER.debug("%s:%s=>%s", host, port, value)
+            action, device_call_id = value["method"].split("_")
+            source_device_id = (
+                f"lumi.{device_call_id}"  #  All known devices use lumi. prefix
+            )
+            callback(source_device_id, action, value["params"])
+            result = {"result": 0, "id": value["id"]}
             header = {
                 "length": 0,
                 "unknown": 0,
@@ -50,19 +61,19 @@ def run(device_id, token, callbacks, address="0.0.0.0"):
                 "checksum": 0,
             }
             m = Message.build(msg, token=token)
-            print(f"{host}:{port}<={result}")
+            _LOGGER.debug("%s:%s<=%s", host, port, result)
             sock.sendto(m, (host, port))
 
 
 if __name__ == "__main__":
-    callbacks = {
-        "set_fm_volume": lambda id, params: {"result": ["ok"], "id": id},
-        "set_usb_on": lambda id, params: {"result": 0, "id": id},
-        "move": lambda id, params: {"result": 0, "id": id},
-        "rotate": lambda id, params: {"result": 0, "id": id},
-    }
+
+    def callback(source_device, action, params):
+        _LOGGER.debug(f"CALLBACK {source_device}=>{action}({params})")
 
     from miio.gateway_scripts import tokens, fake_device_id
+
+    logging.basicConfig(level="DEBUG")
+
     device_id = int(fake_device_id)
-    device_token = bytes.fromhex(tokens['real'])
-    run(device_id, device_token, callbacks)
+    device_token = bytes.fromhex(tokens["real"])
+    run(device_id, device_token, callback)
