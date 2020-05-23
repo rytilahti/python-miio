@@ -1,5 +1,6 @@
 from json import dumps as dumps_orig, loads
 from functools import reduce
+from random import randint
 
 separators = (",", ":")
 dumps = lambda data: dumps_orig(data, separators=separators)
@@ -48,7 +49,7 @@ def build_move(
             action_id["move"](source_sid),
             [
                 "1.0",
-                1590158059,
+                randint(1590161094, 1590162094),
                 [
                     "0",
                     {
@@ -97,7 +98,7 @@ def build_rotate(
             action_id["rotate"](source_sid),
             [
                 "1.0",  # version??
-                1590161094,  # id of automation in mi home database??
+                randint(1590161094, 1590162094),  # id of automation in mi home database??
                 [
                     "0",  # just zero..
                     {
