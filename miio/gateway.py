@@ -141,7 +141,7 @@ class Gateway(Device):
             "AqaraHT": AqaraHT,
             "AqaraMagnet": AqaraMagnet,
         }
-        devices_raw = self.get_gateway_prop("device_list")
+        devices_raw = self.get_prop("device_list")
         self._devices = []
 
         for x in range(0, len(devices_raw), 5):
@@ -170,17 +170,17 @@ class Gateway(Device):
         return self._devices
 
     @command(click.argument("property"))
-    def get_gateway_prop(self, property):
+    def get_prop(self, property):
         """Get the value of a property for given sid."""
         return self.send("get_device_prop", ["lumi.0", property])
 
     @command(click.argument("properties", nargs=-1))
-    def get_gateway_prop_exp(self, properties):
+    def get_prop_exp(self, properties):
         """Get the value of a bunch of properties for given sid."""
         return self.send("get_device_prop_exp", [["lumi.0"] + list(properties)])
 
     @command(click.argument("property"), click.argument("value"))
-    def set_gateway_prop(self, property, value):
+    def set_prop(self, property, value):
         """Set the device property."""
         return self.send("set_device_prop", {"sid": "lumi.0", property: value})
 
@@ -207,7 +207,7 @@ class Gateway(Device):
     @command()
     def timezone(self):
         """Get current timezone."""
-        return self.get_gateway_prop("tzone_sec")
+        return self.get_prop("tzone_sec")
 
     @command()
     def get_illumination(self):
@@ -268,24 +268,24 @@ class GatewayAlarm(GatewayDevice):
     def triggering_time(self) -> int:
         """Return the time in seconds the alarm is going off when triggered"""
         # Response: 30, 60, etc.
-        return self._gateway.get_gateway_prop("alarm_time_len").pop()
+        return self._gateway.get_prop("alarm_time_len").pop()
 
     @command(click.argument("seconds"))
     def set_triggering_time(self, seconds):
         """Set the time in seconds the alarm is going off when triggered"""
-        return self._gateway.set_gateway_prop("alarm_time_len", seconds)
+        return self._gateway.set_prop("alarm_time_len", seconds)
 
     @command()
     def triggering_light(self) -> int:
         """Return the time the gateway light blinks when the alarm is triggerd"""
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._gateway.get_gateway_prop("en_alarm_light").pop()
+        return self._gateway.get_prop("en_alarm_light").pop()
 
     @command(click.argument("seconds"))
     def set_triggering_light(self, seconds):
         """Set the time the gateway light blinks when the alarm is triggerd"""
         # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._gateway.set_gateway_prop("en_alarm_light", seconds)
+        return self._gateway.set_prop("en_alarm_light", seconds)
 
     @command()
     def triggering_volume(self) -> int:
