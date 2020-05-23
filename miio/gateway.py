@@ -70,7 +70,8 @@ class Gateway(Device):
     Use the given property getters to access specific functionalities such
     as `alarm` (for alarm controls) or `light` (for lights).
 
-    Commands whose functionality or parameters are unknown, feel free to implement!
+    Commands whose functionality or parameters are unknown,
+    feel free to implement!
     * toggle_device
     * toggle_plug
     * remove_all_bind
@@ -142,7 +143,10 @@ class Gateway(Device):
 
     @command()
     def discover_devices(self):
-        """Discovers SubDevices and returns a list of the discovered devices."""
+        """
+        Discovers SubDevices
+        and returns a list of the discovered devices.
+        """
         # from https://github.com/aholstenson/miio/issues/26
         device_type_mapping = {
             DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
@@ -158,32 +162,35 @@ class Gateway(Device):
             # Extract discovered information
             dev_info = SubDeviceInfo
             dev_info.sid = devices_raw[x]
-            dev_info.type_id = devices_raw[x+1]
-            dev_info.unknown = devices_raw[x+2]
-            dev_info.unknown2 = devices_raw[x+3]
-            dev_info.fw_ver = devices_raw[x+4]
+            dev_info.type_id = devices_raw[x + 1]
+            dev_info.unknown = devices_raw[x + 2]
+            dev_info.unknown2 = devices_raw[x + 3]
+            dev_info.fw_ver = devices_raw[x + 4]
 
             # Construct DeviceType
             try:
                 device_type = DeviceType(dev_info.type_id)
             except ValueError:
                 _LOGGER.warning(
-                    "Unknown subdevice type '%i': %s discovered, of Xiaomi gateway with ip: %s",
+                    "Unknown subdevice type '%i': %s discovered, "
+                    "of Xiaomi gateway with ip: %s",
                     dev_info.type_id,
                     dev_info.sid,
                     self.ip,
                 )
                 device_type = DeviceType(-1)
-            
+
             # Obtain the correct subdevice class, ignoring the gateway itself
             subdevice_cls = device_type_mapping.get(device_type)
             if subdevice_cls is None and device_type != DeviceType.Gateway:
                 subdevice_cls = SubDevice
                 _LOGGER.info(
-                    "Gateway device type '%s' does not have device specific methods defined, only basic default methods will be available",
+                    "Gateway device type '%s' "
+                    "does not have device specific methods defined, "
+                    "only basic default methods will be available",
                     device_type.name,
                 )
-            
+
             # Initialize and save the subdevice, ignoring the gateway itself
             if device_type != DeviceType.Gateway:
                 self._devices.append(subdevice_cls(self, dev_info))
@@ -198,7 +205,9 @@ class Gateway(Device):
     @command(click.argument("properties", nargs=-1))
     def get_prop_exp(self, properties):
         """Get the value of a bunch of properties for given sid."""
-        return self.send("get_device_prop_exp", [["lumi.0"] + list(properties)])
+        return self.send(
+            "get_device_prop_exp", [["lumi.0"] + list(properties)]
+        )
 
     @command(click.argument("property"), click.argument("value"))
     def set_prop(self, property, value):
@@ -208,7 +217,8 @@ class Gateway(Device):
     @command()
     def clock(self):
         """Alarm clock"""
-        # payload of clock volume ("get_clock_volume") already in get_clock response
+        # payload of clock volume ("get_clock_volume")
+        # already in get_clock response
         return self.send("get_clock")
 
     # Developer key
@@ -235,8 +245,12 @@ class Gateway(Device):
         """Get illumination. In lux?"""
         return self.send("get_illumination").pop()
 
+
 class GatewayDevice(Device):
-    """GatewayDevice class to specify the init method for all gateway device functionalities."""
+    """
+    GatewayDevice class
+    Specifies the init method for all gateway device functionalities.
+    """
 
     def __init__(
         self,
@@ -254,6 +268,7 @@ class GatewayDevice(Device):
             _LOGGER.debug(
                 "Creating new device instance, only use this for cli interface"
             )
+
 
 class GatewayAlarm(GatewayDevice):
     """Class representing the Xiaomi Gateway Alarm."""
@@ -276,7 +291,10 @@ class GatewayAlarm(GatewayDevice):
 
     @command()
     def arming_time(self) -> int:
-        """Return time in seconds the alarm stays 'oning' before transitioning to 'on'"""
+        """
+        Return time in seconds the alarm stays 'oning'
+        before transitioning to 'on'
+        """
         # Response: 5, 15, 30, 60
         return self._gateway.send("get_arm_wait_time").pop()
 
@@ -298,7 +316,10 @@ class GatewayAlarm(GatewayDevice):
 
     @command()
     def triggering_light(self) -> int:
-        """Return the time the gateway light blinks when the alarm is triggerd"""
+        """
+        Return the time the gateway light blinks
+        when the alarm is triggerd
+        """
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._gateway.get_prop("en_alarm_light").pop()
 
@@ -320,8 +341,13 @@ class GatewayAlarm(GatewayDevice):
 
     @command()
     def last_status_change_time(self):
-        """Return the last time the alarm changed status, type datetime.datetime"""
-        return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
+        """
+        Return the last time the alarm changed status,
+        type datetime.datetime
+        """
+        return datetime.fromtimestamp(
+            self._gateway.send("get_arming_time").pop()
+        )
 
 
 class GatewayZigbee(GatewayDevice):
@@ -393,15 +419,18 @@ class GatewayRadio(GatewayDevice):
 
     def play_music_new(self):
         """Unknown."""
-        # {'from': '4', 'id': 9514, 'method': 'set_default_music', 'params': [2, '21']}
-        # {'from': '4', 'id': 9515, 'method': 'play_music_new', 'params': ['21', 0]}
+        # {'from': '4', 'id': 9514,
+        #  'method': 'set_default_music', 'params': [2, '21']}
+        # {'from': '4', 'id': 9515,
+        #  'method': 'play_music_new', 'params': ['21', 0]}
         raise NotImplementedError()
 
     def play_specify_fm(self):
         """play specific stream?"""
         raise NotImplementedError()
         # {"from": "4", "id": 65055, "method": "play_specify_fm",
-        # "params": {"id": 764, "type": 0, "url": "http://live.xmcdn.com/live/764/64.m3u8"}}
+        # "params": {"id": 764, "type": 0,
+        # "url": "http://live.xmcdn.com/live/764/64.m3u8"}}
         return self._gateway.send("play_specify_fm")
 
     def play_fm(self):
@@ -491,7 +520,8 @@ class GatewayLight(GatewayDevice):
         # Returns 0 when light is off?"""
         # looks like this is the same as get_rgb
         # id': 65064, 'method': 'set_night_light_rgb', 'params': [419407616]}
-        # {'method': 'props', 'params': {'light': 'on', 'from.light': '4,,,'}, 'id': 88457} ?!
+        # {'method': 'props', 'params':
+        # {'light': 'on', 'from.light': '4,,,'}, 'id': 88457} ?!
         return self._gateway.send("get_night_light_rgb")
 
     @command(click.argument("color_name", type=str))
@@ -509,7 +539,9 @@ class GatewayLight(GatewayDevice):
         brightness_and_color = brightness_and_color_to_int(
             current_brightness, color_map[color_name]
         )
-        return self._gateway.send("set_night_light_rgb", [brightness_and_color])
+        return self._gateway.send(
+            "set_night_light_rgb", [brightness_and_color]
+        )
 
     @command(click.argument("color_name", type=str))
     def set_color(self, color_name):
@@ -520,7 +552,9 @@ class GatewayLight(GatewayDevice):
                     color=color_name, colors=color_map.keys()
                 )
             )
-        current_brightness = int_to_brightness(self._gateway.send("get_rgb")[0])
+        current_brightness = int_to_brightness(
+            self._gateway.send("get_rgb")[0]
+        )
         brightness_and_color = brightness_and_color_to_int(
             current_brightness, color_map[color_name]
         )
@@ -532,7 +566,9 @@ class GatewayLight(GatewayDevice):
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         current_color = int_to_rgb(self._gateway.send("get_rgb")[0])
-        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
+        brightness_and_color = brightness_and_color_to_int(
+            brightness, current_color
+        )
         return self._gateway.send("set_rgb", [brightness_and_color])
 
     @command(click.argument("brightness", type=int))
@@ -540,13 +576,20 @@ class GatewayLight(GatewayDevice):
         """Set night light brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        current_color = int_to_rgb(self._gateway.send("get_night_light_rgb")[0])
-        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
+        current_color = int_to_rgb(
+            self._gateway.send("get_night_light_rgb")[0]
+        )
+        brightness_and_color = brightness_and_color_to_int(
+            brightness, current_color
+        )
         print(brightness, current_color)
-        return self._gateway.send("set_night_light_rgb", [brightness_and_color])
+        return self._gateway.send(
+            "set_night_light_rgb", [brightness_and_color]
+        )
 
     @command(
-        click.argument("color_name", type=str), click.argument("brightness", type=int)
+        click.argument("color_name", type=str),
+        click.argument("brightness", type=int),
     )
     def set_light(self, color_name, brightness):
         """Set color (using color name) and brightness (0-100)."""
@@ -565,8 +608,11 @@ class GatewayLight(GatewayDevice):
 
 
 class SubDevice(Device):
-    """Base class for all subdevices of the gateway that are connected through zigbee."""
-    
+    """
+    Base class for all subdevices of the gateway
+    these devices are connected through zigbee.
+    """
+
     def __init__(
         self,
         gw: Gateway = None,
@@ -621,20 +667,21 @@ class SubDevice(Device):
             return self._gw.send(command, [self.sid])
         except Exception as ex:
             raise GatewayException(
-                    "Got an exception while sending command %s"
-                    % (command)
-                ) from ex
+                "Got an exception while sending command %s" % (command)
+            ) from ex
             return None
 
     @command()
     def subdevice_send_arg(self, command, arguments):
         """Send a command/query including arguments to the subdevice"""
         try:
-            return self._gw.send(command, arguments, extra_parameters={"sid": self.sid})
+            return self._gw.send(
+                command, arguments, extra_parameters={"sid": self.sid}
+            )
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while sending command '%s' with arguments '%s'"
-                % (command, str(arguments))
+                "Got an exception while sending "
+                "command '%s' with arguments '%s'" % (command, str(arguments))
             ) from ex
 
     @command(click.argument("property"))
@@ -649,7 +696,8 @@ class SubDevice(Device):
 
         if not response:
             raise GatewayException(
-                "Empty response while fetching property %s: %s" % (property, response)
+                "Empty response while fetching property %s: %s"
+                % (property, response)
             )
 
         return response
@@ -663,7 +711,8 @@ class SubDevice(Device):
             ).pop()
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while fetching properties %s: %s" % (properties)
+                "Got an exception while fetching properties %s: %s"
+                % (properties)
             ) from ex
 
         if len(list(properties)) != len(response):
@@ -675,8 +724,8 @@ class SubDevice(Device):
         for item in response:
             if not item:
                 raise GatewayException(
-                    "One or more empty results while fetching properties %s: %s"
-                    % (properties, response)
+                    "One or more empty results while "
+                    "fetching properties %s: %s" % (properties, response)
                 )
 
         return response
@@ -685,10 +734,12 @@ class SubDevice(Device):
     def set_subdevice_prop(self, property, value):
         """Set a device property of the subdevice."""
         try:
-            return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
+            return self._gw.send(
+                "set_device_prop", {"sid": self.sid, property: value}
+            )
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while setting propertie %s to value %s: %s"
+                "Got an exception while setting propertie %s to value %s"
                 % (property, str(value))
             ) from ex
 
@@ -732,7 +783,9 @@ class AqaraHT(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(["temperature", "humidity", "pressure"])
+        values = self.get_subdevice_prop_exp(
+            ["temperature", "humidity", "pressure"]
+        )
         self._temperature = values[0] / 100
         self._humidity = values[1] / 100
         self._pressure = values[2] / 100
@@ -808,12 +861,14 @@ class AqaraRelayTwoChannels(SubDevice):
 
     class AqaraRelayToggleValue(Enum):
         """Options to control the relay"""
+
         toggle = "toggle"
         on = "on"
         off = "off"
 
     class AqaraRelayChannel(Enum):
         """Options to select wich relay to control"""
+
         first = "channel_0"
         second = "channel_1"
 
@@ -835,7 +890,9 @@ class AqaraRelayTwoChannels(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(["load_power", "channel_0", "channel_1"])
+        values = self.get_subdevice_prop_exp(
+            ["load_power", "channel_0", "channel_1"]
+        )
         self._load_power = values[0]
         self._status_ch0 = values[1]
         self._status_ch1 = values[2]
