@@ -167,7 +167,7 @@ class Gateway(Device):
                 )
             
             # Initialize and save the subdevice, ignoring the gateway itself
-            if devices_raw[x] != "lumi.0":
+            if device_type != DeviceType.Gateway:
                 self._devices.append(subdevice_cls(self, *devices_raw[x : x + 5]))
 
         return self._devices
