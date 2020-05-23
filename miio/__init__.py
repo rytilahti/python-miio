@@ -48,5 +48,6 @@ from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
 
 from miio.discovery import Discovery
+from miio.fake_device import FakeDevice
 
 __version__ = version("python-miio")

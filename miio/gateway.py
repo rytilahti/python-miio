@@ -217,40 +217,6 @@ class Gateway(Device):
         """Set the device property."""
         return self.send("set_device_prop", {"sid": sid, property: value})
 
-    @command(click.argument("id"), click.argument("url"))
-    def radio_play_url(self, id, url):
-        """Put url into gateway memory with id"""
-        xiaomi_url = url.replace("/", "\/")
-        print(xiaomi_url)
-        return self.send(
-            "add_channels", {"chs": [{"id": id, "url": xiaomi_url, "type": 0}]}
-        )
-
-    @command(click.argument("id"))
-    def radio_select_channel(self, id):
-        """Select channel"""
-        return self.send("play_specify_fm", [int(id)])
-
-    @command(click.argument("volume"))
-    def radio_volume(self, volume):
-        """Set radio volume"""
-        return self.send("set_fm_volume", [int(volume)])
-
-    @command()
-    def radio_info(self):
-        """Radio info."""
-        return self.send("get_prop_fm")
-
-    @command()
-    def radio_play(self):
-        """Radio play."""
-        return self.send("play_fm", ["on"])
-
-    @command()
-    def radio_stop(self):
-        """Radio stop."""
-        return self.send("play_fm", ["off"])
-
     @command()
     def radio_channels(self):
         """List of channels stored on device."""
