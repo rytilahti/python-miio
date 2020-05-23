@@ -8,6 +8,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
+from .gateway_scripts import build_move, build_rotate
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -55,6 +56,11 @@ class AqaraRelayChannel(Enum):
     first = "channel_0"
     second = "channel_1"
 
+
+class Radio:
+    #@command()
+    def radio_demo(self):
+        print("RADIO KUKU RADIOA GAGA")
 
 class Gateway(Device):
     """Main class representing the Xiaomi Gateway.
@@ -104,6 +110,7 @@ class Gateway(Device):
         self._radio = GatewayRadio(self)
         self._zigbee = GatewayZigbee(self)
         self._light = GatewayLight(self)
+        #self.radio_demo()
 
     @property
     def alarm(self) -> "GatewayAlarm":
@@ -143,6 +150,51 @@ class Gateway(Device):
         """Get the value of a property for given sid."""
         return self.send("get_device_prop", [sid, property])
 
+    @command(click.argument("script_id"))
+    def x_del(self, script_id):
+        """Get the value of a property for given sid."""
+        return self.send("miIO.xdel", [script_id])
+
+    @command()
+    def install_cube_move_script(self):
+        """Get the value of a property for given sid."""
+
+        source = build_move()
+        print(source)
+
+        return self.send(
+            "send_data_frame", {
+                'cur': 0,
+                'data': source,
+                'data_tkn': 48724,
+                'total': 1,
+                'type': "scene"
+            }
+        )
+
+    @command()
+    def install_cube_rotate_script(self):
+        """Get the value of a property for given sid."""
+
+        source = build_rotate()
+        print(source)
+
+        return self.send(
+            "send_data_frame", {
+                'cur': 0,
+                'data': source,
+                'data_tkn': 48724,
+                'total': 1,
+                'type': "scene"
+            }
+        )
+
+
+
+    def bind_cube_action(self, action, target_ip, callback):
+        token = ""
+        return token
+
     @command(click.argument("sid"), click.argument("properties", nargs=-1))
     def get_device_prop_exp(self, sid, properties):
         """Get the value of a bunch of properties for given sid."""
@@ -152,6 +204,43 @@ class Gateway(Device):
     def set_device_prop(self, sid, property, value):
         """Set the device property."""
         return self.send("set_device_prop", {"sid": sid, property: value})
+
+    @command(click.argument("id"), click.argument("url"))
+    def radio_play_url(self, id, url):
+        """Put url into gateway memory with id"""
+        xiaomi_url = url.replace('/', '\/')
+        print(xiaomi_url)
+        return self.send("add_channels", {"chs": [{"id": id, "url": xiaomi_url,"type":0}]})
+
+    @command(click.argument("id"))
+    def radio_select_channel(self, id):
+        """Select channel"""
+        return self.send("play_specify_fm", [int(id)])
+
+    @command(click.argument("volume"))
+    def radio_volume(self, volume):
+        """Set radio volume"""
+        return self.send("set_fm_volume", [int(volume)])
+
+    @command()
+    def radio_info(self):
+        """Radio info."""
+        return self.send("get_prop_fm")
+
+    @command()
+    def radio_play(self):
+        """Radio play."""
+        return self.send('play_fm', ['on'])
+
+    @command()
+    def radio_stop(self):
+        """Radio stop."""
+        return self.send('play_fm', ['off'])
+
+    @command()
+    def radio_channels(self):
+        """List of channels stored on device."""
+        return self.send("get_channels", {"start": 0})
 
     @command(
         click.argument("sid"),
@@ -349,16 +438,6 @@ class GatewayRadio(Device):
     def __init__(self, parent) -> None:
         self._device = parent
 
-    @command()
-    def get_radio_info(self):
-        """Radio play info."""
-        return self._device.send("get_prop_fm")
-
-    @command(click.argument("volume"))
-    def set_radio_volume(self, volume):
-        """Set radio volume"""
-        return self._device.send("set_fm_volume", [volume])
-
     def play_music_new(self):
         """Unknown."""
         # {'from': '4', 'id': 9514, 'method': 'set_default_music', 'params': [2, '21']}
@@ -371,17 +450,6 @@ class GatewayRadio(Device):
         # {"from": "4", "id": 65055, "method": "play_specify_fm",
         # "params": {"id": 764, "type": 0, "url": "http://live.xmcdn.com/live/764/64.m3u8"}}
         return self._device.send("play_specify_fm")
-
-    def play_fm(self):
-        """radio on/off?"""
-        raise NotImplementedError()
-        # play_fm","params":["off"]}
-        return self._device.send("play_fm")
-
-    def volume_ctrl_fm(self):
-        """Unknown."""
-        raise NotImplementedError()
-        return self._device.send("volume_ctrl_fm")
 
     def get_channels(self):
         """Unknown."""
