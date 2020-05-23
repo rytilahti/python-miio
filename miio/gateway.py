@@ -2,7 +2,9 @@ import logging
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Optional
+from functools import reduce
 
+import ifaddr
 import click
 
 from .click_common import EnumType, command, format_output
@@ -23,6 +25,24 @@ color_map = {
     "olive": (128, 128, 0),
     "purple": (128, 0, 128),
 }
+
+
+def ipv4_nonloop_ips():
+    def flatten(a, b):
+        a.extend(b)
+        return a
+
+    return list(
+        filter(
+            lambda ip: isinstance(ip, str) and not ip.startswith("127"),
+            map(
+                lambda ip: ip.ip,
+                reduce(
+                    flatten, map(lambda adapter: adapter.ips, ifaddr.get_adapters()), []
+                ),
+            ),
+        )
+    )
 
 
 class DeviceType(IntEnum):
@@ -56,11 +76,6 @@ class AqaraRelayChannel(Enum):
     first = "channel_0"
     second = "channel_1"
 
-
-class Radio:
-    #@command()
-    def radio_demo(self):
-        print("RADIO KUKU RADIOA GAGA")
 
 class Gateway(Device):
     """Main class representing the Xiaomi Gateway.
@@ -110,7 +125,6 @@ class Gateway(Device):
         self._radio = GatewayRadio(self)
         self._zigbee = GatewayZigbee(self)
         self._light = GatewayLight(self)
-        #self.radio_demo()
 
     @property
     def alarm(self) -> "GatewayAlarm":
@@ -159,37 +173,43 @@ class Gateway(Device):
     def install_cube_move_script(self):
         """Get the value of a property for given sid."""
 
-        source = build_move()
-        print(source)
+        addresses = ipv4_nonloop_ips()
+        my_ip = addresses[0]
+        _LOGGER.debug("Using address %s for callbacks of %s", my_ip, addresses)
+        data_tkn = 48724
+        source = build_move(target_ip=my_ip)
 
         return self.send(
-            "send_data_frame", {
-                'cur': 0,
-                'data': source,
-                'data_tkn': 48724,
-                'total': 1,
-                'type': "scene"
-            }
+            "send_data_frame",
+            {
+                "cur": 0,
+                "data": source,
+                "data_tkn": data_tkn,
+                "total": 1,
+                "type": "scene",
+            },
         )
 
     @command()
     def install_cube_rotate_script(self):
         """Get the value of a property for given sid."""
 
-        source = build_rotate()
-        print(source)
+        addresses = ipv4_nonloop_ips()
+        my_ip = addresses[0]
+        _LOGGER.debug("Using address %s for callbacks of %s", my_ip, addresses)
+        data_tkn = 48724
+        source = build_rotate(target_ip=my_ip)
 
         return self.send(
-            "send_data_frame", {
-                'cur': 0,
-                'data': source,
-                'data_tkn': 48724,
-                'total': 1,
-                'type': "scene"
-            }
+            "send_data_frame",
+            {
+                "cur": 0,
+                "data": source,
+                "data_tkn": data_tkn,
+                "total": 1,
+                "type": "scene",
+            },
         )
-
-
 
     def bind_cube_action(self, action, target_ip, callback):
         token = ""
@@ -208,9 +228,11 @@ class Gateway(Device):
     @command(click.argument("id"), click.argument("url"))
     def radio_play_url(self, id, url):
         """Put url into gateway memory with id"""
-        xiaomi_url = url.replace('/', '\/')
+        xiaomi_url = url.replace("/", "\/")
         print(xiaomi_url)
-        return self.send("add_channels", {"chs": [{"id": id, "url": xiaomi_url,"type":0}]})
+        return self.send(
+            "add_channels", {"chs": [{"id": id, "url": xiaomi_url, "type": 0}]}
+        )
 
     @command(click.argument("id"))
     def radio_select_channel(self, id):
@@ -230,12 +252,12 @@ class Gateway(Device):
     @command()
     def radio_play(self):
         """Radio play."""
-        return self.send('play_fm', ['on'])
+        return self.send("play_fm", ["on"])
 
     @command()
     def radio_stop(self):
         """Radio stop."""
-        return self.send('play_fm', ['off'])
+        return self.send("play_fm", ["off"])
 
     @command()
     def radio_channels(self):

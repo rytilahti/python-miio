@@ -1,5 +1,7 @@
 from json import dumps as dumps_orig, loads
 
+from functools import reduce
+
 separators = (",", ":")
 dumps = lambda data: dumps_orig(data, separators=separators)
 
@@ -15,7 +17,6 @@ action_id = {
     "move": action_prefix + "2732711973",
     "rotate": action_prefix + "2732711975",
 }
-
 
 def build_move(
     source_sid="lumi.158d000103ec74",
@@ -83,7 +84,7 @@ def build_rotate(
                     {
                         "did": source_sid,  # gateway subdevice sid / origin of action zigbee sid
                         "extra": "[1,12,3,85,[1,0],0,0]",  # ???
-                        "key": "event." + source_model + ".rotate",  # event_id??
+                        "key": "event." + source_model + ".rotate",  # event_id
                         "model": source_model,
                         "src": "device",
                         "timespan": [
@@ -114,7 +115,3 @@ def build_rotate(
     ]
 
     return dumps(rotate)
-
-
-# print(build_move())
-# print(build_rotate())
