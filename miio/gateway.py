@@ -422,17 +422,6 @@ class GatewayRadio(Device):
     def __init__(self, parent) -> None:
         self._device = parent
 
-    def play_fm(self):
-        """radio on/off?"""
-        raise NotImplementedError()
-        # play_fm","params":["off"]}
-        return self._device.send("play_fm")
-
-    def volume_ctrl_fm(self):
-        """Unknown."""
-        raise NotImplementedError()
-        return self._device.send("volume_ctrl_fm")
-
     def play_music_new(self):
         """Unknown."""
         # {'from': '4', 'id': 9514, 'method': 'set_default_music', 'params': [2, '21']}
@@ -445,6 +434,17 @@ class GatewayRadio(Device):
         # {"from": "4", "id": 65055, "method": "play_specify_fm",
         # "params": {"id": 764, "type": 0, "url": "http://live.xmcdn.com/live/764/64.m3u8"}}
         return self._device.send("play_specify_fm")
+
+    def play_fm(self):
+        """radio on/off?"""
+        raise NotImplementedError()
+        # play_fm","params":["off"]}
+        return self._device.send("play_fm")
+
+    def volume_ctrl_fm(self):
+        """Unknown."""
+        raise NotImplementedError()
+        return self._device.send("volume_ctrl_fm")
 
     def get_channels(self):
         """Unknown."""
