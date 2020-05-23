@@ -2,7 +2,6 @@ import socket
 from miio.protocol import Message
 from time import time
 import datetime
-import binascii
 import calendar
 import binascii
 import struct
