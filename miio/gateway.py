@@ -349,15 +349,6 @@ class GatewayAlarm(Device):
         """Return the last time the alarm changed status, type datetime.datetime"""
         return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
 
-    @command()
-    def get_radio_info(self):
-        """Radio play info."""
-        return self._device.send("get_prop_fm")
-
-    @command(click.argument("volume"))
-    def set_radio_volume(self, volume):
-        """Set radio volume"""
-        return self._device.send("set_fm_volume", [volume])
 
 class GatewayZigbee(Device):
     """Zigbee controls."""
@@ -421,6 +412,16 @@ class GatewayRadio(Device):
 
     def __init__(self, parent) -> None:
         self._device = parent
+
+    @command()
+    def get_radio_info(self):
+        """Radio play info."""
+        return self._device.send("get_prop_fm")
+
+    @command(click.argument("volume"))
+    def set_radio_volume(self, volume):
+        """Set radio volume"""
+        return self._device.send("set_fm_volume", [volume])
 
     def play_music_new(self):
         """Unknown."""
