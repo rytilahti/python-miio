@@ -22,7 +22,9 @@ def run(device_id, token, callbacks, address="0.0.0.0"):
     sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     # Gateway interacts only with port 54321
     sock.bind((address, 54321))
-    print(f"fake miio device started with  address={address} device_id={device_id} callbacks={list(callbacks.keys())} token=****")
+    print(
+        f"fake miio device started with  address={address} device_id={device_id} callbacks={list(callbacks.keys())} token=****"
+    )
 
     while True:
         data, [host, port] = sock.recvfrom(1024)

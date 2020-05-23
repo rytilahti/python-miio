@@ -1,6 +1,6 @@
 from json import dumps as dumps_orig, loads
 
-separators = (',', ':')
+separators = (",", ":")
 dumps = lambda data: dumps_orig(data, separators=separators)
 
 # token in script doesn't match token of device which is used for (enc/dec)ryption
@@ -109,5 +109,5 @@ def build_rotate(
     return dumps(rotate)
 
 
-#print(build_move())
-#print(build_rotate())
+# print(build_move())
+# print(build_rotate())
