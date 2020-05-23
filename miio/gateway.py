@@ -9,7 +9,7 @@ import ifaddr
 
 from .click_common import EnumType, command, format_output
 from .device import Device
-from .gateway_scripts import action_id, build_move, build_rotate, tokens
+from .gateway_scripts import action_id, build_move, build_rotate, build_singlepress, build_doublepress, build_longpress, build_shake, tokens
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
@@ -181,7 +181,7 @@ class Gateway(Device):
             )
         )
 
-    def install_cube_script(self, sid, action, builder):
+    def install_script(self, sid, action, builder):
         addresses = ipv4_nonloop_ips()
         my_ip = addresses[0]  # Taking forst public IP ;(
         _LOGGER.info("Using address %s for action %s of %s", my_ip, action, sid)
@@ -200,11 +200,27 @@ class Gateway(Device):
 
     @command(click.argument("sid"))
     def install_cube_move_script(self, sid):
-        return self.install_cube_script(sid, "move", build_move)
+        return self.install_script(sid, "move", build_move)
 
     @command(click.argument("sid"))
     def install_cube_rotate_script(self, sid):
-        return self.install_cube_script(sid, "rotate", build_rotate)
+        return self.install_script(sid, "rotate", build_rotate)
+
+    @command(click.argument("sid"))
+    def install_button_singlepress_script(self, sid):
+        return self.install_script(sid, "singlepress", build_singlepress)
+
+    @command(click.argument("sid"))
+    def install_button_doublepress_script(self, sid):
+        return self.install_script(sid, "doublepress", build_doublepress)
+
+    @command(click.argument("sid"))
+    def install_button_longpress_script(self, sid):
+        return self.install_script(sid, "longpress", build_longpress)
+
+    @command(click.argument("sid"))
+    def install_button_shake_script(self, sid):
+        return self.install_script(sid, "shake", build_shake)
 
     @command(click.argument("sid"), click.argument("properties", nargs=-1))
     def get_device_prop_exp(self, sid, properties):
