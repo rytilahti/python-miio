@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Optional
@@ -52,6 +53,15 @@ class DeviceType(IntEnum):
     AqaraSquareButton = 62
     RemoteSwitchSingle = 134
     RemoteSwitchDouble = 135
+
+
+@dataclass
+class SubDeviceInfo:
+    sid: str
+    type_id: int
+    unknown: int
+    unknown2: int
+    fw_ver: int
 
 
 class Gateway(Device):
@@ -145,14 +155,22 @@ class Gateway(Device):
         self._devices = []
 
         for x in range(0, len(devices_raw), 5):
+            # Extract discovered information
+            dev_info = SubDeviceInfo
+            dev_info.sid = devices_raw[x]
+            dev_info.type_id = devices_raw[x+1]
+            dev_info.unknown = devices_raw[x+2]
+            dev_info.unknown2 = devices_raw[x+3]
+            dev_info.fw_ver = devices_raw[x+4]
+
             # Construct DeviceType
             try:
-                device_type = DeviceType(devices_raw[x + 1])
+                device_type = DeviceType(dev_info.type_id)
             except ValueError:
                 _LOGGER.warning(
                     "Unknown subdevice type '%i': %s discovered, of Xiaomi gateway with ip: %s",
-                    devices_raw[x + 1],
-                    devices_raw[x],
+                    dev_info.type_id,
+                    dev_info.sid,
                     self.ip,
                 )
                 device_type = DeviceType(-1)
@@ -168,7 +186,7 @@ class Gateway(Device):
             
             # Initialize and save the subdevice, ignoring the gateway itself
             if device_type != DeviceType.Gateway:
-                self._devices.append(subdevice_cls(self, *devices_raw[x : x + 5]))
+                self._devices.append(subdevice_cls(self, dev_info))
 
         return self._devices
 
@@ -552,11 +570,7 @@ class SubDevice(Device):
     def __init__(
         self,
         gw: Gateway = None,
-        sid: str = None,
-        type: int = None,
-        _: int = None,
-        __: int = None,
-        ___: int = None,
+        dev_info: SubDeviceInfo = None,
         ip: str = None,
         token: str = None,
         start_id: int = 0,
@@ -571,14 +585,14 @@ class SubDevice(Device):
                 "Creating new device instance, only use this for cli interface"
             )
 
-        if sid is None:
+        if dev_info is None:
             raise Exception("sid of the subdevice needs to be specified")
 
         self._gw = gw
-        self.sid = sid
+        self.sid = dev_info.sid
         self._battery = None
         try:
-            self.type = DeviceType(type)
+            self.type = DeviceType(dev_info.type_id)
         except ValueError:
             self.type = DeviceType(-1)
 
