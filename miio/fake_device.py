@@ -1,9 +1,7 @@
 import socket
 from miio.protocol import Message
-from time import time
 import datetime
 import calendar
-import binascii
 import struct
 import logging
 
@@ -54,7 +52,7 @@ class FakeDevice:
                 _LOGGER.debug("%s:%s=>%s", host, port, value)
                 action, device_call_id = value["method"].split("_")
                 source_device_id = (
-                    f"lumi.{device_call_id}"  #  All known devices use lumi. prefix
+                    f"lumi.{device_call_id}"  # All known devices use lumi. prefix
                 )
                 callback(source_device_id, action, value["params"])
                 result = {"result": 0, "id": value["id"]}
