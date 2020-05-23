@@ -135,18 +135,18 @@ class Gateway(Device):
         """Discovers SubDevices and returns a list of the discovered devices."""
         # from https://github.com/aholstenson/miio/issues/26
         device_type_mapping = {
-            "AqaraRelayTwoChannels": AqaraRelayTwoChannels,
-            "Plug": AqaraPlug,
-            "SensorHT": SensorHT,
-            "AqaraHT": AqaraHT,
-            "AqaraMagnet": AqaraMagnet,
+            DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
+            DeviceType.Plug: AqaraPlug,
+            DeviceType.SensorHT: SensorHT,
+            DeviceType.AqaraHT: AqaraHT,
+            DeviceType.AqaraMagnet: AqaraMagnet,
         }
         devices_raw = self.get_prop("device_list")
         self._devices = []
 
         for x in range(0, len(devices_raw), 5):
             try:
-                device_name = DeviceType(devices_raw[x + 1]).name
+                device_type = DeviceType(devices_raw[x + 1])
             except ValueError:
                 _LOGGER.warning(
                     "Unknown subdevice type '%i': %s discovered, of Xiaomi gateway with ip: %s",
@@ -154,14 +154,14 @@ class Gateway(Device):
                     devices_raw[x],
                     self.ip,
                 )
-                device_name = DeviceType(-1).name
+                device_type = DeviceType(-1)
 
-            subdevice_cls = device_type_mapping.get(device_name)
-            if subdevice_cls is None and device_name != DeviceType(0).name:
+            subdevice_cls = device_type_mapping.get(device_type)
+            if subdevice_cls is None and device_type != DeviceType(0):
                 subdevice_cls = SubDevice
                 _LOGGER.info(
                     "Gateway device type '%s' does not have device specific methods defined, only basic default methods will be available",
-                    device_name,
+                    device_type.name,
                 )
 
             if devices_raw[x] != "lumi.0":
