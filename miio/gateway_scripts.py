@@ -1,9 +1,12 @@
-from json import dumps as dumps_orig, loads
-from functools import reduce
+from json import dumps as dumps_orig
 from random import randint
 
 separators = (",", ":")
-dumps = lambda data: dumps_orig(data, separators=separators)
+
+
+def dumps(data):
+    return dumps_orig(data, separators=separators)
+
 
 # token in script doesn't match token of device which is used for (enc/dec)ryption
 # but they are linked somehow

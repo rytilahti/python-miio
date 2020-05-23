@@ -20,7 +20,7 @@ class FakeDevice:
 
     def run(self, callback):
         def build_ack(device: int):
-            # Iriginal devices are using year 1970, but it seems current datetime is fine
+            # Original devices are using year 1970, but it seems current datetime is fine
             timestamp = calendar.timegm(datetime.datetime.now().timetuple())
             # ACK packet not signed, 16 bytes header + 16 bytes of zeroes
             return struct.pack(">HHIII16s", 0x2131, 32, 0, device, timestamp, bytes(16))
@@ -55,6 +55,8 @@ class FakeDevice:
                     f"lumi.{device_call_id}"  # All known devices use lumi. prefix
                 )
                 callback(source_device_id, action, value["params"])
+                # This result means OK, but some methods return ['ok'] instead of 0
+                # might be necessary to use different results for different methods
                 result = {"result": 0, "id": value["id"]}
                 header = {
                     "length": 0,

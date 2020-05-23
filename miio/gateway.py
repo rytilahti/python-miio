@@ -171,7 +171,6 @@ class Gateway(Device):
 
     @command(click.argument("sid"))
     def uninstall_scripts(self, sid):
-        result = {}
         return dict(
             map(
                 lambda action: (
