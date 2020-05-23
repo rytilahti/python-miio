@@ -220,12 +220,12 @@ class GatewayAlarm(Device):
 
     def __init__(
         self,
-        parent: Gateway = None,
         ip: str = None,
         token: str = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        parent: Gateway = None,
     ) -> None:
         if parent is not None:
             self._gateway = parent
@@ -306,12 +306,12 @@ class GatewayZigbee(Device):
 
     def __init__(
         self,
-        parent: Gateway = None,
         ip: str = None,
         token: str = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        parent: Gateway = None,
     ) -> None:
         if parent is not None:
             self._gateway = parent
@@ -377,12 +377,12 @@ class GatewayRadio(Device):
 
     def __init__(
         self,
-        parent: Gateway = None,
         ip: str = None,
         token: str = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        parent: Gateway = None,
     ) -> None:
         if parent is not None:
             self._gateway = parent
@@ -498,12 +498,12 @@ class GatewayLight(Device):
 
     def __init__(
         self,
-        parent: Gateway = None,
         ip: str = None,
         token: str = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        parent: Gateway = None,
     ) -> None:
         if parent is not None:
             self._gateway = parent
@@ -650,12 +650,10 @@ class SubDevice(Device):
         try:
             return self._gw.send(command, [self.sid])
         except Exception as ex:
-            _LOGGER.error(
-                "Got an exception while sending command %s: %s",
-                command,
-                ex,
-                exc_info=True,
-            )
+            raise GatewayException(
+                    "Got an exception while sending command %s"
+                    % (command)
+                ) from ex
             return None
 
     @command()
@@ -665,9 +663,9 @@ class SubDevice(Device):
             return self._gw.send(command, arguments, extra_parameters={"sid": self.sid})
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while sending command '%s' with arguments '%s': %s"
-                % (command, str(arguments), ex)
-            )
+                "Got an exception while sending command '%s' with arguments '%s'"
+                % (command, str(arguments))
+            ) from ex
 
     @command(click.argument("property"))
     def get_subdevice_prop(self, property):
@@ -676,8 +674,8 @@ class SubDevice(Device):
             response = self._gw.send("get_device_prop", [self.sid, property])
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while fetching property %s: %s" % (property, ex)
-            )
+                "Got an exception while fetching property %s" % (property)
+            ) from ex
 
         if not response:
             raise GatewayException(
@@ -695,8 +693,8 @@ class SubDevice(Device):
             ).pop()
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while fetching properties %s: %s" % (properties, ex)
-            )
+                "Got an exception while fetching properties %s: %s" % (properties)
+            ) from ex
 
         if len(list(properties)) != len(response):
             raise GatewayException(
@@ -721,8 +719,8 @@ class SubDevice(Device):
         except Exception as ex:
             raise GatewayException(
                 "Got an exception while setting propertie %s to value %s: %s"
-                % (property, str(value), ex)
-            )
+                % (property, str(value))
+            ) from ex
 
     @command()
     def unpair(self):
