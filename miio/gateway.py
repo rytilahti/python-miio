@@ -10,7 +10,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
-from .gateway_scripts import build_move, build_rotate
+from .gateway_scripts import tokens, build_move, build_rotate
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -169,15 +169,15 @@ class Gateway(Device):
         """Get the value of a property for given sid."""
         return self.send("miIO.xdel", [script_id])
 
-    @command()
-    def install_cube_move_script(self):
+    @command(click.argument("sid"))
+    def install_cube_move_script(self, sid):
         """Get the value of a property for given sid."""
 
         addresses = ipv4_nonloop_ips()
         my_ip = addresses[0]
-        _LOGGER.debug("Using address %s for callbacks of %s", my_ip, addresses)
-        data_tkn = 48724
-        source = build_move(target_ip=my_ip)
+        _LOGGER.info("Using address %s for callbacks of %s", my_ip, addresses)
+        data_tkn = tokens['data_tkn']
+        source = build_move(target_ip=my_ip, source_sid=sid)
 
         return self.send(
             "send_data_frame",
@@ -190,15 +190,15 @@ class Gateway(Device):
             },
         )
 
-    @command()
-    def install_cube_rotate_script(self):
+    @command(click.argument("sid"))
+    def install_cube_rotate_script(self, sid):
         """Get the value of a property for given sid."""
 
         addresses = ipv4_nonloop_ips()
         my_ip = addresses[0]
-        _LOGGER.debug("Using address %s for callbacks of %s", my_ip, addresses)
-        data_tkn = 48724
-        source = build_rotate(target_ip=my_ip)
+        _LOGGER.info("Using address %s for callbacks of %s", my_ip, addresses)
+        data_tkn = tokens['data_tkn']
+        source = build_rotate(target_ip=my_ip, source_sid=sid)
 
         return self.send(
             "send_data_frame",

@@ -10,6 +10,7 @@ dumps = lambda data: dumps_orig(data, separators=separators)
 tokens = {
     "real": "9bc7c7ce6291d3e443fd7708608b9892",
     "encoded": "79cf21b08fb051499389f23c113477a4",
+    "data_tkn": 48724
 }
 
 action_prefix = "x.scene."
