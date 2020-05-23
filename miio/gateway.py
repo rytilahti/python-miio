@@ -159,7 +159,7 @@ class Gateway(Device):
             
             # Obtain the correct subdevice class, ignoring the gateway itself
             subdevice_cls = device_type_mapping.get(device_type)
-            if subdevice_cls is None and device_type != DeviceType(0):
+            if subdevice_cls is None and device_type != DeviceType.Gateway:
                 subdevice_cls = SubDevice
                 _LOGGER.info(
                     "Gateway device type '%s' does not have device specific methods defined, only basic default methods will be available",
