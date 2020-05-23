@@ -31,8 +31,8 @@ def run_server(device_id, token, callbacks, address="0.0.0.0"):
             sock.sendto(m, (host, port))
             print(f"{host}:{port}<=ACK(device_id={device_id})")
         else:
-            print(f"{host}:{port}=>{request.data.value}")
             request = Message.parse(data, token=token)
+            print(f"{host}:{port}=>{request.data.value}")
             value = request.data.value
             result = callbacks[value["method"]](value["id"], value["params"])
             header = {
