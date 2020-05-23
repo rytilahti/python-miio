@@ -214,9 +214,8 @@ class Gateway(Device):
         """Get illumination. In lux?"""
         return self.send("get_illumination").pop()
 
-
-class GatewayAlarm(Device):
-    """Class representing the Xiaomi Gateway Alarm."""
+class GatewayDevice(Device):
+    """GatewayDevice class to specify the init method for all gateway device functionalities."""
 
     def __init__(
         self,
@@ -234,6 +233,9 @@ class GatewayAlarm(Device):
             _LOGGER.debug(
                 "Creating new device instance, only use this for cli interface"
             )
+
+class GatewayAlarm(GatewayDevice):
+    """Class representing the Xiaomi Gateway Alarm."""
 
     @command(default_output=format_output("[alarm_status]"))
     def status(self) -> str:
@@ -301,25 +303,8 @@ class GatewayAlarm(Device):
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
 
-class GatewayZigbee(Device):
+class GatewayZigbee(GatewayDevice):
     """Zigbee controls."""
-
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        parent: Gateway = None,
-    ) -> None:
-        if parent is not None:
-            self._gateway = parent
-        else:
-            self._gateway = Device(ip, token, start_id, debug, lazy_discover)
-            _LOGGER.debug(
-                "Creating new device instance, only use this for cli interface"
-            )
 
     @command()
     def get_zigbee_version(self):
@@ -372,25 +357,8 @@ class GatewayZigbee(Device):
         raise NotImplementedError()
 
 
-class GatewayRadio(Device):
+class GatewayRadio(GatewayDevice):
     """Radio controls for the gateway."""
-
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        parent: Gateway = None,
-    ) -> None:
-        if parent is not None:
-            self._gateway = parent
-        else:
-            self._gateway = Device(ip, token, start_id, debug, lazy_discover)
-            _LOGGER.debug(
-                "Creating new device instance, only use this for cli interface"
-            )
 
     @command()
     def get_radio_info(self):
@@ -493,25 +461,8 @@ class GatewayRadio(Device):
         # method":"set_default_music","params":[0,"2"]}
 
 
-class GatewayLight(Device):
+class GatewayLight(GatewayDevice):
     """Light controls for the gateway."""
-
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        parent: Gateway = None,
-    ) -> None:
-        if parent is not None:
-            self._gateway = parent
-        else:
-            self._gateway = Device(ip, token, start_id, debug, lazy_discover)
-            _LOGGER.debug(
-                "Creating new device instance, only use this for cli interface"
-            )
 
     @command()
     def get_night_light_rgb(self):
@@ -593,6 +544,8 @@ class GatewayLight(Device):
 
 
 class SubDevice(Device):
+    """Base class for all subdevices of the gateway that are connected through zigbee."""
+    
     def __init__(
         self,
         gw: Gateway = None,
