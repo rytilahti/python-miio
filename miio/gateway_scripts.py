@@ -3,7 +3,7 @@ from json import dumps as dumps_orig, loads
 separators = (',', ':')
 dumps = lambda data: dumps_orig(data, separators=separators)
 
-# token in script doesn't match token if device which is used for (enc/dec)ryption
+# token in script doesn't match token of device which is used for (enc/dec)ryption
 # but they are linked somehow
 tokens = {
     "real": "9bc7c7ce6291d3e443fd7708608b9892",

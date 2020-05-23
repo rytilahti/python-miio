@@ -8,7 +8,7 @@ import binascii
 import struct
 
 
-def run_server(device_id, token, callbacks, address="0.0.0.0"):
+def run(device_id, token, callbacks, address="0.0.0.0"):
     def build_ack(device: int):
         # Iriginal devices are using year 1970, but it seems current datetime is fine
         timestamp = calendar.timegm(datetime.datetime.now().timetuple())
@@ -22,6 +22,7 @@ def run_server(device_id, token, callbacks, address="0.0.0.0"):
     sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     # Gateway interacts only with port 54321
     sock.bind((address, 54321))
+    print(f"fake miio device started with  address={address} device_id={device_id} callbacks={list(callbacks.keys())} token=****")
 
     while True:
         data, [host, port] = sock.recvfrom(1024)
@@ -51,13 +52,14 @@ def run_server(device_id, token, callbacks, address="0.0.0.0"):
             sock.sendto(m, (host, port))
 
 
-callbacks = {
-    "set_fm_volume": lambda id, params: {"result": ["ok"], "id": id},
-    "set_usb_on": lambda id, params: {"result": 0, "id": id},
-    "move": lambda id, params: {"result": 0, "id": id},
-    "rotate": lambda id, params: {"result": 0, "id": id},
-}
+if __name__ == "__main__":
+    callbacks = {
+        "set_fm_volume": lambda id, params: {"result": ["ok"], "id": id},
+        "set_usb_on": lambda id, params: {"result": 0, "id": id},
+        "move": lambda id, params: {"result": 0, "id": id},
+        "rotate": lambda id, params: {"result": 0, "id": id},
+    }
 
-device_id = 120009025
-device_token = bytes.fromhex("9bc7c7ce6291d3e443fd7708608b9892")
-run_server(device_id, device_token, callbacks)
+    device_id = 120009025
+    device_token = bytes.fromhex("9bc7c7ce6291d3e443fd7708608b9892")
+    run(device_id, device_token, callbacks)
