@@ -74,32 +74,39 @@ def build_rotate(
 
     rotate = [
         [
-            "x.scene.2723857884",
+            action_id["rotate"],
             [
-                "1.0",
-                1590161094,
+                "1.0",  # version??
+                1590161094,  # id of automation in mi home database??
                 [
-                    "0",
+                    "0",  # just zero..
                     {
-                        "did": source_sid,
-                        "extra": "[1,12,3,85,[1,0],0,0]",
-                        "key": "event." + source_model + ".rotate",
+                        "did": source_sid,  # gateway subdevice sid / origin of action zigbee sid
+                        "extra": "[1,12,3,85,[1,0],0,0]",  # ???
+                        "key": "event." + source_model + ".rotate",  # event_id??
                         "model": source_model,
                         "src": "device",
-                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "timespan": [
+                            "0 0 * * 0,1,2,3,4,5,6",
+                            "0 0 * * 0,1,2,3,4,5,6",
+                        ],  # cron-style always do??
                         "token": "",
                     },
                 ],
                 [
                     {
-                        "command": target_model + ".rotate",
-                        "did": target_id,
-                        "extra": "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",
+                        "command": target_model
+                        + ".rotate",  # part after last dot (rotate) will be used as miio method in gateway callback
+                        "did": target_id,  # device identifier used in all responses of device
+                        "extra": "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",  # ???
                         "id": 0,
                         "ip": target_ip,
                         "model": target_model,
                         "token": tokens["encoded"],
-                        "value": [20, 500],
+                        "value": [
+                            20,
+                            500,
+                        ],  # don't fire event if rotation_angle < 20 and rotation_angle > 500 ??
                     }
                 ],
             ],
