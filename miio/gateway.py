@@ -160,22 +160,16 @@ class Gateway(Device):
 
         for x in range(0, len(devices_raw), 5):
             # Extract discovered information
-            dev_info = SubDeviceInfo
-            dev_info.sid = devices_raw[x]
-            dev_info.type_id = devices_raw[x + 1]
-            dev_info.unknown = devices_raw[x + 2]
-            dev_info.unknown2 = devices_raw[x + 3]
-            dev_info.fw_ver = devices_raw[x + 4]
+            dev_info = SubDeviceInfo(*devices_raw[x : x + 5])
 
             # Construct DeviceType
             try:
                 device_type = DeviceType(dev_info.type_id)
             except ValueError:
                 _LOGGER.warning(
-                    "Unknown subdevice type '%i': %s discovered, "
+                    "Unknown subdevice type %s discovered, "
                     "of Xiaomi gateway with ip: %s",
-                    dev_info.type_id,
-                    dev_info.sid,
+                    dev_info,
                     self.ip,
                 )
                 device_type = DeviceType(-1)
