@@ -95,10 +95,10 @@ class Gateway(Device):
         lazy_discover: bool = True,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
-        self._alarm = GatewayAlarm(self)
-        self._radio = GatewayRadio(self)
-        self._zigbee = GatewayZigbee(self)
-        self._light = GatewayLight(self)
+        self._alarm = GatewayAlarm(parent=self)
+        self._radio = GatewayRadio(parent=self)
+        self._zigbee = GatewayZigbee(parent=self)
+        self._light = GatewayLight(parent=self)
         self._devices = []
 
     @property
@@ -199,126 +199,150 @@ class Gateway(Device):
 
 class GatewayAlarm(Device):
     """Class representing the Xiaomi Gateway Alarm."""
-
-    def __init__(self, parent) -> None:
-        self._device = parent
+    
+    def __init__(
+        self,
+        parent: Gateway = None,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        if parent is not None:
+            self._gateway = parent
+        else:
+            self._gateway = Device(ip, token, start_id, debug, lazy_discover)
+            _LOGGER.debug("Creating new device instance, only use this for cli interface")
 
     @command(default_output=format_output("[alarm_status]"))
     def status(self) -> str:
         """Return the alarm status from the device."""
         # Response: 'on', 'off', 'oning'
-        return self._device.send("get_arming").pop()
+        return self._gateway.send("get_arming").pop()
 
     @command(default_output=format_output("Turning alarm on"))
     def on(self):
         """Turn alarm on."""
-        return self._device.send("set_arming", ["on"])
+        return self._gateway.send("set_arming", ["on"])
 
     @command(default_output=format_output("Turning alarm off"))
     def off(self):
         """Turn alarm off."""
-        return self._device.send("set_arming", ["off"])
+        return self._gateway.send("set_arming", ["off"])
 
     @command()
     def arming_time(self) -> int:
         """Return time in seconds the alarm stays 'oning' before transitioning to 'on'"""
         # Response: 5, 15, 30, 60
-        return self._device.send("get_arm_wait_time").pop()
+        return self._gateway.send("get_arm_wait_time").pop()
 
     @command(click.argument("seconds"))
     def set_arming_time(self, seconds):
         """Set time the alarm stays at 'oning' before transitioning to 'on'"""
-        return self._device.send("set_arm_wait_time", [seconds])
+        return self._gateway.send("set_arm_wait_time", [seconds])
 
     @command()
     def triggering_time(self) -> int:
         """Return the time in seconds the alarm is going off when triggered"""
         # Response: 30, 60, etc.
-        return self._device.get_gateway_prop("alarm_time_len").pop()
+        return self._gateway.get_gateway_prop("alarm_time_len").pop()
 
     @command(click.argument("seconds"))
     def set_triggering_time(self, seconds):
         """Set the time in seconds the alarm is going off when triggered"""
-        return self._device.set_gateway_prop("alarm_time_len", seconds)
+        return self._gateway.set_gateway_prop("alarm_time_len", seconds)
 
     @command()
     def triggering_light(self) -> int:
         """Return the time the gateway light blinks when the alarm is triggerd"""
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._device.get_gateway_prop("en_alarm_light").pop()
+        return self._gateway.get_gateway_prop("en_alarm_light").pop()
 
     @command(click.argument("seconds"))
     def set_triggering_light(self, seconds):
         """Set the time the gateway light blinks when the alarm is triggerd"""
         # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
-        return self._device.set_gateway_prop("en_alarm_light", seconds)
+        return self._gateway.set_gateway_prop("en_alarm_light", seconds)
 
     @command()
     def triggering_volume(self) -> int:
         """Return the volume level at which alarms go off [0-100]"""
-        return self._device.send("get_alarming_volume").pop()
+        return self._gateway.send("get_alarming_volume").pop()
 
     @command(click.argument("volume"))
     def set_triggering_volume(self, volume):
         """Set the volume level at which alarms go off [0-100]"""
-        return self._device.send("set_alarming_volume", [volume])
+        return self._gateway.send("set_alarming_volume", [volume])
 
     @command()
     def last_status_change_time(self):
         """Return the last time the alarm changed status, type datetime.datetime"""
-        return datetime.fromtimestamp(self._device.send("get_arming_time").pop())
+        return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
 
 class GatewayZigbee(Device):
     """Zigbee controls."""
 
-    def __init__(self, parent) -> None:
-        self._device = parent
+    def __init__(
+        self,
+        parent: Gateway = None,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        if parent is not None:
+            self._gateway = parent
+        else:
+            self._gateway = Device(ip, token, start_id, debug, lazy_discover)
+            _LOGGER.debug("Creating new device instance, only use this for cli interface")
 
     @command()
     def get_zigbee_version(self):
         """timeouts on device"""
-        return self._device.send("get_zigbee_device_version")
+        return self._gateway.send("get_zigbee_device_version")
 
     @command()
     def get_zigbee_channel(self):
         """Return currently used zigbee channel."""
-        return self._device.send("get_zigbee_channel")[0]
+        return self._gateway.send("get_zigbee_channel")[0]
 
     @command(click.argument("channel"))
     def set_zigbee_channel(self, channel):
         """Set zigbee channel."""
-        return self._device.send("set_zigbee_channel", [channel])
+        return self._gateway.send("set_zigbee_channel", [channel])
 
     @command(click.argument("timeout", type=int))
     def zigbee_pair(self, timeout):
         """Start pairing, use 0 to disable"""
-        return self._device.send("start_zigbee_join", [timeout])
+        return self._gateway.send("start_zigbee_join", [timeout])
 
     def send_to_zigbee(self):
         """How does this differ from writing? Unknown."""
         raise NotImplementedError()
-        return self._device.send("send_to_zigbee")
+        return self._gateway.send("send_to_zigbee")
 
     def read_zigbee_eep(self):
         """Read eeprom?"""
         raise NotImplementedError()
-        return self._device.send("read_zig_eep", [0])  # 'ok'
+        return self._gateway.send("read_zig_eep", [0])  # 'ok'
 
     def read_zigbee_attribute(self):
         """Read zigbee data?"""
         raise NotImplementedError()
-        return self._device.send("read_zigbee_attribute", [0x0000, 0x0080])
+        return self._gateway.send("read_zigbee_attribute", [0x0000, 0x0080])
 
     def write_zigbee_attribute(self):
         """Unknown parameters."""
         raise NotImplementedError()
-        return self._device.send("write_zigbee_attribute")
+        return self._gateway.send("write_zigbee_attribute")
 
     @command()
     def zigbee_unpair_all(self):
         """Unpair all devices."""
-        return self._device.send("remove_all_device")
+        return self._gateway.send("remove_all_device")
 
     def zigbee_unpair(self, sid):
         """Unpair a device."""
@@ -329,18 +353,30 @@ class GatewayZigbee(Device):
 class GatewayRadio(Device):
     """Radio controls for the gateway."""
 
-    def __init__(self, parent) -> None:
-        self._device = parent
+    def __init__(
+        self,
+        parent: Gateway = None,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        if parent is not None:
+            self._gateway = parent
+        else:
+            self._gateway = Device(ip, token, start_id, debug, lazy_discover)
+            _LOGGER.debug("Creating new device instance, only use this for cli interface")
 
     @command()
     def get_radio_info(self):
         """Radio play info."""
-        return self._device.send("get_prop_fm")
+        return self._gateway.send("get_prop_fm")
 
     @command(click.argument("volume"))
     def set_radio_volume(self, volume):
         """Set radio volume"""
-        return self._device.send("set_fm_volume", [volume])
+        return self._gateway.send("set_fm_volume", [volume])
 
     def play_music_new(self):
         """Unknown."""
@@ -353,79 +389,79 @@ class GatewayRadio(Device):
         raise NotImplementedError()
         # {"from": "4", "id": 65055, "method": "play_specify_fm",
         # "params": {"id": 764, "type": 0, "url": "http://live.xmcdn.com/live/764/64.m3u8"}}
-        return self._device.send("play_specify_fm")
+        return self._gateway.send("play_specify_fm")
 
     def play_fm(self):
         """radio on/off?"""
         raise NotImplementedError()
         # play_fm","params":["off"]}
-        return self._device.send("play_fm")
+        return self._gateway.send("play_fm")
 
     def volume_ctrl_fm(self):
         """Unknown."""
         raise NotImplementedError()
-        return self._device.send("volume_ctrl_fm")
+        return self._gateway.send("volume_ctrl_fm")
 
     def get_channels(self):
         """Unknown."""
         raise NotImplementedError()
         # "method": "get_channels", "params": {"start": 0}}
-        return self._device.send("get_channels")
+        return self._gateway.send("get_channels")
 
     def add_channels(self):
         """Unknown."""
         raise NotImplementedError()
-        return self._device.send("add_channels")
+        return self._gateway.send("add_channels")
 
     def remove_channels(self):
         """Unknown."""
         raise NotImplementedError()
-        return self._device.send("remove_channels")
+        return self._gateway.send("remove_channels")
 
     def get_default_music(self):
         """seems to timeout (w/o internet)"""
         # params [0,1,2]
         raise NotImplementedError()
-        return self._device.send("get_default_music")
+        return self._gateway.send("get_default_music")
 
     @command()
     def get_music_info(self):
         """Unknown."""
-        info = self._device.send("get_music_info")
+        info = self._gateway.send("get_music_info")
         click.echo("info: %s" % info)
-        free_space = self._device.send("get_music_free_space")
+        free_space = self._gateway.send("get_music_free_space")
         click.echo("free space: %s" % free_space)
 
     @command()
     def get_mute(self):
         """mute of what?"""
-        return self._device.send("get_mute")
+        return self._gateway.send("get_mute")
 
     def download_music(self):
         """Unknown"""
         raise NotImplementedError()
-        return self._device.send("download_music")
+        return self._gateway.send("download_music")
 
     def delete_music(self):
         """delete music"""
         raise NotImplementedError()
-        return self._device.send("delete_music")
+        return self._gateway.send("delete_music")
 
     def download_user_music(self):
         """Unknown."""
         raise NotImplementedError()
-        return self._device.send("download_user_music")
+        return self._gateway.send("download_user_music")
 
     def get_download_progress(self):
         """progress for music downloads or updates?"""
         # returns [':0']
         raise NotImplementedError()
-        return self._device.send("get_download_progress")
+        return self._gateway.send("get_download_progress")
 
     @command()
     def set_sound_playing(self):
         """stop playing?"""
-        return self._device.send("set_sound_playing", ["off"])
+        return self._gateway.send("set_sound_playing", ["off"])
 
     def set_default_music(self):
         raise NotImplementedError()
@@ -435,8 +471,20 @@ class GatewayRadio(Device):
 class GatewayLight(Device):
     """Light controls for the gateway."""
 
-    def __init__(self, parent) -> None:
-        self._device = parent
+    def __init__(
+        self,
+        parent: Gateway = None,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        if parent is not None:
+            self._gateway = parent
+        else:
+            self._gateway = Device(ip, token, start_id, debug, lazy_discover)
+            _LOGGER.debug("Creating new device instance, only use this for cli interface")
 
     @command()
     def get_night_light_rgb(self):
@@ -445,7 +493,7 @@ class GatewayLight(Device):
         # looks like this is the same as get_rgb
         # id': 65064, 'method': 'set_night_light_rgb', 'params': [419407616]}
         # {'method': 'props', 'params': {'light': 'on', 'from.light': '4,,,'}, 'id': 88457} ?!
-        return self.send("get_night_light_rgb")
+        return self._gateway.send("get_night_light_rgb")
 
     @command(click.argument("color_name", type=str))
     def set_night_light_color(self, color_name):
@@ -456,11 +504,11 @@ class GatewayLight(Device):
                     color=color_name, colors=color_map.keys()
                 )
             )
-        current_brightness = int_to_brightness(self.send("get_night_light_rgb")[0])
+        current_brightness = int_to_brightness(self._gateway.send("get_night_light_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(
             current_brightness, color_map[color_name]
         )
-        return self.send("set_night_light_rgb", [brightness_and_color])
+        return self._gateway.send("set_night_light_rgb", [brightness_and_color])
 
     @command(click.argument("color_name", type=str))
     def set_color(self, color_name):
@@ -471,30 +519,30 @@ class GatewayLight(Device):
                     color=color_name, colors=color_map.keys()
                 )
             )
-        current_brightness = int_to_brightness(self.send("get_rgb")[0])
+        current_brightness = int_to_brightness(self._gateway.send("get_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(
             current_brightness, color_map[color_name]
         )
-        return self.send("set_rgb", [brightness_and_color])
+        return self._gateway.send("set_rgb", [brightness_and_color])
 
     @command(click.argument("brightness", type=int))
     def set_brightness(self, brightness):
         """Set gateway lamp brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        current_color = int_to_rgb(self.send("get_rgb")[0])
+        current_color = int_to_rgb(self._gateway.send("get_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(brightness, current_color)
-        return self.send("set_rgb", [brightness_and_color])
+        return self._gateway.send("set_rgb", [brightness_and_color])
 
     @command(click.argument("brightness", type=int))
     def set_night_light_brightness(self, brightness):
         """Set night light brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        current_color = int_to_rgb(self.send("get_night_light_rgb")[0])
+        current_color = int_to_rgb(self._gateway.send("get_night_light_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(brightness, current_color)
         print(brightness, current_color)
-        return self.send("set_night_light_rgb", [brightness_and_color])
+        return self._gateway.send("set_night_light_rgb", [brightness_and_color])
 
     @command(
         click.argument("color_name", type=str), click.argument("brightness", type=int)
@@ -512,16 +560,16 @@ class GatewayLight(Device):
         brightness_and_color = brightness_and_color_to_int(
             brightness, color_map[color_name]
         )
-        return self.send("set_rgb", [brightness_and_color])
+        return self._gateway.send("set_rgb", [brightness_and_color])
 
 
 class SubDevice:
-    def __init__(self, gw, sid, type_, _, __, ___):
-        self.gw = gw
+    def __init__(self, gw, sid, type, _, __, ___):
+        self._gw = gw
         self.sid = sid
         self._battery = None
         try:
-            self.type = DeviceType(type_)
+            self.type = DeviceType(type)
         except ValueError:
             self.type = DeviceType(-1)
 
@@ -545,7 +593,7 @@ class SubDevice:
     def subdevice_send(self, command):
         """Send a command/query to the subdevice"""
         try:
-            return self.gw.send(command, [self.sid])
+            return self._gw.send(command, [self.sid])
         except Exception as ex:
             _LOGGER.error(
                 "Got an exception while sending command %s: %s", command, ex, exc_info=True
@@ -556,7 +604,7 @@ class SubDevice:
     def subdevice_send_arg(self, command, arguments):
         """Send a command/query including arguments to the subdevice"""
         try:
-            return self.gw.send(command, arguments, extra_parameters={"sid": self.sid})
+            return self._gw.send(command, arguments, extra_parameters={"sid": self.sid})
         except Exception as ex:
             raise GatewayException("Got an exception while sending command '%s' with arguments '%s': %s" % (command, str(arguments), ex))
 
@@ -564,7 +612,7 @@ class SubDevice:
     def get_subdevice_prop(self, property):
         """Get the value of a property of the subdevice."""
         try:
-            response = self.gw.send("get_device_prop", [self.sid, property])
+            response = self._gw.send("get_device_prop", [self.sid, property])
         except Exception as ex:
             raise GatewayException("Got an exception while fetching property %s: %s" % (property, ex))
         
@@ -577,7 +625,7 @@ class SubDevice:
     def get_subdevice_prop_exp(self, properties):
         """Get the value of a bunch of properties of the subdevice."""
         try:
-            response = self.gw.send("get_device_prop_exp", [[self.sid] + list(properties)]).pop()
+            response = self._gw.send("get_device_prop_exp", [[self.sid] + list(properties)]).pop()
         except Exception as ex:
             raise GatewayException("Got an exception while fetching properties %s: %s" % (properties, ex))
 
@@ -594,7 +642,7 @@ class SubDevice:
     def set_subdevice_prop(self, property, value):
         """Set a device property of the subdevice."""
         try:
-            return self.gw.send("set_device_prop", {"sid": self.sid, property: value})
+            return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
         except Exception as ex:
             raise GatewayException("Got an exception while setting propertie %s to value %s: %s" % (property, str(value), ex))
 
