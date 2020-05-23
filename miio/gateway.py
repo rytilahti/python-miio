@@ -145,6 +145,7 @@ class Gateway(Device):
         self._devices = []
 
         for x in range(0, len(devices_raw), 5):
+            # Construct DeviceType
             try:
                 device_type = DeviceType(devices_raw[x + 1])
             except ValueError:
@@ -155,7 +156,8 @@ class Gateway(Device):
                     self.ip,
                 )
                 device_type = DeviceType(-1)
-
+            
+            # Obtain the correct subdevice class, ignoring the gateway itself
             subdevice_cls = device_type_mapping.get(device_type)
             if subdevice_cls is None and device_type != DeviceType(0):
                 subdevice_cls = SubDevice
@@ -163,7 +165,8 @@ class Gateway(Device):
                     "Gateway device type '%s' does not have device specific methods defined, only basic default methods will be available",
                     device_type.name,
                 )
-
+            
+            # Initialize and save the subdevice, ignoring the gateway itself
             if devices_raw[x] != "lumi.0":
                 self._devices.append(subdevice_cls(self, *devices_raw[x : x + 5]))
 
