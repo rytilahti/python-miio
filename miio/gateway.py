@@ -199,9 +199,7 @@ class Gateway(Device):
     @command(click.argument("properties", nargs=-1))
     def get_prop_exp(self, properties):
         """Get the value of a bunch of properties for given sid."""
-        return self.send(
-            "get_device_prop_exp", [["lumi.0"] + list(properties)]
-        )
+        return self.send("get_device_prop_exp", [["lumi.0"] + list(properties)])
 
     @command(click.argument("property"), click.argument("value"))
     def set_prop(self, property, value):
@@ -339,9 +337,7 @@ class GatewayAlarm(GatewayDevice):
         Return the last time the alarm changed status,
         type datetime.datetime
         """
-        return datetime.fromtimestamp(
-            self._gateway.send("get_arming_time").pop()
-        )
+        return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
 
 class GatewayZigbee(GatewayDevice):
@@ -533,9 +529,7 @@ class GatewayLight(GatewayDevice):
         brightness_and_color = brightness_and_color_to_int(
             current_brightness, color_map[color_name]
         )
-        return self._gateway.send(
-            "set_night_light_rgb", [brightness_and_color]
-        )
+        return self._gateway.send("set_night_light_rgb", [brightness_and_color])
 
     @command(click.argument("color_name", type=str))
     def set_color(self, color_name):
@@ -546,9 +540,7 @@ class GatewayLight(GatewayDevice):
                     color=color_name, colors=color_map.keys()
                 )
             )
-        current_brightness = int_to_brightness(
-            self._gateway.send("get_rgb")[0]
-        )
+        current_brightness = int_to_brightness(self._gateway.send("get_rgb")[0])
         brightness_and_color = brightness_and_color_to_int(
             current_brightness, color_map[color_name]
         )
@@ -560,9 +552,7 @@ class GatewayLight(GatewayDevice):
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         current_color = int_to_rgb(self._gateway.send("get_rgb")[0])
-        brightness_and_color = brightness_and_color_to_int(
-            brightness, current_color
-        )
+        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
         return self._gateway.send("set_rgb", [brightness_and_color])
 
     @command(click.argument("brightness", type=int))
@@ -570,20 +560,13 @@ class GatewayLight(GatewayDevice):
         """Set night light brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        current_color = int_to_rgb(
-            self._gateway.send("get_night_light_rgb")[0]
-        )
-        brightness_and_color = brightness_and_color_to_int(
-            brightness, current_color
-        )
+        current_color = int_to_rgb(self._gateway.send("get_night_light_rgb")[0])
+        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
         print(brightness, current_color)
-        return self._gateway.send(
-            "set_night_light_rgb", [brightness_and_color]
-        )
+        return self._gateway.send("set_night_light_rgb", [brightness_and_color])
 
     @command(
-        click.argument("color_name", type=str),
-        click.argument("brightness", type=int),
+        click.argument("color_name", type=str), click.argument("brightness", type=int),
     )
     def set_light(self, color_name, brightness):
         """Set color (using color name) and brightness (0-100)."""
@@ -669,9 +652,7 @@ class SubDevice(Device):
     def subdevice_send_arg(self, command, arguments):
         """Send a command/query including arguments to the subdevice"""
         try:
-            return self._gw.send(
-                command, arguments, extra_parameters={"sid": self.sid}
-            )
+            return self._gw.send(command, arguments, extra_parameters={"sid": self.sid})
         except Exception as ex:
             raise GatewayException(
                 "Got an exception while sending "
@@ -690,8 +671,7 @@ class SubDevice(Device):
 
         if not response:
             raise GatewayException(
-                "Empty response while fetching property %s: %s"
-                % (property, response)
+                "Empty response while fetching property %s: %s" % (property, response)
             )
 
         return response
@@ -705,8 +685,7 @@ class SubDevice(Device):
             ).pop()
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while fetching properties %s: %s"
-                % (properties)
+                "Got an exception while fetching properties %s: %s" % (properties)
             ) from ex
 
         if len(list(properties)) != len(response):
@@ -728,9 +707,7 @@ class SubDevice(Device):
     def set_subdevice_prop(self, property, value):
         """Set a device property of the subdevice."""
         try:
-            return self._gw.send(
-                "set_device_prop", {"sid": self.sid, property: value}
-            )
+            return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
         except Exception as ex:
             raise GatewayException(
                 "Got an exception while setting propertie %s to value %s"
@@ -777,9 +754,7 @@ class AqaraHT(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(
-            ["temperature", "humidity", "pressure"]
-        )
+        values = self.get_subdevice_prop_exp(["temperature", "humidity", "pressure"])
         self._temperature = values[0] / 100
         self._humidity = values[1] / 100
         self._pressure = values[2] / 100
@@ -884,9 +859,7 @@ class AqaraRelayTwoChannels(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(
-            ["load_power", "channel_0", "channel_1"]
-        )
+        values = self.get_subdevice_prop_exp(["load_power", "channel_0", "channel_1"])
         self._load_power = values[0]
         self._status_ch0 = values[1]
         self._status_ch1 = values[2]
