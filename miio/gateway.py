@@ -177,7 +177,7 @@ class Gateway(Device):
         my_ip = addresses[0]
         _LOGGER.info("Using address %s for callbacks of %s", my_ip, addresses)
         data_tkn = tokens['data_tkn']
-        source = build_move(target_ip=my_ip, source_sid=sid)
+        source = build_move(sid, my_ip)
 
         return self.send(
             "send_data_frame",
@@ -198,7 +198,7 @@ class Gateway(Device):
         my_ip = addresses[0]
         _LOGGER.info("Using address %s for callbacks of %s", my_ip, addresses)
         data_tkn = tokens['data_tkn']
-        source = build_rotate(target_ip=my_ip, source_sid=sid)
+        source = build_rotate(sid, my_ip)
 
         return self.send(
             "send_data_frame",
@@ -210,10 +210,6 @@ class Gateway(Device):
                 "type": "scene",
             },
         )
-
-    def bind_cube_action(self, action, target_ip, callback):
-        token = ""
-        return token
 
     @command(click.argument("sid"), click.argument("properties", nargs=-1))
     def get_device_prop_exp(self, sid, properties):

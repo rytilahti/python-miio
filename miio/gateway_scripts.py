@@ -13,6 +13,9 @@ tokens = {
     "data_tkn": 48724
 }
 
+fake_device_id = "120009025"
+fake_device_model = "chuangmi.plug.v3"
+
 action_prefix = "x.scene."
 action_id = {
     "move": action_prefix + "2732711973",
@@ -20,11 +23,11 @@ action_id = {
 }
 
 def build_move(
-    source_sid="lumi.158d000103ec74",
+    source_sid,
+    target_ip,
+    target_model=fake_device_model,
+    target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    target_model="chuangmi.plug.v3",
-    target_ip="192.168.2.176",
-    target_id="120009025",
     message_id=0,
 ):
 
@@ -66,11 +69,11 @@ def build_move(
 
 
 def build_rotate(
-    source_sid="lumi.158d000103ec74",
+    source_sid,
+    target_ip,
+    target_model=fake_device_model,
+    target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    target_model="chuangmi.plug.v3",
-    target_ip="192.168.2.176",
-    target_id="120009025",
     message_id=0,
 ):
 

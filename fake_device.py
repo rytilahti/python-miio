@@ -1,5 +1,5 @@
 import socket
-from miio.protocol import Message, TimeAdapter, EncryptionAdapter, Utils
+from miio.protocol import Message
 from time import time
 import datetime
 import binascii
@@ -62,6 +62,7 @@ if __name__ == "__main__":
         "rotate": lambda id, params: {"result": 0, "id": id},
     }
 
-    device_id = 120009025
-    device_token = bytes.fromhex("9bc7c7ce6291d3e443fd7708608b9892")
+    from miio.gateway_scripts import tokens, fake_device_id
+    device_id = int(fake_device_id)
+    device_token = bytes.fromhex(tokens['real'])
     run(device_id, device_token, callbacks)
