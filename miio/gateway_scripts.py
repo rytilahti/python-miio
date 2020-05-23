@@ -34,8 +34,12 @@ action_id = {
     "rotate": lambda sid: action_prefix + "2" + sid_to_num(sid),
     "singlepress": lambda sid: action_prefix + "3" + sid_to_num(sid),
     "doublepress": lambda sid: action_prefix + "4" + sid_to_num(sid),
-    "longpress": lambda sid: action_prefix + "6" + sid_to_num(sid),
     "shake": lambda sid: action_prefix + "5" + sid_to_num(sid),
+    "longpress": lambda sid: action_prefix + "6" + sid_to_num(sid),
+    "flip90": lambda sid: action_prefix + "7" + sid_to_num(sid),
+    "flip180": lambda sid: action_prefix + "8" + sid_to_num(sid),
+    "shakeair": lambda sid: action_prefix + "9" + sid_to_num(sid),
+    "taptap": lambda sid: action_prefix + "10" + sid_to_num(sid),
 }
 
 
@@ -86,6 +90,202 @@ def build_move(
     ]
 
     return dumps(move)
+
+
+def build_flip90(
+    source_sid,
+    target_ip,
+    target_model=fake_device_model,
+    target_id=fake_device_id,
+    source_model="lumi.sensor_cube.v1",
+    message_id=0,
+):
+
+    lumi, source_id = source_sid.split(".")
+    method_name = f"flip90_{source_id}"
+
+    flip90 = [
+        [
+            action_id["flip90"](source_sid),
+            [
+                "1.0",
+                randint(1590161094, 1590162094),
+                [
+                    "0",
+                    {
+                        "did": source_sid,
+                        "extra": "[1,18,2,85,[6,64],0,0]",
+                        "key": "event." + source_model + ".flip90",
+                        "model": source_model,
+                        "src": "device",
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
+                ],
+                [
+                    {
+                        "command": target_model + "." + method_name,
+                        "did": target_id,
+                        "extra": "",
+                        "id": message_id,
+                        "ip": target_ip,
+                        "model": target_model,
+                        "token": tokens["encoded"],
+                        "value": "",
+                    }
+                ],
+            ],
+        ]
+    ]
+
+    return dumps(flip90)
+
+
+def build_flip180(
+    source_sid,
+    target_ip,
+    target_model=fake_device_model,
+    target_id=fake_device_id,
+    source_model="lumi.sensor_cube.v1",
+    message_id=0,
+):
+
+    lumi, source_id = source_sid.split(".")
+    method_name = f"flip180_{source_id}"
+
+    flip180 = [
+        [
+            action_id["flip180"](source_sid),
+            [
+                "1.0",
+                randint(1590161094, 1590162094),
+                [
+                    "0",
+                    {
+                        "did": source_sid,
+                        "extra": "[1,18,2,85,[6,128],0,0]",
+                        "key": "event." + source_model + ".flip180",
+                        "model": source_model,
+                        "src": "device",
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
+                ],
+                [
+                    {
+                        "command": target_model + "." + method_name,
+                        "did": target_id,
+                        "extra": "",
+                        "id": message_id,
+                        "ip": target_ip,
+                        "model": target_model,
+                        "token": tokens["encoded"],
+                        "value": "",
+                    }
+                ],
+            ],
+        ]
+    ]
+
+    return dumps(flip180)
+
+
+def build_taptap(
+    source_sid,
+    target_ip,
+    target_model=fake_device_model,
+    target_id=fake_device_id,
+    source_model="lumi.sensor_cube.v1",
+    message_id=0,
+):
+
+    lumi, source_id = source_sid.split(".")
+    method_name = f"taptap_{source_id}"
+
+    taptap = [
+        [
+            action_id["taptap"](source_sid),
+            [
+                "1.0",
+                randint(1590161094, 1590162094),
+                [
+                    "0",
+                    {
+                        "did": source_sid,
+                        "extra": "[1,18,2,85,[6,512],0,0]",
+                        "key": "event." + source_model + ".tap_twice",
+                        "model": source_model,
+                        "src": "device",
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
+                ],
+                [
+                    {
+                        "command": target_model + "." + method_name,
+                        "did": target_id,
+                        "extra": "",
+                        "id": message_id,
+                        "ip": target_ip,
+                        "model": target_model,
+                        "token": tokens["encoded"],
+                        "value": "",
+                    }
+                ],
+            ],
+        ]
+    ]
+
+    return dumps(taptap)
+
+
+def build_shakeair(
+    source_sid,
+    target_ip,
+    target_model=fake_device_model,
+    target_id=fake_device_id,
+    source_model="lumi.sensor_cube.v1",
+    message_id=0,
+):
+
+    lumi, source_id = source_sid.split(".")
+    method_name = f"shakeair_{source_id}"
+
+    shakeair = [
+        [
+            action_id["shakeair"](source_sid),
+            [
+                "1.0",
+                randint(1590161094, 1590162094),
+                [
+                    "0",
+                    {
+                        "did": source_sid,
+                        "extra": "[1,18,2,85,[0,0],0,0]",
+                        "key": "event." + source_model + ".shake_air",
+                        "model": source_model,
+                        "src": "device",
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
+                ],
+                [
+                    {
+                        "command": target_model + "." + method_name,
+                        "did": target_id,
+                        "extra": "",
+                        "id": message_id,
+                        "ip": target_ip,
+                        "model": target_model,
+                        "token": tokens["encoded"],
+                        "value": "",
+                    }
+                ],
+            ],
+        ]
+    ]
+
+    return dumps(shakeair)
 
 
 def build_rotate(
@@ -146,6 +346,7 @@ def build_rotate(
 
     return dumps(rotate)
 
+
 def build_singlepress(
     source_sid,
     target_ip,
@@ -163,9 +364,7 @@ def build_singlepress(
             action_id["singlepress"](source_sid),
             [
                 "1.0",
-                randint(
-                    1590161094, 1590162094
-                ),
+                randint(1590161094, 1590162094),
                 [
                     "0",
                     {
@@ -174,32 +373,28 @@ def build_singlepress(
                         "key": "event." + source_model + ".click",  # event_id
                         "model": source_model,
                         "src": "device",
-                        "timespan": [
-                            "0 0 * * 0,1,2,3,4,5,6",
-                            "0 0 * * 0,1,2,3,4,5,6"
-                        ],
-                        "token": ""
-                    }
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
                 ],
                 [
                     {
-                        "command": target_model
-                        + "."
-                        + method_name,
+                        "command": target_model + "." + method_name,
                         "did": target_id,
                         "extra": "",
                         "id": message_id,
                         "ip": target_ip,
                         "model": target_model,
                         "token": tokens["encoded"],
-                        "value": ""
+                        "value": "",
                     }
-                ]
-            ]
+                ],
+            ],
         ]
     ]
     print(dumps(singlepress))
     return dumps(singlepress)
+
 
 def build_doublepress(
     source_sid,
@@ -218,9 +413,7 @@ def build_doublepress(
             action_id["doublepress"](source_sid),
             [
                 "1.0",
-                randint(
-                    1590161094, 1590162094
-                ),
+                randint(1590161094, 1590162094),
                 [
                     "0",
                     {
@@ -229,31 +422,27 @@ def build_doublepress(
                         "key": "event." + source_model + ".double_click",  # event_id
                         "model": source_model,
                         "src": "device",
-                        "timespan": [
-                            "0 0 * * 0,1,2,3,4,5,6",
-                            "0 0 * * 0,1,2,3,4,5,6"
-                        ],
-                        "token": ""
-                    }
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
                 ],
                 [
                     {
-                        "command": target_model
-                        + "."
-                        + method_name,
+                        "command": target_model + "." + method_name,
                         "did": target_id,
                         "extra": "",
                         "id": message_id,
                         "ip": target_ip,
                         "model": target_model,
                         "token": tokens["encoded"],
-                        "value": ""
+                        "value": "",
                     }
-                ]
-            ]
+                ],
+            ],
         ]
     ]
     return dumps(doublepress)
+
 
 def build_longpress(
     source_sid,
@@ -272,42 +461,38 @@ def build_longpress(
             action_id["longpress"](source_sid),
             [
                 "1.0",
-                randint(
-                    1590161094, 1590162094
-                ),
+                randint(1590161094, 1590162094),
                 [
                     "0",
                     {
                         "did": source_sid,
                         "extra": "[1,13,1,85,[0,16],0,0]",
-                        "key": "event." + source_model + ".long_click_press",  # event_id
+                        "key": "event."
+                        + source_model
+                        + ".long_click_press",  # event_id
                         "model": source_model,
                         "src": "device",
-                        "timespan": [
-                            "0 0 * * 0,1,2,3,4,5,6",
-                            "0 0 * * 0,1,2,3,4,5,6"
-                        ],
-                        "token": ""
-                    }
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
                 ],
                 [
                     {
-                        "command": target_model
-                        + "."
-                        + method_name,
+                        "command": target_model + "." + method_name,
                         "did": target_id,
                         "extra": "",
                         "id": message_id,
                         "ip": target_ip,
                         "model": target_model,
                         "token": tokens["encoded"],
-                        "value": ""
+                        "value": "",
                     }
-                ]
-            ]
+                ],
+            ],
         ]
     ]
     return dumps(longpress)
+
 
 def build_shake(
     source_sid,
@@ -326,9 +511,7 @@ def build_shake(
             action_id["shake"](source_sid),
             [
                 "1.0",
-                randint(
-                    1590161094, 1590162094
-                ),
+                randint(1590161094, 1590162094),
                 [
                     "0",
                     {
@@ -337,28 +520,23 @@ def build_shake(
                         "key": "event." + source_model + ".shake",  # event_id
                         "model": source_model,
                         "src": "device",
-                        "timespan": [
-                            "0 0 * * 0,1,2,3,4,5,6",
-                            "0 0 * * 0,1,2,3,4,5,6"
-                        ],
-                        "token": ""
-                    }
+                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
+                        "token": "",
+                    },
                 ],
                 [
                     {
-                        "command": target_model
-                        + "."
-                        + method_name,
+                        "command": target_model + "." + method_name,
                         "did": target_id,
                         "extra": "",
                         "id": message_id,
                         "ip": target_ip,
                         "model": target_model,
                         "token": tokens["encoded"],
-                        "value": ""
+                        "value": "",
                     }
-                ]
-            ]
+                ],
+            ],
         ]
     ]
     return dumps(shake)

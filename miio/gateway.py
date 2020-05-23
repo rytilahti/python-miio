@@ -9,7 +9,20 @@ import ifaddr
 
 from .click_common import EnumType, command, format_output
 from .device import Device
-from .gateway_scripts import action_id, build_move, build_rotate, build_singlepress, build_doublepress, build_longpress, build_shake, tokens
+from .gateway_scripts import (
+    action_id,
+    build_doublepress,
+    build_flip90,
+    build_flip180,
+    build_longpress,
+    build_move,
+    build_rotate,
+    build_shake,
+    build_shakeair,
+    build_singlepress,
+    build_taptap,
+    tokens,
+)
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
@@ -205,6 +218,22 @@ class Gateway(Device):
     @command(click.argument("sid"))
     def install_cube_rotate_script(self, sid):
         return self.install_script(sid, "rotate", build_rotate)
+
+    @command(click.argument("sid"))
+    def install_cube_shakeair_script(self, sid):
+        return self.install_script(sid, "shakeair", build_shakeair)
+
+    @command(click.argument("sid"))
+    def install_cube_flip90_script(self, sid):
+        return self.install_script(sid, "flip90", build_flip90)
+
+    @command(click.argument("sid"))
+    def install_cube_taptap_script(self, sid):
+        return self.install_script(sid, "taptap", build_taptap)
+
+    @command(click.argument("sid"))
+    def install_cube_flip180_script(self, sid):
+        return self.install_script(sid, "flip180", build_flip180)
 
     @command(click.argument("sid"))
     def install_button_singlepress_script(self, sid):
