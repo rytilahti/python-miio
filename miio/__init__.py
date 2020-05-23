@@ -1,5 +1,6 @@
 # flake8: noqa
 from importlib_metadata import version  # type: ignore
+
 from miio.airconditioningcompanion import (
     AirConditioningCompanion,
     AirConditioningCompanionV3,
@@ -21,6 +22,7 @@ from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.device import Device
 from miio.exceptions import DeviceError, DeviceException
+from miio.fake_device import FakeDevice
 from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
 from miio.gateway import Gateway
 from miio.heater import Heater
@@ -48,6 +50,5 @@ from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
 
 from miio.discovery import Discovery
-from miio.fake_device import FakeDevice
 
 __version__ = version("python-miio")
