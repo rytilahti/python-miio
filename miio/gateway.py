@@ -5,6 +5,7 @@ from functools import reduce
 from typing import Optional
 
 import click
+
 import ifaddr
 
 from .click_common import EnumType, command, format_output

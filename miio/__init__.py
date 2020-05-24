@@ -1,6 +1,5 @@
 # flake8: noqa
 from importlib_metadata import version  # type: ignore
-
 from miio.airconditioningcompanion import (
     AirConditioningCompanion,
     AirConditioningCompanionV3,
