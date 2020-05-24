@@ -584,7 +584,7 @@ class GatewayLight(GatewayDevice):
         return self._gateway.send("set_rgb", [brightness_and_color])
 
 
-class SubDevice(Device):
+class SubDevice():
     """
     Base class for all subdevices of the gateway
     these devices are connected through zigbee.
