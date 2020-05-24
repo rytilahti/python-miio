@@ -1,5 +1,5 @@
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict as dataclasses_asdict
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Optional
@@ -594,23 +594,7 @@ class SubDevice(Device):
         self,
         gw: Gateway = None,
         dev_info: SubDeviceInfo = None,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
     ) -> None:
-        if gw is not None:
-            self._gw = gw
-        else:
-            self._gw = Device(ip, token, start_id, debug, lazy_discover)
-            _LOGGER.debug(
-                "Creating new device instance, only use this for cli interface"
-            )
-
-        if dev_info is None:
-            raise Exception("sid of the subdevice needs to be specified")
-
         self._gw = gw
         self.sid = dev_info.sid
         self._battery = None
@@ -621,12 +605,22 @@ class SubDevice(Device):
             self.type = DeviceType(-1)
 
     def __repr__(self):
-        return "<Subdevice %s: %s fw: %s bat: %s>" % (
+        return "<Subdevice %s: %s fw: %s bat: %s props: %s>" % (
             self.device_type,
             self.sid,
             self.get_firmware_version(),
             self.get_battery(),
+            self.status,
         )
+
+    @property
+    def status(self):
+        """Return sub-device status as a dict containing all properties."""
+        if hasattr(self, '_props'):
+            return dataclasses_asdict(self._props)
+        else:
+            _LOGGER.error("Subdevice '%s' does not have device specific properties defined", self.device_type)
+            return {}
 
     @property
     def device_type(self):
@@ -737,32 +731,28 @@ class SubDevice(Device):
 
 class AqaraHT(SubDevice):
     properties = ["temperature", "humidity", "pressure"]
-    _temperature = None
-    _humidity = None
-    _pressure = None
 
-    @property
-    def temperature(self):
-        """Return the temperature in degrees celsius"""
-        return self._temperature
+    @dataclass
+    class props:
+        temperature: int    # in degrees celsius
+        humidity: int       # in %
+        pressure: int       # in hPa
 
-    @property
-    def humidity(self):
-        """Return the humidity in %"""
-        return self._humidity
-
-    @property
-    def pressure(self):
-        """Return the pressure in hPa"""
-        return self._pressure
+    def __init__(
+            self,
+            gw: Gateway = None,
+            dev_info: SubDeviceInfo = None
+        ):
+            super().__init__(gw, dev_info)
+            self._props = self.props(None, None, None)
 
     @command()
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        self._temperature = values[0] / 100
-        self._humidity = values[1] / 100
-        self._pressure = values[2] / 100
+        self._props.temperature = values[0] / 100
+        self._props.humidity = values[1] / 100
+        self._props.pressure = values[2] / 100
 
 
 class SensorHT(SubDevice):
@@ -791,18 +781,24 @@ class SensorHT(SubDevice):
 
 class AqaraMagnet(SubDevice):
     properties = ["unkown"]
-    _status = None
 
-    @property
-    def status(self):
-        """Returns 'open' or 'closed'"""
-        return self._status
+    @dataclass
+    class props:
+        status: str     # 'open' or 'closed'
+
+    def __init__(
+            self,
+            gw: Gateway = None,
+            dev_info: SubDeviceInfo = None
+        ):
+            super().__init__(gw, dev_info)
+            self._props = self.props(None)
 
     @command()
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        self._status = values[0]
+        self._props.status = values[0]
 
 
 class AqaraPlug(SubDevice):
