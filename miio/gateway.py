@@ -614,6 +614,7 @@ class SubDevice(Device):
         self._gw = gw
         self.sid = dev_info.sid
         self._battery = None
+        self._fw_ver = dev_info.fw_ver
         try:
             self.type = DeviceType(dev_info.type_id)
         except ValueError:
@@ -638,7 +639,7 @@ class SubDevice(Device):
         return self._battery
 
     @command()
-    def subdevice_send(self, command):
+    def send(self, command):
         """Send a command/query to the subdevice"""
         try:
             return self._gw.send(command, [self.sid])
@@ -646,10 +647,9 @@ class SubDevice(Device):
             raise GatewayException(
                 "Got an exception while sending command %s" % (command)
             ) from ex
-            return None
 
     @command()
-    def subdevice_send_arg(self, command, arguments):
+    def send_arg(self, command, arguments):
         """Send a command/query including arguments to the subdevice"""
         try:
             return self._gw.send(command, arguments, extra_parameters={"sid": self.sid})
@@ -660,7 +660,7 @@ class SubDevice(Device):
             ) from ex
 
     @command(click.argument("property"))
-    def get_subdevice_prop(self, property):
+    def get_property(self, property):
         """Get the value of a property of the subdevice."""
         try:
             response = self._gw.send("get_device_prop", [self.sid, property])
@@ -669,15 +669,15 @@ class SubDevice(Device):
                 "Got an exception while fetching property %s" % (property)
             ) from ex
 
-        if not response:
+        if response == []:
             raise GatewayException(
-                "Empty response while fetching property %s: %s" % (property, response)
+                "Empty response while fetching property '%s': %s" % (property, response)
             )
 
         return response
 
     @command(click.argument("properties", nargs=-1))
-    def get_subdevice_prop_exp(self, properties):
+    def get_property_exp(self, properties):
         """Get the value of a bunch of properties of the subdevice."""
         try:
             response = self._gw.send(
@@ -695,7 +695,7 @@ class SubDevice(Device):
             )
 
         for item in response:
-            if not item:
+            if item == '':
                 raise GatewayException(
                     "One or more empty results while "
                     "fetching properties %s: %s" % (properties, response)
@@ -704,7 +704,7 @@ class SubDevice(Device):
         return response
 
     @command(click.argument("property"), click.argument("value"))
-    def set_subdevice_prop(self, property, value):
+    def set_property(self, property, value):
         """Set a device property of the subdevice."""
         try:
             return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
@@ -717,21 +717,26 @@ class SubDevice(Device):
     @command()
     def unpair(self):
         """Unpair this device from the gateway."""
-        return self.subdevice_send("remove_device")
+        return self.send("remove_device")
 
     @command()
     def get_battery(self):
         """Update the battery level and return the new value."""
-        self._battery = self.subdevice_send("get_battery").pop()
+        self._battery = self.send("get_battery").pop()
         return self._battery
 
     @command()
     def get_firmware_version(self) -> Optional[int]:
         """Returns firmware version"""
-        return self.get_subdevice_prop("fw_ver").pop()
+        try:
+            self._fw_ver = self.get_property("fw_ver").pop()
+        except:
+            _LOGGER.info("get_firmware_version failed, returning firmware version from discovery info")
+        return self._fw_ver
 
 
 class AqaraHT(SubDevice):
+    properties = ["temperature", "humidity", "pressure"]
     _temperature = None
     _humidity = None
     _pressure = None
@@ -754,7 +759,7 @@ class AqaraHT(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(["temperature", "humidity", "pressure"])
+        values = self.get_property_exp(self.properties)
         self._temperature = values[0] / 100
         self._humidity = values[1] / 100
         self._pressure = values[2] / 100
@@ -779,12 +784,13 @@ class SensorHT(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(self.properties)
+        values = self.get_property_exp(self.properties)
         self._temperature = values[0] / 100
         self._humidity = values[1] / 100
 
 
 class AqaraMagnet(SubDevice):
+    properties = ["unkown"]
     _status = None
 
     @property
@@ -795,7 +801,7 @@ class AqaraMagnet(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(["unkown"])
+        values = self.get_property_exp(self.properties)
         self._status = values[0]
 
 
@@ -818,12 +824,13 @@ class AqaraPlug(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(self.properties)
+        values = self.get_property_exp(self.properties)
         self._power = values[0]
         self._status = values[1]
 
 
 class AqaraRelayTwoChannels(SubDevice):
+    properties = ["load_power", "channel_0", "channel_1"]
     _status_ch0 = None
     _status_ch1 = None
     _load_power = None
@@ -859,7 +866,7 @@ class AqaraRelayTwoChannels(SubDevice):
     @command()
     def update(self):
         """Update all device properties"""
-        values = self.get_subdevice_prop_exp(["load_power", "channel_0", "channel_1"])
+        values = self.get_property_exp(self.properties)
         self._load_power = values[0]
         self._status_ch0 = values[1]
         self._status_ch1 = values[2]
@@ -870,6 +877,6 @@ class AqaraRelayTwoChannels(SubDevice):
     )
     def toggle(self, sid, channel, value):
         """Toggle Aqara Wireless Relay 2ch"""
-        return self.subdevice_send_arg(
+        return self.send_arg(
             "toggle_ctrl_neutral", [channel.value, value.value]
         ).pop()
