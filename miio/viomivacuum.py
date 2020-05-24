@@ -3,7 +3,7 @@ import time
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 
 import click
 
@@ -127,14 +127,21 @@ class ViomiVacuumStatus:
         return ViomiMode(self.data["mode"])
 
     @property
+    def mop_type(self):
+        """Unknown mop_type values."""
+        return self.data["mop_type"]
+
+    @property
     def error_code(self) -> int:
         """Error code from vacuum."""
 
-        return self.data["error_state"]
+        return self.data["err_state"]
 
     @property
-    def error(self) -> str:
+    def error(self) -> Optional[str]:
         """String presentation for the error code."""
+        if self.error_code is None:
+            return None
 
         return ERROR_CODES.get(self.error_code, f"Unknown error {self.error_code}")
 
@@ -207,7 +214,7 @@ class ViomiVacuum(Device):
             "Mop type: {result.mop_type}\n"
             "Clean time: {result.clean_time}\n"
             "Clean area: {result.clean_area}\n"
-            "Water level: {result.water_level}\n"
+            "Water grade: {result.water_grade}\n"
             "Remember map: {result.remember_map}\n"
             "Has map: {result.has_map}\n"
             "Has new map: {result.has_new_map}\n"
