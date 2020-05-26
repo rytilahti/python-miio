@@ -151,7 +151,7 @@ class Gateway(Device):
         device_type_mapping = {
             DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
             DeviceType.Plug: AqaraPlug,
-            DeviceType.SensorHT: AqaraHT,
+            DeviceType.SensorHT: SensorHT,
             DeviceType.AqaraHT: AqaraHT,
             DeviceType.AqaraMagnet: AqaraMagnet,
         }
@@ -746,6 +746,29 @@ class AqaraHT(SubDevice):
                 "fetching properties %s: %s" % (self.properties, values)
             ) from ex
 
+class SensorHT(SubDevice):
+    accessor = "get_prop_sensor_ht"
+    properties = ["temperature", "humidity", "pressure"]
+
+    @dataclass
+    class props:
+        temperature: int = None # in degrees celsius
+        humidity: int = None    # in %
+        pressure: int = None    # in hPa
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        try:
+            self._props.temperature = values[0] / 100
+            self._props.humidity = values[1] / 100
+            self._props.pressure = values[2] / 100
+        except Exception as ex:
+            raise GatewayException(
+                "One or more unexpected results while "
+                "fetching properties %s: %s" % (self.properties, values)
+            ) from ex
 
 class AqaraMagnet(SubDevice):
     properties = ["unkown"]
