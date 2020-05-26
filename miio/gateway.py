@@ -606,7 +606,7 @@ class SubDevice():
         try:
             self.type = DeviceType(dev_info.type_id)
         except ValueError:
-            self.type = DeviceType(-1)
+            self.type = DeviceType.Unknown
 
     def __repr__(self):
         return "<Subdevice %s: %s fw: %s bat: %s props: %s>" % (
