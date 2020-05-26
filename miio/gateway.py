@@ -611,7 +611,7 @@ class SubDevice():
         return "<Subdevice %s: %s fw: %s bat: %s props: %s>" % (
             self.device_type,
             self.sid,
-            self.get_firmware_version(),
+            self._fw_ver,
             self.get_battery(),
             self.status,
         )
@@ -622,7 +622,7 @@ class SubDevice():
         if hasattr(self, '_props'):
             return dataclasses_asdict(self._props)
         else:
-            _LOGGER.error("Subdevice '%s' does not have device specific properties defined", self.device_type)
+            _LOGGER.debug("Subdevice '%s' does not have device specific properties defined", self.device_type)
             return {}
 
     @property
