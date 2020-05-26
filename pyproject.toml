@@ -33,7 +33,7 @@ tqdm = "^4.45.0"
 netifaces = "^0.10.9"
 android_backup = { version = "^0.2", optional = true }
 importlib_metadata = "^1.6.0"
-dataclasses = "^0.7"
+dataclasses = "^0.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.1"
