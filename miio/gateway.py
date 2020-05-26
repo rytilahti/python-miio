@@ -668,6 +668,11 @@ class SubDevice():
                 "Got an exception while fetching property %s" % (property)
             ) from ex
 
+        if not response:
+            raise GatewayException(
+                "Empty response while fetching property '%s': %s" % (property, response)
+            )
+
         return response
 
     @command(click.argument("properties", nargs=-1))
