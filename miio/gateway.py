@@ -727,10 +727,10 @@ class SubDevice:
         """Returns firmware version"""
         try:
             self._fw_ver = self.get_property("fw_ver").pop()
-        except:
+        except Exception as ex:
             _LOGGER.info(
                 "get_firmware_version failed, returning firmware version from discovery info"
-            )
+            ) from ex
         return self._fw_ver
 
 
