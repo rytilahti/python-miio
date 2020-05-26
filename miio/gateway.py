@@ -332,10 +332,9 @@ class GatewayAlarm(GatewayDevice):
         return self._gateway.send("set_alarming_volume", [volume])
 
     @command()
-    def last_status_change_time(self):
+    def last_status_change_time(self) -> datetime:
         """
-        Return the last time the alarm changed status,
-        type datetime.datetime
+        Return the last time the alarm changed status
         """
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
@@ -603,6 +602,10 @@ class SubDevice():
             self.type = DeviceType(dev_info.type_id)
         except ValueError:
             self.type = DeviceType(-1)
+        
+        # if dataclass props is defined, initialize an instance
+        if hasattr(self, 'props'):
+            self._props = self.props()
 
     def __repr__(self):
         return "<Subdevice %s: %s fw: %s bat: %s props: %s>" % (
@@ -734,17 +737,9 @@ class AqaraHT(SubDevice):
 
     @dataclass
     class props:
-        temperature: int    # in degrees celsius
-        humidity: int       # in %
-        pressure: int       # in hPa
-
-    def __init__(
-            self,
-            gw: Gateway = None,
-            dev_info: SubDeviceInfo = None
-        ):
-            super().__init__(gw, dev_info)
-            self._props = self.props(None, None, None)
+        temperature: int = None # in degrees celsius
+        humidity: int = None    # in %
+        pressure: int = None    # in hPa
 
     @command()
     def update(self):
@@ -758,25 +753,18 @@ class AqaraHT(SubDevice):
 class SensorHT(SubDevice):
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity"]
-    _temperature = None
-    _humidity = None
 
-    @property
-    def temperature(self):
-        """Return the temperature in degrees celsius"""
-        return self._temperature
-
-    @property
-    def humidity(self):
-        """Return the humidity in %"""
-        return self._humidity
+    @dataclass
+    class props:
+        temperature: int = None # in degrees celsius
+        humidity: int = None    # in %
 
     @command()
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        self._temperature = values[0] / 100
-        self._humidity = values[1] / 100
+        self._props.temperature = values[0] / 100
+        self._props.humidity = values[1] / 100
 
 
 class AqaraMagnet(SubDevice):
@@ -784,15 +772,7 @@ class AqaraMagnet(SubDevice):
 
     @dataclass
     class props:
-        status: str     # 'open' or 'closed'
-
-    def __init__(
-            self,
-            gw: Gateway = None,
-            dev_info: SubDeviceInfo = None
-        ):
-            super().__init__(gw, dev_info)
-            self._props = self.props(None)
+        status: str = None  # 'open' or 'closed'
 
     @command()
     def update(self):
@@ -804,25 +784,18 @@ class AqaraMagnet(SubDevice):
 class AqaraPlug(SubDevice):
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0"]
-    _power = None
-    _status = None
 
-    @property
-    def power(self):
-        """Return the power consumption"""
-        return self._power
-
-    @property
-    def status(self):
-        """Return the status of the plug: on/off"""
-        return self._status
+    @dataclass
+    class props:
+        status: str = None      # 'on' / 'off'
+        load_power: int = None  # power consumption in ?unit?
 
     @command()
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        self._power = values[0]
-        self._status = values[1]
+        self._props.load_power = values[0]
+        self._props.status = values[1]
 
 
 class AqaraRelayTwoChannels(SubDevice):
@@ -831,41 +804,30 @@ class AqaraRelayTwoChannels(SubDevice):
     _status_ch1 = None
     _load_power = None
 
+    @dataclass
+    class props:
+        status_ch0: str = None  # 'on' / 'off'
+        status_ch1: str = None  # 'on' / 'off'
+        load_power: int = None  # power consumption in ?unit?
+
     class AqaraRelayToggleValue(Enum):
         """Options to control the relay"""
-
         toggle = "toggle"
         on = "on"
         off = "off"
 
     class AqaraRelayChannel(Enum):
         """Options to select wich relay to control"""
-
         first = "channel_0"
         second = "channel_1"
-
-    @property
-    def status_ch0(self):
-        """Return the state of channel 0"""
-        return self._status_ch0
-
-    @property
-    def status_ch1(self):
-        """Return the state of channel 1"""
-        return self._status_ch1
-
-    @property
-    def load_power(self):
-        """Return the load power"""
-        return self._load_power
 
     @command()
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        self._load_power = values[0]
-        self._status_ch0 = values[1]
-        self._status_ch1 = values[2]
+        self._props.load_power = values[0]
+        self._props.status_ch0 = values[1]
+        self._props.status_ch1 = values[2]
 
     @command(
         click.argument("channel", type=EnumType(AqaraRelayChannel)),
