@@ -583,7 +583,7 @@ class GatewayLight(GatewayDevice):
         return self._gateway.send("set_rgb", [brightness_and_color])
 
 
-class SubDevice():
+class SubDevice:
     """
     Base class for all subdevices of the gateway
     these devices are connected through zigbee.
@@ -593,11 +593,7 @@ class SubDevice():
     class props:
         """Defines properties of the specific device"""
 
-    def __init__(
-        self,
-        gw: Gateway = None,
-        dev_info: SubDeviceInfo = None,
-    ) -> None:
+    def __init__(self, gw: Gateway = None, dev_info: SubDeviceInfo = None,) -> None:
         self._gw = gw
         self.sid = dev_info.sid
         self._battery = None
@@ -635,7 +631,10 @@ class SubDevice():
     @command()
     def update(self):
         """Update the device-specific properties."""
-        _LOGGER.debug("Subdevice '%s' does not have a device specific update method defined", self.device_type)
+        _LOGGER.debug(
+            "Subdevice '%s' does not have a device specific update method defined",
+            self.device_type,
+        )
 
     @command()
     def send(self, command):
@@ -723,7 +722,9 @@ class SubDevice():
         try:
             self._fw_ver = self.get_property("fw_ver").pop()
         except:
-            _LOGGER.info("get_firmware_version failed, returning firmware version from discovery info")
+            _LOGGER.info(
+                "get_firmware_version failed, returning firmware version from discovery info"
+            )
         return self._fw_ver
 
 
@@ -733,9 +734,9 @@ class AqaraHT(SubDevice):
 
     @dataclass
     class props:
-        temperature: int = None # in degrees celsius
-        humidity: int = None    # in %
-        pressure: int = None    # in hPa
+        temperature: int = None  # in degrees celsius
+        humidity: int = None  # in %
+        pressure: int = None  # in hPa
 
     @command()
     def update(self):
@@ -750,6 +751,7 @@ class AqaraHT(SubDevice):
                 "One or more unexpected results while "
                 "fetching properties %s: %s" % (self.properties, values)
             ) from ex
+
 
 class SensorHT(SubDevice):
     accessor = "get_prop_sensor_ht"
@@ -757,9 +759,9 @@ class SensorHT(SubDevice):
 
     @dataclass
     class props:
-        temperature: int = None # in degrees celsius
-        humidity: int = None    # in %
-        pressure: int = None    # in hPa
+        temperature: int = None  # in degrees celsius
+        humidity: int = None  # in %
+        pressure: int = None  # in hPa
 
     @command()
     def update(self):
@@ -774,6 +776,7 @@ class SensorHT(SubDevice):
                 "One or more unexpected results while "
                 "fetching properties %s: %s" % (self.properties, values)
             ) from ex
+
 
 class AqaraMagnet(SubDevice):
     properties = ["unkown"]
@@ -795,7 +798,7 @@ class AqaraPlug(SubDevice):
 
     @dataclass
     class props:
-        status: str = None      # 'on' / 'off'
+        status: str = None  # 'on' / 'off'
         load_power: int = None  # power consumption in ?unit?
 
     @command()
@@ -820,12 +823,14 @@ class AqaraRelayTwoChannels(SubDevice):
 
     class AqaraRelayToggleValue(Enum):
         """Options to control the relay"""
+
         toggle = "toggle"
         on = "on"
         off = "off"
 
     class AqaraRelayChannel(Enum):
         """Options to select wich relay to control"""
+
         first = "channel_0"
         second = "channel_1"
 
@@ -843,6 +848,4 @@ class AqaraRelayTwoChannels(SubDevice):
     )
     def toggle(self, sid, channel, value):
         """Toggle Aqara Wireless Relay 2ch"""
-        return self.send_arg(
-            "toggle_ctrl_neutral", [channel.value, value.value]
-        ).pop()
+        return self.send_arg("toggle_ctrl_neutral", [channel.value, value.value]).pop()
