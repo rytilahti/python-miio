@@ -151,7 +151,7 @@ class Gateway(Device):
         device_type_mapping = {
             DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
             DeviceType.Plug: AqaraPlug,
-            DeviceType.SensorHT: SensorHT,
+            DeviceType.SensorHT: AqaraHT,
             DeviceType.AqaraHT: AqaraHT,
             DeviceType.AqaraMagnet: AqaraMagnet,
         }
@@ -589,6 +589,10 @@ class SubDevice():
     these devices are connected through zigbee.
     """
 
+    @dataclass
+    class props:
+        """Defines properties of the specific device"""
+
     def __init__(
         self,
         gw: Gateway = None,
@@ -598,14 +602,11 @@ class SubDevice():
         self.sid = dev_info.sid
         self._battery = None
         self._fw_ver = dev_info.fw_ver
+        self._props = self.props()
         try:
             self.type = DeviceType(dev_info.type_id)
         except ValueError:
             self.type = DeviceType(-1)
-        
-        # if dataclass props is defined, initialize an instance
-        if hasattr(self, 'props'):
-            self._props = self.props()
 
     def __repr__(self):
         return "<Subdevice %s: %s fw: %s bat: %s props: %s>" % (
@@ -619,11 +620,7 @@ class SubDevice():
     @property
     def status(self):
         """Return sub-device status as a dict containing all properties."""
-        if hasattr(self, '_props'):
-            return dataclasses_asdict(self._props)
-        else:
-            _LOGGER.debug("Subdevice '%s' does not have device specific properties defined", self.device_type)
-            return {}
+        return dataclasses_asdict(self._props)
 
     @property
     def device_type(self):
@@ -634,6 +631,11 @@ class SubDevice():
     def battery(self):
         """Return the battery level."""
         return self._battery
+
+    @command()
+    def update(self):
+        """Update the device-specific properties."""
+        _LOGGER.debug("Subdevice '%s' does not have a device specific update method defined", self.device_type)
 
     @command()
     def send(self, command):
@@ -666,11 +668,6 @@ class SubDevice():
                 "Got an exception while fetching property %s" % (property)
             ) from ex
 
-        if response == []:
-            raise GatewayException(
-                "Empty response while fetching property '%s': %s" % (property, response)
-            )
-
         return response
 
     @command(click.argument("properties", nargs=-1))
@@ -690,13 +687,6 @@ class SubDevice():
                 "unexpected result while fetching properties %s: %s"
                 % (properties, response)
             )
-
-        for item in response:
-            if item == '':
-                raise GatewayException(
-                    "One or more empty results while "
-                    "fetching properties %s: %s" % (properties, response)
-                )
 
         return response
 
@@ -733,6 +723,7 @@ class SubDevice():
 
 
 class AqaraHT(SubDevice):
+    accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
 
     @dataclass
@@ -745,26 +736,15 @@ class AqaraHT(SubDevice):
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        self._props.temperature = values[0] / 100
-        self._props.humidity = values[1] / 100
-        self._props.pressure = values[2] / 100
-
-
-class SensorHT(SubDevice):
-    accessor = "get_prop_sensor_ht"
-    properties = ["temperature", "humidity"]
-
-    @dataclass
-    class props:
-        temperature: int = None # in degrees celsius
-        humidity: int = None    # in %
-
-    @command()
-    def update(self):
-        """Update all device properties"""
-        values = self.get_property_exp(self.properties)
-        self._props.temperature = values[0] / 100
-        self._props.humidity = values[1] / 100
+        try:
+            self._props.temperature = values[0] / 100
+            self._props.humidity = values[1] / 100
+            self._props.pressure = values[2] / 100
+        except Exception as ex:
+            raise GatewayException(
+                "One or more unexpected results while "
+                "fetching properties %s: %s" % (self.properties, values)
+            ) from ex
 
 
 class AqaraMagnet(SubDevice):
