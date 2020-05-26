@@ -1,3 +1,5 @@
+"""Xiaomi Aqara Gateway implementation using Miio protecol."""
+
 import logging
 from dataclasses import dataclass, asdict as dataclasses_asdict
 from datetime import datetime
@@ -32,6 +34,8 @@ class GatewayException(DeviceException):
 
 
 class DeviceType(IntEnum):
+    """DeviceType matching using the values provided by Xiaomi."""
+
     Unknown = -1
     Gateway = 0
     Switch = 1
@@ -57,6 +61,8 @@ class DeviceType(IntEnum):
 
 @dataclass
 class SubDeviceInfo:
+    """SubDevice discovery info."""
+
     sid: str
     type_id: int
     unknown: int
@@ -729,11 +735,15 @@ class SubDevice:
 
 
 class AqaraHT(SubDevice):
+    """Subdevice AqaraHT specific properties and methods"""
+
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
 
     @dataclass
     class props:
+        """Device specific properties"""
+
         temperature: int = None  # in degrees celsius
         humidity: int = None  # in %
         pressure: int = None  # in hPa
@@ -754,11 +764,15 @@ class AqaraHT(SubDevice):
 
 
 class SensorHT(SubDevice):
+    """Subdevice SensorHT specific properties and methods"""
+
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
 
     @dataclass
     class props:
+        """Device specific properties"""
+
         temperature: int = None  # in degrees celsius
         humidity: int = None  # in %
         pressure: int = None  # in hPa
@@ -779,10 +793,14 @@ class SensorHT(SubDevice):
 
 
 class AqaraMagnet(SubDevice):
+    """Subdevice AqaraMagnet specific properties and methods"""
+
     properties = ["unkown"]
 
     @dataclass
     class props:
+        """Device specific properties"""
+
         status: str = None  # 'open' or 'closed'
 
     @command()
@@ -793,11 +811,15 @@ class AqaraMagnet(SubDevice):
 
 
 class AqaraPlug(SubDevice):
+    """Subdevice AqaraPlug specific properties and methods"""
+
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0"]
 
     @dataclass
     class props:
+        """Device specific properties"""
+
         status: str = None  # 'on' / 'off'
         load_power: int = None  # power consumption in ?unit?
 
@@ -810,6 +832,8 @@ class AqaraPlug(SubDevice):
 
 
 class AqaraRelayTwoChannels(SubDevice):
+    """Subdevice AqaraRelayTwoChannels specific properties and methods"""
+
     properties = ["load_power", "channel_0", "channel_1"]
     _status_ch0 = None
     _status_ch1 = None
@@ -817,6 +841,8 @@ class AqaraRelayTwoChannels(SubDevice):
 
     @dataclass
     class props:
+        """Device specific properties"""
+
         status_ch0: str = None  # 'on' / 'off'
         status_ch1: str = None  # 'on' / 'off'
         load_power: int = None  # power consumption in ?unit?
@@ -846,6 +872,6 @@ class AqaraRelayTwoChannels(SubDevice):
         click.argument("channel", type=EnumType(AqaraRelayChannel)),
         click.argument("value", type=EnumType(AqaraRelayToggleValue)),
     )
-    def toggle(self, sid, channel, value):
+    def toggle(self, channel, value):
         """Toggle Aqara Wireless Relay 2ch"""
         return self.send_arg("toggle_ctrl_neutral", [channel.value, value.value]).pop()
