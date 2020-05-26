@@ -1,7 +1,8 @@
 """Xiaomi Aqara Gateway implementation using Miio protecol."""
 
 import logging
-from dataclasses import dataclass, asdict as dataclasses_asdict
+from dataclasses import asdict as dataclasses_asdict
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Optional
@@ -729,8 +730,9 @@ class SubDevice:
             self._fw_ver = self.get_property("fw_ver").pop()
         except Exception as ex:
             _LOGGER.info(
-                "get_firmware_version failed, returning firmware version from discovery info"
-            ) from ex
+                "get_firmware_version failed, returning firmware version from discovery info: %s",
+                ex,
+            )
         return self._fw_ver
 
 
