@@ -243,13 +243,6 @@ class Gateway(Device):
         """Get illumination. In lux?"""
         return self.send("get_illumination").pop()
 
-    @command()
-    def get_local_status(self):
-        """
-        Get infromation about the gateway and connected devices, 
-        currently responds but response cannot be parsed "Resp invalid json".
-        """
-        return self.get_prop("local.status")
 
 class GatewayDevice(Device):
     """
