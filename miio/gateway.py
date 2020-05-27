@@ -55,6 +55,8 @@ class DeviceType(IntEnum):
     AqaraMagnet = 53
     AqaraRelayTwoChannels = 54
     AqaraSquareButton = 62
+    AqaraSwitchOneChannel = 63
+    AqaraSwitchTwoChannels = 64
     RemoteSwitchSingle = 134
     RemoteSwitchDouble = 135
 
@@ -160,6 +162,8 @@ class Gateway(Device):
             DeviceType.SensorHT: SensorHT,
             DeviceType.AqaraHT: AqaraHT,
             DeviceType.AqaraMagnet: AqaraMagnet,
+            DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
+            DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
         }
         devices_raw = self.get_prop("device_list")
         self._devices = []
@@ -815,30 +819,29 @@ class AqaraPlug(SubDevice):
     """Subdevice AqaraPlug specific properties and methods"""
 
     accessor = "get_prop_plug"
-    properties = ["power", "neutral_0"]
+    properties = ["power", "neutral_0", "load_power"]
 
     @attr.s(auto_attribs=True)
     class props:
         """Device specific properties"""
 
         status: str = None  # 'on' / 'off'
+        power: int = None  # diffrent power consumption?? in ?unit?
         load_power: int = None  # power consumption in ?unit?
 
     @command()
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        self._props.load_power = values[0]
+        self._props.power = values[0]
         self._props.status = values[1]
+        self._props.load_power = values[2]
 
 
 class AqaraRelayTwoChannels(SubDevice):
     """Subdevice AqaraRelayTwoChannels specific properties and methods"""
 
     properties = ["load_power", "channel_0", "channel_1"]
-    _status_ch0 = None
-    _status_ch1 = None
-    _load_power = None
 
     @attr.s(auto_attribs=True)
     class props:
@@ -876,3 +879,45 @@ class AqaraRelayTwoChannels(SubDevice):
     def toggle(self, channel, value):
         """Toggle Aqara Wireless Relay 2ch"""
         return self.send_arg("toggle_ctrl_neutral", [channel.value, value.value]).pop()
+
+
+class AqaraSwitchOneChannel(SubDevice):
+    """Subdevice AqaraSwitchOneChannel specific properties and methods"""
+
+    properties = ["neutral_0", "load_power"]
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties"""
+
+        status: str = None  # 'on' / 'off'
+        load_power: int = None  # power consumption in ?unit?
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        self._props.status = values[0]
+        self._props.load_power = values[1]
+
+
+class AqaraSwitchTwoChannels(SubDevice):
+    """Subdevice AqaraSwitchTwoChannels specific properties and methods"""
+
+    properties = ["neutral_0", "neutral_1", "load_power"]
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties"""
+
+        status_ch0: str = None  # 'on' / 'off'
+        status_ch1: str = None  # 'on' / 'off'
+        load_power: int = None  # power consumption in ?unit?
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        self._props.status_ch0 = values[0]
+        self._props.status_ch1 = values[1]
+        self._props.load_power = values[2]
