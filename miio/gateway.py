@@ -1,12 +1,11 @@
 """Xiaomi Aqara Gateway implementation using Miio protecol."""
 
 import logging
-from dataclasses import asdict as dataclasses_asdict
-from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, IntEnum
 from typing import Optional
 
+import attr
 import click
 
 from .click_common import EnumType, command, format_output
@@ -60,7 +59,7 @@ class DeviceType(IntEnum):
     RemoteSwitchDouble = 135
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class SubDeviceInfo:
     """SubDevice discovery info."""
 
@@ -596,7 +595,7 @@ class SubDevice:
     these devices are connected through zigbee.
     """
 
-    @dataclass
+    @attr.s(auto_attribs=True)
     class props:
         """Defines properties of the specific device"""
 
@@ -623,7 +622,7 @@ class SubDevice:
     @property
     def status(self):
         """Return sub-device status as a dict containing all properties."""
-        return dataclasses_asdict(self._props)
+        return attr.asdict(self._props)
 
     @property
     def device_type(self):
@@ -742,7 +741,7 @@ class AqaraHT(SubDevice):
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
 
-    @dataclass
+    @attr.s(auto_attribs=True)
     class props:
         """Device specific properties"""
 
@@ -771,7 +770,7 @@ class SensorHT(SubDevice):
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
 
-    @dataclass
+    @attr.s(auto_attribs=True)
     class props:
         """Device specific properties"""
 
@@ -799,7 +798,7 @@ class AqaraMagnet(SubDevice):
 
     properties = ["unkown"]
 
-    @dataclass
+    @attr.s(auto_attribs=True)
     class props:
         """Device specific properties"""
 
@@ -818,7 +817,7 @@ class AqaraPlug(SubDevice):
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0"]
 
-    @dataclass
+    @attr.s(auto_attribs=True)
     class props:
         """Device specific properties"""
 
@@ -841,7 +840,7 @@ class AqaraRelayTwoChannels(SubDevice):
     _status_ch1 = None
     _load_power = None
 
-    @dataclass
+    @attr.s(auto_attribs=True)
     class props:
         """Device specific properties"""
 
