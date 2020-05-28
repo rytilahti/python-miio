@@ -104,18 +104,18 @@ def build_move(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    move = _inflate(
-        "move",
-        "[1,18,2,85,[6,256],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
+    return dumps(
+        _inflate(
+            "move",
+            "[1,18,2,85,[6,256],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+        )
     )
-    return dumps(move)
 
 
 def build_flip90(
@@ -127,18 +127,18 @@ def build_flip90(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    flip90 = _inflate(
-        "flip90",
-        "[1,18,2,85,[6,64],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
+    return dumps(
+        _inflate(
+            "flip90",
+            "[1,18,2,85,[6,64],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+        )
     )
-    return dumps(flip90)
 
 
 def build_flip180(
@@ -150,18 +150,18 @@ def build_flip180(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    flip180 = _inflate(
-        "flip180",
-        "[1,18,2,85,[6,128],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
+    return dumps(
+        _inflate(
+            "flip180",
+            "[1,18,2,85,[6,128],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+        )
     )
-    return dumps(flip180)
 
 
 def build_taptap(
@@ -173,19 +173,19 @@ def build_taptap(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    taptap = _inflate(
-        "taptap",
-        "[1,18,2,85,[6,512],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
-        "tap_twice",
+    return dumps(
+        _inflate(
+            "taptap",
+            "[1,18,2,85,[6,512],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+            "tap_twice",
+        )
     )
-    return dumps(taptap)
 
 
 def build_shakeair(
@@ -197,19 +197,19 @@ def build_shakeair(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    shakeair = _inflate(
-        "shakeair",
-        "[1,18,2,85,[0,0],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
-        "shake_air",
+    return dumps(
+        _inflate(
+            "shakeair",
+            "[1,18,2,85,[0,0],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+            "shake_air",
+        )
     )
-    return dumps(shakeair)
 
 
 def build_rotate(
@@ -221,20 +221,20 @@ def build_rotate(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    rotate = _inflate(
-        "rotate",
-        "[1,12,3,85,[1,0],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
-        "rotate",
-        "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",
+    return dumps(
+        _inflate(
+            "rotate",
+            "[1,12,3,85,[1,0],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+            "rotate",
+            "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",
+        )
     )
-    return dumps(rotate)
 
 
 def build_singlepress(
@@ -246,19 +246,19 @@ def build_singlepress(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    singlepress = _inflate(
-        "singlepress",
-        "[1,13,1,85,[0,1],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
-        "click",
+    return dumps(
+        _inflate(
+            "singlepress",
+            "[1,13,1,85,[0,1],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+            "click",
+        )
     )
-    return dumps(singlepress)
 
 
 def build_doublepress(
@@ -270,19 +270,19 @@ def build_doublepress(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    doublepress = _inflate(
-        "doublepress",
-        "[1,13,1,85,[0,2],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
-        "double_click",
+    return dumps(
+        _inflate(
+            "doublepress",
+            "[1,13,1,85,[0,2],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+            "double_click",
+        )
     )
-    return dumps(doublepress)
 
 
 def build_longpress(
@@ -294,19 +294,19 @@ def build_longpress(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    longpress = _inflate(
-        "longpress",
-        "[1,13,1,85,[0,16],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
-        "long_click_press",
+    return dumps(
+        _inflate(
+            "longpress",
+            "[1,13,1,85,[0,16],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+            "long_click_press",
+        )
     )
-    return dumps(longpress)
 
 
 def build_shake(
@@ -318,15 +318,15 @@ def build_shake(
     message_id=0,
 ):
 
-    lumi, source_id = source_sid.split(".")
-    shake = _inflate(
-        "shake",
-        "[1,13,1,85,[0,18],0,0]",
-        source_sid,
-        source_model,
-        target_id,
-        target_ip,
-        target_model,
-        message_id,
+    return dumps(
+        _inflate(
+            "shake",
+            "[1,13,1,85,[0,18],0,0]",
+            source_sid,
+            source_model,
+            target_id,
+            target_ip,
+            target_model,
+            message_id,
+        )
     )
-    return dumps(shake)
