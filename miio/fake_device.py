@@ -3,11 +3,13 @@ import datetime
 import logging
 import socket
 import struct
-import ifaddr
 from functools import reduce
+
+import ifaddr
 from miio.protocol import Message
 
 _LOGGER = logging.getLogger(__name__)
+
 
 def ipv4_nonloop_ips():
     def flatten(a, b):
@@ -25,6 +27,7 @@ def ipv4_nonloop_ips():
             ),
         )
     )
+
 
 class FakeDevice:
     _device_id = None

@@ -8,11 +8,10 @@ from typing import Optional
 import attr
 import click
 
-from .fake_device import ipv4_nonloop_ips
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .exceptions import DeviceException
-from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
+from .fake_device import ipv4_nonloop_ips
 from .gateway_scripts import (
     action_id,
     build_doublepress,
@@ -27,7 +26,7 @@ from .gateway_scripts import (
     build_taptap,
     tokens,
 )
-
+from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +42,7 @@ color_map = {
     "olive": (128, 128, 0),
     "purple": (128, 0, 128),
 }
+
 
 class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
@@ -225,7 +225,7 @@ class Gateway(Device):
     @command(click.argument("sid"), click.argument("command"))
     def zigbee_command(self, sid, command):
         self.discover_devices()
-        target = list(filter(lambda subdevice: subdevice.sid == sid,self.devices))
+        target = list(filter(lambda subdevice: subdevice.sid == sid, self.devices))
         if len(target) < 1:
             return f"Device with sid={sid} not found"
         elif not hasattr(target[0], command):
@@ -793,11 +793,15 @@ class SubDevice:
             map(
                 lambda action: (
                     action,
-                    (action_id[action](self.sid), self._gw.x_del(action_id[action](self.sid))),
+                    (
+                        action_id[action](self.sid),
+                        self._gw.x_del(action_id[action](self.sid)),
+                    ),
                 ),
                 action_id.keys(),
             )
         )
+
 
 class AqaraHT(SubDevice):
     """Subdevice AqaraHT specific properties and methods"""
@@ -982,6 +986,7 @@ class AqaraSwitchTwoChannels(SubDevice):
         self._props.status_ch1 = values[1]
         self._props.load_power = values[2]
 
+
 class Cube(SubDevice):
     """Subdevice Cube specific properties and methods"""
 
@@ -1010,6 +1015,7 @@ class Cube(SubDevice):
     @command()
     def install_flip180_script(self):
         return self._gw.install_script(self.sid, "flip180", build_flip180)
+
 
 class AqaraSquareButton(SubDevice):
     """Subdevice AqaraSquareButton specific properties and methods"""
