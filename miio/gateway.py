@@ -223,7 +223,7 @@ class Gateway(Device):
         return self.send("miIO.xdel", [script_id])
 
     @command(click.argument("sid"), click.argument("command"))
-    def zigbee_command(self, sid, command):
+    def subdevice_command(self, sid, command):
         self.discover_devices()
         target = list(filter(lambda subdevice: subdevice.sid == sid, self.devices))
         if len(target) < 1:
