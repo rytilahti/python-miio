@@ -231,7 +231,8 @@ def build_rotate(
         target_ip,
         target_model,
         message_id,
-        "rotate" "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",
+        "rotate",
+        "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",
     )
     return dumps(rotate)
 
