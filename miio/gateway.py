@@ -233,10 +233,9 @@ class Gateway(Device):
         else:
             return getattr(target[0], command)()
 
-    def install_script(self, sid, action, builder):
+    def install_script(self, sid, builder):
         addresses = ipv4_nonloop_ips()
         my_ip = addresses[0]  # Taking first public IP ;(
-        _LOGGER.info("Using address %s for action %s of %s", my_ip, action, sid)
         data_tkn = tokens["data_tkn"]
         source = builder(sid, my_ip)
         return self.send(
@@ -994,27 +993,27 @@ class Cube(SubDevice):
 
     @command()
     def install_move_script(self):
-        return self._gw.install_script(self.sid, "move", build_move)
+        return self._gw.install_script(self.sid, build_move)
 
     @command()
     def install_rotate_script(self):
-        return self._gw.install_script(self.sid, "rotate", build_rotate)
+        return self._gw.install_script(self.sid, build_rotate)
 
     @command()
     def install_shake_script(self):
-        return self._gw.install_script(self.sid, "shakeair", build_shakeair)
+        return self._gw.install_script(self.sid, build_shakeair)
 
     @command()
     def install_flip90_script(self):
-        return self._gw.install_script(self.sid, "flip90", build_flip90)
+        return self._gw.install_script(self.sid, build_flip90)
 
     @command()
     def install_taptap_script(self):
-        return self._gw.install_script(self.sid, "taptap", build_taptap)
+        return self._gw.install_script(self.sid, build_taptap)
 
     @command()
     def install_flip180_script(self):
-        return self._gw.install_script(self.sid, "flip180", build_flip180)
+        return self._gw.install_script(self.sid, build_flip180)
 
 
 class AqaraSquareButton(SubDevice):
@@ -1024,16 +1023,16 @@ class AqaraSquareButton(SubDevice):
 
     @command()
     def install_singlepress_script(self):
-        return self._gw.install_script(self.sid, "singlepress", build_singlepress)
+        return self._gw.install_script(self.sid, build_singlepress)
 
     @command()
     def install_doublepress_script(self):
-        return self._gw.install_script(self.sid, "doublepress", build_doublepress)
+        return self._gw.install_script(self.sid, build_doublepress)
 
     @command()
     def install_longpress_script(self):
-        return self._gw.install_script(self.sid, "longpress", build_longpress)
+        return self._gw.install_script(self.sid, build_longpress)
 
     @command()
     def install_shake_script(self):
-        return self._gw.install_script(self.sid, "shake", build_shake)
+        return self._gw.install_script(self.sid, build_shake)
