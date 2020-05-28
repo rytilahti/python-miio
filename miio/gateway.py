@@ -8,10 +8,26 @@ from typing import Optional
 import attr
 import click
 
+from .fake_device import ipv4_nonloop_ips
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .exceptions import DeviceException
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
+from .gateway_scripts import (
+    action_id,
+    build_doublepress,
+    build_flip90,
+    build_flip180,
+    build_longpress,
+    build_move,
+    build_rotate,
+    build_shake,
+    build_shakeair,
+    build_singlepress,
+    build_taptap,
+    tokens,
+)
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,7 +43,6 @@ color_map = {
     "olive": (128, 128, 0),
     "purple": (128, 0, 128),
 }
-
 
 class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
@@ -161,6 +176,8 @@ class Gateway(Device):
             DeviceType.Plug: AqaraPlug,
             DeviceType.SensorHT: SensorHT,
             DeviceType.AqaraHT: AqaraHT,
+            DeviceType.Cube: Cube,
+            DeviceType.AqaraSquareButton: AqaraSquareButton,
             DeviceType.AqaraMagnet: AqaraMagnet,
             DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
@@ -200,6 +217,38 @@ class Gateway(Device):
                 self._devices.append(subdevice_cls(self, dev_info))
 
         return self._devices
+
+    def x_del(self, script_id):
+        """Delete script by id."""
+        return self.send("miIO.xdel", [script_id])
+
+    @command(click.argument("sid"), click.argument("command"))
+    def zigbee_command(self, sid, command):
+        self.discover_devices()
+        target = list(filter(lambda subdevice: subdevice.sid == sid,self.devices))
+        if len(target) < 1:
+            return f"Device with sid={sid} not found"
+        elif not hasattr(target[0], command):
+            return f"Device with sid={sid} has no method {command}"
+        else:
+            return getattr(target[0], command)()
+
+    def install_script(self, sid, action, builder):
+        addresses = ipv4_nonloop_ips()
+        my_ip = addresses[0]  # Taking first public IP ;(
+        _LOGGER.info("Using address %s for action %s of %s", my_ip, action, sid)
+        data_tkn = tokens["data_tkn"]
+        source = builder(sid, my_ip)
+        return self.send(
+            "send_data_frame",
+            {
+                "cur": 0,
+                "data": source,
+                "data_tkn": data_tkn,
+                "total": 1,
+                "type": "scene",
+            },
+        )
 
     @command(click.argument("property"))
     def get_prop(self, property):
@@ -738,6 +787,17 @@ class SubDevice:
             )
         return self._fw_ver
 
+    @command()
+    def uninstall_scripts(self):
+        return dict(
+            map(
+                lambda action: (
+                    action,
+                    (action_id[action](self.sid), self._gw.x_del(action_id[action](self.sid))),
+                ),
+                action_id.keys(),
+            )
+        )
 
 class AqaraHT(SubDevice):
     """Subdevice AqaraHT specific properties and methods"""
@@ -921,3 +981,53 @@ class AqaraSwitchTwoChannels(SubDevice):
         self._props.status_ch0 = values[0]
         self._props.status_ch1 = values[1]
         self._props.load_power = values[2]
+
+class Cube(SubDevice):
+    """Subdevice Cube specific properties and methods"""
+
+    properties = []
+
+    @command()
+    def install_move_script(self):
+        return self._gw.install_script(self.sid, "move", build_move)
+
+    @command()
+    def install_rotate_script(self):
+        return self._gw.install_script(self.sid, "rotate", build_rotate)
+
+    @command()
+    def install_shake_script(self):
+        return self._gw.install_script(self.sid, "shakeair", build_shakeair)
+
+    @command()
+    def install_flip90_script(self):
+        return self._gw.install_script(self.sid, "flip90", build_flip90)
+
+    @command()
+    def install_taptap_script(self):
+        return self._gw.install_script(self.sid, "taptap", build_taptap)
+
+    @command()
+    def install_flip180_script(self):
+        return self._gw.install_script(self.sid, "flip180", build_flip180)
+
+class AqaraSquareButton(SubDevice):
+    """Subdevice AqaraSquareButton specific properties and methods"""
+
+    properties = []
+
+    @command()
+    def install_singlepress_script(self):
+        return self._gw.install_script(self.sid, "singlepress", build_singlepress)
+
+    @command()
+    def install_doublepress_script(self):
+        return self._gw.install_script(self.sid, "doublepress", build_doublepress)
+
+    @command()
+    def install_longpress_script(self):
+        return self._gw.install_script(self.sid, "longpress", build_longpress)
+
+    @command()
+    def install_shake_script(self):
+        return self._gw.install_script(self.sid, "shake", build_shake)
