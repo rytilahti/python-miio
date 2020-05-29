@@ -3,6 +3,9 @@ from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List
 
+from croniter import croniter
+from pytz import timezone
+
 from .utils import pretty_seconds, pretty_time
 
 
@@ -401,12 +404,13 @@ class Timer:
     The timers are accessed using an integer ID, which is based on the unix
     timestamp of the creation time."""
 
-    def __init__(self, data: List[Any]) -> None:
+    def __init__(self, data: List[Any], timezone: str) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
         #  ['1488667777661', 'off', ['49 21 * * 3,4,5,6', ['start_clean', '']]
         # ],
         self.data = data
+        self.timezone = timezone
 
     @property
     def id(self) -> int:
@@ -433,6 +437,13 @@ class Timer:
         """The action to be taken on the given time.
         Note, this seems to be always 'start'."""
         return str(self.data[2][1])
+
+    @property
+    def next_schedule(self) -> datetime:
+        """Next schedule for the timer"""
+        local_tz = timezone(self.timezone)
+        cron = croniter(self.cron, start_time=local_tz.localize(datetime.now()))
+        return cron.get_next(ret_type=datetime)
 
     def __repr__(self) -> str:
         return "<Timer %s: %s - enabled: %s - cron: %s>" % (

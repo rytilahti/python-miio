@@ -357,7 +357,7 @@ class Vacuum(Device):
         """Return a list of timers."""
         timers = list()
         for rec in self.send("get_timer", [""]):
-            timers.append(Timer(rec))
+            timers.append(Timer(rec, timezone=self.timezone()))
 
         return timers
 
