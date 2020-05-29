@@ -443,6 +443,7 @@ class Timer:
         """Next schedule for the timer."""
         local_tz = timezone(self.timezone)
         cron = croniter(self.cron, start_time=local_tz.localize(datetime.now()))
+
         return cron.get_next(ret_type=datetime)
 
     def __repr__(self) -> str:
