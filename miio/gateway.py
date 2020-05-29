@@ -224,6 +224,7 @@ class Gateway(Device):
 
     @command(click.argument("sid"), click.argument("command"))
     def subdevice_command(self, sid, command):
+        """Send command to subdevice."""
         self.discover_devices()
         target = list(filter(lambda subdevice: subdevice.sid == sid, self.devices))
         if len(target) < 1:
@@ -233,9 +234,13 @@ class Gateway(Device):
         else:
             return getattr(target[0], command)()
 
-    def install_script(self, sid, builder):
-        addresses = ipv4_nonloop_ips()
-        my_ip = addresses[0]  # Taking first public IP ;(
+    def install_script(self, sid, builder, ip=None):
+        """Install script for by building script source and sending it with miio method. You need to run fake or real device to capture script execution results."""
+        if ip is None:
+            addresses = ipv4_nonloop_ips()
+            my_ip = addresses[0]  # Taking first public IP
+        else:
+            my_ip = ip
         data_tkn = tokens["data_tkn"]
         source = builder(sid, my_ip)
         return self.send(
@@ -993,26 +998,32 @@ class Cube(SubDevice):
 
     @command()
     def install_move_script(self):
+        """Generate and install script which captures move event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_move)
 
     @command()
     def install_rotate_script(self):
+        """Generate and install script which captures rotate event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_rotate)
 
     @command()
     def install_shake_script(self):
+        """Generate and install script which captures shake in air event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_shakeair)
 
     @command()
     def install_flip90_script(self):
+        """Generate and install script which captures horizontal 90 flip and sends miio package to device"""
         return self._gw.install_script(self.sid, build_flip90)
 
     @command()
     def install_taptap_script(self):
+        """Generate and install script which captures double tap on surface event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_taptap)
 
     @command()
     def install_flip180_script(self):
+        """Generate and install script which captures horizontal 180 flip and sends miio package to device"""
         return self._gw.install_script(self.sid, build_flip180)
 
 
@@ -1023,16 +1034,20 @@ class AqaraSquareButton(SubDevice):
 
     @command()
     def install_singlepress_script(self):
+        """Generate and install script which captures single press event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_singlepress)
 
     @command()
     def install_doublepress_script(self):
+        """Generate and install script which captures double press event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_doublepress)
 
     @command()
     def install_longpress_script(self):
+        """Generate and install script which captures loooong press event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_longpress)
 
     @command()
     def install_shake_script(self):
+        """Generate and install script which captures shake in air event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_shake)
