@@ -440,7 +440,7 @@ class Timer:
 
     @property
     def next_schedule(self) -> datetime:
-        """Next schedule for the timer"""
+        """Next schedule for the timer."""
         local_tz = timezone(self.timezone)
         cron = croniter(self.cron, start_time=local_tz.localize(datetime.now()))
         return cron.get_next(ret_type=datetime)
