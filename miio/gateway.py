@@ -84,6 +84,9 @@ class Gateway(Device):
     * toggle_plug
     * remove_all_bind
     * list_bind [0]
+ 
+    * self.get_prop("used_for_public") # Return the 'used_for_public' status, probably this has to do with developer mode.
+    * self.set_prop("used_for_public", state) # Set the 'used_for_public' state, probably this has to do with developer mode.
 
     * welcome
     * set_curtain_level
@@ -236,16 +239,6 @@ class Gateway(Device):
             click.echo("Key must be of length 16, was %s" % len(key))
 
         return self.send("set_lumi_dpf_aes_key", [key])
-
-    @command()
-    def get_used_for_public(self):
-        """Return the 'used_for_public' status, probably this has to do with developer mode."""
-        return self.get_prop("used_for_public")
-
-    @command(click.argument("state"))
-    def set_used_for_public(self, state):
-        """Set the 'used_for_public' state, probably this has to do with developer mode."""
-        return self.set_prop("used_for_public", state)
 
     @command()
     def timezone(self):
