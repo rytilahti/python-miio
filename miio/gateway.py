@@ -238,6 +238,16 @@ class Gateway(Device):
         return self.send("set_lumi_dpf_aes_key", [key])
 
     @command()
+    def get_used_for_public(self):
+        """Return the 'used_for_public' status, probably this has to do with developer mode."""
+        return self.get_prop("used_for_public")
+
+    @command(click.argument("state"))
+    def set_used_for_public(self, state):
+        """Set the 'used_for_public' state, probably this has to do with developer mode."""
+        return self.set_prop("used_for_public", state)
+
+    @command()
     def timezone(self):
         """Get current timezone."""
         return self.get_prop("tzone_sec")
