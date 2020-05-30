@@ -84,7 +84,7 @@ class Gateway(Device):
     * toggle_plug
     * remove_all_bind
     * list_bind [0]
- 
+
     * self.get_prop("used_for_public") # Return the 'used_for_public' status, probably this has to do with developer mode.
     * self.set_prop("used_for_public", state) # Set the 'used_for_public' state, probably this has to do with developer mode.
 
