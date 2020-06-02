@@ -37,7 +37,7 @@ class DeviceType(IntEnum):
     """DeviceType matching using the values provided by Xiaomi."""
 
     Unknown = -1
-    Gateway = 0 # lumi.0
+    Gateway = 0                 # lumi.0
     Switch = 1
     Motion = 2
     Magnet = 3
@@ -87,8 +87,8 @@ class Gateway(Device):
     * remove_all_bind
     * list_bind [0]
 
-    * self.get_prop("used_for_public") # Return the 'used_for_public' status, probably this has to do with developer mode.
-    * self.set_prop("used_for_public", state) # Set the 'used_for_public' state, probably this has to do with developer mode.
+    * self.get_prop("used_for_public") # Return the 'used_for_public' status, return value: [0] or [1], probably this has to do with developer mode.
+    * self.set_prop("used_for_public", state) # Set the 'used_for_public' state, value: 0 or 1, probably this has to do with developer mode.
 
     * welcome
     * set_curtain_level
