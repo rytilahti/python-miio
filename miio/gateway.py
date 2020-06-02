@@ -43,7 +43,7 @@ class DeviceType(IntEnum):
     Magnet = 3
     SwitchTwoChannels = 7
     Cube = 8                    # lumi.sensor_cube.v1
-    SwitchOneChannel = 9
+    SwitchOneChannel = 9        # lumi.ctrl_neutral1.v1
     SensorHT = 10
     Plug = 11
     RemoteSwitchSingleV1 = 14   # lumi.sensor_86sw1.v1
