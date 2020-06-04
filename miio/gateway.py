@@ -923,6 +923,7 @@ class AqaraSwitchTwoChannels(SubDevice):
         self._props.status_ch1 = values[1]
         self._props.load_power = values[2]
 
+
 class AqaraWallOutlet(SubDevice):
     """Subdevice AqaraWallOutlet specific properties and methods"""
 
