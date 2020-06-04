@@ -164,6 +164,7 @@ class Gateway(Device):
             DeviceType.AqaraMagnet: AqaraMagnet,
             DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
+            DeviceType.AqaraWallOutlet: AqaraWallOutlet,
         }
         devices_raw = self.get_prop("device_list")
         self._devices = []
@@ -921,3 +922,22 @@ class AqaraSwitchTwoChannels(SubDevice):
         self._props.status_ch0 = values[0]
         self._props.status_ch1 = values[1]
         self._props.load_power = values[2]
+
+class AqaraWallOutlet(SubDevice):
+    """Subdevice AqaraWallOutlet specific properties and methods"""
+
+    properties = ["channel_0", "load_power"]
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties"""
+
+        status: str = None  # 'on' / 'off'
+        load_power: int = None  # power consumption in Watt
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        self._props.status = values[0]
+        self._props.load_power = values[1]
