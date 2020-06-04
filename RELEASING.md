@@ -41,8 +41,16 @@ git push --tags
 
 7. Upload new version to pypi
 
+If not done already, create an API key for pypi (https://pypi.org/manage/account/token/) and configure it:
+```
+poetry config pypi-token.pypi <token>
+```
+
+To build & release:
+
 ```bash
-python setup.py sdist bdist_wheel upload
+poetry build
+poetry publish
 ```
 
 8. Click the "Draft a new release" button on github, select the new tag and copy & paste the changelog into the description.
