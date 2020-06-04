@@ -37,28 +37,30 @@ class DeviceType(IntEnum):
     """DeviceType matching using the values provided by Xiaomi."""
 
     Unknown = -1
-    Gateway = 0
+    Gateway = 0  # lumi.0
     Switch = 1
     Motion = 2
     Magnet = 3
     SwitchTwoChannels = 7
-    Cube = 8
-    SwitchOneChannel = 9
+    Cube = 8  # lumi.sensor_cube.v1
+    SwitchOneChannel = 9  # lumi.ctrl_neutral1.v1
     SensorHT = 10
     Plug = 11
+    RemoteSwitchSingleV1 = 14  # lumi.sensor_86sw1.v1
     SensorSmoke = 15
-    AqaraHT = 19
+    AqaraHT = 19  # lumi.weather.v1
     SwitchLiveOneChannel = 20
     SwitchLiveTwoChannels = 21
     AqaraSwitch = 51
     AqaraMotion = 52
-    AqaraMagnet = 53
+    AqaraMagnet = 53  # lumi.sensor_magnet.aq2
     AqaraRelayTwoChannels = 54
-    AqaraSquareButton = 62
+    AqaraSquareButton = 62  # lumi.sensor_switch.aq3
     AqaraSwitchOneChannel = 63
     AqaraSwitchTwoChannels = 64
-    RemoteSwitchSingle = 134
-    RemoteSwitchDouble = 135
+    AqaraWallOutlet = 65  # lumi.ctrl_86plug.aq1
+    RemoteSwitchSingle = 134  # lumi.remote.b186acn01
+    RemoteSwitchDouble = 135  # lumi.remote.b286acn01
 
 
 @attr.s(auto_attribs=True)
@@ -84,6 +86,9 @@ class Gateway(Device):
     * toggle_plug
     * remove_all_bind
     * list_bind [0]
+
+    * self.get_prop("used_for_public") # Return the 'used_for_public' status, return value: [0] or [1], probably this has to do with developer mode.
+    * self.set_prop("used_for_public", state) # Set the 'used_for_public' state, value: 0 or 1, probably this has to do with developer mode.
 
     * welcome
     * set_curtain_level
