@@ -942,3 +942,18 @@ class AqaraWallOutlet(SubDevice):
         values = self.get_property_exp(self.properties)
         self._props.status = values[0]
         self._props.load_power = values[1]
+
+    @command()
+    def toggle(self):
+        """Toggle Aqara Wall Outlet"""
+        return self.send_arg("toggle_plug", ["channel_0", "toggle"]).pop()
+
+    @command()
+    def on(self):
+        """Turn on Aqara Wall Outlet"""
+        return self.send_arg("toggle_plug", ["channel_0", "on"]).pop()
+
+    @command()
+    def off(self):
+        """Turn off Aqara Wall Outlet"""
+        return self.send_arg("toggle_plug", ["channel_0", "off"]).pop()
