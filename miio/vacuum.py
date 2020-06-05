@@ -61,6 +61,14 @@ class FanspeedV2(enum.Enum):
     Gentle = 105
 
 
+class FanspeedE2(enum.Enum):
+    # Original names from the app: Silent, Standard, Strong, Max
+    Silent = 50
+    Standard = 68
+    Medium = 79
+    Turbo = 100
+
+
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 
 
@@ -463,6 +471,8 @@ class Vacuum(Device):
                 self._fanspeeds = FanspeedV2
             else:
                 self._fanspeeds = FanspeedV1
+        elif info.model == "roborock.vacuum.e2":
+            self._fanspeeds = FanspeedE2
         else:
             self._fanspeeds = FanspeedV2
 
