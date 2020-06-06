@@ -222,7 +222,11 @@ class Gateway(Device):
         """Delete script by id."""
         return self.send("miIO.xdel", [script_id])
 
-    @command(click.argument("sid"), click.argument("command"), click.argument("encoded_token"))
+    @command(
+        click.argument("sid"),
+        click.argument("command"),
+        click.argument("encoded_token"),
+    )
     def subdevice_command(self, sid, command, encoded_token):
         """Send command to subdevice."""
         self.discover_devices()

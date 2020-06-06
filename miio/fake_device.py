@@ -107,7 +107,7 @@ if __name__ == "__main__":
 
     device_id = int(fake_device_id)
     # Use real token on fake device for encryption
-    # encoded is used in scripts = key pair should match 
+    # encoded is used in scripts = key pair should match
     # tokens = {
     #    "real": "9bc7c7ce6291d3e443fd7708608b9892",
     #    "encoded": "79cf21b08fb051499389f23c113477a4",
@@ -115,7 +115,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         device_token = bytes.fromhex(sys.argv[1])
     else:
-        print("WARNING kae device starting with publically known token! Pass other token next time pls...")
-        device_token = bytes.fromhex('9bc7c7ce6291d3e443fd7708608b9892')
+        print(
+            "WARNING kae device starting with publically known token! Pass other token next time pls..."
+        )
+        device_token = bytes.fromhex("9bc7c7ce6291d3e443fd7708608b9892")
     fake_device = FakeDevice(device_id, device_token)
     fake_device.run(callback)
