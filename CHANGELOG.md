@@ -1,5 +1,88 @@
 # Change Log
 
+## [0.5.1](https://github.com/rytilahti/python-miio/tree/0.5.1) (2020-06-04)
+
+The most noteworthy change in this release is the work undertaken by @starkillerOG to improve the support for Xiaomi gateway devices. See the PR description for more details at https://github.com/rytilahti/python-miio/pull/700 .
+
+For downstream developers, this release adds two new exceptions to allow better control in situations where the response payloads from the device are something unexpected. This is useful for gracefully fallbacks when automatic device type discovery fails.
+
+P.S. There is now a matrix room (https://matrix.to/#/#python-miio-chat:matrix.org) so feel free to hop in for any reason.
+
+This release adds support for the following new devices:
+
+* chuangmi.plug.hmi208
+* Gateway subdevices: Aqara Wireless Relay 2ch (@bskaplou), AqaraSwitch{One,Two}Channels (@starkillerOG)
+
+Fixes & Enhancements:
+
+* The initial UDP handshake is sent now several times to accommodate spotty networks
+* chuangmi.camera.ipc019: camera rotation & alarm activation
+* Vacuum: added next_schedule property for timers, water tank status, is_on state for segment cleaning mode
+* chuangmi.plug.v3: works now with updated firmware version
+* Viomi vacuum: various minor fixes
+
+API changes:
+
+* Device.send() accepts `extra_parameters` to allow passing values to the main payload body. This is useful at least for gateway devices.
+
+* Two new exceptions to give more control to downstream developers:
+  * PayloadDecodeException (when the payload is unparseable)
+  * DeviceInfoUnavailableException (when device.info() fails)
+* Dependency management is now done using poetry & pyproject.toml
+
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.0.1...0.5.1)
+
+**Implemented enhancements:**
+
+- How to enhance the Xiaomi camera\(chuangmi.camera.ipc019\) function [\#655](https://github.com/rytilahti/python-miio/issues/655)
+- miio local api soon deprecated? / add support for miot api [\#543](https://github.com/rytilahti/python-miio/issues/543)
+
+**Fixed bugs:**
+
+- STYJ02YM - AttributeError: 'ViomiVacuumStatus' object has no attribute 'mop\_type' [\#704](https://github.com/rytilahti/python-miio/issues/704)
+- 0.5.0 / 0.5.0.1 breaks viomivacuum status [\#694](https://github.com/rytilahti/python-miio/issues/694)
+- Error controlling gateway [\#673](https://github.com/rytilahti/python-miio/issues/673)
+
+**Closed issues:**
+
+- xiaomi fan 1x  encountered  'user ack timeout' [\#714](https://github.com/rytilahti/python-miio/issues/714)
+- New device it's possible ? Ikea tradfri GU10 [\#707](https://github.com/rytilahti/python-miio/issues/707)
+- not supported chuangmi.plug.hmi208 [\#691](https://github.com/rytilahti/python-miio/issues/691)
+- `is\_on` not correct [\#687](https://github.com/rytilahti/python-miio/issues/687)
+- Enhancement request: get snapshot / recording from chuangmi camera [\#682](https://github.com/rytilahti/python-miio/issues/682)
+- Add support to Xiaomi Mi Home 360 1080p MJSXJ05CM  [\#671](https://github.com/rytilahti/python-miio/issues/671)
+- Xiaomi Mi Air Purifier 3H \(zhimi-airpurifier-mb3\)  [\#670](https://github.com/rytilahti/python-miio/issues/670)
+- Can't connect to vacuum anymore [\#667](https://github.com/rytilahti/python-miio/issues/667)
+- error timeout - adding supported to viomi-vacuum-v8\_miio 309248236  [\#666](https://github.com/rytilahti/python-miio/issues/666)
+- python-miio v0.5.0 incomplete utils.py [\#659](https://github.com/rytilahti/python-miio/issues/659)
+- REQ: vacuum - restore map function ? [\#646](https://github.com/rytilahti/python-miio/issues/646)
+- Unsupported device found - chuangmi.plug.hmi208 [\#616](https://github.com/rytilahti/python-miio/issues/616)
+- Viomi V2 discoverable, not responding [\#597](https://github.com/rytilahti/python-miio/issues/597)
+
+**Merged pull requests:**
+
+- Add next\_schedule to vacuum timers [\#712](https://github.com/rytilahti/python-miio/pull/712) ([MarBra](https://github.com/MarBra))
+- gateway: add support for AqaraSwitchOneChannel and AqaraSwitchTwoChannels [\#708](https://github.com/rytilahti/python-miio/pull/708) ([starkillerOG](https://github.com/starkillerOG))
+- Viomi: Expose mop\_type, fix error string handling and fix water\_grade [\#705](https://github.com/rytilahti/python-miio/pull/705) ([rytilahti](https://github.com/rytilahti))
+- restructure and improve gateway subdevices [\#700](https://github.com/rytilahti/python-miio/pull/700) ([starkillerOG](https://github.com/starkillerOG))
+- Added support of Aqara Wireless Relay 2ch \(LLKZMK11LM\) [\#696](https://github.com/rytilahti/python-miio/pull/696) ([bskaplou](https://github.com/bskaplou))
+- Viomi: Use bin\_type instead of box\_type for cli tool [\#695](https://github.com/rytilahti/python-miio/pull/695) ([rytilahti](https://github.com/rytilahti))
+- Add support for chuangmi.plug.hmi208 [\#693](https://github.com/rytilahti/python-miio/pull/693) ([rytilahti](https://github.com/rytilahti))
+- vacuum: is\_on should be true for segment cleaning [\#688](https://github.com/rytilahti/python-miio/pull/688) ([rytilahti](https://github.com/rytilahti))
+- send multiple handshake requests [\#686](https://github.com/rytilahti/python-miio/pull/686) ([rytilahti](https://github.com/rytilahti))
+- Add PayloadDecodeException and DeviceInfoUnavailableException [\#685](https://github.com/rytilahti/python-miio/pull/685) ([rytilahti](https://github.com/rytilahti))
+- update readme \(matrix room, usage instructions\) [\#684](https://github.com/rytilahti/python-miio/pull/684) ([rytilahti](https://github.com/rytilahti))
+- Fix Gateway constructor to follow baseclass' parameters [\#677](https://github.com/rytilahti/python-miio/pull/677) ([rytilahti](https://github.com/rytilahti))
+- Update vacuum doc to actual lib output [\#676](https://github.com/rytilahti/python-miio/pull/676) ([ckesc](https://github.com/ckesc))
+- Xiaomi vacuum. Add property for water box \(water tank\) attach status [\#675](https://github.com/rytilahti/python-miio/pull/675) ([ckesc](https://github.com/ckesc))
+- Convert to use pyproject.toml and poetry, extend tests to more platforms [\#674](https://github.com/rytilahti/python-miio/pull/674) ([rytilahti](https://github.com/rytilahti))
+- add viomi.vacuum.v8 to discovery [\#668](https://github.com/rytilahti/python-miio/pull/668) ([rytilahti](https://github.com/rytilahti))
+- chuangmi.plug.v3: Fixed power state status for updated firmware [\#665](https://github.com/rytilahti/python-miio/pull/665) ([ad](https://github.com/ad))
+- Xiaomi camera \(chuangmi.camera.ipc019\): Add orientation controls and alarm [\#663](https://github.com/rytilahti/python-miio/pull/663) ([rytilahti](https://github.com/rytilahti))
+- Add Device.get\_properties\(\), cleanup devices using get\_prop [\#657](https://github.com/rytilahti/python-miio/pull/657) ([rytilahti](https://github.com/rytilahti))
+- Add extra\_parameters to send\(\) [\#653](https://github.com/rytilahti/python-miio/pull/653) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.5.0.1](https://github.com/rytilahti/python-miio/tree/0.5.0.1)
 
 Due to a mistake during the release process, some changes were completely left out from the release.
