@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-miio"
-version = "0.5.0.1"
+version = "0.5.1"
 description = "Python library for interfacing with Xiaomi smart appliances"
 authors = ["Teemu R <tpr@iki.fi>"]
 repository = "https://github.com/rytilahti/python-miio"
@@ -33,6 +33,7 @@ tqdm = "^4.45.0"
 netifaces = "^0.10.9"
 android_backup = { version = "^0.2", optional = true }
 importlib_metadata = "^1.6.0"
+croniter = "^0.3.32"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.1"
@@ -60,6 +61,7 @@ known_third_party = ["appdirs",
   "attr",
   "click",
   "construct",
+  "croniter",
   "cryptography",
   "netifaces",
   "pytest",

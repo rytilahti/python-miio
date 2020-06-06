@@ -52,28 +52,30 @@ class DeviceType(IntEnum):
     """DeviceType matching using the values provided by Xiaomi."""
 
     Unknown = -1
-    Gateway = 0
+    Gateway = 0  # lumi.0
     Switch = 1
     Motion = 2
     Magnet = 3
     SwitchTwoChannels = 7
-    Cube = 8
-    SwitchOneChannel = 9
+    Cube = 8  # lumi.sensor_cube.v1
+    SwitchOneChannel = 9  # lumi.ctrl_neutral1.v1
     SensorHT = 10
     Plug = 11
+    RemoteSwitchSingleV1 = 14  # lumi.sensor_86sw1.v1
     SensorSmoke = 15
-    AqaraHT = 19
+    AqaraHT = 19  # lumi.weather.v1
     SwitchLiveOneChannel = 20
     SwitchLiveTwoChannels = 21
     AqaraSwitch = 51
     AqaraMotion = 52
-    AqaraMagnet = 53
+    AqaraMagnet = 53  # lumi.sensor_magnet.aq2
     AqaraRelayTwoChannels = 54
-    AqaraSquareButton = 62
+    AqaraSquareButton = 62  # lumi.sensor_switch.aq3
     AqaraSwitchOneChannel = 63
     AqaraSwitchTwoChannels = 64
-    RemoteSwitchSingle = 134
-    RemoteSwitchDouble = 135
+    AqaraWallOutlet = 65  # lumi.ctrl_86plug.aq1
+    RemoteSwitchSingle = 134  # lumi.remote.b186acn01
+    RemoteSwitchDouble = 135  # lumi.remote.b286acn01
 
 
 @attr.s(auto_attribs=True)
@@ -99,6 +101,9 @@ class Gateway(Device):
     * toggle_plug
     * remove_all_bind
     * list_bind [0]
+
+    * self.get_prop("used_for_public") # Return the 'used_for_public' status, return value: [0] or [1], probably this has to do with developer mode.
+    * self.set_prop("used_for_public", state) # Set the 'used_for_public' state, value: 0 or 1, probably this has to do with developer mode.
 
     * welcome
     * set_curtain_level
@@ -181,6 +186,7 @@ class Gateway(Device):
             DeviceType.AqaraMagnet: AqaraMagnet,
             DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
+            DeviceType.AqaraWallOutlet: AqaraWallOutlet,
         }
         devices_raw = self.get_prop("device_list")
         self._devices = []
@@ -995,7 +1001,6 @@ class AqaraSwitchTwoChannels(SubDevice):
         self._props.status_ch1 = values[1]
         self._props.load_power = values[2]
 
-
 class Cube(SubDevice):
     """Subdevice Cube specific properties and methods"""
 
@@ -1056,3 +1061,38 @@ class AqaraSquareButton(SubDevice):
     def install_shake_script(self, encoded_token):
         """Generate and install script which captures shake in air event and sends miio package to device"""
         return self._gw.install_script(self.sid, build_shake, encoded_token)
+
+
+class AqaraWallOutlet(SubDevice):
+    """Subdevice AqaraWallOutlet specific properties and methods"""
+
+    properties = ["channel_0", "load_power"]
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties"""
+
+        status: str = None  # 'on' / 'off'
+        load_power: int = None  # power consumption in Watt
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        self._props.status = values[0]
+        self._props.load_power = values[1]
+
+    @command()
+    def toggle(self):
+        """Toggle Aqara Wall Outlet"""
+        return self.send_arg("toggle_plug", ["channel_0", "toggle"]).pop()
+
+    @command()
+    def on(self):
+        """Turn on Aqara Wall Outlet"""
+        return self.send_arg("toggle_plug", ["channel_0", "on"]).pop()
+
+    @command()
+    def off(self):
+        """Turn off Aqara Wall Outlet"""
+        return self.send_arg("toggle_plug", ["channel_0", "off"]).pop()
