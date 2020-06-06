@@ -8,14 +8,6 @@ def dumps(data):
     return dumps_orig(data, separators=separators)
 
 
-# token in script doesn't match token of device which is used for (enc/dec)ryption
-# but they are linked somehow
-tokens = {
-    "real": "9bc7c7ce6291d3e443fd7708608b9892",
-    "encoded": "79cf21b08fb051499389f23c113477a4",
-    "data_tkn": 29576,
-}
-
 fake_device_id = "120009025"
 fake_device_model = "chuangmi.plug.v3"
 
@@ -51,7 +43,7 @@ def _inflate(
     target_id,
     target_ip,
     target_model,
-    message_id,
+    target_encoded_token,
     event=None,
     command_extra="",
 ):
@@ -83,10 +75,10 @@ def _inflate(
                         "command": target_model + "." + action + "_" + source_id,
                         "did": target_id,
                         "extra": command_extra,
-                        "id": message_id,
+                        "id": randint(0, 999),
                         "ip": target_ip,
                         "model": target_model,
-                        "token": tokens["encoded"],
+                        "token": target_encoded_token,
                         "value": "",
                     }
                 ],
@@ -98,10 +90,10 @@ def _inflate(
 def build_move(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    message_id=0,
 ):
 
     return dumps(
@@ -113,7 +105,7 @@ def build_move(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
         )
     )
 
@@ -121,10 +113,10 @@ def build_move(
 def build_flip90(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    message_id=0,
 ):
 
     return dumps(
@@ -136,7 +128,7 @@ def build_flip90(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
         )
     )
 
@@ -144,10 +136,10 @@ def build_flip90(
 def build_flip180(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    message_id=0,
 ):
 
     return dumps(
@@ -159,7 +151,7 @@ def build_flip180(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
         )
     )
 
@@ -167,10 +159,10 @@ def build_flip180(
 def build_taptap(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    message_id=0,
 ):
 
     return dumps(
@@ -182,7 +174,7 @@ def build_taptap(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
             "tap_twice",
         )
     )
@@ -191,10 +183,10 @@ def build_taptap(
 def build_shakeair(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    message_id=0,
 ):
 
     return dumps(
@@ -206,7 +198,7 @@ def build_shakeair(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
             "shake_air",
         )
     )
@@ -215,10 +207,10 @@ def build_shakeair(
 def build_rotate(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_cube.v1",
-    message_id=0,
 ):
 
     return dumps(
@@ -230,7 +222,7 @@ def build_rotate(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
             "rotate",
             "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]",
         )
@@ -240,10 +232,10 @@ def build_rotate(
 def build_singlepress(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_switch.aq3",
-    message_id=0,
 ):
 
     return dumps(
@@ -255,7 +247,7 @@ def build_singlepress(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
             "click",
         )
     )
@@ -264,10 +256,10 @@ def build_singlepress(
 def build_doublepress(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_switch.aq3",
-    message_id=0,
 ):
 
     return dumps(
@@ -279,7 +271,7 @@ def build_doublepress(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
             "double_click",
         )
     )
@@ -288,10 +280,10 @@ def build_doublepress(
 def build_longpress(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_switch.aq3",
-    message_id=0,
 ):
 
     return dumps(
@@ -303,7 +295,7 @@ def build_longpress(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
             "long_click_press",
         )
     )
@@ -312,10 +304,10 @@ def build_longpress(
 def build_shake(
     source_sid,
     target_ip,
+    target_encoded_token,
     target_model=fake_device_model,
     target_id=fake_device_id,
     source_model="lumi.sensor_switch.aq3",
-    message_id=0,
 ):
 
     return dumps(
@@ -327,6 +319,6 @@ def build_shake(
             target_id,
             target_ip,
             target_model,
-            message_id,
+            target_encoded_token,
         )
     )

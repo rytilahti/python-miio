@@ -5,6 +5,7 @@ import socket
 import struct
 from functools import reduce
 
+import sys
 import ifaddr
 from miio.protocol import Message
 
@@ -100,11 +101,21 @@ if __name__ == "__main__":
     def callback(source_device, action, params):
         _LOGGER.debug(f"CALLBACK {source_device}=>{action}({params})")
 
-    from gateway_scripts import tokens, fake_device_id
+    from gateway_scripts import fake_device_id
 
     logging.basicConfig(level="DEBUG")
 
     device_id = int(fake_device_id)
-    device_token = bytes.fromhex(tokens["real"])
+    # Use real token on fake device for encryption
+    # encoded is used in scripts = key pair should match 
+    # tokens = {
+    #    "real": "9bc7c7ce6291d3e443fd7708608b9892",
+    #    "encoded": "79cf21b08fb051499389f23c113477a4",
+    # }
+    if len(sys.argv) > 1:
+        device_token = bytes.fromhex(sys.argv[1])
+    else:
+        print("WARNING kae device starting with publically known token! Pass other token next time pls...")
+        device_token = bytes.fromhex('9bc7c7ce6291d3e443fd7708608b9892')
     fake_device = FakeDevice(device_id, device_token)
     fake_device.run(callback)
