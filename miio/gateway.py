@@ -126,7 +126,7 @@ class Gateway(Device):
         self._radio = GatewayRadio(parent=self)
         self._zigbee = GatewayZigbee(parent=self)
         self._light = GatewayLight(parent=self)
-        self._devices = []
+        self._devices = {}
 
     @property
     def alarm(self) -> "GatewayAlarm":
@@ -151,7 +151,7 @@ class Gateway(Device):
 
     @property
     def devices(self):
-        """Return a list of the already discovered devices."""
+        """Return a dict of the already discovered devices."""
         return self._devices
 
     @command()
@@ -172,7 +172,7 @@ class Gateway(Device):
             DeviceType.AqaraWallOutlet: AqaraWallOutlet,
         }
         devices_raw = self.get_prop("device_list")
-        self._devices = []
+        self._devices = {}
 
         for x in range(0, len(devices_raw), 5):
             # Extract discovered information
@@ -203,7 +203,7 @@ class Gateway(Device):
 
             # Initialize and save the subdevice, ignoring the gateway itself
             if device_type != DeviceType.Gateway:
-                self._devices.append(subdevice_cls(self, dev_info))
+                self._devices[dev_info.sid] = subdevice_cls(self, dev_info)
 
         return self._devices
 
@@ -638,6 +638,11 @@ class SubDevice:
     def device_type(self):
         """Return the device type name."""
         return self.type.name
+
+    @property
+    def firmware_version(self):
+        """Return the firmware version."""
+        return self._fw_ver
 
     @property
     def battery(self):
