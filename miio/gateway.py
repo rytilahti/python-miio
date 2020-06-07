@@ -640,6 +640,11 @@ class SubDevice:
         return self.type.name
 
     @property
+    def firmware_version(self):
+        """Return the firmware version."""
+        return self._fw_ver
+
+    @property
     def battery(self):
         """Return the battery level."""
         return self._battery
