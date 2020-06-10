@@ -62,7 +62,8 @@ class FanspeedV2(enum.Enum):
 
 
 class FanspeedE2(enum.Enum):
-    # Original names from the app: Silent, Standard, Strong, Max
+    # Original names from the app: Gentle, Silent, Standard, Strong, Max
+    Gentle = 41
     Silent = 50
     Standard = 68
     Medium = 79
