@@ -1021,12 +1021,12 @@ class SwitchOneChannel(SubDevice):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
         self._props.status = values[0]
-        
+
     @command()
     def toggle(self):
         """Toggle Switch One Channel"""
         return self.send_arg("toggle_ctrl_neutral", ["channel_0", "toggle"]).pop()
-        
+
     @command()
     def on(self):
         """Turn on Switch One Channel"""
