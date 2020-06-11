@@ -170,6 +170,12 @@ class Gateway(Device):
             DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
             DeviceType.AqaraWallOutlet: AqaraWallOutlet,
+            DeviceType.Cube: Cube,
+            DeviceType.AqaraSquareButton: AqaraSquareButton,
+            DeviceType.SwitchOneChannel: SwitchOneChannel,
+            DeviceType.RemoteSwitchSingleV1: RemoteSwitchSingleV1,
+            DeviceType.RemoteSwitchSingle: RemoteSwitchSingle,
+            DeviceType.RemoteSwitchDouble: RemoteSwitchDouble,
         }
         devices_raw = self.get_prop("device_list")
         self._devices = {}
@@ -605,6 +611,8 @@ class SubDevice:
     these devices are connected through zigbee.
     """
 
+    _model = "unknown"
+
     @attr.s(auto_attribs=True)
     class props:
         """Defines properties of the specific device"""
@@ -638,6 +646,11 @@ class SubDevice:
     def device_type(self):
         """Return the device type name."""
         return self.type.name
+
+    @property
+    def model(self):
+        """Return the device model."""
+        return self._model
 
     @property
     def firmware_version(self):
@@ -755,6 +768,7 @@ class AqaraHT(SubDevice):
 
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
+    _model = "lumi.weather.v1"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -784,6 +798,7 @@ class SensorHT(SubDevice):
 
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
+    _model = "unknown"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -812,6 +827,7 @@ class AqaraMagnet(SubDevice):
     """Subdevice AqaraMagnet specific properties and methods"""
 
     properties = ["unkown"]
+    _model = "lumi.sensor_magnet.aq2"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -831,6 +847,7 @@ class AqaraPlug(SubDevice):
 
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0", "load_power"]
+    _model = "unknown"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -853,6 +870,7 @@ class AqaraRelayTwoChannels(SubDevice):
     """Subdevice AqaraRelayTwoChannels specific properties and methods"""
 
     properties = ["load_power", "channel_0", "channel_1"]
+    _model = "unknown"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -896,6 +914,7 @@ class AqaraSwitchOneChannel(SubDevice):
     """Subdevice AqaraSwitchOneChannel specific properties and methods"""
 
     properties = ["neutral_0", "load_power"]
+    _model = "unknown"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -916,6 +935,7 @@ class AqaraSwitchTwoChannels(SubDevice):
     """Subdevice AqaraSwitchTwoChannels specific properties and methods"""
 
     properties = ["neutral_0", "neutral_1", "load_power"]
+    _model = "unknown"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -938,6 +958,7 @@ class AqaraWallOutlet(SubDevice):
     """Subdevice AqaraWallOutlet specific properties and methods"""
 
     properties = ["channel_0", "load_power"]
+    _model = "lumi.ctrl_86plug.aq1"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -967,3 +988,72 @@ class AqaraWallOutlet(SubDevice):
     def off(self):
         """Turn off Aqara Wall Outlet"""
         return self.send_arg("toggle_plug", ["channel_0", "off"]).pop()
+
+
+class Cube(SubDevice):
+    """Subdevice Cube specific properties and methods"""
+
+    properties = []
+    _model = "lumi.sensor_cube.v1"
+
+
+class AqaraSquareButton(SubDevice):
+    """Subdevice AqaraSquareButton specific properties and methods"""
+
+    properties = []
+    _model = "lumi.sensor_switch.aq3"
+
+
+class SwitchOneChannel(SubDevice):
+    """Subdevice SwitchOneChannel specific properties and methods"""
+
+    properties = ["neutral_0"]
+    _model = "lumi.ctrl_neutral1.v1"
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties"""
+
+        status: str = None  # 'on' / 'off'
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        self._props.status = values[0]
+
+    @command()
+    def toggle(self):
+        """Toggle Switch One Channel"""
+        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "toggle"]).pop()
+
+    @command()
+    def on(self):
+        """Turn on Switch One Channel"""
+        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "on"]).pop()
+
+    @command()
+    def off(self):
+        """Turn off Switch One Channel"""
+        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "off"]).pop()
+
+
+class RemoteSwitchSingleV1(SubDevice):
+    """Subdevice RemoteSwitchSingleV1 specific properties and methods"""
+
+    properties = []
+    _model = "lumi.sensor_86sw1.v1"
+
+
+class RemoteSwitchSingle(SubDevice):
+    """Subdevice RemoteSwitchSingle specific properties and methods"""
+
+    properties = []
+    _model = "lumi.remote.b186acn01"
+
+
+class RemoteSwitchDouble(SubDevice):
+    """Subdevice RemoteSwitchDouble specific properties and methods"""
+
+    properties = []
+    _model = "lumi.remote.b286acn01"
