@@ -648,6 +648,11 @@ class SubDevice:
         return self.type.name
 
     @property
+    def name(self):
+        """Return the name of the device."""
+        return f"{self.device_type}-{self.sid}"
+
+    @property
     def model(self):
         """Return the device model."""
         return self._model
