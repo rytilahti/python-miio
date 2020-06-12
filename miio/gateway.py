@@ -38,29 +38,69 @@ class DeviceType(IntEnum):
 
     Unknown = -1
     Gateway = 0  # lumi.0
-    Switch = 1
-    Motion = 2
-    Magnet = 3
-    SwitchTwoChannels = 7
+    Switch = 1  # lumi.sensor_switch
+    Motion = 2  # lumi.sensor_motion
+    Magnet = 3  # lumi.sensor_magnet
+    SwitchTwoChannels = 7  # lumi.ctrl_neutral2
     Cube = 8  # lumi.sensor_cube.v1
     SwitchOneChannel = 9  # lumi.ctrl_neutral1.v1
-    SensorHT = 10
-    Plug = 11
+    SensorHT = 10  # lumi.sensor_ht
+    Plug = 11  # lumi.plug
+    RemoteSwitchDoubleV1 = 12  # lumi.sensor_86sw2
     RemoteSwitchSingleV1 = 14  # lumi.sensor_86sw1.v1
-    SensorSmoke = 15
+    SensorSmoke = 15  # lumi.sensor_smoke
     AqaraHT = 19  # lumi.weather.v1
-    SwitchLiveOneChannel = 20
-    SwitchLiveTwoChannels = 21
-    AqaraSwitch = 51
-    AqaraMotion = 52
+    AqaraWallOutletV1 = 17  # lumi.ctrl_86plug.v1
+    SwitchLiveOneChannel = 20  # lumi.ctrl_ln1
+    SwitchLiveTwoChannels = 21  # lumi.ctrl_ln2
+    AqaraSwitch = 51  # lumi.sensor_switch.aq2
+    AqaraMotion = 52  # lumi.sensor_motion.aq2
     AqaraMagnet = 53  # lumi.sensor_magnet.aq2
-    AqaraRelayTwoChannels = 54
-    AqaraSquareButton = 62  # lumi.sensor_switch.aq3
-    AqaraSwitchOneChannel = 63
-    AqaraSwitchTwoChannels = 64
+    AqaraWaterLeak = 55  # lumi.sensor_wleak.aq1
+    AqaraVibration = 56  # lumi.vibration.aq1
+    AqaraRelayTwoChannels = 54  # lumi.relay.c2acn01
+    AqaraSquareButtonV3 = 62  # lumi.sensor_switch.aq3
+    AqaraSwitchOneChannel = 63  # lumi.ctrl_ln1.aq1
+    AqaraSwitchTwoChannels = 64  # lumi.ctrl_ln2.aq1
     AqaraWallOutlet = 65  # lumi.ctrl_86plug.aq1
+    
+    AqaraSquareButton = 133  # lumi.remote.b1acn01
     RemoteSwitchSingle = 134  # lumi.remote.b186acn01
     RemoteSwitchDouble = 135  # lumi.remote.b286acn01
+
+
+# 13 - lumi.curtain
+# 18 - lumi.sensor_natgas
+# 59 - lumi.lock.aq1
+# 66 - lumi.light.aqcn02
+# 68 - lumi.sensor_cube.aqgl01
+# 70 - lumi.lock.acn02
+# 71 - lumi.curtain.aq2
+# 72 - lumi.curtain.hagl04
+# 81 - lumi.lock.v1
+# 82 - ikea.light.led1545g12
+# 83 - ikea.light.led1546g12
+# 84 - ikea.light.led1536g5
+# 85 - ikea.light.led1537r6
+# 86 - ikea.light.led1623g12
+# 87 - ikea.light.led1650r5
+# 88 - ikea.light.led1649c5
+# 163 - lumi.lock.acn03
+# 166 - lumi.lock.acn05
+# 167 - lumi.switch.b1lacn02
+# 168 - lumi.switch.b2lacn02
+# 169 - lumi.switch.b1nacn02
+# 170 - lumi.switch.b2nacn02
+# 171 - lumi.remote.b186acn02
+# 172 - lumi.remote.b286acn02
+# 176 - lumi.switch.n3acn3
+# 177 - lumi.switch.l3acn3
+# 202 - lumi.dimmer.rgbegl01
+# 203 - lumi.dimmer.c3egl01
+# 204 - lumi.dimmer.cwegl01
+# 205 - lumi.airrtc.vrfegl01
+# 206 - lumi.airrtc.tcpecn01
+# 207 - lumi.airrtc.tcpecn02
 
 
 @attr.s(auto_attribs=True)
@@ -171,7 +211,7 @@ class Gateway(Device):
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
             DeviceType.AqaraWallOutlet: AqaraWallOutlet,
             DeviceType.Cube: Cube,
-            DeviceType.AqaraSquareButton: AqaraSquareButton,
+            DeviceType.AqaraSquareButtonV3: AqaraSquareButtonV3,
             DeviceType.SwitchOneChannel: SwitchOneChannel,
             DeviceType.RemoteSwitchSingleV1: RemoteSwitchSingleV1,
             DeviceType.RemoteSwitchSingle: RemoteSwitchSingle,
@@ -812,8 +852,8 @@ class SensorHT(SubDevice):
 
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
-    _zigbee_model = "unknown"
-    _model = "unknown"
+    _zigbee_model = "lumi.sensor_ht"
+    _model = "RTCGQ01LM"
     _name = "Weather sensor"
 
     @attr.s(auto_attribs=True)
@@ -865,8 +905,8 @@ class AqaraPlug(SubDevice):
 
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0", "load_power"]
-    _zigbee_model = "unknown"
-    _model = "unknown"
+    _zigbee_model = "lumi.plug"
+    _model = "ZNCZ02LM"
     _name = "Plug"
 
     @attr.s(auto_attribs=True)
@@ -890,8 +930,8 @@ class AqaraRelayTwoChannels(SubDevice):
     """Subdevice AqaraRelayTwoChannels specific properties and methods"""
 
     properties = ["load_power", "channel_0", "channel_1"]
-    _zigbee_model = "unknown"
-    _model = "unknown"
+    _zigbee_model = "lumi.relay.c2acn01"
+    _model = "LLKZMK11LM"
     _name = "Relay"
 
     @attr.s(auto_attribs=True)
@@ -936,8 +976,8 @@ class AqaraSwitchOneChannel(SubDevice):
     """Subdevice AqaraSwitchOneChannel specific properties and methods"""
 
     properties = ["neutral_0", "load_power"]
-    _zigbee_model = "unknown"
-    _model = "unknown"
+    _zigbee_model = "lumi.ctrl_ln1.aq1"
+    _model = "QBKG11LM"
     _name = "Wall switch single"
 
     @attr.s(auto_attribs=True)
@@ -959,8 +999,8 @@ class AqaraSwitchTwoChannels(SubDevice):
     """Subdevice AqaraSwitchTwoChannels specific properties and methods"""
 
     properties = ["neutral_0", "neutral_1", "load_power"]
-    _zigbee_model = "unknown"
-    _model = "unknown"
+    _zigbee_model = "lumi.ctrl_ln2.aq1"
+    _model = "QBKG12LM"
     _name = "Wall switch double"
 
     @attr.s(auto_attribs=True)
@@ -1027,8 +1067,8 @@ class Cube(SubDevice):
     _name = "Cube"
 
 
-class AqaraSquareButton(SubDevice):
-    """Subdevice AqaraSquareButton specific properties and methods"""
+class AqaraSquareButtonV3(SubDevice):
+    """Subdevice AqaraSquareButtonV3 specific properties and methods"""
 
     properties = []
     _zigbee_model = "lumi.sensor_switch.aq3"
