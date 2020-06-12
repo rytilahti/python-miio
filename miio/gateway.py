@@ -369,18 +369,18 @@ class GatewayAlarm(GatewayDevice):
 
     @command(click.argument("seconds"))
     def set_arming_time(self, seconds):
-        """Set time the alarm stays at 'oning' before transitioning to 'on'"""
+        """Set time the alarm stays at 'oning' before transitioning to 'on'."""
         return self._gateway.send("set_arm_wait_time", [seconds])
 
     @command()
     def triggering_time(self) -> int:
-        """Return the time in seconds the alarm is going off when triggered"""
+        """Return the time in seconds the alarm is going off when triggered."""
         # Response: 30, 60, etc.
         return self._gateway.get_prop("alarm_time_len").pop()
 
     @command(click.argument("seconds"))
     def set_triggering_time(self, seconds):
-        """Set the time in seconds the alarm is going off when triggered"""
+        """Set the time in seconds the alarm is going off when triggered."""
         return self._gateway.set_prop("alarm_time_len", seconds)
 
     @command()
@@ -394,24 +394,24 @@ class GatewayAlarm(GatewayDevice):
 
     @command(click.argument("seconds"))
     def set_triggering_light(self, seconds):
-        """Set the time the gateway light blinks when the alarm is triggerd"""
+        """Set the time the gateway light blinks when the alarm is triggerd."""
         # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._gateway.set_prop("en_alarm_light", seconds)
 
     @command()
     def triggering_volume(self) -> int:
-        """Return the volume level at which alarms go off [0-100]"""
+        """Return the volume level at which alarms go off [0-100]."""
         return self._gateway.send("get_alarming_volume").pop()
 
     @command(click.argument("volume"))
     def set_triggering_volume(self, volume):
-        """Set the volume level at which alarms go off [0-100]"""
+        """Set the volume level at which alarms go off [0-100]."""
         return self._gateway.send("set_alarming_volume", [volume])
 
     @command()
     def last_status_change_time(self) -> datetime:
         """
-        Return the last time the alarm changed status
+        Return the last time the alarm changed status.
         """
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
@@ -421,7 +421,7 @@ class GatewayZigbee(GatewayDevice):
 
     @command()
     def get_zigbee_version(self):
-        """timeouts on device"""
+        """timeouts on device."""
         return self._gateway.send("get_zigbee_device_version")
 
     @command()
@@ -436,7 +436,7 @@ class GatewayZigbee(GatewayDevice):
 
     @command(click.argument("timeout", type=int))
     def zigbee_pair(self, timeout):
-        """Start pairing, use 0 to disable"""
+        """Start pairing, use 0 to disable."""
         return self._gateway.send("start_zigbee_join", [timeout])
 
     def send_to_zigbee(self):
@@ -480,7 +480,7 @@ class GatewayRadio(GatewayDevice):
 
     @command(click.argument("volume"))
     def set_radio_volume(self, volume):
-        """Set radio volume"""
+        """Set radio volume."""
         return self._gateway.send("set_fm_volume", [volume])
 
     def play_music_new(self):
@@ -527,7 +527,7 @@ class GatewayRadio(GatewayDevice):
         return self._gateway.send("remove_channels")
 
     def get_default_music(self):
-        """seems to timeout (w/o internet)"""
+        """seems to timeout (w/o internet)."""
         # params [0,1,2]
         raise NotImplementedError()
         return self._gateway.send("get_default_music")
@@ -546,12 +546,12 @@ class GatewayRadio(GatewayDevice):
         return self._gateway.send("get_mute")
 
     def download_music(self):
-        """Unknown"""
+        """Unknown."""
         raise NotImplementedError()
         return self._gateway.send("download_music")
 
     def delete_music(self):
-        """delete music"""
+        """delete music."""
         raise NotImplementedError()
         return self._gateway.send("delete_music")
 
@@ -672,7 +672,7 @@ class SubDevice:
 
     @attr.s(auto_attribs=True)
     class props:
-        """Defines properties of the specific device"""
+        """Defines properties of the specific device."""
 
     def __init__(self, gw: Gateway = None, dev_info: SubDeviceInfo = None,) -> None:
         self._gw = gw
@@ -739,7 +739,7 @@ class SubDevice:
 
     @command()
     def send(self, command):
-        """Send a command/query to the subdevice"""
+        """Send a command/query to the subdevice."""
         try:
             return self._gw.send(command, [self.sid])
         except Exception as ex:
@@ -749,7 +749,7 @@ class SubDevice:
 
     @command()
     def send_arg(self, command, arguments):
-        """Send a command/query including arguments to the subdevice"""
+        """Send a command/query including arguments to the subdevice."""
         try:
             return self._gw.send(command, arguments, extra_parameters={"sid": self.sid})
         except Exception as ex:
@@ -819,7 +819,7 @@ class SubDevice:
 
     @command()
     def get_firmware_version(self) -> Optional[int]:
-        """Returns firmware version"""
+        """Returns firmware version."""
         try:
             self._fw_ver = self.get_property("fw_ver").pop()
         except Exception as ex:
@@ -831,7 +831,7 @@ class SubDevice:
 
 
 class Switch(SubDevice):
-    """Subdevice Switch specific properties and methods"""
+    """Subdevice Switch specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_switch"
@@ -840,7 +840,7 @@ class Switch(SubDevice):
 
 
 class Motion(SubDevice):
-    """Subdevice Motion specific properties and methods"""
+    """Subdevice Motion specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_motion"
@@ -849,7 +849,7 @@ class Motion(SubDevice):
 
 
 class Magnet(SubDevice):
-    """Subdevice Magnet specific properties and methods"""
+    """Subdevice Magnet specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_magnet"
@@ -858,7 +858,7 @@ class Magnet(SubDevice):
 
 
 class SwitchTwoChannels(SubDevice):
-    """Subdevice SwitchTwoChannels specific properties and methods"""
+    """Subdevice SwitchTwoChannels specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.ctrl_neutral2"
@@ -867,7 +867,7 @@ class SwitchTwoChannels(SubDevice):
 
 
 class Cube(SubDevice):
-    """Subdevice Cube specific properties and methods"""
+    """Subdevice Cube specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_cube.v1"
@@ -876,7 +876,7 @@ class Cube(SubDevice):
 
 
 class SwitchOneChannel(SubDevice):
-    """Subdevice SwitchOneChannel specific properties and methods"""
+    """Subdevice SwitchOneChannel specific properties and methods."""
 
     properties = ["neutral_0"]
     _zigbee_model = "lumi.ctrl_neutral1.v1"
@@ -885,34 +885,34 @@ class SwitchOneChannel(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         status: str = None  # 'on' / 'off'
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         self._props.status = values[0]
 
     @command()
     def toggle(self):
-        """Toggle Switch One Channel"""
+        """Toggle Switch One Channel."""
         return self.send_arg("toggle_ctrl_neutral", ["channel_0", "toggle"]).pop()
 
     @command()
     def on(self):
-        """Turn on Switch One Channel"""
+        """Turn on Switch One Channel."""
         return self.send_arg("toggle_ctrl_neutral", ["channel_0", "on"]).pop()
 
     @command()
     def off(self):
-        """Turn off Switch One Channel"""
+        """Turn off Switch One Channel."""
         return self.send_arg("toggle_ctrl_neutral", ["channel_0", "off"]).pop()
 
 
 class SensorHT(SubDevice):
-    """Subdevice SensorHT specific properties and methods"""
+    """Subdevice SensorHT specific properties and methods."""
 
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
@@ -922,7 +922,7 @@ class SensorHT(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         temperature: int = None  # in degrees celsius
         humidity: int = None  # in %
@@ -930,7 +930,7 @@ class SensorHT(SubDevice):
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         try:
             self._props.temperature = values[0] / 100
@@ -944,7 +944,7 @@ class SensorHT(SubDevice):
 
 
 class Plug(SubDevice):
-    """Subdevice Plug specific properties and methods"""
+    """Subdevice Plug specific properties and methods."""
 
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0", "load_power"]
@@ -954,7 +954,7 @@ class Plug(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         status: str = None  # 'on' / 'off'
         power: int = None  # diffrent power consumption?? in ?unit?
@@ -962,7 +962,7 @@ class Plug(SubDevice):
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         self._props.power = values[0]
         self._props.status = values[1]
@@ -970,7 +970,7 @@ class Plug(SubDevice):
 
 
 class RemoteSwitchDoubleV1(SubDevice):
-    """Subdevice RemoteSwitchDoubleV1 specific properties and methods"""
+    """Subdevice RemoteSwitchDoubleV1 specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_86sw2.v1"
@@ -979,7 +979,7 @@ class RemoteSwitchDoubleV1(SubDevice):
 
 
 class Curtain(SubDevice):
-    """Subdevice Curtain specific properties and methods"""
+    """Subdevice Curtain specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.curtain"
@@ -988,7 +988,7 @@ class Curtain(SubDevice):
 
 
 class RemoteSwitchSingleV1(SubDevice):
-    """Subdevice RemoteSwitchSingleV1 specific properties and methods"""
+    """Subdevice RemoteSwitchSingleV1 specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_86sw1.v1"
@@ -997,7 +997,7 @@ class RemoteSwitchSingleV1(SubDevice):
 
 
 class SensorSmoke(SubDevice):
-    """Subdevice SensorSmoke specific properties and methods"""
+    """Subdevice SensorSmoke specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_smoke"
@@ -1006,7 +1006,7 @@ class SensorSmoke(SubDevice):
 
 
 class AqaraWallOutletV1(SubDevice):
-    """Subdevice AqaraWallOutletV1 specific properties and methods"""
+    """Subdevice AqaraWallOutletV1 specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.ctrl_86plug.v1"
@@ -1015,7 +1015,7 @@ class AqaraWallOutletV1(SubDevice):
 
 
 class SensorNatgas(SubDevice):
-    """Subdevice SensorNatgas specific properties and methods"""
+    """Subdevice SensorNatgas specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_natgas"
@@ -1024,7 +1024,7 @@ class SensorNatgas(SubDevice):
 
 
 class AqaraHT(SubDevice):
-    """Subdevice AqaraHT specific properties and methods"""
+    """Subdevice AqaraHT specific properties and methods."""
 
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
@@ -1034,7 +1034,7 @@ class AqaraHT(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         temperature: int = None  # in degrees celsius
         humidity: int = None  # in %
@@ -1042,7 +1042,7 @@ class AqaraHT(SubDevice):
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         try:
             self._props.temperature = values[0] / 100
@@ -1056,7 +1056,7 @@ class AqaraHT(SubDevice):
 
 
 class SwitchLiveOneChannel(SubDevice):
-    """Subdevice SwitchLiveOneChannel specific properties and methods"""
+    """Subdevice SwitchLiveOneChannel specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.ctrl_ln1"
@@ -1065,7 +1065,7 @@ class SwitchLiveOneChannel(SubDevice):
 
 
 class SwitchLiveTwoChannels(SubDevice):
-    """Subdevice SwitchLiveTwoChannels specific properties and methods"""
+    """Subdevice SwitchLiveTwoChannels specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.ctrl_ln2"
@@ -1074,7 +1074,7 @@ class SwitchLiveTwoChannels(SubDevice):
 
 
 class AqaraSwitch(SubDevice):
-    """Subdevice AqaraSwitch specific properties and methods"""
+    """Subdevice AqaraSwitch specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_switch.aq2"
@@ -1083,7 +1083,7 @@ class AqaraSwitch(SubDevice):
 
 
 class AqaraMotion(SubDevice):
-    """Subdevice AqaraMotion specific properties and methods"""
+    """Subdevice AqaraMotion specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_motion.aq2"
@@ -1092,7 +1092,7 @@ class AqaraMotion(SubDevice):
 
 
 class AqaraMagnet(SubDevice):
-    """Subdevice AqaraMagnet specific properties and methods"""
+    """Subdevice AqaraMagnet specific properties and methods."""
 
     properties = ["unkown"]
     _zigbee_model = "lumi.sensor_magnet.aq2"
@@ -1101,19 +1101,19 @@ class AqaraMagnet(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         status: str = None  # 'open' or 'closed'
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         self._props.status = values[0]
 
 
 class AqaraRelayTwoChannels(SubDevice):
-    """Subdevice AqaraRelayTwoChannels specific properties and methods"""
+    """Subdevice AqaraRelayTwoChannels specific properties and methods."""
 
     properties = ["load_power", "channel_0", "channel_1"]
     _zigbee_model = "lumi.relay.c2acn01"
@@ -1122,28 +1122,28 @@ class AqaraRelayTwoChannels(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         status_ch0: str = None  # 'on' / 'off'
         status_ch1: str = None  # 'on' / 'off'
         load_power: int = None  # power consumption in ?unit?
 
     class AqaraRelayToggleValue(Enum):
-        """Options to control the relay"""
+        """Options to control the relay."""
 
         toggle = "toggle"
         on = "on"
         off = "off"
 
     class AqaraRelayChannel(Enum):
-        """Options to select wich relay to control"""
+        """Options to select wich relay to control."""
 
         first = "channel_0"
         second = "channel_1"
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         self._props.load_power = values[0]
         self._props.status_ch0 = values[1]
@@ -1154,12 +1154,12 @@ class AqaraRelayTwoChannels(SubDevice):
         click.argument("value", type=EnumType(AqaraRelayToggleValue)),
     )
     def toggle(self, channel, value):
-        """Toggle Aqara Wireless Relay 2ch"""
+        """Toggle Aqara Wireless Relay 2ch."""
         return self.send_arg("toggle_ctrl_neutral", [channel.value, value.value]).pop()
 
 
 class AqaraWaterLeak(SubDevice):
-    """Subdevice AqaraWaterLeak specific properties and methods"""
+    """Subdevice AqaraWaterLeak specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_wleak.aq1"
@@ -1168,7 +1168,7 @@ class AqaraWaterLeak(SubDevice):
 
 
 class AqaraVibration(SubDevice):
-    """Subdevice AqaraVibration specific properties and methods"""
+    """Subdevice AqaraVibration specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.vibration.aq1"
@@ -1177,7 +1177,7 @@ class AqaraVibration(SubDevice):
 
 
 class AqaraSquareButtonV3(SubDevice):
-    """Subdevice AqaraSquareButtonV3 specific properties and methods"""
+    """Subdevice AqaraSquareButtonV3 specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.sensor_switch.aq3"
@@ -1186,7 +1186,7 @@ class AqaraSquareButtonV3(SubDevice):
 
 
 class AqaraSwitchOneChannel(SubDevice):
-    """Subdevice AqaraSwitchOneChannel specific properties and methods"""
+    """Subdevice AqaraSwitchOneChannel specific properties and methods."""
 
     properties = ["neutral_0", "load_power"]
     _zigbee_model = "lumi.ctrl_ln1.aq1"
@@ -1195,21 +1195,21 @@ class AqaraSwitchOneChannel(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         status: str = None  # 'on' / 'off'
         load_power: int = None  # power consumption in ?unit?
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         self._props.status = values[0]
         self._props.load_power = values[1]
 
 
 class AqaraSwitchTwoChannels(SubDevice):
-    """Subdevice AqaraSwitchTwoChannels specific properties and methods"""
+    """Subdevice AqaraSwitchTwoChannels specific properties and methods."""
 
     properties = ["neutral_0", "neutral_1", "load_power"]
     _zigbee_model = "lumi.ctrl_ln2.aq1"
@@ -1218,7 +1218,7 @@ class AqaraSwitchTwoChannels(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         status_ch0: str = None  # 'on' / 'off'
         status_ch1: str = None  # 'on' / 'off'
@@ -1226,7 +1226,7 @@ class AqaraSwitchTwoChannels(SubDevice):
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         self._props.status_ch0 = values[0]
         self._props.status_ch1 = values[1]
@@ -1234,7 +1234,7 @@ class AqaraSwitchTwoChannels(SubDevice):
 
 
 class AqaraWallOutlet(SubDevice):
-    """Subdevice AqaraWallOutlet specific properties and methods"""
+    """Subdevice AqaraWallOutlet specific properties and methods."""
 
     properties = ["channel_0", "load_power"]
     _zigbee_model = "lumi.ctrl_86plug.aq1"
@@ -1243,36 +1243,36 @@ class AqaraWallOutlet(SubDevice):
 
     @attr.s(auto_attribs=True)
     class props:
-        """Device specific properties"""
+        """Device specific properties."""
 
         status: str = None  # 'on' / 'off'
         load_power: int = None  # power consumption in Watt
 
     @command()
     def update(self):
-        """Update all device properties"""
+        """Update all device properties."""
         values = self.get_property_exp(self.properties)
         self._props.status = values[0]
         self._props.load_power = values[1]
 
     @command()
     def toggle(self):
-        """Toggle Aqara Wall Outlet"""
+        """Toggle Aqara Wall Outlet."""
         return self.send_arg("toggle_plug", ["channel_0", "toggle"]).pop()
 
     @command()
     def on(self):
-        """Turn on Aqara Wall Outlet"""
+        """Turn on Aqara Wall Outlet."""
         return self.send_arg("toggle_plug", ["channel_0", "on"]).pop()
 
     @command()
     def off(self):
-        """Turn off Aqara Wall Outlet"""
+        """Turn off Aqara Wall Outlet."""
         return self.send_arg("toggle_plug", ["channel_0", "off"]).pop()
 
 
 class AqaraSquareButton(SubDevice):
-    """Subdevice AqaraSquareButton specific properties and methods"""
+    """Subdevice AqaraSquareButton specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.remote.b1acn01"
@@ -1281,7 +1281,7 @@ class AqaraSquareButton(SubDevice):
 
 
 class RemoteSwitchSingle(SubDevice):
-    """Subdevice RemoteSwitchSingle specific properties and methods"""
+    """Subdevice RemoteSwitchSingle specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.remote.b186acn01"
@@ -1290,7 +1290,7 @@ class RemoteSwitchSingle(SubDevice):
 
 
 class RemoteSwitchDouble(SubDevice):
-    """Subdevice RemoteSwitchDouble specific properties and methods"""
+    """Subdevice RemoteSwitchDouble specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.remote.b286acn01"
