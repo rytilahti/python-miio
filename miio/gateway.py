@@ -46,19 +46,21 @@ class DeviceType(IntEnum):
     SwitchOneChannel = 9  # lumi.ctrl_neutral1.v1
     SensorHT = 10  # lumi.sensor_ht
     Plug = 11  # lumi.plug
-    RemoteSwitchDoubleV1 = 12  # lumi.sensor_86sw2
+    RemoteSwitchDoubleV1 = 12  # lumi.sensor_86sw2.v1
+    Curtain = 13  # lumi.curtain
     RemoteSwitchSingleV1 = 14  # lumi.sensor_86sw1.v1
     SensorSmoke = 15  # lumi.sensor_smoke
-    AqaraHT = 19  # lumi.weather.v1
     AqaraWallOutletV1 = 17  # lumi.ctrl_86plug.v1
+    SensorNatgas = 18  # lumi.sensor_natgas
+    AqaraHT = 19  # lumi.weather.v1
     SwitchLiveOneChannel = 20  # lumi.ctrl_ln1
     SwitchLiveTwoChannels = 21  # lumi.ctrl_ln2
     AqaraSwitch = 51  # lumi.sensor_switch.aq2
     AqaraMotion = 52  # lumi.sensor_motion.aq2
     AqaraMagnet = 53  # lumi.sensor_magnet.aq2
+    AqaraRelayTwoChannels = 54  # lumi.relay.c2acn01
     AqaraWaterLeak = 55  # lumi.sensor_wleak.aq1
     AqaraVibration = 56  # lumi.vibration.aq1
-    AqaraRelayTwoChannels = 54  # lumi.relay.c2acn01
     AqaraSquareButtonV3 = 62  # lumi.sensor_switch.aq3
     AqaraSwitchOneChannel = 63  # lumi.ctrl_ln1.aq1
     AqaraSwitchTwoChannels = 64  # lumi.ctrl_ln2.aq1
@@ -68,8 +70,6 @@ class DeviceType(IntEnum):
     RemoteSwitchDouble = 135  # lumi.remote.b286acn01
 
 
-# 13 - lumi.curtain
-# 18 - lumi.sensor_natgas
 # 59 - lumi.lock.aq1
 # 66 - lumi.light.aqcn02
 # 68 - lumi.sensor_cube.aqgl01
@@ -210,18 +210,20 @@ class Gateway(Device):
             DeviceType.SensorHT: SensorHT,
             DeviceType.Plug: Plug,
             DeviceType.RemoteSwitchDoubleV1: RemoteSwitchDoubleV1,
+            DeviceType.Curtain: Curtain,
             DeviceType.RemoteSwitchSingleV1: RemoteSwitchSingleV1,
             DeviceType.SensorSmoke: SensorSmoke,
-            DeviceType.AqaraHT: AqaraHT,
             DeviceType.AqaraWallOutletV1: AqaraWallOutletV1,
+            DeviceType.SensorNatgas: SensorNatgas,
+            DeviceType.AqaraHT: AqaraHT,
             DeviceType.SwitchLiveOneChannel: SwitchLiveOneChannel,
             DeviceType.SwitchLiveTwoChannels: SwitchLiveTwoChannels,
             DeviceType.AqaraSwitch: AqaraSwitch,
             DeviceType.AqaraMotion: AqaraMotion,
             DeviceType.AqaraMagnet: AqaraMagnet,
+            DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
             DeviceType.AqaraWaterLeak: AqaraWaterLeak,
             DeviceType.AqaraVibration: AqaraVibration,
-            DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
             DeviceType.AqaraSquareButtonV3: AqaraSquareButtonV3,
             DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
@@ -705,8 +707,6 @@ class SubDevice:
     @property
     def name(self):
         """Return the name of the device."""
-        if self._name == "unknown":
-            self._name = self.device_type
         return f"{self._name} ({self.sid})"
 
     @property
@@ -977,6 +977,15 @@ class RemoteSwitchDoubleV1(SubDevice):
     _name = "Remote switch double"
 
 
+class Curtain(SubDevice):
+    """Subdevice Curtain specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.curtain"
+    _model = "ZNCLDJ11LM"
+    _name = "Curtain"
+
+
 class RemoteSwitchSingleV1(SubDevice):
     """Subdevice RemoteSwitchSingleV1 specific properties and methods"""
 
@@ -992,7 +1001,25 @@ class SensorSmoke(SubDevice):
     properties = []
     _zigbee_model = "lumi.sensor_smoke"
     _model = "JTYJ-GD-01LM/BW"
-    _name = "Honeywell Smoke Detector"
+    _name = "Honeywell smoke detector"
+
+
+class AqaraWallOutletV1(SubDevice):
+    """Subdevice AqaraWallOutletV1 specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.ctrl_86plug.v1"
+    _model = "QBCZ11LM"
+    _name = "Wall outlet"
+
+
+class SensorNatgas(SubDevice):
+    """Subdevice SensorNatgas specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_natgas"
+    _model = "JTQJ-BF-01LM/BW"
+    _name = "Honeywell natural gas detector"
 
 
 class AqaraHT(SubDevice):
@@ -1025,15 +1052,6 @@ class AqaraHT(SubDevice):
                 "One or more unexpected results while "
                 "fetching properties %s: %s" % (self.properties, values)
             ) from ex
-
-
-class AqaraWallOutletV1(SubDevice):
-    """Subdevice AqaraWallOutletV1 specific properties and methods"""
-
-    properties = []
-    _zigbee_model = "lumi.ctrl_86plug.v1"
-    _model = "QBCZ11LM"
-    _name = "Wall outlet"
 
 
 class SwitchLiveOneChannel(SubDevice):
@@ -1093,24 +1111,6 @@ class AqaraMagnet(SubDevice):
         self._props.status = values[0]
 
 
-class AqaraWaterLeak(SubDevice):
-    """Subdevice AqaraWaterLeak specific properties and methods"""
-
-    properties = []
-    _zigbee_model = "lumi.sensor_wleak.aq1"
-    _model = "SJCGQ11LM"
-    _name = "Water leak sensor"
-
-
-class AqaraVibration(SubDevice):
-    """Subdevice AqaraVibration specific properties and methods"""
-
-    properties = []
-    _zigbee_model = "lumi.vibration.aq1"
-    _model = "DJT11LM"
-    _name = "Vibration sensor"
-
-
 class AqaraRelayTwoChannels(SubDevice):
     """Subdevice AqaraRelayTwoChannels specific properties and methods"""
 
@@ -1155,6 +1155,24 @@ class AqaraRelayTwoChannels(SubDevice):
     def toggle(self, channel, value):
         """Toggle Aqara Wireless Relay 2ch"""
         return self.send_arg("toggle_ctrl_neutral", [channel.value, value.value]).pop()
+
+
+class AqaraWaterLeak(SubDevice):
+    """Subdevice AqaraWaterLeak specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_wleak.aq1"
+    _model = "SJCGQ11LM"
+    _name = "Water leak sensor"
+
+
+class AqaraVibration(SubDevice):
+    """Subdevice AqaraVibration specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.vibration.aq1"
+    _model = "DJT11LM"
+    _name = "Vibration sensor"
 
 
 class AqaraSquareButtonV3(SubDevice):
