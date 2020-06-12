@@ -653,7 +653,7 @@ class SubDevice:
 
     _zigbee_model = "unknown"
     _model = "unknown"
-    _name = "Unknown"
+    _name = "unknown"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -692,6 +692,8 @@ class SubDevice:
     @property
     def name(self):
         """Return the name of the device."""
+        if self._name == "unknown":
+            self._name = self.device_type
         return f"{self._name} ({self.sid})"
 
     @property
