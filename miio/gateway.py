@@ -829,6 +829,7 @@ class SubDevice:
             )
         return self._fw_ver
 
+
 class Switch(SubDevice):
     """Subdevice Switch specific properties and methods"""
 
