@@ -611,7 +611,9 @@ class SubDevice:
     these devices are connected through zigbee.
     """
 
+    _zigbee_model = "unknown"
     _model = "unknown"
+    _name = "Unknown"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -650,12 +652,17 @@ class SubDevice:
     @property
     def name(self):
         """Return the name of the device."""
-        return f"{self.device_type}-{self.sid}"
+        return f"{self._name} ({self.sid})"
 
     @property
     def model(self):
         """Return the device model."""
         return self._model
+
+    @property
+    def zigbee_model(self):
+        """Return the zigbee device model."""
+        return self._zigbee_model
 
     @property
     def firmware_version(self):
@@ -773,7 +780,9 @@ class AqaraHT(SubDevice):
 
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
-    _model = "lumi.weather.v1"
+    _zigbee_model = "lumi.weather.v1"
+    _model = "WSDCGQ11LM"
+    _name = "Weather sensor"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -803,7 +812,9 @@ class SensorHT(SubDevice):
 
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity", "pressure"]
+    _zigbee_model = "unknown"
     _model = "unknown"
+    _name = "Weather sensor"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -832,7 +843,9 @@ class AqaraMagnet(SubDevice):
     """Subdevice AqaraMagnet specific properties and methods"""
 
     properties = ["unkown"]
-    _model = "lumi.sensor_magnet.aq2"
+    _zigbee_model = "lumi.sensor_magnet.aq2"
+    _model = "MCCGQ11LM"
+    _name = "Door sensor"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -852,7 +865,9 @@ class AqaraPlug(SubDevice):
 
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0", "load_power"]
+    _zigbee_model = "unknown"
     _model = "unknown"
+    _name = "Plug"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -875,7 +890,9 @@ class AqaraRelayTwoChannels(SubDevice):
     """Subdevice AqaraRelayTwoChannels specific properties and methods"""
 
     properties = ["load_power", "channel_0", "channel_1"]
+    _zigbee_model = "unknown"
     _model = "unknown"
+    _name = "Relay"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -919,7 +936,9 @@ class AqaraSwitchOneChannel(SubDevice):
     """Subdevice AqaraSwitchOneChannel specific properties and methods"""
 
     properties = ["neutral_0", "load_power"]
+    _zigbee_model = "unknown"
     _model = "unknown"
+    _name = "Wall switch single"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -940,7 +959,9 @@ class AqaraSwitchTwoChannels(SubDevice):
     """Subdevice AqaraSwitchTwoChannels specific properties and methods"""
 
     properties = ["neutral_0", "neutral_1", "load_power"]
+    _zigbee_model = "unknown"
     _model = "unknown"
+    _name = "Wall switch double"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -963,7 +984,9 @@ class AqaraWallOutlet(SubDevice):
     """Subdevice AqaraWallOutlet specific properties and methods"""
 
     properties = ["channel_0", "load_power"]
-    _model = "lumi.ctrl_86plug.aq1"
+    _zigbee_model = "lumi.ctrl_86plug.aq1"
+    _model = "QBCZ11LM"
+    _name = "Wall outlet"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -999,21 +1022,27 @@ class Cube(SubDevice):
     """Subdevice Cube specific properties and methods"""
 
     properties = []
-    _model = "lumi.sensor_cube.v1"
+    _zigbee_model = "lumi.sensor_cube.v1"
+    _model = "MFKZQ01LM"
+    _name = "Cube"
 
 
 class AqaraSquareButton(SubDevice):
     """Subdevice AqaraSquareButton specific properties and methods"""
 
     properties = []
-    _model = "lumi.sensor_switch.aq3"
+    _zigbee_model = "lumi.sensor_switch.aq3"
+    _model = "WXKG12LM"
+    _name = "Button"
 
 
 class SwitchOneChannel(SubDevice):
     """Subdevice SwitchOneChannel specific properties and methods"""
 
     properties = ["neutral_0"]
-    _model = "lumi.ctrl_neutral1.v1"
+    _zigbee_model = "lumi.ctrl_neutral1.v1"
+    _model = "QBKG04LM"
+    _name = "Wall switch no neutral"
 
     @attr.s(auto_attribs=True)
     class props:
@@ -1047,18 +1076,24 @@ class RemoteSwitchSingleV1(SubDevice):
     """Subdevice RemoteSwitchSingleV1 specific properties and methods"""
 
     properties = []
-    _model = "lumi.sensor_86sw1.v1"
+    _zigbee_model = "lumi.sensor_86sw1.v1"
+    _model = "WXKG03LM 2016"
+    _name = "Remote switch single"
 
 
 class RemoteSwitchSingle(SubDevice):
     """Subdevice RemoteSwitchSingle specific properties and methods"""
 
     properties = []
-    _model = "lumi.remote.b186acn01"
+    _zigbee_model = "lumi.remote.b186acn01"
+    _model = "WXKG03LM 2018"
+    _name = "Remote switch single"
 
 
 class RemoteSwitchDouble(SubDevice):
     """Subdevice RemoteSwitchDouble specific properties and methods"""
 
     properties = []
-    _model = "lumi.remote.b286acn01"
+    _zigbee_model = "lumi.remote.b286acn01"
+    _model = "WXKG02LM 2018"
+    _name = "Remote switch double"
