@@ -63,7 +63,6 @@ class DeviceType(IntEnum):
     AqaraSwitchOneChannel = 63  # lumi.ctrl_ln1.aq1
     AqaraSwitchTwoChannels = 64  # lumi.ctrl_ln2.aq1
     AqaraWallOutlet = 65  # lumi.ctrl_86plug.aq1
-    
     AqaraSquareButton = 133  # lumi.remote.b1acn01
     RemoteSwitchSingle = 134  # lumi.remote.b186acn01
     RemoteSwitchDouble = 135  # lumi.remote.b286acn01
@@ -202,18 +201,32 @@ class Gateway(Device):
         """
         # from https://github.com/aholstenson/miio/issues/26
         device_type_mapping = {
-            DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
-            DeviceType.Plug: AqaraPlug,
+            DeviceType.Switch: Switch,
+            DeviceType.Motion: Motion,
+            DeviceType.Magnet: Magnet,
+            DeviceType.SwitchTwoChannels: SwitchTwoChannels,
+            DeviceType.Cube: Cube,
+            DeviceType.SwitchOneChannel: SwitchOneChannel,
             DeviceType.SensorHT: SensorHT,
+            DeviceType.Plug: Plug,
+            DeviceType.RemoteSwitchDoubleV1: RemoteSwitchDoubleV1,
+            DeviceType.RemoteSwitchSingleV1: RemoteSwitchSingleV1,
+            DeviceType.SensorSmoke: SensorSmoke,
             DeviceType.AqaraHT: AqaraHT,
+            DeviceType.AqaraWallOutletV1: AqaraWallOutletV1,
+            DeviceType.SwitchLiveOneChannel: SwitchLiveOneChannel,
+            DeviceType.SwitchLiveTwoChannels: SwitchLiveTwoChannels,
+            DeviceType.AqaraSwitch: AqaraSwitch,
+            DeviceType.AqaraMotion: AqaraMotion,
             DeviceType.AqaraMagnet: AqaraMagnet,
+            DeviceType.AqaraWaterLeak: AqaraWaterLeak,
+            DeviceType.AqaraVibration: AqaraVibration,
+            DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
+            DeviceType.AqaraSquareButtonV3: AqaraSquareButtonV3,
             DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
             DeviceType.AqaraWallOutlet: AqaraWallOutlet,
-            DeviceType.Cube: Cube,
-            DeviceType.AqaraSquareButtonV3: AqaraSquareButtonV3,
-            DeviceType.SwitchOneChannel: SwitchOneChannel,
-            DeviceType.RemoteSwitchSingleV1: RemoteSwitchSingleV1,
+            DeviceType.AqaraSquareButton: AqaraSquareButton,
             DeviceType.RemoteSwitchSingle: RemoteSwitchSingle,
             DeviceType.RemoteSwitchDouble: RemoteSwitchDouble,
         }
@@ -816,37 +829,85 @@ class SubDevice:
             )
         return self._fw_ver
 
+class Switch(SubDevice):
+    """Subdevice Switch specific properties and methods"""
 
-class AqaraHT(SubDevice):
-    """Subdevice AqaraHT specific properties and methods"""
+    properties = []
+    _zigbee_model = "lumi.sensor_switch"
+    _model = "WXKG01LM"
+    _name = "Button"
 
-    accessor = "get_prop_sensor_ht"
-    properties = ["temperature", "humidity", "pressure"]
-    _zigbee_model = "lumi.weather.v1"
-    _model = "WSDCGQ11LM"
-    _name = "Weather sensor"
+
+class Motion(SubDevice):
+    """Subdevice Motion specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_motion"
+    _model = "RTCGQ01LM"
+    _name = "Motion sensor"
+
+
+class Magnet(SubDevice):
+    """Subdevice Magnet specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_magnet"
+    _model = "MCCGQ01LM"
+    _name = "Door sensor"
+
+
+class SwitchTwoChannels(SubDevice):
+    """Subdevice SwitchTwoChannels specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.ctrl_neutral2"
+    _model = "QBKG03LM"
+    _name = "Wall switch double no neutral"
+
+
+class Cube(SubDevice):
+    """Subdevice Cube specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_cube.v1"
+    _model = "MFKZQ01LM"
+    _name = "Cube"
+
+
+class SwitchOneChannel(SubDevice):
+    """Subdevice SwitchOneChannel specific properties and methods"""
+
+    properties = ["neutral_0"]
+    _zigbee_model = "lumi.ctrl_neutral1.v1"
+    _model = "QBKG04LM"
+    _name = "Wall switch no neutral"
 
     @attr.s(auto_attribs=True)
     class props:
         """Device specific properties"""
 
-        temperature: int = None  # in degrees celsius
-        humidity: int = None  # in %
-        pressure: int = None  # in hPa
+        status: str = None  # 'on' / 'off'
 
     @command()
     def update(self):
         """Update all device properties"""
         values = self.get_property_exp(self.properties)
-        try:
-            self._props.temperature = values[0] / 100
-            self._props.humidity = values[1] / 100
-            self._props.pressure = values[2] / 100
-        except Exception as ex:
-            raise GatewayException(
-                "One or more unexpected results while "
-                "fetching properties %s: %s" % (self.properties, values)
-            ) from ex
+        self._props.status = values[0]
+
+    @command()
+    def toggle(self):
+        """Toggle Switch One Channel"""
+        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "toggle"]).pop()
+
+    @command()
+    def on(self):
+        """Turn on Switch One Channel"""
+        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "on"]).pop()
+
+    @command()
+    def off(self):
+        """Turn off Switch One Channel"""
+        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "off"]).pop()
 
 
 class SensorHT(SubDevice):
@@ -881,29 +942,8 @@ class SensorHT(SubDevice):
             ) from ex
 
 
-class AqaraMagnet(SubDevice):
-    """Subdevice AqaraMagnet specific properties and methods"""
-
-    properties = ["unkown"]
-    _zigbee_model = "lumi.sensor_magnet.aq2"
-    _model = "MCCGQ11LM"
-    _name = "Door sensor"
-
-    @attr.s(auto_attribs=True)
-    class props:
-        """Device specific properties"""
-
-        status: str = None  # 'open' or 'closed'
-
-    @command()
-    def update(self):
-        """Update all device properties"""
-        values = self.get_property_exp(self.properties)
-        self._props.status = values[0]
-
-
-class AqaraPlug(SubDevice):
-    """Subdevice AqaraPlug specific properties and methods"""
+class Plug(SubDevice):
+    """Subdevice Plug specific properties and methods"""
 
     accessor = "get_prop_plug"
     properties = ["power", "neutral_0", "load_power"]
@@ -926,6 +966,149 @@ class AqaraPlug(SubDevice):
         self._props.power = values[0]
         self._props.status = values[1]
         self._props.load_power = values[2]
+
+
+class RemoteSwitchDoubleV1(SubDevice):
+    """Subdevice RemoteSwitchDoubleV1 specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_86sw2.v1"
+    _model = "WXKG02LM 2016"
+    _name = "Remote switch double"
+
+
+class RemoteSwitchSingleV1(SubDevice):
+    """Subdevice RemoteSwitchSingleV1 specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_86sw1.v1"
+    _model = "WXKG03LM 2016"
+    _name = "Remote switch single"
+
+
+class SensorSmoke(SubDevice):
+    """Subdevice SensorSmoke specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_smoke"
+    _model = "JTYJ-GD-01LM/BW"
+    _name = "Honeywell Smoke Detector"
+
+
+class AqaraHT(SubDevice):
+    """Subdevice AqaraHT specific properties and methods"""
+
+    accessor = "get_prop_sensor_ht"
+    properties = ["temperature", "humidity", "pressure"]
+    _zigbee_model = "lumi.weather.v1"
+    _model = "WSDCGQ11LM"
+    _name = "Weather sensor"
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties"""
+
+        temperature: int = None  # in degrees celsius
+        humidity: int = None  # in %
+        pressure: int = None  # in hPa
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        try:
+            self._props.temperature = values[0] / 100
+            self._props.humidity = values[1] / 100
+            self._props.pressure = values[2] / 100
+        except Exception as ex:
+            raise GatewayException(
+                "One or more unexpected results while "
+                "fetching properties %s: %s" % (self.properties, values)
+            ) from ex
+
+
+class AqaraWallOutletV1(SubDevice):
+    """Subdevice AqaraWallOutletV1 specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.ctrl_86plug.v1"
+    _model = "QBCZ11LM"
+    _name = "Wall outlet"
+
+
+class SwitchLiveOneChannel(SubDevice):
+    """Subdevice SwitchLiveOneChannel specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.ctrl_ln1"
+    _model = "QBKG11LM"
+    _name = "Wall switch single"
+
+
+class SwitchLiveTwoChannels(SubDevice):
+    """Subdevice SwitchLiveTwoChannels specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.ctrl_ln2"
+    _model = "QBKG12LM"
+    _name = "Wall switch double"
+
+
+class AqaraSwitch(SubDevice):
+    """Subdevice AqaraSwitch specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_switch.aq2"
+    _model = "WXKG11LM 2015"
+    _name = "Button"
+
+
+class AqaraMotion(SubDevice):
+    """Subdevice AqaraMotion specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_motion.aq2"
+    _model = "RTCGQ11LM"
+    _name = "Motion sensor"
+
+
+class AqaraMagnet(SubDevice):
+    """Subdevice AqaraMagnet specific properties and methods"""
+
+    properties = ["unkown"]
+    _zigbee_model = "lumi.sensor_magnet.aq2"
+    _model = "MCCGQ11LM"
+    _name = "Door sensor"
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties"""
+
+        status: str = None  # 'open' or 'closed'
+
+    @command()
+    def update(self):
+        """Update all device properties"""
+        values = self.get_property_exp(self.properties)
+        self._props.status = values[0]
+
+
+class AqaraWaterLeak(SubDevice):
+    """Subdevice AqaraWaterLeak specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_wleak.aq1"
+    _model = "SJCGQ11LM"
+    _name = "Water leak sensor"
+
+
+class AqaraVibration(SubDevice):
+    """Subdevice AqaraVibration specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.vibration.aq1"
+    _model = "DJT11LM"
+    _name = "Vibration sensor"
 
 
 class AqaraRelayTwoChannels(SubDevice):
@@ -972,6 +1155,15 @@ class AqaraRelayTwoChannels(SubDevice):
     def toggle(self, channel, value):
         """Toggle Aqara Wireless Relay 2ch"""
         return self.send_arg("toggle_ctrl_neutral", [channel.value, value.value]).pop()
+
+
+class AqaraSquareButtonV3(SubDevice):
+    """Subdevice AqaraSquareButtonV3 specific properties and methods"""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_switch.aq3"
+    _model = "WXKG12LM"
+    _name = "Button"
 
 
 class AqaraSwitchOneChannel(SubDevice):
@@ -1060,67 +1252,13 @@ class AqaraWallOutlet(SubDevice):
         return self.send_arg("toggle_plug", ["channel_0", "off"]).pop()
 
 
-class Cube(SubDevice):
-    """Subdevice Cube specific properties and methods"""
+class AqaraSquareButton(SubDevice):
+    """Subdevice AqaraSquareButton specific properties and methods"""
 
     properties = []
-    _zigbee_model = "lumi.sensor_cube.v1"
-    _model = "MFKZQ01LM"
-    _name = "Cube"
-
-
-class AqaraSquareButtonV3(SubDevice):
-    """Subdevice AqaraSquareButtonV3 specific properties and methods"""
-
-    properties = []
-    _zigbee_model = "lumi.sensor_switch.aq3"
-    _model = "WXKG12LM"
+    _zigbee_model = "lumi.remote.b1acn01"
+    _model = "WXKG11LM 2018"
     _name = "Button"
-
-
-class SwitchOneChannel(SubDevice):
-    """Subdevice SwitchOneChannel specific properties and methods"""
-
-    properties = ["neutral_0"]
-    _zigbee_model = "lumi.ctrl_neutral1.v1"
-    _model = "QBKG04LM"
-    _name = "Wall switch no neutral"
-
-    @attr.s(auto_attribs=True)
-    class props:
-        """Device specific properties"""
-
-        status: str = None  # 'on' / 'off'
-
-    @command()
-    def update(self):
-        """Update all device properties"""
-        values = self.get_property_exp(self.properties)
-        self._props.status = values[0]
-
-    @command()
-    def toggle(self):
-        """Toggle Switch One Channel"""
-        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "toggle"]).pop()
-
-    @command()
-    def on(self):
-        """Turn on Switch One Channel"""
-        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "on"]).pop()
-
-    @command()
-    def off(self):
-        """Turn off Switch One Channel"""
-        return self.send_arg("toggle_ctrl_neutral", ["channel_0", "off"]).pop()
-
-
-class RemoteSwitchSingleV1(SubDevice):
-    """Subdevice RemoteSwitchSingleV1 specific properties and methods"""
-
-    properties = []
-    _zigbee_model = "lumi.sensor_86sw1.v1"
-    _model = "WXKG03LM 2016"
-    _name = "Remote switch single"
 
 
 class RemoteSwitchSingle(SubDevice):
