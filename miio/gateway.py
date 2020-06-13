@@ -47,7 +47,7 @@ class DeviceType(IntEnum):
     SensorHT = 10  # lumi.sensor_ht
     Plug = 11  # lumi.plug
     RemoteSwitchDoubleV1 = 12  # lumi.sensor_86sw2.v1
-    Curtain = 13  # lumi.curtain
+    CurtainV1 = 13  # lumi.curtain
     RemoteSwitchSingleV1 = 14  # lumi.sensor_86sw1.v1
     SensorSmoke = 15  # lumi.sensor_smoke
     AqaraWallOutletV1 = 17  # lumi.ctrl_86plug.v1
@@ -61,45 +61,45 @@ class DeviceType(IntEnum):
     AqaraRelayTwoChannels = 54  # lumi.relay.c2acn01
     AqaraWaterLeak = 55  # lumi.sensor_wleak.aq1
     AqaraVibration = 56  # lumi.vibration.aq1
+    DoorLockS1 = 59  # lumi.lock.aq1
     AqaraSquareButtonV3 = 62  # lumi.sensor_switch.aq3
     AqaraSwitchOneChannel = 63  # lumi.ctrl_ln1.aq1
     AqaraSwitchTwoChannels = 64  # lumi.ctrl_ln2.aq1
     AqaraWallOutlet = 65  # lumi.ctrl_86plug.aq1
+    AqaraSmartBulbE27 = 66  # lumi.light.aqcn02
+    CubeV2 = 68  # lumi.sensor_cube.aqgl01
+    LockS2 = 70  # lumi.lock.acn02
+    Curtain = 71  # lumi.curtain.aq2
+    CurtainB1 = 72  # lumi.curtain.hagl04
+    LockV1 = 81  # lumi.lock.v1
+    IkeaBulb82 = 82  # ikea.light.led1545g12
+    IkeaBulb83 = 83  # ikea.light.led1546g12 
+    IkeaBulb84 = 84  # ikea.light.led1536g5
+    IkeaBulb85 = 85  # ikea.light.led1537r6
+    IkeaBulb86 = 86  # ikea.light.led1623g12
+    IkeaBulb87 = 87  # ikea.light.led1650r5
+    IkeaBulb88 = 88  # ikea.light.led1649c5
     AqaraSquareButton = 133  # lumi.remote.b1acn01
     RemoteSwitchSingle = 134  # lumi.remote.b186acn01
     RemoteSwitchDouble = 135  # lumi.remote.b286acn01
+    LockS2Pro = 163  # lumi.lock.acn03
+    D1RemoteSwitchSingle = 171  # lumi.remote.b186acn02
+    D1RemoteSwitchDouble = 172  # lumi.remote.b286acn02
+    D1WallSwitchTriple = 176  # lumi.switch.n3acn3
+    D1WallSwitchTripleNN = 177  # lumi.switch.l3acn3
+    ThermostatS2 = 207  # lumi.airrtc.tcpecn02
 
 
-# 59 - lumi.lock.aq1
-# 66 - lumi.light.aqcn02
-# 68 - lumi.sensor_cube.aqgl01
-# 70 - lumi.lock.acn02
-# 71 - lumi.curtain.aq2
-# 72 - lumi.curtain.hagl04
-# 81 - lumi.lock.v1
-# 82 - ikea.light.led1545g12
-# 83 - ikea.light.led1546g12
-# 84 - ikea.light.led1536g5
-# 85 - ikea.light.led1537r6
-# 86 - ikea.light.led1623g12
-# 87 - ikea.light.led1650r5
-# 88 - ikea.light.led1649c5
-# 163 - lumi.lock.acn03
 # 166 - lumi.lock.acn05
 # 167 - lumi.switch.b1lacn02
 # 168 - lumi.switch.b2lacn02
 # 169 - lumi.switch.b1nacn02
 # 170 - lumi.switch.b2nacn02
-# 171 - lumi.remote.b186acn02
-# 172 - lumi.remote.b286acn02
-# 176 - lumi.switch.n3acn3
-# 177 - lumi.switch.l3acn3
 # 202 - lumi.dimmer.rgbegl01
 # 203 - lumi.dimmer.c3egl01
 # 204 - lumi.dimmer.cwegl01
 # 205 - lumi.airrtc.vrfegl01
 # 206 - lumi.airrtc.tcpecn01
-# 207 - lumi.airrtc.tcpecn02
 
 
 @attr.s(auto_attribs=True)
@@ -210,7 +210,7 @@ class Gateway(Device):
             DeviceType.SensorHT: SensorHT,
             DeviceType.Plug: Plug,
             DeviceType.RemoteSwitchDoubleV1: RemoteSwitchDoubleV1,
-            DeviceType.Curtain: Curtain,
+            DeviceType.CurtainV1: CurtainV1,
             DeviceType.RemoteSwitchSingleV1: RemoteSwitchSingleV1,
             DeviceType.SensorSmoke: SensorSmoke,
             DeviceType.AqaraWallOutletV1: AqaraWallOutletV1,
@@ -224,13 +224,33 @@ class Gateway(Device):
             DeviceType.AqaraRelayTwoChannels: AqaraRelayTwoChannels,
             DeviceType.AqaraWaterLeak: AqaraWaterLeak,
             DeviceType.AqaraVibration: AqaraVibration,
+            DeviceType.DoorLockS1: DoorLockS1,
             DeviceType.AqaraSquareButtonV3: AqaraSquareButtonV3,
             DeviceType.AqaraSwitchOneChannel: AqaraSwitchOneChannel,
             DeviceType.AqaraSwitchTwoChannels: AqaraSwitchTwoChannels,
             DeviceType.AqaraWallOutlet: AqaraWallOutlet,
+            DeviceType.AqaraSmartBulbE27: AqaraSmartBulbE27,
+            DeviceType.CubeV2: CubeV2,
+            DeviceType.LockS2: LockS2,
+            DeviceType.Curtain: Curtain,
+            DeviceType.CurtainB1: CurtainB1,
+            DeviceType.LockV1: LockV1,
+            DeviceType.IkeaBulb82: IkeaBulb82,
+            DeviceType.IkeaBulb83: IkeaBulb83,
+            DeviceType.IkeaBulb84: IkeaBulb84,
+            DeviceType.IkeaBulb85: IkeaBulb85,
+            DeviceType.IkeaBulb86: IkeaBulb86,
+            DeviceType.IkeaBulb87: IkeaBulb87,
+            DeviceType.IkeaBulb88: IkeaBulb88,
             DeviceType.AqaraSquareButton: AqaraSquareButton,
             DeviceType.RemoteSwitchSingle: RemoteSwitchSingle,
             DeviceType.RemoteSwitchDouble: RemoteSwitchDouble,
+            DeviceType.LockS2Pro: LockS2Pro,
+            DeviceType.D1RemoteSwitchSingle: D1RemoteSwitchSingle,
+            DeviceType.D1RemoteSwitchDouble: D1RemoteSwitchDouble,
+            DeviceType.D1WallSwitchTriple: D1WallSwitchTriple,
+            DeviceType.D1WallSwitchTripleNN: D1WallSwitchTripleNN,
+            DeviceType.ThermostatS2: ThermostatS2,
         }
         devices_raw = self.get_prop("device_list")
         self._devices = {}
@@ -978,8 +998,8 @@ class RemoteSwitchDoubleV1(SubDevice):
     _name = "Remote switch double"
 
 
-class Curtain(SubDevice):
-    """Subdevice Curtain specific properties and methods."""
+class CurtainV1(SubDevice):
+    """Subdevice CurtainV1 specific properties and methods."""
 
     properties = []
     _zigbee_model = "lumi.curtain"
@@ -1176,6 +1196,15 @@ class AqaraVibration(SubDevice):
     _name = "Vibration sensor"
 
 
+class DoorLockS1(SubDevice):
+    """Subdevice DoorLockS1 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.lock.aq1"
+    _model = "ZNMS11LM"
+    _name = "Door lock S1" 
+
+
 class AqaraSquareButtonV3(SubDevice):
     """Subdevice AqaraSquareButtonV3 specific properties and methods."""
 
@@ -1271,6 +1300,123 @@ class AqaraWallOutlet(SubDevice):
         return self.send_arg("toggle_plug", ["channel_0", "off"]).pop()
 
 
+class AqaraSmartBulbE27(SubDevice):
+    """Subdevice AqaraSmartBulbE27 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.light.aqcn02"
+    _model = "ZNLDP12LM"
+    _name = "Smart bulb E27"
+
+
+class CubeV2(SubDevice):
+    """Subdevice CubeV2 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.sensor_cube.aqgl01"
+    _model = "MFKZQ01LM"
+    _name = "Cube"
+
+
+class LockS2(SubDevice):
+    """Subdevice LockS2 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.lock.acn02"
+    _model = "ZNMS12LM"
+    _name = "Door lock S2"
+
+
+class Curtain(SubDevice):
+    """Subdevice Curtain specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.curtain.aq2"
+    _model = "ZNGZDJ11LM"
+    _name = "Curtain"
+
+
+class CurtainB1(SubDevice):
+    """Subdevice CurtainB1 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.curtain.hagl04"
+    _model = "ZNCLDJ12LM"
+    _name = "Curtain B1"
+
+
+class LockV1(SubDevice):
+    """Subdevice LockV1 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.lock.v1"
+    _model = "A6121"
+    _name = "Vima cylinder lock"
+
+
+class IkeaBulb82(SubDevice):
+    """Subdevice IkeaBulb82 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "ikea.light.led1545g12"
+    _model = "LED1545G12"
+    _name = "Ikea smart bulb E27 white"
+
+
+class IkeaBulb83(SubDevice):
+    """Subdevice IkeaBulb83 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "ikea.light.led1546g12"
+    _model = "LED1546G12"
+    _name = "Ikea smart bulb E27 white"
+
+
+class IkeaBulb84(SubDevice):
+    """Subdevice IkeaBulb84 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "ikea.light.led1536g5"
+    _model = "LED1536G5"
+    _name = "Ikea smart bulb E12 white"
+
+
+class IkeaBulb85(SubDevice):
+    """Subdevice IkeaBulb85 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "ikea.light.led1537r6"
+    _model = "LED1537R6"
+    _name = "Ikea smart bulb GU10 white"
+
+
+class IkeaBulb86(SubDevice):
+    """Subdevice IkeaBulb86 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "ikea.light.led1623g12"
+    _model = "LED1623G12"
+    _name = "Ikea smart bulb E27 white"
+
+
+class IkeaBulb87(SubDevice):
+    """Subdevice IkeaBulb87 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "ikea.light.led1650r5"
+    _model = "LED1650R5"
+    _name = "Ikea smart bulb GU10 white"
+
+
+class IkeaBulb88(SubDevice):
+    """Subdevice IkeaBulb88 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "ikea.light.led1649c5"
+    _model = "LED1649C5"
+    _name = "Ikea smart bulb E12 white"
+
+
 class AqaraSquareButton(SubDevice):
     """Subdevice AqaraSquareButton specific properties and methods."""
 
@@ -1296,3 +1442,58 @@ class RemoteSwitchDouble(SubDevice):
     _zigbee_model = "lumi.remote.b286acn01"
     _model = "WXKG02LM 2018"
     _name = "Remote switch double"
+
+
+class LockS2Pro(SubDevice):
+    """Subdevice LockS2Pro specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.lock.acn03"
+    _model = "ZNMS13LM"
+    _name = "Door lock S2 pro"
+
+
+class D1RemoteSwitchSingle(SubDevice):
+    """Subdevice D1RemoteSwitchSingle specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.remote.b186acn02"
+    _model = "WXKG06LM"
+    _name = "D1 remote switch single"
+
+
+class D1RemoteSwitchDouble(SubDevice):
+    """Subdevice D1RemoteSwitchDouble specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.remote.b286acn02"
+    _model = "WXKG07LM"
+    _name = "D1 remote switch double"
+
+
+class D1WallSwitchTriple(SubDevice):
+    """Subdevice D1WallSwitchTriple specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.switch.n3acn3"
+    _model = "QBKG26LM"
+    _name = "D1 wall switch triple"
+
+
+class D1WallSwitchTripleNN(SubDevice):
+    """Subdevice D1WallSwitchTripleNN specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.switch.l3acn3"
+    _model = "QBKG25LM"
+    _name = "D1 wall switch triple no neutral"
+
+
+class ThermostatS2(SubDevice):
+    """Subdevice ThermostatS2 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.airrtc.tcpecn02"
+    _model = "KTWKQ03ES"
+    _name = "Thermostat S2"
+
