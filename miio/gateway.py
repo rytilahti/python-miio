@@ -1114,22 +1114,10 @@ class AqaraMotion(SubDevice):
 class AqaraMagnet(SubDevice):
     """Subdevice AqaraMagnet specific properties and methods."""
 
-    properties = ["unkown"]
+    properties = []
     _zigbee_model = "lumi.sensor_magnet.aq2"
     _model = "MCCGQ11LM"
     _name = "Door sensor"
-
-    @attr.s(auto_attribs=True)
-    class props:
-        """Device specific properties."""
-
-        status: str = None  # 'open' or 'closed'
-
-    @command()
-    def update(self):
-        """Update all device properties."""
-        values = self.get_property_exp(self.properties)
-        self._props.status = values[0]
 
 
 class AqaraRelayTwoChannels(SubDevice):
