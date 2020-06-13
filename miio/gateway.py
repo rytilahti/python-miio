@@ -73,7 +73,7 @@ class DeviceType(IntEnum):
     CurtainB1 = 72  # lumi.curtain.hagl04
     LockV1 = 81  # lumi.lock.v1
     IkeaBulb82 = 82  # ikea.light.led1545g12
-    IkeaBulb83 = 83  # ikea.light.led1546g12 
+    IkeaBulb83 = 83  # ikea.light.led1546g12
     IkeaBulb84 = 84  # ikea.light.led1536g5
     IkeaBulb85 = 85  # ikea.light.led1537r6
     IkeaBulb86 = 86  # ikea.light.led1623g12
@@ -285,6 +285,14 @@ class Gateway(Device):
             # Initialize and save the subdevice, ignoring the gateway itself
             if device_type != DeviceType.Gateway:
                 self._devices[dev_info.sid] = subdevice_cls(self, dev_info)
+                if self._devices[dev_info.sid].status == {}:
+                    _LOGGER.warning(
+                        "Discovered subdevice type '%s', has no device specific properties defined, "
+                        "this device has not been fully implemented yet (model: %s, name: %s).",
+                        device_type.name,
+                        self._devices[dev_info.sid].model,
+                        self._devices[dev_info.sid].name,
+                    )
 
         return self._devices
 
@@ -706,12 +714,17 @@ class SubDevice:
             self.type = DeviceType.Unknown
 
     def __repr__(self):
-        return "<Subdevice %s: %s fw: %s bat: %s props: %s>" % (
-            self.device_type,
-            self.sid,
-            self._fw_ver,
-            self.get_battery(),
-            self.status,
+        return (
+            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, props: %s>"
+            % (
+                self.device_type,
+                self.sid,
+                self.model,
+                self.zigbee_model,
+                self.firmware_version,
+                self.get_battery(),
+                self.status,
+            )
         )
 
     @property
@@ -1190,7 +1203,7 @@ class DoorLockS1(SubDevice):
     properties = []
     _zigbee_model = "lumi.lock.aq1"
     _model = "ZNMS11LM"
-    _name = "Door lock S1" 
+    _name = "Door lock S1"
 
 
 class AqaraSquareButtonV3(SubDevice):
@@ -1484,4 +1497,3 @@ class ThermostatS2(SubDevice):
     _zigbee_model = "lumi.airrtc.tcpecn02"
     _model = "KTWKQ03ES"
     _name = "Thermostat S2"
-
