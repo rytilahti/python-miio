@@ -286,7 +286,7 @@ class Gateway(Device):
             if device_type != DeviceType.Gateway:
                 self._devices[dev_info.sid] = subdevice_cls(self, dev_info)
                 if self._devices[dev_info.sid].status == {}:
-                    _LOGGER.warning(
+                    _LOGGER.info(
                         "Discovered subdevice type '%s', has no device specific properties defined, "
                         "this device has not been fully implemented yet (model: %s, name: %s).",
                         device_type.name,
