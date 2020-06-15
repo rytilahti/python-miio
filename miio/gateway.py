@@ -1311,8 +1311,6 @@ class AqaraSmartBulbE27(SubDevice):
     _zigbee_model = "lumi.light.aqcn02"
     _model = "ZNLDP12LM"
     _name = "Smart bulb E27"
-    _ctt_min = 153
-    _ctt_max = 500
 
     @attr.s(auto_attribs=True)
     class props:
@@ -1321,8 +1319,8 @@ class AqaraSmartBulbE27(SubDevice):
         status: str = None  # 'on' / 'off'
         brightness: int = None  # in %
         color_temp: int = None  # cct value from _ctt_min to _ctt_max
-        cct_min: int = self._ctt_min
-        cct_max: int = self._ctt_max
+        cct_min: int = 153
+        cct_max: int = 500
 
     @command()
     def update(self):
