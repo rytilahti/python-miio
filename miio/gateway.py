@@ -1330,9 +1330,9 @@ class AqaraSmartBulbE27(SubDevice):
         self._props.brightness = self.send("get_bright").pop()
         self._props.color_temp = self.send("get_ct").pop()
         if self._props.brightness > 0 and self._props.brightness <= 100:
-            self._props.status = 'on'
+            self._props.status = "on"
         else:
-            self._props.status = 'off'
+            self._props.status = "off"
 
     @command()
     def on(self):
