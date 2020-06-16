@@ -59,8 +59,8 @@ class MiIOProtocol:
 
         :raises DeviceException: if the device could not be discovered."""
         m = MiIOProtocol.discover(self.ip)
-        header = m.header.value
         if m is not None:
+            header = m.header.value
             self._device_id = header.device_id
             self._device_ts = header.ts
             self._discovered = True
