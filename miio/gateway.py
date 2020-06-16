@@ -252,8 +252,13 @@ class Gateway(Device):
             DeviceType.D1WallSwitchTripleNN: D1WallSwitchTripleNN,
             DeviceType.ThermostatS2: ThermostatS2,
         }
-        devices_raw = self.get_prop("device_list")
         self._devices = {}
+
+        # Check if this gateway does not supports getting the device_list
+        if self.info().model == "lumi.gateway.mieu01":
+            return self._devices
+
+        devices_raw = self.get_prop("device_list")
 
         for x in range(0, len(devices_raw), 5):
             # Extract discovered information
