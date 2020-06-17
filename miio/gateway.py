@@ -166,6 +166,7 @@ class Gateway(Device):
         self._zigbee = GatewayZigbee(parent=self)
         self._light = GatewayLight(parent=self)
         self._devices = {}
+        self._info = None
 
     @property
     def alarm(self) -> "GatewayAlarm":
@@ -192,6 +193,14 @@ class Gateway(Device):
     def devices(self):
         """Return a dict of the already discovered devices."""
         return self._devices
+
+    @property
+    def model(self):
+        """Return the zigbee model of the gateway."""
+        # Check if catch already has the gateway info, otherwise get it from the device
+        if self._info is None:
+            self._info = self.info()
+        return self._info.model
 
     @command()
     def discover_devices(self):
@@ -255,7 +264,7 @@ class Gateway(Device):
         self._devices = {}
 
         # Check if this gateway does not supports getting the device_list
-        if self.info().model == "lumi.gateway.mieu01":
+        if self.model == "lumi.gateway.mieu01":
             return self._devices
 
         devices_raw = self.get_prop("device_list")
@@ -711,6 +720,7 @@ class SubDevice:
         self._gw = gw
         self.sid = dev_info.sid
         self._battery = None
+        self._voltage = None
         self._fw_ver = dev_info.fw_ver
         self._props = self.props()
         try:
@@ -720,7 +730,7 @@ class SubDevice:
 
     def __repr__(self):
         return (
-            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, props: %s>"
+            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>"
             % (
                 self.device_type,
                 self.sid,
@@ -728,6 +738,7 @@ class SubDevice:
                 self.zigbee_model,
                 self.firmware_version,
                 self.get_battery(),
+                self.get_voltage(),
                 self.status,
             )
         )
@@ -764,8 +775,13 @@ class SubDevice:
 
     @property
     def battery(self):
-        """Return the battery level."""
+        """Return the battery level in %."""
         return self._battery
+
+    @property
+    def voltage(self):
+        """Return the battery voltage in V."""
+        return self._voltage
 
     @command()
     def update(self):
@@ -852,8 +868,26 @@ class SubDevice:
     @command()
     def get_battery(self):
         """Update the battery level and return the new value."""
-        self._battery = self.send("get_battery").pop()
+        if self._gw.model != "lumi.gateway.mieu01":
+            self._battery = self.send("get_battery").pop()
+        else:
+            _LOGGER.info(
+                "Gateway model '%s' does not (yet) support get_battery",
+                self._gw.model,
+            )
         return self._battery
+
+    @command()
+    def get_voltage(self):
+        """Update the battery voltage and return the new value."""
+        if self._gw.model == "lumi.gateway.mieu01":
+            self._voltage = self.get_property("voltage").pop()/1000
+        else:
+            _LOGGER.info(
+                "Gateway model '%s' does not (yet) support get_voltage",
+                self._gw.model,
+            )
+        return self._voltage
 
     @command()
     def get_firmware_version(self) -> Optional[int]:
