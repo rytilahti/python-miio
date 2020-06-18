@@ -1,8 +1,8 @@
 """Xiaomi Aqara Gateway implementation using Miio protecol."""
 
-import logging
 from datetime import datetime
 from enum import Enum, IntEnum
+import logging
 from typing import Optional
 
 import attr
@@ -872,8 +872,7 @@ class SubDevice:
             self._battery = self.send("get_battery").pop()
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_battery",
-                self._gw.model,
+                "Gateway model '%s' does not (yet) support get_battery", self._gw.model,
             )
         return self._battery
 
@@ -881,11 +880,10 @@ class SubDevice:
     def get_voltage(self):
         """Update the battery voltage and return the new value."""
         if self._gw.model == "lumi.gateway.mieu01":
-            self._voltage = self.get_property("voltage").pop()/1000
+            self._voltage = self.get_property("voltage").pop() / 1000
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_voltage",
-                self._gw.model,
+                "Gateway model '%s' does not (yet) support get_voltage", self._gw.model,
             )
         return self._voltage
 
