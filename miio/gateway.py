@@ -1,8 +1,8 @@
 """Xiaomi Aqara Gateway implementation using Miio protecol."""
 
+import logging
 from datetime import datetime
 from enum import Enum, IntEnum
-import logging
 from typing import Optional
 
 import attr
