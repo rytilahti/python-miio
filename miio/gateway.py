@@ -125,6 +125,9 @@ class Gateway(Device):
     * toggle_plug
     * remove_all_bind
     * list_bind [0]
+    * bind_page
+    * bind
+    * remove_bind
 
     * self.get_prop("used_for_public") # Return the 'used_for_public' status, return value: [0] or [1], probably this has to do with developer mode.
     * self.set_prop("used_for_public", state) # Set the 'used_for_public' state, value: 0 or 1, probably this has to do with developer mode.
@@ -1308,6 +1311,46 @@ class AqaraSmartBulbE27(SubDevice):
     _zigbee_model = "lumi.light.aqcn02"
     _model = "ZNLDP12LM"
     _name = "Smart bulb E27"
+
+    @attr.s(auto_attribs=True)
+    class props:
+        """Device specific properties."""
+
+        status: str = None  # 'on' / 'off'
+        brightness: int = None  # in %
+        color_temp: int = None  # cct value from _ctt_min to _ctt_max
+        cct_min: int = 153
+        cct_max: int = 500
+
+    @command()
+    def update(self):
+        """Update all device properties."""
+        self._props.brightness = self.send("get_bright").pop()
+        self._props.color_temp = self.send("get_ct").pop()
+        if self._props.brightness > 0 and self._props.brightness <= 100:
+            self._props.status = "on"
+        else:
+            self._props.status = "off"
+
+    @command()
+    def on(self):
+        """Turn bulb on."""
+        return self.send_arg("set_power", ["on"]).pop()
+
+    @command()
+    def off(self):
+        """Turn bulb off."""
+        return self.send_arg("set_power", ["off"]).pop()
+
+    @command(click.argument("ctt", type=int))
+    def set_color_temp(self, ctt):
+        """Set the color temperature of the bulb ctt_min-ctt_max."""
+        return self.send_arg("set_ct", [ctt]).pop()
+
+    @command(click.argument("brightness", type=int))
+    def set_brightness(self, brightness):
+        """Set the brightness of the bulb 1-100."""
+        return self.send_arg("set_bright", [brightness]).pop()
 
 
 class CubeV2(SubDevice):
