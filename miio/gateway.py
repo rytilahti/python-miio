@@ -333,6 +333,11 @@ class Gateway(Device):
         return self.send("set_lumi_dpf_aes_key", [key])
 
     @command()
+    def enable_telnet(self):
+        """Enable root telnet acces to the operating system, use login "admin" or "app", no password."""
+        return self.send("enable_telnet_service")
+
+    @command()
     def timezone(self):
         """Get current timezone."""
         return self.get_prop("tzone_sec")
