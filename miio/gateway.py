@@ -263,7 +263,7 @@ class Gateway(Device):
         }
         self._devices = {}
 
-        # Check if this gateway does not supports getting the device_list
+        # Skip the models which do not support getting the device list
         if self.model == "lumi.gateway.mieu01":
             return self._devices
 
