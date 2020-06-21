@@ -266,7 +266,8 @@ class Gateway(Device):
         # Skip the models which do not support getting the device list
         if self.model == "lumi.gateway.mieu01":
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support getting the device list", self.model,
+                "Gateway model '%s' does not (yet) support getting the device list",
+                self.model,
             )
             return self._devices
 
