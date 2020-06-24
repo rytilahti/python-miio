@@ -951,7 +951,7 @@ class SensorHT(SubDevice):
     """Subdevice SensorHT specific properties and methods."""
 
     accessor = "get_prop_sensor_ht"
-    properties = ["temperature", "humidity", "pressure"]
+    properties = ["temperature", "humidity"]
     _zigbee_model = "lumi.sensor_ht"
     _model = "RTCGQ01LM"
     _name = "Weather sensor"
@@ -962,7 +962,6 @@ class SensorHT(SubDevice):
 
         temperature: int = None  # in degrees celsius
         humidity: int = None  # in %
-        pressure: int = None  # in hPa
 
     @command()
     def update(self):
@@ -971,7 +970,6 @@ class SensorHT(SubDevice):
         try:
             self._props.temperature = values[0] / 100
             self._props.humidity = values[1] / 100
-            self._props.pressure = values[2] / 100
         except Exception as ex:
             raise GatewayException(
                 "One or more unexpected results while "
@@ -983,7 +981,7 @@ class Plug(SubDevice):
     """Subdevice Plug specific properties and methods."""
 
     accessor = "get_prop_plug"
-    properties = ["power", "neutral_0", "load_power"]
+    properties = ["neutral_0", "load_power"]
     _zigbee_model = "lumi.plug"
     _model = "ZNCZ02LM"
     _name = "Plug"
@@ -993,16 +991,14 @@ class Plug(SubDevice):
         """Device specific properties."""
 
         status: str = None  # 'on' / 'off'
-        power: int = None  # diffrent power consumption?? in ?unit?
         load_power: int = None  # power consumption in ?unit?
 
     @command()
     def update(self):
         """Update all device properties."""
         values = self.get_property_exp(self.properties)
-        self._props.power = values[0]
-        self._props.status = values[1]
-        self._props.load_power = values[2]
+        self._props.status = values[0]
+        self._props.load_power = values[1]
 
 
 class RemoteSwitchDoubleV1(SubDevice):
