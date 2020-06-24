@@ -953,7 +953,7 @@ class SensorHT(SubDevice):
     accessor = "get_prop_sensor_ht"
     properties = ["temperature", "humidity"]
     _zigbee_model = "lumi.sensor_ht"
-    _model = "RTCGQ01LM"
+    _model = "WSDCGQ01LM"
     _name = "Weather sensor"
 
     @attr.s(auto_attribs=True)
