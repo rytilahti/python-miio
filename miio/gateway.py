@@ -991,7 +991,7 @@ class Plug(SubDevice):
         """Device specific properties."""
 
         status: str = None  # 'on' / 'off'
-        load_power: int = None  # power consumption in ?unit?
+        load_power: int = None  # power consumption in Watt
 
     @command()
     def update(self):
