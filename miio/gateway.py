@@ -269,7 +269,7 @@ class Gateway(Device):
 
         # Skip the models which do not support getting the device list
         if self.model == GATEWAY_MODEL_EU:
-            _LOGGER.info(
+            _LOGGER.warning(
                 "Gateway model '%s' does not (yet) support getting the device list",
                 self.model,
             )
