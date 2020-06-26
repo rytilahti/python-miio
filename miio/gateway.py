@@ -16,7 +16,7 @@ from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 _LOGGER = logging.getLogger(__name__)
 
 GATEWAY_MODEL_CHINA = "lumi.gateway.v3"
-GATEWAY_MODEL_EU ="lumi.gateway.mieu01"
+GATEWAY_MODEL_EU = "lumi.gateway.mieu01"
 GATEWAY_MODEL_ZIG3 = "lumi.gateway.mgl03"
 GATEWAY_MODEL_AQARA = "lumi.gateway.aqhm01"
 
