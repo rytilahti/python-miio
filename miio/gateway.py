@@ -15,6 +15,10 @@ from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
 
+GATEWAY_MODEL_CHINA = "lumi.gateway.v3"
+GATEWAY_MODEL_EU = "lumi.gateway.mieu01"
+GATEWAY_MODEL_ZIG3 = "lumi.gateway.mgl03"
+GATEWAY_MODEL_AQARA = "lumi.gateway.aqhm01"
 
 color_map = {
     "red": (255, 0, 0),
@@ -169,6 +173,7 @@ class Gateway(Device):
         self._zigbee = GatewayZigbee(parent=self)
         self._light = GatewayLight(parent=self)
         self._devices = {}
+        self._info = None
 
     @property
     def alarm(self) -> "GatewayAlarm":
@@ -195,6 +200,14 @@ class Gateway(Device):
     def devices(self):
         """Return a dict of the already discovered devices."""
         return self._devices
+
+    @property
+    def model(self):
+        """Return the zigbee model of the gateway."""
+        # Check if catch already has the gateway info, otherwise get it from the device
+        if self._info is None:
+            self._info = self.info()
+        return self._info.model
 
     @command()
     def discover_devices(self):
@@ -255,8 +268,17 @@ class Gateway(Device):
             DeviceType.D1WallSwitchTripleNN: D1WallSwitchTripleNN,
             DeviceType.ThermostatS2: ThermostatS2,
         }
-        devices_raw = self.get_prop("device_list")
         self._devices = {}
+
+        # Skip the models which do not support getting the device list
+        if self.model == GATEWAY_MODEL_EU:
+            _LOGGER.warning(
+                "Gateway model '%s' does not (yet) support getting the device list",
+                self.model,
+            )
+            return self._devices
+
+        devices_raw = self.get_prop("device_list")
 
         for x in range(0, len(devices_raw), 5):
             # Extract discovered information
@@ -709,6 +731,7 @@ class SubDevice:
         self._gw = gw
         self.sid = dev_info.sid
         self._battery = None
+        self._voltage = None
         self._fw_ver = dev_info.fw_ver
         self._props = self.props()
         try:
@@ -718,7 +741,7 @@ class SubDevice:
 
     def __repr__(self):
         return (
-            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, props: %s>"
+            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>"
             % (
                 self.device_type,
                 self.sid,
@@ -726,6 +749,7 @@ class SubDevice:
                 self.zigbee_model,
                 self.firmware_version,
                 self.get_battery(),
+                self.get_voltage(),
                 self.status,
             )
         )
@@ -762,8 +786,13 @@ class SubDevice:
 
     @property
     def battery(self):
-        """Return the battery level."""
+        """Return the battery level in %."""
         return self._battery
+
+    @property
+    def voltage(self):
+        """Return the battery voltage in V."""
+        return self._voltage
 
     @command()
     def update(self):
@@ -849,9 +878,25 @@ class SubDevice:
 
     @command()
     def get_battery(self):
-        """Update the battery level and return the new value."""
-        self._battery = self.send("get_battery").pop()
+        """Update the battery level, if available."""
+        if self._gw.model != GATEWAY_MODEL_EU:
+            self._battery = self.send("get_battery").pop()
+        else:
+            _LOGGER.info(
+                "Gateway model '%s' does not (yet) support get_battery", self._gw.model,
+            )
         return self._battery
+
+    @command()
+    def get_voltage(self):
+        """Update the battery voltage, if available."""
+        if self._gw.model == GATEWAY_MODEL_EU:
+            self._voltage = self.get_property("voltage").pop() / 1000
+        else:
+            _LOGGER.info(
+                "Gateway model '%s' does not (yet) support get_voltage", self._gw.model,
+            )
+        return self._voltage
 
     @command()
     def get_firmware_version(self) -> Optional[int]:
