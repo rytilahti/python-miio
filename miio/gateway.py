@@ -15,6 +15,10 @@ from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
 
+GATEWAY_MODEL_CHINA = "lumi.gateway.v3"
+GATEWAY_MODEL_EU ="lumi.gateway.mieu01"
+GATEWAY_MODEL_ZIG3 = "lumi.gateway.mgl03"
+GATEWAY_MODEL_AQARA = "lumi.gateway.aqhm01"
 
 color_map = {
     "red": (255, 0, 0),
@@ -264,7 +268,7 @@ class Gateway(Device):
         self._devices = {}
 
         # Skip the models which do not support getting the device list
-        if self.model == "lumi.gateway.mieu01":
+        if self.model == GATEWAY_MODEL_EU:
             _LOGGER.info(
                 "Gateway model '%s' does not (yet) support getting the device list",
                 self.model,
@@ -871,8 +875,8 @@ class SubDevice:
 
     @command()
     def get_battery(self):
-        """Update the battery level and return the new value."""
-        if self._gw.model != "lumi.gateway.mieu01":
+        """Update the battery level, if available."""
+        if self._gw.model != GATEWAY_MODEL_EU:
             self._battery = self.send("get_battery").pop()
         else:
             _LOGGER.info(
@@ -882,8 +886,8 @@ class SubDevice:
 
     @command()
     def get_voltage(self):
-        """Update the battery voltage and return the new value."""
-        if self._gw.model == "lumi.gateway.mieu01":
+        """Update the battery voltage, if available."""
+        if self._gw.model == GATEWAY_MODEL_EU:
             self._voltage = self.get_property("voltage").pop() / 1000
         else:
             _LOGGER.info(
