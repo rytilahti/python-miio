@@ -1000,6 +1000,21 @@ class Plug(SubDevice):
         self._props.status = values[0]
         self._props.load_power = values[1]
 
+    @command()
+    def toggle(self):
+        """Toggle Plug."""
+        return self.send_arg("toggle_plug", ["channel_0", "toggle"]).pop()
+
+    @command()
+    def on(self):
+        """Turn on Plug."""
+        return self.send_arg("toggle_plug", ["channel_0", "on"]).pop()
+
+    @command()
+    def off(self):
+        """Turn off Plug."""
+        return self.send_arg("toggle_plug", ["channel_0", "off"]).pop()
+
 
 class RemoteSwitchDoubleV1(SubDevice):
     """Subdevice RemoteSwitchDoubleV1 specific properties and methods."""
