@@ -10,7 +10,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device
-from .exceptions import DeviceException
+from .exceptions import DeviceException, DeviceError
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
@@ -335,7 +335,14 @@ class Gateway(Device):
     @command()
     def enable_telnet(self):
         """Enable root telnet acces to the operating system, use login "admin" or "app", no password."""
-        return self.send("enable_telnet_service")
+        try:
+            return self.send("enable_telnet_service")
+        except DeviceError:
+            _LOGGER.error(
+                "Gateway model '%s' does not (yet) support enabling the telnet interface",
+                self.model,
+            )
+            return None
 
     @command()
     def timezone(self):
