@@ -10,7 +10,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device
-from .exceptions import DeviceException, DeviceError
+from .exceptions import DeviceError, DeviceException
 from .utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
