@@ -259,12 +259,11 @@ class TestFanV2(TestCase):
         assert delay_off_countdown() == 100
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
+        self.device.delay_off(0)
+        assert delay_off_countdown() == 0
 
         with pytest.raises(FanException):
             self.device.delay_off(-1)
-
-        with pytest.raises(FanException):
-            self.device.delay_off(0)
 
 
 class DummyFanV3(DummyDevice, Fan):
