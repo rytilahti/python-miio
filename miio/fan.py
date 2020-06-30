@@ -548,7 +548,7 @@ class Fan(Device):
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
 
-        if seconds < 1:
+        if seconds < 0:
             raise FanException("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("set_poweroff_time", [seconds])
@@ -755,7 +755,7 @@ class FanP5(Device):
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
 
-        if minutes < 1:
+        if minutes < 0:
             raise FanException("Invalid value for a delayed turn off: %s" % minutes)
 
         return self.send("s_t_off", [minutes])

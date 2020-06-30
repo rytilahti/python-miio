@@ -259,12 +259,11 @@ class TestFanV2(TestCase):
         assert delay_off_countdown() == 100
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
+        self.device.delay_off(0)
+        assert delay_off_countdown() == 0
 
         with pytest.raises(FanException):
             self.device.delay_off(-1)
-
-        with pytest.raises(FanException):
-            self.device.delay_off(0)
 
 
 class DummyFanV3(DummyDevice, Fan):
@@ -513,12 +512,11 @@ class TestFanV3(TestCase):
         assert delay_off_countdown() == 100
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
+        self.device.delay_off(0)
+        assert delay_off_countdown() == 0
 
         with pytest.raises(FanException):
             self.device.delay_off(-1)
-
-        with pytest.raises(FanException):
-            self.device.delay_off(0)
 
 
 class DummyFanSA1(DummyDevice, Fan):
@@ -729,12 +727,11 @@ class TestFanSA1(TestCase):
         assert delay_off_countdown() == 100
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
+        self.device.delay_off(0)
+        assert delay_off_countdown() == 0
 
         with pytest.raises(FanException):
             self.device.delay_off(-1)
-
-        with pytest.raises(FanException):
-            self.device.delay_off(0)
 
 
 class DummyFanP5(DummyDevice, FanP5):
@@ -912,9 +909,8 @@ class TestFanP5(TestCase):
         assert delay_off_countdown() == 100
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
+        self.device.delay_off(0)
+        assert delay_off_countdown() == 0
 
         with pytest.raises(FanException):
             self.device.delay_off(-1)
-
-        with pytest.raises(FanException):
-            self.device.delay_off(0)
