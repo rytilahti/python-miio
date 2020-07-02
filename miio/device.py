@@ -212,7 +212,9 @@ class Device(metaclass=DeviceGroupMeta):
 
         return self.send("miIO.config_router", params)[0]
 
-    def get_properties(self, properties, *, max_properties=None):
+    def get_properties(
+        self, properties, *, property_getter="get_prop", max_properties=None
+    ):
         """Request properties in slices based on given max_properties.
 
         This is necessary as some devices have limitation on how many
@@ -227,7 +229,7 @@ class Device(metaclass=DeviceGroupMeta):
         _props = properties.copy()
         values = []
         while _props:
-            values.extend(self.send("get_prop", _props[:max_properties]))
+            values.extend(self.send(property_getter, _props[:max_properties]))
             if max_properties is None:
                 break
 
