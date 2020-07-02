@@ -26,7 +26,9 @@ class MiotDevice(Device):
         # We send property key in "did" because it's sent back via response and we can identify the property.
         properties = [{"did": k, **v} for k, v in self.mapping.items()]
 
-        return self.get_properties(properties, max_properties=15)
+        return self.get_properties(
+            properties, property_getter="get_properties", max_properties=15
+        )
 
     def set_property(self, property_key: str, value):
         """Sets property value."""
