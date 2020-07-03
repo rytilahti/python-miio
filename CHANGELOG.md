@@ -1,5 +1,16 @@
 # Change Log
 
+
+## [0.5.2.1](https://github.com/rytilahti/python-miio/tree/0.5.2.1) (2020-07-03)
+
+A quick minor fix for vacuum gen1 fan speed detection.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.2...0.5.2.1)
+
+**Merged pull requests:**
+
+- vacuum: Catch DeviceInfoUnavailableException for model detection [\#748](https://github.com/rytilahti/python-miio/pull/748) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.5.2](https://github.com/rytilahti/python-miio/tree/0.5.2) (2020-07-03)
 
 This release brings several improvements to the gateway support, thanks to @starkillerOG as well as some minor improvements and fixes to some other parts.
