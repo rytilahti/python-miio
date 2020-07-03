@@ -30,7 +30,7 @@ git commit -av
 5. Tag a release (and add short changelog as a tag commit message)
 
 ```bash
-git tag -a 0.3.1
+git tag -a $NEW_RELEASE
 ```
 
 6. Push to git
