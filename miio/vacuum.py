@@ -14,7 +14,7 @@ from appdirs import user_cache_dir
 
 from .click_common import DeviceGroup, GlobalContextObject, LiteralParamType, command
 from .device import Device
-from .exceptions import DeviceException
+from .exceptions import DeviceException, DeviceInfoUnavailableException
 from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,
@@ -454,7 +454,7 @@ class Vacuum(Device):
         try:
             info = self.info()
             self.model = info.model
-        except TypeError:
+        except (TypeError, DeviceInfoUnavailableException):
             # cloud-blocked vacuums will not return proper payloads
             self._fanspeeds = FanspeedV1
             self.model = ROCKROBO_V1
