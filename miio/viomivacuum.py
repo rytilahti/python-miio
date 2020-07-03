@@ -100,6 +100,13 @@ class ViomiWaterGrade(Enum):
     High = 13
 
 
+class ViomiMopMode(Enum):
+    """Mopping pattern."""
+
+    S = 0
+    Y = 1
+
+
 class ViomiVacuumStatus:
     def __init__(self, data):
         # ["run_state","mode","err_state","battary_life","box_type","mop_type","s_time","s_area",
@@ -293,9 +300,13 @@ class ViomiVacuum(Device):
         self.send("set_direction", [ViomiMovementDirection.Stop.value])
 
     @command(click.argument("mode", type=EnumType(ViomiMode, False)))
-    def mop_mode(self, mode):
-        """Set mopping mode."""
+    def clean_mode(self, mode):
+        """Set the cleaning mode."""
         self.send("set_mop", [mode.value])
+
+    @command(click.argument("mop_mode", type=EnumType(ViomiMopMode, False)))
+    def mop_mode(self, mop_mode):
+        self.send("set_moproute", [mop_mode.value])
 
     @command()
     def dnd_status(self):
