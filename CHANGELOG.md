@@ -5,9 +5,9 @@
 This release brings several improvements to the gateway support, thanks to @starkillerOG as well as some minor improvements and fixes to some other parts.
 
 Improvements:
-* viomi: ability to change the mopping pattern
 * gateway: plug controls, support for aqara wall outlet and aqara smart bulbs, ability to enable telnet access & general improvements
-* fan: ability to disable turn off
+* viomi: ability to change the mopping pattern
+* fan: ability to disable delayed turn off
 
 Fixes:
 * airpurifier_miot: Incorrect get_properties usage
