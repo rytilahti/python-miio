@@ -1,5 +1,50 @@
 # Change Log
 
+## [0.5.2](https://github.com/rytilahti/python-miio/tree/0.5.2) (2020-07-03)
+
+This release brings several improvements to the gateway support, thanks to @starkillerOG as well as some minor improvements and fixes to some other parts.
+
+Improvements:
+* viomi: ability to change the mopping pattern
+* gateway: plug controls, support for aqara wall outlet and aqara smart bulbs, ability to enable telnet access & general improvements
+* fan: ability to disable turn off
+
+Fixes:
+* airpurifier_miot: Incorrect get_properties usage
+
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.1...0.5.2)
+
+**Fixed bugs:**
+
+- Air priefier H3 doasn't work in 0.5.1 [\#730](https://github.com/rytilahti/python-miio/issues/730)
+
+**Closed issues:**
+
+- Viomi V8: AttributeError: 'NoneType' object has no attribute 'header' [\#746](https://github.com/rytilahti/python-miio/issues/746)
+- viomi: add command for changing the mopping mode [\#725](https://github.com/rytilahti/python-miio/issues/725)
+- fan za3, got token, but does not work [\#720](https://github.com/rytilahti/python-miio/issues/720)
+- Capitalisation of Air Purifier modes [\#715](https://github.com/rytilahti/python-miio/issues/715)
+- STYJ02YM Unable to decrypt error [\#701](https://github.com/rytilahti/python-miio/issues/701)
+
+**Merged pull requests:**
+
+- Use "get\_properties" instead of "get\_prop" for miot devices [\#745](https://github.com/rytilahti/python-miio/pull/745) ([rytilahti](https://github.com/rytilahti))
+- viomi: add ability to change the mopping pattern [\#744](https://github.com/rytilahti/python-miio/pull/744) ([rytilahti](https://github.com/rytilahti))
+- fan: Ability to disable delayed turn off functionality [\#741](https://github.com/rytilahti/python-miio/pull/741) ([insajd](https://github.com/insajd))
+- Gateway: Add control commands to Plug [\#737](https://github.com/rytilahti/python-miio/pull/737) ([starkillerOG](https://github.com/starkillerOG))
+- gateway: cleanup SensorHT and Plug class [\#735](https://github.com/rytilahti/python-miio/pull/735) ([starkillerOG](https://github.com/starkillerOG))
+- Add "enable\_telnet" to gateway [\#734](https://github.com/rytilahti/python-miio/pull/734) ([starkillerOG](https://github.com/starkillerOG))
+- prevent errors on "lumi.gateway.mieu01" [\#732](https://github.com/rytilahti/python-miio/pull/732) ([starkillerOG](https://github.com/starkillerOG))
+- Moved access to discover message attribute inside 'if message is not None' statement [\#731](https://github.com/rytilahti/python-miio/pull/731) ([jthure](https://github.com/jthure))
+- Add AqaraSmartBulbE27 support [\#729](https://github.com/rytilahti/python-miio/pull/729) ([starkillerOG](https://github.com/starkillerOG))
+- Gateway: add name + model property to subdevice & add loads of subdevices [\#724](https://github.com/rytilahti/python-miio/pull/724) ([starkillerOG](https://github.com/starkillerOG))
+- Add gentle mode for Roborock E2 [\#723](https://github.com/rytilahti/python-miio/pull/723) ([tribut](https://github.com/tribut))
+- gateway: add model property & implement SwitchOneChannel [\#722](https://github.com/rytilahti/python-miio/pull/722) ([starkillerOG](https://github.com/starkillerOG))
+- Add support for fanspeeds of Roborock E2 \(E20/E25\) [\#718](https://github.com/rytilahti/python-miio/pull/718) ([tribut](https://github.com/tribut))
+- add AqaraWallOutlet support [\#717](https://github.com/rytilahti/python-miio/pull/717) ([starkillerOG](https://github.com/starkillerOG))
+- Add new device type mappings, add note about 'used\_for\_public' [\#713](https://github.com/rytilahti/python-miio/pull/713) ([starkillerOG](https://github.com/starkillerOG))
+
 ## [0.5.1](https://github.com/rytilahti/python-miio/tree/0.5.1) (2020-06-04)
 
 The most noteworthy change in this release is the work undertaken by @starkillerOG to improve the support for Xiaomi gateway devices. See the PR description for more details at https://github.com/rytilahti/python-miio/pull/700 .
