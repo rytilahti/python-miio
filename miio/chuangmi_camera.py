@@ -106,6 +106,31 @@ class HomeMonitoringMode(enum.IntEnum):
     Custom = 2
 
 
+class NASState(enum.IntEnum):
+    """NAS state."""
+
+    Off = 2
+    On = 3
+
+
+class NASSyncInterval(enum.IntEnum):
+    """NAS sync interval."""
+
+    Realtime = 300
+    Hour = 3600
+    Day = 86400
+
+
+class NASVideoRetentionTime(enum.IntEnum):
+    """NAS video retention time."""
+
+    Week = 604800
+    Month = 2592000
+    Quarter = 7776000
+    HalfYear = 15552000
+    Year = 31104000
+
+
 class CameraStatus:
     """Container for status reports from the Xiaomi Chuangmi Camera."""
 
@@ -417,4 +442,40 @@ class ChuangmiCamera(Device):
         return self.send(
             "setAlarmConfig",
             [mode, start_hour, start_minute, end_hour, end_minute, notify, interval],
+        )
+
+    @command(default_output=format_output("Clearing NAS directory"),)
+    def clear_nas_dir(self):
+        """Clear NAS directory"""
+        return self.send("nas_clear_dir", [[]],)
+
+    @command(default_output=format_output("Getting NAS config info"),)
+    def get_nas_config(self):
+        """Get NAS config info"""
+        return self.send("nas_get_config", {},)
+
+    @command(
+        click.argument("state", type=EnumType(NASState, False)),
+        click.argument("share"),
+        click.argument("sync-interval", type=EnumType(NASSyncInterval, False)),
+        click.argument(
+            "video-retention-time", type=EnumType(NASVideoRetentionTime, False)
+        ),
+        default_output=format_output("Setting NAS config to '{state.name}'"),
+    )
+    def set_nas_config(
+        self,
+        state: NASState,
+        share={},
+        sync_interval: NASSyncInterval = NASSyncInterval.Realtime,
+        video_retention_time: NASVideoRetentionTime = NASVideoRetentionTime.Week,
+    ):
+        """Set NAS configuration"""
+        return self.send(
+            "nas_set_config",
+            {
+                "state": state,
+                "sync_interval": sync_interval,
+                "video_retention_time": video_retention_time,
+            },
         )
