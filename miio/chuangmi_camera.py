@@ -34,6 +34,14 @@ class MotionDetectionSensitivity(enum.Enum):
     Low = 1
 
 
+class HomeMonitoringMode(enum.IntEnum):
+    """Home monitoring mode."""
+
+    Off = 0
+    AllDay = 1
+    Custom = 2
+
+
 class CameraStatus:
     """Container for status reports from the Xiaomi Chuangmi Camera."""
 
@@ -317,3 +325,25 @@ class ChuangmiCamera(Device):
         return self.send("set_motion_region",
                          CONST_HIGH_SENSITIVITY if sensitivity == MotionDetectionSensitivity.High else CONST_LOW_SENSITIVITY)
 
+    @command(
+        click.argument("mode", type=EnumType(HomeMonitoringMode, False)),
+        click.argument("start-hour", default=10),
+        click.argument("start-minute", default=0),
+        click.argument("end-hour", default=17),
+        click.argument("end-minute", default=0),
+        click.argument("notify", default=1),
+        click.argument("interval", default=5),
+        default_output=format_output("Setting alarm config to '{mode.name}'")
+    )
+    def set_home_monitoring_config(
+        self,
+        mode: HomeMonitoringMode = HomeMonitoringMode.AllDay,
+        start_hour: int = 10,
+        start_minute: int = 0,
+        end_hour: int = 17,
+        end_minute: int = 0,
+        notify: int = 1,
+        interval: int = 5
+    ):
+        """Set home monitoring configuration"""
+        return self.send("setAlarmConfig", [mode, start_hour, start_minute, end_hour, end_minute, notify, interval])
