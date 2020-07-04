@@ -12,10 +12,74 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
-CONST_HIGH_SENSITIVITY = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-                          3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
-CONST_LOW_SENSITIVITY = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+CONST_HIGH_SENSITIVITY = [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+]
+CONST_LOW_SENSITIVITY = [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+]
 
 
 class Direction(enum.Enum):
@@ -322,8 +386,12 @@ class ChuangmiCamera(Device):
     )
     def set_motion_sensitivity(self, sensitivity: MotionDetectionSensitivity):
         """Set motion sensitivity (high, low)."""
-        return self.send("set_motion_region",
-                         CONST_HIGH_SENSITIVITY if sensitivity == MotionDetectionSensitivity.High else CONST_LOW_SENSITIVITY)
+        return self.send(
+            "set_motion_region",
+            CONST_HIGH_SENSITIVITY
+            if sensitivity == MotionDetectionSensitivity.High
+            else CONST_LOW_SENSITIVITY,
+        )
 
     @command(
         click.argument("mode", type=EnumType(HomeMonitoringMode, False)),
@@ -333,7 +401,7 @@ class ChuangmiCamera(Device):
         click.argument("end-minute", default=0),
         click.argument("notify", default=1),
         click.argument("interval", default=5),
-        default_output=format_output("Setting alarm config to '{mode.name}'")
+        default_output=format_output("Setting alarm config to '{mode.name}'"),
     )
     def set_home_monitoring_config(
         self,
@@ -343,7 +411,10 @@ class ChuangmiCamera(Device):
         end_hour: int = 17,
         end_minute: int = 0,
         notify: int = 1,
-        interval: int = 5
+        interval: int = 5,
     ):
         """Set home monitoring configuration"""
-        return self.send("setAlarmConfig", [mode, start_hour, start_minute, end_hour, end_minute, notify, interval])
+        return self.send(
+            "setAlarmConfig",
+            [mode, start_hour, start_minute, end_hour, end_minute, notify, interval],
+        )
