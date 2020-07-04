@@ -12,6 +12,12 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
+CONST_HIGH_SENSITIVITY = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+                          3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+CONST_LOW_SENSITIVITY = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+
 class Direction(enum.Enum):
     """Rotation direction."""
 
@@ -19,6 +25,13 @@ class Direction(enum.Enum):
     Right = 2
     Up = 3
     Down = 4
+
+
+class MotionDetectionSensitivity(enum.Enum):
+    """Motion detection sensitivity."""
+
+    High = 3
+    Low = 1
 
 
 class CameraStatus:
@@ -294,3 +307,13 @@ class ChuangmiCamera(Device):
     def alarm(self):
         """Sound a loud alarm for 10 seconds."""
         return self.send("alarm_sound")
+
+    @command(
+        click.argument("sensitivity", type=EnumType(MotionDetectionSensitivity, False)),
+        default_output=format_output("Setting motion sensitivity '{sensitivity.name}'"),
+    )
+    def set_motion_sensitivity(self, sensitivity: MotionDetectionSensitivity):
+        """Set motion sensitivity (high, low)."""
+        return self.send("set_motion_region",
+                         CONST_HIGH_SENSITIVITY if sensitivity == MotionDetectionSensitivity.High else CONST_LOW_SENSITIVITY)
+
