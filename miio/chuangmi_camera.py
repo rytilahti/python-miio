@@ -283,7 +283,7 @@ class ChuangmiCamera(Device):
         return self.send("set_night_mode", [2])
 
     @command(
-        click.argument("mode", type=EnumType(Direction, False)),
+        click.argument("direction", type=EnumType(Direction, False)),
         default_output=format_output("Rotating to direction '{direction.name}'"),
     )
     def rotate(self, direction: Direction):
