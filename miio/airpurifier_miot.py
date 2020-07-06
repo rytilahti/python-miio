@@ -100,7 +100,7 @@ class AirPurifierMiotStatus:
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         if self.data["temperature"] is not None:
-            return self.data["temperature"]
+            return round(self.data["temperature"], 1)
 
         return None
 
