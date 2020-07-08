@@ -12,76 +12,6 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 
-CONST_HIGH_SENSITIVITY = [
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-]
-CONST_LOW_SENSITIVITY = [
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-]
-
-
 class Direction(enum.Enum):
     """Rotation direction."""
 
@@ -91,7 +21,7 @@ class Direction(enum.Enum):
     Down = 4
 
 
-class MotionDetectionSensitivity(enum.Enum):
+class MotionDetectionSensitivity(enum.IntEnum):
     """Motion detection sensitivity."""
 
     High = 3
@@ -129,6 +59,10 @@ class NASVideoRetentionTime(enum.IntEnum):
     Quarter = 7776000
     HalfYear = 15552000
     Year = 31104000
+
+
+CONST_HIGH_SENSITIVITY = [MotionDetectionSensitivity.High] * 32
+CONST_LOW_SENSITIVITY = [MotionDetectionSensitivity.Low] * 32
 
 
 class CameraStatus:
