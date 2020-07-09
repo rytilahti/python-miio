@@ -49,21 +49,31 @@ class MiIOProtocol:
         self.__id = start_id
         self._device_id = None
 
-    def send_handshake(self) -> Message:
-        """Send a handshake to the device,
-        which can be used to the device type and serial.
+    def send_handshake(self, *, retry_count=3) -> Message:
+        """Send a handshake to the device.
+
+        This returns some information, such as device type and serial,
+        as well as device's timestamp in response.
+
         The handshake must also be done regularly to enable communication
         with the device.
 
-        :rtype: Message
+        :raises DeviceException: if the device could not be discovered after retries.
+        """
+        try:
+            m = MiIOProtocol.discover(self.ip)
+        except DeviceException as ex:
+            if retry_count > 0:
+                return self.send_handshake(retry_count=retry_count - 1)
 
-        :raises DeviceException: if the device could not be discovered."""
-        m = MiIOProtocol.discover(self.ip)
+            raise ex
+
         if m is not None:
             header = m.header.value
             self._device_id = header.device_id
             self._device_ts = header.ts
             self._discovered = True
+
             if self.debug > 1:
                 _LOGGER.debug(m)
             _LOGGER.debug(
@@ -73,7 +83,7 @@ class MiIOProtocol:
                 codecs.encode(m.checksum, "hex"),
             )
         else:
-            _LOGGER.error("Unable to discover a device at address %s", self.ip)
+            _LOGGER.debug("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
 
         return m
