@@ -35,16 +35,20 @@ android_backup = { version = "^0.2", optional = true }
 importlib_metadata = "^1.6.0"
 croniter = "^0.3.32"
 
+sphinx = { version = "^3.1", optional = true }
+sphinx_click = { version = "^2.3", optional = true }
+
+[tool.poetry.extras]
+docs = ["sphinx", "sphinx_click"]
+
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.1"
 pytest-cov = "^2.8.1"
 pytest-mock = "^3.1.0"
 voluptuous = "^0.11.7"
 pre-commit = "^2.2.0"
-sphinx = "^3.0.1"
 doc8 = "^0.8.0"
 restructuredtext_lint = "^1.3.0"
-sphinx-click = "^2.3.2"
 tox = "^3.14.6"
 isort = "^4.3.21"
 cffi = "^1.14.0"
