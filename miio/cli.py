@@ -20,6 +20,7 @@ _LOGGER = logging.getLogger(__name__)
     type=click.Choice(["default", "json", "json_pretty"]),
     default="default",
 )
+@click.version_option()
 @click.pass_context
 def cli(ctx, debug: int, output: str):
     if debug:
