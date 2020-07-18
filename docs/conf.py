@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
+    "sphinxcontrib.apidoc",
     "sphinx_click.ext",
 ]
 
@@ -181,4 +182,8 @@ texinfo_documents = [
     )
 ]
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3.6", None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3.8", None)}
+
+apidoc_module_dir = "../miio"
+apidoc_output_dir = "."
+apidoc_excluded_paths = ["tests"]
