@@ -112,7 +112,7 @@ class Vacuum(Device):
     def resume_or_start(self):
         """A shortcut for resuming or starting cleaning."""
         status = self.status()
-        if status.in_zone_cleaning and status.is_paused:
+        if status.in_zone_cleaning and (status.is_paused or status.got_error):
             return self.resume_zoned_clean()
 
         return self.start()
