@@ -3,7 +3,7 @@
 import logging
 from datetime import datetime
 from enum import Enum, IntEnum
-from typing import Optional
+from typing import Optional, Tuple
 
 import attr
 import click
@@ -688,7 +688,7 @@ class GatewayLight(GatewayDevice):
         click.argument("brightness", type=int),
         click.argument("rgb", type=(int, int, int)),
     )
-    def set_rgb(self, brightness: int, rgb: (int, int, int)):
+    def set_rgb(self, brightness: int, rgb: Tuple[int, int, int]):
         """Set gateway light using brightness and rgb tuple."""
         brightness_and_color = brightness_and_color_to_int(brightness, rgb)
 
@@ -698,7 +698,7 @@ class GatewayLight(GatewayDevice):
         click.argument("brightness", type=int),
         click.argument("rgb", type=(int, int, int)),
     )
-    def set_night_light(self, brightness: int, rgb: (int, int, int)):
+    def set_night_light(self, brightness: int, rgb: Tuple[int, int, int]):
         """Set gateway night light using brightness and rgb tuple."""
         brightness_and_color = brightness_and_color_to_int(brightness, rgb)
 
