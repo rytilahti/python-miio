@@ -720,7 +720,10 @@ class GatewayLight(GatewayDevice):
 
     @command(click.argument("color_name", type=str))
     def set_rgb_color(self, color_name: str):
-        """Set gateway light color using color name (red, green, etc)."""
+        """
+        Set gateway light color using color name (red, green, etc).
+        Valid color_name: "red", "green", "blue", "white", "yellow", "orange", "aqua", "olive" or "purple".
+        """
         if color_name not in color_map.keys():
             raise Exception(
                 "Cannot find {color} in {colors}".format(
@@ -733,7 +736,10 @@ class GatewayLight(GatewayDevice):
 
     @command(click.argument("color_name", type=str))
     def set_night_light_color(self, color_name: str):
-        """Set night light color using color name (red, green, etc)."""
+        """
+        Set night light color using color name (red, green, etc).
+        Valid color_name: "red", "green", "blue", "white", "yellow", "orange", "aqua", "olive" or "purple".
+        """
         if color_name not in color_map.keys():
             raise Exception(
                 "Cannot find {color} in {colors}".format(
@@ -748,7 +754,10 @@ class GatewayLight(GatewayDevice):
         click.argument("color_name", type=str), click.argument("brightness", type=int),
     )
     def set_rgb_using_name(self, color_name: str, brightness: int):
-        """Set gateway light color (using color name) and brightness (0-100)."""
+        """
+        Set gateway light color (using color name) and brightness (0-100).
+        Valid color_name: "red", "green", "blue", "white", "yellow", "orange", "aqua", "olive" or "purple".
+        """
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
@@ -764,7 +773,10 @@ class GatewayLight(GatewayDevice):
         click.argument("color_name", type=str), click.argument("brightness", type=int),
     )
     def set_night_light_using_name(self, color_name: str, brightness: int):
-        """Set night light color (using color name) and brightness (0-100)."""
+        """
+        Set night light color (using color name) and brightness (0-100).
+        Valid color_name: "red", "green", "blue", "white", "yellow", "orange", "aqua", "olive" or "purple".
+        """
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
