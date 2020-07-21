@@ -645,7 +645,7 @@ class GatewayRadio(GatewayDevice):
 class GatewayLight(GatewayDevice):
     """
     Light controls for the gateway.
-    
+
     The gateway LEDs can be controlled using 'rgb' or 'night_light' methods.
     The 'night_light' methods control the same LEDs as the 'rgb' methods, but has a seprate memory for brightness and color.
     Changing the 'rgb' light does not effect the stored state of the 'night_light', while changing the 'night_light' does effect the state of the 'rgb' light.
@@ -688,7 +688,7 @@ class GatewayLight(GatewayDevice):
         click.argument("brightness", type=int),
         click.argument("rgb", type=(int, int, int)),
     )
-    def set_rgb(self, brightness: int, rgb: Tuple[int, int, int]):
+    def set_rgb(self, brightness: int, rgb: (int, int, int)):
         """Set gateway light using brightness and rgb tuple."""
         brightness_and_color = brightness_and_color_to_int(brightness, rgb)
 
@@ -698,7 +698,7 @@ class GatewayLight(GatewayDevice):
         click.argument("brightness", type=int),
         click.argument("rgb", type=(int, int, int)),
     )
-    def set_night_light(self, brightness: int, rgb: Tuple[int, int, int]):
+    def set_night_light(self, brightness: int, rgb:(int, int, int)):
         """Set gateway night light using brightness and rgb tuple."""
         brightness_and_color = brightness_and_color_to_int(brightness, rgb)
 
