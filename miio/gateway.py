@@ -647,7 +647,7 @@ class GatewayLight(GatewayDevice):
     Light controls for the gateway.
 
     The gateway LEDs can be controlled using 'rgb' or 'night_light' methods.
-    The 'night_light' methods control the same LEDs as the 'rgb' methods, but has a seprate memory for brightness and color.
+    The 'night_light' methods control the same light as the 'rgb' methods, but has a separate memory for brightness and color.
     Changing the 'rgb' light does not effect the stored state of the 'night_light', while changing the 'night_light' does effect the state of the 'rgb' light.
     """
 
