@@ -655,7 +655,7 @@ class GatewayLight(GatewayDevice):
     def rgb_status(self):
         """
         Get current status of the light.
-        Always represents the current status of the LEDs as oposed to 'night_light_status'.
+        Always represents the current status of the light as opposed to 'night_light_status'.
 
         Example:
            {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
