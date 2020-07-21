@@ -19,6 +19,9 @@ GATEWAY_MODEL_CHINA = "lumi.gateway.v3"
 GATEWAY_MODEL_EU = "lumi.gateway.mieu01"
 GATEWAY_MODEL_ZIG3 = "lumi.gateway.mgl03"
 GATEWAY_MODEL_AQARA = "lumi.gateway.aqhm01"
+GATEWAY_MODEL_AC_V1 = "lumi.acpartner.v1"
+GATEWAY_MODEL_AC_V2 = "lumi.acpartner.v2"
+GATEWAY_MODEL_AC_V3 = "lumi.acpartner.v3"
 
 color_map = {
     "red": (255, 0, 0),
