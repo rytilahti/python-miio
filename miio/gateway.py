@@ -698,7 +698,7 @@ class GatewayLight(GatewayDevice):
         click.argument("brightness", type=int),
         click.argument("rgb", type=(int, int, int)),
     )
-    def set_night_light(self, brightness: int, rgb:(int, int, int)):
+    def set_night_light(self, brightness: int, rgb: (int, int, int)):
         """Set gateway night light using brightness and rgb tuple."""
         brightness_and_color = brightness_and_color_to_int(brightness, rgb)
 
