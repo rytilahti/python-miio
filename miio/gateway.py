@@ -643,13 +643,19 @@ class GatewayRadio(GatewayDevice):
 
 
 class GatewayLight(GatewayDevice):
-    """Light controls for the gateway."""
+    """
+    Light controls for the gateway.
+    
+    The gateway LEDs can be controlled using 'rgb' or 'night_light' methods.
+    The 'night_light' methods control the same LEDs as the 'rgb' methods, but has a seprate memory for brightness and color.
+    Changing the 'rgb' light does not effect the stored state of the 'night_light', while changing the 'night_light' does effect the state of the 'rgb' light.
+    """
 
     @command()
     def rgb_status(self):
         """
         Get current status of the light.
-        Always represents the current status of the LEDs as oposed to while night_light_status.
+        Always represents the current status of the LEDs as oposed to 'night_light_status'.
 
         Example:
            {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
@@ -666,10 +672,8 @@ class GatewayLight(GatewayDevice):
     def night_light_status(self):
         """
         Get status of the night light.
+        This command only gives the correct status of the LEDs if the last command was a 'night_light' command and not a 'rgb' light command, otherwise it gives the stored values of the 'night_light'.
 
-        The night light controls the same LEDs as the rgb light, but has a seprate memory for brightness and color.
-        Changing the rgb light does not effect the stored state of the night light, while changing the night light does effect the state of the rgb light.
-        Therefore this command only gives the correct status of the LEDs if the last command was a night light command and not a rgb light command, otherwise it gives the stored values of the night light.
         Example:
            {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
         """
