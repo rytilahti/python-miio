@@ -71,7 +71,7 @@ class FanspeedE2(enum.Enum):
 
 
 class WaterFlow:
-    """Strength """
+    """Water flow strength on s5 max. """
 
     Minimum = 200
     Low = 201
