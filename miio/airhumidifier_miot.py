@@ -17,12 +17,13 @@ _MAPPING = {
     "mode": {"siid": 2, "piid": 5},  # 0 - Auto, 1 - lvl1, 2 - lvl2, 3 - lvl3
     "target_humidity": {"siid": 2, "piid": 6},  # [30, 80] step 1
     "water_level": {"siid": 2, "piid": 7},  # [0, 128] step 1
-    "speed_level": {"siid": 2, "piid": 11},  # [200, 2000], step 10
     "dry": {"siid": 2, "piid": 8},  # bool
     "use_time": {"siid": 2, "piid": 9},  # [0, 2147483600], step 1
     "button_pressed": {"siid": 2, "piid": 10},  # 0 - none, 1 - led, 2 - power
+    "speed_level": {"siid": 2, "piid": 11},  # [200, 2000], step 10
     # Environment (siid=3)
     "temperature": {"siid": 3, "piid": 7},  # [-40, 125] step 0.1
+    "fahrenheit": {"siid": 3, "piid": 8},  # [-40, 257] step 0.1
     "humidity": {"siid": 3, "piid": 9},  # [0, 100] step 1
     # Alarm (siid=4)
     "buzzer": {"siid": 4, "piid": 1},
@@ -53,11 +54,19 @@ class LedBrightness(enum.Enum):
     Bright = 2
 
 
+class PressedButton(enum.Enum):
+    No = 0
+    Led = 1
+    Power = 2
+
+
 class AirHumidifierMiotStatus:
     """Container for status reports from the air humidifier."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
+
+    # Air Humidifier
 
     @property
     def is_on(self) -> bool:
@@ -70,6 +79,50 @@ class AirHumidifierMiotStatus:
         return "on" if self.is_on else "off"
 
     @property
+    def fault(self) -> int:
+        """Fault state."""
+        return self.data["fault"]
+
+    @property
+    def mode(self) -> OperationMode:
+        """Current operation mode."""
+        return OperationMode(self.data["mode"])
+
+    @property
+    def target_humidity(self) -> int:
+        """Target humidity."""
+        return self.data["target_humidity"]
+
+    @property
+    def water_level(self) -> int:
+        """Current water level."""
+        return self.data["water_level"]
+
+    @property
+    def dry(self) -> Optional[bool]:
+        """Return True if dry mode is on."""
+        if self.data["dry"] is not None:
+            return self.data["dry"]
+        return None
+
+    @property
+    def use_time(self) -> int:
+        """How long the device has been active in seconds."""
+        return self.data["use_time"]
+
+    @property
+    def button_pressed(self) -> int:
+        """Showed last pressed button."""
+        return PressedButton(self.data["button_pressed"])
+
+    @property
+    def motor_speed(self) -> int:
+        """Target speed of the motor."""
+        return self.data["speed_level"]
+
+    # Environment
+
+    @property
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
@@ -79,18 +132,25 @@ class AirHumidifierMiotStatus:
         """Current temperature, if available."""
         if self.data["temperature"] is not None:
             return round(self.data["temperature"], 1)
-
         return None
 
     @property
-    def water_level(self) -> int:
-        """Current fan level."""
-        return self.data["water_level"]
+    def fahrenheit(self) -> Optional[float]:
+        """Current temperature in fahrenheit, if available."""
+        if self.data["fahrenheit"] is not None:
+            return round(self.data["fahrenheit"], 1)
+        return None
+
+    # Alarm
 
     @property
-    def mode(self) -> OperationMode:
-        """Current operation mode."""
-        return OperationMode(self.data["mode"])
+    def buzzer(self) -> Optional[bool]:
+        """Return True if buzzer is on."""
+        if self.data["buzzer"] is not None:
+            return self.data["buzzer"]
+        return None
+
+    # Indicator Light
 
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
@@ -103,59 +163,63 @@ class AirHumidifierMiotStatus:
 
         return None
 
-    @property
-    def buzzer(self) -> Optional[bool]:
-        """Return True if buzzer is on."""
-        if self.data["buzzer"] is not None:
-            return self.data["buzzer"]
-
-        return None
+    # Physical Control Locked
 
     @property
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"]
 
-    @property
-    def dry(self) -> bool:
-        """Return True if dry mode is on."""
-        return self.data["dry"]
+    # Other
 
     @property
-    def use_time(self) -> int:
-        """How long the device has been active in seconds."""
-        return self.data["use_time"]
+    def actual_speed(self) -> int:
+        """Real speed of the motor."""
+        return self.data["actual_speed"]
 
     @property
-    def motor_speed(self) -> int:
-        """Speed of the motor."""
-        return self.data["speed_level"]
+    def power_time(self) -> int:
+        """How long the device has been powered in seconds."""
+        return self.data["power_time"]
 
     def __repr__(self) -> str:
         s = (
-            "<AirHumidifierMiotStatus power=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "water_level=%s, "
+            "<AirHumidifierMiotStatus"
+            "power=%s, "
+            "fault=%s, "
             "mode=%s, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
+            "target_humidity=%s, "
+            "water_level=%s, "
             "dry=%s, "
             "use_time=%s, "
-            "motor_speed=%s>"
+            "button_pressed=%s, "
+            "motor_speed=%s, "
+            "temperature=%s, "
+            "fahrenheit=%s, "
+            "humidity=%s, "
+            "buzzer=%s, "
+            "led_brightness=%s, "
+            "child_lock=%s, "
+            "actual_speed=%s, "
+            "power_time=%s>"
             % (
                 self.power,
-                self.temperature,
-                self.humidity,
-                self.water_level,
+                self.fault,
                 self.mode,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
+                self.target_humidity,
+                self.water_level,
                 self.dry,
                 self.use_time,
+                self.button_pressed,
                 self.motor_speed,
+                self.temperature,
+                self.fahrenheit,
+                self.humidity,
+                self.buzzer,
+                self.led_brightness,
+                self.child_lock,
+                self.actual_speed,
+                self.power_time,
             )
         )
         return s
@@ -181,16 +245,22 @@ class AirHumidifierMiot(MiotDevice):
         default_output=format_output(
             "",
             "Power: {result.power}\n"
+            "Fault: {result.fault}\n"
+            "Target Humidity: {result.target_humidity} %\n"
             "Humidity: {result.humidity} %\n"
             "Temperature: {result.temperature} °C\n"
-            "Water Level: {result.water_level} %\n"
+            "Temperature: {result.fahrenheit} °F\n"
+            "Water Level: {result.water_level}\n"
             "Mode: {result.mode}\n"
             "LED brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
             "Child lock: {result.child_lock}\n"
             "Dry mode: {result.dry}\n"
+            "Button pressed {result.button_pressed}\n"
+            "Target motor speed: {result.motor_speed} rpm\n"
+            "Actual motor speed: {result.actual_speed} rpm\n"
             "Use time: {result.use_time} s\n"
-            "Motor speed: {result.motor_speed} rpm\n",
+            "Power time: {result.power_time} s\n",
         )
     )
     def status(self) -> AirHumidifierMiotStatus:
@@ -217,7 +287,7 @@ class AirHumidifierMiot(MiotDevice):
         click.argument("rpm", type=int),
         default_output=format_output("Setting motor speed '{rpm}' rpm"),
     )
-    def set_speed_level(self, rpm: int):
+    def set_speed(self, rpm: int):
         """Set motor speed."""
         if rpm < 200 or rpm > 2000 or rpm % 10 != 0:
             raise AirHumidifierMiotException(
@@ -230,7 +300,7 @@ class AirHumidifierMiot(MiotDevice):
         click.argument("humidity", type=int),
         default_output=format_output("Setting target humidity {humidity}%"),
     )
-    def set_target_humidity(self, humidity: int):
+    def set_humidity(self, humidity: int):
         """Set target humidity."""
         if humidity < 30 or humidity > 80:
             raise AirHumidifierMiotException(
@@ -243,14 +313,14 @@ class AirHumidifierMiot(MiotDevice):
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
-        """Set mode."""
+        """Set working mode."""
         return self.set_property("mode", mode.value)
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness, False)),
         default_output=format_output("Setting LED brightness to {brightness}"),
     )
-    def set_led_brightness(self, brightness: LedBrightness):
+    def set_led(self, brightness: LedBrightness):
         """Set led brightness."""
         return self.set_property("led_brightness", brightness.value)
 
@@ -270,7 +340,7 @@ class AirHumidifierMiot(MiotDevice):
             lambda lock: "Turning on child lock" if lock else "Turning off child lock"
         ),
     )
-    def set_child_lock(self, lock: bool):
+    def set_lock(self, lock: bool):
         """Set child lock on/off."""
         return self.set_property("child_lock", lock)
 
@@ -280,6 +350,6 @@ class AirHumidifierMiot(MiotDevice):
             lambda dry: "Turning on dry mode" if dry else "Turning off dry mode"
         ),
     )
-    def set_dry_mode(self, dry: bool):
+    def set_dry(self, dry: bool):
         """Set dry mode on/off."""
         return self.set_property("dry", dry)
