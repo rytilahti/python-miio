@@ -40,13 +40,13 @@ class DummyAirHumidifierMiot(DummyMiotDevice, AirHumidifierMiot):
         self.return_values = {
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),
+            "set_speed": lambda x: self._set_state("speed_level", x),
+            "set_humidity": lambda x: self._set_state("target_humidity", x),
             "set_mode": lambda x: self._set_state("mode", x),
-            "set_led": lambda x: self._set_state("led", x),
+            "set_led": lambda x: self._set_state("led_brightness", x),
             "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_level_favorite": lambda x: self._set_state("favorite_level", x),
-            "set_led_b": lambda x: self._set_state("led_b", x),
-            "set_volume": lambda x: self._set_state("volume", x),
+            "set_lock": lambda x: self._set_state("child_lock", x),
+            "set_dry": lambda x: self._set_state("dry", x),
         }
         super().__init__(*args, **kwargs)
 
@@ -78,7 +78,7 @@ class TestAirHumidifier(TestCase):
         assert status.fault == _INITIAL_STATE["fault"]
         assert status.mode == OperationMode(_INITIAL_STATE["mode"])
         assert status.target_humidity == _INITIAL_STATE["target_humidity"]
-        assert status.water_level == _INITIAL_STATE["water_level"]
+        assert status.water_level == int(_INITIAL_STATE["water_level"] / 1.25)
         assert status.dry == _INITIAL_STATE["dry"]
         assert status.use_time == _INITIAL_STATE["use_time"]
         assert status.button_pressed == PressedButton(_INITIAL_STATE["button_pressed"])
