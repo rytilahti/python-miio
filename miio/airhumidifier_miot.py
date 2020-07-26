@@ -96,7 +96,8 @@ class AirHumidifierMiotStatus:
     @property
     def water_level(self) -> int:
         """Current water level."""
-        return self.data["water_level"]
+        # 127 without water tank. 125 = 100% water
+        return int(self.data["water_level"] / 1.25)
 
     @property
     def dry(self) -> Optional[bool]:
@@ -250,7 +251,7 @@ class AirHumidifierMiot(MiotDevice):
             "Humidity: {result.humidity} %\n"
             "Temperature: {result.temperature} °C\n"
             "Temperature: {result.fahrenheit} °F\n"
-            "Water Level: {result.water_level}\n"
+            "Water Level: {result.water_level} %\n"
             "Mode: {result.mode}\n"
             "LED brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
