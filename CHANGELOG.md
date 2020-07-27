@@ -1,5 +1,56 @@
 # Change Log
 
+## [0.5.3](https://github.com/rytilahti/python-miio/tree/0.5.3) (2020-07-27)
+
+New devices:
+* Xiaomi Mi Air Humidifier CA4 (zhimi.humidifier.ca4) (@Toxblh)
+
+Improvements:
+* S5 vacuum: adjustable water volume for mopping
+* Gateway: improved light controls (@starkillerOG)
+* Chuangmi Camera: improved home monitoring support (@impankratov)
+
+Fixes:
+* Xioawa E25: do not crash when trying to access timers
+* Vacuum: allow resuming after error in zoned cleanup (@r4nd0mbr1ck)
+
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.2.1...0.5.3)
+
+**Implemented enhancements:**
+
+- Vacuum: Add water volume setting \(s5 max\) [\#773](https://github.com/rytilahti/python-miio/pull/773) ([rytilahti](https://github.com/rytilahti))
+- improve gateway light class [\#770](https://github.com/rytilahti/python-miio/pull/770) ([starkillerOG](https://github.com/starkillerOG))
+
+**Fixed bugs:**
+
+- AqaraSmartBulbE27 support added in \#729 is not work [\#771](https://github.com/rytilahti/python-miio/issues/771)
+- Broken timezone call \(dictionary instead of string\) breaks HASS integration [\#759](https://github.com/rytilahti/python-miio/issues/759)
+
+**Closed issues:**
+
+- Roborock S5 Max, Failure to connect in Homeassistant. [\#758](https://github.com/rytilahti/python-miio/issues/758)
+- Unable to decrypt, returning raw bytes: b'' - while mirobo discovery [\#752](https://github.com/rytilahti/python-miio/issues/752)
+- Error with Windows x64 python [\#733](https://github.com/rytilahti/python-miio/issues/733)
+- Xiaomi Vacuum - resume clean-up after pause [\#471](https://github.com/rytilahti/python-miio/issues/471)
+
+**Merged pull requests:**
+
+- Remove labeler as it doesn't work as expected [\#774](https://github.com/rytilahti/python-miio/pull/774) ([rytilahti](https://github.com/rytilahti))
+- Add support for zhimi.humidifier.ca4 \(miot\) [\#772](https://github.com/rytilahti/python-miio/pull/772) ([Toxblh](https://github.com/Toxblh))
+- add "lumi.acpartner.v3" since it also works with this code [\#769](https://github.com/rytilahti/python-miio/pull/769) ([starkillerOG](https://github.com/starkillerOG))
+- Add automatic labeling for PRs [\#768](https://github.com/rytilahti/python-miio/pull/768) ([rytilahti](https://github.com/rytilahti))
+- Add --version to miiocli [\#767](https://github.com/rytilahti/python-miio/pull/767) ([rytilahti](https://github.com/rytilahti))
+- Add preliminary issue templates [\#766](https://github.com/rytilahti/python-miio/pull/766) ([rytilahti](https://github.com/rytilahti))
+- Create separate API doc pages per module [\#765](https://github.com/rytilahti/python-miio/pull/765) ([rytilahti](https://github.com/rytilahti))
+- Add sphinxcontrib.apidoc to doc builds to keep the API index up-to-date [\#764](https://github.com/rytilahti/python-miio/pull/764) ([rytilahti](https://github.com/rytilahti))
+- Resume zoned clean from error state [\#763](https://github.com/rytilahti/python-miio/pull/763) ([r4nd0mbr1ck](https://github.com/r4nd0mbr1ck))
+- Allow alternative timezone format seen in Xioawa E25 [\#760](https://github.com/rytilahti/python-miio/pull/760) ([rytilahti](https://github.com/rytilahti))
+- Fix readthedocs build after poetry convert [\#755](https://github.com/rytilahti/python-miio/pull/755) ([rytilahti](https://github.com/rytilahti))
+- Add retries to discovery requests [\#754](https://github.com/rytilahti/python-miio/pull/754) ([rytilahti](https://github.com/rytilahti))
+- AirPurifier MIoT: round temperature  [\#753](https://github.com/rytilahti/python-miio/pull/753) ([petrkotek](https://github.com/petrkotek))
+- chuangmi\_camera: Improve home monitoring support [\#751](https://github.com/rytilahti/python-miio/pull/751) ([impankratov](https://github.com/impankratov))
+
 
 ## [0.5.2.1](https://github.com/rytilahti/python-miio/tree/0.5.2.1) (2020-07-03)
 
