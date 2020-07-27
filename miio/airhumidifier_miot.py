@@ -333,7 +333,6 @@ class AirHumidifierMiot(MiotDevice):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        """Set buzzer on/off."""
         return self.set_property("buzzer", buzzer)
 
     @command(
