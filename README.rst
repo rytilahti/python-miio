@@ -31,7 +31,7 @@ For example, executing it without any extra arguments will print out options and
 You can get some information from any miIO/miOT device, including its device model, using the `info` command::
 
     miiocli device --ip <ip> --token <token> info
-    
+
     Model: some.device.model1
     Hardware version: esp8285
     Firmware version: 1.0.1_0012
@@ -42,7 +42,7 @@ Each different device type is supported by their corresponding module (e.g., `va
 You can get the list of available commands for any given module by passing `--help` argument to it::
 
     $ miiocli vacuum --help
-    
+
     Usage: miiocli vacuum [OPTIONS] COMMAND [ARGS]...
 
     Options:
@@ -60,11 +60,12 @@ API usage
 All functionality is accessible through the `miio` module::
 
     from miio import Vacuum
-    
+
     vac = Vacuum("<ip address>", "<token>")
     vac.start()
-    
-Each separate device type inherits from `miio.Device` (and in case of miOT devices, `miio.MiotDevice`) which provides common API.
+
+Each separate device type inherits from `miio.Device`
+(and in case of miOT devices, `miio.MiotDevice`) which provides common API.
 
 Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/miio.html>`__ for more information.
 
@@ -105,7 +106,7 @@ Supported devices
 -  Xiaomi Philips Zhirui Bedroom Smart Lamp
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR)
 -  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, P5
--  Xiaomi Mi Air Humidifier V1, CA1, CB1, MJJSQ, JSQ001
+-  Xiaomi Mi Air Humidifier V1, CA1, CA4, CB1, MJJSQ, JSQ001
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off)
 -  Xiaomi PM2.5 Air Quality Monitor V1, B1, S1
 -  Xiaomi Smart WiFi Speaker
