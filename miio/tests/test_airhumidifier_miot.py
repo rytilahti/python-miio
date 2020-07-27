@@ -75,10 +75,10 @@ class TestAirHumidifier(TestCase):
     def test_status(self):
         status = self.device.status()
         assert status.is_on is _INITIAL_STATE["power"]
-        assert status.fault == _INITIAL_STATE["fault"]
+        assert status.error == _INITIAL_STATE["fault"]
         assert status.mode == OperationMode(_INITIAL_STATE["mode"])
         assert status.target_humidity == _INITIAL_STATE["target_humidity"]
-        assert status.water_level == int(_INITIAL_STATE["water_level"] / 1.25)
+        assert status.water_level == int(_INITIAL_STATE["water_level"] / 1.20)
         assert status.dry == _INITIAL_STATE["dry"]
         assert status.use_time == _INITIAL_STATE["use_time"]
         assert status.button_pressed == PressedButton(_INITIAL_STATE["button_pressed"])

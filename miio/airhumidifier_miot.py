@@ -75,29 +75,36 @@ class AirHumidifierMiotStatus:
 
     @property
     def power(self) -> str:
-        """Power state."""
+        """Return power state."""
         return "on" if self.is_on else "off"
 
     @property
-    def fault(self) -> int:
-        """Fault state."""
+    def error(self) -> int:
+        """Return error state."""
         return self.data["fault"]
 
     @property
     def mode(self) -> OperationMode:
-        """Current operation mode."""
-        return OperationMode(self.data["mode"])
+        """Return current operation mode."""
+
+        try:
+            mode = OperationMode(self.data["mode"])
+        except ValueError as e:
+            _LOGGER.exception("Cannot parse mode: %s", e)
+            return OperationMode.Auto
+
+        return mode
 
     @property
     def target_humidity(self) -> int:
-        """Target humidity."""
+        """Return target humidity."""
         return self.data["target_humidity"]
 
     @property
     def water_level(self) -> int:
-        """Current water level."""
-        # 127 without water tank. 125 = 100% water
-        return int(self.data["water_level"] / 1.25)
+        """Return current water level."""
+        # 127 without water tank. 120 = 100% water
+        return int(self.data["water_level"] / 1.20)
 
     @property
     def dry(self) -> Optional[bool]:
@@ -108,36 +115,43 @@ class AirHumidifierMiotStatus:
 
     @property
     def use_time(self) -> int:
-        """How long the device has been active in seconds."""
+        """Return how long the device has been active in seconds."""
         return self.data["use_time"]
 
     @property
-    def button_pressed(self) -> int:
+    def button_pressed(self) -> PressedButton:
         """Return last pressed button."""
-        return PressedButton(self.data["button_pressed"])
+
+        try:
+            button = PressedButton(self.data["button_pressed"])
+        except ValueError as e:
+            _LOGGER.exception("Cannot parse button_pressed: %s", e)
+            return PressedButton.No
+
+        return button
 
     @property
     def motor_speed(self) -> int:
-        """Target speed of the motor."""
+        """Return target speed of the motor."""
         return self.data["speed_level"]
 
     # Environment
 
     @property
     def humidity(self) -> int:
-        """Current humidity."""
+        """Return current humidity."""
         return self.data["humidity"]
 
     @property
     def temperature(self) -> Optional[float]:
-        """Current temperature, if available."""
+        """Return current temperature, if available."""
         if self.data["temperature"] is not None:
             return round(self.data["temperature"], 1)
         return None
 
     @property
     def fahrenheit(self) -> Optional[float]:
-        """Current temperature in fahrenheit, if available."""
+        """Return current temperature in fahrenheit, if available."""
         if self.data["fahrenheit"] is not None:
             return round(self.data["fahrenheit"], 1)
         return None
@@ -155,11 +169,13 @@ class AirHumidifierMiotStatus:
 
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
-        """Brightness of the LED."""
+        """Return brightness of the LED."""
+
         if self.data["led_brightness"] is not None:
             try:
                 return LedBrightness(self.data["led_brightness"])
-            except ValueError:
+            except ValueError as e:
+                _LOGGER.exception("Cannot parse led_brightness: %s", e)
                 return None
 
         return None
@@ -175,12 +191,12 @@ class AirHumidifierMiotStatus:
 
     @property
     def actual_speed(self) -> int:
-        """Real speed of the motor."""
+        """Return real speed of the motor."""
         return self.data["actual_speed"]
 
     @property
     def power_time(self) -> int:
-        """How long the device has been powered in seconds."""
+        """Return how long the device has been powered in seconds."""
         return self.data["power_time"]
 
     def __repr__(self) -> str:
@@ -246,7 +262,7 @@ class AirHumidifierMiot(MiotDevice):
         default_output=format_output(
             "",
             "Power: {result.power}\n"
-            "Fault: {result.fault}\n"
+            "Error: {result.error}\n"
             "Target Humidity: {result.target_humidity} %\n"
             "Humidity: {result.humidity} %\n"
             "Temperature: {result.temperature} °C\n"
