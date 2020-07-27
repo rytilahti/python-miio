@@ -70,6 +70,15 @@ class FanspeedE2(enum.Enum):
     Turbo = 100
 
 
+class WaterFlow:
+    """Water flow strength on s5 max. """
+
+    Minimum = 200
+    Low = 201
+    High = 202
+    Maximum = 203
+
+
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 
 
@@ -655,6 +664,16 @@ class Vacuum(Device):
     def split_segment(self):
         raise NotImplementedError("unknown parameters")
         # return self.send("split_segment")
+
+    @command()
+    def waterflow(self) -> WaterFlow:
+        """Get water flow setting."""
+        return WaterFlow(self.send("get_water_box_custom_mode")[0])
+
+    @command(click.argument("waterflow", type=WaterFlow))
+    def set_waterflow(self, waterflow: WaterFlow):
+        """Set water flow setting."""
+        return self.send("set_water_box_custom_mode", [waterflow.value])
 
     @classmethod
     def get_device_group(cls):
