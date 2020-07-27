@@ -301,7 +301,7 @@ class AirHumidifierMiot(MiotDevice):
         click.argument("humidity", type=int),
         default_output=format_output("Setting target humidity {humidity}%"),
     )
-    def set_humidity(self, humidity: int):
+    def set_target_humidity(self, humidity: int):
         """Set target humidity."""
         if humidity < 30 or humidity > 80:
             raise AirHumidifierMiotException(
@@ -321,7 +321,7 @@ class AirHumidifierMiot(MiotDevice):
         click.argument("brightness", type=EnumType(LedBrightness, False)),
         default_output=format_output("Setting LED brightness to {brightness}"),
     )
-    def set_led(self, brightness: LedBrightness):
+    def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         return self.set_property("led_brightness", brightness.value)
 
@@ -333,6 +333,7 @@ class AirHumidifierMiot(MiotDevice):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
+        """Set buzzer on/off."""
         return self.set_property("buzzer", buzzer)
 
     @command(
@@ -341,7 +342,7 @@ class AirHumidifierMiot(MiotDevice):
             lambda lock: "Turning on child lock" if lock else "Turning off child lock"
         ),
     )
-    def set_lock(self, lock: bool):
+    def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
         return self.set_property("child_lock", lock)
 

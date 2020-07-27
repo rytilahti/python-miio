@@ -41,11 +41,11 @@ class DummyAirHumidifierMiot(DummyMiotDevice, AirHumidifierMiot):
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),
             "set_speed": lambda x: self._set_state("speed_level", x),
-            "set_humidity": lambda x: self._set_state("target_humidity", x),
+            "set_target_humidity": lambda x: self._set_state("target_humidity", x),
             "set_mode": lambda x: self._set_state("mode", x),
-            "set_led": lambda x: self._set_state("led_brightness", x),
+            "set_led_brightness": lambda x: self._set_state("led_brightness", x),
             "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_lock": lambda x: self._set_state("child_lock", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
             "set_dry": lambda x: self._set_state("dry", x),
         }
         super().__init__(*args, **kwargs)
@@ -107,20 +107,20 @@ class TestAirHumidifier(TestCase):
         with pytest.raises(AirHumidifierMiotException):
             self.device.set_speed(2001)
 
-    def test_set_humidity(self):
+    def test_set_target_humidity(self):
         def target_humidity():
             return self.device.status().target_humidity
 
-        self.device.set_humidity(30)
+        self.device.set_target_humidity(30)
         assert target_humidity() == 30
-        self.device.set_humidity(80)
+        self.device.set_target_humidity(80)
         assert target_humidity() == 80
 
         with pytest.raises(AirHumidifierMiotException):
-            self.device.set_humidity(29)
+            self.device.set_target_humidity(29)
 
         with pytest.raises(AirHumidifierMiotException):
-            self.device.set_humidity(81)
+            self.device.set_target_humidity(81)
 
     def test_set_mode(self):
         def mode():
@@ -138,17 +138,17 @@ class TestAirHumidifier(TestCase):
         self.device.set_mode(OperationMode.High)
         assert mode() == OperationMode.High
 
-    def test_set_led(self):
+    def test_set_led_brightness(self):
         def led_brightness():
             return self.device.status().led_brightness
 
-        self.device.set_led(LedBrightness.Bright)
+        self.device.set_led_brightness(LedBrightness.Bright)
         assert led_brightness() == LedBrightness.Bright
 
-        self.device.set_led(LedBrightness.Dim)
+        self.device.set_led_brightness(LedBrightness.Dim)
         assert led_brightness() == LedBrightness.Dim
 
-        self.device.set_led(LedBrightness.Off)
+        self.device.set_led_brightness(LedBrightness.Off)
         assert led_brightness() == LedBrightness.Off
 
     def test_set_buzzer(self):
@@ -161,14 +161,14 @@ class TestAirHumidifier(TestCase):
         self.device.set_buzzer(False)
         assert buzzer() is False
 
-    def test_set_lock(self):
+    def test_set_child_lock(self):
         def child_lock():
             return self.device.status().child_lock
 
-        self.device.set_lock(True)
+        self.device.set_child_lock(True)
         assert child_lock() is True
 
-        self.device.set_lock(False)
+        self.device.set_child_lock(False)
         assert child_lock() is False
 
     def test_set_dry(self):
