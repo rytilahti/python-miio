@@ -113,7 +113,7 @@ class AirHumidifierMiotStatus:
 
     @property
     def button_pressed(self) -> int:
-        """Showed last pressed button."""
+        """Return last pressed button."""
         return PressedButton(self.data["button_pressed"])
 
     @property
