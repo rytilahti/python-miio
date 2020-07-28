@@ -14,6 +14,7 @@ Submodules
    miio.airfresh_t2017
    miio.airhumidifier
    miio.airhumidifier_jsq
+   miio.airhumidifier_miot
    miio.airhumidifier_mjjsq
    miio.airpurifier
    miio.airpurifier_miot
