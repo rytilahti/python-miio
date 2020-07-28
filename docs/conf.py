@@ -188,6 +188,6 @@ apidoc_module_dir = "../miio"
 apidoc_output_dir = "api"
 apidoc_excluded_paths = ["tests"]
 apidoc_separate_modules = True
-# autodoc_member_order = "groupwise"
+autodoc_member_order = "groupwise"
 autodoc_inherit_docstrings = True
 autodoc_default_options = {"inherited-members": True}
