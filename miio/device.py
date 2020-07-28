@@ -185,6 +185,11 @@ class Device(metaclass=DeviceGroupMeta):
                 "Unable to request miIO.info from the device"
             ) from ex
 
+    @property
+    def raw_id(self):
+        """Return the last used protocol sequence id."""
+        return self._protocol.raw_id
+
     def update(self, url: str, md5: str):
         """Start an OTA update."""
         payload = {

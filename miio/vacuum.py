@@ -649,10 +649,6 @@ class Vacuum(Device):
         """Get the status of a segment."""
         return self.send("get_segment_status")
 
-    @property
-    def raw_id(self):
-        return self._protocol.raw_id
-
     def name_segment(self):
         raise NotImplementedError("unknown parameters")
         # return self.send("name_segment")
