@@ -504,7 +504,7 @@ description = "World timezone definitions, modern and historical"
 name = "pytz"
 optional = false
 python-versions = "*"
-version = "2019.3"
+version = "2020.1"
 
 [[package]]
 category = "dev"
@@ -821,10 +821,10 @@ description = "Pure Python Multicast DNS Service Discovery Library (Bonjour/Avah
 name = "zeroconf"
 optional = false
 python-versions = "*"
-version = "0.25.1"
+version = "0.28.0"
 
 [package.dependencies]
-ifaddr = "*"
+ifaddr = ">=0.1.7"
 
 [[package]]
 category = "main"
@@ -842,7 +842,7 @@ testing = ["jaraco.itertools", "func-timeout"]
 docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme"]
 
 [metadata]
-content-hash = "fe0f48c710318886270f5b9d0510ffc3788e04a920b1062e779e114127605886"
+content-hash = "c8db3710e0e6341decff8d047f8d16035ef994f784c9e30335233e68d8637c08"
 python-versions = "^3.6.5"
 
 [metadata.files]
@@ -1150,8 +1150,8 @@ python-dateutil = [
     {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
 ]
 pytz = [
-    {file = "pytz-2019.3-py2.py3-none-any.whl", hash = "sha256:1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d"},
-    {file = "pytz-2019.3.tar.gz", hash = "sha256:b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"},
+    {file = "pytz-2020.1-py2.py3-none-any.whl", hash = "sha256:a494d53b6d39c3c6e44c3bec237336e14305e4f29bbf800b599253057fbb79ed"},
+    {file = "pytz-2020.1.tar.gz", hash = "sha256:c35965d010ce31b23eeb663ed3cc8c906275d6be1a34393a1d73a41febf4a048"},
 ]
 pyyaml = [
     {file = "PyYAML-5.3.1-cp27-cp27m-win32.whl", hash = "sha256:74809a57b329d6cc0fdccee6318f44b9b8649961fa73144a98735b0aaf029f1f"},
@@ -1253,8 +1253,8 @@ wcwidth = [
     {file = "wcwidth-0.2.5.tar.gz", hash = "sha256:c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83"},
 ]
 zeroconf = [
-    {file = "zeroconf-0.25.1-py3-none-any.whl", hash = "sha256:265bc23ddcea3d76940b6bb5b85d8a5a4e20618e5e6c3da677794e7e26a0e8c5"},
-    {file = "zeroconf-0.25.1.tar.gz", hash = "sha256:9b6eb9f73410cc06d203ca510f470e23e83affbe1bd65551daea2990b9171f75"},
+    {file = "zeroconf-0.28.0-py3-none-any.whl", hash = "sha256:8c448ad37ed074ce8811c9eb2765c01714a93f977a1c04fc39fbf6f516b0566f"},
+    {file = "zeroconf-0.28.0.tar.gz", hash = "sha256:881da2ed3d7c8e0ab59fb1cc8b02b53134351941c4d8d3f3553a96700f257a03"},
 ]
 zipp = [
     {file = "zipp-3.1.0-py3-none-any.whl", hash = "sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b"},
