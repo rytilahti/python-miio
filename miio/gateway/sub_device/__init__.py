@@ -1,5 +1,6 @@
 """Xiaomi Gateway subdevice base class."""
 
+# flake8: noqa
 from .button import AqaraSquareButton, AqaraSquareButtonV3, AqaraSwitch, Switch
 from .cube import Cube, CubeV2
 from .curtain import Curtain, CurtainB1, CurtainV1
