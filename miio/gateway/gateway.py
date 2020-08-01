@@ -160,23 +160,23 @@ class Gateway(Device):
         self._info = None
 
     @property
-    def alarm(self) -> "GatewayAlarm":
+    def alarm(self) -> "GatewayAlarm":  # noqa: F821
         """Return alarm control interface."""
         # example: gateway.alarm.on()
         return self._alarm
 
     @property
-    def radio(self) -> "GatewayRadio":
+    def radio(self) -> "GatewayRadio":  # noqa: F821
         """Return radio control interface."""
         return self._radio
 
     @property
-    def zigbee(self) -> "GatewayZigbee":
+    def zigbee(self) -> "GatewayZigbee":  # noqa: F821
         """Return zigbee control interface."""
         return self._zigbee
 
     @property
-    def light(self) -> "GatewayLight":
+    def light(self) -> "GatewayLight":  # noqa: F821
         """Return light control interface."""
         return self._light
 
