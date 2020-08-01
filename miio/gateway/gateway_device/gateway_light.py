@@ -8,7 +8,6 @@ from ...click_common import command
 from ...utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 from .gateway_device import GatewayDevice
 
-
 color_map = {
     "red": (255, 0, 0),
     "green": (0, 255, 0),
