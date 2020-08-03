@@ -56,7 +56,7 @@ class ViomiVacuumState(Enum):
     Cleaning = 3
     Returning = 4
     Docked = 5
-    Mopping = 6
+    VacuumingAndMopping = 6
 
 
 class ViomiMode(Enum):
@@ -129,7 +129,10 @@ class ViomiVacuumStatus:
     @property
     def is_on(self) -> bool:
         """True if cleaning."""
-        cleaning_states = [ViomiVacuumState.Cleaning, ViomiVacuumState.Mopping]
+        cleaning_states = [
+            ViomiVacuumState.Cleaning,
+            ViomiVacuumState.VacuumingAndMopping,
+        ]
         return self.state in cleaning_states
 
     @property
