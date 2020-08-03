@@ -49,12 +49,14 @@ class ViomiVacuumSpeed(Enum):
 
 
 class ViomiVacuumState(Enum):
+    Unknown = -1
     IdleNotDocked = 0
     Idle = 1
     Idle2 = 2
     Cleaning = 3
     Returning = 4
     Docked = 5
+    Mopping = 6
 
 
 class ViomiMode(Enum):
@@ -118,12 +120,17 @@ class ViomiVacuumStatus:
     @property
     def state(self):
         """State of the vacuum."""
-        return ViomiVacuumState(self.data["run_state"])
+        try:
+            return ViomiVacuumState(self.data["run_state"])
+        except ValueError:
+            _LOGGER.warning("Unknown vacuum state: %s", self.data["run_state"])
+            return ViomiVacuumState.Unknown
 
     @property
     def is_on(self) -> bool:
         """True if cleaning."""
-        return self.state == ViomiVacuumState.Cleaning
+        cleaning_states = [ViomiVacuumState.Cleaning, ViomiVacuumState.Mopping]
+        return self.state in cleaning_states
 
     @property
     def mode(self):
@@ -141,7 +148,6 @@ class ViomiVacuumStatus:
     @property
     def error_code(self) -> int:
         """Error code from vacuum."""
-
         return self.data["err_state"]
 
     @property
