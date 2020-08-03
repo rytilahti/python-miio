@@ -70,7 +70,7 @@ class FanspeedE2(enum.Enum):
     Turbo = 100
 
 
-class WaterFlow:
+class WaterFlow(enum.Enum):
     """Water flow strength on s5 max. """
 
     Minimum = 200
