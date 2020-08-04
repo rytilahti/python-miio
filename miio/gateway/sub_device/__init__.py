@@ -28,8 +28,11 @@ from .remote_switch import (
 from .sensor import AqaraVibration, AqaraWaterLeak, SensorNatgas, SensorSmoke
 from .sub_device import SubDevice, SubDeviceInfo
 from .switch import (
+    AqaraRelayTwoChannels,
     AqaraSwitchOneChannel,
     AqaraSwitchTwoChannels,
+    AqaraWallOutlet,
+    AqaraWallOutletV1,
     D1WallSwitchTriple,
     D1WallSwitchTripleNN,
     Plug,
@@ -39,5 +42,4 @@ from .switch import (
     SwitchTwoChannels,
 )
 from .thermostat import ThermostatS2
-from .wall_outlet import AqaraRelayTwoChannels, AqaraWallOutlet, AqaraWallOutletV1
 from .weather_sensor import AqaraHT, SensorHT
