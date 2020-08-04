@@ -7,13 +7,8 @@ from ...click_common import command
 from .sub_device import SubDevice
 
 
-class AqaraSmartBulbE27(SubDevice):
-    """Subdevice AqaraSmartBulbE27 specific properties and methods."""
-
-    properties = []
-    _zigbee_model = "lumi.light.aqcn02"
-    _model = "ZNLDP12LM"
-    _name = "Smart bulb E27"
+class LightBulb(SubDevice):
+    """Base class for subdevice light bulbs."""
 
     @attr.s(auto_attribs=True)
     class props:
@@ -56,7 +51,16 @@ class AqaraSmartBulbE27(SubDevice):
         return self.send_arg("set_bright", [brightness]).pop()
 
 
-class IkeaBulb82(SubDevice):
+class AqaraSmartBulbE27(LightBulb):
+    """Subdevice AqaraSmartBulbE27 specific properties and methods."""
+
+    properties = []
+    _zigbee_model = "lumi.light.aqcn02"
+    _model = "ZNLDP12LM"
+    _name = "Smart bulb E27"
+
+
+class IkeaBulb82(LightBulb):
     """Subdevice IkeaBulb82 specific properties and methods."""
 
     properties = []
@@ -65,7 +69,7 @@ class IkeaBulb82(SubDevice):
     _name = "Ikea smart bulb E27 white"
 
 
-class IkeaBulb83(SubDevice):
+class IkeaBulb83(LightBulb):
     """Subdevice IkeaBulb83 specific properties and methods."""
 
     properties = []
@@ -74,7 +78,7 @@ class IkeaBulb83(SubDevice):
     _name = "Ikea smart bulb E27 white"
 
 
-class IkeaBulb84(SubDevice):
+class IkeaBulb84(LightBulb):
     """Subdevice IkeaBulb84 specific properties and methods."""
 
     properties = []
@@ -83,7 +87,7 @@ class IkeaBulb84(SubDevice):
     _name = "Ikea smart bulb E12 white"
 
 
-class IkeaBulb85(SubDevice):
+class IkeaBulb85(LightBulb):
     """Subdevice IkeaBulb85 specific properties and methods."""
 
     properties = []
@@ -92,7 +96,7 @@ class IkeaBulb85(SubDevice):
     _name = "Ikea smart bulb GU10 white"
 
 
-class IkeaBulb86(SubDevice):
+class IkeaBulb86(LightBulb):
     """Subdevice IkeaBulb86 specific properties and methods."""
 
     properties = []
@@ -101,7 +105,7 @@ class IkeaBulb86(SubDevice):
     _name = "Ikea smart bulb E27 white"
 
 
-class IkeaBulb87(SubDevice):
+class IkeaBulb87(LightBulb):
     """Subdevice IkeaBulb87 specific properties and methods."""
 
     properties = []
@@ -110,7 +114,7 @@ class IkeaBulb87(SubDevice):
     _name = "Ikea smart bulb GU10 white"
 
 
-class IkeaBulb88(SubDevice):
+class IkeaBulb88(LightBulb):
     """Subdevice IkeaBulb88 specific properties and methods."""
 
     properties = []
