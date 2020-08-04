@@ -37,17 +37,23 @@ class OneChannelSwitch(SubDevice):
     @command(click.argument("channel", type=int))
     def toggle(self, channel: int = 0):
         """Toggle a channel of the switch, default channel_0."""
-        return self.send_arg(self.set_command, [self.Channel_map(channel).name, "toggle"]).pop()
+        return self.send_arg(
+            self.set_command, [self.Channel_map(channel).name, "toggle"]
+        ).pop()
 
     @command(click.argument("channel", type=int))
     def on(self, channel: int = 0):
         """Turn on a channel of the switch, default channel_0."""
-        return self.send_arg(self.set_command, [self.Channel_map(channel).name, "on"]).pop()
+        return self.send_arg(
+            self.set_command, [self.Channel_map(channel).name, "on"]
+        ).pop()
 
     @command(click.argument("channel", type=int))
     def off(self, channel: int = 0):
         """Turn off a channel of the switch, default channel_0."""
-        return self.send_arg(self.set_command, [self.Channel_map(channel).name, "off"]).pop()
+        return self.send_arg(
+            self.set_command, [self.Channel_map(channel).name, "off"]
+        ).pop()
 
 
 class TwoChannelSwitch(OneChannelSwitch):
