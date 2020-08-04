@@ -1,8 +1,9 @@
 """Xiaomi Zigbee switches."""
 
-import attr
-
 from enum import IntEnum
+
+import attr
+import click
 
 from ...click_common import command
 from .sub_device import SubDevice
@@ -79,7 +80,7 @@ class OneChannelSwitchLoad(OneChannelSwitch):
         """Device specific properties."""
 
         status: str = None  # 'on' / 'off'
-        load_power: int = None  # power consumption in ?unit?
+        load_power: int = None  # power consumption in Watt
 
     @command()
     def update(self):
@@ -100,7 +101,7 @@ class TwoChannelSwitchLoad(OneChannelSwitch):
 
         status_ch0: str = None  # 'on' / 'off'
         status_ch1: str = None  # 'on' / 'off'
-        load_power: int = None  # power consumption in ?unit?
+        load_power: int = None  # power consumption in Watt
 
     @command()
     def update(self):
@@ -123,7 +124,7 @@ class ThreeChannelSwitchLoad(OneChannelSwitch):
         status_ch0: str = None  # 'on' / 'off'
         status_ch1: str = None  # 'on' / 'off'
         status_ch2: str = None  # 'on' / 'off'
-        load_power: int = None  # power consumption in ?unit?
+        load_power: int = None  # power consumption in Watt
 
     @command()
     def update(self):
@@ -207,3 +208,32 @@ class Plug(OneChannelSwitchLoad):
     _zigbee_model = "lumi.plug"
     _model = "ZNCZ02LM"
     _name = "Plug"
+
+
+class AqaraWallOutletV1(OneChannelSwitch):
+    """Subdevice AqaraWallOutletV1 specific properties and methods."""
+
+    properties = ["channel_0"]
+    set_command = "toggle_plug"
+    _zigbee_model = "lumi.ctrl_86plug.v1"
+    _model = "QBCZ11LM"
+    _name = "Wall outlet"
+
+
+class AqaraWallOutlet(OneChannelSwitchLoad):
+    """Subdevice AqaraWallOutlet specific properties and methods."""
+
+    properties = ["channel_0", "load_power"]
+    set_command = "toggle_plug"
+    _zigbee_model = "lumi.ctrl_86plug.aq1"
+    _model = "QBCZ11LM"
+    _name = "Wall outlet"
+
+
+class AqaraRelayTwoChannels(TwoChannelSwitchLoad):
+    """Subdevice AqaraRelayTwoChannels specific properties and methods."""
+
+    properties = ["channel_0", "channel_1", "load_power"]
+    _zigbee_model = "lumi.relay.c2acn01"
+    _model = "LLKZMK11LM"
+    _name = "Relay"
