@@ -130,7 +130,7 @@ class Toiletlid(Device):
         return self.send("nozzle_clean", ["on"])
 
     @command(
-        click.argument("color", type=EnumType(AmbientLightColor, False)),
+        click.argument("color", type=EnumType(AmbientLightColor)),
         click.argument("xiaomi_id", type=str, default=""),
         default_output=format_output(
             "Set the ambient light to {color} color the next time you start it."

@@ -276,7 +276,7 @@ class ViomiVacuum(Device):
         """Pause cleaning."""
         self.send("set_mode_withroom", [0, 2, 0])
 
-    @command(click.argument("speed", type=EnumType(ViomiVacuumSpeed, False)))
+    @command(click.argument("speed", type=EnumType(ViomiVacuumSpeed)))
     def set_fan_speed(self, speed: ViomiVacuumSpeed):
         """Set fanspeed [silent, standard, medium, turbo]."""
         self.send("set_suction", [speed.value])
@@ -292,7 +292,7 @@ class ViomiVacuum(Device):
         self.send("set_charge", [1])
 
     @command(
-        click.argument("direction", type=EnumType(ViomiMovementDirection, False)),
+        click.argument("direction", type=EnumType(ViomiMovementDirection)),
         click.option(
             "--duration",
             type=float,
@@ -308,12 +308,12 @@ class ViomiVacuum(Device):
             time.sleep(0.1)
         self.send("set_direction", [ViomiMovementDirection.Stop.value])
 
-    @command(click.argument("mode", type=EnumType(ViomiMode, False)))
+    @command(click.argument("mode", type=EnumType(ViomiMode)))
     def clean_mode(self, mode):
         """Set the cleaning mode."""
         self.send("set_mop", [mode.value])
 
-    @command(click.argument("mop_mode", type=EnumType(ViomiMopMode, False)))
+    @command(click.argument("mop_mode", type=EnumType(ViomiMopMode)))
     def mop_mode(self, mop_mode):
         self.send("set_moproute", [mop_mode.value])
 
@@ -352,12 +352,12 @@ class ViomiVacuum(Device):
             [0 if disable else 1, start_hr, start_min, end_hr, end_min],
         )
 
-    @command(click.argument("language", type=EnumType(ViomiLanguage, False)))
+    @command(click.argument("language", type=EnumType(ViomiLanguage)))
     def set_language(self, language: ViomiLanguage):
         """Set the device's audio language."""
         return self.send("set_language", [language.value])
 
-    @command(click.argument("state", type=EnumType(ViomiLedState, False)))
+    @command(click.argument("state", type=EnumType(ViomiLedState)))
     def led(self, state: ViomiLedState):
         """Switch the button leds on or off."""
         return self.send("set_light", [state.value])

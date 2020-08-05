@@ -90,9 +90,7 @@ class AlarmClock(Device):
         """
         return HourlySystem(self.send("get_hourly_system")[0])
 
-    @command(
-        click.argument("brightness", type=EnumType(HourlySystem, casesensitive=False))
-    )
+    @command(click.argument("brightness", type=EnumType(HourlySystem)))
     def set_hourly_system(self, hs: HourlySystem):
         return self.send("set_hourly_system", [hs.value])
 
@@ -126,9 +124,7 @@ class AlarmClock(Device):
 
     @command(
         click.argument(
-            "alarm_type",
-            type=EnumType(AlarmType, casesensitive=False),
-            default=AlarmType.Alarm.name,
+            "alarm_type", type=EnumType(AlarmType), default=AlarmType.Alarm.name
         )
     )
     def get_ring(self, alarm_type: AlarmType):
@@ -136,8 +132,8 @@ class AlarmClock(Device):
         return RingTone(self.send("get_ring", [{"type": alarm_type.value}]).pop())
 
     @command(
-        click.argument("alarm_type", type=EnumType(AlarmType, casesensitive=False)),
-        click.argument("tone", type=EnumType(Tone, casesensitive=False)),
+        click.argument("alarm_type", type=EnumType(AlarmType)),
+        click.argument("tone", type=EnumType(Tone)),
     )
     def set_ring(self, alarm_type: AlarmType, ring: RingTone):
         """Set alarm tone.

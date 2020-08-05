@@ -223,7 +223,7 @@ class Heater(Device):
         return self.send("set_target_temperature", [temperature])
 
     @command(
-        click.argument("brightness", type=EnumType(Brightness, False)),
+        click.argument("brightness", type=EnumType(Brightness)),
         default_output=format_output("Setting display brightness to {brightness}"),
     )
     def set_brightness(self, brightness: Brightness):

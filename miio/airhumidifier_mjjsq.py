@@ -182,7 +182,7 @@ class AirHumidifierMjjsq(Device):
         return self.send("Set_OnOff", [0])
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode, False)),
+        click.argument("mode", type=EnumType(OperationMode)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
