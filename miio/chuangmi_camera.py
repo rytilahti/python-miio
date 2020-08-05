@@ -327,7 +327,7 @@ class ChuangmiCamera(Device):
         return self.send("set_night_mode", [2])
 
     @command(
-        click.argument("direction", type=EnumType(Direction, False)),
+        click.argument("direction", type=EnumType(Direction)),
         default_output=format_output("Rotating to direction '{direction.name}'"),
     )
     def rotate(self, direction: Direction):
@@ -340,7 +340,7 @@ class ChuangmiCamera(Device):
         return self.send("alarm_sound")
 
     @command(
-        click.argument("sensitivity", type=EnumType(MotionDetectionSensitivity, False)),
+        click.argument("sensitivity", type=EnumType(MotionDetectionSensitivity)),
         default_output=format_output("Setting motion sensitivity '{sensitivity.name}'"),
     )
     def set_motion_sensitivity(self, sensitivity: MotionDetectionSensitivity):
@@ -353,7 +353,7 @@ class ChuangmiCamera(Device):
         )
 
     @command(
-        click.argument("mode", type=EnumType(HomeMonitoringMode, False)),
+        click.argument("mode", type=EnumType(HomeMonitoringMode)),
         click.argument("start-hour", default=10),
         click.argument("start-minute", default=0),
         click.argument("end-hour", default=17),
@@ -378,23 +378,21 @@ class ChuangmiCamera(Device):
             [mode, start_hour, start_minute, end_hour, end_minute, notify, interval],
         )
 
-    @command(default_output=format_output("Clearing NAS directory"),)
+    @command(default_output=format_output("Clearing NAS directory"))
     def clear_nas_dir(self):
         """Clear NAS directory"""
-        return self.send("nas_clear_dir", [[]],)
+        return self.send("nas_clear_dir", [[]])
 
-    @command(default_output=format_output("Getting NAS config info"),)
+    @command(default_output=format_output("Getting NAS config info"))
     def get_nas_config(self):
         """Get NAS config info"""
-        return self.send("nas_get_config", {},)
+        return self.send("nas_get_config", {})
 
     @command(
-        click.argument("state", type=EnumType(NASState, False)),
+        click.argument("state", type=EnumType(NASState)),
         click.argument("share"),
-        click.argument("sync-interval", type=EnumType(NASSyncInterval, False)),
-        click.argument(
-            "video-retention-time", type=EnumType(NASVideoRetentionTime, False)
-        ),
+        click.argument("sync-interval", type=EnumType(NASSyncInterval)),
+        click.argument("video-retention-time", type=EnumType(NASVideoRetentionTime)),
         default_output=format_output("Setting NAS config to '{state.name}'"),
     )
     def set_nas_config(

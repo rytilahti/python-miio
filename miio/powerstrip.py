@@ -213,7 +213,7 @@ class PowerStrip(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        click.argument("mode", type=EnumType(PowerMode, False)),
+        click.argument("mode", type=EnumType(PowerMode)),
         default_output=format_output("Setting mode to {mode}"),
     )
     def set_power_mode(self, mode: PowerMode):

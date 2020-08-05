@@ -12,7 +12,13 @@ import click
 import pytz
 from appdirs import user_cache_dir
 
-from .click_common import DeviceGroup, GlobalContextObject, LiteralParamType, command
+from .click_common import (
+    DeviceGroup,
+    EnumType,
+    GlobalContextObject,
+    LiteralParamType,
+    command,
+)
 from .device import Device
 from .exceptions import DeviceException, DeviceInfoUnavailableException
 from .vacuumcontainers import (
@@ -666,7 +672,7 @@ class Vacuum(Device):
         """Get water flow setting."""
         return WaterFlow(self.send("get_water_box_custom_mode")[0])
 
-    @command(click.argument("waterflow", type=WaterFlow))
+    @command(click.argument("waterflow", type=EnumType(WaterFlow)))
     def set_waterflow(self, waterflow: WaterFlow):
         """Set water flow setting."""
         return self.send("set_water_box_custom_mode", [waterflow.value])

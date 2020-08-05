@@ -253,7 +253,7 @@ class AirDehumidifier(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode, False)),
+        click.argument("mode", type=EnumType(OperationMode)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
@@ -268,7 +268,7 @@ class AirDehumidifier(Device):
             raise
 
     @command(
-        click.argument("fan_speed", type=EnumType(FanSpeed, False)),
+        click.argument("fan_speed", type=EnumType(FanSpeed)),
         default_output=format_output("Setting fan level to {fan_level}"),
     )
     def set_fan_speed(self, fan_speed: FanSpeed):

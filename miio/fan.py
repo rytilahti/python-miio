@@ -455,7 +455,7 @@ class Fan(Device):
         return self.send("set_speed_level", [speed])
 
     @command(
-        click.argument("direction", type=EnumType(MoveDirection, False)),
+        click.argument("direction", type=EnumType(MoveDirection)),
         default_output=format_output("Rotating the fan to the {direction}"),
     )
     def set_rotate(self, direction: MoveDirection):
@@ -489,7 +489,7 @@ class Fan(Device):
             return self.send("set_angle_enable", ["off"])
 
     @command(
-        click.argument("brightness", type=EnumType(LedBrightness, False)),
+        click.argument("brightness", type=EnumType(LedBrightness)),
         default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightness):
@@ -663,7 +663,7 @@ class FanP5(Device):
         return self.send("s_power", [False])
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode, False)),
+        click.argument("mode", type=EnumType(OperationMode)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
@@ -761,7 +761,7 @@ class FanP5(Device):
         return self.send("s_t_off", [minutes])
 
     @command(
-        click.argument("direction", type=EnumType(MoveDirection, False)),
+        click.argument("direction", type=EnumType(MoveDirection)),
         default_output=format_output("Rotating the fan to the {direction}"),
     )
     def set_rotate(self, direction: MoveDirection):

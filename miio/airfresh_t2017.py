@@ -295,7 +295,7 @@ class AirFreshT2017(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode, False)),
+        click.argument("mode", type=EnumType(OperationMode)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
@@ -316,7 +316,7 @@ class AirFreshT2017(Device):
             return self.send("set_display", ["off"])
 
     @command(
-        click.argument("orientation", type=EnumType(DisplayOrientation, False)),
+        click.argument("orientation", type=EnumType(DisplayOrientation)),
         default_output=format_output("Setting orientation to '{orientation.value}'"),
     )
     def set_display_orientation(self, orientation: DisplayOrientation):
@@ -324,7 +324,7 @@ class AirFreshT2017(Device):
         return self.send("set_screen_direction", [orientation.value])
 
     @command(
-        click.argument("level", type=EnumType(PtcLevel, False)),
+        click.argument("level", type=EnumType(PtcLevel)),
         default_output=format_output("Setting ptc level to '{level.value}'"),
     )
     def set_ptc_level(self, level: PtcLevel):
