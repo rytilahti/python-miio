@@ -1,6 +1,6 @@
 """Xiaomi Zigbee door sensor."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class MagnetDevice(SubDevice):

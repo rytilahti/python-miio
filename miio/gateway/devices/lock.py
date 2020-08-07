@@ -1,6 +1,6 @@
 """Xiaomi Zigbee Locks."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class LockDevice(SubDevice):

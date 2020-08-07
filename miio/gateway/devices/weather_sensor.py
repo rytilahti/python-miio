@@ -4,7 +4,7 @@ import attr
 
 from ...click_common import command
 from ..gateway import GatewayException
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class SensorHT(SubDevice):

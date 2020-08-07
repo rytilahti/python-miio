@@ -4,8 +4,8 @@ from datetime import datetime
 
 import click
 
-from ...click_common import command, format_output
-from .gateway_device import GatewayDevice
+from ..click_common import command, format_output
+from .gatewaydevice import GatewayDevice
 
 
 class GatewayAlarm(GatewayDevice):

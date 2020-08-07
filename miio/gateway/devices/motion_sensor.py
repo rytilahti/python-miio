@@ -1,6 +1,6 @@
 """Xiaomi Zigbee motion."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class MotionDevice(SubDevice):

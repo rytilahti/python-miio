@@ -1,6 +1,6 @@
 """Xiaomi Zigbee Cube."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class CubeDevice(SubDevice):

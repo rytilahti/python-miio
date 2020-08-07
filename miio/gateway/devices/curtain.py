@@ -1,6 +1,6 @@
 """Xiaomi Zigbee curtain."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class CurtainDevice(SubDevice):

@@ -145,7 +145,7 @@ class Gateway(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-        from .gateway_device import (
+        from . import (
             GatewayAlarm,
             GatewayRadio,
             GatewayZigbee,
@@ -200,7 +200,7 @@ class Gateway(Device):
         and returns a list of the discovered devices.
         """
 
-        from .sub_device import (
+        from .devices import (
             SubDevice,
             SubDeviceInfo,
             Switch,

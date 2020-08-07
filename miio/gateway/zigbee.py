@@ -2,8 +2,8 @@
 
 import click
 
-from ...click_common import command
-from .gateway_device import GatewayDevice
+from ..click_common import command
+from .gatewaydevice import GatewayDevice
 
 
 class GatewayZigbee(GatewayDevice):
