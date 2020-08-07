@@ -142,6 +142,13 @@ class Gateway(Device):
                 self.model,
             )
             return self._devices
+        if self.model == GATEWAY_MODEL_ZIG3:
+            # it is unknown if self.get_prop("device_list") will work for the GATEWAY_MODEL_ZIG3
+            # self.send("get_device_list") has been suggested to work for the GATEWAY_MODEL_ZIG3
+            _LOGGER.warning(
+                "Gateway model '%s' has not been tested to be able to get the device list, a possible alternative would be self.send('get_device_list')",
+                self.model,
+            )
 
         devices_raw = self.get_prop("device_list")
 
