@@ -6,7 +6,7 @@ from ..click_common import command
 from .gatewaydevice import GatewayDevice
 
 
-class GatewayZigbee(GatewayDevice):
+class Zigbee(GatewayDevice):
     """Zigbee controls."""
 
     @command()
