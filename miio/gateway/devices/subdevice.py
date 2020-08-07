@@ -1,27 +1,39 @@
 """Xiaomi Gateway subdevice base class."""
 
-import attr
-import click
 import logging
-
 from enum import IntEnum
 from typing import Optional
+
+import attr
+import click
 
 from ...click_common import command
 from ..gateway import GATEWAY_MODEL_EU, Gateway, GatewayException
 from . import (
-    Switch,
-    AqaraSwitch,
-    AqaraSquareButtonV3,
+    AqaraHT,
+    AqaraMagnet,
+    AqaraMotion,
+    AqaraRelayTwoChannels,
+    AqaraSmartBulbE27,
     AqaraSquareButton,
+    AqaraSquareButtonV3,
+    AqaraSwitch,
+    AqaraSwitchOneChannel,
+    AqaraSwitchTwoChannels,
+    AqaraVibration,
+    AqaraWallOutlet,
+    AqaraWallOutletV1,
+    AqaraWaterLeak,
     Cube,
     CubeV2,
-    CurtainV1,
     Curtain,
     CurtainB1,
-    Magnet,
-    AqaraMagnet,
-    AqaraSmartBulbE27,
+    CurtainV1,
+    D1RemoteSwitchDouble,
+    D1RemoteSwitchSingle,
+    D1WallSwitchTriple,
+    D1WallSwitchTripleNN,
+    DoorLockS1,
     IkeaBulb82,
     IkeaBulb83,
     IkeaBulb84,
@@ -29,37 +41,25 @@ from . import (
     IkeaBulb86,
     IkeaBulb87,
     IkeaBulb88,
-    DoorLockS1,
     LockS2,
-    LockV1,
     LockS2Pro,
+    LockV1,
+    Magnet,
     Motion,
-    AqaraMotion,
-    RemoteSwitchDoubleV1,
-    RemoteSwitchSingleV1,
-    RemoteSwitchSingle,
+    Plug,
     RemoteSwitchDouble,
-    D1RemoteSwitchSingle,
-    D1RemoteSwitchDouble,
-    SensorSmoke,
+    RemoteSwitchDoubleV1,
+    RemoteSwitchSingle,
+    RemoteSwitchSingleV1,
+    SensorHT,
     SensorNatgas,
-    AqaraWaterLeak,
-    AqaraVibration,
-    SwitchTwoChannels,
-    SwitchOneChannel,
+    SensorSmoke,
+    Switch,
     SwitchLiveOneChannel,
     SwitchLiveTwoChannels,
-    AqaraSwitchOneChannel,
-    AqaraSwitchTwoChannels,
-    D1WallSwitchTriple,
-    D1WallSwitchTripleNN,
-    Plug,
+    SwitchOneChannel,
+    SwitchTwoChannels,
     ThermostatS2,
-    AqaraWallOutletV1,
-    AqaraRelayTwoChannels,
-    AqaraWallOutlet,
-    SensorHT,
-    AqaraHT,
 )
 
 _LOGGER = logging.getLogger(__name__)
