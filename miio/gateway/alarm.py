@@ -8,7 +8,7 @@ from ..click_common import command, format_output
 from .gatewaydevice import GatewayDevice
 
 
-class GatewayAlarm(GatewayDevice):
+class Alarm(GatewayDevice):
     """Class representing the Xiaomi Gateway Alarm."""
 
     @command(default_output=format_output("[alarm_status]"))

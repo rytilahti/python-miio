@@ -146,16 +146,16 @@ class Gateway(Device):
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         from . import (
-            GatewayAlarm,
-            GatewayRadio,
-            GatewayZigbee,
-            GatewayLight,
+            Alarm,
+            Radio,
+            Zigbee,
+            Light,
         )
 
-        self._alarm = GatewayAlarm(parent=self)
-        self._radio = GatewayRadio(parent=self)
-        self._zigbee = GatewayZigbee(parent=self)
-        self._light = GatewayLight(parent=self)
+        self._alarm = Alarm(parent=self)
+        self._radio = Radio(parent=self)
+        self._zigbee = Zigbee(parent=self)
+        self._light = Light(parent=self)
         self._devices = {}
         self._info = None
 

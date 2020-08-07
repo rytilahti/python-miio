@@ -21,7 +21,7 @@ color_map = {
 }
 
 
-class GatewayLight(GatewayDevice):
+class Light(GatewayDevice):
     """
     Light controls for the gateway.
 

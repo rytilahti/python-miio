@@ -6,7 +6,7 @@ from ..click_common import command
 from .gatewaydevice import GatewayDevice
 
 
-class GatewayRadio(GatewayDevice):
+class Radio(GatewayDevice):
     """Radio controls for the gateway."""
 
     @command()
