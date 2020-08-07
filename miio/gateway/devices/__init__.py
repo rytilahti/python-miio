@@ -29,7 +29,7 @@ from .remote_switch import (
     Switch,
 )
 from .sensor import AqaraVibration, AqaraWaterLeak, SensorNatgas, SensorSmoke
-from .subdevice import SubDevice, SubDeviceInfo
+from .subdevice import DeviceType, DeviceTypeMapping, SubDevice, SubDeviceInfo
 from .switch import (
     AqaraRelayTwoChannels,
     AqaraSwitchOneChannel,
