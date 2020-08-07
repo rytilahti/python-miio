@@ -1,7 +1,6 @@
 """Xiaomi Gateway implementation using Miio protecol."""
 
 import logging
-from enum import IntEnum
 
 import click
 
