@@ -1,5 +1,7 @@
 """Xiaomi Zigbee Locks."""
 
+import attr
+
 from .subdevice import SubDevice
 
 
