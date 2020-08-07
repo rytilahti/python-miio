@@ -1,6 +1,6 @@
 """Xiaomi Zigbee remote switches/buttons."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class RemoteSwitchDevice(SubDevice):

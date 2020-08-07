@@ -1,6 +1,6 @@
 """Xiaomi Zigbee thermostats."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class ThermostatS2(SubDevice):

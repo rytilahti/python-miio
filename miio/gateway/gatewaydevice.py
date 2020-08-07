@@ -2,8 +2,8 @@
 
 import logging
 
-from ...device import Device
-from ..gateway import Gateway
+from ..device import Device
+from .gateway import Gateway
 
 _LOGGER = logging.getLogger(__name__)
 

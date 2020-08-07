@@ -6,7 +6,7 @@ import attr
 import click
 
 from ...click_common import command
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class OneChannelSwitch(SubDevice):

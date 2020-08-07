@@ -1,6 +1,6 @@
 """Xiaomi Zigbee various sensors."""
 
-from .sub_device import SubDevice
+from .subdevice import SubDevice
 
 
 class SensorSmoke(SubDevice):
