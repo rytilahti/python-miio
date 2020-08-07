@@ -3,7 +3,13 @@
 from .sub_device import SubDevice
 
 
-class Motion(SubDevice):
+class MotionDevice(SubDevice):
+    """Base class for subdevice motion."""
+
+    properties = []
+
+
+class Motion(MotionDevice):
     """Subdevice Motion specific properties and methods."""
 
     properties = []
@@ -12,7 +18,7 @@ class Motion(SubDevice):
     _name = "Motion sensor"
 
 
-class AqaraMotion(SubDevice):
+class AqaraMotion(MotionDevice):
     """Subdevice AqaraMotion specific properties and methods."""
 
     properties = []
