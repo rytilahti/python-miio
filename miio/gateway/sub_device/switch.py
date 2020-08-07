@@ -27,7 +27,7 @@ class OneChannelSwitch(SubDevice):
         values = self.get_property_exp(self.properties)
         self._props.status = values[0]
 
-    class Channel_map(IntEnum):
+    class ChannelMap(IntEnum):
         """Option to select wich channel to control."""
 
         channel_0 = 0
@@ -38,21 +38,21 @@ class OneChannelSwitch(SubDevice):
     def toggle(self, channel: int = 0):
         """Toggle a channel of the switch, default channel_0."""
         return self.send_arg(
-            self.set_command, [self.Channel_map(channel).name, "toggle"]
+            self.set_command, [self.ChannelMap(channel).name, "toggle"]
         ).pop()
 
     @command(click.argument("channel", type=int))
     def on(self, channel: int = 0):
         """Turn on a channel of the switch, default channel_0."""
         return self.send_arg(
-            self.set_command, [self.Channel_map(channel).name, "on"]
+            self.set_command, [self.ChannelMap(channel).name, "on"]
         ).pop()
 
     @command(click.argument("channel", type=int))
     def off(self, channel: int = 0):
         """Turn off a channel of the switch, default channel_0."""
         return self.send_arg(
-            self.set_command, [self.Channel_map(channel).name, "off"]
+            self.set_command, [self.ChannelMap(channel).name, "off"]
         ).pop()
 
 
