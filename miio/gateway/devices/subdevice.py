@@ -1,10 +1,11 @@
 """Xiaomi Gateway subdevice base class."""
 
-import logging
-from typing import Optional
-
 import attr
 import click
+import logging
+
+from enum import IntEnum
+from typing import Optional
 
 from ...click_common import command
 from ..gateway import GATEWAY_MODEL_EU, Gateway, GatewayException
