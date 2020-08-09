@@ -66,6 +66,34 @@ class AirFreshStatus:
     """Container for status reports from the air fresh."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response of a Air Fresh VA4 (zhimi.airfresh.va4):
+
+        {
+            'power': 'on',
+            'temp_dec': 28.5,
+            'aqi': 1,
+            'average_aqi': 1,
+            'co2': 1081,
+            'buzzer': 'off',
+            'child_lock': 'off',
+            'humidity': 40,
+            'led_level': 1,
+            'mode': 'silent',
+            'motor1_speed': 400,
+            'use_time': 510000,
+            'ntcT': 33.53,
+            'app_extra': None,
+            'f1_hour_used': 141,
+            'filter_life': None,
+            'f_hour': None,
+            'favorite_level': None,
+            'led': None,
+            'ptc_state': 'off',
+        }
+
+        """
+
         self.data = data
 
     @property
@@ -111,6 +139,14 @@ class AirFreshStatus:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
+
+        return None
+
+    @property
+    def ntc_temperature(self) -> Optional[float]:
+        """Current ntc temperature, if available."""
+        if self.data["ntcT"] is not None:
+            return self.data["ntcT"]
 
         return None
 
@@ -182,6 +218,7 @@ class AirFreshStatus:
             "aqi=%s, "
             "average_aqi=%s, "
             "temperature=%s, "
+            "ntc_temperature=%s, "
             "humidity=%s%%, "
             "co2=%s, "
             "mode=%s, "
@@ -200,6 +237,7 @@ class AirFreshStatus:
                 self.aqi,
                 self.average_aqi,
                 self.temperature,
+                self.ntc_temperature,
                 self.humidity,
                 self.co2,
                 self.mode,
@@ -247,6 +285,7 @@ class AirFresh(Device):
             "AQI: {result.aqi} μg/m³\n"
             "Average AQI: {result.average_aqi} μg/m³\n"
             "Temperature: {result.temperature} °C\n"
+            "NTC temperature: {result.ntc_temperature} °C\n"
             "Humidity: {result.humidity} %\n"
             "CO2: {result.co2} %\n"
             "Mode: {result.mode.value}\n"

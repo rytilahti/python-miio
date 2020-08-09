@@ -31,7 +31,7 @@ class DummyAirFresh(DummyDevice, AirFresh):
             "mode": "auto",
             "motor1_speed": 354,
             "use_time": 2457000,
-            "ntcT": None,
+            "ntcT": 33.53,
             "app_extra": 1,
             "f1_hour_used": 682,
             "filter_life": 80,
@@ -95,6 +95,7 @@ class TestAirFresh(TestCase):
         assert self.state().aqi == self.device.start_state["aqi"]
         assert self.state().average_aqi == self.device.start_state["average_aqi"]
         assert self.state().temperature == self.device.start_state["temp_dec"] / 10.0
+        assert self.state().ntc_temperature == self.device.start_state["ntcT"]
         assert self.state().humidity == self.device.start_state["humidity"]
         assert self.state().co2 == self.device.start_state["co2"]
         assert self.state().mode == OperationMode(self.device.start_state["mode"])
@@ -222,3 +223,9 @@ class TestAirFresh(TestCase):
 
         self.device.state["ptc_state"] = None
         assert self.state().ptc is None
+
+    def test_status_without_ntc_temperature(self):
+        self.device._reset_state()
+
+        self.device.state["ntcT"] = None
+        assert self.state().ntc_temperature is None
