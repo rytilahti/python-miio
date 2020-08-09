@@ -38,7 +38,7 @@ AVAILABLE_PROPERTIES_COMMON = [
 
 AVAILABLE_PROPERTIES = {
     MODEL_AIRFRESH_VA2: AVAILABLE_PROPERTIES_COMMON,
-    MODEL_AIRFRESH_VA4: AVAILABLE_PROPERTIES_COMMON + ["ptc_state",],
+    MODEL_AIRFRESH_VA4: AVAILABLE_PROPERTIES_COMMON + ["ptc_state"],
 }
 
 
@@ -105,11 +105,6 @@ class AirFreshStatus:
             return self.data["ptc_state"] == "on"
 
         return None
-
-    @property
-    def humidity(self) -> int:
-        """Current humidity."""
-        return self.data["humidity"]
 
     @property
     def temperature(self) -> Optional[float]:
