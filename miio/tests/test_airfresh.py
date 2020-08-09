@@ -17,7 +17,7 @@ class DummyAirFresh(DummyDevice, AirFresh):
     def __init__(self, *args, **kwargs):
         self.state = {
             "power": "on",
-            "temp_dec": 186,
+            "temp_dec": 18.6,
             "aqi": 10,
             "average_aqi": 8,
             "humidity": 62,
@@ -89,7 +89,7 @@ class TestAirFresh(TestCase):
         assert self.is_on() is True
         assert self.state().aqi == self.device.start_state["aqi"]
         assert self.state().average_aqi == self.device.start_state["average_aqi"]
-        assert self.state().temperature == self.device.start_state["temp_dec"] / 10.0
+        assert self.state().temperature == self.device.start_state["temp_dec"]
         assert self.state().humidity == self.device.start_state["humidity"]
         assert self.state().co2 == self.device.start_state["co2"]
         assert self.state().mode == OperationMode(self.device.start_state["mode"])
