@@ -45,6 +45,7 @@ from .airconditioningcompanion import (
     MODEL_ACPARTNER_V2,
     MODEL_ACPARTNER_V3,
 )
+from .airfresh import MODEL_AIRFRESH_VA2, MODEL_AIRFRESH_VA4
 from .airhumidifier import (
     MODEL_HUMIDIFIER_CA1,
     MODEL_HUMIDIFIER_CB1,
@@ -156,7 +157,8 @@ DEVICE_MAP = {
     "zhimi-fan-za4": partial(Fan, model=MODEL_FAN_ZA4),
     "dmaker-fan-p5": partial(Fan, model=MODEL_FAN_P5),
     "tinymu-toiletlid-v1": partial(Toiletlid, model=MODEL_TOILETLID_V1),
-    "zhimi-airfresh-va2": AirFresh,
+    "zhimi-airfresh-va2": partial(AirFresh, model=MODEL_AIRFRESH_VA2),
+    "zhimi-airfresh-va4": partial(AirFresh, model=MODEL_AIRFRESH_VA4),
     "dmaker-airfresh-t2017": AirFreshT2017,
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),

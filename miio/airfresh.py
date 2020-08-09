@@ -11,6 +11,36 @@ from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_AIRFRESH_VA2 = "zhimi.airfresh.va2"
+MODEL_AIRFRESH_VA4 = "zhimi.airfresh.va4"
+
+AVAILABLE_PROPERTIES_COMMON = [
+    "power",
+    "temp_dec",
+    "aqi",
+    "average_aqi",
+    "co2",
+    "buzzer",
+    "child_lock",
+    "humidity",
+    "led_level",
+    "mode",
+    "motor1_speed",
+    "use_time",
+    "ntcT",
+    "app_extra",
+    "f1_hour_used",
+    "filter_life",
+    "f_hour",
+    "favorite_level",
+    "led",
+]
+
+AVAILABLE_PROPERTIES = {
+    MODEL_AIRFRESH_VA2: AVAILABLE_PROPERTIES_COMMON,
+    MODEL_AIRFRESH_VA4: AVAILABLE_PROPERTIES_COMMON + ["ptc_state",],
+}
+
 
 class AirFreshException(DeviceException):
     pass
@@ -62,6 +92,19 @@ class AirFreshStatus:
     def co2(self) -> int:
         """Carbon dioxide."""
         return self.data["co2"]
+
+    @property
+    def humidity(self) -> int:
+        """Current humidity."""
+        return self.data["humidity"]
+
+    @property
+    def ptc(self) -> Optional[bool]:
+        """Return True if PTC is on."""
+        if self.data["ptc_state"] is not None:
+            return self.data["ptc_state"] == "on"
+
+        return None
 
     @property
     def humidity(self) -> int:
@@ -140,6 +183,7 @@ class AirFreshStatus:
     def __repr__(self) -> str:
         s = (
             "<AirFreshStatus power=%s, "
+            "ptc=%s, "
             "aqi=%s, "
             "average_aqi=%s, "
             "temperature=%s, "
@@ -157,6 +201,7 @@ class AirFreshStatus:
             "extra_features=%s>"
             % (
                 self.power,
+                self.ptc,
                 self.aqi,
                 self.average_aqi,
                 self.temperature,
@@ -183,10 +228,27 @@ class AirFreshStatus:
 class AirFresh(Device):
     """Main class representing the air fresh."""
 
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_AIRFRESH_VA2,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_AIRFRESH_VA2
+
     @command(
         default_output=format_output(
             "",
             "Power: {result.power}\n"
+            "Heater (PTC): {result.ptc}\n"
             "AQI: {result.aqi} μg/m³\n"
             "Average AQI: {result.average_aqi} μg/m³\n"
             "Temperature: {result.temperature} °C\n"
@@ -206,28 +268,7 @@ class AirFresh(Device):
     def status(self) -> AirFreshStatus:
         """Retrieve properties."""
 
-        properties = [
-            "power",
-            "temp_dec",
-            "aqi",
-            "average_aqi",
-            "co2",
-            "buzzer",
-            "child_lock",
-            "humidity",
-            "led_level",
-            "mode",
-            "motor1_speed",
-            "use_time",
-            "ntcT",
-            "app_extra",
-            "f1_hour_used",
-            "filter_life",
-            "f_hour",
-            "favorite_level",
-            "led",
-        ]
-
+        properties = AVAILABLE_PROPERTIES[self.model]
         values = self.get_properties(properties, max_properties=15)
 
         return AirFreshStatus(defaultdict(lambda: None, zip(properties, values)))
@@ -312,3 +353,16 @@ class AirFresh(Device):
     def reset_filter(self):
         """Resets filter hours used and remaining life."""
         return self.send("reset_filter1")
+
+    @command(
+        click.argument("ptc", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on PTC" if buzzer else "Turning off PTC"
+        ),
+    )
+    def set_ptc(self, ptc: bool):
+        """Set PTC on/off."""
+        if ptc:
+            return self.send("set_ptc_state", ["on"])
+        else:
+            return self.send("set_ptc_state", ["off"])
