@@ -91,7 +91,6 @@ class AirFreshStatus:
             'led': None,
             'ptc_state': 'off',
         }
-
         """
 
         self.data = data
