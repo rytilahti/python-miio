@@ -4,6 +4,7 @@ import pytest
 
 from miio import AirFresh
 from miio.airfresh import (
+    MODEL_AIRFRESH_VA4,
     AirFreshException,
     AirFreshStatus,
     LedBrightness,
@@ -15,8 +16,10 @@ from .dummies import DummyDevice
 
 class DummyAirFresh(DummyDevice, AirFresh):
     def __init__(self, *args, **kwargs):
+        self.model = MODEL_AIRFRESH_VA4
         self.state = {
             "power": "on",
+            "ptc_state": "off",
             "temp_dec": 186,
             "aqi": 10,
             "average_aqi": 8,
@@ -39,6 +42,7 @@ class DummyAirFresh(DummyDevice, AirFresh):
         self.return_values = {
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),
+            "set_ptc_state": lambda x: self._set_state("ptc_state", x),
             "set_mode": lambda x: self._set_state("mode", x),
             "set_buzzer": lambda x: self._set_state("buzzer", x),
             "set_child_lock": lambda x: self._set_state("child_lock", x),
@@ -87,6 +91,7 @@ class TestAirFresh(TestCase):
         assert repr(self.state()) == repr(AirFreshStatus(self.device.start_state))
 
         assert self.is_on() is True
+        assert self.state().ptc == (self.device.start_state["ptc_state"] == "on")
         assert self.state().aqi == self.device.start_state["aqi"]
         assert self.state().average_aqi == self.device.start_state["average_aqi"]
         assert self.state().temperature == self.device.start_state["temp_dec"] / 10.0
@@ -201,3 +206,19 @@ class TestAirFresh(TestCase):
         self.device.reset_filter()
         assert filter_hours_used() == 0
         assert filter_life_remaining() == 100
+
+    def test_set_ptc(self):
+        def ptc():
+            return self.device.status().ptc
+
+        self.device.set_ptc(True)
+        assert ptc() is True
+
+        self.device.set_ptc(False)
+        assert ptc() is False
+
+    def test_status_without_ptc(self):
+        self.device._reset_state()
+
+        self.device.state["ptc_state"] = None
+        assert self.state().ptc is None
