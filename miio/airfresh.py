@@ -65,7 +65,7 @@ class LedBrightness(enum.Enum):
 class AirFreshStatus:
     """Container for status reports from the air fresh."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[str, Any], model: str) -> None:
         """
         Response of a Air Fresh VA4 (zhimi.airfresh.va4):
 
@@ -94,6 +94,7 @@ class AirFreshStatus:
         """
 
         self.data = data
+        self.model = model
 
     @property
     def power(self) -> str:
@@ -137,7 +138,10 @@ class AirFreshStatus:
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
-            return self.data["temp_dec"]
+            if self.model == MODEL_AIRFRESH_VA4:
+                return self.data["temp_dec"]
+            else:
+                return self.data["temp_dec"] / 10.0
 
         return None
 
@@ -304,7 +308,9 @@ class AirFresh(Device):
         properties = AVAILABLE_PROPERTIES[self.model]
         values = self.get_properties(properties, max_properties=15)
 
-        return AirFreshStatus(defaultdict(lambda: None, zip(properties, values)))
+        return AirFreshStatus(
+            defaultdict(lambda: None, zip(properties, values)), self.model
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -399,3 +405,19 @@ class AirFresh(Device):
             return self.send("set_ptc_state", ["on"])
         else:
             return self.send("set_ptc_state", ["off"])
+
+
+class AirFreshVA4(AirFresh):
+    """Main class representing the air fresh va4."""
+
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, model=MODEL_AIRFRESH_VA4
+        )
