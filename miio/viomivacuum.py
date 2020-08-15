@@ -38,6 +38,8 @@ ERROR_CODES = {
     530: "Mop and water tank missing",
     531: "Water tank is not installed",
     2101: "Unsufficient battery, continuing cleaning after recharge",
+    2103: "Charging",
+    2105: "Fully charged",
 }
 
 
@@ -63,7 +65,7 @@ class ViomiMode(Enum):
     Vacuum = 0  # No Mop, Vacuum only
     VacuumAndMop = 1
     Mop = 2
-
+    Unknown = 4
 
 class ViomiLanguage(Enum):
     CN = 1  # Chinese (default)
@@ -94,7 +96,7 @@ class ViomiBinType(Enum):
     Vacuum = 1
     Water = 2
     VacuumAndWater = 3
-
+    NoBin = 0
 
 class ViomiWaterGrade(Enum):
     Low = 11
