@@ -30,7 +30,7 @@ class MiotDevice(Device):
             properties, property_getter="get_properties", max_properties=15
         )
     
-    def get_property(self, property_key: str):
+    def get_property(self, property_key: str) -> dict:
         property = {"did": property_key, **self.mapping.get(property_key)}
 
         return self.get_properties(
@@ -38,7 +38,7 @@ class MiotDevice(Device):
         )[0]
 
     def get_value(self, property_key: str):
-        return self.get_property(property_key)["value"]
+        return self.get_property(property_key).get("value")
 
     def set_property(self, property_key: str, value):
         """Sets property value."""
