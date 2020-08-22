@@ -202,7 +202,7 @@ class PhilipsRwread(Device):
         return self.send("enable_flm", [int(motion_detection)])
 
     @command(
-        click.argument("sensitivity", type=EnumType(MotionDetectionSensitivity, False)),
+        click.argument("sensitivity", type=EnumType(MotionDetectionSensitivity)),
         default_output=format_output(
             "Setting motion detection sensitivity to {sensitivity}"
         ),

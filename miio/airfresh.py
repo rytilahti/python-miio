@@ -72,7 +72,7 @@ class AirFreshStatus:
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
-            return self.data["temp_dec"] / 10.0
+            return self.data["temp_dec"]
 
         return None
 
@@ -243,7 +243,7 @@ class AirFresh(Device):
         return self.send("set_power", ["off"])
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode, False)),
+        click.argument("mode", type=EnumType(OperationMode)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
@@ -264,7 +264,7 @@ class AirFresh(Device):
             return self.send("set_led", ["off"])
 
     @command(
-        click.argument("brightness", type=EnumType(LedBrightness, False)),
+        click.argument("brightness", type=EnumType(LedBrightness)),
         default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightness):

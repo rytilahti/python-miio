@@ -403,12 +403,12 @@ class AirConditioningCompanion(Device):
 
     @command(
         click.argument("model", type=str),
-        click.argument("power", type=EnumType(Power, False)),
-        click.argument("operation_mode", type=EnumType(OperationMode, False)),
+        click.argument("power", type=EnumType(Power)),
+        click.argument("operation_mode", type=EnumType(OperationMode)),
         click.argument("target_temperature", type=int),
-        click.argument("fan_speed", type=EnumType(FanSpeed, False)),
-        click.argument("swing_mode", type=EnumType(SwingMode, False)),
-        click.argument("led", type=EnumType(Led, False)),
+        click.argument("fan_speed", type=EnumType(FanSpeed)),
+        click.argument("swing_mode", type=EnumType(SwingMode)),
+        click.argument("led", type=EnumType(Led)),
         default_output=format_output("Sending a configuration to the air conditioner"),
     )
     def send_configuration(

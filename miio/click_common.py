@@ -63,7 +63,7 @@ class ExceptionHandlerGroup(click.Group):
 
 
 class EnumType(click.Choice):
-    def __init__(self, enumcls, casesensitive=True):
+    def __init__(self, enumcls, casesensitive=False):
         choices = enumcls.__members__
 
         if not casesensitive:

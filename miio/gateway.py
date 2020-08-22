@@ -3,7 +3,7 @@
 import logging
 from datetime import datetime
 from enum import Enum, IntEnum
-from typing import Optional
+from typing import Optional, Tuple
 
 import attr
 import click
@@ -19,6 +19,9 @@ GATEWAY_MODEL_CHINA = "lumi.gateway.v3"
 GATEWAY_MODEL_EU = "lumi.gateway.mieu01"
 GATEWAY_MODEL_ZIG3 = "lumi.gateway.mgl03"
 GATEWAY_MODEL_AQARA = "lumi.gateway.aqhm01"
+GATEWAY_MODEL_AC_V1 = "lumi.acpartner.v1"
+GATEWAY_MODEL_AC_V2 = "lumi.acpartner.v2"
+GATEWAY_MODEL_AC_V3 = "lumi.acpartner.v3"
 
 color_map = {
     "red": (255, 0, 0),
@@ -643,74 +646,116 @@ class GatewayRadio(GatewayDevice):
 
 
 class GatewayLight(GatewayDevice):
-    """Light controls for the gateway."""
+    """
+    Light controls for the gateway.
+
+    The gateway LEDs can be controlled using 'rgb' or 'night_light' methods.
+    The 'night_light' methods control the same light as the 'rgb' methods, but has a separate memory for brightness and color.
+    Changing the 'rgb' light does not affect the stored state of the 'night_light', while changing the 'night_light' does effect the state of the 'rgb' light.
+    """
 
     @command()
-    def get_night_light_rgb(self):
-        """Unknown."""
-        # Returns 0 when light is off?"""
-        # looks like this is the same as get_rgb
-        # id': 65064, 'method': 'set_night_light_rgb', 'params': [419407616]}
-        # {'method': 'props', 'params':
-        # {'light': 'on', 'from.light': '4,,,'}, 'id': 88457} ?!
-        return self._gateway.send("get_night_light_rgb")
+    def rgb_status(self):
+        """
+        Get current status of the light.
+        Always represents the current status of the light as opposed to 'night_light_status'.
 
-    @command(click.argument("color_name", type=str))
-    def set_night_light_color(self, color_name):
-        """Set night light color using color name (red, green, etc)."""
-        if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
-        current_brightness = int_to_brightness(
-            self._gateway.send("get_night_light_rgb")[0]
-        )
-        brightness_and_color = brightness_and_color_to_int(
-            current_brightness, color_map[color_name]
-        )
+        Example:
+           {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
+        """
+        # Returns {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)} when light is off
+        state_int = self._gateway.send("get_rgb").pop()
+        brightness = int_to_brightness(state_int)
+        rgb = int_to_rgb(state_int)
+        is_on = brightness > 0
+
+        return {"is_on": is_on, "brightness": brightness, "rgb": rgb}
+
+    @command()
+    def night_light_status(self):
+        """
+        Get status of the night light.
+        This command only gives the correct status of the LEDs if the last command was a 'night_light' command and not a 'rgb' light command, otherwise it gives the stored values of the 'night_light'.
+
+        Example:
+           {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
+        """
+        state_int = self._gateway.send("get_night_light_rgb").pop()
+        brightness = int_to_brightness(state_int)
+        rgb = int_to_rgb(state_int)
+        is_on = brightness > 0
+
+        return {"is_on": is_on, "brightness": brightness, "rgb": rgb}
+
+    @command(
+        click.argument("brightness", type=int),
+        click.argument("rgb", type=(int, int, int)),
+    )
+    def set_rgb(self, brightness: int, rgb: Tuple[int, int, int]):
+        """Set gateway light using brightness and rgb tuple."""
+        brightness_and_color = brightness_and_color_to_int(brightness, rgb)
+
+        return self._gateway.send("set_rgb", [brightness_and_color])
+
+    @command(
+        click.argument("brightness", type=int),
+        click.argument("rgb", type=(int, int, int)),
+    )
+    def set_night_light(self, brightness: int, rgb: Tuple[int, int, int]):
+        """Set gateway night light using brightness and rgb tuple."""
+        brightness_and_color = brightness_and_color_to_int(brightness, rgb)
+
         return self._gateway.send("set_night_light_rgb", [brightness_and_color])
 
-    @command(click.argument("color_name", type=str))
-    def set_color(self, color_name):
-        """Set gateway lamp color using color name (red, green, etc)."""
-        if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
-        current_brightness = int_to_brightness(self._gateway.send("get_rgb")[0])
-        brightness_and_color = brightness_and_color_to_int(
-            current_brightness, color_map[color_name]
-        )
-        return self._gateway.send("set_rgb", [brightness_and_color])
-
     @command(click.argument("brightness", type=int))
-    def set_brightness(self, brightness):
-        """Set gateway lamp brightness (0-100)."""
+    def set_rgb_brightness(self, brightness: int):
+        """Set gateway light brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        current_color = int_to_rgb(self._gateway.send("get_rgb")[0])
-        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
-        return self._gateway.send("set_rgb", [brightness_and_color])
+        current_color = self.rgb_status()["rgb"]
+
+        return self.set_rgb(brightness, current_color)
 
     @command(click.argument("brightness", type=int))
-    def set_night_light_brightness(self, brightness):
+    def set_night_light_brightness(self, brightness: int):
         """Set night light brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        current_color = int_to_rgb(self._gateway.send("get_night_light_rgb")[0])
-        brightness_and_color = brightness_and_color_to_int(brightness, current_color)
-        print(brightness, current_color)
-        return self._gateway.send("set_night_light_rgb", [brightness_and_color])
+        current_color = self.night_light_status()["rgb"]
+
+        return self.set_night_light(brightness, current_color)
+
+    @command(click.argument("color_name", type=str))
+    def set_rgb_color(self, color_name: str):
+        """Set gateway light color using color name ('color_map' variable in the source holds the valid values)."""
+        if color_name not in color_map.keys():
+            raise Exception(
+                "Cannot find {color} in {colors}".format(
+                    color=color_name, colors=color_map.keys()
+                )
+            )
+        current_brightness = self.rgb_status()["brightness"]
+
+        return self.set_rgb(current_brightness, color_map[color_name])
+
+    @command(click.argument("color_name", type=str))
+    def set_night_light_color(self, color_name: str):
+        """Set night light color using color name ('color_map' variable in the source holds the valid values)."""
+        if color_name not in color_map.keys():
+            raise Exception(
+                "Cannot find {color} in {colors}".format(
+                    color=color_name, colors=color_map.keys()
+                )
+            )
+        current_brightness = self.night_light_status()["brightness"]
+
+        return self.set_night_light(current_brightness, color_map[color_name])
 
     @command(
         click.argument("color_name", type=str), click.argument("brightness", type=int),
     )
-    def set_light(self, color_name, brightness):
-        """Set color (using color name) and brightness (0-100)."""
+    def set_rgb_using_name(self, color_name: str, brightness: int):
+        """Set gateway light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
@@ -719,10 +764,24 @@ class GatewayLight(GatewayDevice):
                     color=color_name, colors=color_map.keys()
                 )
             )
-        brightness_and_color = brightness_and_color_to_int(
-            brightness, color_map[color_name]
-        )
-        return self._gateway.send("set_rgb", [brightness_and_color])
+
+        return self.set_rgb(brightness, color_map[color_name])
+
+    @command(
+        click.argument("color_name", type=str), click.argument("brightness", type=int),
+    )
+    def set_night_light_using_name(self, color_name: str, brightness: int):
+        """Set night light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
+        if 100 < brightness < 0:
+            raise Exception("Brightness must be between 0 and 100")
+        if color_name not in color_map.keys():
+            raise Exception(
+                "Cannot find {color} in {colors}".format(
+                    color=color_name, colors=color_map.keys()
+                )
+            )
+
+        return self.set_night_light(brightness, color_map[color_name])
 
 
 class SubDevice:

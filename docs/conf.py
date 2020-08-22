@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
+    "sphinxcontrib.apidoc",
     "sphinx_click.ext",
 ]
 
@@ -91,7 +92,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -181,4 +182,12 @@ texinfo_documents = [
     )
 ]
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3.6", None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3.8", None)}
+
+apidoc_module_dir = "../miio"
+apidoc_output_dir = "api"
+apidoc_excluded_paths = ["tests"]
+apidoc_separate_modules = True
+autodoc_member_order = "groupwise"
+autodoc_inherit_docstrings = True
+autodoc_default_options = {"inherited-members": True}

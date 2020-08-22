@@ -21,6 +21,50 @@ class Direction(enum.Enum):
     Down = 4
 
 
+class MotionDetectionSensitivity(enum.IntEnum):
+    """Motion detection sensitivity."""
+
+    High = 3
+    Low = 1
+
+
+class HomeMonitoringMode(enum.IntEnum):
+    """Home monitoring mode."""
+
+    Off = 0
+    AllDay = 1
+    Custom = 2
+
+
+class NASState(enum.IntEnum):
+    """NAS state."""
+
+    Off = 2
+    On = 3
+
+
+class NASSyncInterval(enum.IntEnum):
+    """NAS sync interval."""
+
+    Realtime = 300
+    Hour = 3600
+    Day = 86400
+
+
+class NASVideoRetentionTime(enum.IntEnum):
+    """NAS video retention time."""
+
+    Week = 604800
+    Month = 2592000
+    Quarter = 7776000
+    HalfYear = 15552000
+    Year = 31104000
+
+
+CONST_HIGH_SENSITIVITY = [MotionDetectionSensitivity.High] * 32
+CONST_LOW_SENSITIVITY = [MotionDetectionSensitivity.Low] * 32
+
+
 class CameraStatus:
     """Container for status reports from the Xiaomi Chuangmi Camera."""
 
@@ -283,7 +327,7 @@ class ChuangmiCamera(Device):
         return self.send("set_night_mode", [2])
 
     @command(
-        click.argument("mode", type=EnumType(Direction, False)),
+        click.argument("direction", type=EnumType(Direction)),
         default_output=format_output("Rotating to direction '{direction.name}'"),
     )
     def rotate(self, direction: Direction):
@@ -294,3 +338,76 @@ class ChuangmiCamera(Device):
     def alarm(self):
         """Sound a loud alarm for 10 seconds."""
         return self.send("alarm_sound")
+
+    @command(
+        click.argument("sensitivity", type=EnumType(MotionDetectionSensitivity)),
+        default_output=format_output("Setting motion sensitivity '{sensitivity.name}'"),
+    )
+    def set_motion_sensitivity(self, sensitivity: MotionDetectionSensitivity):
+        """Set motion sensitivity (high, low)."""
+        return self.send(
+            "set_motion_region",
+            CONST_HIGH_SENSITIVITY
+            if sensitivity == MotionDetectionSensitivity.High
+            else CONST_LOW_SENSITIVITY,
+        )
+
+    @command(
+        click.argument("mode", type=EnumType(HomeMonitoringMode)),
+        click.argument("start-hour", default=10),
+        click.argument("start-minute", default=0),
+        click.argument("end-hour", default=17),
+        click.argument("end-minute", default=0),
+        click.argument("notify", default=1),
+        click.argument("interval", default=5),
+        default_output=format_output("Setting alarm config to '{mode.name}'"),
+    )
+    def set_home_monitoring_config(
+        self,
+        mode: HomeMonitoringMode = HomeMonitoringMode.AllDay,
+        start_hour: int = 10,
+        start_minute: int = 0,
+        end_hour: int = 17,
+        end_minute: int = 0,
+        notify: int = 1,
+        interval: int = 5,
+    ):
+        """Set home monitoring configuration"""
+        return self.send(
+            "setAlarmConfig",
+            [mode, start_hour, start_minute, end_hour, end_minute, notify, interval],
+        )
+
+    @command(default_output=format_output("Clearing NAS directory"))
+    def clear_nas_dir(self):
+        """Clear NAS directory"""
+        return self.send("nas_clear_dir", [[]])
+
+    @command(default_output=format_output("Getting NAS config info"))
+    def get_nas_config(self):
+        """Get NAS config info"""
+        return self.send("nas_get_config", {})
+
+    @command(
+        click.argument("state", type=EnumType(NASState)),
+        click.argument("share"),
+        click.argument("sync-interval", type=EnumType(NASSyncInterval)),
+        click.argument("video-retention-time", type=EnumType(NASVideoRetentionTime)),
+        default_output=format_output("Setting NAS config to '{state.name}'"),
+    )
+    def set_nas_config(
+        self,
+        state: NASState,
+        share={},
+        sync_interval: NASSyncInterval = NASSyncInterval.Realtime,
+        video_retention_time: NASVideoRetentionTime = NASVideoRetentionTime.Week,
+    ):
+        """Set NAS configuration"""
+        return self.send(
+            "nas_set_config",
+            {
+                "state": state,
+                "sync_interval": sync_interval,
+                "video_retention_time": video_retention_time,
+            },
+        )

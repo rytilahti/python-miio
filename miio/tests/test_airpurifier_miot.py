@@ -13,7 +13,7 @@ _INITIAL_STATE = {
     "aqi": 10,
     "average_aqi": 8,
     "humidity": 62,
-    "temperature": 18.6,
+    "temperature": 18.599999,
     "fan_level": 2,
     "mode": 0,
     "led": True,
@@ -84,7 +84,7 @@ class TestAirPurifier(TestCase):
         assert status.aqi == _INITIAL_STATE["aqi"]
         assert status.average_aqi == _INITIAL_STATE["average_aqi"]
         assert status.humidity == _INITIAL_STATE["humidity"]
-        assert status.temperature == _INITIAL_STATE["temperature"]
+        assert status.temperature == 18.6
         assert status.fan_level == _INITIAL_STATE["fan_level"]
         assert status.mode == OperationMode(_INITIAL_STATE["mode"])
         assert status.led == _INITIAL_STATE["led"]
