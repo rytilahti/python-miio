@@ -8,6 +8,7 @@ Submodules
    :maxdepth: 4
 
    miio.airconditioningcompanion
+   miio.airconditioningcompanionMCN
    miio.airdehumidifier
    miio.airfilter_util
    miio.airfresh
@@ -38,7 +39,6 @@ Submodules
    miio.heater
    miio.miioprotocol
    miio.miot_device
-   miio.parse_ast
    miio.philips_bulb
    miio.philips_eyecare
    miio.philips_eyecare_cli

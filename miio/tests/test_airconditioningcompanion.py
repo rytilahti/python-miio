@@ -5,7 +5,11 @@ from unittest import TestCase
 
 import pytest
 
-from miio import AirConditioningCompanion, AirConditioningCompanionV3
+from miio import (
+    AirConditioningCompanion,
+    AirConditioningCompanionMcn02,
+    AirConditioningCompanionV3,
+)
 from miio.airconditioningcompanion import (
     MODEL_ACPARTNER_V3,
     STORAGE_SLOT_ID,
@@ -17,6 +21,13 @@ from miio.airconditioningcompanion import (
     Power,
     SwingMode,
 )
+from miio.airconditioningcompanionMCN import MODEL_ACPARTNER_MCN02
+from miio.airconditioningcompanionMCN import (
+    AirConditioningCompanionStatus as AirConditioningCompanionStatusMcn02,
+)
+from miio.airconditioningcompanionMCN import FanSpeed as FanSpeedMcn02
+from miio.airconditioningcompanionMCN import OperationMode as OperationModeMcn02
+from miio.airconditioningcompanionMCN import SwingMode as SwingModeMcn02
 from miio.tests.dummies import DummyDevice
 
 STATE_ON = ["on"]
@@ -297,3 +308,49 @@ class TestAirConditioningCompanionV3(TestCase):
         assert self.state().fan_speed == FanSpeed.Low
         assert self.state().mode == OperationMode.Heat
         assert self.state().led is True
+
+
+class DummyAirConditioningCompanionMcn02(DummyDevice, AirConditioningCompanionMcn02):
+    def __init__(self, *args, **kwargs):
+        self.state = ["on", "cool", 28, "small_fan", "on", 441.0]
+        self.model = MODEL_ACPARTNER_MCN02
+
+        self.return_values = {"get_prop": self._get_state}
+        self.start_state = self.state.copy()
+        super().__init__(args, kwargs)
+
+    def _reset_state(self):
+        """Revert back to the original state."""
+        self.state = self.start_state.copy()
+
+    def _get_state(self, props):
+        """Return the requested data"""
+        return self.state
+
+
+@pytest.fixture(scope="class")
+def airconditioningcompanionMcn02(request):
+    request.cls.device = DummyAirConditioningCompanionMcn02()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("airconditioningcompanionMcn02")
+class TestAirConditioningCompanionMcn02(TestCase):
+    def state(self):
+        return self.device.status()
+
+    def is_on(self):
+        return self.device.status().is_on
+
+    def test_status(self):
+        self.device._reset_state()
+
+        assert repr(self.state()) == repr(
+            AirConditioningCompanionStatusMcn02(self.device.start_state)
+        )
+
+        assert self.is_on() is True
+        assert self.state().target_temperature == 28
+        assert self.state().swing_mode == SwingModeMcn02.On
+        assert self.state().fan_speed == FanSpeedMcn02.Low
+        assert self.state().mode == OperationModeMcn02.Cool
