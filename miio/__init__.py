@@ -4,6 +4,7 @@ from miio.airconditioningcompanion import (
     AirConditioningCompanion,
     AirConditioningCompanionV3,
 )
+from miio.airconditioningcompanionMCN import AirConditioningCompanionMcn02
 from miio.airdehumidifier import AirDehumidifier
 from miio.airfresh import AirFresh
 from miio.airfresh_t2017 import AirFreshT2017
