@@ -5,7 +5,11 @@ from unittest import TestCase
 
 import pytest
 
-from miio import AirConditioningCompanion, AirConditioningCompanionV3, AirConditioningCompanionMcn02
+from miio import (
+    AirConditioningCompanion,
+    AirConditioningCompanionV3,
+    AirConditioningCompanionMcn02,
+)
 from miio.airconditioningcompanion import (
     MODEL_ACPARTNER_V3,
     STORAGE_SLOT_ID,
@@ -22,7 +26,7 @@ from miio.airconditioningcompanionMCN import (
     SwingMode as SwingModeMcn02,
     FanSpeed as FanSpeedMcn02,
     OperationMode as OperationModeMcn02,
-    AirConditioningCompanionStatus as AirConditioningCompanionStatusMcn02
+    AirConditioningCompanionStatus as AirConditioningCompanionStatusMcn02,
 )
 from miio.tests.dummies import DummyDevice
 
@@ -308,12 +312,10 @@ class TestAirConditioningCompanionV3(TestCase):
 
 class DummyAirConditioningCompanionMcn02(DummyDevice, AirConditioningCompanionMcn02):
     def __init__(self, *args, **kwargs):
-        self.state = ['on', 'cool', 28, 'small_fan', 'on', 441.0]
+        self.state = ["on", "cool", 28, "small_fan", "on", 441.0]
         self.model = MODEL_ACPARTNER_MCN02
 
-        self.return_values = {
-            "get_prop": self._get_state
-        }
+        self.return_values = {"get_prop": self._get_state}
         self.start_state = self.state.copy()
         super().__init__(args, kwargs)
 
@@ -324,6 +326,7 @@ class DummyAirConditioningCompanionMcn02(DummyDevice, AirConditioningCompanionMc
     def _get_state(self, props):
         """Return the requested data"""
         return self.state
+
 
 @pytest.fixture(scope="class")
 def airconditioningcompanionMcn02(request):
@@ -343,9 +346,7 @@ class TestAirConditioningCompanionMcn02(TestCase):
         self.device._reset_state()
 
         assert repr(self.state()) == repr(
-            AirConditioningCompanionStatusMcn02(
-                self.device.start_state
-            )
+            AirConditioningCompanionStatusMcn02(self.device.start_state)
         )
 
         assert self.is_on() is True

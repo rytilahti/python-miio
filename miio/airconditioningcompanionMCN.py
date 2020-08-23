@@ -155,7 +155,10 @@ class AirConditioningCompanionMcn02(Device):
     )
     def status(self) -> AirConditioningCompanionStatus:
         """Return device status."""
-        data = self.send("get_prop", ['power', 'mode', 'tar_temp', 'fan_level', 'ver_swing', 'load_power'])
+        data = self.send(
+            "get_prop",
+            ["power", "mode", "tar_temp", "fan_level", "ver_swing", "load_power"],
+        )
         return AirConditioningCompanionStatus(data)
 
     @command(default_output=format_output("Powering the air condition on"))
