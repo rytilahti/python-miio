@@ -1,7 +1,7 @@
 import enum
-import random
 import logging
-from typing import Optional, Any
+import random
+from typing import Any, Optional
 
 from .click_common import command, format_output
 from .device import Device

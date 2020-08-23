@@ -31,7 +31,7 @@ Status reporting
     Cleaning since: 0:00:00
     Cleaned area: 0.0 m²
     Water box attached: False
-    
+
 Start cleaning
 ~~~~~~~~~~~~~~
 
@@ -66,7 +66,7 @@ State of consumables
     Side brush:   2 days, 16:14:00 (left 5 days, 15:46:00)
     Filter:       2 days, 16:14:00 (left 3 days, 13:46:00)
     Sensor dirty: 2:37:48 (left 1 day, 3:22:12)
-    
+
 Schedule information
 ~~~~~~~~~~~~~~~~~~~~
 

@@ -7,8 +7,8 @@ import pytest
 
 from miio import (
     AirConditioningCompanion,
-    AirConditioningCompanionV3,
     AirConditioningCompanionMcn02,
+    AirConditioningCompanionV3,
 )
 from miio.airconditioningcompanion import (
     MODEL_ACPARTNER_V3,
@@ -21,13 +21,13 @@ from miio.airconditioningcompanion import (
     Power,
     SwingMode,
 )
+from miio.airconditioningcompanionMCN import MODEL_ACPARTNER_MCN02
 from miio.airconditioningcompanionMCN import (
-    MODEL_ACPARTNER_MCN02,
-    SwingMode as SwingModeMcn02,
-    FanSpeed as FanSpeedMcn02,
-    OperationMode as OperationModeMcn02,
     AirConditioningCompanionStatus as AirConditioningCompanionStatusMcn02,
 )
+from miio.airconditioningcompanionMCN import FanSpeed as FanSpeedMcn02
+from miio.airconditioningcompanionMCN import OperationMode as OperationModeMcn02
+from miio.airconditioningcompanionMCN import SwingMode as SwingModeMcn02
 from miio.tests.dummies import DummyDevice
 
 STATE_ON = ["on"]
