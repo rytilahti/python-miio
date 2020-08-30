@@ -3,7 +3,7 @@ import time
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
-from typing import Any, List, Dict, Optional
+from typing import Dict, List, Optional
 
 import click
 
@@ -39,6 +39,7 @@ ERROR_CODES = {
     531: "Water tank is not installed",
     2101: "Unsufficient battery, continuing cleaning after recharge",
 }
+
 
 class ViomiConsumableStatus(ConsumableStatus):
     def __init__(self, data: List[int]) -> None:
