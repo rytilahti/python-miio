@@ -112,7 +112,7 @@ Supported devices
 -  Xiaomi Smart WiFi Speaker
 -  Xiaomi Mi WiFi Repeater 2
 -  Xiaomi Mi Smart Rice Cooker
--  Xiaomi Smartmi Fresh Air System VA2 (zhimi.airfresh.va2), T2017 (dmaker.airfresh.t2017)
+-  Xiaomi Smartmi Fresh Air System VA2 (zhimi.airfresh.va2), VA4 (zhimi.airfresh.va4), T2017 (dmaker.airfresh.t2017)
 -  Yeelight lights (basic support, we recommend using `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__)
 -  Xiaomi Mi Air Dehumidifier
 -  Xiaomi Tinymu Smart Toilet Cover
