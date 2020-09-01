@@ -752,7 +752,8 @@ class GatewayLight(GatewayDevice):
         return self.set_night_light(current_brightness, color_map[color_name])
 
     @command(
-        click.argument("color_name", type=str), click.argument("brightness", type=int),
+        click.argument("color_name", type=str),
+        click.argument("brightness", type=int),
     )
     def set_rgb_using_name(self, color_name: str, brightness: int):
         """Set gateway light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
@@ -768,7 +769,8 @@ class GatewayLight(GatewayDevice):
         return self.set_rgb(brightness, color_map[color_name])
 
     @command(
-        click.argument("color_name", type=str), click.argument("brightness", type=int),
+        click.argument("color_name", type=str),
+        click.argument("brightness", type=int),
     )
     def set_night_light_using_name(self, color_name: str, brightness: int):
         """Set night light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
@@ -798,7 +800,11 @@ class SubDevice:
     class props:
         """Defines properties of the specific device."""
 
-    def __init__(self, gw: Gateway = None, dev_info: SubDeviceInfo = None,) -> None:
+    def __init__(
+        self,
+        gw: Gateway = None,
+        dev_info: SubDeviceInfo = None,
+    ) -> None:
         self._gw = gw
         self.sid = dev_info.sid
         self._battery = None
@@ -811,18 +817,15 @@ class SubDevice:
             self.type = DeviceType.Unknown
 
     def __repr__(self):
-        return (
-            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>"
-            % (
-                self.device_type,
-                self.sid,
-                self.model,
-                self.zigbee_model,
-                self.firmware_version,
-                self.get_battery(),
-                self.get_voltage(),
-                self.status,
-            )
+        return "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>" % (
+            self.device_type,
+            self.sid,
+            self.model,
+            self.zigbee_model,
+            self.firmware_version,
+            self.get_battery(),
+            self.get_voltage(),
+            self.status,
         )
 
     @property
@@ -954,7 +957,8 @@ class SubDevice:
             self._battery = self.send("get_battery").pop()
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_battery", self._gw.model,
+                "Gateway model '%s' does not (yet) support get_battery",
+                self._gw.model,
             )
         return self._battery
 
@@ -965,7 +969,8 @@ class SubDevice:
             self._voltage = self.get_property("voltage").pop() / 1000
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_voltage", self._gw.model,
+                "Gateway model '%s' does not (yet) support get_voltage",
+                self._gw.model,
             )
         return self._voltage
 

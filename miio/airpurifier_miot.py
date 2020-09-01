@@ -361,7 +361,7 @@ class AirPurifierMiot(MiotDevice):
     )
     def set_favorite_level(self, level: int):
         """Set the favorite level used when the mode is `favorite`,
-         should be  between 0 and 14.
+        should be  between 0 and 14.
         """
         if level < 0 or level > 14:
             raise AirPurifierMiotException("Invalid favorite level: %s" % level)

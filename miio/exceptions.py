@@ -23,7 +23,7 @@ class DeviceError(DeviceException):
 
     The device given error code and message can be accessed with
      `code` and `message` variables.
-     """
+    """
 
     def __init__(self, error):
         self.code = error.get("code")
