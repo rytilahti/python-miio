@@ -130,7 +130,7 @@ class Gateway(Device):
         and returns a list of the discovered devices.
         """
 
-        from .devices import DeviceType, DeviceTypeMapping, SubDevice, SubDeviceInfo
+        from .devices import SubDeviceInfo
 
         self._devices = {}
 
@@ -141,56 +141,97 @@ class Gateway(Device):
                 self.model,
             )
             return self._devices
+
         if self.model == GATEWAY_MODEL_ZIG3:
-            # it is unknown if self.get_prop("device_list") will work for the GATEWAY_MODEL_ZIG3
-            # self.send("get_device_list") has been suggested to work for the GATEWAY_MODEL_ZIG3
-            _LOGGER.warning(
-                "Gateway model '%s' has not been tested to be able to get the device list, a possible alternative would be self.send('get_device_list')",
-                self.model,
-            )
+            # self.get_prop("device_list") does not work for the GATEWAY_MODEL_ZIG3
+            # self.send("get_device_list") does work for the GATEWAY_MODEL_ZIG3 but gives slightly diffrent return values
+            devices_raw = self.send("get_device_list")
 
-        devices_raw = self.get_prop("device_list")
+            for device in devices_raw:
+                # Match 'model' to get the type_id
+                type_id = self.match_zigbee_model(device["model"])
 
-        for x in range(0, len(devices_raw), 5):
-            # Extract discovered information
-            dev_info = SubDeviceInfo(*devices_raw[x : x + 5])
+                # Extract discovered information
+                dev_info = SubDeviceInfo(device["did"], type_id, -1, -1, -1)
+                
+                # Setup the device
+                self.setup_device(dev_info)
+        else:
+            devices_raw = self.get_prop("device_list")
 
-            # Construct DeviceType
-            try:
-                device_type = DeviceType(dev_info.type_id)
-            except ValueError:
-                _LOGGER.warning(
-                    "Unknown subdevice type %s discovered, "
-                    "of Xiaomi gateway with ip: %s",
-                    dev_info,
-                    self.ip,
-                )
-                device_type = DeviceType(-1)
+            for x in range(0, len(devices_raw), 5):
+                # Extract discovered information
+                dev_info = SubDeviceInfo(*devices_raw[x : x + 5])
 
-            # Obtain the correct subdevice class, ignoring the gateway itself
-            subdevice_cls = DeviceTypeMapping.get(device_type)
-            if subdevice_cls is None and device_type != DeviceType.Gateway:
-                subdevice_cls = SubDevice
-                _LOGGER.info(
-                    "Gateway device type '%s' "
-                    "does not have device specific methods defined, "
-                    "only basic default methods will be available",
-                    device_type.name,
-                )
-
-            # Initialize and save the subdevice, ignoring the gateway itself
-            if device_type != DeviceType.Gateway:
-                self._devices[dev_info.sid] = subdevice_cls(self, dev_info)
-                if self._devices[dev_info.sid].status == {}:
-                    _LOGGER.info(
-                        "Discovered subdevice type '%s', has no device specific properties defined, "
-                        "this device has not been fully implemented yet (model: %s, name: %s).",
-                        device_type.name,
-                        self._devices[dev_info.sid].model,
-                        self._devices[dev_info.sid].name,
-                    )
+                # Setup the device
+                self.setup_device(dev_info)
 
         return self._devices
+
+    @command(click.argument("zigbee_model"))
+    def match_zigbee_model(self, zigbee_model):
+        """
+        Match the zigbee_model to obtain the type_id
+        """
+
+        from .devices import DeviceType, DeviceTypeMapping
+
+        for type_id in DeviceTypeMapping:
+            if DeviceTypeMapping[type_id]._zigbee_model == zigbee_model:
+                return type_id
+        
+        _LOGGER.warning(
+                "Unknown subdevice discovered, could not match zigbee_model '%s' "
+                "of Xiaomi gateway with ip: %s",
+                zigbee_model,
+                self.ip,
+            )
+        return DeviceType.Unknown
+
+    @command(click.argument("dev_info"))
+    def setup_device(self, dev_info):
+        """
+        Setup a device using the SubDeviceInfo
+        """
+        
+        from .devices import DeviceType, DeviceTypeMapping, SubDevice
+        
+        # Construct DeviceType
+        try:
+            device_type = DeviceType(dev_info.type_id)
+        except ValueError:
+            _LOGGER.warning(
+                "Unknown subdevice type %s discovered, "
+                "of Xiaomi gateway with ip: %s",
+                dev_info,
+                self.ip,
+            )
+            device_type = DeviceType(-1)
+
+        # Obtain the correct subdevice class, ignoring the gateway itself
+        subdevice_cls = DeviceTypeMapping.get(device_type)
+        if subdevice_cls is None and device_type != DeviceType.Gateway:
+            subdevice_cls = SubDevice
+            _LOGGER.info(
+                "Gateway device type '%s' "
+                "does not have device specific methods defined, "
+                "only basic default methods will be available",
+                device_type.name,
+            )
+
+        # Initialize and save the subdevice, ignoring the gateway itself
+        if device_type != DeviceType.Gateway:
+            self._devices[dev_info.sid] = subdevice_cls(self, dev_info)
+            if self._devices[dev_info.sid].status == {}:
+                _LOGGER.info(
+                    "Discovered subdevice type '%s', has no device specific properties defined, "
+                    "this device has not been fully implemented yet (model: %s, name: %s).",
+                    device_type.name,
+                    self._devices[dev_info.sid].model,
+                    self._devices[dev_info.sid].name,
+                )
+
+        return self._devices[dev_info.sid]
 
     @command(click.argument("property"))
     def get_prop(self, property):
