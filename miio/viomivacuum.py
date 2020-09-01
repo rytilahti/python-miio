@@ -3,14 +3,14 @@ import time
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .utils import pretty_seconds
-from .vacuumcontainers import DNDStatus
+from .vacuumcontainers import ConsumableStatus, DNDStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,6 +39,69 @@ ERROR_CODES = {
     531: "Water tank is not installed",
     2101: "Unsufficient battery, continuing cleaning after recharge",
 }
+
+
+class ViomiConsumableStatus(ConsumableStatus):
+    def __init__(self, data: List[int]) -> None:
+        # [17, 17, 17, 17]
+        self.data = [d * 60 * 60 for d in data]
+        self.side_brush_total = timedelta(hours=180)
+        self.main_brush_total = timedelta(hours=360)
+        self.filter_total = timedelta(hours=180)
+        self.mop_total = timedelta(hours=180)
+
+    @property
+    def main_brush(self) -> timedelta:
+        """Main brush usage time."""
+        return pretty_seconds(self.data[0])
+
+    @property
+    def main_brush_left(self) -> timedelta:
+        """How long until the main brush should be changed."""
+        return self.main_brush_total - self.main_brush
+
+    @property
+    def side_brush(self) -> timedelta:
+        """Side brush usage time."""
+        return pretty_seconds(self.data[1])
+
+    @property
+    def side_brush_left(self) -> timedelta:
+        """How long until the side brush should be changed."""
+        return self.side_brush_total - self.side_brush
+
+    @property
+    def filter(self) -> timedelta:
+        """Filter usage time."""
+        return pretty_seconds(self.data[2])
+
+    @property
+    def filter_left(self) -> timedelta:
+        """How long until the filter should be changed."""
+        return self.filter_total - self.filter
+
+    @property
+    def mop(self) -> timedelta:
+        """Return ``sensor_dirty_time``"""
+        return pretty_seconds(self.data[3])
+
+    @property
+    def mop_left(self) -> timedelta:
+        return self.sensor_dirty_total - self.sensor_dirty
+
+    def __repr__(self) -> str:
+        return (
+            "<ConsumableStatus main: %s, side: %s, filter: %s, mop: %s>"
+            % (  # noqa: E501
+                self.main_brush,
+                self.side_brush,
+                self.filter,
+                self.mop,
+            )
+        )
+
+    def __json__(self):
+        return self.data
 
 
 class ViomiVacuumSpeed(Enum):
@@ -316,6 +379,11 @@ class ViomiVacuum(Device):
     @command(click.argument("mop_mode", type=EnumType(ViomiMopMode)))
     def mop_mode(self, mop_mode):
         self.send("set_moproute", [mop_mode.value])
+
+    @command()
+    def consumable_status(self) -> ViomiConsumableStatus:
+        """Return information about consumables."""
+        return ViomiConsumableStatus(self.send("get_consumables"))
 
     @command()
     def dnd_status(self):

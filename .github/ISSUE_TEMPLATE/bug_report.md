@@ -16,13 +16,13 @@ A clear and concise description of what the bug is.
 
 **Device information:**
 If the issue is specific to a device [Use `miiocli device --ip <ip address> --token <token>`]:
-  - Model: 
+  - Model:
   - Hardware version:
   - Firmware version:
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. 
+1.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

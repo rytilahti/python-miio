@@ -86,8 +86,7 @@ class AlarmClock(Device):
 
     @command()
     def clock_system(self) -> HourlySystem:
-        """Returns either 12 or 24 depending on which system is in use.
-        """
+        """Returns either 12 or 24 depending on which system is in use."""
         return HourlySystem(self.send("get_hourly_system")[0])
 
     @command(click.argument("brightness", type=EnumType(HourlySystem)))
@@ -138,9 +137,9 @@ class AlarmClock(Device):
     def set_ring(self, alarm_type: AlarmType, ring: RingTone):
         """Set alarm tone.
 
-         ->  192.168.0.128 data= {"id":236,"method":"set_ring",
-            "params":[{"ringtone":"a1.mp3","smart_clock":"","type":"alarm"}]}
-         <-  192.168.0.57 data= {"result":["OK"],"id":236}
+        ->  192.168.0.128 data= {"id":236,"method":"set_ring",
+           "params":[{"ringtone":"a1.mp3","smart_clock":"","type":"alarm"}]}
+        <-  192.168.0.57 data= {"result":["OK"],"id":236}
         """
         raise NotImplementedError()
         # return self.send("set_ring", ) == ["OK"]
@@ -192,7 +191,7 @@ class AlarmClock(Device):
     @command()
     def countdown(self):
         """
-         ->  192.168.0.128 data= {"id":258,"method":"get_count_down_v2","params":[]}
+        ->  192.168.0.128 data= {"id":258,"method":"get_count_down_v2","params":[]}
         """
         return self.send("get_count_down_v2")
 
@@ -265,8 +264,8 @@ class AlarmClock(Device):
     @command()
     def query(self):
         """
-          ->  192.168.0.128 data= {"id":227,"method":"alarm_ops","params":
-          {"operation":"query","index":0,"update_datetime":1564205198413,"req_type":"reminder"}}
+        ->  192.168.0.128 data= {"id":227,"method":"alarm_ops","params":
+        {"operation":"query","index":0,"update_datetime":1564205198413,"req_type":"reminder"}}
 
         """
 

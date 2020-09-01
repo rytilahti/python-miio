@@ -587,7 +587,7 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
 
     `--ip` can be used to override automatically detected IP address for
      the device to contact for the update.
-     """
+    """
 
     # TODO Check that the device is in updateable state.
 

@@ -209,7 +209,7 @@ class Listener:
 
     def check_and_create_device(self, info, addr) -> Optional[Device]:
         """Create a corresponding :class:`Device` implementation
-         for a given info and address.."""
+        for a given info and address.."""
         name = info.name
         for identifier, v in DEVICE_MAP.items():
             if name.startswith(identifier):

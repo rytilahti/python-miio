@@ -274,7 +274,7 @@ class CleaningDetails:
     def complete(self) -> bool:
         """Return True if the cleaning run was complete (e.g. without errors).
 
-         see also :func:`error`."""
+        see also :func:`error`."""
         return bool(self.data[5] == 1)
 
     def __repr__(self) -> str:
