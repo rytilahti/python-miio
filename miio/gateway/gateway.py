@@ -130,7 +130,7 @@ class Gateway(Device):
         and returns a list of the discovered devices.
         """
 
-        from .devices import SubDeviceInfo
+        from .devices.subdevice import SubDeviceInfo
 
         self._devices = {}
 
