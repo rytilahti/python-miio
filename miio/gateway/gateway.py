@@ -153,7 +153,7 @@ class Gateway(Device):
 
                 # Extract discovered information
                 dev_info = SubDeviceInfo(device["did"], type_id, -1, -1, -1)
-                
+
                 # Setup the device
                 self.setup_device(dev_info)
         else:
@@ -179,13 +179,13 @@ class Gateway(Device):
         for type_id in DeviceTypeMapping:
             if DeviceTypeMapping[type_id]._zigbee_model == zigbee_model:
                 return type_id
-        
+
         _LOGGER.warning(
-                "Unknown subdevice discovered, could not match zigbee_model '%s' "
-                "of Xiaomi gateway with ip: %s",
-                zigbee_model,
-                self.ip,
-            )
+            "Unknown subdevice discovered, could not match zigbee_model '%s' "
+            "of Xiaomi gateway with ip: %s",
+            zigbee_model,
+            self.ip,
+        )
         return DeviceType.Unknown
 
     @command(click.argument("dev_info"))
@@ -193,9 +193,9 @@ class Gateway(Device):
         """
         Setup a device using the SubDeviceInfo
         """
-        
+
         from .devices import DeviceType, DeviceTypeMapping, SubDevice
-        
+
         # Construct DeviceType
         try:
             device_type = DeviceType(dev_info.type_id)
