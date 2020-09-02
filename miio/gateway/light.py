@@ -128,7 +128,8 @@ class Light(GatewayDevice):
         return self.set_night_light(current_brightness, color_map[color_name])
 
     @command(
-        click.argument("color_name", type=str), click.argument("brightness", type=int),
+        click.argument("color_name", type=str),
+        click.argument("brightness", type=int),
     )
     def set_rgb_using_name(self, color_name: str, brightness: int):
         """Set gateway light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
@@ -144,7 +145,8 @@ class Light(GatewayDevice):
         return self.set_rgb(brightness, color_map[color_name])
 
     @command(
-        click.argument("color_name", type=str), click.argument("brightness", type=int),
+        click.argument("color_name", type=str),
+        click.argument("brightness", type=int),
     )
     def set_night_light_using_name(self, color_name: str, brightness: int):
         """Set night light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
