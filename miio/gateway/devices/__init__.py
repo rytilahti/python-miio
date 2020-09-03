@@ -46,5 +46,5 @@ from .switch import (
 from .thermostat import ThermostatS2
 from .weather_sensor import AqaraHT, SensorHT
 
-from .subdevice import SubDevice, SubDeviceInfo
-from .subdevice_mapping import DeviceType, DeviceTypeMapping
+from .subdevice import SubDevice, SubDeviceInfo  # isort:skip
+from .subdevice_mapping import DeviceType, DeviceTypeMapping  # isort:skip
