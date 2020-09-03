@@ -29,7 +29,6 @@ from .remote_switch import (
     Switch,
 )
 from .sensor import AqaraVibration, AqaraWaterLeak, SensorNatgas, SensorSmoke
-from .subdevice import DeviceType, DeviceTypeMapping, SubDevice, SubDeviceInfo
 from .switch import (
     AqaraRelayTwoChannels,
     AqaraSwitchOneChannel,
@@ -46,3 +45,6 @@ from .switch import (
 )
 from .thermostat import ThermostatS2
 from .weather_sensor import AqaraHT, SensorHT
+
+from .subdevice import SubDevice, SubDeviceInfo
+from .subdevice_mapping import DeviceType, DeviceTypeMapping
