@@ -53,6 +53,7 @@ from . import (
     ThermostatS2,
 )
 
+
 class DeviceType(IntEnum):
     """DeviceType matching using the values provided by Xiaomi."""
 
