@@ -7,7 +7,7 @@ import attr
 import click
 
 from ...click_common import command
-from ..gateway import GATEWAY_MODEL_EU, Gateway, GatewayException
+from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, Gateway, GatewayException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -193,7 +193,7 @@ class SubDevice:
     @command()
     def get_battery(self):
         """Update the battery level, if available."""
-        if self._gw.model != GATEWAY_MODEL_EU:
+        if self._gw.model not in [GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3] :
             self._battery = self.send("get_battery").pop()
         else:
             _LOGGER.info(
@@ -205,7 +205,7 @@ class SubDevice:
     @command()
     def get_voltage(self):
         """Update the battery voltage, if available."""
-        if self._gw.model == GATEWAY_MODEL_EU:
+        if self._gw.model in [GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3]:
             self._voltage = self.get_property("voltage").pop() / 1000
         else:
             _LOGGER.info(
