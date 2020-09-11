@@ -31,6 +31,7 @@ class MiotDevice(Device):
         )
     
     def get_property(self, property_key: str) -> dict:
+        """Retrieve raw property based on mapping."""
         property = {"did": property_key, **self.mapping.get(property_key)}
 
         return self.get_properties(
@@ -38,6 +39,7 @@ class MiotDevice(Device):
         )[0]
 
     def get_value(self, property_key: str):
+        """Retrieve a property value based on mapping."""
         return self.get_property(property_key).get("value")
 
     def set_property(self, property_key: str, value):
