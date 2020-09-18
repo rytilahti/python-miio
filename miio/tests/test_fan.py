@@ -2,17 +2,16 @@ from unittest import TestCase
 
 import pytest
 
-from miio import Fan, FanP5, FanMiot
+from miio import Fan, FanMiot, FanP5
 from miio.fan import (
-    MODEL_FAN_P10,
     MODEL_FAN_P5,
+    MODEL_FAN_P10,
     MODEL_FAN_SA1,
     MODEL_FAN_V2,
     MODEL_FAN_V3,
     FanException,
     FanStatus,
     FanStatusP5,
-    FanStatusMiot,
     LedBrightness,
     MoveDirection,
     OperationMode,
@@ -918,6 +917,7 @@ class TestFanP5(TestCase):
         with pytest.raises(FanException):
             self.device.delay_off(-1)
 
+
 class DummyFanMiot(DummyMiotDevice, FanMiot):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_FAN_P10
@@ -947,6 +947,7 @@ class DummyFanMiot(DummyMiotDevice, FanMiot):
             "set_move": lambda x: True,
         }
         super().__init__(args, kwargs)
+
 
 @pytest.fixture(scope="class")
 def fanmiot(request):

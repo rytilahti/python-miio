@@ -94,8 +94,9 @@ MIOT_MAPPING = {
         "light": {"siid": 2, "piid": 7},
         "mode": {"siid": 2, "piid": 3},
         "set_move": {"siid": 2, "piid": 9},
-    }
+    },
 }
+
 
 class FanException(DeviceException):
     pass
@@ -105,9 +106,11 @@ class OperationMode(enum.Enum):
     Normal = "normal"
     Nature = "nature"
 
+
 class OperationModeMiot(enum.Enum):
     Normal = 0
     Nature = 1
+
 
 class LedBrightness(enum.Enum):
     Bright = 0
@@ -401,6 +404,7 @@ class FanStatusP5:
 
     def __json__(self):
         return self.data
+
 
 class FanStatusMiot:
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker P9/P10."""
@@ -888,6 +892,7 @@ class FanP5(Device):
         """Rotate the fan by -5/+5 degrees left/right."""
         return self.send("m_roll", [direction.value])
 
+
 class FanMiot(MiotDevice):
     def __init__(
         self,
@@ -904,7 +909,6 @@ class FanMiot(MiotDevice):
             self.model = model
         else:
             self.model = MODEL_FAN_P10
-    
 
     @command(
         default_output=format_output(
@@ -1041,6 +1045,7 @@ class FanMiot(MiotDevice):
     def set_rotate(self, direction: MoveDirection):
         return self.set_property("set_move", [direction.value])
 
+
 class FanP9(FanMiot):
     def __init__(
         self,
@@ -1051,6 +1056,7 @@ class FanP9(FanMiot):
         lazy_discover: bool = True,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_P9)
+
 
 class FanP10(FanMiot):
     def __init__(
