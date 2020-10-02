@@ -23,7 +23,7 @@ miiocli = "miio.cli:create_cli"
 [tool.poetry.dependencies]
 python = "^3.6.5"
 click = "^7"
-cryptography = "^2"
+cryptography = "^3"
 construct = "^2.10.56"
 zeroconf = "^0"
 attrs = "*"
