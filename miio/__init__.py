@@ -45,6 +45,7 @@ from miio.vacuumcontainers import (
 )
 from miio.viomivacuum import ViomiVacuum
 from miio.waterpurifier import WaterPurifier
+from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
