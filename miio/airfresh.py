@@ -257,9 +257,6 @@ class AirFreshStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class AirFresh(Device):
     """Main class representing the air fresh."""

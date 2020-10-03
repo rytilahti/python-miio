@@ -157,9 +157,6 @@ class PowerStripStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class PowerStrip(Device):
     """Main class representing the smart power strip."""

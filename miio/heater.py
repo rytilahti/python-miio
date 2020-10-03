@@ -148,9 +148,6 @@ class HeaterStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class Heater(Device):
     """Main class representing the Smartmi Zhimi Heater."""
