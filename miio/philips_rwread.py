@@ -101,9 +101,6 @@ class PhilipsRwreadStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class PhilipsRwread(Device):
     """Main class representing Xiaomi Philips RW Read."""
