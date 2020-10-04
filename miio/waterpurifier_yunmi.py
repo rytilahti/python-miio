@@ -11,6 +11,19 @@ class WaterPurifierYunmiStatus:
     """Container for status reports from the water purifier (Yunmi model)."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Status of a Water Purifier C1 (yummi.waterpuri.lx11):
+            [0, 7200, 8640, 520, 379, 7200, 17280, 2110, 4544,
+            80, 4, 0, 31, 100, 7200, 8640, 1440, 3313]
+
+        Parsed by WaterPurifierYunmi device as:
+            {'run_status': 0, 'f1_totalflow': 7200, 'f1_totaltime': 8640,
+             'f1_usedflow': 520, 'f1_usedtime': 379, 'f2_totalflow': 7200,
+             'f2_totaltime': 17280, 'f2_usedflow': 2110, 'f2_usedtime': 4544,
+             'tds_in': 80, 'tds_out': 4, 'rinse': 0, 'temperature': 31,
+             'tds_warn_thd': 100, 'f3_totalflow': 7200, 'f3_totaltime': 8640,
+             'f3_usedflow': 1440, 'f3_usedtime': 3313}
+        """
         self.data = data
 
     @property
@@ -182,7 +195,6 @@ class WaterPurifierYunmi(Device):
 
         properties = [
             "run_status",
-            # "mode",
             "f1_totalflow",
             "f1_totaltime",
             "f1_usedflow",
@@ -193,7 +205,6 @@ class WaterPurifierYunmi(Device):
             "f2_usedtime",
             "tds_in",
             "tds_out",
-            # "tds_out_avg",
             "rinse",
             "temperature",
             "tds_warn_thd",
