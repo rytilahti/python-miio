@@ -258,7 +258,7 @@ class AirConditionerMiot(MiotDevice):
         return self.set_property("power", False)
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode, False)),
+        click.argument("mode", type=EnumType(OperationMode)),
         default_output=format_output("Setting operation mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
@@ -326,7 +326,7 @@ class AirConditionerMiot(MiotDevice):
         return self.set_property("sleep_mode", sleep_mode)
 
     @command(
-        click.argument("fan_level", type=EnumType(FanLevel, False)),
+        click.argument("fan_level", type=EnumType(FanLevel)),
         default_output=format_output("Setting fan level to {fan_level}"),
     )
     def set_fan_level(self, fan_level: FanLevel):
