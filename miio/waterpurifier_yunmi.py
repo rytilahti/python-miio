@@ -90,7 +90,7 @@ class WaterPurifierYunmiStatus:
 
     @property
     def rinse(self) -> bool:
-        """True if the device is rising."""
+        """True if the device is rinsing."""
         return self.data["rinse"]
 
     @property
