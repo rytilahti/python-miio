@@ -23,7 +23,7 @@ from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.device import Device
 from miio.exceptions import DeviceError, DeviceException
-from miio.fan import Fan, FanMiot, FanP5, FanP9, FanP10, FanSA1, FanV2, FanZA1, FanZA4
+from miio.fan import Fan, FanP5, FanP9, FanP10, FanSA1, FanV2, FanZA1, FanZA4
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb

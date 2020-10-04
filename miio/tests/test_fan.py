@@ -2,10 +2,10 @@ from unittest import TestCase
 
 import pytest
 
-from miio import Fan, FanMiot, FanP5
+from miio import Fan, FanP5, FanP9
 from miio.fan import (
     MODEL_FAN_P5,
-    MODEL_FAN_P10,
+    MODEL_FAN_P9,
     MODEL_FAN_SA1,
     MODEL_FAN_V2,
     MODEL_FAN_V3,
@@ -15,7 +15,6 @@ from miio.fan import (
     LedBrightness,
     MoveDirection,
     OperationMode,
-    OperationModeMiot,
 )
 
 from .dummies import DummyDevice, DummyMiotDevice
@@ -918,9 +917,9 @@ class TestFanP5(TestCase):
             self.device.delay_off(-1)
 
 
-class DummyFanMiot(DummyMiotDevice, FanMiot):
+class DummyFanP9(DummyMiotDevice, FanP9):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_FAN_P10
+        self.model = MODEL_FAN_P9
         self.state = {
             "power": True,
             "mode": 0,
@@ -950,12 +949,12 @@ class DummyFanMiot(DummyMiotDevice, FanMiot):
 
 
 @pytest.fixture(scope="class")
-def fanmiot(request):
-    request.cls.device = DummyFanMiot()
+def fanp9(request):
+    request.cls.device = DummyFanP9()
 
 
-@pytest.mark.usefixtures("fanmiot")
-class TestFanMiot(TestCase):
+@pytest.mark.usefixtures("fanp9")
+class TestFanP9(TestCase):
     def is_on(self):
         return self.device.status().is_on
 
@@ -980,11 +979,11 @@ class TestFanMiot(TestCase):
         def mode():
             return self.device.status().mode
 
-        self.device.set_mode(OperationModeMiot.Normal)
-        assert mode() == OperationModeMiot.Normal
+        self.device.set_mode(OperationMode.Normal)
+        assert mode() == OperationMode.Normal
 
-        self.device.set_mode(OperationModeMiot.Nature)
-        assert mode() == OperationModeMiot.Nature
+        self.device.set_mode(OperationMode.Nature)
+        assert mode() == OperationMode.Nature
 
     def test_set_speed(self):
         def speed():
