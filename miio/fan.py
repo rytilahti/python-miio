@@ -6,7 +6,6 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .fan_common import FanException, LedBrightness, MoveDirection, OperationMode
-from .fan_miot import MODEL_FAN_P9, MODEL_FAN_P10, FanMiot
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -747,27 +746,3 @@ class FanP5(Device):
     def set_rotate(self, direction: MoveDirection):
         """Rotate the fan by -5/+5 degrees left/right."""
         return self.send("m_roll", [direction.value])
-
-
-class FanP9(FanMiot):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_P9)
-
-
-class FanP10(FanMiot):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_P10)

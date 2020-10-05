@@ -51,6 +51,27 @@ class FanStatusMiot:
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker P9/P10."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response of a FanMiot (dmaker.fan.p10):
+
+        {
+          'id': 1,
+          'result': [
+            {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'fan_level', 'siid': 2, 'piid': 2, 'code': 0, 'value': 2},
+            {'did': 'child_lock', 'siid': 3, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'fan_speed', 'siid': 2, 'piid': 10, 'code': 0, 'value': 54},
+            {'did': 'swing_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': False},
+            {'did': 'swing_mode_angle', 'siid': 2, 'piid': 5, 'code': 0, 'value': 30},
+            {'did': 'power_off_time', 'siid': 2, 'piid': 6, 'code': 0, 'value': 0},
+            {'did': 'buzzer', 'siid': 2, 'piid': 8, 'code': 0, 'value': False},
+            {'did': 'light', 'siid': 2, 'piid': 7, 'code': 0, 'value': True},
+            {'did': 'mode', 'siid': 2, 'piid': 3, 'code': 0, 'value': 0},
+            {'did': 'set_move', 'siid': 2, 'piid': 9, 'code': -4003}
+          ],
+          'exe_time': 280
+        }
+        """
         self.data = data
 
     @property
@@ -128,9 +149,6 @@ class FanStatusMiot:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class FanMiot(MiotDevice):
     def __init__(
@@ -142,12 +160,11 @@ class FanMiot(MiotDevice):
         lazy_discover: bool = True,
         model: str = MODEL_FAN_P10,
     ) -> None:
-        super().__init__(MIOT_MAPPING[model], ip, token, start_id, debug, lazy_discover)
-
         if model in MIOT_MAPPING:
             self.model = model
         else:
-            self.model = MODEL_FAN_P10
+            raise FanException("Invalid FanMiot model: %s" % model)
+        super().__init__(MIOT_MAPPING[model], ip, token, start_id, debug, lazy_discover)
 
     @command(
         default_output=format_output(
@@ -283,3 +300,27 @@ class FanMiot(MiotDevice):
     )
     def set_rotate(self, direction: MoveDirection):
         return self.set_property("set_move", [direction.value])
+
+
+class FanP9(FanMiot):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_P9)
+
+
+class FanP10(FanMiot):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_P10)
