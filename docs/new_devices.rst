@@ -14,9 +14,11 @@ We use `poetry <https://python-poetry.org/>`__ for managing the dependencies and
 
     poetry install
 
-If you were not already inside a virtual environment, poetry will create one for you.
-You can execute commands inside this environment by using `poetry run <command>`, or alternatively,
-enter the virtual environment shell by executing `poetry shell` to avoid repeting `poetry run`.
+If you were not already inside a virtual environment during the install,
+poetry will create one for you.
+You can execute commands inside this environment by using ``poetry run <command>``,
+or alternatively,
+enter the virtual environment shell by executing ``poetry shell`` to avoid repeating ``poetry run``.
 
 To verify the installation, you can launch tox_ to run all the checks::
 
