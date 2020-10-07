@@ -26,6 +26,7 @@ from . import (
     Cooker,
     Device,
     Fan,
+    FanMiot,
     Heater,
     PhilipsBulb,
     PhilipsEyecare,
@@ -78,6 +79,7 @@ from .fan import (
     MODEL_FAN_ZA3,
     MODEL_FAN_ZA4,
 )
+from .fan_miot import MODEL_FAN_P9, MODEL_FAN_P10
 from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
@@ -161,6 +163,8 @@ DEVICE_MAP = {
     "zhimi-fan-za3": partial(Fan, model=MODEL_FAN_ZA3),
     "zhimi-fan-za4": partial(Fan, model=MODEL_FAN_ZA4),
     "dmaker-fan-p5": partial(Fan, model=MODEL_FAN_P5),
+    "dmaker-fan-p9": partial(FanMiot, model=MODEL_FAN_P9),
+    "dmaker-fan-p10": partial(FanMiot, model=MODEL_FAN_P10),
     "tinymu-toiletlid-v1": partial(Toiletlid, model=MODEL_TOILETLID_V1),
     "zhimi-airfresh-va2": partial(AirFresh, model=MODEL_AIRFRESH_VA2),
     "zhimi-airfresh-va4": partial(AirFresh, model=MODEL_AIRFRESH_VA4),

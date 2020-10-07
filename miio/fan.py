@@ -1,4 +1,3 @@
-import enum
 import logging
 from typing import Any, Dict, Optional
 
@@ -6,7 +5,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device
-from .exceptions import DeviceException
+from .fan_common import FanException, LedBrightness, MoveDirection, OperationMode
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,26 +61,6 @@ AVAILABLE_PROPERTIES = {
     MODEL_FAN_ZA4: AVAILABLE_PROPERTIES_COMMON,
     MODEL_FAN_P5: AVAILABLE_PROPERTIES_P5,
 }
-
-
-class FanException(DeviceException):
-    pass
-
-
-class OperationMode(enum.Enum):
-    Normal = "normal"
-    Nature = "nature"
-
-
-class LedBrightness(enum.Enum):
-    Bright = 0
-    Dim = 1
-    Off = 2
-
-
-class MoveDirection(enum.Enum):
-    Left = "left"
-    Right = "right"
 
 
 class FanStatus:

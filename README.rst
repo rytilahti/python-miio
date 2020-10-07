@@ -105,7 +105,7 @@ Supported devices
 -  Xiaomi Philips Zhirui Smart LED Bulb E14 Candle Lamp
 -  Xiaomi Philips Zhirui Bedroom Smart Lamp
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR)
--  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, P5
+-  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, P5, P9, P10
 -  Xiaomi Mi Air Humidifier V1, CA1, CA4, CB1, MJJSQ, JSQ001
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off)
 -  Xiaomi PM2.5 Air Quality Monitor V1, B1, S1
