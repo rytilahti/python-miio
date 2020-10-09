@@ -386,7 +386,7 @@ class Gateway(Device):
             raise GatewayException(
                 "Got an exception while getting gateway illumination"
             ) from ex
-    
+
 
 class GatewayDevice(Device):
     """
