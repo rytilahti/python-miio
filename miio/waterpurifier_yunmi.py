@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from typing import Any, Dict
 
 from .click_common import command, format_output
@@ -17,77 +18,77 @@ class WaterPurifierYunmiStatus:
             80, 4, 0, 31, 100, 7200, 8640, 1440, 3313]
 
         Parsed by WaterPurifierYunmi device as:
-            {'run_status': 0, 'f1_totalflow': 7200, 'f1_totaltime': 8640,
-             'f1_usedflow': 520, 'f1_usedtime': 379, 'f2_totalflow': 7200,
-             'f2_totaltime': 17280, 'f2_usedflow': 2110, 'f2_usedtime': 4544,
+            {'run_status': 0, 'filter1_flow_total': 7200, 'filter1_life_total': 8640,
+             'filter1_flow_used': 520, 'filter1_life_used': 379, 'filter2_flow_total': 7200,
+             'filter2_life_total': 17280, 'filter2_flow_used': 2110, 'filter2_life_used': 4544,
              'tds_in': 80, 'tds_out': 4, 'rinse': 0, 'temperature': 31,
-             'tds_warn_thd': 100, 'f3_totalflow': 7200, 'f3_totaltime': 8640,
-             'f3_usedflow': 1440, 'f3_usedtime': 3313}
+             'tds_warn_thd': 100, 'filter3_flow_total': 7200, 'filter3_life_total': 8640,
+             'filter3_flow_used': 1440, 'filter3_life_used': 3313}
         """
         self.data = data
 
     @property
-    def run_status(self) -> int:
+    def status(self) -> int:
         """Current running status, 0 for no error."""
         return self.data["run_status"]
 
     @property
-    def f1_totaltime(self) -> int:
+    def filter1_life_total(self) -> timedelta:
         """Filter1 total available time in hours."""
         return self.data["f1_totaltime"]
 
     @property
-    def f1_usedtime(self) -> int:
+    def filter1_life_used(self) -> timedelta:
         """Filter1 used time in hours."""
         return self.data["f1_usedtime"]
 
     @property
-    def f1_totalflow(self) -> int:
+    def filter1_flow_total(self) -> int:
         """Filter1 total available flow in Metric Liter (L)."""
         return self.data["f1_totalflow"]
 
     @property
-    def f1_usedflow(self) -> int:
+    def filter1_flow_used(self) -> int:
         """Filter1 used flow in Metric Liter (L)."""
         return self.data["f1_usedflow"]
 
     @property
-    def f2_totaltime(self) -> int:
+    def filter2_life_total(self) -> timedelta:
         """Filter2 total available time in hours."""
         return self.data["f2_totaltime"]
 
     @property
-    def f2_usedtime(self) -> int:
+    def filter2_life_used(self) -> timedelta:
         """Filter2 used time in hours."""
         return self.data["f2_usedtime"]
 
     @property
-    def f2_totalflow(self) -> int:
+    def filter2_flow_total(self) -> int:
         """Filter2 total available flow in Metric Liter (L)."""
         return self.data["f2_totalflow"]
 
     @property
-    def f2_usedflow(self) -> int:
+    def filter2_flow_used(self) -> int:
         """Filter2 used flow in Metric Liter (L)."""
         return self.data["f2_usedflow"]
 
     @property
-    def f3_totaltime(self) -> int:
+    def filter3_life_total(self) -> timedelta:
         """Filter3 total available time in hours."""
         return self.data["f3_totaltime"]
 
     @property
-    def f3_usedtime(self) -> int:
+    def filter3_life_used(self) -> timedelta:
         """Filter3 used time in hours."""
         return self.data["f3_usedtime"]
 
     @property
-    def f3_totalflow(self) -> int:
+    def filter3_flow_total(self) -> int:
         """Filter3 total available flow in Metric Liter (L)."""
         return self.data["f3_totalflow"]
 
     @property
-    def f3_usedflow(self) -> int:
+    def filter3_flow_used(self) -> int:
         """Filter3 used flow in Metric Liter (L)."""
         return self.data["f3_usedflow"]
 
@@ -119,38 +120,38 @@ class WaterPurifierYunmiStatus:
     def __repr__(self) -> str:
         return (
             "<WaterPurifierYunmiStatus "
-            "run_status=%s, "
-            "f1_totaltime=%s, "
-            "f1_usedtime=%s, "
-            "f1_totalflow=%s, "
-            "f1_usedflow=%s, "
-            "f2_totaltime=%s, "
-            "f2_usedtime=%s, "
-            "f2_totalflow=%s, "
-            "f2_usedflow=%s, "
-            "f3_totaltime=%s, "
-            "f3_usedtime=%s, "
-            "f3_totalflow=%s, "
-            "f3_usedflow=%s, "
+            "status=%s, "
+            "filter1_life_total=%s, "
+            "filter1_life_used=%s, "
+            "filter1_flow_total=%s, "
+            "filter1_flow_used=%s, "
+            "filter2_life_total=%s, "
+            "filter2_life_used=%s, "
+            "filter2_flow_total=%s, "
+            "filter2_flow_used=%s, "
+            "filter3_life_total=%s, "
+            "filter3_life_used=%s, "
+            "filter3_flow_total=%s, "
+            "filter3_flow_used=%s, "
             "tds_in=%s, "
             "tds_out=%s, "
             "rinse=%s, "
             "temperature=%s, "
             "tds_warn_thd=%s>"
             % (
-                self.run_status,
-                self.f1_totaltime,
-                self.f1_usedtime,
-                self.f1_totalflow,
-                self.f1_usedflow,
-                self.f2_totaltime,
-                self.f2_usedtime,
-                self.f2_totalflow,
-                self.f2_usedflow,
-                self.f3_totaltime,
-                self.f3_usedtime,
-                self.f3_totalflow,
-                self.f3_usedflow,
+                self.status,
+                self.filter1_life_total,
+                self.filter1_life_used,
+                self.filter1_flow_total,
+                self.filter1_flow_used,
+                self.filter2_life_total,
+                self.filter2_life_used,
+                self.filter2_flow_total,
+                self.filter2_flow_used,
+                self.filter3_life_total,
+                self.filter3_life_used,
+                self.filter3_flow_total,
+                self.filter3_flow_used,
                 self.tds_in,
                 self.tds_out,
                 self.rinse,
@@ -169,20 +170,19 @@ class WaterPurifierYunmi(Device):
     @command(
         default_output=format_output(
             "",
-            ""
-            "Error: {result.run_status}\n"
-            "Filter1 total time: {result.f1_totaltime} hours\n"
-            "Filter1 used time: {result.f1_usedtime} hours\n"
-            "Filter1 total flow: {result.f1_totalflow} L\n"
-            "Filter1 used flow: {result.f1_usedflow} L\n"
-            "Filter2 total time: {result.f2_totaltime} hours\n"
-            "Filter2 used time: {result.f2_usedtime} hours\n"
-            "Filter2 total flow: {result.f2_totalflow} L\n"
-            "Filter2 used flow: {result.f2_usedflow} L\n"
-            "Filter3 total time: {result.f3_totaltime} hours\n"
-            "Filter3 used time: {result.f3_usedtime} hours\n"
-            "Filter3 total flow: {result.f3_totalflow} L\n"
-            "Filter3 used flow: {result.f3_usedflow} L\n"
+            "Error: {result.status}\n"
+            "Filter1 total time: {result.filter1_life_total} hours\n"
+            "Filter1 used time: {result.filter1_life_used} hours\n"
+            "Filter1 total flow: {result.filter1_flow_total} L\n"
+            "Filter1 used flow: {result.filter1_flow_used} L\n"
+            "Filter2 total time: {result.filter2_life_total} hours\n"
+            "Filter2 used time: {result.filter2_life_used} hours\n"
+            "Filter2 total flow: {result.filter2_flow_total} L\n"
+            "Filter2 used flow: {result.filter2_flow_used} L\n"
+            "Filter3 total time: {result.filter3_life_total} hours\n"
+            "Filter3 used time: {result.filter3_life_used} hours\n"
+            "Filter3 total flow: {result.filter3_flow_total} L\n"
+            "Filter3 used flow: {result.filter3_flow_used} L\n"
             "TDS in: {result.tds_in}\n"
             "TDS out: {result.tds_out}\n"
             "Rinsing: {result.rinse}\n"
