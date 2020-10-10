@@ -5,8 +5,10 @@ import pytest
 from miio import AirConditionerMiot
 from miio.airconditioner_miot import (
     AirConditionerMiotException,
-    FanLevel,
+    CleaningStatus,
+    FanSpeed,
     OperationMode,
+    TimerStatus,
 )
 
 from .dummies import DummyMiotDevice
@@ -19,7 +21,7 @@ _INITIAL_STATE = {
     "heater": True,
     "dryer": False,
     "sleep_mode": False,
-    "fan_level": FanLevel.Level7,
+    "fan_speed": FanSpeed.Level7,
     "vertical_swing": True,
     "temperature": 27.5,
     "buzzer": True,
@@ -46,7 +48,7 @@ class DummyAirConditionerMiot(DummyMiotDevice, AirConditionerMiot):
             "set_heater": lambda x: self._set_state("heater", x),
             "set_dryer": lambda x: self._set_state("dryer", x),
             "set_sleep_mode": lambda x: self._set_state("sleep_mode", x),
-            "set_fan_level": lambda x: self._set_state("fan_level", x),
+            "set_fan_speed": lambda x: self._set_state("fan_speed", x),
             "set_vertical_swing": lambda x: self._set_state("vertical_swing", x),
             "set_temperature": lambda x: self._set_state("temperature", x),
             "set_buzzer": lambda x: self._set_state("buzzer", x),
@@ -88,14 +90,14 @@ class TestAirConditioner(TestCase):
         assert status.heater == _INITIAL_STATE["heater"]
         assert status.dryer == _INITIAL_STATE["dryer"]
         assert status.sleep_mode == _INITIAL_STATE["sleep_mode"]
-        assert status.fan_level == FanLevel(_INITIAL_STATE["fan_level"])
+        assert status.fan_speed == FanSpeed(_INITIAL_STATE["fan_speed"])
         assert status.vertical_swing == _INITIAL_STATE["vertical_swing"]
         assert status.temperature == _INITIAL_STATE["temperature"]
         assert status.buzzer == _INITIAL_STATE["buzzer"]
         assert status.led == _INITIAL_STATE["led"]
-        assert status.clean == _INITIAL_STATE["clean"]
+        assert repr(status.clean) == repr(CleaningStatus(_INITIAL_STATE["clean"]))
         assert status.fan_percent == _INITIAL_STATE["fan_percent"]
-        assert status.timer == _INITIAL_STATE["timer"]
+        assert repr(status.timer) == repr(TimerStatus(_INITIAL_STATE["timer"]))
 
     def test_set_mode(self):
         def mode():
@@ -171,33 +173,33 @@ class TestAirConditioner(TestCase):
         self.device.set_sleep_mode(False)
         assert sleep_mode() is False
 
-    def test_set_fan_level(self):
-        def fan_level():
-            return self.device.status().fan_level
+    def test_set_fan_speed(self):
+        def fan_speed():
+            return self.device.status().fan_speed
 
-        self.device.set_fan_level(FanLevel.Auto)
-        assert fan_level() == FanLevel.Auto
+        self.device.set_fan_speed(FanSpeed.Auto)
+        assert fan_speed() == FanSpeed.Auto
 
-        self.device.set_fan_level(FanLevel.Level1)
-        assert fan_level() == FanLevel.Level1
+        self.device.set_fan_speed(FanSpeed.Level1)
+        assert fan_speed() == FanSpeed.Level1
 
-        self.device.set_fan_level(FanLevel.Level2)
-        assert fan_level() == FanLevel.Level2
+        self.device.set_fan_speed(FanSpeed.Level2)
+        assert fan_speed() == FanSpeed.Level2
 
-        self.device.set_fan_level(FanLevel.Level3)
-        assert fan_level() == FanLevel.Level3
+        self.device.set_fan_speed(FanSpeed.Level3)
+        assert fan_speed() == FanSpeed.Level3
 
-        self.device.set_fan_level(FanLevel.Level4)
-        assert fan_level() == FanLevel.Level4
+        self.device.set_fan_speed(FanSpeed.Level4)
+        assert fan_speed() == FanSpeed.Level4
 
-        self.device.set_fan_level(FanLevel.Level5)
-        assert fan_level() == FanLevel.Level5
+        self.device.set_fan_speed(FanSpeed.Level5)
+        assert fan_speed() == FanSpeed.Level5
 
-        self.device.set_fan_level(FanLevel.Level6)
-        assert fan_level() == FanLevel.Level6
+        self.device.set_fan_speed(FanSpeed.Level6)
+        assert fan_speed() == FanSpeed.Level6
 
-        self.device.set_fan_level(FanLevel.Level7)
-        assert fan_level() == FanLevel.Level7
+        self.device.set_fan_speed(FanSpeed.Level7)
+        assert fan_speed() == FanSpeed.Level7
 
     def test_set_vertical_swing(self):
         def vertical_swing():
@@ -246,7 +248,7 @@ class TestAirConditioner(TestCase):
 
     def test_set_timer(self):
         def timer():
-            return self.device.status().timer
+            return self.device.status().data["timer"]
 
         self.device.set_timer(60, True)
         assert timer() == "1,60,1"
@@ -256,7 +258,7 @@ class TestAirConditioner(TestCase):
 
     def test_set_clean(self):
         def clean():
-            return self.device.status().clean
+            return self.device.status().data["clean"]
 
         self.device.set_clean(True)
         assert clean() == "1"

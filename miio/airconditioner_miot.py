@@ -1,5 +1,6 @@
 import enum
 import logging
+from datetime import timedelta
 from typing import Any, Dict
 
 import click
@@ -50,7 +51,7 @@ class OperationMode(enum.Enum):
     Heat = 5
 
 
-class FanLevel(enum.Enum):
+class FanSpeed(enum.Enum):
     Auto = 0
     Level1 = 1
     Level2 = 2
@@ -65,6 +66,29 @@ class AirConditionerMiotStatus:
     """Container for status reports from the air conditioner which uses MIoT protocol."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response (MIoT format) of a Mi Smart Air Conditioner A (xiaomi.aircondition.mc4)
+        [
+            {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'mode', 'siid': 2, 'piid': 2, 'code': 0, 'value': 2},
+            {'did': 'target_temperature', 'siid': 2, 'piid': 4, 'code': 0, 'value': 26.5},
+            {'did': 'eco', 'siid': 2, 'piid': 7, 'code': 0, 'value': False},
+            {'did': 'heater', 'siid': 2, 'piid': 9, 'code': 0, 'value': True},
+            {'did': 'dryer', 'siid': 2, 'piid': 10, 'code': 0, 'value': True},
+            {'did': 'sleep_mode', 'siid': 2, 'piid': 11, 'code': 0, 'value': False},
+            {'did': 'fan_level', 'siid': 3, 'piid': 2, 'code': 0, 'value': 0},
+            {'did': 'vertical_swing', 'siid': 3, 'piid': 4, 'code': 0, 'value': True},
+            {'did': 'temperature', 'siid': 4, 'piid': 7, 'code': 0, 'value': 28.4},
+            {'did': 'buzzer', 'siid': 5, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'led', 'siid': 6, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'electricity', 'siid': 8, 'piid': 1, 'code': 0, 'value': 0.0},
+            {'did': 'clean', 'siid': 9, 'piid': 1, 'code': 0, 'value': '0,100,1,1'},
+            {'did': 'running_duration', 'siid': 9, 'piid': 5, 'code': 0, 'value': 151.0},
+            {'did': 'fan_percent', 'siid': 10, 'piid': 1, 'code': 0, 'value': 101},
+            {'did': 'timer', 'siid': 10, 'piid': 3, 'code': 0, 'value': '0,0,0,0'}
+        ]
+
+        """
         self.data = data
 
     @property
@@ -108,9 +132,9 @@ class AirConditionerMiotStatus:
         return self.data["sleep_mode"]
 
     @property
-    def fan_level(self) -> FanLevel:
-        """Current Fan level."""
-        return FanLevel(self.data["fan_level"])
+    def fan_speed(self) -> FanSpeed:
+        """Current Fan speed."""
+        return FanSpeed(self.data["fan_level"])
 
     @property
     def vertical_swing(self) -> bool:
@@ -143,13 +167,13 @@ class AirConditionerMiotStatus:
         return self.data["clean"]
 
     @property
-    def running_duration(self) -> float:
+    def running_duration(self) -> timedelta:
         """Total running duration in hours."""
         return self.data["running_duration"]
 
     @property
     def fan_percent(self) -> int:
-        """Current fan level in percent."""
+        """Current fan speed in percent."""
         return self.data["fan_percent"]
 
     @property
@@ -166,7 +190,7 @@ class AirConditionerMiotStatus:
             "heater=%s, "
             "dryer=%s, "
             "sleep_mode=%s, "
-            "fan_level=%s, "
+            "fan_speed=%s, "
             "vertical_swing=%s, "
             "temperature=%s, "
             "buzzer=%s, "
@@ -184,7 +208,7 @@ class AirConditionerMiotStatus:
                 self.heater,
                 self.dryer,
                 self.sleep_mode,
-                self.fan_level,
+                self.fan_speed,
                 self.vertical_swing,
                 self.temperature,
                 self.buzzer,
@@ -225,7 +249,7 @@ class AirConditionerMiot(MiotDevice):
             "Heater: {result.heater}\n"
             "Dryer: {result.dryer}\n"
             "Sleep Mode: {result.sleep_mode}\n"
-            "Fan Level: {result.fan_level}\n"
+            "Fan Speed: {result.fan_level}\n"
             "Vertical Swing: {result.vertical_swing}\n"
             "Room Temperature: {result.temperature} ℃\n"
             "Buzzer: {result.buzzer}\n"
@@ -326,12 +350,12 @@ class AirConditionerMiot(MiotDevice):
         return self.set_property("sleep_mode", sleep_mode)
 
     @command(
-        click.argument("fan_level", type=EnumType(FanLevel)),
-        default_output=format_output("Setting fan level to {fan_level}"),
+        click.argument("fan_speed", type=EnumType(FanSpeed)),
+        default_output=format_output("Setting fan speed to {fan_speed}"),
     )
-    def set_fan_level(self, fan_level: FanLevel):
-        """Set fan level."""
-        return self.set_property("fan_level", fan_level.value)
+    def set_fan_speed(self, fan_speed: FanSpeed):
+        """Set fan speed."""
+        return self.set_property("fan_level", fan_speed.value)
 
     @command(
         click.argument("vertical_swing", type=bool),
@@ -370,7 +394,7 @@ class AirConditionerMiot(MiotDevice):
         default_output=format_output("Setting fan percent to {fan_percent}"),
     )
     def set_fan_percent(self, fan_percent):
-        """Set fan level in percent, should be  between 1 to 100 or 101(auto)."""
+        """Set fan speed in percent, should be  between 1 to 100 or 101(auto)."""
         if fan_percent < 1 or fan_percent > 101:
             raise AirConditionerMiotException("Invalid fan percent: %s" % fan_percent)
         return self.set_property("fan_percent", fan_percent)
