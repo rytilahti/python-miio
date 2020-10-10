@@ -41,6 +41,7 @@ from miio.g1vacuum import G1Vacuum
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
+from miio.ihcooker import IHCooker
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.yeelight import Yeelight
 from miio.miot_device import MiotDevice

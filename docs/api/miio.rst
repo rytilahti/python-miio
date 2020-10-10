@@ -54,6 +54,7 @@ Submodules
    miio.heater
    miio.heater_miot
    miio.huizuo
+   miio.ihcooker
    miio.miioprotocol
    miio.miot_device
    miio.philips_bulb
