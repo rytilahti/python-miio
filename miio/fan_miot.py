@@ -32,6 +32,7 @@ class FanMiotDeviceAdapter:
     def __init__(
         self,
         spec_file_name: str,
+        spec=None,
         on=PropertyAdapter("fan", "on"),
         level=PropertyAdapter("fan", "fan-level"),
         lock=PropertyAdapter("physical-controls-locked", "physical-controls-locked"),
@@ -56,7 +57,7 @@ class FanMiotDeviceAdapter:
         ),
     ):
         self.spec_file_name = spec_file_name
-        self.spec = DeviceSpec.load(spec_file_name)
+        self.spec = DeviceSpec.load(spec_file_name) if spec is None else spec
         self.on = on
         self.level = level
         self.lock = lock
