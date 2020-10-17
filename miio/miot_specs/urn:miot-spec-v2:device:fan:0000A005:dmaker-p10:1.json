@@ -1,0 +1,273 @@
+{
+  "type": "urn:miot-spec-v2:device:fan:0000A005:dmaker-p10:1",
+  "description": "Fan",
+  "services": [
+    {
+      "iid": 1,
+      "type": "urn:miot-spec-v2:service:device-information:00007801:dmaker-p10:1",
+      "description": "Device Information",
+      "properties": [
+        {
+          "iid": 1,
+          "type": "urn:miot-spec-v2:property:manufacturer:00000001:dmaker-p10:1",
+          "description": "Device Manufacturer",
+          "format": "string",
+          "access": [
+            "read"
+          ]
+        },
+        {
+          "iid": 2,
+          "type": "urn:miot-spec-v2:property:model:00000002:dmaker-p10:1",
+          "description": "Device Model",
+          "format": "string",
+          "access": [
+            "read"
+          ]
+        },
+        {
+          "iid": 3,
+          "type": "urn:miot-spec-v2:property:serial-number:00000003:dmaker-p10:1",
+          "description": "Device Serial Number",
+          "format": "string",
+          "access": [
+            "read"
+          ]
+        },
+        {
+          "iid": 4,
+          "type": "urn:miot-spec-v2:property:firmware-revision:00000005:dmaker-p10:1",
+          "description": "Current Firmware Version",
+          "format": "string",
+          "access": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "iid": 2,
+      "type": "urn:miot-spec-v2:service:fan:00007808:dmaker-p10:1",
+      "description": "Fan",
+      "properties": [
+        {
+          "iid": 1,
+          "type": "urn:miot-spec-v2:property:on:00000006:dmaker-p10:1",
+          "description": "Switch Status",
+          "format": "bool",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ]
+        },
+        {
+          "iid": 2,
+          "type": "urn:miot-spec-v2:property:fan-level:00000016:dmaker-p10:1",
+          "description": "Fan Level",
+          "format": "uint8",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ],
+          "unit": "none",
+          "value-list": [
+            {
+              "value": 1,
+              "description": "Level1"
+            },
+            {
+              "value": 2,
+              "description": "Level2"
+            },
+            {
+              "value": 3,
+              "description": "Level3"
+            },
+            {
+              "value": 4,
+              "description": "Level4"
+            }
+          ]
+        },
+        {
+          "iid": 3,
+          "type": "urn:miot-spec-v2:property:mode:00000008:dmaker-p10:1",
+          "description": "Mode",
+          "format": "uint8",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ],
+          "unit": "none",
+          "value-list": [
+            {
+              "value": 0,
+              "description": "Straight Wind"
+            },
+            {
+              "value": 1,
+              "description": "Natural Wind"
+            }
+          ]
+        },
+        {
+          "iid": 4,
+          "type": "urn:miot-spec-v2:property:horizontal-swing:00000017:dmaker-p10:1",
+          "description": "Horizontal Swing",
+          "format": "bool",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ],
+          "unit": "none"
+        },
+        {
+          "iid": 5,
+          "type": "urn:miot-spec-v2:property:horizontal-angle:00000019:dmaker-p10:1",
+          "description": "Horizontal Angle",
+          "format": "uint16",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ],
+          "unit": "none",
+          "value-list": [
+            {
+              "value": 30,
+              "description": "30"
+            },
+            {
+              "value": 60,
+              "description": "60"
+            },
+            {
+              "value": 90,
+              "description": "90"
+            },
+            {
+              "value": 120,
+              "description": "120"
+            },
+            {
+              "value": 140,
+              "description": "140"
+            }
+          ]
+        },
+        {
+          "iid": 6,
+          "type": "urn:miot-spec-v2:property:off-delay-time:00000054:dmaker-p10:1",
+          "description": "Power Off Delay Time",
+          "format": "uint32",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ],
+          "unit": "minutes",
+          "value-range": [
+            0,
+            480,
+            1
+          ]
+        },
+        {
+          "iid": 7,
+          "type": "urn:miot-spec-v2:property:brightness:0000000D:dmaker-p10:1",
+          "description": "Brightness",
+          "format": "bool",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ],
+          "unit": "none"
+        },
+        {
+          "iid": 8,
+          "type": "urn:miot-spec-v2:property:alarm:00000012:dmaker-p10:1",
+          "description": "Alarm",
+          "format": "bool",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ]
+        },
+        {
+          "iid": 9,
+          "type": "urn:miot-spec-v2:property:motor-control:00000038:dmaker-p10:1",
+          "description": "Motor Control",
+          "format": "uint8",
+          "access": [
+            "write"
+          ],
+          "unit": "none",
+          "value-list": [
+            {
+              "value": 0,
+              "description": "NO"
+            },
+            {
+              "value": 1,
+              "description": "LEFT"
+            },
+            {
+              "value": 2,
+              "description": "RIGHT"
+            }
+          ]
+        },
+        {
+          "iid": 10,
+          "type": "urn:miot-spec-v2:property:speed-level:00000023:dmaker-p10:1",
+          "description": "Speed Level",
+          "format": "uint8",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ],
+          "unit": "none",
+          "value-range": [
+            1,
+            100,
+            1
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "iid": 1,
+          "type": "urn:miot-spec-v2:action:toggle:00002811:dmaker-p10:1",
+          "description": "Toggle",
+          "in": [],
+          "out": []
+        }
+      ]
+    },
+    {
+      "iid": 3,
+      "type": "urn:miot-spec-v2:service:physical-controls-locked:00007807:dmaker-p10:1",
+      "description": "Physical Control Locked",
+      "properties": [
+        {
+          "iid": 1,
+          "type": "urn:miot-spec-v2:property:physical-controls-locked:0000001D:dmaker-p10:1",
+          "description": "Physical Control Locked",
+          "format": "bool",
+          "access": [
+            "read",
+            "write",
+            "notify"
+          ]
+        }
+      ]
+    }
+  ]
+}

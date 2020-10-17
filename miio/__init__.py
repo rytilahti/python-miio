@@ -33,6 +33,15 @@ from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
 from miio.fan_miot import FanMiot, FanP9, FanP10
 from miio.gateway import Gateway
 from miio.heater import Heater
+from miio.miot_spec_v2 import (
+    Action,
+    DeviceSpec,
+    Property,
+    Service,
+    SpecificationType,
+    UrnExpression,
+)
+from miio.miot_v2_device import MiotV2Device
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
 from miio.philips_eyecare import PhilipsEyecare
 from miio.philips_moonlight import PhilipsMoonlight

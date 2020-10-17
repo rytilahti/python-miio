@@ -3,40 +3,65 @@ from unittest import TestCase
 import pytest
 
 from miio import FanMiot
-from miio.fan_miot import MODEL_FAN_P9, FanException, OperationMode
+from miio.fan_miot import (
+    MODEL_FAN_P9,
+    FanException,
+    FanMiotDeviceAdapter,
+    OperationMode,
+    PropertyAdapter,
+)
 
-from .dummies import DummyMiotDevice
+from .dummies import DummyMiotV2Device
 
 
-class DummyFanMiot(DummyMiotDevice, FanMiot):
+class TestFanMiotDeviceAdapter(TestCase):
+    def test_check_validation(self):
+        adapter = FanMiotDeviceAdapter(
+            "urn:miot-spec-v2:device:fan:0000A005:dmaker-p11:1.json",
+            speed=PropertyAdapter("fan", "fan-level"),
+            off_delay=PropertyAdapter("off-delay-time", "off-delay-time"),
+            alarm=PropertyAdapter("alarm", "alarm"),
+            brightness=PropertyAdapter("indicator-light", "on"),
+            motor_control=PropertyAdapter("motor-controller", "motor-control"),
+        )
+        adapter.check_validation()
+
+
+class DummyFanMiot(DummyMiotV2Device, FanMiot):
     def __init__(self, *args, **kwargs):
         self.model = MODEL_FAN_P9
+        self.adapter = self.get_adapter()
+        self.spec = self.adapter.spec
         self.state = {
-            "power": True,
-            "mode": 0,
-            "fan_speed": 35,
-            "swing_mode": False,
-            "swing_mode_angle": 140,
-            "power_off_time": 0,
-            "light": True,
-            "buzzer": False,
-            "child_lock": False,
+            "fan.on": True,
+            "fan.mode": 0,
+            "fan.speed-level": 35,
+            "fan.horizontal-swing": False,
+            "fan.horizontal-angle": 140,
+            "fan.off-delay-time": 0,
+            "fan.brightness": True,
+            "fan.alarm": False,
+            "physical-controls-locked": False,
         }
-
         self.return_values = {
             "get_prop": self._get_state,
-            "power": lambda x: self._set_state("power", x),
-            "mode": lambda x: self._set_state("mode", x),
-            "fan_speed": lambda x: self._set_state("fan_speed", x),
-            "swing_mode": lambda x: self._set_state("swing_mode", x),
-            "swing_mode_angle": lambda x: self._set_state("swing_mode_angle", x),
-            "power_off_time": lambda x: self._set_state("power_off_time", x),
-            "light": lambda x: self._set_state("light", x),
-            "buzzer": lambda x: self._set_state("buzzer", x),
-            "child_lock": lambda x: self._set_state("child_lock", x),
-            "set_move": lambda x: True,
+            "fan.on": lambda x: self._set_state("power", x),
+            "fan.mode": lambda x: self._set_state("mode", x),
+            "fan.speed-level": lambda x: self._set_state("fan_speed", x),
+            "fan.horizontal-swing": lambda x: self._set_state("swing_mode", x),
+            "fan.horizontal-angle": lambda x: self._set_state("swing_mode_angle", x),
+            "fan.off-delay-time": lambda x: self._set_state("power_off_time", x),
+            "fan.brightness": lambda x: self._set_state("light", x),
+            "fan.alarm": lambda x: self._set_state("buzzer", x),
+            "physical-controls-locked": lambda x: self._set_state("child_lock", x),
+            "motor-control": lambda x: True,
         }
         super().__init__(args, kwargs)
+
+    def get_adapter(self):
+        return FanMiotDeviceAdapter(
+            "urn:miot-spec-v2:device:fan:0000A005:dmaker-p9:1.json"
+        )
 
 
 @pytest.fixture(scope="class")

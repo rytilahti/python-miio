@@ -71,3 +71,42 @@ class DummyMiotDevice(DummyDevice):
             if prop["did"] == property_key:
                 prop["value"] = value
         return None
+
+
+class DummyMiotV2Device(DummyDevice):
+    def __init__(self, *args, **kwargs):
+        adapter = self.get_adapter()
+        spec = adapter.spec
+
+        def get_siid_and_piid(key: str):
+            serv_name = key
+            prop_name = key
+            if "." in key:
+                str_arr = key.split(".")
+                serv_name = str_arr[0]
+                prop_name = str_arr[1]
+            serv, prop = spec.find_service_and_property(serv_name, prop_name)
+            return {"siid": serv.iid, "piid": prop.iid}
+
+        self.state = [
+            {"did": k, "value": v, "code": 0, **get_siid_and_piid(k)}
+            for k, v in self.state.items()
+        ]
+        super().__init__(*args, **kwargs)
+
+    def get_readable_properties(self, request_props=None):
+        return self.state
+
+    def set_property(self, service_name: str, property_name: str, value):
+        did = (
+            service_name
+            if service_name == property_name
+            else service_name + "." + property_name
+        )
+        for prop in self.state:
+            if prop["did"] == did:
+                prop["value"] = value
+        return None
+
+    def get_adapter(self):
+        pass

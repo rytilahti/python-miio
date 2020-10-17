@@ -41,6 +41,8 @@ Submodules
    miio.heater
    miio.miioprotocol
    miio.miot_device
+   miio.miot_spec_v2
+   miio.miot_v2_device
    miio.philips_bulb
    miio.philips_eyecare
    miio.philips_eyecare_cli
