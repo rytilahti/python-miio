@@ -89,7 +89,7 @@ ADAPTERS = {
     ),
     MODEL_FAN_P11: FanMiotDeviceAdapter(
         "urn:miot-spec-v2:device:fan:0000A005:dmaker-p11:1.json",
-        speed=PropertyAdapter("fan", "fan-level"),
+        speed=PropertyAdapter("fan", "status"),
         off_delay=PropertyAdapter("off-delay-time", "off-delay-time"),
         alarm=PropertyAdapter("alarm", "alarm"),
         brightness=PropertyAdapter("indicator-light", "on"),
