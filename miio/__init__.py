@@ -41,7 +41,7 @@ from miio.miot_spec_v2 import (
     SpecificationType,
     UrnExpression,
 )
-from miio.miot_v2_device import MiotV2Device
+from miio.miot_v2_device import MiotV2Device, PropertyAdapter
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
 from miio.philips_eyecare import PhilipsEyecare
 from miio.philips_moonlight import PhilipsMoonlight

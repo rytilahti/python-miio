@@ -5,7 +5,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .fan_common import FanException, MoveDirection, OperationMode
 from .miot_spec_v2 import DeviceSpec
-from .miot_v2_device import MiotV2Device
+from .miot_v2_device import DeviceAdapter, MiotV2Device, PropertyAdapter
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,21 +14,7 @@ MODEL_FAN_P10 = "dmaker.fan.p10"
 MODEL_FAN_P11 = "dmaker.fan.p11"
 
 
-class PropertyAdapter:
-    def __init__(
-        self,
-        service: str,
-        property: str,
-        value_decoder=lambda v: v,
-        value_encoder=lambda v: v,
-    ):
-        self.service = service
-        self.property = property
-        self.value_decoder = value_decoder
-        self.value_encoder = value_encoder
-
-
-class FanMiotDeviceAdapter:
+class FanMiotDeviceAdapter(DeviceAdapter):
     def __init__(
         self,
         spec_file_name: str,
@@ -69,16 +55,7 @@ class FanMiotDeviceAdapter:
         self.brightness = brightness
         self.mode = mode
         self.motor_control = motor_control
-
-    def check_validation(self):
-        for name, value in vars(self).items():
-            if type(value) != PropertyAdapter:
-                continue
-            if not self.spec.contains(value.service, value.property):
-                raise FanException(
-                    f"invalid adapter for spec {self.spec_file_name}: "
-                    f"service '{value.service}' property '{value.property}' not found"
-                )
+        super().__init__(spec_file_name, spec)
 
 
 ADAPTERS = {

@@ -2,13 +2,12 @@ from unittest import TestCase
 
 import pytest
 
-from miio import FanMiot
+from miio import FanMiot, PropertyAdapter
 from miio.fan_miot import (
     MODEL_FAN_P9,
     FanException,
     FanMiotDeviceAdapter,
     OperationMode,
-    PropertyAdapter,
 )
 from miio.miot_spec_v2 import DeviceSpec
 

@@ -65,3 +65,37 @@ class MiotV2Device(Device):
             return service_name
         else:
             return service_name + "." + property_name
+
+
+class PropertyAdapter:
+    def __init__(
+        self,
+        service: str,
+        property: str,
+        value_decoder=lambda v: v,
+        value_encoder=lambda v: v,
+    ):
+        self.service = service
+        self.property = property
+        self.value_decoder = value_decoder
+        self.value_encoder = value_encoder
+
+
+class DeviceAdapter:
+    def __init__(
+        self,
+        spec_file_name: str,
+        spec=None,
+    ):
+        self.spec_file_name = spec_file_name
+        self.spec = DeviceSpec.load(spec_file_name) if spec is None else spec
+
+    def check_validation(self):
+        for name, value in vars(self).items():
+            if type(value) != PropertyAdapter:
+                continue
+            if not self.spec.contains(value.service, value.property):
+                raise Exception(
+                    f"invalid adapter for spec {self.spec_file_name}: "
+                    f"service '{value.service}' property '{value.property}' not found"
+                )
