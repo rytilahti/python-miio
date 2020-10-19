@@ -21,7 +21,7 @@ _MAPPING = {
     "dryer": {"siid": 2, "piid": 10},
     "sleep_mode": {"siid": 2, "piid": 11},
     # Fan Control (siid=3)
-    "fan_level": {"siid": 3, "piid": 2},
+    "fan_speed": {"siid": 3, "piid": 2},
     "vertical_swing": {"siid": 3, "piid": 4},
     # Environment (siid=4)
     "temperature": {"siid": 4, "piid": 7},
@@ -39,9 +39,74 @@ _MAPPING = {
     "timer": {"siid": 10, "piid": 3},
 }
 
+CLEANING_STAGES = [
+    "Stopped",
+    "Condensing water",
+    "Frosting the surface",
+    "Defrosting the surface",
+    "Drying",
+]
+
 
 class AirConditionerMiotException(DeviceException):
     pass
+
+
+class CleaningStatus:
+    def __init__(self, status: str):
+        """
+        Auto clean mode indicator.
+
+        Value format: <int>,<int>,<int>,<int>
+        Integer 1: whether auto cleaning mode started.
+        Integer 2: current progress in percent.
+        Integer 3: which stage it is currently under (see CLEANING_STAGE list).
+        Integer 4: if current operation could be cancelled.
+
+        Example auto clean indicator 1: 0,100,0,1
+        indicates the auto clean mode has finished or not started yet.
+        Example auto clean indicator 2: 1,22,1,1
+        indicates auto clean mode finished 22%, it is condensing water and can be cancelled.
+        Example auto clean indicator 3: 1,72,4,0
+        indicates auto clean mode finished 72%, it is drying and cannot be cancelled.
+
+        Only write 1 or 0 to it would start or abort the auto clean mode.
+        """
+        self.status = [int(value) for value in status.split(",")]
+
+    @property
+    def cleaning(self) -> bool:
+        return bool(self.status[0])
+
+    @property
+    def progress(self) -> int:
+        return int(self.status[1])
+
+    @property
+    def stage(self) -> str:
+        try:
+            return CLEANING_STAGES[self.status[2]]
+        except KeyError:
+            return "Unknown stage"
+
+    @property
+    def cancellable(self) -> bool:
+        return bool(self.status[3])
+
+    def __repr__(self) -> str:
+        s = (
+            "<CleaningStage cleaning=%s, "
+            "progress=%s, "
+            "stage=%s, "
+            "cancellable=%s>"
+            % (
+                self.cleaning,
+                self.progress,
+                self.stage,
+                self.cancellable,
+            )
+        )
+        return s
 
 
 class OperationMode(enum.Enum):
@@ -62,6 +127,61 @@ class FanSpeed(enum.Enum):
     Level7 = 7
 
 
+class TimerStatus:
+    def __init__(self, status):
+        """
+        Countdown timer indicator.
+
+        Value format: <int>,<int>,<int>,<int>
+        Integer 1: whether the timer is enabled.
+        Integer 2: countdown timer setting value in minutes.
+        Integer 3: the device would be powered on (1) or powered off (0) after timeout.
+        Integer 4: the remaining countdown time in minutes.
+
+        Example timer value 1: 1,120,0,103
+        indicates the device would be turned off after 120 minutes, remaining 103 minutes.
+        Example timer value 2: 1,60,1,60
+        indicates the device would be turned on after 60 minutes, remaining 60 minutes.
+        Example timer value 3: 0,0,0,0
+        indicates countdown timer not set.
+
+        Write the first three integers would set the correct countdown timer.
+        Also, if the countdown minutes set to 0, the timer would be disabled.
+        """
+        self.status = [int(value) for value in status.split(",")]
+
+    @property
+    def enabled(self) -> bool:
+        return bool(self.status[0])
+
+    @property
+    def countdown(self) -> timedelta:
+        return timedelta(minutes=self.status[1])
+
+    @property
+    def power_on(self) -> bool:
+        return bool(self.status[2])
+
+    @property
+    def time_left(self) -> timedelta:
+        return timedelta(minutes=self.status[3])
+
+    def __repr__(self) -> str:
+        s = (
+            "<TimerStatus enabled=%s, "
+            "countdown=%s, "
+            "power_on=%s, "
+            "time_left=%s>"
+            % (
+                self.enabled,
+                self.countdown,
+                self.power_on,
+                self.time_left,
+            )
+        )
+        return s
+
+
 class AirConditionerMiotStatus:
     """Container for status reports from the air conditioner which uses MIoT protocol."""
 
@@ -76,7 +196,7 @@ class AirConditionerMiotStatus:
             {'did': 'heater', 'siid': 2, 'piid': 9, 'code': 0, 'value': True},
             {'did': 'dryer', 'siid': 2, 'piid': 10, 'code': 0, 'value': True},
             {'did': 'sleep_mode', 'siid': 2, 'piid': 11, 'code': 0, 'value': False},
-            {'did': 'fan_level', 'siid': 3, 'piid': 2, 'code': 0, 'value': 0},
+            {'did': 'fan_speed', 'siid': 3, 'piid': 2, 'code': 0, 'value': 0},
             {'did': 'vertical_swing', 'siid': 3, 'piid': 4, 'code': 0, 'value': True},
             {'did': 'temperature', 'siid': 4, 'piid': 7, 'code': 0, 'value': 28.4},
             {'did': 'buzzer', 'siid': 5, 'piid': 1, 'code': 0, 'value': False},
@@ -134,7 +254,7 @@ class AirConditionerMiotStatus:
     @property
     def fan_speed(self) -> FanSpeed:
         """Current Fan speed."""
-        return FanSpeed(self.data["fan_level"])
+        return FanSpeed(self.data["fan_speed"])
 
     @property
     def vertical_swing(self) -> bool:
@@ -162,14 +282,14 @@ class AirConditionerMiotStatus:
         return self.data["electricity"]
 
     @property
-    def clean(self) -> str:
-        """Auto clean mode indicator."""
-        return self.data["clean"]
+    def clean(self) -> CleaningStatus:
+        """TODO   """
+        return CleaningStatus(self.data["clean"])
 
     @property
     def running_duration(self) -> timedelta:
         """Total running duration in hours."""
-        return self.data["running_duration"]
+        return timedelta(hours=self.data["running_duration"])
 
     @property
     def fan_percent(self) -> int:
@@ -177,9 +297,9 @@ class AirConditionerMiotStatus:
         return self.data["fan_percent"]
 
     @property
-    def timer(self) -> str:
+    def timer(self) -> TimerStatus:
         """Timer indicator."""
-        return self.data["timer"]
+        return TimerStatus(self.data["timer"])
 
     def __repr__(self) -> str:
         s = (
@@ -249,14 +369,14 @@ class AirConditionerMiot(MiotDevice):
             "Heater: {result.heater}\n"
             "Dryer: {result.dryer}\n"
             "Sleep Mode: {result.sleep_mode}\n"
-            "Fan Speed: {result.fan_level}\n"
+            "Fan Speed: {result.fan_speed}\n"
             "Vertical Swing: {result.vertical_swing}\n"
             "Room Temperature: {result.temperature} ℃\n"
             "Buzzer: {result.buzzer}\n"
             "LED: {result.led}\n"
             "Electricity: {result.electricity}kWh\n"
             "Clean: {result.clean}\n"
-            "Running Duration: {result.running_duration}h\n"
+            "Running Duration: {result.running_duration}\n"
             "Fan percent: {result.fan_percent}\n"
             "Timer: {result.timer}\n",
         )
@@ -355,7 +475,7 @@ class AirConditionerMiot(MiotDevice):
     )
     def set_fan_speed(self, fan_speed: FanSpeed):
         """Set fan speed."""
-        return self.set_property("fan_level", fan_speed.value)
+        return self.set_property("fan_speed", fan_speed.value)
 
     @command(
         click.argument("vertical_swing", type=bool),
@@ -411,7 +531,10 @@ class AirConditionerMiot(MiotDevice):
         ),
     )
     def set_timer(self, minutes, delay_on):
-        """Set timer."""
+        """
+        Set countdown timer minutes and if it would be turned on after timeout.
+        Set minutes to 0 would disable the timer.
+        """
         return self.set_property(
             "timer", ",".join(["1", str(minutes), str(int(delay_on))])
         )
@@ -423,5 +546,5 @@ class AirConditionerMiot(MiotDevice):
         ),
     )
     def set_clean(self, clean):
-        """Set clean mode."""
+        """Start or abort clean mode."""
         return self.set_property("clean", str(int(clean)))
