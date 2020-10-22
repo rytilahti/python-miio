@@ -88,9 +88,7 @@ class TestService(TestCase):
         assert len(p.access) == 3
 
     def test_load(self):
-        device = DeviceSpec.load(
-            "urn:miot-spec-v2:device:fan:0000A005:dmaker-p10:1.json"
-        )
+        device = DeviceSpec.load("fan-dmaker-p10-1.json")
         assert device.type.name == "fan"
 
 

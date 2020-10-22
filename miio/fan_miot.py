@@ -57,14 +57,10 @@ class FanMiotDeviceAdapter(DeviceAdapter):
 
 
 ADAPTERS = {
-    MODEL_FAN_P9: FanMiotDeviceAdapter(
-        "urn:miot-spec-v2:device:fan:0000A005:dmaker-p9:1.json"
-    ),
-    MODEL_FAN_P10: FanMiotDeviceAdapter(
-        "urn:miot-spec-v2:device:fan:0000A005:dmaker-p10:1.json"
-    ),
+    MODEL_FAN_P9: FanMiotDeviceAdapter("fan-dmaker-p9-1.json"),
+    MODEL_FAN_P10: FanMiotDeviceAdapter("fan-dmaker-p10-1.json"),
     MODEL_FAN_P11: FanMiotDeviceAdapter(
-        "urn:miot-spec-v2:device:fan:0000A005:dmaker-p11:1.json",
+        "fan-dmaker-p11-1.json",
         speed=PropertyAdapter("fan", "status"),
         off_delay=PropertyAdapter("off-delay-time", "off-delay-time"),
         alarm=PropertyAdapter("alarm", "alarm"),
