@@ -42,8 +42,6 @@ class FanMiotDeviceAdapter(DeviceAdapter):
             value_encoder=lambda v: 1 if v == MoveDirection.Left else 2,
         ),
     ):
-        self.spec_file_name = spec_file_name
-        self.spec = DeviceSpec.load(spec_file_name) if spec is None else spec
         self.on = on
         self.level = level
         self.lock = lock

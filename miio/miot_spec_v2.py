@@ -4,7 +4,7 @@ miot specification v2 parser. pls refer https://iot.mi.com/new/doc/standard/miot
 
 import enum
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config
 
@@ -60,11 +60,13 @@ class Property(DataClassJsonMixin):
     description: str
     format: str
     access: List[Access]
-    unit: str = None
+    unit: Optional[str] = None
     value_list: List = field(
         default_factory=list, metadata=config(field_name="value-list")
     )
-    value_range: List = field(default=None, metadata=config(field_name="value-range"))
+    value_range: Optional[List] = field(
+        default=None, metadata=config(field_name="value-range")
+    )
 
     def __init__(
         self, iid, type, description, format, access, unit, value_list, value_range
