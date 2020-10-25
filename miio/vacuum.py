@@ -61,9 +61,9 @@ class FanspeedV1(enum.Enum):
 
 class FanspeedV2(enum.Enum):
     Silent = 101
-    Standard = 102
-    Medium = 103
-    Turbo = 104
+    Balanced = 102
+    Turbo = 103
+    Max = 104
     Gentle = 105
 
 
