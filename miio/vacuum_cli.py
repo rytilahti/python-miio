@@ -233,6 +233,13 @@ def manual(vac: miio.Vacuum):
 
 @manual.command()
 @pass_dev
+def tui(vac: miio.Vacuum):
+    """TUI for the manual mode."""
+    miio.VacuumTUI(vac).run()
+
+
+@manual.command()
+@pass_dev
 def start(vac: miio.Vacuum):  # noqa: F811  # redef of start
     """Activate the manual mode."""
     click.echo("Activating manual controls")
