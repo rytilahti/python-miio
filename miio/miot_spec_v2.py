@@ -200,9 +200,9 @@ class DeviceSpec(DataClassJsonMixin):
             import importlib_resources as pkg_resources
 
         try:
-            from . import miot_specs
+            import miio.miot_specs as specs
 
-            spec = pkg_resources.read_text(miot_specs, file_name)
+            spec = pkg_resources.read_text(specs, file_name)
             return DeviceSpec.from_json(spec)
         except FileNotFoundError:
             try:
