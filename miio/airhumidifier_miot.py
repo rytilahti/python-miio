@@ -241,9 +241,6 @@ class AirHumidifierMiotStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class AirHumidifierMiot(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""

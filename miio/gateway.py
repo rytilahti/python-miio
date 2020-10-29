@@ -380,7 +380,12 @@ class Gateway(Device):
     @command()
     def get_illumination(self):
         """Get illumination. In lux?"""
-        return self.send("get_illumination").pop()
+        try:
+            return self.send("get_illumination").pop()
+        except Exception as ex:
+            raise GatewayException(
+                "Got an exception while getting gateway illumination"
+            ) from ex
 
 
 class GatewayDevice(Device):

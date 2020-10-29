@@ -23,7 +23,7 @@ miiocli = "miio.cli:create_cli"
 [tool.poetry.dependencies]
 python = "^3.6.5"
 click = "^7"
-cryptography = "^2"
+cryptography = "^3"
 construct = "^2.10.56"
 zeroconf = "^0"
 attrs = "*"
@@ -32,7 +32,7 @@ appdirs = "^1"
 tqdm = "^4"
 netifaces = "^0"
 android_backup = { version = "^0", optional = true }
-importlib_metadata = "^1"
+importlib_metadata = { version = "^1", markers = "python_version <= '3.7'" }
 croniter = "^0"
 
 sphinx = { version = "^3", optional = true }

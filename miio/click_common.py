@@ -304,8 +304,11 @@ def json_output(pretty=False):
                 return
 
             get_json_data_func = getattr(result, "__json__", None)
+            data_variable = getattr(result, "data", None)
             if get_json_data_func is not None:
                 result = get_json_data_func()
+            elif data_variable is not None:
+                result = data_variable
             click.echo(json.dumps(result, indent=indent))
 
         return wrap

@@ -230,9 +230,6 @@ class AirFreshStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class AirFreshT2017(Device):
     """Main class representing the air fresh t2017."""

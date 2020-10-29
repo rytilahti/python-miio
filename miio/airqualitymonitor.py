@@ -177,9 +177,6 @@ class AirQualityMonitorStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""

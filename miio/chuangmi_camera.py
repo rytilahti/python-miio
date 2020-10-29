@@ -178,9 +178,6 @@ class CameraStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class ChuangmiCamera(Device):
     """Main class representing the Xiaomi Chuangmi Camera."""
