@@ -39,8 +39,9 @@ class YeelightStatus:
     @property
     def rgb(self) -> Optional[Tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
-        if self.color_mode == YeelightMode.RGB:
-            return int_to_rgb(int(self.data["rgb"]))
+        rgb = self.data["rgb"]
+        if self.color_mode == YeelightMode.RGB and rgb:
+            return int_to_rgb(int(rgb))
         return None
 
     @property
@@ -51,15 +52,19 @@ class YeelightStatus:
     @property
     def hsv(self) -> Optional[Tuple[int, int, int]]:
         """Return current color in HSV if HSV mode is active."""
-        if self.color_mode == YeelightMode.HSV:
-            return self.data["hue"], self.data["sat"], self.data["bright"]
+        hue = self.data["hue"]
+        sat = self.data["sat"]
+        brightness = self.data["bright"]
+        if self.color_mode == YeelightMode.HSV and (hue or sat or brightness):
+            return hue, sat, brightness
         return None
 
     @property
     def color_temp(self) -> Optional[int]:
         """Return current color temperature, if applicable."""
-        if self.color_mode == YeelightMode.ColorTemperature:
-            return int(self.data["ct"])
+        ct = self.data["ct"]
+        if self.color_mode == YeelightMode.ColorTemperature and ct:
+            return int(ct)
         return None
 
     @property

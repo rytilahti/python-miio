@@ -35,6 +35,8 @@ Submodules
    miio.exceptions
    miio.extract_tokens
    miio.fan
+   miio.fan_common
+   miio.fan_miot
    miio.gateway
    miio.heater
    miio.miioprotocol

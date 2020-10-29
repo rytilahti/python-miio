@@ -55,9 +55,6 @@ class DeviceInfo:
             self.data["token"],
         )
 
-    def __json__(self):
-        return self.data
-
     @property
     def network_interface(self):
         """Information about network configuration."""

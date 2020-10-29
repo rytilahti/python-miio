@@ -99,9 +99,6 @@ class PhilipsEyecareStatus:
         )
         return s
 
-    def __json__(self):
-        return self.data
-
 
 class PhilipsEyecare(Device):
     """Main class representing Xiaomi Philips Eyecare Smart Lamp 2."""
