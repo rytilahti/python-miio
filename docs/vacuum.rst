@@ -188,6 +188,43 @@ and updating from an URL requires you to pass the md5 hash of the file.
 
     mirobo update-firmware v11_003094.pkg
 
+Manual control
+~~~~~~~~~~~~~~
+
+To start the manual mode:
+
+::
+
+    mirobo manual start
+
+To move forward with velocity 0.3 for default amount of time:
+
+::
+
+    mirobo manual forward 0.3
+
+To turn 90 degrees to the right for default amount of time:
+
+::
+
+    mirobo manual right 90
+
+To stop the manual mode:
+
+::
+
+    mirobo manual stop
+
+To run the manual control TUI:
+
+.. NOTE::
+
+    Make sure you have got `curses` library installed on your system.
+
+::
+
+    mirobo manual tui
+
 
 DND functionality
 ~~~~~~~~~~~~~~~~~

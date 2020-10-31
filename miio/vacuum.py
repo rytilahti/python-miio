@@ -168,12 +168,22 @@ class Vacuum(Device):
         self.manual_seqnum = 0
         return self.send("app_rc_end")
 
+    MANUAL_ROTATION_MAX = 180
+    MANUAL_ROTATION_MIN = -MANUAL_ROTATION_MAX
+    MANUAL_VELOCITY_MAX = 0.3
+    MANUAL_VELOCITY_MIN = -MANUAL_VELOCITY_MAX
+    MANUAL_DURATION_DEFAULT = 1500
+
     @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
-        click.argument("duration", type=int, required=False, default=1500),
+        click.argument(
+            "duration", type=int, required=False, default=MANUAL_DURATION_DEFAULT
+        ),
     )
-    def manual_control_once(self, rotation: int, velocity: float, duration: int = 1500):
+    def manual_control_once(
+        self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT
+    ):
         """Starts the remote control mode and executes
         the action once before deactivating the mode."""
         number_of_tries = 3
@@ -191,18 +201,23 @@ class Vacuum(Device):
     @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
-        click.argument("duration", type=int, required=False, default=1500),
+        click.argument(
+            "duration", type=int, required=False, default=MANUAL_DURATION_DEFAULT
+        ),
     )
-    def manual_control(self, rotation: int, velocity: float, duration: int = 1500):
+    def manual_control(
+        self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT
+    ):
         """Give a command over manual control interface."""
-        if rotation < -180 or rotation > 180:
+        if rotation < self.MANUAL_ROTATION_MIN or rotation > self.MANUAL_ROTATION_MAX:
             raise DeviceException(
-                "Given rotation is invalid, should " "be ]-180, 180[, was %s" % rotation
+                "Given rotation is invalid, should be ]%s, %s[, was %s"
+                % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotation)
             )
-        if velocity < -0.3 or velocity > 0.3:
+        if velocity < self.MANUAL_VELOCITY_MIN or velocity > self.MANUAL_VELOCITY_MAX:
             raise DeviceException(
-                "Given velocity is invalid, should "
-                "be ]-0.3, 0.3[, was: %s" % velocity
+                "Given velocity is invalid, should be ]%s, %s[, was: %s"
+                % (self.MANUAL_VELOCITY_MIN, self.MANUAL_VELOCITY_MAX, velocity)
             )
 
         self.manual_seqnum += 1

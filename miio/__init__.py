@@ -42,6 +42,7 @@ from miio.protocol import Message, Utils
 from miio.pwzn_relay import PwznRelay
 from miio.toiletlid import Toiletlid
 from miio.vacuum import Vacuum, VacuumException
+from miio.vacuum_tui import VacuumTUI
 from miio.vacuumcontainers import (
     CleaningDetails,
     CleaningSummary,
