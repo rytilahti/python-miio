@@ -68,6 +68,7 @@ class ViomiMode(Enum):
     CleanZone = 3
     CleanSpot = 4
 
+
 class ViomiLanguage(Enum):
     CN = 1  # Chinese (default)
     EN = 2  # English
@@ -98,6 +99,7 @@ class ViomiBinType(Enum):
     Water = 2
     VacuumAndWater = 3
     NoBin = 0
+
 
 class ViomiWaterGrade(Enum):
     Low = 11
