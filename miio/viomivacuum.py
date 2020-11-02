@@ -65,7 +65,8 @@ class ViomiMode(Enum):
     Vacuum = 0  # No Mop, Vacuum only
     VacuumAndMop = 1
     Mop = 2
-    Unknown = 4
+    CleanZone = 3
+    CleanSpot = 4
 
 class ViomiLanguage(Enum):
     CN = 1  # Chinese (default)
