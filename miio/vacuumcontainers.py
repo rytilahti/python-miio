@@ -4,7 +4,6 @@ from enum import IntEnum
 from typing import Any, Dict, List
 
 from croniter import croniter
-from pytz import timezone
 
 from .utils import pretty_seconds, pretty_time
 
@@ -389,13 +388,18 @@ class Timer:
     The timers are accessed using an integer ID, which is based on the unix
     timestamp of the creation time."""
 
-    def __init__(self, data: List[Any], timezone: str) -> None:
+    def __init__(self, data: List[Any], timezone: "datetime.tzinfo") -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
         #  ['1488667777661', 'off', ['49 21 * * 3,4,5,6', ['start_clean', '']]
         # ],
         self.data = data
         self.timezone = timezone
+
+        # Initialize croniter to cause an exception on invalid entries (#847)
+        self.croniter = croniter(
+            self.cron, start_time=timezone.localize(datetime.now())
+        )
 
     @property
     def id(self) -> int:
@@ -426,10 +430,7 @@ class Timer:
     @property
     def next_schedule(self) -> datetime:
         """Next schedule for the timer."""
-        local_tz = timezone(self.timezone)
-        cron = croniter(self.cron, start_time=local_tz.localize(datetime.now()))
-
-        return cron.get_next(ret_type=datetime)
+        return self.croniter.get_next(ret_type=datetime)
 
     def __repr__(self) -> str:
         return "<Timer %s: %s - enabled: %s - cron: %s>" % (
