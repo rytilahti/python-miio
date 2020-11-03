@@ -3,10 +3,30 @@
 ## [0.5.4](https://github.com/rytilahti/python-miio/tree/0.5.4) (2020-11-02)
 
 New devices:
+* Xiaomi Smartmi Fresh Air System VA4 (zhimi.airfresh.va4) (@syssi)
+* Xiaomi Mi Smart Pedestal Fan P9 and 10 (dmaker.fan.p9, dmaker.fan.p10) (@swim2sun)
+* Air Conditioner Companion MCN (lumi.acpartner.mcn02) (@EugeneLiu)
 
 Improvements:
+* ViomiVacuum: New modes, states and error codes added ()
+* ViomiVacuum: Add consumable status (@titilambert)
+* Gateway: Throwing GatewayException in get\_illumination (@javicalle)
+* Vacuum: Implement TUI for the manual mode (@rnovatorov)
+* Vacuum: Rename Mopping to VacuumingAndMopping (@rytilahti)
+* Bump cryptography dependency to new major version (@rytilahti)
+* Move raw\_id from Vacuum to the Device base class (@rytilahti)
+* Remove \_\_json\_\_ boilerplate code from all status containers (@rytilahti)
+* Loosen pinned versions & bump cryptography dependency to new major version (@rytilahti)
+* Correct importlib\_metadata python\_version bounds (@jonringer)
+* CLI: Make EnumType default to incasesensitive (@rytilahti)
+* Better documentation and presentation of the documentation (@rytilahti)
 
 Fixes:
+* Vacuum: Invalid cron expression fixed (@rytilahti)
+* Vacuum: Handle invalid cron elements gracefully (@rytilahti)
+* Vacuum: Define WaterFlow as an enum (@rytilahti)
+* Yeelight: Check color mode values for emptiness (@rytilahti)
+* Airfresh: Fix zhimi.airfresh.va2 temperature (@syssi)
 
 
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.3...0.5.4)
@@ -15,27 +35,30 @@ Fixes:
 
 - Add error codes 2103 & 2105 [\#789](https://github.com/rytilahti/python-miio/issues/789)
 - ViomiVacuumState 6 seems to be VaccuumMopping [\#783](https://github.com/rytilahti/python-miio/issues/783)
+- Added some parameters: Error code, Viomimode, Viomibintype [\#799](https://github.com/rytilahti/python-miio/pull/799) ([fs79](https://github.com/fs79))
 - Add mopping state & log a warning when encountering unknown state [\#784](https://github.com/rytilahti/python-miio/pull/784) ([rytilahti](https://github.com/rytilahti))
 
 **Fixed bugs:**
 
-- Mi Air Purifier 3H - unable to connect [\#836](https://github.com/rytilahti/python-miio/issues/836)
-- update-firmware on Xiaomi Mi Robot Vacuum V1 fails [\#818](https://github.com/rytilahti/python-miio/issues/818)
+- Invalid cron expression when using xiaomi\_miio integration in Home Assistant [\#847](https://github.com/rytilahti/python-miio/issues/847)
 - viomivacuum doesn´t work with -o json\_pretty [\#816](https://github.com/rytilahti/python-miio/issues/816)
 - yeeligth without color temperature status error [\#802](https://github.com/rytilahti/python-miio/issues/802)
-- Unable to discover the device \(zhimi.airpurifier.ma4\) [\#798](https://github.com/rytilahti/python-miio/issues/798)
-- Mi Air Purifier 3H Timed out [\#796](https://github.com/rytilahti/python-miio/issues/796)
 - set\_waterflow roborock.vacuum.s5e [\#786](https://github.com/rytilahti/python-miio/issues/786)
 - Requirement is pinned for python-miio 0.5.3: zeroconf\>=0.25.1,\<0.26.0 [\#780](https://github.com/rytilahti/python-miio/issues/780)
 - Requirement is pinned for python-miio 0.5.3: pytz\>=2019.3,\<2020.0 [\#779](https://github.com/rytilahti/python-miio/issues/779)
+- Vacuum: handle invalid cron elements gracefully [\#848](https://github.com/rytilahti/python-miio/pull/848) ([rytilahti](https://github.com/rytilahti))
 - yeelight: Check color mode values for emptiness [\#829](https://github.com/rytilahti/python-miio/pull/829) ([rytilahti](https://github.com/rytilahti))
 - Define WaterFlow as an enum [\#787](https://github.com/rytilahti/python-miio/pull/787) ([rytilahti](https://github.com/rytilahti))
 
 **Closed issues:**
 
-- Freash air sistem calibration of CO2 sensor command [\#814](https://github.com/rytilahti/python-miio/issues/814)
 - Notify access support for MIoT Device [\#843](https://github.com/rytilahti/python-miio/issues/843)
 - Xiaomi WiFi Power Plug\(Bluetooth Gateway\)\(chuangmi.plug.hmi208\) [\#840](https://github.com/rytilahti/python-miio/issues/840)
+- Mi Air Purifier 3H - unable to connect [\#836](https://github.com/rytilahti/python-miio/issues/836)
+- update-firmware on Xiaomi Mi Robot Vacuum V1 fails [\#818](https://github.com/rytilahti/python-miio/issues/818)
+- Freash air sistem calibration of CO2 sensor command [\#814](https://github.com/rytilahti/python-miio/issues/814)
+- Unable to discover the device \(zhimi.airpurifier.ma4\) [\#798](https://github.com/rytilahti/python-miio/issues/798)
+- Mi Air Purifier 3H Timed out [\#796](https://github.com/rytilahti/python-miio/issues/796)
 - Xiaomi Smartmi Fresh Air System XFXTDFR02ZM.   upgrade version of  XFXT01ZM with heater. [\#791](https://github.com/rytilahti/python-miio/issues/791)
 - mi smart sensor gateway - check status [\#762](https://github.com/rytilahti/python-miio/issues/762)
 - Installation problem 64bit [\#727](https://github.com/rytilahti/python-miio/issues/727)
