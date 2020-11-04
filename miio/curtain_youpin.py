@@ -16,12 +16,12 @@ _MAPPING = {
         "motor_control": {"siid": 2, "piid": 2}, # 0 - Pause, 1 - Open, 2 - Close, 3 - auto
         "current_position": {"siid": 2, "piid": 3}, # Range: [0, 100, 1]
         "status": {"siid": 2, "piid": 6}, # 0 - Stopped, 1 - Opening, 2 - Closing
-        "target_position": {"siid": 2, "piid": 7}, # Range: [0, 100, 1] 
+        "target_position": {"siid": 2, "piid": 7}, # Range: [0, 100, 1]
         # curtain_cfg
         "manual_enabled": {"siid": 4, "piid": 1}, #
         "polarity": {"siid": 4, "piid": 2},
-        "pos_limit": {"siid": 4, "piid": 3},
-        "en_night_tip_light": {"siid": 4, "piid": 4},
+        "position_limit": {"siid": 4, "piid": 3},
+        "night_tip_light": {"siid": 4, "piid": 4},
         "run_time": {"siid": 4, "piid": 5}, # Range: [0, 255, 1]
         # motor_controller
         "adjust_value": {"siid": 5, "piid": 1}, # Range: [-100, 100, 1]
@@ -37,7 +37,7 @@ class MotorControl(enum.Enum):
     Pause = 0
     Open = 1
     Close = 2
-    auto = 3
+    Auto = 3
 
 class Status(enum.Enum):
     Stopped = 0
@@ -71,8 +71,8 @@ class CurtainStatus:
                 {'did': 'target_position', 'siid': 2, 'piid': 7, 'code': 0, 'value': 0},
                 {'did': 'manual_enabled', 'siid': 4, 'piid': 1, 'code': 0, 'value': 1},
                 {'did': 'polarity', 'siid': 4, 'piid': 2, 'code': 0, 'value': 0},
-                {'did': 'pos_limit', 'siid': 4, 'piid': 3, 'code': 0, 'value': 0},
-                {'did': 'en_night_tip_light', 'siid': 4, 'piid': 4, 'code': 0, 'value': 1},
+                {'did': 'position_limit', 'siid': 4, 'piid': 3, 'code': 0, 'value': 0},
+                {'did': 'night_tip_light', 'siid': 4, 'piid': 4, 'code': 0, 'value': 1},
                 {'did': 'run_time', 'siid': 4, 'piid': 5, 'code': 0, 'value': 0},
                 {'did': 'adjust_value', 'siid': 5, 'piid': 1, 'code': -4000}
             ]}
@@ -87,57 +87,57 @@ class CurtainStatus:
     """ curtain_cfg """
     @property
     def manual_enabled(self) -> ManualEnabled:
-        """
-        Values: ManualEnabled
+        """Manual control enable status
+        Values: Disable, Enable
         """
         return ManualEnabled(self.data["manual_enabled"])
 
     @property
     def polarity(self) -> Polarity:
-        """
-        Values: Polarity
+        """Polarity
+        Values: Positive, Reverse
         """
         return Polarity(self.data["polarity"])
 
     @property
-    def pos_limit(self) -> PosLimit:
+    def position_limit(self) -> PosLimit:
+        """Position limit
+        Values: Unlimit, Limit
         """
-        Values: PosLimit
-        """
-        return PosLimit(self.data["pos_limit"])
+        return PosLimit(self.data["position_limit"])
 
     @property
-    def en_night_tip_light(self) -> NightTipLight:
+    def night_tip_light(self) -> NightTipLight:
+        """Night tip light status
+        Values: Enable, Disable
         """
-        Values: NightTipLight
-        """
-        return NightTipLight(self.data["en_night_tip_light"])
+        return NightTipLight(self.data["night_tip_light"])
 
     @property
     def run_time(self) -> int:
-        """
-        Range: [0, 255, 1]
+        """Run time
+        Value range: [0, 255, 1]
         """
         return self.data["run_time"]
 
     @property
     def current_position(self) -> int:
-        """Current Position
-        Range: [0, 100, 1]
+        """Current position
+        Value range: [0, 100, 1]
         """
         return self.data["current_position"]
 
     @property
     def target_position(self) -> int:
-        """Target Position
-        Range: [0, 100, 1]
+        """Target position
+        Value range: [0, 100, 1]
         """
         return self.data["target_position"]
 
     @property
     def adjust_value(self) -> int:
         """ Adjust value
-        Range: [-100, 100, 1]
+        Value range: [-100, 100, 1]
         """
         return self.data["adjust_value"]
 
@@ -146,8 +146,8 @@ class CurtainStatus:
             "<CurtainStatus"
             "status=%s,"
             "polarity=%s,"
-            "pos_limit=%s,"
-            "en_night_tip_light=%s,"
+            "position_limit=%s,"
+            "night_tip_light=%s,"
             "run_time=%s,"
             "current_position=%s,"
             "target_position=%s,"
@@ -155,8 +155,8 @@ class CurtainStatus:
             % (
                 self.status,
                 self.polarity,
-                self.pos_limit,
-                self.en_night_tip_light,
+                self.position_limit,
+                self.night_tip_light,
                 self.run_time,
                 self.current_position,
                 self.target_position,
@@ -184,8 +184,8 @@ class CurtainMiot(MiotDevice):
             "Device status: {result.status}\n"
             "Manual enabled: {result.manual_enabled}\n"
             "Polarity: {result.polarity}\n"
-            "Position limit: {result.pos_limit}\n"
-            "Enabled night tip light: {result.en_night_tip_light}\n"
+            "Position limit: {result.position_limit}\n"
+            "Enabled night tip light: {result.night_tip_light}\n"
             "Run time: {result.run_time}\n"
             "Current position: {result.current_position}\n"
             "Target position: {result.target_position}\n"
@@ -194,7 +194,7 @@ class CurtainMiot(MiotDevice):
     )
     def status(self) -> CurtainStatus:
         """Retrieve properties."""
-    
+
         return CurtainStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
@@ -204,11 +204,11 @@ class CurtainMiot(MiotDevice):
 
     @command(
         click.argument("motor_control", type=EnumType(MotorControl)),
-        default_output=format_output(""),
+        default_output=format_output("Set motor control to {motor_control}"),
     )
-    def set_Motor_Control(self, motor_control: MotorControl):
-        """Motor Control
-        Values: MotorControl
+    def set_motor_control(self, motor_control: MotorControl):
+        """Set motor control.
+        Values: Pause, Open, Close, Auto
         """
         try:
             self.set_property("motor_control", motor_control.value)
@@ -216,22 +216,22 @@ class CurtainMiot(MiotDevice):
             raise
 
     @command(
-        click.argument("target-position", type=int),
-        default_output=format_output(""),
+        click.argument("target_position", type=int),
+        default_output=format_output("Set target position to {target_position}"),
     )
-    def set_Target_Position(self, var: int):
-        """Target Position
-        Range: [0, 100, 1]
+    def set_target_position(self, target_position: int):
+        """Set target position.
+        Value range: [0, 100, 1]
         """
-        self.set_property("target_position", var)
+        self.set_property("target_position", target_position)
 
     @command(
         click.argument("manual_enabled", type=EnumType(ManualEnabled)),
-        default_output=format_output(""),
+        default_output=format_output("Set manual control {manual_enabled}"),
     )
     def set_manual_enabled(self, manual_enabled: ManualEnabled):
-        """
-        Values: ManualEnabled
+        """Set manual control of curtain.
+        Values: Enable, Disable
         """
         try:
             self.set_property("manual_enabled", manual_enabled.value)
@@ -240,11 +240,11 @@ class CurtainMiot(MiotDevice):
 
     @command(
         click.argument("polarity", type=EnumType(Polarity)),
-        default_output=format_output(""),
+        default_output=format_output("Set polarity to {polarity}"),
     )
     def set_polarity(self, polarity: Polarity):
-        """
-        Values: Polarity
+        """Set polarity of the motor.
+        Values: Positive, Reverse
         """
         try:
             self.set_property("polarity", polarity.value)
@@ -253,38 +253,38 @@ class CurtainMiot(MiotDevice):
 
     @command(
         click.argument("pos_limit", type=EnumType(PosLimit)),
-        default_output=format_output(""),
+        default_output=format_output("Set position limit to {pos_limit}"),
     )
-    def set_pos_limit(self, pos_limit: PosLimit):
-        """
-        Values: PosLimit
+    def set_position_limit(self, pos_limit: PosLimit):
+        """Set position limit parameter.
+        Values: Unlimit, Limit
         """
         try:
-            self.set_property("pos_limit", pos_limit.value)
+            self.set_property("position_limit", pos_limit.value)
         except DeviceError as error:
             raise
 
     @command(
-        click.argument("en-night-tip-light", type=EnumType(NightTipLight)),
-        default_output=format_output(""),
+        click.argument("night_tip_light", type=EnumType(NightTipLight)),
+        default_output=format_output("Setting night tip light {night_tip_light"),
     )
-    def set_en_night_tip_light(self, en_night_tip_light: NightTipLight):
-        """
-        Values: NightTipLight 
+    def set_night_tip_light(self, en_night_tip_light: NightTipLight):
+        """Set night tip light.
+        Values: Enable, Disable
         """
         try:
-            self.set_property("en_night_tip_light", en_night_tip_light.value)
+            self.set_property("night_tip_light", en_night_tip_light.value)
         except DeviceError as error:
             raise
 
     """ motor_controller """
     @command(
         click.argument("adjust", type=int),
-        default_output=format_output("Set adjust value"),
+        default_output=format_output("Set adjust value to {adjust}"),
     )
     def set_adjust_value(self, var: int):
-        """
-        Range: [-100, 100, 1]
+        """Set adjust value.
+        Value range: [-100, 100, 1]
         """
         self.set_property("adjust_value", var)
 
