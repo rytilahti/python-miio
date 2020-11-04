@@ -8,25 +8,24 @@ New devices:
 * Air Conditioner Companion MCN (lumi.acpartner.mcn02) (@EugeneLiu)
 
 Improvements:
-* ViomiVacuum: New modes, states and error codes added ()
-* ViomiVacuum: Add consumable status (@titilambert)
-* Gateway: Throwing GatewayException in get\_illumination (@javicalle)
-* Vacuum: Implement TUI for the manual mode (@rnovatorov)
-* Vacuum: Rename Mopping to VacuumingAndMopping (@rytilahti)
-* Bump cryptography dependency to new major version (@rytilahti)
-* Move raw\_id from Vacuum to the Device base class (@rytilahti)
-* Remove \_\_json\_\_ boilerplate code from all status containers (@rytilahti)
-* Loosen pinned versions & bump cryptography dependency to new major version (@rytilahti)
-* Correct importlib\_metadata python\_version bounds (@jonringer)
-* CLI: Make EnumType default to incasesensitive (@rytilahti)
+* ViomiVacuum: New modes, states and error codes (@fs79)
+* ViomiVacuum: Consumable status added (@titilambert)
+* Gateway: Throws GatewayException in get\_illumination (@javicalle)
+* Vacuum: Tangible User Interface (TUI) for the manual mode added (@rnovatorov)
+* Vacuum: Mopping to VacuumingAndMopping renamed (@rytilahti)
+* raw\_id moved from Vacuum to the Device base class (@rytilahti)
+* \_\_json\_\_ boilerplate code from all status containers removed (@rytilahti)
+* Pinned versions loosed and cryptography dependency bumped to new major version (@rytilahti)
+* importlib\_metadata python\_version bounds corrected (@jonringer)
+* CLI: EnumType defaults to incasesensitive now (@rytilahti)
 * Better documentation and presentation of the documentation (@rytilahti)
 
 Fixes:
 * Vacuum: Invalid cron expression fixed (@rytilahti)
-* Vacuum: Handle invalid cron elements gracefully (@rytilahti)
-* Vacuum: Define WaterFlow as an enum (@rytilahti)
+* Vacuum: Invalid cron elements handled gracefully (@rytilahti)
+* Vacuum: WaterFlow as an enum defined (@rytilahti)
 * Yeelight: Check color mode values for emptiness (@rytilahti)
-* Airfresh: Fix zhimi.airfresh.va2 temperature (@syssi)
+* Airfresh: Temperature property of the zhimi.airfresh.va2 fixed (@syssi)
 
 
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.3...0.5.4)
