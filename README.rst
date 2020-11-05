@@ -90,6 +90,7 @@ Supported devices
 -  Xiaomi Mi Home Air Conditioner Companion
 -  Xiaomi Mi Smart Air Conditioner A (xiaomi.aircondition.mc1, mc2, mc4, mc5)
 -  Xiaomi Mi Air Purifier
+-  Xiaomi Mi Air Humidifier
 -  Xiaomi Aqara Camera
 -  Xiaomi Aqara Gateway (basic implementation, alarm, lights)
 -  Xiaomi Mijia 360 1080p

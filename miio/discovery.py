@@ -56,7 +56,7 @@ from .airhumidifier import (
     MODEL_HUMIDIFIER_CB1,
     MODEL_HUMIDIFIER_V1,
 )
-from .airhumidifier_mjjsq import MODEL_HUMIDIFIER_MJJSQ
+from .airhumidifier_mjjsq import MODEL_HUMIDIFIER_JSQ1, MODEL_HUMIDIFIER_MJJSQ
 from .airqualitymonitor import (
     MODEL_AIRQUALITYMONITOR_B1,
     MODEL_AIRQUALITYMONITOR_S1,
@@ -134,6 +134,7 @@ DEVICE_MAP = {
     "deerma-humidifier-mjjsq": partial(
         AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
     ),
+    "deerma-humidifier-jsq1": partial(AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_JSQ1),
     "yunmi-waterpuri-v2": WaterPurifier,
     "yunmi.waterpuri.lx9": WaterPurifierYunmi,
     "yunmi.waterpuri.lx11": WaterPurifierYunmi,
