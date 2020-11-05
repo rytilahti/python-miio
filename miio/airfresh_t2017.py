@@ -306,10 +306,7 @@ class AirFreshT2017(Device):
     )
     def set_display(self, display: bool):
         """Turn led on/off."""
-        if display:
-            return self.send("set_display", ["on"])
-        else:
-            return self.send("set_display", ["off"])
+        return self.send("set_display", [display])
 
     @command(
         click.argument("orientation", type=EnumType(DisplayOrientation)),
@@ -345,10 +342,7 @@ class AirFreshT2017(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set sound on/off."""
-        if buzzer:
-            return self.send("set_sound", ["on"])
-        else:
-            return self.send("set_sound", ["off"])
+        return self.send("set_sound", [buzzer])
 
     @command(
         click.argument("lock", type=bool),
