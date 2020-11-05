@@ -266,23 +266,23 @@ class CurtainMiot(MiotDevice):
         click.argument("night_tip_light", type=EnumType(NightTipLight)),
         default_output=format_output("Setting night tip light {night_tip_light"),
     )
-    def set_night_tip_light(self, en_night_tip_light: NightTipLight):
+    def set_night_tip_light(self, night_tip_light: NightTipLight):
         """Set night tip light.
         """
         try:
-            self.set_property("night_tip_light", en_night_tip_light.value)
+            self.set_property("night_tip_light", night_tip_light.value)
         except DeviceError as error:
             raise
 
     """ motor_controller """
     @command(
-        click.argument("adjust", type=int),
-        default_output=format_output("Set adjust value to {adjust}"),
+        click.argument("adjust_value", type=int),
+        default_output=format_output("Set adjust value to {adjust_value}"),
     )
-    def set_adjust_value(self, value: int):
+    def set_adjust_value(self, adjust_value: int):
         """Set adjust value.
         """
-        if value < -100 or value > 100:
+        if adjust_value < -100 or adjust_value > 100:
             raise ValueError("Wrong value")
-        self.set_property("adjust_value", value)
+        self.set_property("adjust_value", adjust_value)
 
