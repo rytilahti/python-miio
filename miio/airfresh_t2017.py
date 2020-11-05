@@ -327,10 +327,7 @@ class AirFreshT2017(Device):
     )
     def set_ptc(self, ptc: bool):
         """Turn ptc on/off."""
-        if ptc:
-            return self.send("set_ptc_on", ["on"])
-        else:
-            return self.send("set_ptc_on", ["off"])
+        return self.send("set_ptc_on", [ptc])
 
     @command(
         click.argument("level", type=EnumType(PtcLevel)),
