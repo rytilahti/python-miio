@@ -12,6 +12,7 @@ from .exceptions import DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_HUMIDIFIER_MJJSQ = "deerma.humidifier.mjjsq"
+MODEL_HUMIDIFIER_JSQ1 = "deerma.humidifier.jsq1"
 
 AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_MJJSQ: [
@@ -24,7 +25,11 @@ AVAILABLE_PROPERTIES = {
         "TipSound_State",
         "waterstatus",
         "watertankstatus",
-    ]
+    ],
+    MODEL_HUMIDIFIER_JSQ1: MODEL_HUMIDIFIER_MJJSQ
+    + [
+        "wet_and_protect",
+    ],
 }
 
 
@@ -103,6 +108,11 @@ class AirHumidifierStatus:
         """True if the water tank is detached."""
         return self.data["watertankstatus"] == 0
 
+    @property
+    def wet_protection(self) -> bool:
+        """True if wet protection is enabled."""
+        return self.data["wet_and_protect"] == 1
+
     def __repr__(self) -> str:
         s = (
             "<AirHumidiferStatus power=%s, "
@@ -113,7 +123,8 @@ class AirHumidifierStatus:
             "buzzer=%s, "
             "target_humidity=%s%%, "
             "no_water=%s, "
-            "water_tank_detached=%s>"
+            "water_tank_detached=%s,"
+            "wet_protection=%s>"
             % (
                 self.power,
                 self.mode,
@@ -124,6 +135,7 @@ class AirHumidifierStatus:
                 self.target_humidity,
                 self.no_water,
                 self.water_tank_detached,
+                self.wet_protection,
             )
         )
         return s
@@ -157,7 +169,8 @@ class AirHumidifierMjjsq(Device):
             "Buzzer: {result.buzzer}\n"
             "Target humidity: {result.target_humidity} %\n"
             "No water: {result.no_water}\n"
-            "Water tank detached: {result.water_tank_detached}\n",
+            "Water tank detached: {result.water_tank_detached}\n"
+            "Wet protection: {result.wet_protection}\n",
         )
     )
     def status(self) -> AirHumidifierStatus:
@@ -216,3 +229,15 @@ class AirHumidifierMjjsq(Device):
             raise AirHumidifierException("Invalid target humidity: %s" % humidity)
 
         return self.send("Set_HumiValue", [humidity])
+
+    @command(
+        click.argument("protection", type=bool),
+        default_output=format_output(
+            lambda protection: "Turning on wet protection"
+            if protection
+            else "Turning off wet protection"
+        ),
+    )
+    def set_wet_protection(self, protection: bool):
+        """Turn wet protection on/off."""
+        return self.send("Set_wet_and_protect", [int(protection)])
