@@ -9,6 +9,7 @@ from .miot_device import MiotDevice
 
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
+MODEL_FAN_P11 = "dmaker.fan.p11"
 
 MIOT_MAPPING = {
     MODEL_FAN_P9: {
@@ -38,6 +39,21 @@ MIOT_MAPPING = {
         "light": {"siid": 2, "piid": 7},
         "mode": {"siid": 2, "piid": 3},
         "set_move": {"siid": 2, "piid": 9},
+    },
+    MODEL_FAN_P11: {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p11:1
+        "power": {"siid": 2, "piid": 1},
+        "fan_level": {"siid": 2, "piid": 2},
+        "mode": {"siid": 2, "piid": 3},
+        "swing_mode": {"siid": 2, "piid": 4},
+        "swing_mode_angle": {"siid": 2, "piid": 5},
+        # "status": {"siid": 2, "piid": 6},
+        "light": {"siid": 4, "piid": 1},
+        "buzzer": {"siid": 5, "piid": 1},
+        # "device_fault": {"siid": 6, "piid": 2},
+        "child_lock": {"siid": 7, "piid": 1},
+        "power_off_time": {"siid": 3, "piid": 1},
+        "set_move": {"siid": 6, "piid": 1},
     },
 }
 
@@ -324,3 +340,15 @@ class FanP10(FanMiot):
         lazy_discover: bool = True,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_P10)
+
+
+class FanP11(FanMiot):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_P11)
