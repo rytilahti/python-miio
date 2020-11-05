@@ -49,7 +49,6 @@ class OperationMode(enum.Enum):
 
 
 class PtcLevel(enum.Enum):
-    Off = "off"
     Low = "low"
     Medium = "medium"
     High = "high"
@@ -319,6 +318,19 @@ class AirFreshT2017(Device):
     def set_display_orientation(self, orientation: DisplayOrientation):
         """Set display orientation."""
         return self.send("set_screen_direction", [orientation.value])
+
+    @command(
+        click.argument("ptc", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on ptc" if led else "Turning off ptc"
+        ),
+    )
+    def set_ptc(self, ptc: bool):
+        """Turn ptc on/off."""
+        if ptc:
+            return self.send("set_ptc_on", ["on"])
+        else:
+            return self.send("set_ptc_on", ["off"])
 
     @command(
         click.argument("level", type=EnumType(PtcLevel)),

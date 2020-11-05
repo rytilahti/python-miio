@@ -47,6 +47,7 @@ class DummyAirFreshT2017(DummyDevice, AirFreshT2017):
             "set_display": lambda x: self._set_state("display", [(x[0] == "on")]),
             "set_screen_direction": lambda x: self._set_state("screen_direction", x),
             "set_ptc_level": lambda x: self._set_state("ptc_level", x),
+            "set_ptc_on": lambda x: self._set_state("ptc_on", x),
             "set_favourite_speed": lambda x: self._set_state("favourite_speed", x),
             "set_filter_reset": lambda x: self._set_filter_reset(x),
         }
@@ -201,12 +202,20 @@ class TestAirFreshT2017(TestCase):
         with pytest.raises(AirFreshException):
             self.device.set_favorite_speed(301)
 
+    def test_set_ptc(self):
+        def ptc():
+            return self.device.status().ptc
+
+        self.device.set_ptc(True)
+        assert ptc() is True
+
+        self.device.set_ptc(False)
+        assert ptc() is False
+
     def test_set_ptc_level(self):
         def ptc_level():
             return self.device.status().ptc_level
 
-        self.device.set_ptc_level(PtcLevel.Off)
-        assert ptc_level() == PtcLevel.Off
         self.device.set_ptc_level(PtcLevel.Low)
         assert ptc_level() == PtcLevel.Low
         self.device.set_ptc_level(PtcLevel.Medium)
