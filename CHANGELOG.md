@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.5.4](https://github.com/rytilahti/python-miio/tree/0.5.4) (2020-11-02)
+## [0.5.4](https://github.com/rytilahti/python-miio/tree/0.5.4) (2020-11-05)
 
 New devices:
 * Xiaomi Smartmi Fresh Air System VA4 (zhimi.airfresh.va4) (@syssi)
