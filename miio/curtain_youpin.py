@@ -72,7 +72,7 @@ class CurtainStatus:
     @property
     def is_manual_enabled(self) -> bool:
         """True if manual controls are enabled."""
-        return self.data["is_manual_enabled"]
+        return bool(self.data["is_manual_enabled"])
 
     @property
     def polarity(self) -> Polarity:
@@ -81,38 +81,32 @@ class CurtainStatus:
 
     @property
     def is_position_limited(self) -> bool:
-        """Position limit
-        """
+        """Position limit."""
         return bool(self.data["is_position_limited"])
 
     @property
     def night_tip_light(self) -> bool:
-        """Night tip light status
-        """
+        """Night tip light status."""
         return bool(self.data["night_tip_light"])
 
     @property
     def run_time(self) -> int:
-        """Run time of the motor
-        """
+        """Run time of the motor."""
         return self.data["run_time"]
 
     @property
     def current_position(self) -> int:
-        """Current curtain position
-        """
+        """Current curtain position."""
         return self.data["current_position"]
 
     @property
     def target_position(self) -> int:
-        """Target curtain position
-        """
+        """Target curtain position."""
         return self.data["target_position"]
 
     @property
     def adjust_value(self) -> int:
-        """ Adjust value
-        """
+        """ Adjust value."""
         return self.data["adjust_value"]
 
     def __repr__(self) -> str:
@@ -194,7 +188,7 @@ class CurtainMiot(MiotDevice):
         """
         if target_position < 0 or target_position  > 100:
             raise ValueError("Value must be between [0, 100] value, was %s" % target_position)
-        self.set_property("target_position", target_position)
+        return self.set_property("target_position", target_position)
 
     @command(
         click.argument("manual_enabled", type=bool),
@@ -203,7 +197,7 @@ class CurtainMiot(MiotDevice):
     def set_manual_enabled(self, manual_enabled: bool):
         """Set manual control of curtain.
         """
-        self.set_property("is_manual_enabled", manual_enabled)
+        return self.set_property("is_manual_enabled", manual_enabled)
 
     @command(
         click.argument("polarity", type=EnumType(Polarity)),
@@ -212,7 +206,7 @@ class CurtainMiot(MiotDevice):
     def set_polarity(self, polarity: Polarity):
         """Set polarity of the motor.
         """
-        self.set_property("polarity", polarity.value)
+        return self.set_property("polarity", polarity.value)
 
     @command(
         click.argument("pos_limit", type=bool),
@@ -221,7 +215,7 @@ class CurtainMiot(MiotDevice):
     def set_position_limit(self, pos_limit: bool):
         """Set position limit parameter.
         """
-        self.set_property("is_position_limited", pos_limit)
+        return self.set_property("is_position_limited", pos_limit)
 
     @command(
         click.argument("night_tip_light", type=bool),
@@ -230,16 +224,15 @@ class CurtainMiot(MiotDevice):
     def set_night_tip_light(self, night_tip_light: bool):
         """Set night tip light.
         """
-        self.set_property("night_tip_light", night_tip_light)
+        return self.set_property("night_tip_light", night_tip_light)
 
-    """ motor_controller """
     @command(
         click.argument("adjust_value", type=int),
         default_output=format_output("Set adjust value to {adjust_value}"),
     )
     def set_adjust_value(self, adjust_value: int):
-        """Set adjust value.
+        """Adjust to preferred position.
         """
         if adjust_value < -100 or adjust_value > 100:
             raise ValueError("Value must be between [-100, 100] value, was %s" % adjust_value)
-        self.set_property("adjust_value", adjust_value)
+        return self.set_property("adjust_value", adjust_value)
