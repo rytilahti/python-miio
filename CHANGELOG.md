@@ -4,7 +4,7 @@
 
 New devices:
 * Xiaomi Smartmi Fresh Air System VA4 (zhimi.airfresh.va4) (@syssi)
-* Xiaomi Mi Smart Pedestal Fan P9 and 10 (dmaker.fan.p9, dmaker.fan.p10) (@swim2sun)
+* Xiaomi Mi Smart Pedestal Fan P9, P10, P11 (dmaker.fan.p9, dmaker.fan.p10, dmaker.fan.p11) (@swim2sun)
 * Air Conditioner Companion MCN (lumi.acpartner.mcn02) (@EugeneLiu)
 
 Improvements:
@@ -66,6 +66,7 @@ Fixes:
 
 **Merged pull requests:**
 
+- Add basic dmaker.fan.p11 support [\#850](https://github.com/rytilahti/python-miio/pull/850) ([syssi](https://github.com/syssi))
 - Vacuum: Implement TUI for the manual mode [\#845](https://github.com/rytilahti/python-miio/pull/845) ([rnovatorov](https://github.com/rnovatorov))
 - Throwing GatewayException in get\_illumination [\#831](https://github.com/rytilahti/python-miio/pull/831) ([javicalle](https://github.com/javicalle))
 - improve poetry usage documentation [\#830](https://github.com/rytilahti/python-miio/pull/830) ([rytilahti](https://github.com/rytilahti))
