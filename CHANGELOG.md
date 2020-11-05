@@ -26,6 +26,8 @@ Fixes:
 * Vacuum: WaterFlow as an enum defined (@rytilahti)
 * Yeelight: Check color mode values for emptiness (@rytilahti)
 * Airfresh: Temperature property of the zhimi.airfresh.va2 fixed (@syssi)
+* Airfresh: PTC support of the dmaker.airfresh.t2017 fixed (@syssi)
+* Fan: Fan speed property of the dmaker.fan.p11 fixed (@iquix)
 
 
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.3...0.5.4)
@@ -66,6 +68,8 @@ Fixes:
 
 **Merged pull requests:**
 
+- Fix PTC support of the dmaker.airfresh.t2017 [\#853](https://github.com/rytilahti/python-miio/pull/853) ([syssi](https://github.com/syssi))
+- Fix fan speed property of the dmaker.fan.p11 [\#852](https://github.com/rytilahti/python-miio/pull/852) ([iquix](https://github.com/iquix))
 - Add basic dmaker.fan.p11 support [\#850](https://github.com/rytilahti/python-miio/pull/850) ([syssi](https://github.com/syssi))
 - Vacuum: Implement TUI for the manual mode [\#845](https://github.com/rytilahti/python-miio/pull/845) ([rnovatorov](https://github.com/rnovatorov))
 - Throwing GatewayException in get\_illumination [\#831](https://github.com/rytilahti/python-miio/pull/831) ([javicalle](https://github.com/javicalle))
