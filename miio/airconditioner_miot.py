@@ -99,12 +99,7 @@ class CleaningStatus:
             "progress=%s, "
             "stage=%s, "
             "cancellable=%s>"
-            % (
-                self.cleaning,
-                self.progress,
-                self.stage,
-                self.cancellable,
-            )
+            % (self.cleaning, self.progress, self.stage, self.cancellable)
         )
         return s
 
@@ -172,12 +167,7 @@ class TimerStatus:
             "countdown=%s, "
             "power_on=%s, "
             "time_left=%s>"
-            % (
-                self.enabled,
-                self.countdown,
-                self.power_on,
-                self.time_left,
-            )
+            % (self.enabled, self.countdown, self.power_on, self.time_left)
         )
         return s
 
@@ -292,7 +282,7 @@ class AirConditionerMiotStatus:
         return timedelta(hours=self.data["running_duration"])
 
     @property
-    def fan_percent(self) -> int:
+    def fan_speed_percent(self) -> int:
         """Current fan speed in percent."""
         return self.data["fan_percent"]
 
@@ -318,7 +308,7 @@ class AirConditionerMiotStatus:
             "electricity=%s"
             "clean=%s"
             "total_running_duration=%s"
-            "fan_percent=%s"
+            "fan_speed_percent=%s"
             "timer=%s"
             % (
                 self.power,
@@ -336,7 +326,7 @@ class AirConditionerMiotStatus:
                 self.electricity,
                 self.clean,
                 self.total_running_duration,
-                self.fan_percent,
+                self.fan_speed_percent,
                 self.timer,
             )
         )
@@ -377,7 +367,7 @@ class AirConditionerMiot(MiotDevice):
             "Electricity: {result.electricity}kWh\n"
             "Clean: {result.clean}\n"
             "Running Duration: {result.total_running_duration}\n"
-            "Fan percent: {result.fan_percent}\n"
+            "Fan percent: {result.fan_speed_percent}\n"
             "Timer: {result.timer}\n",
         )
     )
@@ -510,14 +500,16 @@ class AirConditionerMiot(MiotDevice):
         return self.set_property("buzzer", buzzer)
 
     @command(
-        click.argument("fan_percent", type=int),
-        default_output=format_output("Setting fan percent to {fan_percent}"),
+        click.argument("percent", type=int),
+        default_output=format_output("Setting fan percent to {percent}%"),
     )
-    def set_fan_percent(self, fan_percent):
+    def set_fan_speed_percent(self, fan_speed_percent):
         """Set fan speed in percent, should be  between 1 to 100 or 101(auto)."""
-        if fan_percent < 1 or fan_percent > 101:
-            raise AirConditionerMiotException("Invalid fan percent: %s" % fan_percent)
-        return self.set_property("fan_percent", fan_percent)
+        if fan_speed_percent < 1 or fan_speed_percent > 101:
+            raise AirConditionerMiotException(
+                "Invalid fan percent: %s" % fan_speed_percent
+            )
+        return self.set_property("fan_percent", fan_speed_percent)
 
     @command(
         click.argument("minutes", type=int),
