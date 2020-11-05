@@ -244,7 +244,7 @@ class WaterPurifierYunmiStatus:
     def __repr__(self) -> str:
         return (
             "<WaterPurifierYunmiStatus "
-            "error=%s, "
+            "operation_status=%s, "
             "filter1_life_total=%s, "
             "filter1_life_used=%s, "
             "filter1_life_remaining=%s, "
@@ -269,7 +269,7 @@ class WaterPurifierYunmiStatus:
             "temperature=%s, "
             "tds_warn_thd=%s>"
             % (
-                self.error,
+                self.operation_status,
                 self.filter1_life_total,
                 self.filter1_life_used,
                 self.filter1_life_remaining,
@@ -306,7 +306,7 @@ class WaterPurifierYunmi(Device):
     @command(
         default_output=format_output(
             "",
-            "Error: {result.error}\n"
+            "Operaton status: {result.operation_status}\n"
             "Filter1 total time: {result.filter1_life_total}\n"
             "Filter1 used time: {result.filter1_life_used}\n"
             "Filter1 remaining time: {result.filter1_life_remaining}\n"
