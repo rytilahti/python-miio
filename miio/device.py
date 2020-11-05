@@ -166,9 +166,7 @@ class Device(metaclass=DeviceGroupMeta):
             "",
             "Model: {result.model}\n"
             "Hardware version: {result.hardware_version}\n"
-            "Firmware version: {result.firmware_version}\n"
-            "Network: {result.network_interface}\n"
-            "AP: {result.accesspoint}\n",
+            "Firmware version: {result.firmware_version}\n",
         )
     )
     def info(self) -> DeviceInfo:
