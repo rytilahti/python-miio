@@ -1,34 +1,33 @@
 import enum
-import warnings
 import logging
+from typing import Any, Dict
 
 import click
 
-from typing import Any, Dict
 from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
 from .miot_device import MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
-        # # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:lumi-hagl05:1
-        # Curtain
-        "motor_control": {"siid": 2, "piid": 2}, # 0 - Pause, 1 - Open, 2 - Close, 3 - auto
-        "current_position": {"siid": 2, "piid": 3}, # Range: [0, 100, 1]
-        "status": {"siid": 2, "piid": 6}, # 0 - Stopped, 1 - Opening, 2 - Closing
-        "target_position": {"siid": 2, "piid": 7}, # Range: [0, 100, 1]
-        # curtain_cfg
-        "manual_enabled": {"siid": 4, "piid": 1}, #
-        "polarity": {"siid": 4, "piid": 2},
-        "is_position_limited": {"siid": 4, "piid": 3},
-        "night_tip_light": {"siid": 4, "piid": 4},
-        "run_time": {"siid": 4, "piid": 5}, # Range: [0, 255, 1]
-        # motor_controller
-        "adjust_value": {"siid": 5, "piid": 1}, # Range: [-100, 100, 1]
+    # # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:lumi-hagl05:1
+    # Curtain
+    "motor_control": {"siid": 2, "piid": 2},  # 0 - Pause, 1 - Open, 2 - Close, 3 - auto
+    "current_position": {"siid": 2, "piid": 3},  # Range: [0, 100, 1]
+    "status": {"siid": 2, "piid": 6},  # 0 - Stopped, 1 - Opening, 2 - Closing
+    "target_position": {"siid": 2, "piid": 7},  # Range: [0, 100, 1]
+    # curtain_cfg
+    "manual_enabled": {"siid": 4, "piid": 1},  #
+    "polarity": {"siid": 4, "piid": 2},
+    "is_position_limited": {"siid": 4, "piid": 3},
+    "night_tip_light": {"siid": 4, "piid": 4},
+    "run_time": {"siid": 4, "piid": 5},  # Range: [0, 255, 1]
+    # motor_controller
+    "adjust_value": {"siid": 5, "piid": 1},  # Range: [-100, 100, 1]
 }
 
 # Model: ZNCLDJ21LM (also known as "Xiaomiyoupin Curtain Controller (Wi-Fi)"
 MODEL_CURTAIN_HAGL05 = "lumi.curtain.hagl05"
+
 
 class MotorControl(enum.Enum):
     Pause = 0
@@ -36,10 +35,12 @@ class MotorControl(enum.Enum):
     Close = 2
     Auto = 3
 
+
 class Status(enum.Enum):
     Stopped = 0
     Opening = 1
     Closing = 2
+
 
 class Polarity(enum.Enum):
     Positive = 0
@@ -48,19 +49,18 @@ class Polarity(enum.Enum):
 
 class CurtainStatus:
     def __init__(self, data: Dict[str, Any]) -> None:
-        """ Response from device
-            {'id': 1, 'result': [
-                {'did': 'motor_control', 'siid': 2, 'piid': 2, 'code': -4001},
-                {'did': 'current_position', 'siid': 2, 'piid': 3, 'code': 0, 'value': 0},
-                {'did': 'status', 'siid': 2, 'piid': 6, 'code': 0, 'value': 0},
-                {'did': 'target_position', 'siid': 2, 'piid': 7, 'code': 0, 'value': 0},
-                {'did': 'is_manual_enabled', 'siid': 4, 'piid': 1, 'code': 0, 'value': 1},
-                {'did': 'polarity', 'siid': 4, 'piid': 2, 'code': 0, 'value': 0},
-                {'did': 'is_position_limited', 'siid': 4, 'piid': 3, 'code': 0, 'value': 0},
-                {'did': 'night_tip_light', 'siid': 4, 'piid': 4, 'code': 0, 'value': 1},
-                {'did': 'run_time', 'siid': 4, 'piid': 5, 'code': 0, 'value': 0},
-                {'did': 'adjust_value', 'siid': 5, 'piid': 1, 'code': -4000}
-            ]}
+        """Response from device
+        {'id': 1, 'result': [
+            {'did': 'current_position', 'siid': 2, 'piid': 3, 'code': 0, 'value': 0},
+            {'did': 'status', 'siid': 2, 'piid': 6, 'code': 0, 'value': 0},
+            {'did': 'target_position', 'siid': 2, 'piid': 7, 'code': 0, 'value': 0},
+            {'did': 'is_manual_enabled', 'siid': 4, 'piid': 1, 'code': 0, 'value': 1},
+            {'did': 'polarity', 'siid': 4, 'piid': 2, 'code': 0, 'value': 0},
+            {'did': 'is_position_limited', 'siid': 4, 'piid': 3, 'code': 0, 'value': 0},
+            {'did': 'night_tip_light', 'siid': 4, 'piid': 4, 'code': 0, 'value': 1},
+            {'did': 'run_time', 'siid': 4, 'piid': 5, 'code': 0, 'value': 0},
+            {'did': 'adjust_value', 'siid': 5, 'piid': 1, 'code': -4000}
+        ]}
         """
         self.data = data
 
@@ -128,10 +128,11 @@ class CurtainStatus:
                 self.run_time,
                 self.current_position,
                 self.target_position,
-                self.adjust_value
+                self.adjust_value,
             )
         )
         return s
+
 
 class CurtainMiot(MiotDevice):
     """Main class representing the lumi.curtain.hagl05 curtain."""
@@ -175,8 +176,7 @@ class CurtainMiot(MiotDevice):
         default_output=format_output("Set motor control to {motor_control}"),
     )
     def set_motor_control(self, motor_control: MotorControl):
-        """Set motor control.
-        """
+        """Set motor control."""
         return self.set_property("motor_control", motor_control.value)
 
     @command(
@@ -184,10 +184,11 @@ class CurtainMiot(MiotDevice):
         default_output=format_output("Set target position to {target_position}"),
     )
     def set_target_position(self, target_position: int):
-        """Set target position.
-        """
-        if target_position < 0 or target_position  > 100:
-            raise ValueError("Value must be between [0, 100] value, was %s" % target_position)
+        """Set target position."""
+        if target_position < 0 or target_position > 100:
+            raise ValueError(
+                "Value must be between [0, 100] value, was %s" % target_position
+            )
         return self.set_property("target_position", target_position)
 
     @command(
@@ -195,8 +196,7 @@ class CurtainMiot(MiotDevice):
         default_output=format_output("Set manual control {manual_enabled}"),
     )
     def set_manual_enabled(self, manual_enabled: bool):
-        """Set manual control of curtain.
-        """
+        """Set manual control of curtain."""
         return self.set_property("is_manual_enabled", manual_enabled)
 
     @command(
@@ -204,8 +204,7 @@ class CurtainMiot(MiotDevice):
         default_output=format_output("Set polarity to {polarity}"),
     )
     def set_polarity(self, polarity: Polarity):
-        """Set polarity of the motor.
-        """
+        """Set polarity of the motor."""
         return self.set_property("polarity", polarity.value)
 
     @command(
@@ -213,8 +212,7 @@ class CurtainMiot(MiotDevice):
         default_output=format_output("Set position limit to {pos_limit}"),
     )
     def set_position_limit(self, pos_limit: bool):
-        """Set position limit parameter.
-        """
+        """Set position limit parameter."""
         return self.set_property("is_position_limited", pos_limit)
 
     @command(
@@ -222,8 +220,7 @@ class CurtainMiot(MiotDevice):
         default_output=format_output("Setting night tip light {night_tip_light"),
     )
     def set_night_tip_light(self, night_tip_light: bool):
-        """Set night tip light.
-        """
+        """Set night tip light."""
         return self.set_property("night_tip_light", night_tip_light)
 
     @command(
@@ -231,8 +228,9 @@ class CurtainMiot(MiotDevice):
         default_output=format_output("Set adjust value to {adjust_value}"),
     )
     def set_adjust_value(self, adjust_value: int):
-        """Adjust to preferred position.
-        """
+        """Adjust to preferred position."""
         if adjust_value < -100 or adjust_value > 100:
-            raise ValueError("Value must be between [-100, 100] value, was %s" % adjust_value)
+            raise ValueError(
+                "Value must be between [-100, 100] value, was %s" % adjust_value
+            )
         return self.set_property("adjust_value", adjust_value)
