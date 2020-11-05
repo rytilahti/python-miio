@@ -73,24 +73,24 @@ ERROR_DESCRIPTION = [
 ]
 
 
-class RunStatus:
-    def __init__(self, run_status: int):
+class OperationStatus:
+    def __init__(self, operation_status: int):
         """
-        Running status parser.
+        Operation status parser.
 
-        Return value of run_status: <int>
+        Return value of operation_status: <int>
 
-        We should convert the run_status code to binary, each bit from
+        We should convert the operation_status code to binary, each bit from
         LSB to MSB represents one error. It's able to cover multiple errors.
 
-        Example run_status value: 9 (binary: 1001)
+        Example operation_status value: 9 (binary: 1001)
         Thus, the purifier reports 2 errors, stands bit 0 and bit 3,
         means "Water temperature anomaly" and "Filter life expired".
         """
         self.err_list = [
             ERROR_DESCRIPTION[i]
             for i in range(0, len(ERROR_DESCRIPTION))
-            if (1 << i) & run_status
+            if (1 << i) & operation_status
         ]
 
     @property
@@ -98,7 +98,7 @@ class RunStatus:
         return self.err_list
 
     def __repr__(self) -> str:
-        s = "<RunStatus errors=%s>" % (self.errors)
+        s = "<OperationStatus errors=%s>" % (self.errors)
         return s
 
 
@@ -122,9 +122,9 @@ class WaterPurifierYunmiStatus:
         self.data = data
 
     @property
-    def error(self) -> RunStatus:
-        """Current running status, 0 for no error."""
-        return RunStatus(self.data["run_status"])
+    def operation_status(self) -> OperationStatus:
+        """Current operation status."""
+        return OperationStatus(self.data["run_status"])
 
     @property
     def filter1_life_total(self) -> timedelta:
