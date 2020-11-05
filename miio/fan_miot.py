@@ -47,7 +47,7 @@ MIOT_MAPPING = {
         "mode": {"siid": 2, "piid": 3},
         "swing_mode": {"siid": 2, "piid": 4},
         "swing_mode_angle": {"siid": 2, "piid": 5},
-        # "status": {"siid": 2, "piid": 6},
+        "fan_speed": {"siid": 2, "piid": 6},
         "light": {"siid": 4, "piid": 1},
         "buzzer": {"siid": 5, "piid": 1},
         # "device_fault": {"siid": 6, "piid": 2},
