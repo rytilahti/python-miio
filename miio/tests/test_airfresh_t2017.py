@@ -43,7 +43,7 @@ class DummyAirFreshT2017(DummyDevice, AirFreshT2017):
             "set_power": lambda x: self._set_state("power", [(x[0] == "on")]),
             "set_mode": lambda x: self._set_state("mode", x),
             "set_sound": lambda x: self._set_state("sound", x),
-            "set_child_lock": lambda x: self._set_state("child_lock", [(x[0] == "on")]),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
             "set_display": lambda x: self._set_state("display", x),
             "set_screen_direction": lambda x: self._set_state("screen_direction", x),
             "set_ptc_level": lambda x: self._set_state("ptc_level", x),

@@ -352,10 +352,7 @@ class AirFreshT2017(Device):
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
-        if lock:
-            return self.send("set_child_lock", ["on"])
-        else:
-            return self.send("set_child_lock", ["off"])
+        return self.send("set_child_lock", [lock])
 
     @command(default_output=format_output("Resetting upper filter"))
     def reset_upper_filter(self):
