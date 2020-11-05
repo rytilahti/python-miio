@@ -283,12 +283,12 @@ class AirFreshT2017(Device):
     @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
-        return self.send("set_power", ["on"])
+        return self.send("set_power", [True])
 
     @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
-        return self.send("set_power", ["off"])
+        return self.send("set_power", [False])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode)),

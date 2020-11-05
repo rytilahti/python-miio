@@ -40,7 +40,7 @@ class DummyAirFreshT2017(DummyDevice, AirFreshT2017):
         }
         self.return_values = {
             "get_prop": self._get_state,
-            "set_power": lambda x: self._set_state("power", [(x[0] == "on")]),
+            "set_power": lambda x: self._set_state("power", x),
             "set_mode": lambda x: self._set_state("mode", x),
             "set_sound": lambda x: self._set_state("sound", x),
             "set_child_lock": lambda x: self._set_state("child_lock", x),
