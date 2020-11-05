@@ -273,7 +273,7 @@ class AirConditionerMiotStatus:
 
     @property
     def clean(self) -> CleaningStatus:
-        """TODO   """
+        """Auto clean mode indicator."""
         return CleaningStatus(self.data["clean"])
 
     @property
@@ -288,7 +288,7 @@ class AirConditionerMiotStatus:
 
     @property
     def timer(self) -> TimerStatus:
-        """Timer indicator."""
+        """Countdown timer indicator."""
         return TimerStatus(self.data["timer"])
 
     def __repr__(self) -> str:
