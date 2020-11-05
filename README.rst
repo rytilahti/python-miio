@@ -88,6 +88,7 @@ Supported devices
 
 -  Xiaomi Mi Robot Vacuum V1, S5, M1S
 -  Xiaomi Mi Home Air Conditioner Companion
+-  Xiaomi Mi Smart Air Conditioner A (xiaomi.aircondition.mc1, mc2, mc4, mc5)
 -  Xiaomi Mi Air Purifier
 -  Xiaomi Aqara Camera
 -  Xiaomi Aqara Gateway (basic implementation, alarm, lights)

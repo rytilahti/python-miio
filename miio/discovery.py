@@ -8,6 +8,7 @@ from typing import Callable, Dict, Optional, Union  # noqa: F401
 import zeroconf
 
 from . import (
+    AirConditionerMiot,
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
     AirFresh,
@@ -102,6 +103,10 @@ DEVICE_MAP = {
     "qmi-powerstrip-v1": partial(PowerStrip, model=MODEL_POWER_STRIP_V1),
     "zimi-powerstrip-v2": partial(PowerStrip, model=MODEL_POWER_STRIP_V2),
     "zimi-clock-myk01": AlarmClock,
+    "xiaomi.aircondition.mc1": AirConditionerMiot,
+    "xiaomi.aircondition.mc2": AirConditionerMiot,
+    "xiaomi.aircondition.mc4": AirConditionerMiot,
+    "xiaomi.aircondition.mc5": AirConditionerMiot,
     "zhimi-airpurifier-m1": AirPurifier,  # mini model
     "zhimi-airpurifier-m2": AirPurifier,  # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
