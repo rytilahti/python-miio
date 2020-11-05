@@ -29,7 +29,7 @@ _INITIAL_STATE = {
     "electricity": 0.0,
     "clean": "0,100,1,1",
     "running_duration": 100.4,
-    "fan_percent": 90,
+    "fan_speed_percent": 90,
     "timer": "0,0,0,0",
 }
 
@@ -54,7 +54,7 @@ class DummyAirConditionerMiot(DummyMiotDevice, AirConditionerMiot):
             "set_buzzer": lambda x: self._set_state("buzzer", x),
             "set_led": lambda x: self._set_state("led", x),
             "set_clean": lambda x: self._set_state("clean", x),
-            "set_fan_percent": lambda x: self._set_state("fan_percent", x),
+            "set_fan_speed_percent": lambda x: self._set_state("fan_speed_percent", x),
             "set_timer": lambda x, y: self._set_state("timer", x, y),
         }
         super().__init__(*args, **kwargs)
@@ -96,7 +96,7 @@ class TestAirConditioner(TestCase):
         assert status.buzzer == _INITIAL_STATE["buzzer"]
         assert status.led == _INITIAL_STATE["led"]
         assert repr(status.clean) == repr(CleaningStatus(_INITIAL_STATE["clean"]))
-        assert status.fan_percent == _INITIAL_STATE["fan_percent"]
+        assert status.fan_speed_percent == _INITIAL_STATE["fan_speed_percent"]
         assert repr(status.timer) == repr(TimerStatus(_INITIAL_STATE["timer"]))
 
     def test_set_mode(self):
@@ -231,20 +231,20 @@ class TestAirConditioner(TestCase):
         self.device.set_buzzer(False)
         assert buzzer() is False
 
-    def test_set_fan_percent(self):
-        def fan_percent():
-            return self.device.status().fan_percent
+    def test_set_fan_speed_percent(self):
+        def fan_speed_percent():
+            return self.device.status().fan_speed_percent
 
-        self.device.set_fan_percent(1)
-        assert fan_percent() == 1
-        self.device.set_fan_percent(101)
-        assert fan_percent() == 101
-
-        with pytest.raises(AirConditionerMiotException):
-            self.device.set_fan_percent(102)
+        self.device.set_fan_speed_percent(1)
+        assert fan_speed_percent() == 1
+        self.device.set_fan_speed_percent(101)
+        assert fan_speed_percent() == 101
 
         with pytest.raises(AirConditionerMiotException):
-            self.device.set_fan_percent(0)
+            self.device.set_fan_speed_percent(102)
+
+        with pytest.raises(AirConditionerMiotException):
+            self.device.set_fan_speed_percent(0)
 
     def test_set_timer(self):
         def timer():
