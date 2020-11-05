@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -14,22 +14,21 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_HUMIDIFIER_MJJSQ = "deerma.humidifier.mjjsq"
 MODEL_HUMIDIFIER_JSQ1 = "deerma.humidifier.jsq1"
 
+MODEL_HUMIDIFIER_JSQ_COMMON = [
+    "OnOff_State",
+    "TemperatureValue",
+    "Humidity_Value",
+    "HumiSet_Value",
+    "Humidifier_Gear",
+    "Led_State",
+    "TipSound_State",
+    "waterstatus",
+    "watertankstatus",
+]
+
 AVAILABLE_PROPERTIES = {
-    MODEL_HUMIDIFIER_MJJSQ: [
-        "OnOff_State",
-        "TemperatureValue",
-        "Humidity_Value",
-        "HumiSet_Value",
-        "Humidifier_Gear",
-        "Led_State",
-        "TipSound_State",
-        "waterstatus",
-        "watertankstatus",
-    ],
-    MODEL_HUMIDIFIER_JSQ1: MODEL_HUMIDIFIER_MJJSQ
-    + [
-        "wet_and_protect",
-    ],
+    MODEL_HUMIDIFIER_MJJSQ: MODEL_HUMIDIFIER_JSQ_COMMON,
+    MODEL_HUMIDIFIER_JSQ1: MODEL_HUMIDIFIER_JSQ_COMMON + ["wet_and_protect"],
 }
 
 
@@ -109,9 +108,12 @@ class AirHumidifierStatus:
         return self.data["watertankstatus"] == 0
 
     @property
-    def wet_protection(self) -> bool:
+    def wet_protection(self) -> Optional[bool]:
         """True if wet protection is enabled."""
-        return self.data["wet_and_protect"] == 1
+        if self.data["wet_and_protect"] is not None:
+            return self.data["wet_and_protect"] == 1
+
+        return None
 
     def __repr__(self) -> str:
         s = (
