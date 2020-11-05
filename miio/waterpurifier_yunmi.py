@@ -152,7 +152,7 @@ class WaterPurifierYunmiStatus:
         return self.data["f1_usedflow"]
 
     @property
-    def filter1_flow_remaining(self) -> timedelta:
+    def filter1_flow_remaining(self) -> int:
         """Filter1 remaining flow in Metric Liter (L)."""
         return self.filter1_flow_total - self.filter1_flow_used
 
@@ -182,7 +182,7 @@ class WaterPurifierYunmiStatus:
         return self.data["f2_usedflow"]
 
     @property
-    def filter2_flow_remaining(self) -> timedelta:
+    def filter2_flow_remaining(self) -> int:
         """Filter2 remaining flow in Metric Liter (L)."""
         return self.filter2_flow_total - self.filter2_flow_used
 
@@ -212,7 +212,7 @@ class WaterPurifierYunmiStatus:
         return self.data["f3_usedflow"]
 
     @property
-    def filter3_flow_remaining(self) -> timedelta:
+    def filter3_flow_remaining(self) -> int:
         """Filter1 remaining flow in Metric Liter (L)."""
         return self.filter3_flow_total - self.filter3_flow_used
 
