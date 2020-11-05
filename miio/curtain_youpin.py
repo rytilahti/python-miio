@@ -85,56 +85,48 @@ class CurtainStatus:
     @property
     def manual_enabled(self) -> ManualEnabled:
         """Manual control enable status
-        Values: Disable, Enable
         """
         return ManualEnabled(self.data["manual_enabled"])
 
     @property
     def polarity(self) -> Polarity:
         """Polarity
-        Values: Positive, Reverse
         """
         return Polarity(self.data["polarity"])
 
     @property
     def position_limit(self) -> PosLimit:
         """Position limit
-        Values: Unlimit, Limit
         """
         return PosLimit(self.data["position_limit"])
 
     @property
     def night_tip_light(self) -> NightTipLight:
         """Night tip light status
-        Values: Enable, Disable
         """
         return NightTipLight(self.data["night_tip_light"])
 
     @property
     def run_time(self) -> int:
         """Run time
-        Value range: [0, 255, 1]
         """
         return self.data["run_time"]
 
     @property
     def current_position(self) -> int:
         """Current position
-        Value range: [0, 100, 1]
         """
         return self.data["current_position"]
 
     @property
     def target_position(self) -> int:
         """Target position
-        Value range: [0, 100, 1]
         """
         return self.data["target_position"]
 
     @property
     def adjust_value(self) -> int:
         """ Adjust value
-        Value range: [-100, 100, 1]
         """
         return self.data["adjust_value"]
 
@@ -206,7 +198,7 @@ class CurtainMiot(MiotDevice):
     def set_motor_control(self, motor_control: MotorControl):
         """Set motor control.
         """
-         self.set_property("motor_control", motor_control.value)
+        self.set_property("motor_control", motor_control.value)
 
     @command(
         click.argument("target_position", type=int),
@@ -216,7 +208,7 @@ class CurtainMiot(MiotDevice):
         """Set target position.
         """
         if target_position < 0 or target_position  > 100:
-            raise ValueError("Wrong value")
+            raise ValueError("Value must be between [0, 100] value, was %s" % target_position)
         self.set_property("target_position", target_position)
 
     @command(
@@ -243,7 +235,6 @@ class CurtainMiot(MiotDevice):
     )
     def set_position_limit(self, pos_limit: PosLimit):
         """Set position limit parameter.
-        Values: Unlimit, Limit
         """
         self.set_property("position_limit", pos_limit.value)
 
@@ -265,6 +256,6 @@ class CurtainMiot(MiotDevice):
         """Set adjust value.
         """
         if adjust_value < -100 or adjust_value > 100:
-            raise ValueError("Wrong value")
+            raise ValueError("Value must be between [-100, 100] value, was %s" % adjust_value)
         self.set_property("adjust_value", adjust_value)
 
