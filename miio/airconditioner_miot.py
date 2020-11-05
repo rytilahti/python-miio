@@ -287,7 +287,7 @@ class AirConditionerMiotStatus:
         return CleaningStatus(self.data["clean"])
 
     @property
-    def running_duration(self) -> timedelta:
+    def total_running_duration(self) -> timedelta:
         """Total running duration in hours."""
         return timedelta(hours=self.data["running_duration"])
 
@@ -317,7 +317,7 @@ class AirConditionerMiotStatus:
             "led=%s"
             "electricity=%s"
             "clean=%s"
-            "running_duration=%s"
+            "total_running_duration=%s"
             "fan_percent=%s"
             "timer=%s"
             % (
@@ -335,7 +335,7 @@ class AirConditionerMiotStatus:
                 self.led,
                 self.electricity,
                 self.clean,
-                self.running_duration,
+                self.total_running_duration,
                 self.fan_percent,
                 self.timer,
             )
@@ -376,7 +376,7 @@ class AirConditionerMiot(MiotDevice):
             "LED: {result.led}\n"
             "Electricity: {result.electricity}kWh\n"
             "Clean: {result.clean}\n"
-            "Running Duration: {result.running_duration}\n"
+            "Running Duration: {result.total_running_duration}\n"
             "Fan percent: {result.fan_percent}\n"
             "Timer: {result.timer}\n",
         )
