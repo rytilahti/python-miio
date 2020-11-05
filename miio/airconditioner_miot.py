@@ -35,7 +35,7 @@ _MAPPING = {
     "clean": {"siid": 9, "piid": 1},
     "running_duration": {"siid": 9, "piid": 5},
     # Enhance (siid=10)
-    "fan_percent": {"siid": 10, "piid": 1},
+    "fan_speed_percent": {"siid": 10, "piid": 1},
     "timer": {"siid": 10, "piid": 3},
 }
 
@@ -194,7 +194,7 @@ class AirConditionerMiotStatus:
             {'did': 'electricity', 'siid': 8, 'piid': 1, 'code': 0, 'value': 0.0},
             {'did': 'clean', 'siid': 9, 'piid': 1, 'code': 0, 'value': '0,100,1,1'},
             {'did': 'running_duration', 'siid': 9, 'piid': 5, 'code': 0, 'value': 151.0},
-            {'did': 'fan_percent', 'siid': 10, 'piid': 1, 'code': 0, 'value': 101},
+            {'did': 'fan_speed_percent', 'siid': 10, 'piid': 1, 'code': 0, 'value': 101},
             {'did': 'timer', 'siid': 10, 'piid': 3, 'code': 0, 'value': '0,0,0,0'}
         ]
 
@@ -284,7 +284,7 @@ class AirConditionerMiotStatus:
     @property
     def fan_speed_percent(self) -> int:
         """Current fan speed in percent."""
-        return self.data["fan_percent"]
+        return self.data["fan_speed_percent"]
 
     @property
     def timer(self) -> TimerStatus:
@@ -509,7 +509,7 @@ class AirConditionerMiot(MiotDevice):
             raise AirConditionerMiotException(
                 "Invalid fan percent: %s" % fan_speed_percent
             )
-        return self.set_property("fan_percent", fan_speed_percent)
+        return self.set_property("fan_speed_percent", fan_speed_percent)
 
     @command(
         click.argument("minutes", type=int),
