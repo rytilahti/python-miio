@@ -30,9 +30,6 @@ _MAPPING = {
 # Model: ZNCLDJ21LM (also known as "Xiaomiyoupin Curtain Controller (Wi-Fi)"
 MODEL_CURTAIN_HAGL05 = "lumi.curtain.hagl05"
 
-class CurtainMiotException(DeviceException):
-    pass
-
 class MotorControl(enum.Enum):
     Pause = 0
     Open = 1
@@ -209,10 +206,7 @@ class CurtainMiot(MiotDevice):
     def set_motor_control(self, motor_control: MotorControl):
         """Set motor control.
         """
-        try:
-            self.set_property("motor_control", motor_control.value)
-        except DeviceError as error:
-            raise
+         self.set_property("motor_control", motor_control.value)
 
     @command(
         click.argument("target_position", type=int),
@@ -232,10 +226,7 @@ class CurtainMiot(MiotDevice):
     def set_manual_enabled(self, manual_enabled: ManualEnabled):
         """Set manual control of curtain.
         """
-        try:
-            self.set_property("manual_enabled", manual_enabled.value)
-        except DeviceError as error:
-            raise
+        self.set_property("manual_enabled", manual_enabled.value)
 
     @command(
         click.argument("polarity", type=EnumType(Polarity)),
@@ -244,10 +235,7 @@ class CurtainMiot(MiotDevice):
     def set_polarity(self, polarity: Polarity):
         """Set polarity of the motor.
         """
-        try:
-            self.set_property("polarity", polarity.value)
-        except DeviceError as error:
-            raise
+        self.set_property("polarity", polarity.value)
 
     @command(
         click.argument("pos_limit", type=EnumType(PosLimit)),
@@ -257,10 +245,7 @@ class CurtainMiot(MiotDevice):
         """Set position limit parameter.
         Values: Unlimit, Limit
         """
-        try:
-            self.set_property("position_limit", pos_limit.value)
-        except DeviceError as error:
-            raise
+        self.set_property("position_limit", pos_limit.value)
 
     @command(
         click.argument("night_tip_light", type=EnumType(NightTipLight)),
@@ -269,10 +254,7 @@ class CurtainMiot(MiotDevice):
     def set_night_tip_light(self, night_tip_light: NightTipLight):
         """Set night tip light.
         """
-        try:
-            self.set_property("night_tip_light", night_tip_light.value)
-        except DeviceError as error:
-            raise
+        self.set_property("night_tip_light", night_tip_light.value)
 
     """ motor_controller """
     @command(
