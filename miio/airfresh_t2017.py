@@ -319,7 +319,7 @@ class AirFreshT2017(Device):
     @command(
         click.argument("ptc", type=bool),
         default_output=format_output(
-            lambda led: "Turning on ptc" if led else "Turning off ptc"
+            lambda ptc: "Turning on ptc" if ptc else "Turning off ptc"
         ),
     )
     def set_ptc(self, ptc: bool):
