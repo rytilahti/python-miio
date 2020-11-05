@@ -166,7 +166,7 @@ class CurtainStatus:
         return s
 
 class CurtainMiot(MiotDevice):
-    """Main class representing the curtain which uses MIoT protocol."""
+    """Main class representing the lumi.curtain.hagl05 curtain."""
 
     def __init__(
         self,
@@ -208,7 +208,6 @@ class CurtainMiot(MiotDevice):
     )
     def set_motor_control(self, motor_control: MotorControl):
         """Set motor control.
-        Values: Pause, Open, Close, Auto
         """
         try:
             self.set_property("motor_control", motor_control.value)
@@ -221,8 +220,9 @@ class CurtainMiot(MiotDevice):
     )
     def set_target_position(self, target_position: int):
         """Set target position.
-        Value range: [0, 100, 1]
         """
+        if target_position < 0 or target_position  > 100:
+            raise ValueError("Wrong value")
         self.set_property("target_position", target_position)
 
     @command(
@@ -231,7 +231,6 @@ class CurtainMiot(MiotDevice):
     )
     def set_manual_enabled(self, manual_enabled: ManualEnabled):
         """Set manual control of curtain.
-        Values: Enable, Disable
         """
         try:
             self.set_property("manual_enabled", manual_enabled.value)
@@ -244,7 +243,6 @@ class CurtainMiot(MiotDevice):
     )
     def set_polarity(self, polarity: Polarity):
         """Set polarity of the motor.
-        Values: Positive, Reverse
         """
         try:
             self.set_property("polarity", polarity.value)
@@ -270,7 +268,6 @@ class CurtainMiot(MiotDevice):
     )
     def set_night_tip_light(self, en_night_tip_light: NightTipLight):
         """Set night tip light.
-        Values: Enable, Disable
         """
         try:
             self.set_property("night_tip_light", en_night_tip_light.value)
@@ -282,9 +279,10 @@ class CurtainMiot(MiotDevice):
         click.argument("adjust", type=int),
         default_output=format_output("Set adjust value to {adjust}"),
     )
-    def set_adjust_value(self, var: int):
+    def set_adjust_value(self, value: int):
         """Set adjust value.
-        Value range: [-100, 100, 1]
         """
-        self.set_property("adjust_value", var)
+        if value < -100 or value > 100:
+            raise ValueError("Wrong value")
+        self.set_property("adjust_value", value)
 
