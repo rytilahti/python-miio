@@ -283,12 +283,12 @@ class AirFreshT2017(Device):
     @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
-        return self.send("set_power", ["on"])
+        return self.send("set_power", [True])
 
     @command(default_output=format_output("Powering off"))
     def off(self):
         """Power off."""
-        return self.send("set_power", ["off"])
+        return self.send("set_power", [False])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode)),
@@ -306,10 +306,7 @@ class AirFreshT2017(Device):
     )
     def set_display(self, display: bool):
         """Turn led on/off."""
-        if display:
-            return self.send("set_display", ["on"])
-        else:
-            return self.send("set_display", ["off"])
+        return self.send("set_display", [display])
 
     @command(
         click.argument("orientation", type=EnumType(DisplayOrientation)),
@@ -345,10 +342,7 @@ class AirFreshT2017(Device):
     )
     def set_buzzer(self, buzzer: bool):
         """Set sound on/off."""
-        if buzzer:
-            return self.send("set_sound", ["on"])
-        else:
-            return self.send("set_sound", ["off"])
+        return self.send("set_sound", [buzzer])
 
     @command(
         click.argument("lock", type=bool),
@@ -358,10 +352,7 @@ class AirFreshT2017(Device):
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
-        if lock:
-            return self.send("set_child_lock", ["on"])
-        else:
-            return self.send("set_child_lock", ["off"])
+        return self.send("set_child_lock", [lock])
 
     @command(default_output=format_output("Resetting upper filter"))
     def reset_upper_filter(self):
