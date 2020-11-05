@@ -4,7 +4,7 @@ import pytest
 
 from miio import AirHumidifierMjjsq
 from miio.airhumidifier_mjjsq import (
-    MODEL_HUMIDIFIER_MJJSQ,
+    MODEL_HUMIDIFIER_JSQ1,
     AirHumidifierException,
     AirHumidifierStatus,
     OperationMode,
@@ -15,7 +15,7 @@ from .dummies import DummyDevice
 
 class DummyAirHumidifierMjjsq(DummyDevice, AirHumidifierMjjsq):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_HUMIDIFIER_MJJSQ
+        self.model = MODEL_HUMIDIFIER_JSQ1
         self.state = {
             "Humidifier_Gear": 1,
             "Humidity_Value": 44,
@@ -26,6 +26,7 @@ class DummyAirHumidifierMjjsq(DummyDevice, AirHumidifierMjjsq):
             "TipSound_State": 0,
             "waterstatus": 1,
             "watertankstatus": 1,
+            "wet_and_protect": 1,
         }
         self.return_values = {
             "get_prop": self._get_state,
@@ -34,6 +35,7 @@ class DummyAirHumidifierMjjsq(DummyDevice, AirHumidifierMjjsq):
             "SetLedState": lambda x: self._set_state("Led_State", x),
             "SetTipSound_Status": lambda x: self._set_state("TipSound_State", x),
             "Set_HumiValue": lambda x: self._set_state("HumiSet_Value", x),
+            "Set_wet_and_protect": lambda x: self._set_state("wet_and_protect", x),
         }
         super().__init__(args, kwargs)
 
@@ -139,3 +141,13 @@ class TestAirHumidifierMjjsq(TestCase):
 
         with pytest.raises(AirHumidifierException):
             self.device.set_target_humidity(101)
+
+    def test_set_wet_protection(self):
+        def wet_protection():
+            return self.device.status().wet_protection
+
+        self.device.set_wet_protection(True)
+        assert wet_protection() is True
+
+        self.device.set_wet_protection(False)
+        assert wet_protection() is False
