@@ -66,33 +66,30 @@ class CurtainStatus:
 
     @property
     def status(self) -> Status:
-        """ Device status """
+        """Device status."""
         return Status(self.data["status"])
 
-    """ curtain_cfg """
     @property
     def is_manual_enabled(self) -> bool:
-        """Manual control enable status
-        """
+        """True if manual controls are enabled."""
         return self.data["is_manual_enabled"]
 
     @property
     def polarity(self) -> Polarity:
-        """Motor rotation polarity
-        """
+        """Motor rotation polarity."""
         return Polarity(self.data["polarity"])
 
     @property
     def is_position_limited(self) -> bool:
         """Position limit
         """
-        return self.data["is_position_limited"]
+        return bool(self.data["is_position_limited"])
 
     @property
     def night_tip_light(self) -> bool:
         """Night tip light status
         """
-        return self.data["night_tip_light"]
+        return bool(self.data["night_tip_light"])
 
     @property
     def run_time(self) -> int:
@@ -186,7 +183,7 @@ class CurtainMiot(MiotDevice):
     def set_motor_control(self, motor_control: MotorControl):
         """Set motor control.
         """
-        self.set_property("motor_control", motor_control.value)
+        return self.set_property("motor_control", motor_control.value)
 
     @command(
         click.argument("target_position", type=int),
@@ -246,4 +243,3 @@ class CurtainMiot(MiotDevice):
         if adjust_value < -100 or adjust_value > 100:
             raise ValueError("Value must be between [-100, 100] value, was %s" % adjust_value)
         self.set_property("adjust_value", adjust_value)
-
