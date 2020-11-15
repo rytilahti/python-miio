@@ -16,7 +16,7 @@ _MAPPING = {
     "status": {"siid": 2, "piid": 6},  # 0 - Stopped, 1 - Opening, 2 - Closing
     "target_position": {"siid": 2, "piid": 7},  # Range: [0, 100, 1]
     # curtain_cfg
-    "manual_enabled": {"siid": 4, "piid": 1},  #
+    "is_manual_enabled": {"siid": 4, "piid": 1},  #
     "polarity": {"siid": 4, "piid": 2},
     "is_position_limited": {"siid": 4, "piid": 3},
     "night_tip_light": {"siid": 4, "piid": 4},
