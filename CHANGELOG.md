@@ -1,5 +1,106 @@
 # Change Log
 
+## [0.5.4](https://github.com/rytilahti/python-miio/tree/0.5.4) (2020-11-15)
+
+New devices:
+* Xiaomi Smartmi Fresh Air System VA4 (zhimi.airfresh.va4) (@syssi)
+* Xiaomi Mi Smart Pedestal Fan P9, P10, P11 (dmaker.fan.p9, dmaker.fan.p10, dmaker.fan.p11) (@swim2sun)
+* Mijia Intelligent Sterilization Humidifier SCK0A45 (deerma.humidifier.jsq1)
+* Air Conditioner Companion MCN (lumi.acpartner.mcn02) (@EugeneLiu)
+* Xiaomi Water Purifier D1 (yunmi.waterpuri.lx9) and C1 (Triple Setting, yunmi.waterpuri.lx11) (@zhangjingye03)
+* Xiaomi Mi Smart Air Conditioner A (xiaomi.aircondition.mc1, mc2, mc4 and mc5) (@zhangjingye03)
+* Xiaomiyoupin Curtain Controller (Wi-Fi) / Aqara A1 (lumi.curtain.hagl05) (@in7egral)
+
+Improvements:
+* ViomiVacuum: New modes, states and error codes (@fs79)
+* ViomiVacuum: Consumable status added (@titilambert)
+* Gateway: Throws GatewayException in get\_illumination (@javicalle)
+* Vacuum: Tangible User Interface (TUI) for the manual mode added (@rnovatorov)
+* Vacuum: Mopping to VacuumingAndMopping renamed (@rytilahti)
+* raw\_id moved from Vacuum to the Device base class (@rytilahti)
+* \_\_json\_\_ boilerplate code from all status containers removed (@rytilahti)
+* Pinned versions loosed and cryptography dependency bumped to new major version (@rytilahti)
+* importlib\_metadata python\_version bounds corrected (@jonringer)
+* CLI: EnumType defaults to incasesensitive now (@rytilahti)
+* Better documentation and presentation of the documentation (@rytilahti)
+
+Fixes:
+* Vacuum: Invalid cron expression fixed (@rytilahti)
+* Vacuum: Invalid cron elements handled gracefully (@rytilahti)
+* Vacuum: WaterFlow as an enum defined (@rytilahti)
+* Yeelight: Check color mode values for emptiness (@rytilahti)
+* Airfresh: Temperature property of the zhimi.airfresh.va2 fixed (@syssi)
+* Airfresh: PTC support of the dmaker.airfresh.t2017 fixed (@syssi)
+* Airfresh: Payload of the boolean setter fixed (@syssi)
+* Fan: Fan speed property of the dmaker.fan.p11 fixed (@iquix)
+
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.3...0.5.4)
+
+**Implemented enhancements:**
+
+- Add error codes 2103 & 2105 [\#789](https://github.com/rytilahti/python-miio/issues/789)
+- ViomiVacuumState 6 seems to be VaccuumMopping [\#783](https://github.com/rytilahti/python-miio/issues/783)
+- Added some parameters: Error code, Viomimode, Viomibintype [\#799](https://github.com/rytilahti/python-miio/pull/799) ([fs79](https://github.com/fs79))
+- Add mopping state & log a warning when encountering unknown state [\#784](https://github.com/rytilahti/python-miio/pull/784) ([rytilahti](https://github.com/rytilahti))
+
+**Fixed bugs:**
+
+- Invalid cron expression when using xiaomi\_miio integration in Home Assistant [\#847](https://github.com/rytilahti/python-miio/issues/847)
+- viomivacuum doesn´t work with -o json\_pretty [\#816](https://github.com/rytilahti/python-miio/issues/816)
+- yeeligth without color temperature status error [\#802](https://github.com/rytilahti/python-miio/issues/802)
+- set\_waterflow roborock.vacuum.s5e [\#786](https://github.com/rytilahti/python-miio/issues/786)
+- Requirement is pinned for python-miio 0.5.3: zeroconf\>=0.25.1,\<0.26.0 [\#780](https://github.com/rytilahti/python-miio/issues/780)
+- Requirement is pinned for python-miio 0.5.3: pytz\>=2019.3,\<2020.0 [\#779](https://github.com/rytilahti/python-miio/issues/779)
+- miiocli: remove network & AP information from info output [\#857](https://github.com/rytilahti/python-miio/pull/857) ([rytilahti](https://github.com/rytilahti))
+- Fix PTC support of the dmaker.airfresh.t2017 [\#853](https://github.com/rytilahti/python-miio/pull/853) ([syssi](https://github.com/syssi))
+- Vacuum: handle invalid cron elements gracefully [\#848](https://github.com/rytilahti/python-miio/pull/848) ([rytilahti](https://github.com/rytilahti))
+- yeelight: Check color mode values for emptiness [\#829](https://github.com/rytilahti/python-miio/pull/829) ([rytilahti](https://github.com/rytilahti))
+- Define WaterFlow as an enum [\#787](https://github.com/rytilahti/python-miio/pull/787) ([rytilahti](https://github.com/rytilahti))
+
+**Closed issues:**
+
+- Notify access support for MIoT Device [\#843](https://github.com/rytilahti/python-miio/issues/843)
+- Xiaomi WiFi Power Plug\(Bluetooth Gateway\)\(chuangmi.plug.hmi208\) [\#840](https://github.com/rytilahti/python-miio/issues/840)
+- Mi Air Purifier 3H - unable to connect [\#836](https://github.com/rytilahti/python-miio/issues/836)
+- update-firmware on Xiaomi Mi Robot Vacuum V1 fails [\#818](https://github.com/rytilahti/python-miio/issues/818)
+- Freash air system calibration of CO2 sensor command [\#814](https://github.com/rytilahti/python-miio/issues/814)
+- Unable to discover the device \(zhimi.airpurifier.ma4\) [\#798](https://github.com/rytilahti/python-miio/issues/798)
+- Mi Air Purifier 3H Timed out [\#796](https://github.com/rytilahti/python-miio/issues/796)
+- Xiaomi Smartmi Fresh Air System XFXTDFR02ZM.   upgrade version of  XFXT01ZM with heater. [\#791](https://github.com/rytilahti/python-miio/issues/791)
+- mi smart sensor gateway - check status [\#762](https://github.com/rytilahti/python-miio/issues/762)
+- Installation problem 64bit [\#727](https://github.com/rytilahti/python-miio/issues/727)
+- support dmaker.fan.p9 and dmaker.fan.p10 [\#721](https://github.com/rytilahti/python-miio/issues/721)
+- Add support for lumi.acpartner.mcn02 please? [\#637](https://github.com/rytilahti/python-miio/issues/637)
+
+**Merged pull requests:**
+
+- Add deerma.humidifier.jsq1 support [\#856](https://github.com/rytilahti/python-miio/pull/856) ([syssi](https://github.com/syssi))
+- Fix CLI of the PTC support \(dmaker.airfresh.t2017\) [\#855](https://github.com/rytilahti/python-miio/pull/855) ([syssi](https://github.com/syssi))
+- Fix payload of all dmaker.airfresh.t2017 toggles [\#854](https://github.com/rytilahti/python-miio/pull/854) ([syssi](https://github.com/syssi))
+- Fix fan speed property of the dmaker.fan.p11 [\#852](https://github.com/rytilahti/python-miio/pull/852) ([iquix](https://github.com/iquix))
+- Initial support for lumi.curtain.hagl05 [\#851](https://github.com/rytilahti/python-miio/pull/851) ([in7egral](https://github.com/in7egral))
+- Add basic dmaker.fan.p11 support [\#850](https://github.com/rytilahti/python-miio/pull/850) ([syssi](https://github.com/syssi))
+- Vacuum: Implement TUI for the manual mode [\#845](https://github.com/rytilahti/python-miio/pull/845) ([rnovatorov](https://github.com/rnovatorov))
+- Throwing GatewayException in get\_illumination [\#831](https://github.com/rytilahti/python-miio/pull/831) ([javicalle](https://github.com/javicalle))
+- improve poetry usage documentation [\#830](https://github.com/rytilahti/python-miio/pull/830) ([rytilahti](https://github.com/rytilahti))
+- Correct importlib\_metadata python\_version bounds [\#828](https://github.com/rytilahti/python-miio/pull/828) ([jonringer](https://github.com/jonringer))
+- Remove \_\_json\_\_ boilerplate code from all status containers [\#827](https://github.com/rytilahti/python-miio/pull/827) ([rytilahti](https://github.com/rytilahti))
+- Add basic support for yunmi.waterpuri.lx9 and lx11 [\#826](https://github.com/rytilahti/python-miio/pull/826) ([zhangjingye03](https://github.com/zhangjingye03))
+- Add basic support for xiaomi.aircondition.mc1, mc2, mc4, mc5 [\#825](https://github.com/rytilahti/python-miio/pull/825) ([zhangjingye03](https://github.com/zhangjingye03))
+- Bump cryptography dependency to new major version [\#824](https://github.com/rytilahti/python-miio/pull/824) ([rytilahti](https://github.com/rytilahti))
+- Add support for dmaker.fan.p9 and dmaker.fan.p10 [\#819](https://github.com/rytilahti/python-miio/pull/819) ([swim2sun](https://github.com/swim2sun))
+- Add support for lumi.acpartner.mcn02 [\#809](https://github.com/rytilahti/python-miio/pull/809) ([EugeneLiu](https://github.com/EugeneLiu))
+- Add consumable status to viomi vacuum [\#805](https://github.com/rytilahti/python-miio/pull/805) ([titilambert](https://github.com/titilambert))
+- Add zhimi.airfresh.va4 support [\#795](https://github.com/rytilahti/python-miio/pull/795) ([syssi](https://github.com/syssi))
+- Fix zhimi.airfresh.va2 temperature [\#794](https://github.com/rytilahti/python-miio/pull/794) ([syssi](https://github.com/syssi))
+- Make EnumType default to incasesensitive for cli tool [\#790](https://github.com/rytilahti/python-miio/pull/790) ([rytilahti](https://github.com/rytilahti))
+- Rename Mopping to VacuumingAndMopping [\#785](https://github.com/rytilahti/python-miio/pull/785) ([rytilahti](https://github.com/rytilahti))
+- Loosen pinned versions [\#781](https://github.com/rytilahti/python-miio/pull/781) ([rytilahti](https://github.com/rytilahti))
+- Improve documentation presentation [\#777](https://github.com/rytilahti/python-miio/pull/777) ([rytilahti](https://github.com/rytilahti))
+- Move raw\_id from Vacuum to the Device base class [\#776](https://github.com/rytilahti/python-miio/pull/776) ([rytilahti](https://github.com/rytilahti))
+
+
 ## [0.5.3](https://github.com/rytilahti/python-miio/tree/0.5.3) (2020-07-27)
 
 New devices:
