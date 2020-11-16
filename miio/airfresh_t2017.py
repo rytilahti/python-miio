@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -11,29 +11,39 @@ from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
+MODEL_AIRFRESH_A1 = "dmaker.airfresh.a1"
 MODEL_AIRFRESH_T2017 = "dmaker.airfresh.t2017"
 
+AVAILABLE_PROPERTIES_COMMON = [
+    "power",
+    "mode",
+    "pm25",
+    "co2",
+    "temperature_outside",
+    "favourite_speed",
+    "control_speed",
+    "ptc_on",
+    "ptc_status",
+    "child_lock",
+    "sound",
+    "display",
+]
+
 AVAILABLE_PROPERTIES = {
-    MODEL_AIRFRESH_T2017: [
-        "power",
-        "mode",
-        "pm25",
-        "co2",
-        "temperature_outside",
-        "favourite_speed",
-        "control_speed",
+    MODEL_AIRFRESH_T2017: AVAILABLE_PROPERTIES_COMMON
+    + [
         "filter_intermediate",
         "filter_inter_day",
         "filter_efficient",
         "filter_effi_day",
-        "ptc_on",
         "ptc_level",
-        "ptc_status",
-        "child_lock",
-        "sound",
-        "display",
         "screen_direction",
-    ]
+    ],
+    MODEL_AIRFRESH_A1: AVAILABLE_PROPERTIES_COMMON
+    + [
+        "filter_rate",
+        "filter_day",
+    ],
 }
 
 
@@ -132,24 +142,44 @@ class AirFreshStatus:
         return self.data["control_speed"]
 
     @property
-    def dust_filter_life_remaining(self) -> int:
+    def dust_filter_life_remaining(self) -> Optional[int]:
         """Remaining dust filter life in percent."""
-        return self.data["filter_intermediate"]
+        if self.data["filter_intermediate"] is not None:
+            return self.data["filter_intermediate"]
+
+        # Filter property of the A1
+        if self.data["filter_rate"] is not None:
+            return self.data["filter_rate"]
+
+        return None
 
     @property
-    def dust_filter_life_remaining_days(self) -> int:
+    def dust_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining dust filter life in days."""
-        return self.data["filter_inter_day"]
+        if self.data["filter_inter_day"] is not None:
+            return self.data["filter_inter_day"]
+
+        # Filter property of the A1
+        if self.data["filter_day"] is not None:
+            return self.data["filter_day"]
+
+        return None
 
     @property
-    def upper_filter_life_remaining(self) -> int:
+    def upper_filter_life_remaining(self) -> Optional[int]:
         """Remaining upper filter life in percent."""
-        return self.data["filter_efficient"]
+        if self.data["filter_efficient"] is not None:
+            return self.data["filter_efficient"]
+
+        return None
 
     @property
-    def upper_filter_life_remaining_days(self) -> int:
+    def upper_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining upper filter life in days."""
-        return self.data["filter_effi_day"]
+        if self.data["filter_effi_day"] is not None:
+            return self.data["filter_effi_day"]
+
+        return None
 
     @property
     def ptc(self) -> bool:
@@ -157,9 +187,12 @@ class AirFreshStatus:
         return self.data["ptc_on"]
 
     @property
-    def ptc_level(self) -> int:
+    def ptc_level(self) -> Optional[int]:
         """PTC level."""
-        return PtcLevel(self.data["ptc_level"])
+        if self.data["ptc_level"] is not None:
+            return PtcLevel(self.data["ptc_level"])
+
+        return None
 
     @property
     def ptc_status(self) -> bool:
@@ -182,9 +215,12 @@ class AirFreshStatus:
         return self.data["display"]
 
     @property
-    def display_orientation(self) -> int:
+    def display_orientation(self) -> Optional[int]:
         """Display orientation."""
-        return DisplayOrientation(self.data["screen_direction"])
+        if self.data["screen_direction"] is not None:
+            return DisplayOrientation(self.data["screen_direction"])
+
+        return None
 
     def __repr__(self) -> str:
         s = (
@@ -230,7 +266,27 @@ class AirFreshStatus:
         return s
 
 
-class AirFreshT2017(Device):
+class AirFreshA1(Device):
+    """Main class representing the air fresh a1."""
+
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_AIRFRESH_A1,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_AIRFRESH_A1
+
+
+class AirFreshT2017(AirFreshA1):
     """Main class representing the air fresh t2017."""
 
     def __init__(
