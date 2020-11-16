@@ -285,6 +285,130 @@ class AirFreshA1(Device):
         else:
             self.model = MODEL_AIRFRESH_A1
 
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Mode: {result.mode}\n"
+            "PM2.5: {result.pm25}\n"
+            "CO2: {result.co2}\n"
+            "Temperature: {result.temperature}\n"
+            "Favorite speed: {result.favorite_speed}\n"
+            "Control speed: {result.control_speed}\n"
+            "Dust filter life: {result.dust_filter_life_remaining} %, "
+            "{result.dust_filter_life_remaining_days} days\n"
+            "PTC: {result.ptc}\n"
+            "PTC status: {result.ptc_status}\n"
+            "Child lock: {result.child_lock}\n"
+            "Buzzer: {result.buzzer}\n"
+            "Display: {result.display}\n",
+        )
+    )
+    def status(self) -> AirFreshStatus:
+        """Retrieve properties."""
+
+        properties = AVAILABLE_PROPERTIES[self.model]
+        values = self.get_properties(properties, max_properties=15)
+
+        return AirFreshStatus(defaultdict(lambda: None, zip(properties, values)))
+
+    @command(default_output=format_output("Powering on"))
+    def on(self):
+        """Power on."""
+        return self.send("set_power", [True])
+
+    @command(default_output=format_output("Powering off"))
+    def off(self):
+        """Power off."""
+        return self.send("set_power", [False])
+
+    @command(
+        click.argument("mode", type=EnumType(OperationMode)),
+        default_output=format_output("Setting mode to '{mode.value}'"),
+    )
+    def set_mode(self, mode: OperationMode):
+        """Set mode."""
+        return self.send("set_mode", [mode.value])
+
+    @command(
+        click.argument("display", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on display" if led else "Turning off display"
+        ),
+    )
+    def set_display(self, display: bool):
+        """Turn led on/off."""
+        return self.send("set_display", [display])
+
+    @command(
+        click.argument("ptc", type=bool),
+        default_output=format_output(
+            lambda ptc: "Turning on ptc" if ptc else "Turning off ptc"
+        ),
+    )
+    def set_ptc(self, ptc: bool):
+        """Turn ptc on/off."""
+        return self.send("set_ptc_on", [ptc])
+
+    @command(
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
+    )
+    def set_buzzer(self, buzzer: bool):
+        """Set sound on/off."""
+        return self.send("set_sound", [buzzer])
+
+    @command(
+        click.argument("lock", type=bool),
+        default_output=format_output(
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
+    )
+    def set_child_lock(self, lock: bool):
+        """Set child lock on/off."""
+        return self.send("set_child_lock", [lock])
+
+    @command(default_output=format_output("Resetting dust filter"))
+    def reset_dust_filter(self):
+        """Resets filter lifetime of the dust filter."""
+        return self.send("set_filter_rate", [100])
+
+    @command(
+        click.argument("speed", type=int),
+        default_output=format_output("Setting favorite speed to {speed}"),
+    )
+    def set_favorite_speed(self, speed: int):
+        """Sets the fan speed in favorite mode."""
+        if speed < 0 or speed > 150:
+            raise AirFreshException("Invalid favorite speed: %s" % speed)
+
+        return self.send("set_favourite_speed", [speed])
+
+    @command()
+    def set_ptc_timer(self):
+        """
+        value = time.index + '-' +
+            time.hexSum + '-' +
+            time.startTime + '-' +
+            time.ptcTimer.endTime + '-' +
+            time.level + '-' +
+            time.status;
+        return self.send("set_ptc_timer", [value])
+        """
+        raise NotImplementedError()
+
+    @command()
+    def get_ptc_timer(self):
+        """Returns a list of PTC timers. Response unknown."""
+        return self.send("get_ptc_timer")
+
+    @command()
+    def get_timer(self):
+        """Response unknown."""
+        return self.send("get_timer")
+
 
 class AirFreshT2017(AirFreshA1):
     """Main class representing the air fresh t2017."""
@@ -331,38 +455,28 @@ class AirFreshT2017(AirFreshA1):
     def status(self) -> AirFreshStatus:
         """Retrieve properties."""
 
-        properties = AVAILABLE_PROPERTIES[self.model]
-        values = self.get_properties(properties, max_properties=15)
-
-        return AirFreshStatus(defaultdict(lambda: None, zip(properties, values)))
-
-    @command(default_output=format_output("Powering on"))
-    def on(self):
-        """Power on."""
-        return self.send("set_power", [True])
-
-    @command(default_output=format_output("Powering off"))
-    def off(self):
-        """Power off."""
-        return self.send("set_power", [False])
+        return super().status()
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode)),
-        default_output=format_output("Setting mode to '{mode.value}'"),
+        click.argument("speed", type=int),
+        default_output=format_output("Setting favorite speed to {speed}"),
     )
-    def set_mode(self, mode: OperationMode):
-        """Set mode."""
-        return self.send("set_mode", [mode.value])
+    def set_favorite_speed(self, speed: int):
+        """Sets the fan speed in favorite mode."""
+        if speed < 60 or speed > 300:
+            raise AirFreshException("Invalid favorite speed: %s" % speed)
 
-    @command(
-        click.argument("display", type=bool),
-        default_output=format_output(
-            lambda led: "Turning on display" if led else "Turning off display"
-        ),
-    )
-    def set_display(self, display: bool):
-        """Turn led on/off."""
-        return self.send("set_display", [display])
+        return self.send("set_favourite_speed", [speed])
+
+    @command(default_output=format_output("Resetting dust filter"))
+    def reset_dust_filter(self):
+        """Resets filter lifetime of the dust filter."""
+        return self.send("set_filter_reset", ["intermediate"])
+
+    @command(default_output=format_output("Resetting upper filter"))
+    def reset_upper_filter(self):
+        """Resets filter lifetime of the upper filter."""
+        return self.send("set_filter_reset", ["efficient"])
 
     @command(
         click.argument("orientation", type=EnumType(DisplayOrientation)),
@@ -373,83 +487,9 @@ class AirFreshT2017(AirFreshA1):
         return self.send("set_screen_direction", [orientation.value])
 
     @command(
-        click.argument("ptc", type=bool),
-        default_output=format_output(
-            lambda ptc: "Turning on ptc" if ptc else "Turning off ptc"
-        ),
-    )
-    def set_ptc(self, ptc: bool):
-        """Turn ptc on/off."""
-        return self.send("set_ptc_on", [ptc])
-
-    @command(
         click.argument("level", type=EnumType(PtcLevel)),
         default_output=format_output("Setting ptc level to '{level.value}'"),
     )
     def set_ptc_level(self, level: PtcLevel):
         """Set PTC level."""
         return self.send("set_ptc_level", [level.value])
-
-    @command(
-        click.argument("buzzer", type=bool),
-        default_output=format_output(
-            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
-        ),
-    )
-    def set_buzzer(self, buzzer: bool):
-        """Set sound on/off."""
-        return self.send("set_sound", [buzzer])
-
-    @command(
-        click.argument("lock", type=bool),
-        default_output=format_output(
-            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
-        ),
-    )
-    def set_child_lock(self, lock: bool):
-        """Set child lock on/off."""
-        return self.send("set_child_lock", [lock])
-
-    @command(default_output=format_output("Resetting upper filter"))
-    def reset_upper_filter(self):
-        """Resets filter lifetime of the upper filter."""
-        return self.send("set_filter_reset", ["efficient"])
-
-    @command(default_output=format_output("Resetting dust filter"))
-    def reset_dust_filter(self):
-        """Resets filter lifetime of the dust filter."""
-        return self.send("set_filter_reset", ["intermediate"])
-
-    @command(
-        click.argument("speed", type=int),
-        default_output=format_output("Setting favorite speed to {speed}"),
-    )
-    def set_favorite_speed(self, speed: int):
-        """Storage register to enable extra features at the app."""
-        if speed < 60 or speed > 300:
-            raise AirFreshException("Invalid favorite speed: %s" % speed)
-
-        return self.send("set_favourite_speed", [speed])
-
-    @command()
-    def set_ptc_timer(self):
-        """
-        value = time.index + '-' +
-            time.hexSum + '-' +
-            time.startTime + '-' +
-            time.ptcTimer.endTime + '-' +
-            time.level + '-' +
-            time.status;
-        return self.send("set_ptc_timer", [value])
-        """
-        raise NotImplementedError()
-
-    @command()
-    def get_ptc_timer(self):
-        """Returns a list of PTC timers. Response unknown."""
-        return self.send("get_ptc_timer")
-
-    @command()
-    def get_timer(self):
-        """Response unknown."""
-        return self.send("get_timer")
