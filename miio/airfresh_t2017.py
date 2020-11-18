@@ -75,11 +75,29 @@ class AirFreshStatus:
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """
-        Response of a Air Airfresh T2017 (dmaker.airfresh.t2017):
+        Response of a Air Fresh A1 (dmaker.airfresh.a1):
+        {
+            'power': True,
+            'mode': 'auto',
+            'pm25': 2,
+            'co2': 554,
+            'temperature_outside': 12,
+            'favourite_speed': 150,
+            'control_speed': 60,
+            'filter_rate': 45,
+            'filter_day': 81,
+            'ptc_on': False,
+            'ptc_status': False,
+            'child_lock': False,
+            'sound': False,
+            'display': False,
+        }
+
+        Response of a Air Fresh T2017 (dmaker.airfresh.t2017):
 
         {
-            'power': true,
-            'mode': "favourite",
+            'power': True,
+            'mode': 'favourite',
             'pm25': 1,
             'co2': 550,
             'temperature_outside': 24,
@@ -89,13 +107,13 @@ class AirFreshStatus:
             'filter_inter_day': 90,
             'filter_efficient': 100,
             'filter_effi_day': 180,
-            'ptc_on': false,
-            'ptc_level': "low",
-            'ptc_status': false,
-            'child_lock': false,
-            'sound': true,
-            'display': false,
-            'screen_direction': "forward",
+            'ptc_on': False,
+            'ptc_level': 'low',
+            'ptc_status': False,
+            'child_lock': False,
+            'sound': True,
+            'display': False,
+            'screen_direction': 'forward',
         }
         """
 
