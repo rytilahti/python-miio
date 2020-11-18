@@ -144,11 +144,14 @@ class AirFreshStatus:
     @property
     def dust_filter_life_remaining(self) -> Optional[int]:
         """Remaining dust filter life in percent."""
-        if self.data["filter_intermediate"] is not None:
+        if (
+            "filter_intermediate" in self.data
+            and self.data["filter_intermediate"] is not None
+        ):
             return self.data["filter_intermediate"]
 
         # Filter property of the A1
-        if self.data["filter_rate"] is not None:
+        if "filter_rate" in self.data and self.data["filter_rate"] is not None:
             return self.data["filter_rate"]
 
         return None
@@ -156,11 +159,14 @@ class AirFreshStatus:
     @property
     def dust_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining dust filter life in days."""
-        if self.data["filter_inter_day"] is not None:
+        if (
+            "filter_inter_day" in self.data
+            and self.data["filter_inter_day"] is not None
+        ):
             return self.data["filter_inter_day"]
 
         # Filter property of the A1
-        if self.data["filter_day"] is not None:
+        if "filter_day" in self.data and self.data["filter_day"] is not None:
             return self.data["filter_day"]
 
         return None
@@ -168,7 +174,10 @@ class AirFreshStatus:
     @property
     def upper_filter_life_remaining(self) -> Optional[int]:
         """Remaining upper filter life in percent."""
-        if self.data["filter_efficient"] is not None:
+        if (
+            "filter_efficient" in self.data
+            and self.data["filter_efficient"] is not None
+        ):
             return self.data["filter_efficient"]
 
         return None
@@ -176,7 +185,7 @@ class AirFreshStatus:
     @property
     def upper_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining upper filter life in days."""
-        if self.data["filter_effi_day"] is not None:
+        if "filter_effi_day" in self.data and self.data["filter_effi_day"] is not None:
             return self.data["filter_effi_day"]
 
         return None
@@ -189,7 +198,7 @@ class AirFreshStatus:
     @property
     def ptc_level(self) -> Optional[int]:
         """PTC level."""
-        if self.data["ptc_level"] is not None:
+        if "ptc_level" in self.data and self.data["ptc_level"] is not None:
             return PtcLevel(self.data["ptc_level"])
 
         return None
@@ -217,7 +226,10 @@ class AirFreshStatus:
     @property
     def display_orientation(self) -> Optional[int]:
         """Display orientation."""
-        if self.data["screen_direction"] is not None:
+        if (
+            "screen_direction" in self.data
+            and self.data["screen_direction"] is not None
+        ):
             return DisplayOrientation(self.data["screen_direction"])
 
         return None
