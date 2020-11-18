@@ -142,7 +142,7 @@ class AirFreshStatus:
         return self.data["control_speed"]
 
     @property
-    def dust_filter_life_remaining(self) -> Optional[int]:
+    def dust_filter_life_remaining(self) -> int:
         """Remaining dust filter life in percent."""
         if (
             "filter_intermediate" in self.data
@@ -154,10 +154,8 @@ class AirFreshStatus:
         if "filter_rate" in self.data and self.data["filter_rate"] is not None:
             return self.data["filter_rate"]
 
-        return None
-
     @property
-    def dust_filter_life_remaining_days(self) -> Optional[int]:
+    def dust_filter_life_remaining_days(self) -> int:
         """Remaining dust filter life in days."""
         if (
             "filter_inter_day" in self.data
@@ -168,8 +166,6 @@ class AirFreshStatus:
         # Filter property of the A1
         if "filter_day" in self.data and self.data["filter_day"] is not None:
             return self.data["filter_day"]
-
-        return None
 
     @property
     def upper_filter_life_remaining(self) -> Optional[int]:
