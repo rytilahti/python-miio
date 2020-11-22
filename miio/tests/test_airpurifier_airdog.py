@@ -5,6 +5,7 @@ import pytest
 from miio import AirDog
 from miio.airpurifier_airdog import (
     MODEL_AIRDOG_X3,
+    MODEL_AIRDOG_X7SM,
     AirDogException,
     AirDogStatus,
     OperationMode,
@@ -142,3 +143,41 @@ class TestAirDogX3(TestCase):
 
         self.device.set_filters_cleaned()
         assert clean_filters() is False
+
+
+class DummyAirDogX7SM(DummyAirDogX3, AirDog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.model = MODEL_AIRDOG_X7SM
+        self.state = {
+            "power": "on",
+            "mode": "manual",
+            "speed": 2,
+            "lock": "unlock",
+            "clean": "y",
+            "pm": 11,
+            "hcho": 2,
+        }
+
+
+@pytest.fixture(scope="class")
+def airdogx7sm(request):
+    request.cls.device = DummyAirDogX7SM()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("airdogx7sm")
+class TestAirDogX7SM(TestCase):
+    def test_set_mode_and_speed(self):
+        def mode():
+            return self.device.status().mode
+
+        def speed():
+            return self.device.status().speed
+
+        self.device.set_mode_and_speed(OperationMode.Manual, 5)
+        assert mode() == OperationMode.Manual
+        assert speed() == 5
+
+        with pytest.raises(AirDogException):
+            self.device.set_mode_and_speed(OperationMode.Manual, 6)
