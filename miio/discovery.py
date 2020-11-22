@@ -11,6 +11,7 @@ from . import (
     AirConditionerMiot,
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
+    AirDog,
     AirFresh,
     AirFreshT2017,
     AirHumidifier,
@@ -57,6 +58,7 @@ from .airhumidifier import (
     MODEL_HUMIDIFIER_V1,
 )
 from .airhumidifier_mjjsq import MODEL_HUMIDIFIER_JSQ1, MODEL_HUMIDIFIER_MJJSQ
+from .airpurifier_airdog import MODEL_AIRDOG_X3, MODEL_AIRDOG_X5, MODEL_AIRDOG_X7SM
 from .airqualitymonitor import (
     MODEL_AIRQUALITYMONITOR_B1,
     MODEL_AIRQUALITYMONITOR_S1,
@@ -108,6 +110,9 @@ DEVICE_MAP = {
     "xiaomi.aircondition.mc2": AirConditionerMiot,
     "xiaomi.aircondition.mc4": AirConditionerMiot,
     "xiaomi.aircondition.mc5": AirConditionerMiot,
+    "airdog-airpurifier-x3": partial(AirDog, model=MODEL_AIRDOG_X3),
+    "airdog-airpurifier-x5": partial(AirDog, model=MODEL_AIRDOG_X5),
+    "airdog-airpurifier-x7sm": partial(AirDog, model=MODEL_AIRDOG_X7SM),
     "zhimi-airpurifier-m1": AirPurifier,  # mini model
     "zhimi-airpurifier-m2": AirPurifier,  # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
