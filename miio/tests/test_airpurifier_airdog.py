@@ -5,6 +5,7 @@ import pytest
 from miio import AirDog
 from miio.airpurifier_airdog import (
     MODEL_AIRDOG_X3,
+    MODEL_AIRDOG_X5,
     MODEL_AIRDOG_X7SM,
     AirDogException,
     AirDogStatus,
@@ -145,10 +146,10 @@ class TestAirDogX3(TestCase):
         assert clean_filters() is False
 
 
-class DummyAirDogX7SM(DummyAirDogX3, AirDog):
+class DummyAirDogX5(DummyAirDogX3, AirDog):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
-        self.model = MODEL_AIRDOG_X7SM
+        self.model = MODEL_AIRDOG_X5
         self.state = {
             "power": "on",
             "mode": "manual",
@@ -156,8 +157,21 @@ class DummyAirDogX7SM(DummyAirDogX3, AirDog):
             "lock": "unlock",
             "clean": "y",
             "pm": 11,
-            "hcho": 2,
+            "hcho": None,
         }
+
+
+@pytest.fixture(scope="class")
+def airdogx5(request):
+    request.cls.device = DummyAirDogX5()
+    # TODO add ability to test on a real device
+
+
+class DummyAirDogX7SM(DummyAirDogX5, AirDog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.model = MODEL_AIRDOG_X7SM
+        self.state["hcho"] = 2
 
 
 @pytest.fixture(scope="class")
@@ -166,8 +180,9 @@ def airdogx7sm(request):
     # TODO add ability to test on a real device
 
 
+@pytest.mark.usefixtures("airdogx5")
 @pytest.mark.usefixtures("airdogx7sm")
-class TestAirDogX7SM(TestCase):
+class TestAirDogX5AndX7SM(TestCase):
     def test_set_mode_and_speed(self):
         def mode():
             return self.device.status().mode
