@@ -56,7 +56,7 @@ class AirDogStatus:
     @property
     def power(self) -> str:
         """Power state."""
-        return "on" if self.data["power"] == 1 else "off"
+        return self.data["power"]
 
     @property
     def is_on(self) -> bool:
@@ -172,7 +172,7 @@ class AirDog(Device):
             "Setting mode to '{mode.value}' and speed to {speed}"
         ),
     )
-    def set_mode_and_speed(self, mode: OperationModeMapping, speed: int = 1):
+    def set_mode_and_speed(self, mode: OperationMode, speed: int = 1):
         """Set mode and speed."""
         if mode.value not in (om.value for om in OperationMode):
             raise AirDogException(
@@ -191,7 +191,7 @@ class AirDog(Device):
         if speed < 1 or speed > max_speed:
             raise AirDogException("Invalid speed: %s" % speed)
 
-        return self.send("set_wind", [mode.value, speed])
+        return self.send("set_wind", [OperationModeMapping[mode.name], speed])
 
     @command(
         click.argument("lock", type=bool),

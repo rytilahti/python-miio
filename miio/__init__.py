@@ -20,6 +20,7 @@ from miio.airhumidifier_jsq import AirHumidifierJsq
 from miio.airhumidifier_miot import AirHumidifierMiot
 from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airpurifier import AirPurifier
+from miio.airpurifier_airdog import AirDog
 from miio.airpurifier_miot import AirPurifierMiot
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.aqaracamera import AqaraCamera
