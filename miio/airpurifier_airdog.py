@@ -118,7 +118,7 @@ class AirDogStatus:
         return s
 
 
-class AirDog(Device):
+class AirDogX3(Device):
     def __init__(
         self,
         ip: str = None,
@@ -207,3 +207,39 @@ class AirDog(Device):
     def set_filters_cleaned(self):
         """Set filters cleaned."""
         return self.send("set_clean")
+
+
+class AirDogX5(Device):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_AIRDOG_X5,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_AIRDOG_X5
+
+
+class AirDogX7SM(Device):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_AIRDOG_X7SM,
+    ) -> None:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+
+        if model in AVAILABLE_PROPERTIES:
+            self.model = model
+        else:
+            self.model = MODEL_AIRDOG_X7SM
