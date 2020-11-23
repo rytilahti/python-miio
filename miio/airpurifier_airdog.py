@@ -201,10 +201,7 @@ class AirDog(Device):
     )
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
-        if lock:
-            return self.send("set_lock", [1])
-        else:
-            return self.send("set_lock", [0])
+        return self.send("set_lock", [int(lock)])
 
     @command(default_output=format_output("Setting filters cleaned"))
     def set_filters_cleaned(self):
