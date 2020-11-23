@@ -160,49 +160,24 @@ class AirFreshStatus:
         return self.data["control_speed"]
 
     @property
-    def dust_filter_life_remaining(self) -> int:
+    def dust_filter_life_remaining(self) -> Optional[int]:
         """Remaining dust filter life in percent."""
-        if (
-            "filter_intermediate" in self.data
-            and self.data["filter_intermediate"] is not None
-        ):
-            return self.data["filter_intermediate"]
-
-        # Filter property of the A1
-        if "filter_rate" in self.data and self.data["filter_rate"] is not None:
-            return self.data["filter_rate"]
+        return self.data.get("filter_intermediate", self.data.get("filter_rate"))
 
     @property
-    def dust_filter_life_remaining_days(self) -> int:
+    def dust_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining dust filter life in days."""
-        if (
-            "filter_inter_day" in self.data
-            and self.data["filter_inter_day"] is not None
-        ):
-            return self.data["filter_inter_day"]
-
-        # Filter property of the A1
-        if "filter_day" in self.data and self.data["filter_day"] is not None:
-            return self.data["filter_day"]
+        return self.data.get("filter_inter_day", self.data.get("filter_day"))
 
     @property
     def upper_filter_life_remaining(self) -> Optional[int]:
         """Remaining upper filter life in percent."""
-        if (
-            "filter_efficient" in self.data
-            and self.data["filter_efficient"] is not None
-        ):
-            return self.data["filter_efficient"]
-
-        return None
+        return self.data.get("filter_efficient")
 
     @property
     def upper_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining upper filter life in days."""
-        if "filter_effi_day" in self.data and self.data["filter_effi_day"] is not None:
-            return self.data["filter_effi_day"]
-
-        return None
+        return self.data.get("filter_effi_day")
 
     @property
     def ptc(self) -> bool:
@@ -210,12 +185,12 @@ class AirFreshStatus:
         return self.data["ptc_on"]
 
     @property
-    def ptc_level(self) -> Optional[int]:
+    def ptc_level(self) -> Optional[PtcLevel]:
         """PTC level."""
-        if "ptc_level" in self.data and self.data["ptc_level"] is not None:
+        try:
             return PtcLevel(self.data["ptc_level"])
-
-        return None
+        except KeyError:
+            return None
 
     @property
     def ptc_status(self) -> bool:
@@ -238,15 +213,12 @@ class AirFreshStatus:
         return self.data["display"]
 
     @property
-    def display_orientation(self) -> Optional[int]:
+    def display_orientation(self) -> Optional[DisplayOrientation]:
         """Display orientation."""
-        if (
-            "screen_direction" in self.data
-            and self.data["screen_direction"] is not None
-        ):
+        try:
             return DisplayOrientation(self.data["screen_direction"])
-
-        return None
+        except KeyError:
+            return None
 
     def __repr__(self) -> str:
         s = (
