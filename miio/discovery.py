@@ -11,6 +11,9 @@ from . import (
     AirConditionerMiot,
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
+    AirDogX3,
+    AirDogX5,
+    AirDogX7SM,
     AirFresh,
     AirFreshT2017,
     AirHumidifier,
@@ -108,6 +111,9 @@ DEVICE_MAP = {
     "xiaomi.aircondition.mc2": AirConditionerMiot,
     "xiaomi.aircondition.mc4": AirConditionerMiot,
     "xiaomi.aircondition.mc5": AirConditionerMiot,
+    "airdog-airpurifier-x3": AirDogX3,
+    "airdog-airpurifier-x5": AirDogX5,
+    "airdog-airpurifier-x7sm": AirDogX7SM,
     "zhimi-airpurifier-m1": AirPurifier,  # mini model
     "zhimi-airpurifier-m2": AirPurifier,  # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
