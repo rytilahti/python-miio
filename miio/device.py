@@ -113,10 +113,13 @@ class Device(metaclass=DeviceGroupMeta):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: int = 5,
     ) -> None:
         self.ip = ip
         self.token = token
-        self._protocol = MiIOProtocol(ip, token, start_id, debug, lazy_discover)
+        self._protocol = MiIOProtocol(
+            ip, token, start_id, debug, lazy_discover, timeout
+        )
 
     def send(
         self,
