@@ -26,6 +26,7 @@ class MiIOProtocol:
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: int = 5,
     ) -> None:
         """
         Create a :class:`Device` instance.
@@ -43,7 +44,7 @@ class MiIOProtocol:
         self.debug = debug
         self.lazy_discover = lazy_discover
 
-        self._timeout = 5
+        self._timeout = timeout
         self._discovered = False
         self._device_ts = None  # type: datetime.datetime
         self.__id = start_id
@@ -89,7 +90,7 @@ class MiIOProtocol:
         return m
 
     @staticmethod
-    def discover(addr: str = None) -> Any:
+    def discover(addr: str = None, timeout: int = 5) -> Any:
         """Scan for devices in the network.
         This method is used to discover supported devices by sending a
         handshake message to the broadcast address on port 54321.
@@ -97,7 +98,6 @@ class MiIOProtocol:
         an unicast packet.
 
         :param str addr: Target IP address"""
-        timeout = 5
         is_broadcast = addr is None
         seen_addrs = []  # type: List[str]
         if is_broadcast:
