@@ -189,7 +189,7 @@ class AirFreshStatus:
         """PTC level."""
         try:
             return PtcLevel(self.data["ptc_level"])
-        except KeyError:
+        except (KeyError, ValueError):
             return None
 
     @property
@@ -217,7 +217,7 @@ class AirFreshStatus:
         """Display orientation."""
         try:
             return DisplayOrientation(self.data["screen_direction"])
-        except KeyError:
+        except (KeyError, ValueError):
             return None
 
     def __repr__(self) -> str:
