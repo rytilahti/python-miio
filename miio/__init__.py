@@ -14,7 +14,7 @@ from miio.airconditioningcompanion import (
 from miio.airconditioningcompanionMCN import AirConditioningCompanionMcn02
 from miio.airdehumidifier import AirDehumidifier
 from miio.airfresh import AirFresh, AirFreshVA4
-from miio.airfresh_t2017 import AirFreshT2017
+from miio.airfresh_t2017 import AirFreshA1, AirFreshT2017
 from miio.airhumidifier import AirHumidifier, AirHumidifierCA1, AirHumidifierCB1
 from miio.airhumidifier_jsq import AirHumidifierJsq
 from miio.airhumidifier_miot import AirHumidifierMiot
