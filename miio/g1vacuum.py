@@ -33,12 +33,12 @@ _MAPPING = {
 # #        "direction_key": {"siid": 8, "piid": 1}
 }
 
-class G1ChargeState(Enum):
+class ChargeState(Enum):
     Not_charging = 0
     Charging = 1
     Charging_competely = 2
 
-class G1Error(Enum):
+class Error(Enum):
     Left_wheel_error = 1
     Right_wheel_error = 2
     Cliff_error = 3
@@ -53,7 +53,7 @@ class G1Error(Enum):
     Everything_is_ok = 0
     Pick_up_error = 12
 
-class G1State(Enum):
+class State(Enum):
     """Vacuum Status"""        
     Idle = 1
     Sweeping = 2
@@ -62,34 +62,34 @@ class G1State(Enum):
     Charging = 5
     Go_Charging = 6
 
-class G1Mode(Enum):
+class VacuumMode(Enum):
     """Vacuum Mode"""        
     Global_clean = 1
     Spot_clean = 2
     Wiping = 3
 
-class G1WaterLevel(Enum):
+class WaterLevel(Enum):
     """Water Flow Level"""        
     Level1 = 1
     Level2 = 2
     Level3 = 3
 
-class G1FanSpeed(Enum):
+class FanSpeed(Enum):
     """Fan speeds, same as for ViomiVacuum."""    
     Mute = 0
     Standard = 1
     Medium = 2
     High = 3
     
-class G1Languages(Enum):
+class Languages(Enum):
     Chinese = 0
     English = 1
 
-class G1MopState(Enum):
+class MopState(Enum):
         Off = 0
         On  = 1
     
-class G1MovementDirection(Enum):
+class MovementDirection(Enum):
     Left = 0
     Right = 1
     Forward = 2
@@ -108,39 +108,39 @@ class G1Status:
         return self.data["battery"]
         
     @property
-    def charge_state(self) -> G1ChargeState:
+    def charge_state(self) -> ChargeState:
         """Charging State."""
-        return G1ChargeState[G1ChargeState(self.data["charge_state"]).name]        
+        return ChargeState[ChargeState(self.data["charge_state"]).name]        
 
     @property
-    def error(self) -> G1Error:
+    def error(self) -> Error:
         """Error Message."""
-        return G1Error[G1Error(self.data["error"]).name]        
+        return Error[Error(self.data["error"]).name]        
 
     @property
-    def state(self) -> G1State:
+    def state(self) -> State:
         """Vacuum Status."""
-        return G1State[G1State(self.data["state"]).name]  
+        return State[State(self.data["state"]).name]  
 
     @property
-    def fan_speed(self) -> G1FanSpeed:
+    def fan_speed(self) -> FanSpeed:
         """Fan Speed."""
-        return G1FanSpeed[G1FanSpeed(self.data["fan_speed"]).name]        
+        return FanSpeed[FanSpeed(self.data["fan_speed"]).name]        
 
     @property
-    def operating_mode(self) -> G1Mode:
+    def operating_mode(self) -> VacuumMode:
         """Operating Mode."""
-        return G1Mode[G1Mode(self.data["operating_mode"]).name]        
+        return VacuumMode[VacuumMode(self.data["operating_mode"]).name]        
  
     @property
-    def mop_state(self) -> G1MopState:
+    def mop_state(self) -> MopState:
         """Mop State."""
-        return G1MopState[G1MopState(self.data["mop_state"]).name]        
+        return MopState[MopState(self.data["mop_state"]).name]        
  
     @property
-    def water_level(self) -> G1MopState:
+    def water_level(self) -> WaterLevel:
         """Mop State."""
-        return G1WaterLevel[G1WaterLevel(self.data["water_level"]).name]        
+        return WaterLevel[WaterLevel(self.data["water_level"]).name]        
         
     @property
     def brush_life_level(self) -> int:
@@ -305,10 +305,12 @@ class G1Vacuum(MiotDevice):
         """Reset Brush Life"""
         return self.call_action(15, 1)
   
-    # @command(
-    # click.argument("level", type=EnumType(G1FanLevel, casesensitive=False)))   
-    # def fanlevel(self, level):
-        # """aiid 1 Set Fan Level: in: [] -> out: []"""
-        # return self.set_properties_for_dataclass(battery=0,fan_level=level.value)
-    
+    @command(
+        click.argument("fan_speed", type=EnumType(FanSpeed)),
+        default_output=format_output("Setting fan speed to {fan_speed}"),
+    )
+    def set_fan_speed(self, fan_speed: FanSpeed):
+        """Set fan speed."""
+        return self.set_property("fan_speed", fan_speed.value)
+        
 
