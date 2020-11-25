@@ -121,19 +121,17 @@ class Huizuo(Device):
         """Set brightness."""
         if level < 0 or level > 100:
             raise HuizuoException("Invalid brightness: %s" % level)
-        click.argument("level", type=int),
         return self.raw_command("set_prop", [{"siid": 2, "piid": 2, "value": level}])
 
     @command(
-        click.argument("level", type=int),
-        default_output=format_output("Setting color temperature to {level}"),
+        click.argument("color_temp", type=int),
+        default_output=format_output("Setting color temperature to {color_temp}"),
     )
-    def set_color_temp(self, level):
+    def set_color_temp(self, color_temp):
         """Set color temp in kelvin."""
-        if level > 6400 or level < 3000:
-            raise HuizuoException("Invalid color temperature: %s" % level)
-        click.argument("color_temp")
-        return self.raw_command("set_prop", [{"siid": 2, "piid": 3, "value": level}])
+        if color_temp > 6400 or color_temp < 3000:
+            raise HuizuoException("Invalid color temperature: %s" % color_temp)
+        return self.raw_command("set_prop", [{"siid": 2, "piid": 3, "value": color_temp}])
 
     def __str__(self):
         return "<Huizuo at %s: %s>" % (self.ip, self.token)
