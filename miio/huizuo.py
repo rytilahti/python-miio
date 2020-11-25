@@ -1,3 +1,4 @@
+import logging
 import click
 
 from .click_common import command, format_output
@@ -11,6 +12,8 @@ This lamp is white color only and supports dimming and control of the temperatur
 Specs: https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:light:0000A001:huayi-pis123:1
 
 """
+
+_LOGGER = logging.getLogger(__name__)
 
 MODEL_HUIZUO_PIS123 = "huayi.light.pis123"
 
