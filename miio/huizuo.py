@@ -73,9 +73,7 @@ class Huizuo(Device):
             self.model = model
         else:
             self.model = MODEL_HUIZUO_PIS123
-            _LOGGER.error(
-                "Device model %s unsupported. Falling back to %s.", model, self.model
-            )
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
 
     @command(
         default_output=format_output(
