@@ -66,9 +66,6 @@ class RingTone:
             self.smart_clock,
         )
 
-    def __str__(self):
-        return self.__repr__()
-
 
 class AlarmClock(Device):
     """

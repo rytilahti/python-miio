@@ -267,6 +267,3 @@ class Yeelight(Device):
         """Set the scene."""
         raise NotImplementedError("Setting the scene is not implemented yet.")
         # return self.send("set_scene", [scene, *vals])
-
-    def __str__(self):
-        return "<Yeelight at %s: %s>" % (self.ip, self.token)
