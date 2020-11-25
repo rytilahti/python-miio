@@ -7,6 +7,7 @@ Specs: https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:
 """
 
 import logging
+
 import click
 
 from .click_common import command, format_output
@@ -29,7 +30,7 @@ class HuizuoStatus:
         # power = '{"siid":2,"piid":1}' values = true,false
         # brightless = '{"siid":2,"piid":2}' values = 1-100
         # color-temperature = '{"siid":2,"piid":3}' values = 3000-6400
-        
+
         ####################################################################################################################
         # Complete response payload (miiocli -d):
         # pi@raspberrypi:~ $ miiocli -d huizuo --ip 192.168.X.X --token ****** status
@@ -61,7 +62,6 @@ class HuizuoStatus:
         # Brightness: 94
         # Temperature: 6400
         #########################################################################################################################
-
 
         self.data = data
 
@@ -107,7 +107,9 @@ class Huizuo(Device):
             self.model = model
         else:
             self.model = MODEL_HUIZUO_PIS123
-            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+            _LOGGER.error(
+                "Device model %s unsupported. Falling back to %s.", model, self.model
+            )
 
     @command(
         default_output=format_output(
@@ -165,4 +167,6 @@ class Huizuo(Device):
         """Set color temp in kelvin."""
         if color_temp < 3000 or color_temp > 6400:
             raise HuizuoException("Invalid color temperature: %s" % color_temp)
-        return self.raw_command("set_prop", [{"siid": 2, "piid": 3, "value": color_temp}])
+        return self.raw_command(
+            "set_prop", [{"siid": 2, "piid": 3, "value": color_temp}]
+        )
