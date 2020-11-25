@@ -163,6 +163,6 @@ class Huizuo(Device):
     )
     def set_color_temp(self, color_temp):
         """Set color temp in kelvin."""
-        if color_temp > 6400 or color_temp < 3000:
+        if color_temp < 3000 or color_temp > 6400:
             raise HuizuoException("Invalid color temperature: %s" % color_temp)
         return self.raw_command("set_prop", [{"siid": 2, "piid": 3, "value": color_temp}])
