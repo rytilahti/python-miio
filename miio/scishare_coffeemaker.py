@@ -1,4 +1,5 @@
 import logging
+from enum import IntEnum
 
 import click
 
@@ -8,6 +9,21 @@ from .device import Device
 _LOGGER = logging.getLogger(__name__)
 
 MODEL = "scishare.coffee.s1102"
+
+
+class Status(IntEnum):
+    Unknown = -1
+    Off = 1
+    On = 2
+    SelfCheck = 3
+    StopPreheat = 4
+    CoffeeReady = 5
+    StopDescaling = 6
+    Standby = 7
+    Preheating = 8
+
+    Brewing = 201
+    NoWater = 203
 
 
 class ScishareCoffee(Device):
@@ -21,7 +37,19 @@ class ScishareCoffee(Device):
             "Status code unknown, please report the state of the machine for code %s",
             status_code,
         )
-        return status_code
+        try:
+            return Status(status_code)
+        except ValueError:
+            _LOGGER.error("Unknown status: %s", status_code)
+            return Status.Unknown
+
+    @command(
+        click.argument("temperature", type=int),
+        default_output=format_output("Setting preheat to {temperature}"),
+    )
+    def preheat(self, temperature: int):
+        """Pre-heat to given temperature."""
+        return self.send("Boiler_Preheating_Set", [temperature])
 
     @command(default_output=format_output("Stopping pre-heating"))
     def stop_preheat(self) -> bool:
