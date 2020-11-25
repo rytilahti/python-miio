@@ -32,6 +32,7 @@ from . import (
     Fan,
     FanMiot,
     Heater,
+    Huizuo,
     PhilipsBulb,
     PhilipsEyecare,
     PhilipsMoonlight,
@@ -153,6 +154,7 @@ DEVICE_MAP = {
     "philips-light-sread1": PhilipsEyecare,  # name needs to be checked
     "philips-light-moonlight": PhilipsMoonlight,  # name needs to be checked
     "philips-light-rwread": PhilipsRwread,  # name needs to be checked
+    "huayi.light.pis123": Huizuo,
     "xiaomi-wifispeaker-v1": WifiSpeaker,  # name needs to be checked
     "xiaomi-repeater-v1": WifiRepeater,  # name needs to be checked
     "xiaomi-repeater-v3": WifiRepeater,  # name needs to be checked
