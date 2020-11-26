@@ -112,6 +112,7 @@ class Huizuo(Device):
         values_info = []
         for value in values:
             values_info.append(value["value"])
+
         return HuizuoStatus(dict(zip(properties_name, values_info)))
 
     @command(
@@ -136,6 +137,7 @@ class Huizuo(Device):
         """Set brightness."""
         if level < 0 or level > 100:
             raise HuizuoException("Invalid brightness: %s" % level)
+
         return self.raw_command("set_prop", [{"siid": 2, "piid": 2, "value": level}])
 
     @command(
@@ -146,6 +148,7 @@ class Huizuo(Device):
         """Set color temp in kelvin."""
         if color_temp < 3000 or color_temp > 6400:
             raise HuizuoException("Invalid color temperature: %s" % color_temp)
+
         return self.raw_command(
             "set_prop", [{"siid": 2, "piid": 3, "value": color_temp}]
         )
