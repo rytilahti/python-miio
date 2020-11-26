@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass, field
 from typing import Any, Dict
 from enum import Enum
 import click
@@ -9,7 +8,7 @@ from .miot_device import MiotDevice
 _LOGGER = logging.getLogger(__name__)
 
 _MAPPING = {
-    #Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:vacuum:0000A006:mijia-v1:1
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:vacuum:0000A006:mijia-v1:1
     "battery": {"siid": 3, "piid": 1},
     "charge_state": {"siid": 3, "piid": 2},
     "error": {"siid": 2, "piid": 2},
@@ -19,18 +18,18 @@ _MAPPING = {
     "mop_state": {"siid": 16, "piid": 1},
     "water_level": {"siid": 2, "piid": 5},
     "brush_life_level": {"siid": 14, "piid": 1},
-# #        "brush_life_time": {"siid": 14, "piid": 2},
+    #  "brush_life_time": {"siid": 14, "piid": 2},
     "brush_life_level2": {"siid": 15, "piid": 1},
-# #        "brush_life_time2": {"siid": 15, "piid": 2},
+    #  "brush_life_time2": {"siid": 15, "piid": 2},
     "filter_life_level": {"siid": 11, "piid": 1},
-# #        "filter_life_time": {"siid": 11, "piid": 2},
+    #  "filter_life_time": {"siid": 11, "piid": 2},
     "clean_area": {"siid": 9, "piid": 1},
     "clean_time": {"siid": 18, "piid": 5},
     "total_clean_count": {"siid": 9, "piid": 5},
-#    "total_clean_area": {"siid": 9, "piid": 3},
-# #       "dnd_enabled": {"siid": 12, "piid": 2},
-# #        "audio_volume": {"siid": 4, "piid": 2},
-# #        "direction_key": {"siid": 8, "piid": 1}
+    #   "total_clean_area": {"siid": 9, "piid": 3},
+    #  "dnd_enabled": {"siid": 12, "piid": 2},
+    #  "audio_volume": {"siid": 4, "piid": 2},
+    #  "direction_key": {"siid": 8, "piid": 1}
 }
 
 class ChargeState(Enum):
@@ -54,7 +53,7 @@ class Error(Enum):
     Pick_up_error = 12
 
 class State(Enum):
-    """Vacuum Status"""        
+    """Vacuum Status"""
     Idle = 1
     Sweeping = 2
     Paused = 3
@@ -63,85 +62,85 @@ class State(Enum):
     Go_Charging = 6
 
 class VacuumMode(Enum):
-    """Vacuum Mode"""        
+    """Vacuum Mode"""
     Global_clean = 1
     Spot_clean = 2
     Wiping = 3
 
 class WaterLevel(Enum):
-    """Water Flow Level"""        
+    """Water Flow Level"""
     Level1 = 1
     Level2 = 2
     Level3 = 3
 
 class FanSpeed(Enum):
-    """Fan speeds, same as for ViomiVacuum."""    
+    """Fan speeds, same as for ViomiVacuum."""
     Mute = 0
     Standard = 1
     Medium = 2
     High = 3
-    
+
 class Languages(Enum):
     Chinese = 0
     English = 1
 
 class MopState(Enum):
-        Off = 0
-        On  = 1
-    
+    Off = 0
+    On = 1
+
 class MovementDirection(Enum):
     Left = 0
-    Right = 1 
+    Right = 1
     Forward = 2
     Backward = 3
     Stop = 4
-    
+
 class G1Status:
     """Container for status reports from the Mijia Vacuum G1."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
-    
+
     @property
     def battery(self) -> int:
         """Battery Level."""
         return self.data["battery"]
-        
+
     @property
     def charge_state(self) -> ChargeState:
         """Charging State."""
-        return ChargeState[ChargeState(self.data["charge_state"]).name]        
+        return ChargeState[ChargeState(self.data["charge_state"]).name]
 
     @property
     def error(self) -> Error:
         """Error Message."""
-        return Error[Error(self.data["error"]).name]        
+        return Error[Error(self.data["error"]).name]
 
     @property
     def state(self) -> State:
         """Vacuum Status."""
-        return State[State(self.data["state"]).name]  
+        return State[State(self.data["state"]).name]
 
     @property
     def fan_speed(self) -> FanSpeed:
         """Fan Speed."""
-        return FanSpeed[FanSpeed(self.data["fan_speed"]).name]        
+        return FanSpeed[FanSpeed(self.data["fan_speed"]).name]
 
     @property
     def operating_mode(self) -> VacuumMode:
         """Operating Mode."""
-        return VacuumMode[VacuumMode(self.data["operating_mode"]).name]        
- 
+        return VacuumMode[VacuumMode(self.data["operating_mode"]).name]
+
     @property
     def mop_state(self) -> MopState:
         """Mop State."""
-        return MopState[MopState(self.data["mop_state"]).name]        
- 
+        return MopState[MopState(self.data["mop_state"]).name]
+
     @property
     def water_level(self) -> WaterLevel:
         """Mop State."""
-        return WaterLevel[WaterLevel(self.data["water_level"]).name]        
-        
+        return WaterLevel[WaterLevel(self.data["water_level"]).name]
+
     @property
     def brush_life_level(self) -> int:
         """Brush Life Level."""
@@ -161,7 +160,7 @@ class G1Status:
     def clean_area(self) -> int:
         """Clean Area."""
         return self.data["clean_area"]
- 
+
     @property
     def clean_time(self) -> int:
         """Clean Time."""
@@ -178,7 +177,7 @@ class G1Status:
         # return self.data["total_clean_area"]
 
     def __repr__(self) -> str:
-        s = (
+        ret = (
             "<VacuumStatus battery=%s, "
             "state=%s, "
             "error=%s, "
@@ -187,13 +186,12 @@ class G1Status:
             "mode=%s, "
             "mopstate=%s, "
             "waterlevel=%s, "
-            "brushlife=%s, "
-            "sidebrushlife=%s, "
+            "brushlevel=%s, "
+            "sidebrushlevel=%s, "
             "filterlife=%s, "
             "cleanarea=%s, "
             "cleantime=%s, "
             "totalcleancount=%s, "
-#            "totalcleanarea=%s>"
             % (
                 self.battery,
                 self.state,
@@ -209,21 +207,20 @@ class G1Status:
                 self.clean_area,
                 self.clean_time,
                 self.total_clean_count,
-#                self.total_clean_area,
             )
         )
-        return s
+        return ret
 
 class G1Vacuum(MiotDevice):
     """Support for G1 vacuum (G1, mijia.vacuum.v2)."""
 
     def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
+            self,
+            ip: str = None,
+            token: str = None,
+            start_id: int = 0,
+            debug: int = 0,
+            lazy_discover: bool = True,
     ) -> None:
         super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
 
@@ -243,7 +240,7 @@ class G1Vacuum(MiotDevice):
             "Side Brush Life Level: {result.brush_life_level2}%\n"
             "Clean Area: {result.clean_area}\n"
             "Clean Time: {result.clean_time}\n"
-#            "Total Clean Area: {result.total_clean_area}\n"
+            #  "Total Clean Area: {result.total_clean_area}\n"
             "Total Clean Count: {result.total_clean_count}\n",
         )
     )
@@ -259,6 +256,7 @@ class G1Vacuum(MiotDevice):
         )
 
     def call_action(self, siid, aiid, params=None):
+        """Call Action"""
         # {"did":"<mydeviceID>","siid":18,"aiid":1,"in":[{"piid":1,"value":2}]
         if params is None:
             params = []
@@ -304,7 +302,7 @@ class G1Vacuum(MiotDevice):
     def reset_brush_life2(self) -> None:
         """Reset Brush Life"""
         return self.call_action(15, 1)
-  
+
     @command(
         click.argument("fan_speed", type=EnumType(FanSpeed)),
         default_output=format_output("Setting fan speed to {fan_speed}"),
@@ -312,5 +310,5 @@ class G1Vacuum(MiotDevice):
     def set_fan_speed(self, fan_speed: FanSpeed):
         """Set fan speed."""
         return self.set_property("fan_speed", fan_speed.value)
-        
+
 
