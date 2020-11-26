@@ -310,5 +310,3 @@ class G1Vacuum(MiotDevice):
     def set_fan_speed(self, fan_speed: FanSpeed):
         """Set fan speed."""
         return self.set_property("fan_speed", fan_speed.value)
-
-
