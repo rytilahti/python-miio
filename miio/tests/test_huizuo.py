@@ -3,9 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import HuizuoMiot
-from miio.huizuo import (
-    HuizuoException,
-)
+from miio.huizuo import HuizuoException
 
 from .dummies import DummyMiotDevice
 

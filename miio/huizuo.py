@@ -7,16 +7,14 @@ Specs: https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:
 """
 
 import logging
+from typing import Any, Dict
 
 import click
 
 from .click_common import command, format_output
-
 # from .device import Device
 from .exceptions import DeviceException
 from .miot_device import MiotDevice
-
-from typing import Any, Dict, Optional
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -96,7 +94,9 @@ class HuizuoMiot(MiotDevice):
             self.model = model
         else:
             self.model = MODEL_HUIZUO_PIS123
-            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+            _LOGGER.error(
+                "Device model %s unsupported. Falling back to %s.", model, self.model
+            )
 
     @command(
         default_output=format_output("Powering on"),
