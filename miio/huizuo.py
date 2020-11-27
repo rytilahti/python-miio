@@ -11,10 +11,20 @@ import logging
 import click
 
 from .click_common import command, format_output
-from .device import Device
+
+# from .device import Device
 from .exceptions import DeviceException
+from .miot_device import MiotDevice
+
+from typing import Any, Dict, Optional
 
 _LOGGER = logging.getLogger(__name__)
+
+_MAPPING = {
+    "power": {"siid": 2, "piid": 1},
+    "brigtness": {"siid": 2, "piid": 2},
+    "color_temp": {"siid": 2, "piid": 3},
+}
 
 MODEL_HUIZUO_PIS123 = "huayi.light.pis123"
 
@@ -25,8 +35,8 @@ class HuizuoException(DeviceException):
     pass
 
 
-class HuizuoStatus:
-    def __init__(self, data):
+class HuizuoMiotStatus:
+    def __init__(self, data: Dict[str, Any]) -> None:
         """
         Response of a Huizuo Pisces For Bedroom (huayi.light.pis123)
          {'id': 1, 'result': [
@@ -46,29 +56,29 @@ class HuizuoStatus:
 
     @property
     def is_on(self) -> bool:
-        """Return whether the lamp is on or off."""
+        """Return True if device is on."""
         return self.data["power"]
 
     @property
-    def brightness(self) -> int:
-        """Return current brightness."""
-        return self.data["brightness"]
+    def brigtness(self) -> int:
+        """Return current brigtness."""
+        return self.data["brigtness"]
 
     @property
     def color_temp(self) -> int:
         """Return current color temperature."""
-        return self.data["temperature"]
+        return self.data["color_temp"]
 
     def __repr__(self):
-        s = "<Huizuo on=%s brightness=%s color_temp=%s>" % (
+        s = "<Huizuo on=%s brigtness=%s color_temp=%s>" % (
             self.is_on,
-            self.brightness,
+            self.brigtness,
             self.color_temp,
         )
         return s
 
 
-class Huizuo(Device):
+class HuizuoMiot(MiotDevice):
     """A support for Huizuo PIS123."""
 
     def __init__(
@@ -80,65 +90,57 @@ class Huizuo(Device):
         lazy_discover: bool = True,
         model: str = MODEL_HUIZUO_PIS123,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
+        super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
 
         if model in MODELS_SUPPORTED:
             self.model = model
         else:
             self.model = MODEL_HUIZUO_PIS123
-            _LOGGER.error(
-                "Device model %s unsupported. Falling back to %s.", model, self.model
-            )
-
-    @command(
-        default_output=format_output(
-            "\n",
-            "Power: {result.is_on}\n"
-            "Brightness: {result.brightness}\n"
-            "Temperature: {result.color_temp}\n"
-            "\n",
-        )
-    )
-    def status(self) -> HuizuoStatus:
-        """Retrieve properties."""
-        properties = [
-            {"siid": 2, "piid": 1},
-            {"siid": 2, "piid": 2},
-            {"siid": 2, "piid": 3},
-        ]
-        properties_name = ["power", "brightness", "temperature"]
-
-        values = self.get_properties(properties)
-        values_info = []
-        for value in values:
-            values_info.append(value["value"])
-
-        return HuizuoStatus(dict(zip(properties_name, values_info)))
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
 
     @command(
         default_output=format_output("Powering on"),
     )
     def on(self):
         """Power on."""
-        return self.raw_command("set_prop", [{"siid": 2, "piid": 1, "value": True}])
+        return self.set_property("power", True)
 
     @command(
         default_output=format_output("Powering off"),
     )
     def off(self):
         """Power off."""
-        return self.raw_command("set_prop", [{"siid": 2, "piid": 1, "value": False}])
+        return self.set_property("power", False)
+
+    @command(
+        default_output=format_output(
+            "\n",
+            "Power: {result.is_on}\n"
+            "Brigtness: {result.brigtness}\n"
+            "Color Temperature: {result.color_temp}\n"
+            "\n",
+        )
+    )
+    def status(self) -> HuizuoMiotStatus:
+        """Retrieve properties."""
+
+        return HuizuoMiotStatus(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping()
+            }
+        )
 
     @command(
         click.argument("level", type=int),
-        default_output=format_output("Setting brightness to {level}"),
+        default_output=format_output("Setting brigtness to {level}"),
     )
-    def set_brightness(self, level):
-        """Set brightness."""
+    def set_brigtness(self, level):
+        """Set brigtness."""
         if level < 0 or level > 100:
-            raise HuizuoException("Invalid brightness: %s" % level)
+            raise HuizuoException("Invalid brigtness: %s" % level)
 
-        return self.raw_command("set_prop", [{"siid": 2, "piid": 2, "value": level}])
+        return self.set_property("brigtness", level)
 
     @command(
         click.argument("color_temp", type=int),
@@ -149,6 +151,4 @@ class Huizuo(Device):
         if color_temp < 3000 or color_temp > 6400:
             raise HuizuoException("Invalid color temperature: %s" % color_temp)
 
-        return self.raw_command(
-            "set_prop", [{"siid": 2, "piid": 3, "value": color_temp}]
-        )
+        return self.set_property("color_temp", color_temp)
