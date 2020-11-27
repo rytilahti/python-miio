@@ -12,7 +12,6 @@ from typing import Any, Dict
 import click
 
 from .click_common import command, format_output
-# from .device import Device
 from .exceptions import DeviceException
 from .miot_device import MiotDevice
 
