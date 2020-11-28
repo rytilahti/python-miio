@@ -130,4 +130,4 @@ class TestFanLeshow(TestCase):
             self.device.delay_off(-1)
 
         with pytest.raises(FanLeshowException):
-            self.device.delay_off(1000)
+            self.device.delay_off(541)
