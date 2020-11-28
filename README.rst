@@ -110,6 +110,7 @@ Supported devices
 -  Huayi Huizuo Pisces For Bedroom (huayi.light.pis123)
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR)
 -  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, P5, P9, P10, P11
+-  Xiaomi Rosou SS4 Ventilator (leshow.fan.ss4)
 -  Xiaomi Mi Air Humidifier V1, CA1, CA4, CB1, MJJSQ, JSQ001
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off)
 -  Xiaomi Mi Water Purifier D1, C1 (Triple Setting)
