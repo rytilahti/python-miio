@@ -166,7 +166,7 @@ class FanLeshow(Device):
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
-        """Set mode."""
+        """Set mode. Choose from manual, natural, sleep, strong."""
         return self.send("set_mode", [mode.value])
 
     @command(
@@ -174,7 +174,7 @@ class FanLeshow(Device):
         default_output=format_output("Setting speed of the manual mode to {speed}"),
     )
     def set_speed(self, speed: int):
-        """Set natural level."""
+        """Set a speed level between 0 and 100."""
         if speed < 0 or speed > 100:
             raise FanLeshowException("Invalid speed: %s" % speed)
 
