@@ -127,7 +127,7 @@ class Device(metaclass=DeviceGroupMeta):
         parameters: Any = None,
         retry_count=3,
         *,
-        extra_parameters=None
+        extra_parameters=None,
     ) -> Any:
         """Send a command to the device.
 
@@ -249,3 +249,6 @@ class Device(metaclass=DeviceGroupMeta):
             )
 
         return values
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
