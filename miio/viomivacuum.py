@@ -365,7 +365,7 @@ class ViomiVacuum(Device):
             help="number of seconds to perform this movement",
         ),
     )
-    def move(self, direction, duration=0.5):
+    def move(self, direction: ViomiMovementDirection, duration=0.5):
         """Manual movement."""
         start = time.time()
         while time.time() - start < duration:
@@ -374,12 +374,12 @@ class ViomiVacuum(Device):
         self.send("set_direction", [ViomiMovementDirection.Stop.value])
 
     @command(click.argument("mode", type=EnumType(ViomiMode)))
-    def clean_mode(self, mode):
+    def clean_mode(self, mode: ViomiMode):
         """Set the cleaning mode."""
         self.send("set_mop", [mode.value])
 
     @command(click.argument("mop_mode", type=EnumType(ViomiMopMode)))
-    def mop_mode(self, mop_mode):
+    def mop_mode(self, mop_mode: ViomiMopMode):
         self.send("set_moproute", [mop_mode.value])
 
     @command()
