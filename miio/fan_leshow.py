@@ -43,7 +43,7 @@ class FanLeshowStatus:
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """
-        Response of a Leshow Fan SS4 ():
+        Response of a Leshow Fan SS4 (leshow.fan.ss4):
 
         {'power': 1, 'mode': 2, 'blow': 100, 'timer': 0,
          'sound': 1, 'yaw': 0, 'fault': 0}
@@ -63,7 +63,7 @@ class FanLeshowStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either 0, 1, 2 or 3."""
+        """Operation mode."""
         return OperationMode(self.data["mode"])
 
     @property
