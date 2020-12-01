@@ -12,6 +12,7 @@ from .exceptions import DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_HUMIDIFIER_MJJSQ = "deerma.humidifier.mjjsq"
+MODEL_HUMIDIFIER_JSQ = "deerma.humidifier.jsq"
 MODEL_HUMIDIFIER_JSQ1 = "deerma.humidifier.jsq1"
 
 MODEL_HUMIDIFIER_JSQ_COMMON = [
@@ -28,6 +29,7 @@ MODEL_HUMIDIFIER_JSQ_COMMON = [
 
 AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_MJJSQ: MODEL_HUMIDIFIER_JSQ_COMMON,
+    MODEL_HUMIDIFIER_JSQ: MODEL_HUMIDIFIER_JSQ_COMMON,
     MODEL_HUMIDIFIER_JSQ1: MODEL_HUMIDIFIER_JSQ_COMMON + ["wet_and_protect"],
 }
 
