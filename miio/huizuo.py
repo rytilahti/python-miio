@@ -276,7 +276,7 @@ class Huizuo(MiotDevice):
             "Fan power:  {result.is_fan_on}\n"
             "Fan level: {result.fan_speed_level}\n"
             "Fan mode: {result.fan_mode}\n"
-            "Fan reverse: {result.fan_reverse}\n"
+            "Fan reverse: {result.is_fan_reverse}\n"
             "\n"
             "------- Parameters for models with heater --------\n"
             "Heater power: {result.is_heater_on}\n"
