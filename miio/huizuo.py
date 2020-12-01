@@ -173,21 +173,21 @@ class HuizuoStatus:
         return None
 
     @property
-    def is_heater_on(self):
+    def is_heater_on(self) -> bool:
         """Return True if Heater is on."""
         if "heater_power" in self.data:
             return self.data["heater_power"]
         return None
 
     @property
-    def heater_fault_code(self):
+    def heater_fault_code(self) -> int:
         """Return Heater's fault code. 0 - No Fault"""
         if "heater_fault_code" in self.data:
             return self.data["heater_fault_code"]
         return None
 
     @property
-    def heat_level(self):
+    def heat_level(self) -> int:
         """Return Heater's heat level"""
         if "heat_level" in self.data:
             return self.data["heat_level"]
@@ -233,13 +233,13 @@ class Huizuo(MiotDevice):
         model: str = MODEL_HUIZUO_PIS123,
     ) -> None:
 
-        if self.model in MODELS_WITH_FAN_WY:
+        if model in MODELS_WITH_FAN_WY:
             _MAPPING.update(_ADDITIONAL_MAPPING_FAN_WY)
-        if self.model in MODELS_WITH_FAN_WY2:
+        if model in MODELS_WITH_FAN_WY2:
             _MAPPING.update(_ADDITIONAL_MAPPING_FAN_WY2)
-        if self.model in MODELS_WITH_SCENES:
+        if model in MODELS_WITH_SCENES:
             _MAPPING.update(_ADDITIONAL_MAPPING_SCENE)
-        if self.model in MODELS_WITH_HEATER:
+        if model in MODELS_WITH_HEATER:
             _MAPPING.update(_ADDITIONAL_MAPPING_HEATER)
 
         super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
@@ -267,22 +267,22 @@ class Huizuo(MiotDevice):
     @command(
         default_output=format_output(
             "\n",
-            "------------ Basic parameters for lamp -----------\n",
+            "------------ Basic parameters for lamp -----------\n" 
             "Power: {result.is_on}\n"
             "Brightness: {result.brightness}\n"
             "Color Temperature: {result.color_temp}\n"
-            "\n",
-            "--------- Parameters for models with fan ---------\n",
-            "Fan power:  {result.is_fan_on}\n",
-            "Fan level: {result.fan_speed_level}\n",
-            "Fan mode: {result.fan_mode}\n",
-            "Fan reverse: {result.fan_reverse}\n",
-            "\n",
-            "------- Parameters for models with heater --------\n",
-            "Heater power: {result.is_heater_on}\n",
-            "Heat level: {result.heat_level}\n",
+            "\n"
+            "--------- Parameters for models with fan ---------\n"
+            "Fan power:  {result.is_fan_on}\n"
+            "Fan level: {result.fan_speed_level}\n"
+            "Fan mode: {result.fan_mode}\n"
+            "Fan reverse: {result.fan_reverse}\n"
+            "\n"
+            "------- Parameters for models with heater --------\n"
+            "Heater power: {result.is_heater_on}\n"
+            "Heat level: {result.heat_level}\n"
             "Heat fault code (0 means 'OK'): {result.heater_fault_code}\n",
-        )
+        ),
     )
     def status(self) -> HuizuoStatus:
         """Retrieve properties."""
