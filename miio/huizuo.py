@@ -247,7 +247,9 @@ class Huizuo(MiotDevice):
             self.model = model
         else:
             self.model = MODEL_HUIZUO_PIS123
-            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
+            _LOGGER.error(
+                "Device model %s unsupported. Falling back to %s.", model, self.model
+            )
 
     @command(
         default_output=format_output("Powering on"),
@@ -447,7 +449,7 @@ class Huizuo(MiotDevice):
     @command(
         default_output=format_output("On/Off switch"),
     )
-    def scene_on_of(self):
+    def scene_on_off(self):
         """Switch the on/off (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_off", 0)
