@@ -264,17 +264,7 @@ class Huizuo(MiotDevice):
             "Power: {result.is_on}\n"
             "Brightness: {result.brightness}\n"
             "Color Temperature: {result.color_temp}\n"
-            "\n"
-            "--------- Parameters for models with fan ---------\n"
-            "Fan power:  {result.is_fan_on}\n"
-            "Fan level: {result.fan_speed_level}\n"
-            "Fan mode: {result.fan_mode}\n"
-            "Fan reverse: {result.is_fan_reverse}\n"
-            "\n"
-            "------- Parameters for models with heater --------\n"
-            "Heater power: {result.is_heater_on}\n"
-            "Heat level: {result.heat_level}\n"
-            "Heat fault code (0 means 'OK'): {result.heater_fault_code}\n",
+            "\n",
         ),
     )
     def status(self) -> HuizuoStatus:
