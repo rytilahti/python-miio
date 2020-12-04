@@ -3,7 +3,6 @@ from unittest import TestCase
 import pytest
 
 from miio import Huizuo, HuizuoLampFan, HuizuoLampHeater
-
 from miio.huizuo import MODEL_HUIZUO_FANWY  # Fan model extended
 from miio.huizuo import MODEL_HUIZUO_FANWY2  # Fan model basic
 from miio.huizuo import MODEL_HUIZUO_PIS123  # Basic model
