@@ -2,7 +2,8 @@ from unittest import TestCase
 
 import pytest
 
-from miio import Huizuo
+from miio import Huizuo, HuizuoLampFan, HuizuoLampHeater
+
 from miio.huizuo import MODEL_HUIZUO_FANWY  # Fan model extended
 from miio.huizuo import MODEL_HUIZUO_FANWY2  # Fan model basic
 from miio.huizuo import MODEL_HUIZUO_PIS123  # Basic model
@@ -43,21 +44,21 @@ class DummyHuizuo(DummyMiotDevice, Huizuo):
         super().__init__(*args, **kwargs)
 
 
-class DummyHuizuoFan(DummyMiotDevice, Huizuo):
+class DummyHuizuoFan(DummyMiotDevice, HuizuoLampFan):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE_FAN
         self.model = MODEL_HUIZUO_FANWY
         super().__init__(*args, **kwargs)
 
 
-class DummyHuizuoFan2(DummyMiotDevice, Huizuo):
+class DummyHuizuoFan2(DummyMiotDevice, HuizuoLampFan):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE_FAN
         self.model = MODEL_HUIZUO_FANWY2
         super().__init__(*args, **kwargs)
 
 
-class DummyHuizuoHeater(DummyMiotDevice, Huizuo):
+class DummyHuizuoHeater(DummyMiotDevice, HuizuoLampHeater):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE_HEATER
         self.model = MODEL_HUIZUO_WYHEAT

@@ -6,7 +6,7 @@ These lamps have a white color only and support dimming and control of the tempe
 """
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -125,68 +125,62 @@ class HuizuoStatus:
     @property
     def is_on(self) -> bool:
         """Return True if device is on."""
-        if "power" in self.data:
-            return self.data["power"]
-        return None
+        return self.data["power"]
 
     @property
     def brightness(self) -> int:
         """Return current brightness."""
-        if "brightness" in self.data:
-            return self.data["brightness"]
-        return None
+        return self.data["brightness"]
 
     @property
     def color_temp(self) -> int:
         """Return current color temperature."""
-        if "color_temp" in self.data:
-            return self.data["color_temp"]
-        return None
+        return self.data["color_temp"]
 
     @property
-    def is_fan_on(self) -> bool:
+    def is_fan_on(self) -> Optional[bool]:
         """Return True if Fan is on."""
         if "fan_power" in self.data:
             return self.data["fan_power"]
         return None
 
     @property
-    def fan_speed_level(self) -> int:
+    def fan_speed_level(self) -> Optional[int]:
         """Return current Fan speed level."""
         if "fan_level" in self.data:
             return self.data["fan_level"]
         return None
 
     @property
-    def is_fan_reverse(self) -> bool:
+    def is_fan_reverse(self) -> Optional[bool]:
         """Return True if Fan reverse is on."""
         if "fan_motor_reverse" in self.data:
             return self.data["fan_motor_reverse"]
         return None
 
     @property
-    def fan_mode(self) -> int:
+    def fan_mode(self) -> Optional[int]:
         """Return 0 if 'Basic' and 1 if 'Natural wind'"""
         if "fan_mode" in self.data:
             return self.data["fan_mode"]
         return None
 
     @property
-    def is_heater_on(self) -> bool:
+    def is_heater_on(self) -> Optional[bool]:
         """Return True if Heater is on."""
         if "heater_power" in self.data:
             return self.data["heater_power"]
         return None
 
     @property
-    def heater_fault_code(self) -> int:
+    def heater_fault_code(self) -> Optional[int]:
         """Return Heater's fault code. 0 - No Fault"""
         if "heater_fault_code" in self.data:
             return self.data["heater_fault_code"]
         return None
 
     @property
-    def heat_level(self) -> int:
+    def heat_level(self) -> Optional[int]:
         """Return Heater's heat level"""
         if "heat_level" in self.data:
             return self.data["heat_level"]
@@ -220,7 +214,7 @@ class HuizuoStatus:
 
 
 class Huizuo(MiotDevice):
-    """A support for Huizuo PIS123."""
+    """A basic support for Huizuo Lamps"""
 
     def __init__(
         self,
@@ -247,9 +241,7 @@ class Huizuo(MiotDevice):
             self.model = model
         else:
             self.model = MODEL_HUIZUO_PIS123
-            _LOGGER.error(
-                "Device model %s unsupported. Falling back to %s.", model, self.model
-            )
+            _LOGGER.error("Device model %s unsupported. Falling back to %s.", model, self.model)
 
     @command(
         default_output=format_output("Powering on"),
@@ -325,6 +317,10 @@ class Huizuo(MiotDevice):
 
         return self.set_property("color_temp", color_temp)
 
+
+class HuizuoLampFan(Huizuo):
+    """Support for Huizuo Lamps with fan"""
+
     # The next section contains the fan management commands
     # Right now I have no devices with the fan for live testing, so the following section
     # generated based on device specitifations
@@ -383,6 +379,32 @@ class Huizuo(MiotDevice):
         else:
             raise HuizuoException("Your device doesn't support a fan management")
 
+    @command(
+        default_output=format_output(
+            "\n",
+            "------------ Lamp parameters -----------\n"
+            "Power: {result.is_on}\n"
+            "Brightness: {result.brightness}\n"
+            "Color Temperature: {result.color_temp}\n"
+            "\n"
+            "------------Fan parameters -------------\n"
+            "Fan power:  {result.is_fan_on}\n"
+            "Fan level: {result.fan_speed_level}\n"
+            "Fan mode: {result.fan_mode}\n"
+            "Fan reverse: {result.is_fan_reverse}\n"
+            "\n",
+        ),
+    )
+    def status(self) -> HuizuoStatus:
+        """Retrieve properties."""
+
+        return HuizuoStatus(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping()
+            }
+        )
+
     # Fan Reverse option is not available for all models with fan
     @command(
         default_output=format_output("Enable fan reverse"),
@@ -403,6 +425,10 @@ class Huizuo(MiotDevice):
             return self.set_property("fan_motor_reverse", False)
         else:
             raise HuizuoException("Your device doesn't support a fan management")
+
+
+class HuizuoLampHeater(Huizuo):
+    """Support for Huizuo Lamps with heater"""
 
     # The next section contains the heater management commands
     # Right now I have no devices with the heater for live testing, so the following section
@@ -441,6 +467,34 @@ class Huizuo(MiotDevice):
             return self.set_property("heat_level", heat_level)
         else:
             raise HuizuoException("Your device doesn't support a heat management")
+
+    @command(
+        default_output=format_output(
+            "\n",
+            "------------ Lamp parameters -----------\n"
+            "Power: {result.is_on}\n"
+            "Brightness: {result.brightness}\n"
+            "Color Temperature: {result.color_temp}\n"
+            "\n"
+            "---------- Heater parameters -----------\n"
+            "Heater power: {result.is_heater_on}\n"
+            "Heat level: {result.heat_level}\n"
+            "Heat fault code (0 means 'OK'): {result.heater_fault_code}\n",
+        ),
+    )
+    def status(self) -> HuizuoStatus:
+        """Retrieve properties."""
+
+        return HuizuoStatus(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping()
+            }
+        )
+
+
+class HuizuoLampScene(Huizuo):
+    """Support for Huizuo Lamps with additional scene commands"""
 
     # The next section contains the scene management commands
     # Right now I have no devices with the scenes for live testing, so the following section

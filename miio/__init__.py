@@ -37,7 +37,7 @@ from miio.fan_leshow import FanLeshow
 from miio.fan_miot import FanMiot, FanP9, FanP10, FanP11
 from miio.gateway import Gateway
 from miio.heater import Heater
-from miio.huizuo import Huizuo
+from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.miot_device import MiotDevice
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
 from miio.philips_eyecare import PhilipsEyecare
