@@ -117,6 +117,8 @@ class Device(metaclass=DeviceGroupMeta):
     ) -> None:
         self.ip = ip
         self.token = token
+        if hasattr(self, "timeout"):
+            timeout = self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
         )
@@ -143,6 +145,8 @@ class Device(metaclass=DeviceGroupMeta):
         :param int retry_count: How many times to retry on error
         :param dict extra_parameters: Extra top-level parameters
         """
+        if hasattr(self, "retry_count"):
+            retry_count = self.retry_count
         return self._protocol.send(
             command, parameters, retry_count, extra_parameters=extra_parameters
         )
