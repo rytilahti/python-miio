@@ -66,6 +66,16 @@ class DummyMiotDevice(DummyDevice):
     def get_properties_for_mapping(self):
         return self.state
 
+    def get_properties(self, properties):
+        """Return values only for listed properties"""
+        keys = [p["did"] for p in properties]
+        props = []
+        for prop in self.state:
+            if prop["did"] in keys:
+                props.append(prop)
+
+        return props
+
     def set_property(self, property_key: str, value):
         for prop in self.state:
             if prop["did"] == property_key:
