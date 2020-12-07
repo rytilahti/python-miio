@@ -149,6 +149,7 @@ Supported devices
 -  Smartmi Radiant Heater Smart Version (ZA1 version)
 -  Xiaomi Mi Smart Space Heater
 -  Xiaomiyoupin Curtain Controller (Wi-Fi) (lumi.curtain.hagl05)
+-  Xiaomi Dishwasher (viomi.dishwasher.m02)
 -  Xiaomi Xiaomi Mi Smart Space Heater S (zhimi.heater.mc2)
 -  Xiaomi Xiaomi Mi Smart Space Heater 1S (zhimi.heater.za2)
 -  Yeelight Dual Control Module (yeelink.switch.sw1)
