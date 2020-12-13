@@ -46,6 +46,27 @@ _MAPPING = {
     "app_extra": {"siid": 15, "piid": 1},
 }
 
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-mb4:2
+_MODEL_AIRPURIFIER_MB4 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    # Environment
+    "aqi": {"siid": 3, "piid": 4},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Screen
+    "led_brightness_level": {"siid": 7, "piid": 2},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    "favorite_rpm": {"siid": 9, "piid": 3},
+}
+
 
 class AirPurifierMiotException(DeviceException):
     pass
@@ -64,7 +85,7 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class AirPurifierMiotStatus:
+class BasicAirPurifierMiotStatus:
     """Container for status reports from the air purifier."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -91,6 +112,46 @@ class AirPurifierMiotStatus:
         return self.data["aqi"]
 
     @property
+    def mode(self) -> OperationMode:
+        """Current operation mode."""
+        return OperationMode(self.data["mode"])
+
+    @property
+    def buzzer(self) -> Optional[bool]:
+        """Return True if buzzer is on."""
+        if self.data["buzzer"] is not None:
+            return self.data["buzzer"]
+
+        return None
+
+    @property
+    def child_lock(self) -> bool:
+        """Return True if child lock is on."""
+        return self.data["child_lock"]
+
+    @property
+    def filter_life_remaining(self) -> int:
+        """Time until the filter should be changed."""
+        return self.data["filter_life_remaining"]
+
+    @property
+    def filter_hours_used(self) -> int:
+        """How long the filter has been in use."""
+        return self.data["filter_hours_used"]
+
+    @property
+    def motor_speed(self) -> int:
+        """Speed of the motor."""
+        return self.data["motor_speed"]
+
+
+class AirPurifierMiotStatus(BasicAirPurifierMiotStatus):
+    """Container for status reports from the air purifier."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        super().__init__(data)
+
+    @property
     def average_aqi(self) -> int:
         """Average of the air quality index."""
         return self.data["average_aqi"]
@@ -114,11 +175,6 @@ class AirPurifierMiotStatus:
         return self.data["fan_level"]
 
     @property
-    def mode(self) -> OperationMode:
-        """Current operation mode."""
-        return OperationMode(self.data["mode"])
-
-    @property
     def led(self) -> bool:
         """Return True if LED is on."""
         return self.data["led"]
@@ -135,14 +191,6 @@ class AirPurifierMiotStatus:
         return None
 
     @property
-    def buzzer(self) -> Optional[bool]:
-        """Return True if buzzer is on."""
-        if self.data["buzzer"] is not None:
-            return self.data["buzzer"]
-
-        return None
-
-    @property
     def buzzer_volume(self) -> Optional[int]:
         """Return buzzer volume."""
         if self.data["buzzer_volume"] is not None:
@@ -151,25 +199,10 @@ class AirPurifierMiotStatus:
         return None
 
     @property
-    def child_lock(self) -> bool:
-        """Return True if child lock is on."""
-        return self.data["child_lock"]
-
-    @property
     def favorite_level(self) -> int:
         """Return favorite level, which is used if the mode is ``favorite``."""
         # Favorite level used when the mode is `favorite`.
         return self.data["favorite_level"]
-
-    @property
-    def filter_life_remaining(self) -> int:
-        """Time until the filter should be changed."""
-        return self.data["filter_life_remaining"]
-
-    @property
-    def filter_hours_used(self) -> int:
-        """How long the filter has been in use."""
-        return self.data["filter_hours_used"]
 
     @property
     def use_time(self) -> int:
@@ -180,11 +213,6 @@ class AirPurifierMiotStatus:
     def purify_volume(self) -> int:
         """The volume of purified air in cubic meter."""
         return self.data["purify_volume"]
-
-    @property
-    def motor_speed(self) -> int:
-        """Speed of the motor."""
-        return self.data["motor_speed"]
 
     @property
     def filter_rfid_product_id(self) -> Optional[str]:
@@ -253,7 +281,118 @@ class AirPurifierMiotStatus:
         return s
 
 
-class AirPurifierMiot(MiotDevice):
+class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
+    """Container for status reports from the air purifier."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        super().__init__(data)
+
+    @property
+    def led_brightness_level(self) -> int:
+        """Return brightness level."""
+        return self.data["led_brightness_level"]
+
+    @property
+    def favorite_level(self) -> int:
+        """Return favorite rpm level."""
+        return self.data["favorite_rpm"]
+
+    def __repr__(self) -> str:
+        s = (
+            "<AirPurifierMiotStatus power=%s, "
+            "aqi=%s, "
+            "mode=%s, "
+            "led_brightness_level=%s, "
+            "buzzer=%s, "
+            "child_lock=%s, "
+            "filter_life_remaining=%s, "
+            "filter_hours_used=%s, "
+            "motor_speed=%s, "
+            "favorite_rpm=%s>"
+            % (
+                self.power,
+                self.aqi,
+                self.mode,
+                self.led_brightness_level,
+                self.buzzer,
+                self.child_lock,
+                self.filter_life_remaining,
+                self.filter_hours_used,
+                self.motor_speed,
+                self.favorite_rpm,
+            )
+        )
+        return s
+
+
+class BasicAirPurifierMiot(MiotDevice):
+    """Main class representing the air purifier which uses MIoT protocol."""
+
+    def __init__(
+        self,
+        attributes: dict = [],
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(attributes, ip, token, start_id, debug, lazy_discover)
+
+    @command(default_output=format_output("Powering on"))
+    def on(self):
+        """Power on."""
+        return self.set_property("power", True)
+
+    @command(default_output=format_output("Powering off"))
+    def off(self):
+        """Power off."""
+        return self.set_property("power", False)
+
+    @command(
+        click.argument("rpm", type=int),
+        default_output=format_output("Setting favorite motor speed '{rpm}' rpm"),
+    )
+    def set_favorite_rpm(self, rpm: int):
+        """Set favorite motor speed."""
+        # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
+        if rpm < 300 or rpm > 2300 or rpm % 10 != 0:
+            raise AirPurifierMiotException(
+                "Invalid favorite motor speed: %s. Must be between 300 and 2300 and divisible by 10"
+                % rpm
+            )
+        return self.set_property("favorite_rpm", rpm)
+
+    @command(
+        click.argument("mode", type=EnumType(OperationMode)),
+        default_output=format_output("Setting mode to '{mode.value}'"),
+    )
+    def set_mode(self, mode: OperationMode):
+        """Set mode."""
+        return self.set_property("mode", mode.value)
+
+    @command(
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
+    )
+    def set_buzzer(self, buzzer: bool):
+        """Set buzzer on/off."""
+        return self.set_property("buzzer", buzzer)
+
+    @command(
+        click.argument("lock", type=bool),
+        default_output=format_output(
+            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+        ),
+    )
+    def set_child_lock(self, lock: bool):
+        """Set child lock on/off."""
+        return self.set_property("child_lock", lock)
+
+
+class AirPurifierMiot(BasicAirPurifierMiot):
     """Main class representing the air purifier which uses MIoT protocol."""
 
     def __init__(
@@ -302,16 +441,6 @@ class AirPurifierMiot(MiotDevice):
             }
         )
 
-    @command(default_output=format_output("Powering on"))
-    def on(self):
-        """Power on."""
-        return self.set_property("power", True)
-
-    @command(default_output=format_output("Powering off"))
-    def off(self):
-        """Power off."""
-        return self.set_property("power", False)
-
     @command(
         click.argument("level", type=int),
         default_output=format_output("Setting fan level to '{level}'"),
@@ -321,20 +450,6 @@ class AirPurifierMiot(MiotDevice):
         if level < 1 or level > 3:
             raise AirPurifierMiotException("Invalid fan level: %s" % level)
         return self.set_property("fan_level", level)
-
-    @command(
-        click.argument("rpm", type=int),
-        default_output=format_output("Setting favorite motor speed '{rpm}' rpm"),
-    )
-    def set_favorite_rpm(self, rpm: int):
-        """Set favorite motor speed."""
-        # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
-        if rpm < 300 or rpm > 2300 or rpm % 10 != 0:
-            raise AirPurifierMiotException(
-                "Invalid favorite motor speed: %s. Must be between 300 and 2300 and divisible by 10"
-                % rpm
-            )
-        return self.set_property("favorite_rpm", rpm)
 
     @command(
         click.argument("volume", type=int),
@@ -347,14 +462,6 @@ class AirPurifierMiot(MiotDevice):
                 "Invalid volume: %s. Must be between 0 and 100" % volume
             )
         return self.set_property("buzzer_volume", volume)
-
-    @command(
-        click.argument("mode", type=EnumType(OperationMode)),
-        default_output=format_output("Setting mode to '{mode.value}'"),
-    )
-    def set_mode(self, mode: OperationMode):
-        """Set mode."""
-        return self.set_property("mode", mode.value)
 
     @command(
         click.argument("level", type=int),
@@ -388,22 +495,54 @@ class AirPurifierMiot(MiotDevice):
         """Turn led on/off."""
         return self.set_property("led", led)
 
-    @command(
-        click.argument("buzzer", type=bool),
-        default_output=format_output(
-            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
-        ),
-    )
-    def set_buzzer(self, buzzer: bool):
-        """Set buzzer on/off."""
-        return self.set_property("buzzer", buzzer)
+
+class AirPurifierMB4(BasicAirPurifierMiot):
+    """Main class representing the air purifier which uses MIoT protocol."""
+
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            _MODEL_AIRPURIFIER_MB4, ip, token, start_id, debug, lazy_discover
+        )
 
     @command(
-        click.argument("lock", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
-        ),
+            "",
+            "Power: {result.power}\n"
+            "AQI: {result.aqi} μg/m³\n"
+            "Mode: {result.mode}\n"
+            "LED brightness level: {result.led_brightness_level}\n"
+            "Buzzer: {result.buzzer}\n"
+            "Child lock: {result.child_lock}\n"
+            "Filter life remaining: {result.filter_life_remaining} %\n"
+            "Filter hours used: {result.filter_hours_used}\n"
+            "Motor speed: {result.motor_speed} rpm\n"
+            "Favorite RPM: {result.favorite_rpm} rpm\n",
+        )
     )
-    def set_child_lock(self, lock: bool):
-        """Set child lock on/off."""
-        return self.set_property("child_lock", lock)
+    def status(self) -> AirPurifierMB4Status:
+        """Retrieve properties."""
+
+        return AirPurifierMB4Status(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping()
+            }
+        )
+
+    @command(
+        click.argument("led_brightness_level", type=int),
+        default_output=format_output("Setting LED brightness level to {brightness}"),
+    )
+    def set_led_brightness_level(self, level: int):
+        """Set led brightness level."""
+        if level < 0 or level > 8:
+            raise AirPurifierMiotException("Invalid brightness level: %s" % level)
+
+        return self.set_property("led_brightness_level", level)
