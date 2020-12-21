@@ -17,6 +17,17 @@ def test_get_properties_splitting(mocker, max_properties):
     if max_properties is None:
         max_properties = len(properties)
     assert send.call_count == math.ceil(len(properties) / max_properties)
+    assert 5 == d._protocol._timeout
+
+
+def test_timeout_retry(mocker):
+    send = mocker.patch("miio.miioprotocol.MiIOProtocol.send")
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff", timeout=4)
+    assert 4 == d._protocol._timeout
+    d.send("fake_command", [], 1)
+    send.assert_called_with("fake_command", [], 1, extra_parameters=None)
+    d.send("fake_command", [])
+    send.assert_called_with("fake_command", [], 3, extra_parameters=None)
 
 
 def test_unavailable_device_info_raises(mocker):
