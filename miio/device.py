@@ -106,6 +106,9 @@ class Device(metaclass=DeviceGroupMeta):
     This class should not be initialized directly but a device-specific class inheriting
     it should be used instead of it."""
 
+    retry_count = 3
+    timeout = 5
+
     def __init__(
         self,
         ip: str = None,
@@ -113,10 +116,11 @@ class Device(metaclass=DeviceGroupMeta):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = 5,
+        timeout: int = None,
     ) -> None:
         self.ip = ip
         self.token = token
+        timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
         )
@@ -125,7 +129,7 @@ class Device(metaclass=DeviceGroupMeta):
         self,
         command: str,
         parameters: Any = None,
-        retry_count=3,
+        retry_count: int = None,
         *,
         extra_parameters=None,
     ) -> Any:
@@ -143,6 +147,7 @@ class Device(metaclass=DeviceGroupMeta):
         :param int retry_count: How many times to retry on error
         :param dict extra_parameters: Extra top-level parameters
         """
+        retry_count = retry_count if retry_count is not None else self.retry_count
         return self._protocol.send(
             command, parameters, retry_count, extra_parameters=extra_parameters
         )
