@@ -129,6 +129,8 @@ class Vacuum(Device):
         status = self.status()
         if status.in_zone_cleaning and (status.is_paused or status.got_error):
             return self.resume_zoned_clean()
+        if status.in_segment_cleaning and (status.is_paused or status.got_error):
+            return self.resume_segment_clean()
 
         return self.start()
 
