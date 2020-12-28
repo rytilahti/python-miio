@@ -188,33 +188,48 @@ class HuizuoStatus:
 
     def __repr__(self):
         parameters = []
-        if self.is_on is not None:
-            parameters.append("on=" + self.is_on)
-        if self.brightness is not None:
-            parameters.append("brightness=" + self.brightness)
-        if self.color_temp is not None:
-            parameters.append("color_temp=" + self.color_temp)
-        if self.is_fan_on is not None:
-            parameters.append("fan_on=" + self.is_fan_on)
-        if self.fan_speed_level is not None:
-            parameters.append("fan_level=" + self.fan_speed_level)
-        if self.fan_mode is not None:
-            parameters.append("fan_mode=" + self.fan_mode)
-        if self.is_fan_reverse is not None:
-            parameters.append("fan_motor_reverse=" + self.is_fan_reverse)
-        if self.is_heater_on is not None:
-            parameters.append("heater_on=" + self.is_heater_on)
-        if self.heat_level is not None:
-            parameters.append("heat_level=" + self.heat_level)
-        if self.heater_fault_code is not None:
-            parameters.append("heater_fault_code=" + self.heater_fault_code)
+        device_properties = [
+            "is_on",
+            "brightness",
+            "color_temp",
+            "is_fan_on",
+            "fan_speed_level",
+            "fan_mode",
+            "is_fan_reverse",
+            "is_heater_on",
+            "heat_level",
+            "heater_fault_code",
+        ]
+
+        for prop in device_properties:
+            val = getattr(self, prop)
+            if val is not None:
+                parameters.append(f"{prop}={val}")
 
         s = "<Huizuo " + " ".join(parameters) + ">"
         return s
 
 
 class Huizuo(MiotDevice):
-    """A basic support for Huizuo Lamps"""
+    """A basic support for Huizuo Lamps
+
+    Example: response of a Huizuo Pisces For Bedroom (huayi.light.pis123)
+        {'id': 1, 'result': [
+          {'did': '', 'siid': 2, 'piid': 1, 'code': 0, 'value': False},
+          {'did': '', 'siid': 2, 'piid': 2, 'code': 0, 'value': 94},
+          {'did': '', 'siid': 2, 'piid': 3, 'code': 0, 'value': 6400}
+          ]
+        }
+
+    Explanation (line-by-line):
+        power = '{"siid":2,"piid":1}' values = true,false
+        brightless(%) = '{"siid":2,"piid":2}' values = 1-100
+        color temperature(Kelvin) = '{"siid":2,"piid":3}' values = 3000-6400
+
+    This is basic response for all HUIZUO lamps
+    Also some models supports additional properties, like for Fan or Heating management.
+    If your device does't support some properties, the 'None' will be returned
+    """
 
     def __init__(
         self,
@@ -420,11 +435,11 @@ class HuizuoLampFan(Huizuo):
 
 
 class HuizuoLampHeater(Huizuo):
-    """Support for Huizuo Lamps with heater"""
+    """Support for Huizuo Lamps with heater
 
-    # The next section contains the heater management commands
-    # Right now I have no devices with the heater for live testing, so the following section
-    # generated based on device specitifations
+    The next section contains the heater management commands
+    Right now I have no devices with the heater for live testing, so the following section
+    generated based on device specitifations"""
 
     @command(
         default_output=format_output("Heater powering on"),
@@ -486,11 +501,11 @@ class HuizuoLampHeater(Huizuo):
 
 
 class HuizuoLampScene(Huizuo):
-    """Support for Huizuo Lamps with additional scene commands"""
+    """Support for Huizuo Lamps with additional scene commands
 
-    # The next section contains the scene management commands
-    # Right now I have no devices with the scenes for live testing, so the following section
-    # generated based on device specitifations
+    The next section contains the scene management commands
+    Right now I have no devices with the scenes for live testing, so the following section
+    generated based on device specitifations"""
 
     @command(
         default_output=format_output("On/Off switch"),
@@ -503,22 +518,22 @@ class HuizuoLampScene(Huizuo):
             raise HuizuoException("Your device doesn't support scenes")
 
     @command(
-        default_output=format_output("Add the brightness"),
+        default_output=format_output("Increase the brightness"),
     )
-    def brightness_add(self):
-        """Add the brightness (only for models with scenes support)."""
+    def brightness_increase(self):
+        """Increase the brightness (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
-            return self.set_property("brightness_add", 0)
+            return self.set_property("brightness_increase", 0)
         else:
             raise HuizuoException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Decrease the brightness"),
     )
-    def brightness_dec(self):
+    def brightness_decrease(self):
         """Decrease the brightness (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
-            return self.set_property("brightness_dec", 0)
+            return self.set_property("brightness_decrease", 0)
         else:
             raise HuizuoException("Your device doesn't support scenes")
 
@@ -533,22 +548,22 @@ class HuizuoLampScene(Huizuo):
             raise HuizuoException("Your device doesn't support scenes")
 
     @command(
-        default_output=format_output("Add the color temperature"),
+        default_output=format_output("Increase the color temperature"),
     )
-    def colortemp_add(self):
-        """Add the color temperature (only for models with scenes support)."""
+    def colortemp_increase(self):
+        """Increase the color temperature (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
-            return self.set_property("colortemp_add", 0)
+            return self.set_property("colortemp_increase", 0)
         else:
             raise HuizuoException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Decrease the color temperature"),
     )
-    def colortemp_dec(self):
+    def colortemp_decrease(self):
         """Decrease the color temperature (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
-            return self.set_property("colortemp_dec", 0)
+            return self.set_property("colortemp_decrease", 0)
         else:
             raise HuizuoException("Your device doesn't support scenes")
 
@@ -563,20 +578,20 @@ class HuizuoLampScene(Huizuo):
             raise HuizuoException("Your device doesn't support scenes")
 
     @command(
-        default_output=format_output("Switch on or add brightness"),
+        default_output=format_output("Switch on or increase brightness"),
     )
     def on_or_brightness(self):
-        """Switch on or add brightness (only for models with scenes support)."""
+        """Switch on or increase brightness (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_or_brightness", 0)
         else:
             raise HuizuoException("Your device doesn't support scenes")
 
     @command(
-        default_output=format_output("Switch on or add color temperature"),
+        default_output=format_output("Switch on or increase color temperature"),
     )
     def on_or_colortemp(self):
-        """Switch on or add color temperature (only for models with scenes support)."""
+        """Switch on or increase color temperature (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_or_colortemp", 0)
         else:
