@@ -40,6 +40,19 @@ class HeaterMiotStatus:
     """Container for status reports from the Xiaomi Smart Space Heater S."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response (MIoT format) of Xiaomi Smart Space Heater S (zhimi.heater.mc2):
+
+        [
+          { "did": "power", "siid": 2, "piid": 1, "code": 0, "value": False },
+          { "did": "target_temperature", "siid": 2, "piid": 5, "code": 0, "value": 18 },
+          { "did": "countdown_time", "siid": 3, "piid": 1, "code": 0, "value": 0 },
+          { "did": "temperature", "siid": 4, "piid": 7, "code": 0, "value": 22.6 },
+          { "did": "child_lock", "siid": 5, "piid": 1, "code": 0, "value": False },
+          { "did": "buzzer", "siid": 6, "piid": 1, "code": 0, "value": False },
+          { "did": "led_brightness", "siid": 7, "piid": 3, "code": 0, "value": 0 }
+        ]
+        """
         self.data = data
 
     @property
