@@ -10,7 +10,7 @@ from .miot_device import MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
-    # Source https://miot-spec.org/miot-spec-v2/instance\?type\=urn:miot-spec-v2:device:heater:0000A01A:zhimi-mc2:1
+    # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:zhimi-mc2:1
     # Heater (siid=2)
     "power": {"siid": 2, "piid": 1},
     "target_temperature": {"siid": 2, "piid": 5},
