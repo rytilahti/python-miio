@@ -37,7 +37,7 @@ class HeaterMiotException(DeviceException):
 
 
 class HeaterMiotStatus:
-    """Container for status reports from the heater which uses the MIoT protocol."""
+    """Container for status reports from the Xiaomi Smart Space Heater S."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
@@ -105,7 +105,7 @@ class HeaterMiotStatus:
 
 
 class HeaterMiot(MiotDevice):
-    """Main class representing the heater which uses MIoT protocol."""
+    """Main class representing the Xiaomi Smart Space Heater S."""
 
     def __init__(
         self,
