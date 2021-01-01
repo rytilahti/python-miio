@@ -70,7 +70,7 @@ class TestAirPurifier(TestCase):
         assert status.led_brightness_level == _INITIAL_STATE["led_brightness_level"]
         assert status.buzzer == _INITIAL_STATE["buzzer"]
         assert status.child_lock == _INITIAL_STATE["child_lock"]
-        assert status.favorite_rpm == _INITIAL_STATE["favorite_rpm"]
+        assert status.favorite_level == _INITIAL_STATE["favorite_rpm"]
         assert status.filter_life_remaining == _INITIAL_STATE["filter_life_remaining"]
         assert status.filter_hours_used == _INITIAL_STATE["filter_hours_used"]
         assert status.motor_speed == _INITIAL_STATE["motor_speed"]
@@ -92,15 +92,15 @@ class TestAirPurifier(TestCase):
         assert mode() == OperationMode.Fan
 
     def test_set_favorite_rpm(self):
-        def favorite_rpm():
-            return self.device.status().favorite_rpm
+        def favorite_level():
+            return self.device.status().favorite_level
 
         self.device.set_favorite_rpm(300)
-        assert favorite_rpm() == 300
+        assert favorite_level() == 300
         self.device.set_favorite_rpm(1000)
-        assert favorite_rpm() == 1000
+        assert favorite_level() == 1000
         self.device.set_favorite_rpm(2300)
-        assert favorite_rpm() == 2300
+        assert favorite_level() == 2300
 
         with pytest.raises(AirPurifierMiotException):
             self.device.set_favorite_rpm(301)
