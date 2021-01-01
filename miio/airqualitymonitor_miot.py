@@ -188,7 +188,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
             "Temperature: {result.temperature} °C\n"
             "CO₂: {result.co2} μg/m³\n"
             "Battery: {result.battery} %\n"
-            "Charing state: {result.charging_state.name}\n"
+            "Charging state: {result.charging_state.name}\n"
             "Monitoring frequency: {result.monitoring_frequency.name}\n"
             "Screen off: {result.screen_off.name}\n"
             "Device off: {result.device_off.name}\n"
