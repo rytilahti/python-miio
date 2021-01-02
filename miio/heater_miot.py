@@ -26,6 +26,11 @@ _MAPPING = {
     "led_brightness": {"siid": 7, "piid": 3},
 }
 
+HEATER_PROPERTIES = {
+    "temperature_range": (18, 28),
+    "delay_off_range": (0, 12 * 3600),
+}
+
 
 class LedBrightness(enum.Enum):
     On = 0
@@ -71,8 +76,8 @@ class HeaterMiotStatus:
         return self.data["target_temperature"]
 
     @property
-    def countdown_time(self) -> int:
-        """Countdown time."""
+    def delay_off_countdown(self) -> int:
+        """Countdown until turning off in seconds."""
         return self.data["countdown_time"]
 
     @property
@@ -103,7 +108,7 @@ class HeaterMiotStatus:
             "led_brightness=%s, "
             "buzzer=%s, "
             "child_lock=%s, "
-            "countdown_time=%s "
+            "delay_off_countdown=%s "
             % (
                 self.power,
                 self.target_temperature,
@@ -111,7 +116,7 @@ class HeaterMiotStatus:
                 self.led_brightness,
                 self.buzzer,
                 self.child_lock,
-                self.countdown_time,
+                self.delay_off_countdown,
             )
         )
         return s
@@ -136,10 +141,10 @@ class HeaterMiot(MiotDevice):
             "Power: {result.power}\n"
             "Temperature: {result.temperature} °C\n"
             "Target Temperature: {result.target_temperature} °C\n"
-            "LED indicator brightness: {result.brightness}\n"
+            "LED indicator brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"
             "Child lock: {result.child_lock}\n"
-            "Countdown time: {result.countdown_time} hours\n",
+            "Power-off time: {result.delay_off_countdown} hours\n",
         )
     )
     def status(self) -> HeaterMiotStatus:
@@ -170,26 +175,13 @@ class HeaterMiot(MiotDevice):
     )
     def set_target_temperature(self, target_temperature: int):
         """Set target_temperature ."""
-        if target_temperature < 18 or target_temperature > 28:
+        min_temp, max_temp = HEATER_PROPERTIES["temperature_range"]
+        if target_temperature < min_temp or target_temperature > max_temp:
             raise HeaterMiotException(
-                "Invalid temperature: %s. Must be between 18 and 28."
-                % target_temperature
+                "Invalid temperature: %s. Must be between %s and %s."
+                % (target_temperature, min_temp, max_temp)
             )
         return self.set_property("target_temperature", target_temperature)
-
-    @command(
-        click.argument("hours", type=int),
-        default_output=format_output(
-            "Scheduling the heater to turn off in '{hours}' hours"
-        ),
-    )
-    def set_countdown_time(self, hours: int):
-        """Set scheduled turn off."""
-        if hours < 0 or hours > 12:
-            raise HeaterMiotException(
-                "Invalid scheduled turn off: %s. Must be between 0 and 12" % hours
-            )
-        return self.set_property("countdown_time", hours)
 
     @command(
         click.argument("lock", type=bool),
@@ -220,3 +212,17 @@ class HeaterMiot(MiotDevice):
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         return self.set_property("led_brightness", brightness.value)
+
+    @command(
+        click.argument("seconds", type=int),
+        default_output=format_output("Setting delayed turn off to {seconds} seconds"),
+    )
+    def set_delay_off(self, seconds: int):
+        """Set delay off seconds."""
+        min_delay, max_delay = HEATER_PROPERTIES["delay_off_range"]
+        if seconds < min_delay or seconds > max_delay:
+            raise HeaterMiotException(
+                "Invalid scheduled turn off: %s. Must be between %s and %s"
+                % (seconds, min_delay, max_delay)
+            )
+        return self.set_property("countdown_time", seconds // 3600)

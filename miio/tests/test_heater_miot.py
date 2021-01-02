@@ -27,7 +27,7 @@ class DummyHeaterMiot(DummyMiotDevice, HeaterMiot):
             "set_led_brightness": lambda x: self._set_state("led_brightness", x),
             "set_buzzer": lambda x: self._set_state("buzzer", x),
             "set_child_lock": lambda x: self._set_state("child_lock", x),
-            "set_countdown_time": lambda x: self._set_state("countdown_time", x),
+            "set_delay_off": lambda x: self._set_state("countdown_time", x),
             "set_target_temperature": lambda x: self._set_state(
                 "target_temperature", x
             ),
@@ -89,22 +89,24 @@ class TestHeater(TestCase):
         self.device.set_child_lock(False)
         assert child_lock() is False
 
-    def test_set_countdown_time(self):
-        def countdown_time():
-            return self.device.status().countdown_time
+    def test_set_delay_off(self):
+        def delay_off_countdown():
+            return self.device.status().delay_off_countdown
 
-        self.device.set_countdown_time(0)
-        assert countdown_time() == 0
-        self.device.set_countdown_time(9)
-        assert countdown_time() == 9
-        self.device.set_countdown_time(12)
-        assert countdown_time() == 12
+        self.device.set_delay_off(0)
+        assert delay_off_countdown() == 0
+        self.device.set_delay_off(9 * 3600)
+        assert delay_off_countdown() == 9
+        self.device.set_delay_off(12 * 3600)
+        assert delay_off_countdown() == 12
+        self.device.set_delay_off(9 * 3600 + 1)
+        assert delay_off_countdown() == 9
 
         with pytest.raises(HeaterMiotException):
-            self.device.set_countdown_time(-1)
+            self.device.set_delay_off(-1)
 
         with pytest.raises(HeaterMiotException):
-            self.device.set_countdown_time(13)
+            self.device.set_delay_off(13 * 3600)
 
     def test_set_target_temperature(self):
         def target_temperature():
