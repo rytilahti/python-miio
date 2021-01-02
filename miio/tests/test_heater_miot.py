@@ -61,7 +61,7 @@ class TestHeater(TestCase):
 
     def test_set_led_brightness(self):
         def led_brightness():
-            return self.device.status().brightness
+            return self.device.status().led_brightness
 
         self.device.set_led_brightness(LedBrightness.On)
         assert led_brightness() == LedBrightness.On

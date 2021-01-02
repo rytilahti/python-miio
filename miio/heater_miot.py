@@ -91,7 +91,7 @@ class HeaterMiotStatus:
         return self.data["buzzer"] is True
 
     @property
-    def brightness(self) -> LedBrightness:
+    def led_brightness(self) -> LedBrightness:
         """LED indicator brightness."""
         return LedBrightness(self.data["led_brightness"])
 
@@ -108,7 +108,7 @@ class HeaterMiotStatus:
                 self.power,
                 self.target_temperature,
                 self.temperature,
-                self.brightness,
+                self.led_brightness,
                 self.buzzer,
                 self.child_lock,
                 self.countdown_time,
