@@ -123,7 +123,7 @@ class HeaterMiotStatus:
 
 
 class HeaterMiot(MiotDevice):
-    """Main class representing the Xiaomi Smart Space Heater S."""
+    """Main class representing the Xiaomi Smart Space Heater S (zhimi.heater.mc2)."""
 
     def __init__(
         self,
