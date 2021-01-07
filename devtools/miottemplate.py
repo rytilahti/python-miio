@@ -21,6 +21,34 @@ class Generator:
     def __init__(self, data):
         self.data = data
 
+    def print_infos(self):
+        dev = Device.from_json(self.data)
+        click.echo(
+            f"Device '{dev.type}': {dev.description} with {len(dev.services)} services"
+        )
+        for serv in dev.services:
+            click.echo(f"\n* Service {serv}")
+
+            if serv.properties:
+                click.echo("\n\t## Properties ##")
+                for prop in serv.properties:
+                    click.echo(f"\t\tsiid {serv.iid}: {prop}")
+                    if prop.value_list:
+                        for value in prop.value_list:
+                            click.echo(f"\t\t\t{value}")
+                    if prop.value_range:
+                        click.echo(f"\t\t\tRange: {prop.value_range}")
+
+            if serv.actions:
+                click.echo("\n\t## Actions ##")
+                for act in serv.actions:
+                    click.echo(f"\t\tsiid {serv.iid}: {act}")
+
+            if serv.events:
+                click.echo("\n\t## Events ##")
+                for evt in serv.events:
+                    click.echo(f"\t\tsiid {serv.iid}: {evt}")
+
     def generate(self):
         dev = Device.from_json(self.data)
 
@@ -42,9 +70,22 @@ class Generator:
 @click.argument("file", type=click.File())
 def generate(file):
     """Generate pseudo-code python for given file."""
+    raise NotImplementedError(
+        "Disabled until miot support gets improved, please use print command instead"
+    )
     data = file.read()
     gen = Generator(data)
     print(gen.generate())
+
+
+@cli.command()
+@click.argument("file", type=click.File())
+def print(file):
+    """Print out device information (props, actions, events)."""
+    data = file.read()
+    gen = Generator(data)
+
+    gen.print_infos()
 
 
 @cli.command()
