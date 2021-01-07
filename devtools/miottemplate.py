@@ -1,8 +1,12 @@
 import logging
+from pathlib import Path
 
 import click
 
-from containers import Device
+import requests
+from containers import Device, ModelMapping
+
+MIOTSPEC_MAPPING = Path("model_miotspec_mapping.json")
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -89,14 +93,57 @@ def print(file):
 
 
 @cli.command()
-@click.argument("type")
-def download(type):
-    """Download description file for model."""
-    import requests
+def download_mapping():
+    """Download model<->urn mapping."""
+    click.echo(
+        "Downloading and saving model<->urn mapping to %s" % MIOTSPEC_MAPPING.name
+    )
+    url = "http://miot-spec.org/miot-spec-v2/instances?status=all"
+    res = requests.get(url)
 
-    url = f"https://miot-spec.org/miot-spec-v2/instance?type={type}"
+    with MIOTSPEC_MAPPING.open("w") as f:
+        f.write(res.text)
+
+
+def get_mapping() -> ModelMapping:
+    with MIOTSPEC_MAPPING.open("r") as f:
+        return ModelMapping.from_json(f.read())
+
+
+@cli.command()
+def list():
+    """List all entries in the model<->urn mapping file."""
+    mapping = get_mapping()
+
+    for inst in mapping.instances:
+        click.echo(f"* {repr(inst)}")
+
+
+@cli.command()
+@click.option("--urn", default=None)
+@click.argument("model", required=False)
+@click.pass_context
+def download(ctx, urn, model):
+    """Download description file for model."""
+
+    if urn is None:
+        if model is None:
+            click.echo("You need to specify either the model or --urn")
+            return
+
+        if not MIOTSPEC_MAPPING.exists():
+            click.echo(
+                "miotspec mapping doesn't exist, downloading to %s"
+                % MIOTSPEC_MAPPING.name
+            )
+            ctx.invoke(download_mapping)
+
+        mapping = get_mapping()
+        urn = mapping.urn_for_model(model)
+
+    url = f"https://miot-spec.org/miot-spec-v2/instance?type={urn}"
     content = requests.get(url)
-    save_to = f"{type}.json"
+    save_to = f"{urn}.json"
     click.echo(f"Saving data to {save_to}")
     with open(save_to, "w") as f:
         f.write(content.text)
