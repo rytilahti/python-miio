@@ -28,6 +28,28 @@ def indent(data, level=4):
 
 
 @dataclass
+class InstanceInfo:
+    model: str
+    status: str
+    type: str
+    version: int
+
+
+@dataclass
+class ModelMapping(DataClassJsonMixin):
+    instances: List[InstanceInfo]
+
+    def urn_for_model(self, model: str):
+        matches = [inst.type for inst in self.instances if inst.model == model]
+        if len(matches) > 1:
+            print(
+                "WARNING more than a single match for model %s: %s" % (model, matches)
+            )
+
+        return matches[0]
+
+
+@dataclass
 class Property(DataClassJsonMixin):
     iid: int
     type: str
