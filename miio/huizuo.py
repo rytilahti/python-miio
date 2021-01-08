@@ -109,8 +109,8 @@ _ADDITIONAL_MAPPING_SCENE = {  # Only for write, send "0" to activate
     "colortemp_add": {"siid": 3, "piid": 5},
     "colortemp_dec": {"siid": 3, "piid": 6},
     "colortemp_switch": {"siid": 3, "piid": 7},
-    "on_or_brightness": {"siid": 3, "piid": 8},
-    "on_or_colortemp": {"siid": 3, "piid": 9},
+    "on_or_increasbrightness": {"siid": 3, "piid": 8},
+    "on_or_increase_colortemp": {"siid": 3, "piid": 9},
 }
 
 
@@ -580,19 +580,19 @@ class HuizuoLampScene(Huizuo):
     @command(
         default_output=format_output("Switch on or increase brightness"),
     )
-    def on_or_brightness(self):
+    def on_or_increase_brightness(self):
         """Switch on or increase brightness (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
-            return self.set_property("on_or_brightness", 0)
+            return self.set_property("on_or_increase_brightness", 0)
         else:
             raise HuizuoException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Switch on or increase color temperature"),
     )
-    def on_or_colortemp(self):
+    def on_or_increase_colortemp(self):
         """Switch on or increase color temperature (only for models with scenes support)."""
         if self.model in MODELS_WITH_SCENES:
-            return self.set_property("on_or_colortemp", 0)
+            return self.set_property("on_or_increase_colortemp", 0)
         else:
             raise HuizuoException("Your device doesn't support scenes")
