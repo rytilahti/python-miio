@@ -29,9 +29,18 @@ _MAPPING_CGDN1 = {
     # Settings
     "start_time": {"siid": 9, "piid": 2},  # [0, 2147483647] step 1
     "end_time": {"siid": 9, "piid": 3},  # [0, 2147483647] step 1
-    "monitoring_frequency": {"siid": 9, "piid": 4},  # 1, 60, 300, 600, 0
-    "screen_off": {"siid": 9, "piid": 5},  # 15, 30, 60, 300, 0
-    "device_off": {"siid": 9, "piid": 6},  # 15, 30, 60, 0
+    "monitoring_frequency": {
+        "siid": 9,
+        "piid": 4,
+    },  # 1, 60, 300, 600, 0; device accepts [0..600]
+    "screen_off": {
+        "siid": 9,
+        "piid": 5,
+    },  # 15, 30, 60, 300, 0; device accepts [0..300], 0 means never
+    "device_off": {
+        "siid": 9,
+        "piid": 6,
+    },  # 15, 30, 60, 0; device accepts [0..60], 0 means never
     "temperature_unit": {"siid": 9, "piid": 7},
 }
 
@@ -47,7 +56,7 @@ class ChargingState(enum.Enum):
     NotChargable = 3
 
 
-class MonitoringFrequencyCGDN1(enum.Enum):
+class MonitoringFrequencyCGDN1(enum.Enum):  # Official spec options
     Every1Second = 1
     Every1Minute = 60
     Every5Minutes = 300
@@ -55,7 +64,7 @@ class MonitoringFrequencyCGDN1(enum.Enum):
     NotSet = 0
 
 
-class ScreenOffCGDN1(enum.Enum):
+class ScreenOffCGDN1(enum.Enum):  # Official spec options
     After15Seconds = 15
     After30Seconds = 30
     After1Minute = 60
@@ -63,7 +72,7 @@ class ScreenOffCGDN1(enum.Enum):
     Never = 0
 
 
-class DeviceOffCGDN1(enum.Enum):
+class DeviceOffCGDN1(enum.Enum):  # Official spec options
     After15Minutes = 15
     After30Minutes = 30
     After1Hour = 60
@@ -80,6 +89,9 @@ class AirQualityMonitorCGDN1Status:
 
     def __init__(self, data):
         self.data = data
+        self._monitoring_frequency_options = MonitoringFrequencyCGDN1
+        self._screen_off_options = ScreenOffCGDN1
+        self._device_off_options = DeviceOffCGDN1
 
     @property
     def humidity(self) -> int:
@@ -118,18 +130,18 @@ class AirQualityMonitorCGDN1Status:
 
     @property
     def monitoring_frequency(self) -> int:
-        """Return monitoring frequency time."""
-        return MonitoringFrequencyCGDN1(self.data["monitoring_frequency"])
+        """Return monitoring frequency time (0..600 s)."""
+        return self.data["monitoring_frequency"]
 
     @property
     def screen_off(self) -> int:
-        """Return screen off time."""
-        return ScreenOffCGDN1(self.data["screen_off"])
+        """Return screen off time (0..300 s)."""
+        return self.data["screen_off"]
 
     @property
     def device_off(self) -> int:
-        """Return device off time."""
-        return DeviceOffCGDN1(self.data["device_off"])
+        """Return device off time (0..60 min)."""
+        return self.data["device_off"]
 
     @property
     def display_temperature_unit(self):
@@ -189,9 +201,9 @@ class AirQualityMonitorCGDN1(MiotDevice):
             "CO₂: {result.co2} μg/m³\n"
             "Battery: {result.battery} %\n"
             "Charging state: {result.charging_state.name}\n"
-            "Monitoring frequency: {result.monitoring_frequency.name}\n"
-            "Screen off: {result.screen_off.name}\n"
-            "Device off: {result.device_off.name}\n"
+            "Monitoring frequency: {result.monitoring_frequency} s\n"
+            "Screen off: {result.screen_off} s\n"
+            "Device off: {result.device_off} min\n"
             "Display temperature unit: {result.display_temperature_unit.name}\n",
         )
     )
@@ -206,40 +218,40 @@ class AirQualityMonitorCGDN1(MiotDevice):
         )
 
     @command(
-        click.argument(
-            "freq",
-            type=click.Choice(MonitoringFrequencyCGDN1.__members__),
-            callback=lambda c, p, v: getattr(MonitoringFrequencyCGDN1, v),
-        ),
-        default_output=format_output("Setting monitoring frequency to {freq.name}"),
+        click.argument("duration", type=int),
+        default_output=format_output("Setting monitoring frequency to {duration} s"),
     )
-    def set_monitoring_frequency(self, freq: MonitoringFrequencyCGDN1):
+    def set_monitoring_frequency_duration(self, duration):
         """Set monitoring frequency."""
-        return self.set_property("monitoring_frequency", freq.value)
+        if duration < 0 or duration > 600:
+            raise AirQualityMonitorMiotException(
+                "Invalid duration: %s. Must be between 0 and 600" % duration
+            )
+        return self.set_property("monitoring_frequency", duration)
 
     @command(
-        click.argument(
-            "duration",
-            type=click.Choice(DeviceOffCGDN1.__members__),
-            callback=lambda c, p, v: getattr(DeviceOffCGDN1, v),
-        ),
-        default_output=format_output("Setting device off duration to {duration.name}"),
+        click.argument("duration", type=int),
+        default_output=format_output("Setting device off duration to {duration} min"),
     )
-    def set_device_off_duration(self, duration: DeviceOffCGDN1):
+    def set_device_off_duration(self, duration):
         """Set device off duration."""
-        return self.set_property("device_off", duration.value)
+        if duration < 0 or duration > 60:
+            raise AirQualityMonitorMiotException(
+                "Invalid duration: %s. Must be between 0 and 60" % duration
+            )
+        return self.set_property("device_off", duration)
 
     @command(
-        click.argument(
-            "duration",
-            type=click.Choice(ScreenOffCGDN1.__members__),
-            callback=lambda c, p, v: getattr(ScreenOffCGDN1, v),
-        ),
-        default_output=format_output("Setting screen off duration to {duration.name}"),
+        click.argument("duration", type=int),
+        default_output=format_output("Setting screen off duration to {duration} s"),
     )
-    def set_screen_off_duration(self, duration: ScreenOffCGDN1):
+    def set_screen_off_duration(self, duration):
         """Set screen off duration."""
-        return self.set_property("screen_off", duration.value)
+        if duration < 0 or duration > 300:
+            raise AirQualityMonitorMiotException(
+                "Invalid duration: %s. Must be between 0 and 300" % duration
+            )
+        return self.set_property("screen_off", duration)
 
     @command(
         click.argument(
