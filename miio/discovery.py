@@ -1,8 +1,8 @@
 import codecs
 import inspect
-import ipaddress
 import logging
 from functools import partial
+from ipaddress import ip_address
 from typing import Callable, Dict, Optional, Union  # noqa: F401
 
 import zeroconf
@@ -205,9 +205,19 @@ def pretty_token(token):
     return codecs.encode(token, "hex").decode()
 
 
+def get_addr_from_info(info):
+    addrs = info.addresses
+    if len(addrs) > 1:
+        _LOGGER.warning(
+            "More than single IP address in the advertisement, using the first one"
+        )
+
+    return str(ip_address(addrs[0]))
+
+
 def other_package_info(info, desc):
     """Return information about another package supporting the device."""
-    return "%s @ %s, check %s" % (info.name, ipaddress.ip_address(info.address), desc)
+    return "Found %s at %s, check %s" % (info.name, get_addr_from_info(info), desc)
 
 
 def create_device(name: str, addr: str, device_cls: partial) -> Device:
@@ -261,7 +271,8 @@ class Listener:
 
     def add_service(self, zeroconf, type, name):
         info = zeroconf.get_service_info(type, name)
-        addr = str(ipaddress.ip_address(info.address))
+        addr = get_addr_from_info(info)
+
         if addr not in self.found_devices:
             dev = self.check_and_create_device(info, addr)
             self.found_devices[addr] = dev

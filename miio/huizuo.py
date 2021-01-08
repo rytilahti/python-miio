@@ -103,13 +103,13 @@ _ADDITIONAL_MAPPING_HEATER = {
 
 _ADDITIONAL_MAPPING_SCENE = {  # Only for write, send "0" to activate
     "on_off": {"siid": 3, "piid": 1},
-    "brightness_add": {"siid": 3, "piid": 2},
-    "brightness_dec": {"siid": 3, "piid": 3},
+    "brightness_increase": {"siid": 3, "piid": 2},
+    "brightness_decrease": {"siid": 3, "piid": 3},
     "brightness_switch": {"siid": 3, "piid": 4},
-    "colortemp_add": {"siid": 3, "piid": 5},
-    "colortemp_dec": {"siid": 3, "piid": 6},
+    "colortemp_increase": {"siid": 3, "piid": 5},
+    "colortemp_decrease": {"siid": 3, "piid": 6},
     "colortemp_switch": {"siid": 3, "piid": 7},
-    "on_or_increasbrightness": {"siid": 3, "piid": 8},
+    "on_or_increase_brightness": {"siid": 3, "piid": 8},
     "on_or_increase_colortemp": {"siid": 3, "piid": 9},
 }
 

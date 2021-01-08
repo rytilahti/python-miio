@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import Any, Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config
 
@@ -28,6 +28,28 @@ def indent(data, level=4):
 
 
 @dataclass
+class InstanceInfo:
+    model: str
+    status: str
+    type: str
+    version: int
+
+
+@dataclass
+class ModelMapping(DataClassJsonMixin):
+    instances: List[InstanceInfo]
+
+    def urn_for_model(self, model: str):
+        matches = [inst.type for inst in self.instances if inst.model == model]
+        if len(matches) > 1:
+            print(
+                "WARNING more than a single match for model %s: %s" % (model, matches)
+            )
+
+        return matches[0]
+
+
+@dataclass
 class Property(DataClassJsonMixin):
     iid: int
     type: str
@@ -35,15 +57,17 @@ class Property(DataClassJsonMixin):
     format: str
     access: List[str]
 
-    value_list: List = field(
+    value_list: Optional[List[Dict]] = field(
         default_factory=list, metadata=config(field_name="value-list")
     )
-    value_range: List = field(default=None, metadata=config(field_name="value-range"))
+    value_range: Optional[List[int]] = field(
+        default=None, metadata=config(field_name="value-range")
+    )
 
-    unit: str = None
+    unit: Optional[str] = None
 
     def __repr__(self):
-        return f"piid: {self.iid} ({self.description}): ({self.format}, unit: {self.unit}) (acc: {self.access}, value-list: {self.value_list}, value-range: {self.value_range})"
+        return f"piid: {self.iid} ({self.description}): ({self.format}, unit: {self.unit}) (acc: {self.access})"
 
     def __str__(self):
         return self.__repr__()
@@ -111,14 +135,11 @@ class Action(DataClassJsonMixin):
     iid: int
     type: str
     description: str
-    out: List = field(default_factory=list)
-    in_: List = field(default_factory=list, metadata=config(field_name="in"))
+    out: List[Any] = field(default_factory=list)
+    in_: List[Any] = field(default_factory=list, metadata=config(field_name="in"))
 
     def __repr__(self):
         return f"aiid {self.iid} {self.description}: in: {self.in_} -> out: {self.out}"
-
-    def __str__(self):
-        return self.__repr__()
 
     def pretty_name(self):
         return pretty_name(self.description)
@@ -136,13 +157,10 @@ class Event(DataClassJsonMixin):
     iid: int
     type: str
     description: str
-    arguments: List
+    arguments: List[int]
 
     def __repr__(self):
         return f"eiid {self.iid} ({self.description}): (args: {self.arguments})"
-
-    def __str__(self):
-        return self.__repr__()
 
 
 @dataclass
@@ -156,9 +174,6 @@ class Service(DataClassJsonMixin):
 
     def __repr__(self):
         return f"siid {self.iid}: ({self.description}): {len(self.properties)} props, {len(self.actions)} actions"
-
-    def __str__(self):
-        return self.__repr__()
 
     def as_code(self):
         s = ""
