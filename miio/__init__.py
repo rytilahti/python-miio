@@ -64,6 +64,7 @@ from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight import Yeelight
+from miio.yeelight_dual_switch import YeelightDualControlModule
 
 from miio.discovery import Discovery
 
