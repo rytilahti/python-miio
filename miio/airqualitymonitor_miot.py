@@ -40,7 +40,7 @@ class AirQualityMonitorMiotException(DeviceException):
     pass
 
 
-class ChargingStateCGDN1(enum.Enum):
+class ChargingState(enum.Enum):
     Unplugged = 0  # Not mentioned in the spec
     Charging = 1
     NotCharging = 2
@@ -112,9 +112,9 @@ class AirQualityMonitorCGDN1Status:
         return self.data["battery"]
 
     @property
-    def charging_state(self) -> ChargingStateCGDN1:
+    def charging_state(self) -> ChargingState:
         """Return charging state."""
-        return ChargingStateCGDN1(self.data["charging_state"])
+        return ChargingState(self.data["charging_state"])
 
     @property
     def monitoring_frequency(self) -> int:

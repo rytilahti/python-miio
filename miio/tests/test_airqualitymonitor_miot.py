@@ -4,7 +4,7 @@ import pytest
 
 from miio import AirQualityMonitorCGDN1
 from miio.airqualitymonitor_miot import (
-    ChargingStateCGDN1,
+    ChargingState,
     DeviceOffCGDN1,
     DisplayTemeratureUnitCGDN1,
     MonitoringFrequencyCGDN1,
@@ -63,9 +63,7 @@ class TestAirQualityMonitor(TestCase):
         assert status.temperature is _INITIAL_STATE["temperature"]
         assert status.co2 is _INITIAL_STATE["co2"]
         assert status.battery is _INITIAL_STATE["battery"]
-        assert status.charging_state is ChargingStateCGDN1(
-            _INITIAL_STATE["charging_state"]
-        )
+        assert status.charging_state is ChargingState(_INITIAL_STATE["charging_state"])
         assert status.monitoring_frequency is MonitoringFrequencyCGDN1(
             _INITIAL_STATE["monitoring_frequency"]
         )
