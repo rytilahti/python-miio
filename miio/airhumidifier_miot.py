@@ -34,6 +34,7 @@ _MAPPING = {
     # Other (siid=7)
     "actual_speed": {"siid": 7, "piid": 1},  # [0, 2000] step 1
     "power_time": {"siid": 7, "piid": 3},  # [0, 4294967295] step 1
+    "clean_mode": {"siid": 7, "piid": 5},  # bool
 }
 
 
@@ -199,6 +200,11 @@ class AirHumidifierMiotStatus:
         """Return how long the device has been powered in seconds."""
         return self.data["power_time"]
 
+    @property
+    def clean_mode(self) -> bool:
+        """Return True if clean mode is active."""
+        return self.data["clean_mode"]
+
     def __repr__(self) -> str:
         s = (
             "<AirHumidifierMiotStatus"
@@ -218,7 +224,8 @@ class AirHumidifierMiotStatus:
             "led_brightness=%s, "
             "child_lock=%s, "
             "actual_speed=%s, "
-            "power_time=%s>"
+            "power_time=%s, "
+            "clean_mode=%s>"
             % (
                 self.power,
                 self.fault,
@@ -237,6 +244,7 @@ class AirHumidifierMiotStatus:
                 self.child_lock,
                 self.actual_speed,
                 self.power_time,
+                self.clean_mode,
             )
         )
         return s
@@ -274,7 +282,8 @@ class AirHumidifierMiot(MiotDevice):
             "Target motor speed: {result.motor_speed} rpm\n"
             "Actual motor speed: {result.actual_speed} rpm\n"
             "Use time: {result.use_time} s\n"
-            "Power time: {result.power_time} s\n",
+            "Power time: {result.power_time} s\n"
+            "Clean mode: {result.clean_mode}\n",
         )
     )
     def status(self) -> AirHumidifierMiotStatus:
@@ -367,3 +376,15 @@ class AirHumidifierMiot(MiotDevice):
     def set_dry(self, dry: bool):
         """Set dry mode on/off."""
         return self.set_property("dry", dry)
+
+    @command(
+        click.argument("clean_mode", type=bool),
+        default_output=format_output(
+            lambda clean_mode: "Turning on clean mode"
+            if clean_mode
+            else "Turning off clean mode"
+        ),
+    )
+    def set_clean_mode(self, clean_mode: bool):
+        """Set clean mode on/off."""
+        return self.set_property("clean_mode", clean_mode)
