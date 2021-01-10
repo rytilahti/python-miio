@@ -209,7 +209,7 @@ class AirDogX3(Device):
         return self.send("set_clean")
 
 
-class AirDogX5(Device):
+class AirDogX5(AirDogX3):
     def __init__(
         self,
         ip: str = None,
@@ -227,7 +227,7 @@ class AirDogX5(Device):
             self.model = MODEL_AIRDOG_X5
 
 
-class AirDogX7SM(Device):
+class AirDogX7SM(AirDogX3):
     def __init__(
         self,
         ip: str = None,
