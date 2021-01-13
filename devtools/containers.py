@@ -57,7 +57,7 @@ class Property(DataClassJsonMixin):
     format: str
     access: List[str]
 
-    value_list: Optional[List[Dict]] = field(
+    value_list: Optional[List[Dict[str, Any]]] = field(
         default_factory=list, metadata=config(field_name="value-list")
     )
     value_range: Optional[List[int]] = field(
