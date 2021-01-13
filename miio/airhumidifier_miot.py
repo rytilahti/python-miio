@@ -209,7 +209,7 @@ class AirHumidifierMiotStatus:
         s = (
             "<AirHumidifierMiotStatus"
             "power=%s, "
-            "fault=%s, "
+            "error=%s, "
             "mode=%s, "
             "target_humidity=%s, "
             "water_level=%s, "
@@ -228,7 +228,7 @@ class AirHumidifierMiotStatus:
             "clean_mode=%s>"
             % (
                 self.power,
-                self.fault,
+                self.error,
                 self.mode,
                 self.target_humidity,
                 self.water_level,
