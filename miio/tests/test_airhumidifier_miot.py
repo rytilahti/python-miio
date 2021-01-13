@@ -31,6 +31,7 @@ _INITIAL_STATE = {
     "motor_speed": 354,
     "actual_speed": 820,
     "power_time": 4272468,
+    "clean_mode": False,
 }
 
 
@@ -47,6 +48,7 @@ class DummyAirHumidifierMiot(DummyMiotDevice, AirHumidifierMiot):
             "set_buzzer": lambda x: self._set_state("buzzer", x),
             "set_child_lock": lambda x: self._set_state("child_lock", x),
             "set_dry": lambda x: self._set_state("dry", x),
+            "set_clean_mode": lambda x: self._set_state("clean_mode", x),
         }
         super().__init__(*args, **kwargs)
 
@@ -180,3 +182,13 @@ class TestAirHumidifier(TestCase):
 
         self.device.set_dry(False)
         assert dry() is False
+
+    def test_set_clean_mode(self):
+        def clean_mode():
+            return self.device.status().clean_mode
+
+        self.device.set_clean_mode(True)
+        assert clean_mode() is True
+
+        self.device.set_clean_mode(False)
+        assert clean_mode() is False
