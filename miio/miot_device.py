@@ -1,19 +1,27 @@
 import logging
 from enum import Enum
+from functools import partial
 from typing import Any, Union
 
 import click
 
-from .click_common import EnumType, command
+from .click_common import EnumType, LiteralParamType, command
 from .device import Device
+from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
 
+def _str2bool(x):
+    """Helper to convert string to boolean."""
+    return x.lower() in ("true", "1")
+
+
+# partial is required here for str2bool, see https://stackoverflow.com/a/40339397
 class MiotValueType(Enum):
     Int = int
     Float = float
-    Bool = bool
+    Bool = partial(_str2bool)
     Str = str
 
 
@@ -26,11 +34,43 @@ class MiotDevice(Device):
         """Retrieve raw properties based on mapping."""
 
         # We send property key in "did" because it's sent back via response and we can identify the property.
-        properties = [{"did": k, **v} for k, v in self.mapping.items()]
+        properties = [
+            {"did": k, **v} for k, v in self.mapping.items() if "aiid" not in v
+        ]
 
         return self.get_properties(
             properties, property_getter="get_properties", max_properties=15
         )
+
+    @command(
+        click.argument("name", type=str),
+        click.argument("params", type=LiteralParamType(), required=False),
+    )
+    def call_action(self, name: str, params=None):
+        """Call an action by a name in the mapping."""
+        action = self.mapping.get(name)
+        if "siid" not in action or "aiid" not in action:
+            raise DeviceException(f"{name} is not an action (missing siid or aiid)")
+
+        return self.call_action_by(action["siid"], action["aiid"], params)
+
+    @command(
+        click.argument("siid", type=int),
+        click.argument("aiid", type=int),
+        click.argument("params", type=LiteralParamType(), required=False),
+    )
+    def call_action_by(self, siid, aiid, params=None):
+        """Call an action."""
+        if params is None:
+            params = []
+        payload = {
+            "did": f"call-{siid}-{aiid}",
+            "siid": siid,
+            "aiid": aiid,
+            "in": params,
+        }
+
+        return self.send("action", payload)
 
     @command(
         click.argument("siid", type=int),
