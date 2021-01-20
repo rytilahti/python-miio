@@ -1,5 +1,10 @@
 [flake8]
 exclude = .git,.tox,__pycache__
 max-line-length = 88
-select = C,E,F,W,B,B950
-ignore = E501,W503,E203
+# TODO: enable ANN aftewards
+# TODO: enable PT (pytest) afterwards
+# TODO: enable R for return values when __repr__ for containers is refactored
+select = C,E,F,W,B,SIM,T
+# the line lengths are enforced by black and docformatter
+# therefore we ignore E501 and B950 here
+ignore = E501,B950,W503,E203
