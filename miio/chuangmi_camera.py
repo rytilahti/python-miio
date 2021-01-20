@@ -395,11 +395,13 @@ class ChuangmiCamera(Device):
     def set_nas_config(
         self,
         state: NASState,
-        share={},
+        share=None,
         sync_interval: NASSyncInterval = NASSyncInterval.Realtime,
         video_retention_time: NASVideoRetentionTime = NASVideoRetentionTime.Week,
     ):
         """Set NAS configuration."""
+        if share is None:
+            share = {}
         return self.send(
             "nas_set_config",
             {

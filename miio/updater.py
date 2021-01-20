@@ -42,7 +42,7 @@ class OneShotServer:
     def __init__(self, file, interface=None):
         addr = ("", 0)
         self.server = HTTPServer(addr, SingleFileHandler)
-        setattr(self.server, "got_request", False)
+        setattr(self.server, "got_request", False)  # noqa: B010
 
         self.addr, self.port = self.server.server_address
         self.server.timeout = 10
@@ -83,7 +83,7 @@ class OneShotServer:
 
     def serve_once(self):
         self.server.handle_request()
-        if getattr(self.server, "got_request"):
+        if getattr(self.server, "got_request"):  # noqa: B009
             _LOGGER.info("Got a request, should be downloading now.")
             return True
         else:

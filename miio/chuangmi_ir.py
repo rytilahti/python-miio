@@ -144,17 +144,18 @@ class ChuangmiIr(Device):
         else:
             command_type, command, *command_args = command.split(":")
 
-        if command_type == "raw":
-            play_method = self.play_raw
-            arg_types = [int]
-        elif command_type == "pronto":
-            play_method = self.play_pronto
-            arg_types = [int]
-        else:
-            raise ChuangmiIrException("Invalid command type")
-
+        arg_types = [int]
         if len(command_args) > len(arg_types):
             raise ChuangmiIrException("Invalid command arguments count")
+
+        if command_type not in ["raw", "pronto"]:
+            raise ChuangmiIrException("Invalid command type")
+
+        if command_type == "raw":
+            play_method = self.play_raw
+
+        elif command_type == "pronto":
+            play_method = self.play_pronto
 
         try:
             command_args = [t(v) for v, t in zip(command_args, arg_types)]

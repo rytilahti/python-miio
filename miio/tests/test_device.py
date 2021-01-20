@@ -22,7 +22,7 @@ def test_get_properties_splitting(mocker, max_properties):
 def test_default_timeout_and_retry(mocker):
     send = mocker.patch("miio.miioprotocol.MiIOProtocol.send")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-    assert 5 == d._protocol._timeout
+    assert d._protocol._timeout == 5
     d.send(command="fake_command", parameters=[])
     send.assert_called_with("fake_command", [], 3, extra_parameters=None)
 
@@ -30,7 +30,7 @@ def test_default_timeout_and_retry(mocker):
 def test_timeout_retry(mocker):
     send = mocker.patch("miio.miioprotocol.MiIOProtocol.send")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff", timeout=4)
-    assert 4 == d._protocol._timeout
+    assert d._protocol._timeout == 4
     d.send("fake_command", [], 1)
     send.assert_called_with("fake_command", [], 1, extra_parameters=None)
     d.send("fake_command", [])
@@ -41,7 +41,7 @@ def test_timeout_retry(mocker):
         timeout = 1
 
     d2 = CustomDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-    assert 1 == d2._protocol._timeout
+    assert d2._protocol._timeout == 1
     d2.send("fake_command", [])
     send.assert_called_with("fake_command", [], 5, extra_parameters=None)
 

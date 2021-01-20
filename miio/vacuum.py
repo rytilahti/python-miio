@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import enum
 import json
@@ -284,22 +285,24 @@ class Vacuum(Device):
     @command(click.option("--version", default=1))
     def fresh_map(self, version):
         """Return fresh map?"""
+        if version not in [1, 2]:
+            raise VacuumException("Unknown map version: %s" % version)
+
         if version == 1:
             return self.send("get_fresh_map")
         elif version == 2:
             return self.send("get_fresh_map_v2")
-        else:
-            raise VacuumException("Unknown map version: %s" % version)
 
     @command(click.option("--version", default=1))
     def persist_map(self, version):
         """Return fresh map?"""
+        if version not in [1, 2]:
+            raise VacuumException("Unknown map version: %s" % version)
+
         if version == 1:
             return self.send("get_persist_map")
         elif version == 2:
             return self.send("get_persist_map_v2")
-        else:
-            raise VacuumException("Unknown map version: %s" % version)
 
     @command(
         click.argument("x1", type=int),
@@ -728,14 +731,13 @@ class Vacuum(Device):
                 kwargs["debug"] = gco.debug
 
             start_id = manual_seq = 0
-            try:
-                with open(id_file, "r") as f:
-                    x = json.load(f)
-                    start_id = x.get("seq", 0)
-                    manual_seq = x.get("manual_seq", 0)
-                    _LOGGER.debug("Read stored sequence ids: %s", x)
-            except (FileNotFoundError, TypeError, ValueError):
-                pass
+            with open(id_file, "r") as f, contextlib.suppress(
+                FileNotFoundError, TypeError, ValueError
+            ):
+                x = json.load(f)
+                start_id = x.get("seq", 0)
+                manual_seq = x.get("manual_seq", 0)
+                _LOGGER.debug("Read stored sequence ids: %s", x)
 
             ctx.obj = cls(*args, start_id=start_id, **kwargs)
             ctx.obj.manual_seqnum = manual_seq

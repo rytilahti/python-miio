@@ -126,11 +126,13 @@ class AirConditioningCompanionMcn02(Device):
         self,
         ip: str = None,
         token: str = None,
-        start_id: int = random.randint(0, 999),
+        start_id: int = None,
         debug: int = 0,
         lazy_discover: bool = True,
         model: str = MODEL_ACPARTNER_MCN02,
     ) -> None:
+        if start_id is None:
+            start_id = random.randint(0, 999)
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model != MODEL_ACPARTNER_MCN02:

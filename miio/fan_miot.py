@@ -176,10 +176,11 @@ class FanMiot(MiotDevice):
         lazy_discover: bool = True,
         model: str = MODEL_FAN_P10,
     ) -> None:
-        if model in MIOT_MAPPING:
-            self.model = model
-        else:
+        if model not in MIOT_MAPPING:
             raise FanException("Invalid FanMiot model: %s" % model)
+
+        self.model = model
+
         super().__init__(MIOT_MAPPING[model], ip, token, start_id, debug, lazy_discover)
 
     @command(

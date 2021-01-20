@@ -45,7 +45,7 @@ def deprecated(reason):
 
         return decorator
 
-    elif inspect.isclass(reason) or inspect.isfunction(reason):
+    elif inspect.isclass(reason) or inspect.isfunction(reason):  # noqa: SIM106
 
         # The @deprecated is used without any 'reason'.
         #

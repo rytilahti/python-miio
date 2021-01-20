@@ -69,23 +69,23 @@ class MiIOProtocol:
 
             raise ex
 
-        if m is not None:
-            header = m.header.value
-            self._device_id = header.device_id
-            self._device_ts = header.ts
-            self._discovered = True
-
-            if self.debug > 1:
-                _LOGGER.debug(m)
-            _LOGGER.debug(
-                "Discovered %s with ts: %s, token: %s",
-                binascii.hexlify(self._device_id).decode(),
-                self._device_ts,
-                codecs.encode(m.checksum, "hex"),
-            )
-        else:
+        if m is None:
             _LOGGER.debug("Unable to discover a device at address %s", self.ip)
             raise DeviceException("Unable to discover the device %s" % self.ip)
+
+        header = m.header.value
+        self._device_id = header.device_id
+        self._device_ts = header.ts
+        self._discovered = True
+
+        if self.debug > 1:
+            _LOGGER.debug(m)
+        _LOGGER.debug(
+            "Discovered %s with ts: %s, token: %s",
+            binascii.hexlify(self._device_id).decode(),
+            self._device_ts,
+            codecs.encode(m.checksum, "hex"),
+        )
 
         return m
 

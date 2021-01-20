@@ -79,12 +79,12 @@ def generate(file):
     )
     data = file.read()
     gen = Generator(data)
-    print(gen.generate())
+    click.echo(gen.generate())
 
 
-@cli.command()
+@cli.command(name="print")
 @click.argument("file", type=click.File())
-def print(file):
+def _print(file):
     """Print out device information (props, actions, events)."""
     data = file.read()
     gen = Generator(data)
