@@ -67,6 +67,13 @@ class FanspeedV2(enum.Enum):
     Gentle = 105
 
 
+class FanspeedV3(enum.Enum):
+    Silent = 38
+    Standard = 60
+    Medium = 75
+    Turbo = 100
+
+
 class FanspeedE2(enum.Enum):
     # Original names from the app: Gentle, Silent, Standard, Strong, Max
     Gentle = 41
@@ -503,7 +510,9 @@ class Vacuum(Device):
             fw_version = info.firmware_version
             version, build = fw_version.split("_")
             version = tuple(map(int, version.split(".")))
-            if version >= (3, 5, 7):
+            if version >= (3, 5, 8):
+                self._fanspeeds = FanspeedV3
+            elif version == (3, 5, 7):
                 self._fanspeeds = FanspeedV2
             else:
                 self._fanspeeds = FanspeedV1
