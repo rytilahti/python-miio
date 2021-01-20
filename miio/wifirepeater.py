@@ -49,8 +49,7 @@ class WifiRepeaterStatus:
 
 class WifiRepeaterConfiguration:
     def __init__(self, data):
-        """
-        Response of a xiaomi.repeater.v2:
+        """Response of a xiaomi.repeater.v2:
 
         {'ssid': 'SSID', 'pwd': 'PWD', 'hidden': 0}
         """

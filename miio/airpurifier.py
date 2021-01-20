@@ -48,8 +48,7 @@ class AirPurifierStatus:
     _filter_type_cache = {}
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Air Purifier Pro (zhimi.airpurifier.v6):
+        """Response of a Air Purifier Pro (zhimi.airpurifier.v6):
 
         {'power': 'off', 'aqi': 7, 'average_aqi': 18, 'humidity': 45,
          'temp_dec': 234, 'mode': 'auto', 'favorite_level': 17,
@@ -131,7 +130,10 @@ class AirPurifierStatus:
 
     @property
     def sleep_mode(self) -> Optional[SleepMode]:
-        """Operation mode of the sleep state. (Idle vs. Silent)"""
+        """Operation mode of the sleep state.
+
+        (Idle vs. Silent)
+        """
         if self.data["sleep_mode"] is not None:
             return SleepMode(self.data["sleep_mode"])
 
@@ -156,7 +158,9 @@ class AirPurifierStatus:
     @property
     def illuminance(self) -> Optional[int]:
         """Environment illuminance level in lux [0-200].
-        Sensor value is updated only when device is turned on."""
+
+        Sensor value is updated only when device is turned on.
+        """
         return self.data["bright"]
 
     @property
@@ -525,7 +529,10 @@ class AirPurifier(Device):
         ),
     )
     def set_auto_detect(self, auto_detect: bool):
-        """Set auto detect on/off. It's a feature of the AirPurifier V1 & V3"""
+        """Set auto detect on/off.
+
+        It's a feature of the AirPurifier V1 & V3
+        """
         if auto_detect:
             return self.send("set_act_det", ["on"])
         else:

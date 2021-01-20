@@ -8,7 +8,6 @@ State: 1
 Ambient Light: Yellow
 Filter remaining: 100%
 Filter remaining time: 180
-
 """
 from unittest import TestCase
 

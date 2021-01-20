@@ -84,7 +84,7 @@ class FanspeedE2(enum.Enum):
 
 
 class WaterFlow(enum.Enum):
-    """Water flow strength on s5 max. """
+    """Water flow strength on s5 max."""
 
     Minimum = 200
     Low = 201
@@ -115,8 +115,8 @@ class Vacuum(Device):
     def stop(self):
         """Stop cleaning.
 
-        Note, prefer 'pause' instead of this for wider support.
-        Some newer vacuum models do not support this command.
+        Note, prefer 'pause' instead of this for wider support. Some newer vacuum models
+        do not support this command.
         """
         return self.send("app_stop")
 
@@ -150,14 +150,18 @@ class Vacuum(Device):
     @command(click.argument("x_coord", type=int), click.argument("y_coord", type=int))
     def goto(self, x_coord: int, y_coord: int):
         """Go to specific target.
+
         :param int x_coord: x coordinate
-        :param int y_coord: y coordinate"""
+        :param int y_coord: y coordinate
+        """
         return self.send("app_goto_target", [x_coord, y_coord])
 
     @command(click.argument("zones", type=LiteralParamType(), required=True))
     def zoned_clean(self, zones: List):
         """Clean zones.
-        :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]"""
+
+        :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]
+        """
         return self.send("app_zoned_clean", zones)
 
     @command()
@@ -193,8 +197,8 @@ class Vacuum(Device):
     def manual_control_once(
         self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT
     ):
-        """Starts the remote control mode and executes
-        the action once before deactivating the mode."""
+        """Starts the remote control mode and executes the action once before
+        deactivating the mode."""
         number_of_tries = 3
         self.manual_start()
         while number_of_tries > 0:
@@ -343,8 +347,8 @@ class Vacuum(Device):
     def enable_lab_mode(self, enable):
         """Enable persistent maps and software barriers.
 
-        This is required to use create_nogo_zone and create_software_barrier
-        commands."""
+        This is required to use create_nogo_zone and create_software_barrier commands.
+        """
         return self.send("set_lab_status", int(enable))["ok"]
 
     @command()
@@ -356,7 +360,8 @@ class Vacuum(Device):
     def last_clean_details(self) -> Optional[CleaningDetails]:
         """Return details from the last cleaning.
 
-        Returns None if there has been no cleanups."""
+        Returns None if there has been no cleanups.
+        """
         history = self.clean_history()
         if not history.ids:
             return None
@@ -423,7 +428,8 @@ class Vacuum(Device):
 
         :param cron: schedule in cron format
         :param command: ignored by the vacuum.
-        :param parameters: ignored by the vacuum."""
+        :param parameters: ignored by the vacuum.
+        """
         import time
 
         ts = int(round(time.time() * 1000))
@@ -433,7 +439,8 @@ class Vacuum(Device):
     def delete_timer(self, timer_id: int):
         """Delete a timer with given ID.
 
-        :param int timer_id: Timer ID"""
+        :param int timer_id: Timer ID
+        """
         return self.send("del_timer", [str(timer_id)])
 
     @command(
@@ -443,7 +450,8 @@ class Vacuum(Device):
         """Update a timer with given ID.
 
         :param int timer_id: Timer ID
-        :param TimerStae mode: either On or Off"""
+        :param TimerStae mode: either On or Off
+        """
         if mode != TimerState.On and mode != TimerState.Off:
             raise DeviceException("Only 'On' or 'Off' are  allowed")
         return self.send("upd_timer", [str(timer_id), mode.value])
@@ -467,7 +475,8 @@ class Vacuum(Device):
         :param int start_hr: Start hour
         :param int start_min: Start minute
         :param int end_hr: End hour
-        :param int end_min: End minute"""
+        :param int end_min: End minute
+        """
         return self.send("set_dnd_timer", [start_hr, start_min, end_hr, end_min])
 
     @command()
@@ -479,7 +488,8 @@ class Vacuum(Device):
     def set_fan_speed(self, speed: int):
         """Set fan speed.
 
-        :param int speed: Fan speed to set"""
+        :param int speed: Fan speed to set
+        """
         # speed = [38, 60 or 77]
         return self.send("set_custom_mode", [speed])
 
@@ -491,8 +501,9 @@ class Vacuum(Device):
     def _autodetect_model(self):
         """Detect the model of the vacuum.
 
-        For the moment this is used only for the fanspeeds,
-        but that could be extended to cover other supported features."""
+        For the moment this is used only for the fanspeeds, but that could be extended
+        to cover other supported features.
+        """
         try:
             info = self.info()
             self.model = info.model
@@ -613,7 +624,7 @@ class Vacuum(Device):
 
     @command()
     def carpet_mode(self):
-        """Get carpet mode settings"""
+        """Get carpet mode settings."""
         return CarpetModeStatus(self.send("get_carpet_mode")[0])
 
     @command(
@@ -660,7 +671,9 @@ class Vacuum(Device):
     @command(click.argument("segments", type=LiteralParamType(), required=True))
     def segment_clean(self, segments: List):
         """Clean segments.
-        :param List segments: List of segments to clean: [16,17,18]"""
+
+        :param List segments: List of segments to clean: [16,17,18]
+        """
         return self.send("app_segment_clean", segments)
 
     @command()

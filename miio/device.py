@@ -20,12 +20,13 @@ class UpdateState(Enum):
 
 class DeviceInfo:
     """Container of miIO device information.
-    Hardware properties such as device model, MAC address, memory information,
-    and hardware and software information is contained here."""
+
+    Hardware properties such as device model, MAC address, memory information, and
+    hardware and software information is contained here.
+    """
 
     def __init__(self, data):
-        """
-        Response of a Xiaomi Smart WiFi Plug
+        """Response of a Xiaomi Smart WiFi Plug.
 
         {'ap': {'bssid': 'FF:FF:FF:FF:FF:FF', 'rssi': -68, 'ssid': 'network'},
          'cfg_time': 0,
@@ -101,10 +102,11 @@ class DeviceInfo:
 
 class Device(metaclass=DeviceGroupMeta):
     """Base class for all device implementations.
-    This is the main class providing the basic protocol handling for devices using
-    the ``miIO`` protocol.
-    This class should not be initialized directly but a device-specific class inheriting
-    it should be used instead of it."""
+
+    This is the main class providing the basic protocol handling for devices using the
+    ``miIO`` protocol. This class should not be initialized directly but a device-
+    specific class inheriting it should be used instead of it.
+    """
 
     retry_count = 3
     timeout = 5
@@ -161,12 +163,12 @@ class Device(metaclass=DeviceGroupMeta):
         click.argument("parameters", type=LiteralParamType(), required=False),
     )
     def raw_command(self, command, parameters):
-        """Send a raw command to the device.
-        This is mostly useful when trying out commands which are not
-        implemented by a given device instance.
+        """Send a raw command to the device. This is mostly useful when trying out
+        commands which are not implemented by a given device instance.
 
         :param str command: Command to send
-        :param dict parameters: Parameters to send"""
+        :param dict parameters: Parameters to send
+        """
         return self.send(command, parameters)
 
     @command(
@@ -179,8 +181,10 @@ class Device(metaclass=DeviceGroupMeta):
     )
     def info(self) -> DeviceInfo:
         """Get miIO protocol information from the device.
-        This includes information about connected wlan network,
-        and hardware and software versions."""
+
+        This includes information about connected wlan network, and hardware and
+        software versions.
+        """
         try:
             return DeviceInfo(self.send("miIO.info"))
         except PayloadDecodeException as ex:

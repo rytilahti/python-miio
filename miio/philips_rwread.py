@@ -29,11 +29,10 @@ class MotionDetectionSensitivity(enum.Enum):
 
 
 class PhilipsRwreadStatus:
-    """Container for status reports from Xiaomi Philips RW Read"""
+    """Container for status reports from Xiaomi Philips RW Read."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a RW Read (philips.light.rwread):
+        """Response of a RW Read (philips.light.rwread):
 
         {'power': 'on', 'bright': 53, 'dv': 0, 'snm': 1,
          'flm': 0, 'chl': 0, 'flmv': 0}

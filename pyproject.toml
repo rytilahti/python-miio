@@ -54,6 +54,7 @@ restructuredtext_lint = "^1"
 tox = "^3"
 isort = "^4"
 cffi = "^1"
+docformatter = "^1"
 
 [tool.isort]
 multi_line_output = 3

@@ -99,8 +99,7 @@ class OperationMode(enum.Enum):
 
 class TemperatureHistory:
     def __init__(self, data: str):
-        """
-        Container of temperatures recorded every 10-15 seconds while cooking.
+        """Container of temperatures recorded every 10-15 seconds while cooking.
 
         Example values:
 
@@ -149,8 +148,7 @@ class TemperatureHistory:
 
 class CookerCustomizations:
     def __init__(self, custom: str):
-        """
-        Container of different user customizations.
+        """Container of different user customizations.
 
         Example values:
 
@@ -224,8 +222,7 @@ class CookerCustomizations:
 
 class CookingStage:
     def __init__(self, stage: str):
-        """
-        Container of cooking stages.
+        """Container of cooking stages.
 
         Example timeouts: 'null', 02000000ff, 03000000ff, 0a000000ff, 1000000000
 
@@ -327,8 +324,7 @@ class CookingStage:
 
 class InteractionTimeouts:
     def __init__(self, timeouts: str = None):
-        """
-        Example timeouts: 05040f, 05060f
+        """Example timeouts: 05040f, 05060f.
 
         Data structure:
 
@@ -382,8 +378,7 @@ class InteractionTimeouts:
 
 class CookerSettings:
     def __init__(self, settings: str = None):
-        """
-        Example settings: 1407, 0607, 0207
+        """Example settings: 1407, 0607, 0207.
 
         Data structure:
 
@@ -538,8 +533,7 @@ class CookerSettings:
 
 class CookerStatus:
     def __init__(self, data):
-        """
-        Responses of a chunmi.cooker.normal2 (fw_ver: 1.2.8):
+        """Responses of a chunmi.cooker.normal2 (fw_ver: 1.2.8):
 
         { 'func': 'precook',
           'menu': '0001',
@@ -601,8 +595,7 @@ class CookerStatus:
 
     @property
     def temperature(self) -> Optional[int]:
-        """
-        Current temperature, if idle.
+        """Current temperature, if idle.
 
         Example values: *29*, 031e0b23, 031e0b23031e
         """
@@ -614,11 +607,10 @@ class CookerStatus:
 
     @property
     def start_time(self) -> Optional[time]:
-        """
-        Start time of cooking?
+        """Start time of cooking?
 
-        The property "temp" is used for different purposes.
-        Example values: 29, *031e0b23*, 031e0b23031e
+        The property "temp" is used for different purposes. Example values: 29,
+        *031e0b23*, 031e0b23031e
         """
         value = self.data["temp"]
         if len(value) == 8:
@@ -668,7 +660,10 @@ class CookerStatus:
 
     @property
     def favorite(self) -> int:
-        """Favored recipe id. Can be compared with the menu property."""
+        """Favored recipe id.
+
+        Can be compared with the menu property.
+        """
         return int(self.data["favorite"], 16)
 
     @property
@@ -807,7 +802,10 @@ class Cooker(Device):
 
     # FIXME: Add unified CLI support
     def set_interaction(self, settings: CookerSettings, timeouts: InteractionTimeouts):
-        """Set interaction. Supported by all cookers except MODEL_PRESS1"""
+        """Set interaction.
+
+        Supported by all cookers except MODEL_PRESS1
+        """
         self.send(
             "set_interaction",
             [
@@ -823,7 +821,7 @@ class Cooker(Device):
         default_output=format_output("Setting menu to {profile}"),
     )
     def set_menu(self, profile: str):
-        """Select one of the default(?) cooking profiles"""
+        """Select one of the default(?) cooking profiles."""
         if not self._validate_profile(profile):
             raise CookerException("Invalid cooking profile: %s" % profile)
 
@@ -833,8 +831,8 @@ class Cooker(Device):
     def get_temperature_history(self) -> TemperatureHistory:
         """Retrieves a temperature history.
 
-        The temperature is only available while cooking.
-        Approx. six data points per minute.
+        The temperature is only available while cooking. Approx. six data points per
+        minute.
         """
         data = self.send("get_temp_history")
 

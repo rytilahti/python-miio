@@ -175,15 +175,18 @@ class TestFanV2(TestCase):
             self.device.set_direct_speed(101)
 
     def test_set_rotate(self):
-        """The method is open-loop. The new state cannot be retrieved."""
+        """The method is open-loop.
+
+        The new state cannot be retrieved.
+        """
         self.device.set_rotate(MoveDirection.Left)
         self.device.set_rotate(MoveDirection.Right)
 
     def test_set_angle(self):
         """This test doesn't implement the real behaviour of the device may be.
 
-        The property "angle" doesn't provide the current setting.
-        It's a measurement of the current position probably.
+        The property "angle" doesn't provide the current setting. It's a measurement of
+        the current position probably.
         """
 
         def angle():
@@ -428,15 +431,18 @@ class TestFanV3(TestCase):
             self.device.set_natural_speed(101)
 
     def test_set_rotate(self):
-        """The method is open-loop. The new state cannot be retrieved."""
+        """The method is open-loop.
+
+        The new state cannot be retrieved.
+        """
         self.device.set_rotate(MoveDirection.Left)
         self.device.set_rotate(MoveDirection.Right)
 
     def test_set_angle(self):
         """This test doesn't implement the real behaviour of the device may be.
 
-        The property "angle" doesn't provide the current setting.
-        It's a measurement of the current position probably.
+        The property "angle" doesn't provide the current setting. It's a measurement of
+        the current position probably.
         """
 
         def angle():
@@ -643,15 +649,18 @@ class TestFanSA1(TestCase):
             self.device.set_natural_speed(101)
 
     def test_set_rotate(self):
-        """The method is open-loop. The new state cannot be retrieved."""
+        """The method is open-loop.
+
+        The new state cannot be retrieved.
+        """
         self.device.set_rotate(MoveDirection.Left)
         self.device.set_rotate(MoveDirection.Right)
 
     def test_set_angle(self):
         """This test doesn't implement the real behaviour of the device may be.
 
-        The property "angle" doesn't provide the current setting.
-        It's a measurement of the current position probably.
+        The property "angle" doesn't provide the current setting. It's a measurement of
+        the current position probably.
         """
 
         def angle():

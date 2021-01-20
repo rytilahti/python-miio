@@ -53,8 +53,8 @@ def read_android_yeelight(db) -> Iterator[DeviceConfig]:
 
 class BackupDatabaseReader:
     """Main class for reading backup files.
-    The main usage is following:
 
+    Example:
     .. code-block:: python
 
         r = BackupDatabaseReader()
@@ -125,7 +125,8 @@ class BackupDatabaseReader:
     def read_tokens(self, db) -> Iterator[DeviceConfig]:
         """Read device information out from a given database file.
 
-        :param str db: Database file"""
+        :param str db: Database file
+        """
         self.db = db
         _LOGGER.info("Reading database from %s" % db)
         self.conn = sqlite3.connect(db)
@@ -168,10 +169,10 @@ class BackupDatabaseReader:
 @click.option("--dump-raw", is_flag=True, help="dumps raw rows")
 def main(backup, write_to_disk, password, dump_all, dump_raw):
     """Reads device information out from an sqlite3 DB.
-    If the given file is an Android backup (.ab), the database
-    will be extracted automatically.
-    If the given file is an iOS backup, the tokens will be
-    extracted (and decrypted if needed) automatically.
+
+    If the given file is an Android backup (.ab), the database will be extracted
+    automatically. If the given file is an iOS backup, the tokens will be extracted (and
+    decrypted if needed) automatically.
     """
 
     def read_miio_database(tar):

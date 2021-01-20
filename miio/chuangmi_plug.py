@@ -35,8 +35,8 @@ class ChuangmiPlugStatus:
     """Container for status reports from the plug."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Chuangmi Plug V1 (chuangmi.plug.v1)
+        """Response of a Chuangmi Plug V1 (chuangmi.plug.v1)
+
         { 'power': True, 'usb_on': True, 'temperature': 32 }
 
         Response of a Chuangmi Plug V3 (chuangmi.plug.v3):

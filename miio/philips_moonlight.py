@@ -20,8 +20,7 @@ class PhilipsMoonlightStatus:
     """Container for status reports from Xiaomi Philips Zhirui Bedside Lamp."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Moonlight (philips.light.moonlight):
+        """Response of a Moonlight (philips.light.moonlight):
 
         {'pow': 'off', 'sta': 0, 'bri': 1, 'rgb': 16741971, 'cct': 1, 'snm': 0, 'spr': 0,
          'spt': 15, 'wke': 0, 'bl': 1, 'ms': 1, 'mb': 1, 'wkp': [0, 24, 0]}
@@ -55,8 +54,7 @@ class PhilipsMoonlightStatus:
 
     @property
     def sleep_assistant(self) -> int:
-        """
-        Example values:
+        """Example values:
 
         0: Unknown
         1: Unknown
@@ -131,7 +129,6 @@ class PhilipsMoonlight(Device):
     go_night                        # Night light / read mode
     get_wakeup_time
     enable_bl                       # Night light
-
     """
 
     @command(

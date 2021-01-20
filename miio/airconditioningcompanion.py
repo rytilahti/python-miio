@@ -81,8 +81,7 @@ class AirConditioningCompanionStatus:
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
-        """
-        Device model: lumi.acpartner.v2
+        """Device model: lumi.acpartner.v2.
 
         Response of "get_model_and_state":
         ['010500978022222102', '010201190280222221', '2']
@@ -133,8 +132,7 @@ class AirConditioningCompanionStatus:
 
     @property
     def air_condition_brand(self) -> int:
-        """
-        Brand of the air conditioner.
+        """Brand of the air conditioner.
 
         Known brand ids are 0x0182, 0x0097, 0x0037, 0x0202, 0x02782, 0x0197, 0x0192.
         """
@@ -142,24 +140,22 @@ class AirConditioningCompanionStatus:
 
     @property
     def air_condition_remote(self) -> int:
-        """
+        """Remote id.
+
         Known remote ids:
-
-        0x80111111, 0x80111112 (brand: 0x0182)
-        0x80222221 (brand: 0x0097)
-        0x80333331 (brand: 0x0037)
-        0x80444441 (brand: 0x0202)
-        0x80555551 (brand: 0x2782)
-        0x80777771 (brand: 0x0197)
-        0x80666661 (brand: 0x0192)
-
+        * 0x80111111, 0x80111112 (brand: 0x0182)
+        * 0x80222221 (brand: 0x0097)
+        * 0x80333331 (brand: 0x0037)
+        * 0x80444441 (brand: 0x0202)
+        * 0x80555551 (brand: 0x2782)
+        * 0x80777771 (brand: 0x0197)
+        * 0x80666661 (brand: 0x0192)
         """
         return int(self.air_condition_model[4:8].hex(), 16)
 
     @property
     def state_format(self) -> int:
-        """
-        Version number of the state format.
+        """Version number of the state format.
 
         Known values are: 1, 2, 3
         """
@@ -395,7 +391,8 @@ class AirConditioningCompanion(Device):
     def send_command(self, command: str):
         """Send a command to the air conditioner.
 
-        :param str command: Command to execute"""
+        :param str command: Command to execute
+        """
         return self.send("send_cmd", [str(command)])
 
     @command(

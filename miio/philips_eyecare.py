@@ -16,7 +16,7 @@ class PhilipsEyecareException(DeviceException):
 
 
 class PhilipsEyecareStatus:
-    """Container for status reports from Xiaomi Philips Eyecare Smart Lamp 2"""
+    """Container for status reports from Xiaomi Philips Eyecare Smart Lamp 2."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         # ['power': 'off', 'bright': 5, 'notifystatus': 'off',

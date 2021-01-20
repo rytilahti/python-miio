@@ -39,7 +39,8 @@ class ChuangmiIr(Device):
     def learn(self, key: int = 1):
         """Learn an infrared command.
 
-        :param int key: Storage slot, must be between 1 and 1000000"""
+        :param int key: Storage slot, must be between 1 and 1000000
+        """
 
         if key < 1 or key > 1000000:
             raise ChuangmiIrException("Invalid storage slot.")
@@ -61,7 +62,8 @@ class ChuangmiIr(Device):
         Negative response (chuangmi.ir.v2):
         {'error': {'code': -5003, 'message': 'learn timeout'}, 'id': 17}
 
-        :param int key: Slot to read from"""
+        :param int key: Slot to read from
+        """
 
         if key < 1 or key > 1000000:
             raise ChuangmiIrException("Invalid storage slot.")
@@ -71,24 +73,27 @@ class ChuangmiIr(Device):
         """Play a captured command.
 
         :param str command: Command to execute
-        :param int frequency: Execution frequency"""
+        :param int frequency: Execution frequency
+        """
         return self.send("miIO.ir_play", {"freq": frequency, "code": command})
 
     def play_pronto(self, pronto: str, repeats: int = 1):
-        """Play a Pronto Hex encoded IR command.
-        Supports only raw Pronto format, starting with 0000.
+        """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
+        starting with 0000.
 
         :param str pronto: Pronto Hex string.
-        :param int repeats: Number of extra signal repeats."""
+        :param int repeats: Number of extra signal repeats.
+        """
         return self.play_raw(*self.pronto_to_raw(pronto, repeats))
 
     @classmethod
     def pronto_to_raw(cls, pronto: str, repeats: int = 1):
-        """Play a Pronto Hex encoded IR command.
-        Supports only raw Pronto format, starting with 0000.
+        """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
+        starting with 0000.
 
         :param str pronto: Pronto Hex string.
-        :param int repeats: Number of extra signal repeats."""
+        :param int repeats: Number of extra signal repeats.
+        """
         if repeats < 0:
             raise ChuangmiIrException("Invalid repeats value")
 

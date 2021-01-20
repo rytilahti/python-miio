@@ -30,12 +30,13 @@ class TransportChannel(enum.Enum):
 
 class WifiSpeakerStatus:
     """Container of a speaker state.
-    This contains information such as the name of the device,
-    and what is currently being played by it."""
+
+    This contains information such as the name of the device, and what is currently
+    being played by it.
+    """
 
     def __init__(self, data):
-        """
-        Example response of a xiaomi.wifispeaker.v2:
+        """Example response of a xiaomi.wifispeaker.v2:
 
         {"DeviceName": "Mi Internet Speaker", "channel_title\": "XXX",
          "current_state": "PLAYING", "hardware_version": "S602",
@@ -87,7 +88,7 @@ class WifiSpeakerStatus:
 
     @property
     def transport_channel(self) -> TransportChannel:
-        """Transport channel, e.g. PLAYLIST"""
+        """Transport channel, e.g. PLAYLIST."""
         return TransportChannel(self.data["transport_channel"])
 
     def __repr__(self) -> str:

@@ -233,6 +233,9 @@ class TestPowerStripV2(TestCase):
         assert self.state().power_price is None
 
     def test_set_realtime_power(self):
-        """The method is open-loop. The new state cannot be retrieved."""
+        """The method is open-loop.
+
+        The new state cannot be retrieved.
+        """
         self.device.set_realtime_power(True)
         self.device.set_realtime_power(False)

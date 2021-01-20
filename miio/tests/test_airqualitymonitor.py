@@ -98,7 +98,7 @@ class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
         super().__init__(args, kwargs)
 
     def _get_state(self, props):
-        """Return wanted properties"""
+        """Return wanted properties."""
         return self.state
 
 
@@ -148,7 +148,7 @@ class DummyAirQualityMonitorB1(DummyDevice, AirQualityMonitor):
         super().__init__(args, kwargs)
 
     def _get_state(self, props):
-        """Return wanted properties"""
+        """Return wanted properties."""
         return self.state
 
 

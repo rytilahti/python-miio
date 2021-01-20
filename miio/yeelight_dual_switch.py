@@ -59,47 +59,47 @@ class DualControlModuleStatus:
 
     @property
     def switch_1_state(self) -> bool:
-        """First switch state"""
+        """First switch state."""
         return bool(self.data["switch_1_state"])
 
     @property
     def switch_1_default_state(self) -> bool:
-        """First switch default state"""
+        """First switch default state."""
         return bool(self.data["switch_1_default_state"])
 
     @property
     def switch_1_off_delay(self) -> int:
-        """First switch off delay"""
+        """First switch off delay."""
         return self.data["switch_1_off_delay"]
 
     @property
     def switch_2_state(self) -> bool:
-        """Second switch state"""
+        """Second switch state."""
         return bool(self.data["switch_2_state"])
 
     @property
     def switch_2_default_state(self) -> bool:
-        """Second switch default state"""
+        """Second switch default state."""
         return bool(self.data["switch_2_default_state"])
 
     @property
     def switch_2_off_delay(self) -> int:
-        """Second switch off delay"""
+        """Second switch off delay."""
         return self.data["switch_2_off_delay"]
 
     @property
     def interlock(self) -> bool:
-        """Interlock"""
+        """Interlock."""
         return bool(self.data["interlock"])
 
     @property
     def flex_mode(self) -> int:
-        """Flex mode"""
+        """Flex mode."""
         return self.data["flex_mode"]
 
     @property
     def rc_list(self) -> str:
-        """List of paired remote controls"""
+        """List of paired remote controls."""
         return self.data["rc_list"]
 
     def __repr__(self) -> str:
@@ -130,7 +130,8 @@ class DualControlModuleStatus:
 
 
 class YeelightDualControlModule(MiotDevice):
-    """Main class representing the Yeelight Dual Control Module (yeelink.switch.sw1) which uses MIoT protocol."""
+    """Main class representing the Yeelight Dual Control Module (yeelink.switch.sw1)
+    which uses MIoT protocol."""
 
     def __init__(
         self,
@@ -157,7 +158,7 @@ class YeelightDualControlModule(MiotDevice):
         )
     )
     def status(self) -> DualControlModuleStatus:
-        """Retrieve properties"""
+        """Retrieve properties."""
         p = [
             "switch_1_state",
             "switch_1_default_state",
@@ -251,7 +252,7 @@ class YeelightDualControlModule(MiotDevice):
         default_output=format_output("Delete remote control with MAC: {rc_mac}"),
     )
     def delete_rc(self, rc_mac: str):
-        """Delete remote control by MAC"""
+        """Delete remote control by MAC."""
         return self.set_property("rc_list_for_del", rc_mac)
 
     @command(
@@ -259,5 +260,5 @@ class YeelightDualControlModule(MiotDevice):
         default_output=format_output("Set interlock to: {interlock}"),
     )
     def set_interlock(self, interlock: bool):
-        """Set interlock"""
+        """Set interlock."""
         return self.set_property("interlock", interlock)

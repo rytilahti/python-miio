@@ -44,8 +44,7 @@ class AirDogStatus:
     """Container for status reports from the air dog x3."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Air Dog X3 (airdog.airpurifier.x3):
+        """Response of a Air Dog X3 (airdog.airpurifier.x3):
 
         {'power: 'on', 'mode': 'sleep', 'speed': 1, 'lock': 'unlock',
          'clean': 'n', 'pm': 11, 'hcho': 0}
@@ -65,7 +64,10 @@ class AirDogStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either auto, manual, sleep."""
+        """Operation mode.
+
+        Can be either auto, manual, sleep.
+        """
         return OperationMode(self.data["mode"])
 
     @property

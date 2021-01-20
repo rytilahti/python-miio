@@ -28,7 +28,7 @@ class DummyChuangmiPlugV1(DummyDevice, ChuangmiPlug):
         super().__init__(args, kwargs)
 
     def _set_state_basic(self, var, value):
-        """Set a state of a variable"""
+        """Set a state of a variable."""
         self.state[var] = value
 
 
@@ -100,11 +100,11 @@ class DummyChuangmiPlugV3(DummyDevice, ChuangmiPlug):
         super().__init__(args, kwargs)
 
     def _set_state_basic(self, var, value):
-        """Set a state of a variable"""
+        """Set a state of a variable."""
         self.state[var] = value
 
     def _get_load_power(self, props=None):
-        """Return load power"""
+        """Return load power."""
         return [300]
 
 

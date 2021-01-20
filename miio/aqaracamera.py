@@ -54,6 +54,7 @@ class SDCardStatus(IntEnum):
 
 class MotionDetectionSensitivity(IntEnum):
     """'Default' values for md sensitivity.
+
     Currently unused as the value can also be set arbitrarily.
     """
 
@@ -66,8 +67,7 @@ class CameraStatus:
     """Container for status reports from the Aqara Camera."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a lumi.camera.aq1:
+        """Response of a lumi.camera.aq1:
 
         {"p2p_id":"#################","app_type":"celing",
         "offset_x":"0","offset_y":"0","offset_radius":"0",

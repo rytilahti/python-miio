@@ -60,8 +60,8 @@ class PwznRelayStatus:
     """Container for status reports from the plug."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a PWZN Relay Apple (pwzn.relay.apple)
+        """Response of a PWZN Relay Apple (pwzn.relay.apple)
+
         { 'relay_status': 9, 'on_count': 2, 'name0': 'channel1', 'name1': '',
         'name2': '', 'name3': '', 'name4': '', 'name5': '', 'name6': '',
         'name7': '', 'name8': '', 'name9': '', 'name10': '', 'name11': '',
@@ -78,7 +78,7 @@ class PwznRelayStatus:
     @property
     def relay_names(self) -> Dict[int, str]:
         def _extract_index_from_key(name) -> int:
-            """extract the index from the variable"""
+            """extract the index from the variable."""
             return int(name[4:])
 
         return {

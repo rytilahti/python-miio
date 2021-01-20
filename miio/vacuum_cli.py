@@ -296,7 +296,7 @@ def backward(vac: miio.Vacuum, amount: float):
 @click.argument("velocity", type=float)
 @click.argument("duration", type=int)
 def move(vac: miio.Vacuum, rotation: int, velocity: float, duration: int):
-    """Pass raw manual values"""
+    """Pass raw manual values."""
     return vac.manual_control(rotation, velocity, duration)
 
 
@@ -564,8 +564,9 @@ def carpet_mode(vac: miio.Vacuum, enabled=None):
 def configure_wifi(vac: miio.Vacuum, ssid: str, password: str, uid: int, timezone: str):
     """Configure the wifi settings.
 
-    Note that some newer firmwares may expect you to define the timezone
-    by using --timezone."""
+    Note that some newer firmwares may expect you to define the timezone by using
+    --timezone.
+    """
     click.echo("Configuring wifi to SSID: %s" % ssid)
     click.echo(vac.configure_wifi(ssid, password, uid, timezone))
 

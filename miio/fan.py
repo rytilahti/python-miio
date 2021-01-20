@@ -67,8 +67,7 @@ class FanStatus:
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Fan (zhimi.fan.v3):
+        """Response of a Fan (zhimi.fan.v3):
 
         {'temp_dec': 232, 'humidity': 46, 'angle': 118, 'speed': 298,
          'poweroff_time': 0, 'power': 'on', 'ac_power': 'off', 'battery': 98,
@@ -256,8 +255,8 @@ class FanStatusP5:
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker P5."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Fan (dmaker.fan.p5):
+        """Response of a Fan (dmaker.fan.p5):
+
         {'power': False, 'mode': 'normal', 'speed': 35, 'roll_enable': False,
          'roll_angle': 140, 'time_off': 0, 'light': True, 'beep_sound': False,
          'child_lock': False}
@@ -476,7 +475,10 @@ class Fan(Device):
         ),
     )
     def set_led(self, led: bool):
-        """Turn led on/off. Not supported by model SA1."""
+        """Turn led on/off.
+
+        Not supported by model SA1.
+        """
         if led:
             return self.send("set_led", ["on"])
         else:

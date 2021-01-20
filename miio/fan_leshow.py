@@ -42,12 +42,10 @@ class FanLeshowStatus:
     """Container for status reports from the Xiaomi Rosou SS4 Ventilator."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Leshow Fan SS4 (leshow.fan.ss4):
+        """Response of a Leshow Fan SS4 (leshow.fan.ss4):
 
         {'power': 1, 'mode': 2, 'blow': 100, 'timer': 0,
          'sound': 1, 'yaw': 0, 'fault': 0}
-
         """
         self.data = data
 
@@ -166,7 +164,7 @@ class FanLeshow(Device):
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
-        """Set mode. Choose from manual, natural, sleep, strong."""
+        """Set mode (manual, natural, sleep, strong)."""
         return self.send("set_mode", [mode.value])
 
     @command(

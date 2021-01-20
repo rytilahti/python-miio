@@ -369,7 +369,7 @@ class ChuangmiCamera(Device):
         notify: int = 1,
         interval: int = 5,
     ):
-        """Set home monitoring configuration"""
+        """Set home monitoring configuration."""
         return self.send(
             "setAlarmConfig",
             [mode, start_hour, start_minute, end_hour, end_minute, notify, interval],
@@ -377,12 +377,12 @@ class ChuangmiCamera(Device):
 
     @command(default_output=format_output("Clearing NAS directory"))
     def clear_nas_dir(self):
-        """Clear NAS directory"""
+        """Clear NAS directory."""
         return self.send("nas_clear_dir", [[]])
 
     @command(default_output=format_output("Getting NAS config info"))
     def get_nas_config(self):
-        """Get NAS config info"""
+        """Get NAS config info."""
         return self.send("nas_get_config", {})
 
     @command(
@@ -399,7 +399,7 @@ class ChuangmiCamera(Device):
         sync_interval: NASSyncInterval = NASSyncInterval.Realtime,
         video_retention_time: NASVideoRetentionTime = NASVideoRetentionTime.Week,
     ):
-        """Set NAS configuration"""
+        """Set NAS configuration."""
         return self.send(
             "nas_set_config",
             {

@@ -120,7 +120,7 @@ class VacuumStatus:
 
     @property
     def battery(self) -> int:
-        """Remaining battery in percentage. """
+        """Remaining battery in percentage."""
         return int(self.data["battery"])
 
     @property
@@ -267,7 +267,8 @@ class CleaningDetails:
     def complete(self) -> bool:
         """Return True if the cleaning run was complete (e.g. without errors).
 
-        see also :func:`error`."""
+        see also :func:`error`.
+        """
         return bool(self.data[5] == 1)
 
     def __repr__(self) -> str:
@@ -280,9 +281,9 @@ class CleaningDetails:
 
 
 class ConsumableStatus:
-    """Container for consumable status information,
-    including information about brushes and duration until they should be changed.
-    The methods returning time left are based on the following lifetimes:
+    """Container for consumable status information, including information about brushes
+    and duration until they should be changed. The methods returning time left are based
+    on the following lifetimes:
 
     - Sensor cleanup time: XXX FIXME
     - Main brush: 300 hours
@@ -385,8 +386,10 @@ class DNDStatus:
 
 class Timer:
     """A container for scheduling.
-    The timers are accessed using an integer ID, which is based on the unix
-    timestamp of the creation time."""
+
+    The timers are accessed using an integer ID, which is based on the unix timestamp of
+    the creation time.
+    """
 
     def __init__(self, data: List[Any], timezone: "datetime.tzinfo") -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
@@ -424,7 +427,9 @@ class Timer:
     @property
     def action(self) -> str:
         """The action to be taken on the given time.
-        Note, this seems to be always 'start'."""
+
+        Note, this seems to be always 'start'.
+        """
         return str(self.data[2][1])
 
     @property

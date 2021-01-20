@@ -53,8 +53,8 @@ class HeaterStatus:
     """Container for status reports from the Smartmi Zhimi Heater."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Heater (zhimi.heater.za1):
+        """Response of a Heater (zhimi.heater.za1):
+
         {'power': 'off', 'target_temperature': 24, 'brightness': 1,
         'buzzer': 'on', 'child_lock': 'off', 'temperature': 22.3,
         'use_time': 43117, 'poweroff_time': 0, 'relative_humidity': 34}

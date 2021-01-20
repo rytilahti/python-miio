@@ -40,11 +40,11 @@ class AirConditioningCompanionStatus:
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
-        """
-        Device model: lumi.acpartner.mcn02
+        """Status constructor.
 
-        Response of "get_prop, params:['power', 'mode', 'tar_temp', 'fan_level', 'ver_swing', 'load_power']":
-        ['on', 'dry', 16, 'small_fan', 'off', 84.0]
+        Example response (lumi.acpartner.mcn02):
+        * ['power', 'mode', 'tar_temp', 'fan_level', 'ver_swing', 'load_power']
+        * ['on',    'dry',   16,        'small_fan', 'off',        84.0]
         """
         self.data = data
 
@@ -174,5 +174,6 @@ class AirConditioningCompanionMcn02(Device):
     def send_command(self, command: str, parameters: Any = None) -> Any:
         """Send a command to the air conditioner.
 
-        :param str command: Command to execute"""
+        :param str command: Command to execute
+        """
         return self.send(command, parameters)

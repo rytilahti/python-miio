@@ -49,7 +49,8 @@ class Polarity(enum.Enum):
 
 class CurtainStatus:
     def __init__(self, data: Dict[str, Any]) -> None:
-        """Response from device
+        """Response from device.
+
         {'id': 1, 'result': [
             {'did': 'current_position', 'siid': 2, 'piid': 3, 'code': 0, 'value': 0},
             {'did': 'status', 'siid': 2, 'piid': 6, 'code': 0, 'value': 0},
@@ -106,7 +107,7 @@ class CurtainStatus:
 
     @property
     def adjust_value(self) -> int:
-        """ Adjust value."""
+        """Adjust value."""
         return self.data["adjust_value"]
 
     def __repr__(self) -> str:
