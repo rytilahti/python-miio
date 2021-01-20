@@ -164,10 +164,7 @@ class FanLeshow(Device):
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
-        """Set mode.
-
-        Choose from manual, natural, sleep, strong.
-        """
+        """Set mode (manual, natural, sleep, strong)."""
         return self.send("set_mode", [mode.value])
 
     @command(

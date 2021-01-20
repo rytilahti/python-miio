@@ -288,7 +288,7 @@ class Discovery:
 
     @staticmethod
     def discover_mdns() -> Dict[str, Device]:
-        """Discover devices with mdns until."""
+        """Discover devices with mdns until any keyboard input."""
         _LOGGER.info("Discovering devices with mDNS, press any key to quit...")
 
         listener = Listener()

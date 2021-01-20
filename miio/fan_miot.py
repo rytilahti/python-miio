@@ -64,8 +64,7 @@ class OperationModeMiot(enum.Enum):
 
 
 class FanStatusMiot:
-    """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker
-    P9/P10."""
+    """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker P9/P10."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """

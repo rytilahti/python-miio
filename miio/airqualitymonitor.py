@@ -80,15 +80,12 @@ class AirQualityMonitorStatus:
 
     @property
     def aqi(self) -> Optional[int]:
-        """Air quality index value.
-
-        (0...600).
-        """
+        """Air quality index value (0..600)."""
         return self.data.get("aqi", None)
 
     @property
     def battery(self) -> Optional[int]:
-        """Current battery level (0...100)."""
+        """Current battery level (0..100)."""
         return self.data.get("battery", None)
 
     @property
@@ -202,7 +199,7 @@ class AirQualityMonitor(Device):
                 "Device model %s unsupported. Falling back to %s.", model, self.model
             )
         else:
-            """Force autodetection."""
+            # Force autodetection.
             self.model = None
 
     @command(
@@ -225,7 +222,6 @@ class AirQualityMonitor(Device):
         """Return device status."""
 
         if self.model is None:
-            """Autodetection."""
             info = self.info()
             self.model = info.model
 

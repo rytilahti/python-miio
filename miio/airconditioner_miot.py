@@ -171,8 +171,7 @@ class TimerStatus:
 
 
 class AirConditionerMiotStatus:
-    """Container for status reports from the air conditioner which uses MIoT
-    protocol."""
+    """Container for status reports from the air conditioner (MIoT)."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """

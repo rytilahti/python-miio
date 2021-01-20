@@ -52,8 +52,9 @@ def read_android_yeelight(db) -> Iterator[DeviceConfig]:
 
 
 class BackupDatabaseReader:
-    """Main class for reading backup files. The main usage is following:
+    """Main class for reading backup files.
 
+    Example:
     .. code-block:: python
 
         r = BackupDatabaseReader()

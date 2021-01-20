@@ -140,11 +140,16 @@ class AirConditioningCompanionStatus:
 
     @property
     def air_condition_remote(self) -> int:
-        """Known remote ids:
+        """Remote id.
 
-        0x80111111, 0x80111112 (brand: 0x0182) 0x80222221 (brand: 0x0097) 0x80333331
-        (brand: 0x0037) 0x80444441 (brand: 0x0202) 0x80555551 (brand: 0x2782) 0x80777771
-        (brand: 0x0197) 0x80666661 (brand: 0x0192)
+        Known remote ids:
+        * 0x80111111, 0x80111112 (brand: 0x0182)
+        * 0x80222221 (brand: 0x0097)
+        * 0x80333331 (brand: 0x0037)
+        * 0x80444441 (brand: 0x0202)
+        * 0x80555551 (brand: 0x2782)
+        * 0x80777771 (brand: 0x0197)
+        * 0x80666661 (brand: 0x0192)
         """
         return int(self.air_condition_model[4:8].hex(), 16)
 

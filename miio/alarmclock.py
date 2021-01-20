@@ -68,8 +68,11 @@ class RingTone:
 
 
 class AlarmClock(Device):
-    """Note, this device is not very responsive to the requests, so it may take several
-    seconds /tries to get an answer.."""
+    """Implementation of Xiao AI Smart Alarm Clock.
+
+    Note, this device is not very responsive to the requests, so it may take several
+    seconds /tries to get an answer.
+    """
 
     @command()
     def get_config_version(self):
