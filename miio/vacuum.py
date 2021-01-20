@@ -73,7 +73,7 @@ class FanspeedV3(enum.Enum):
     Medium = 75
     Turbo = 100
 
-    
+
 class FanspeedE2(enum.Enum):
     # Original names from the app: Gentle, Silent, Standard, Strong, Max
     Gentle = 41
