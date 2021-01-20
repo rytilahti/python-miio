@@ -273,7 +273,7 @@ class ViomiVacuumStatus:
 
     @property
     def mop_mode(self) -> ViomiMode:
-        """Whether mopping is enabled and if so which mode
+        """Whether mopping is enabled and if so which mode.
 
         TODO: is this really the same as mode?
         """
@@ -416,7 +416,8 @@ class ViomiVacuum(Device):
         :param int start_hr: Start hour
         :param int start_min: Start minute
         :param int end_hr: End hour
-        :param int end_min: End minute"""
+        :param int end_min: End minute
+        """
         return self.send(
             "set_notdisturb",
             [0 if disable else 1, start_hr, start_min, end_hr, end_min],

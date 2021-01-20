@@ -75,8 +75,7 @@ ERROR_DESCRIPTION = [
 
 class OperationStatus:
     def __init__(self, operation_status: int):
-        """
-        Operation status parser.
+        """Operation status parser.
 
         Return value of operation_status: <int>
 
@@ -106,8 +105,8 @@ class WaterPurifierYunmiStatus:
     """Container for status reports from the water purifier (Yunmi model)."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Status of a Water Purifier C1 (yummi.waterpuri.lx11):
+        """Status of a Water Purifier C1 (yummi.waterpuri.lx11):
+
             [0, 7200, 8640, 520, 379, 7200, 17280, 2110, 4544,
             80, 4, 0, 31, 100, 7200, 8640, 1440, 3313]
 

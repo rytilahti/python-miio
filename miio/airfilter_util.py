@@ -25,8 +25,7 @@ class FilterTypeUtil:
     def determine_filter_type(
         self, rfid_tag: Optional[str], product_id: Optional[str]
     ) -> Optional[FilterType]:
-        """
-        Determine Xiaomi air filter type based on its product ID.
+        """Determine Xiaomi air filter type based on its product ID.
 
         :param rfid_tag: RFID tag value
         :param product_id: Product ID such as "0:0:30:33"

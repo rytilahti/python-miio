@@ -15,6 +15,13 @@ repos:
   - id: black
     language_version: python3
 
+- repo: https://github.com/myint/docformatter
+  rev: v1.3.1
+  hooks:
+    - id: docformatter
+      args: [--in-place, --wrap-summaries, '88', --wrap-descriptions, '88']
+
+
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v2.3.0
   hooks:

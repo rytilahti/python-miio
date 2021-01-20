@@ -47,8 +47,8 @@ class AirHumidifierStatus:
     """Container for status reports from the air humidifier jsq."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Status of an Air Humidifier (shuii.humidifier.jsq001):
+        """Status of an Air Humidifier (shuii.humidifier.jsq001):
+
             [24, 30, 1, 1, 0, 2, 0, 0, 0]
 
         Parsed by AirHumidifierJsq device as:
@@ -70,7 +70,10 @@ class AirHumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either low, medium, high or humidity."""
+        """Operation mode.
+
+        Can be either low, medium, high or humidity.
+        """
 
         try:
             mode = OperationMode(self.data["mode"])
@@ -153,9 +156,7 @@ class AirHumidifierStatus:
 
 
 class AirHumidifierJsq(Device):
-    """
-    Implementation of Xiaomi Zero Fog Humidifier: shuii.humidifier.jsq001
-    """
+    """Implementation of Xiaomi Zero Fog Humidifier: shuii.humidifier.jsq001."""
 
     def __init__(
         self,

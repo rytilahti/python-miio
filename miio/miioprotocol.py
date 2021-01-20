@@ -1,7 +1,7 @@
-"""miIO protocol implementation
+"""miIO protocol implementation.
 
-This module contains the implementation of routines to send handshakes, send
-commands and discover devices (MiIOProtocol).
+This module contains the implementation of routines to send handshakes, send commands
+and discover devices (MiIOProtocol).
 """
 import binascii
 import codecs
@@ -28,8 +28,8 @@ class MiIOProtocol:
         lazy_discover: bool = True,
         timeout: int = 5,
     ) -> None:
-        """
-        Create a :class:`Device` instance.
+        """Create a :class:`Device` instance.
+
         :param ip: IP address or a hostname for the device
         :param token: Token used for encryption
         :param start_id: Running message id sent to the device
@@ -91,13 +91,13 @@ class MiIOProtocol:
 
     @staticmethod
     def discover(addr: str = None, timeout: int = 5) -> Any:
-        """Scan for devices in the network.
-        This method is used to discover supported devices by sending a
-        handshake message to the broadcast address on port 54321.
-        If the target IP address is given, the handshake will be send as
-        an unicast packet.
+        """Scan for devices in the network. This method is used to discover supported
+        devices by sending a handshake message to the broadcast address on port 54321.
+        If the target IP address is given, the handshake will be send as an unicast
+        packet.
 
-        :param str addr: Target IP address"""
+        :param str addr: Target IP address
+        """
         is_broadcast = addr is None
         seen_addrs = []  # type: List[str]
         if is_broadcast:
@@ -146,15 +146,16 @@ class MiIOProtocol:
         *,
         extra_parameters: Dict = None
     ) -> Any:
-        """Build and send the given command.
-        Note that this will implicitly call :func:`send_handshake` to do a handshake,
-        and will re-try in case of errors while incrementing the `_id` by 100.
+        """Build and send the given command. Note that this will implicitly call
+        :func:`send_handshake` to do a handshake, and will re-try in case of errors
+        while incrementing the `_id` by 100.
 
         :param str command: Command to send
         :param dict parameters: Parameters to send, or an empty list
         :param retry_count: How many times to retry in case of failure, how many handshakes to send
         :param dict extra_parameters: Extra top-level parameters
-        :raises DeviceException: if an error has occurred during communication."""
+        :raises DeviceException: if an error has occurred during communication.
+        """
 
         if not self.lazy_discover or not self._discovered:
             self.send_handshake()

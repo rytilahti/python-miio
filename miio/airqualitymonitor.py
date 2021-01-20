@@ -45,8 +45,7 @@ class AirQualityMonitorStatus:
     """Container of air quality monitor status."""
 
     def __init__(self, data):
-        """
-        Response of a Xiaomi Air Quality Monitor (zhimi.airmonitor.v1):
+        """Response of a Xiaomi Air Quality Monitor (zhimi.airmonitor.v1):
 
         {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off', 'time_state': 'on'}
 
@@ -81,7 +80,10 @@ class AirQualityMonitorStatus:
 
     @property
     def aqi(self) -> Optional[int]:
-        """Air quality index value. (0...600)."""
+        """Air quality index value.
+
+        (0...600).
+        """
         return self.data.get("aqi", None)
 
     @property
@@ -200,7 +202,7 @@ class AirQualityMonitor(Device):
                 "Device model %s unsupported. Falling back to %s.", model, self.model
             )
         else:
-            """Force autodetection"""
+            """Force autodetection."""
             self.model = None
 
     @command(
@@ -223,7 +225,7 @@ class AirQualityMonitor(Device):
         """Return device status."""
 
         if self.model is None:
-            """Autodetection"""
+            """Autodetection."""
             info = self.info()
             self.model = info.model
 

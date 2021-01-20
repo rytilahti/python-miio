@@ -72,7 +72,7 @@ class DummyAirHumidifierJsq(DummyDevice, AirHumidifierJsq):
         return self.dummy_device_info
 
     def _get_state(self, props):
-        """Return wanted properties"""
+        """Return wanted properties."""
         return list(self.state.values())
 
 

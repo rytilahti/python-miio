@@ -55,8 +55,7 @@ class AirDehumidifierStatus:
     """Container for status reports from the air dehumidifier."""
 
     def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
-        """
-        Response of a Air Dehumidifier (nwt.derh.wdh318efw1):
+        """Response of a Air Dehumidifier (nwt.derh.wdh318efw1):
 
         {'on_off': 'on', 'mode': 'auto', 'fan_st': 2,
          'buzzer': 'off', 'led': 'on', 'child_lock': 'off',
@@ -80,7 +79,10 @@ class AirDehumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either on, auth or dry_cloth."""
+        """Operation mode.
+
+        Can be either on, auth or dry_cloth.
+        """
         return OperationMode(self.data["mode"])
 
     @property
@@ -112,7 +114,10 @@ class AirDehumidifierStatus:
 
     @property
     def target_humidity(self) -> Optional[int]:
-        """Target humiditiy. Can be either 40, 50, 60 percent."""
+        """Target humiditiy.
+
+        Can be either 40, 50, 60 percent.
+        """
         if "auto" in self.data and self.data["auto"] is not None:
             return self.data["auto"]
         return None

@@ -160,7 +160,8 @@ class Gateway(Device):
     * get_device_prop_exp [[sid, list, of, properties]]
 
     ## scene
-    * get_lumi_bind ["scene", <page number>] for rooms/devices"""
+    * get_lumi_bind ["scene", <page number>] for rooms/devices
+    """
 
     def __init__(
         self,
@@ -214,10 +215,7 @@ class Gateway(Device):
 
     @command()
     def discover_devices(self):
-        """
-        Discovers SubDevices
-        and returns a list of the discovered devices.
-        """
+        """Discovers SubDevices and returns a list of the discovered devices."""
         # from https://github.com/aholstenson/miio/issues/26
         device_type_mapping = {
             DeviceType.Switch: Switch,
@@ -341,7 +339,7 @@ class Gateway(Device):
 
     @command()
     def clock(self):
-        """Alarm clock"""
+        """Alarm clock."""
         # payload of clock volume ("get_clock_volume")
         # already in get_clock response
         return self.send("get_clock")
@@ -362,7 +360,8 @@ class Gateway(Device):
 
     @command()
     def enable_telnet(self):
-        """Enable root telnet acces to the operating system, use login "admin" or "app", no password."""
+        """Enable root telnet acces to the operating system, use login "admin" or "app",
+        no password."""
         try:
             return self.send("enable_telnet_service")
         except DeviceError:
@@ -379,7 +378,10 @@ class Gateway(Device):
 
     @command()
     def get_illumination(self):
-        """Get illumination. In lux?"""
+        """Get illumination.
+
+        In lux?
+        """
         try:
             return self.send("get_illumination").pop()
         except Exception as ex:
@@ -389,10 +391,8 @@ class Gateway(Device):
 
 
 class GatewayDevice(Device):
-    """
-    GatewayDevice class
-    Specifies the init method for all gateway device functionalities.
-    """
+    """GatewayDevice class Specifies the init method for all gateway device
+    functionalities."""
 
     def __init__(
         self,
@@ -433,10 +433,8 @@ class GatewayAlarm(GatewayDevice):
 
     @command()
     def arming_time(self) -> int:
-        """
-        Return time in seconds the alarm stays 'oning'
-        before transitioning to 'on'
-        """
+        """Return time in seconds the alarm stays 'oning' before transitioning to
+        'on'."""
         # Response: 5, 15, 30, 60
         return self._gateway.send("get_arm_wait_time").pop()
 
@@ -458,10 +456,7 @@ class GatewayAlarm(GatewayDevice):
 
     @command()
     def triggering_light(self) -> int:
-        """
-        Return the time the gateway light blinks
-        when the alarm is triggerd
-        """
+        """Return the time the gateway light blinks when the alarm is triggerd."""
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._gateway.get_prop("en_alarm_light").pop()
 
@@ -483,9 +478,7 @@ class GatewayAlarm(GatewayDevice):
 
     @command()
     def last_status_change_time(self) -> datetime:
-        """
-        Return the last time the alarm changed status.
-        """
+        """Return the last time the alarm changed status."""
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
 
@@ -513,7 +506,10 @@ class GatewayZigbee(GatewayDevice):
         return self._gateway.send("start_zigbee_join", [timeout])
 
     def send_to_zigbee(self):
-        """How does this differ from writing? Unknown."""
+        """How does this differ from writing?
+
+        Unknown.
+        """
         raise NotImplementedError()
         return self._gateway.send("send_to_zigbee")
 
@@ -651,19 +647,19 @@ class GatewayRadio(GatewayDevice):
 
 
 class GatewayLight(GatewayDevice):
-    """
-    Light controls for the gateway.
+    """Light controls for the gateway.
 
-    The gateway LEDs can be controlled using 'rgb' or 'night_light' methods.
-    The 'night_light' methods control the same light as the 'rgb' methods, but has a separate memory for brightness and color.
-    Changing the 'rgb' light does not affect the stored state of the 'night_light', while changing the 'night_light' does effect the state of the 'rgb' light.
+    The gateway LEDs can be controlled using 'rgb' or 'night_light' methods. The
+    'night_light' methods control the same light as the 'rgb' methods, but has a
+    separate memory for brightness and color. Changing the 'rgb' light does not affect
+    the stored state of the 'night_light', while changing the 'night_light' does effect
+    the state of the 'rgb' light.
     """
 
     @command()
     def rgb_status(self):
-        """
-        Get current status of the light.
-        Always represents the current status of the light as opposed to 'night_light_status'.
+        """Get current status of the light. Always represents the current status of the
+        light as opposed to 'night_light_status'.
 
         Example:
            {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
@@ -678,9 +674,9 @@ class GatewayLight(GatewayDevice):
 
     @command()
     def night_light_status(self):
-        """
-        Get status of the night light.
-        This command only gives the correct status of the LEDs if the last command was a 'night_light' command and not a 'rgb' light command, otherwise it gives the stored values of the 'night_light'.
+        """Get status of the night light. This command only gives the correct status of
+        the LEDs if the last command was a 'night_light' command and not a 'rgb' light
+        command, otherwise it gives the stored values of the 'night_light'.
 
         Example:
            {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
@@ -732,7 +728,8 @@ class GatewayLight(GatewayDevice):
 
     @command(click.argument("color_name", type=str))
     def set_rgb_color(self, color_name: str):
-        """Set gateway light color using color name ('color_map' variable in the source holds the valid values)."""
+        """Set gateway light color using color name ('color_map' variable in the source
+        holds the valid values)."""
         if color_name not in color_map.keys():
             raise Exception(
                 "Cannot find {color} in {colors}".format(
@@ -745,7 +742,8 @@ class GatewayLight(GatewayDevice):
 
     @command(click.argument("color_name", type=str))
     def set_night_light_color(self, color_name: str):
-        """Set night light color using color name ('color_map' variable in the source holds the valid values)."""
+        """Set night light color using color name ('color_map' variable in the source
+        holds the valid values)."""
         if color_name not in color_map.keys():
             raise Exception(
                 "Cannot find {color} in {colors}".format(
@@ -761,7 +759,8 @@ class GatewayLight(GatewayDevice):
         click.argument("brightness", type=int),
     )
     def set_rgb_using_name(self, color_name: str, brightness: int):
-        """Set gateway light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
+        """Set gateway light color (using color name, 'color_map' variable in the source
+        holds the valid values) and brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
@@ -778,7 +777,8 @@ class GatewayLight(GatewayDevice):
         click.argument("brightness", type=int),
     )
     def set_night_light_using_name(self, color_name: str, brightness: int):
-        """Set night light color (using color name, 'color_map' variable in the source holds the valid values) and brightness (0-100)."""
+        """Set night light color (using color name, 'color_map' variable in the source
+        holds the valid values) and brightness (0-100)."""
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
@@ -792,10 +792,8 @@ class GatewayLight(GatewayDevice):
 
 
 class SubDevice:
-    """
-    Base class for all subdevices of the gateway
-    these devices are connected through zigbee.
-    """
+    """Base class for all subdevices of the gateway these devices are connected through
+    zigbee."""
 
     _zigbee_model = "unknown"
     _model = "unknown"

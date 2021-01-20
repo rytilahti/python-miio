@@ -59,8 +59,7 @@ class AirHumidifierStatus:
     """Container for status reports from the air humidifier."""
 
     def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
-        """
-        Response of a Air Humidifier (zhimi.humidifier.v1):
+        """Response of a Air Humidifier (zhimi.humidifier.v1):
 
         {'power': 'off', 'mode': 'high', 'temp_dec': 294,
          'humidity': 33, 'buzzer': 'on', 'led_b': 0,
@@ -84,7 +83,10 @@ class AirHumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either silent, medium or high."""
+        """Operation mode.
+
+        Can be either silent, medium or high.
+        """
         return OperationMode(self.data["mode"])
 
     @property
@@ -120,13 +122,15 @@ class AirHumidifierStatus:
 
     @property
     def target_humidity(self) -> int:
-        """Target humidity. Can be either 30, 40, 50, 60, 70, 80 percent."""
+        """Target humidity.
+
+        Can be either 30, 40, 50, 60, 70, 80 percent.
+        """
         return self.data["limit_hum"]
 
     @property
     def trans_level(self) -> Optional[int]:
-        """
-        The meaning of the property is unknown.
+        """The meaning of the property is unknown.
 
         The property is used to determine the strong mode is enabled on old firmware.
         """
@@ -147,7 +151,10 @@ class AirHumidifierStatus:
 
     @property
     def firmware_version(self) -> str:
-        """Returns the fw_ver of miIO.info. For example 1.2.9_5033."""
+        """Returns the fw_ver of miIO.info.
+
+        For example 1.2.9_5033.
+        """
         return self.device_info.firmware_version
 
     @property
@@ -179,8 +186,8 @@ class AirHumidifierStatus:
 
     @property
     def dry(self) -> Optional[bool]:
-        """
-        Dry mode: The amount of water is not enough to continue to work for about 8 hours.
+        """Dry mode: The amount of water is not enough to continue to work for about 8
+        hours.
 
         Return True if dry mode is on if available.
         """

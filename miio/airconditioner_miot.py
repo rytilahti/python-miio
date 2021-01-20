@@ -54,8 +54,7 @@ class AirConditionerMiotException(DeviceException):
 
 class CleaningStatus:
     def __init__(self, status: str):
-        """
-        Auto clean mode indicator.
+        """Auto clean mode indicator.
 
         Value format: <int>,<int>,<int>,<int>
         Integer 1: whether auto cleaning mode started.
@@ -124,8 +123,7 @@ class FanSpeed(enum.Enum):
 
 class TimerStatus:
     def __init__(self, status):
-        """
-        Countdown timer indicator.
+        """Countdown timer indicator.
 
         Value format: <int>,<int>,<int>,<int>
         Integer 1: whether the timer is enabled.
@@ -173,7 +171,8 @@ class TimerStatus:
 
 
 class AirConditionerMiotStatus:
-    """Container for status reports from the air conditioner which uses MIoT protocol."""
+    """Container for status reports from the air conditioner which uses MIoT
+    protocol."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """
@@ -523,8 +522,8 @@ class AirConditionerMiot(MiotDevice):
         ),
     )
     def set_timer(self, minutes, delay_on):
-        """
-        Set countdown timer minutes and if it would be turned on after timeout.
+        """Set countdown timer minutes and if it would be turned on after timeout.
+
         Set minutes to 0 would disable the timer.
         """
         return self.set_property(

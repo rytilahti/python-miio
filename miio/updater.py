@@ -35,8 +35,9 @@ class SingleFileHandler(BaseHTTPRequestHandler):
 class OneShotServer:
     """A simple HTTP server for serving an update file.
 
-    The server will be started in an emphemeral port, and will only accept
-    a single request to keep it simple."""
+    The server will be started in an emphemeral port, and will only accept a single
+    request to keep it simple.
+    """
 
     def __init__(self, file, interface=None):
         addr = ("", 0)

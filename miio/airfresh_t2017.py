@@ -399,7 +399,10 @@ class AirFreshA1(Device):
 
     @command()
     def get_ptc_timer(self):
-        """Returns a list of PTC timers. Response unknown."""
+        """Returns a list of PTC timers.
+
+        Response unknown.
+        """
         return self.send("get_ptc_timer")
 
     @command()

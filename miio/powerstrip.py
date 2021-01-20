@@ -50,8 +50,7 @@ class PowerStripStatus:
     """Container for status reports from the power strip."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Supported device models: qmi.powerstrip.v1, zimi.powerstrip.v2
+        """Supported device models: qmi.powerstrip.v1, zimi.powerstrip.v2.
 
         Response of a Power Strip 2 (zimi.powerstrip.v2):
         {'power','on', 'temperature': 48.7, 'current': 0.05, 'mode': None,
@@ -76,7 +75,10 @@ class PowerStripStatus:
 
     @property
     def current(self) -> Optional[float]:
-        """Current, if available. Meaning and voltage reference unknown."""
+        """Current, if available.
+
+        Meaning and voltage reference unknown.
+        """
         if self.data["current"] is not None:
             return self.data["current"]
         return None

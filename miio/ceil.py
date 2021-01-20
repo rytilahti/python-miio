@@ -179,7 +179,10 @@ class Ceil(Device):
         default_output=format_output("Setting fixed scene to {number}"),
     )
     def set_scene(self, number: int):
-        """Set a fixed scene. 4 fixed scenes are available (1-4)"""
+        """Set a fixed scene.
+
+        4 fixed scenes are available (1-4)
+        """
         if number < 1 or number > 4:
             raise CeilException("Invalid fixed scene number: %s" % number)
 

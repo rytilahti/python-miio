@@ -42,12 +42,12 @@ class ToiletlidStatus:
 
     @property
     def work_state(self) -> int:
-        """Device state code"""
+        """Device state code."""
         return self.data["work_state"]
 
     @property
     def work_mode(self) -> ToiletlidOperatingMode:
-        """Device working mode"""
+        """Device working mode."""
         return ToiletlidOperatingMode((self.work_state - 1) // 16)
 
     @property
@@ -56,12 +56,12 @@ class ToiletlidStatus:
 
     @property
     def filter_use_percentage(self) -> str:
-        """Filter percentage of remaining life"""
+        """Filter percentage of remaining life."""
         return "{}%".format(self.data["filter_use_flux"])
 
     @property
     def filter_remaining_time(self) -> int:
-        """Filter remaining life days"""
+        """Filter remaining life days."""
         return self.data["filter_use_time"]
 
     @property

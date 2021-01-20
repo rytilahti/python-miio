@@ -85,11 +85,11 @@ class DummyAirConditioningCompanion(DummyDevice, AirConditioningCompanion):
         self.state = self.start_state.copy()
 
     def _get_state(self, props):
-        """Return the requested data"""
+        """Return the requested data."""
         return self.state
 
     def _set_power(self, value: str):
-        """Set the requested power state"""
+        """Set the requested power state."""
         if value == STATE_ON:
             self.state[1] = self.state[1][:2] + "1" + self.state[1][3:]
 
@@ -239,15 +239,15 @@ class DummyAirConditioningCompanionV3(DummyDevice, AirConditioningCompanionV3):
         self.state = self.start_state.copy()
 
     def _get_state(self, props):
-        """Return the requested data"""
+        """Return the requested data."""
         return self.state
 
     def _get_device_prop(self, props):
-        """Return the requested data"""
+        """Return the requested data."""
         return self.device_prop[props[0]][props[1]]
 
     def _toggle_plug(self, props):
-        """Toggle the lumi.0 plug state"""
+        """Toggle the lumi.0 plug state."""
         self.device_prop["lumi.0"]["plug_state"] = [props.pop()]
 
 
@@ -324,7 +324,7 @@ class DummyAirConditioningCompanionMcn02(DummyDevice, AirConditioningCompanionMc
         self.state = self.start_state.copy()
 
     def _get_state(self, props):
-        """Return the requested data"""
+        """Return the requested data."""
         return self.state
 
 

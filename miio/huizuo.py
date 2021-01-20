@@ -1,8 +1,7 @@
-"""
-Basic implementation for HUAYI HUIZUO LAMPS (huayi.light.*)
+"""Basic implementation for HUAYI HUIZUO LAMPS (huayi.light.*)
 
-These lamps have a white color only and support dimming and control of the temperature from 3000K to 6400K
-
+These lamps have a white color only and support dimming and control of the temperature
+from 3000K to 6400K
 """
 
 import logging
@@ -160,7 +159,7 @@ class HuizuoStatus:
 
     @property
     def fan_mode(self) -> Optional[int]:
-        """Return 0 if 'Basic' and 1 if 'Natural wind'"""
+        """Return 0 if 'Basic' and 1 if 'Natural wind'."""
         if "fan_mode" in self.data:
             return self.data["fan_mode"]
         return None
@@ -174,14 +173,17 @@ class HuizuoStatus:
 
     @property
     def heater_fault_code(self) -> Optional[int]:
-        """Return Heater's fault code. 0 - No Fault"""
+        """Return Heater's fault code.
+
+        0 - No Fault
+        """
         if "heater_fault_code" in self.data:
             return self.data["heater_fault_code"]
         return None
 
     @property
     def heat_level(self) -> Optional[int]:
-        """Return Heater's heat level"""
+        """Return Heater's heat level."""
         if "heat_level" in self.data:
             return self.data["heat_level"]
         return None
@@ -211,7 +213,7 @@ class HuizuoStatus:
 
 
 class Huizuo(MiotDevice):
-    """A basic support for Huizuo Lamps
+    """A basic support for Huizuo Lamps.
 
     Example: response of a Huizuo Pisces For Bedroom (huayi.light.pis123)
         {'id': 1, 'result': [
@@ -326,11 +328,12 @@ class Huizuo(MiotDevice):
 
 
 class HuizuoLampFan(Huizuo):
-    """Support for Huizuo Lamps with fan
+    """Support for Huizuo Lamps with fan.
 
-    The next section contains the fan management commands
-    Right now I have no devices with the fan for live testing, so the following section
-    generated based on device specitifations"""
+    The next section contains the fan management commands Right now I have no devices
+    with the fan for live testing, so the following section generated based on device
+    specitifations
+    """
 
     @command(
         default_output=format_output("Fan powering on"),
@@ -435,11 +438,12 @@ class HuizuoLampFan(Huizuo):
 
 
 class HuizuoLampHeater(Huizuo):
-    """Support for Huizuo Lamps with heater
+    """Support for Huizuo Lamps with heater.
 
-    The next section contains the heater management commands
-    Right now I have no devices with the heater for live testing, so the following section
-    generated based on device specitifations"""
+    The next section contains the heater management commands Right now I have no devices
+    with the heater for live testing, so the following section generated based on device
+    specitifations
+    """
 
     @command(
         default_output=format_output("Heater powering on"),
@@ -501,11 +505,12 @@ class HuizuoLampHeater(Huizuo):
 
 
 class HuizuoLampScene(Huizuo):
-    """Support for Huizuo Lamps with additional scene commands
+    """Support for Huizuo Lamps with additional scene commands.
 
-    The next section contains the scene management commands
-    Right now I have no devices with the scenes for live testing, so the following section
-    generated based on device specitifations"""
+    The next section contains the scene management commands Right now I have no devices
+    with the scenes for live testing, so the following section generated based on device
+    specitifations
+    """
 
     @command(
         default_output=format_output("On/Off switch"),
@@ -571,7 +576,8 @@ class HuizuoLampScene(Huizuo):
         default_output=format_output("Switch between the color temperatures"),
     )
     def colortemp_switch(self):
-        """Switch between the color temperatures (only for models with scenes support)."""
+        """Switch between the color temperatures (only for models with scenes
+        support)."""
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("colortemp_switch", 0)
 
@@ -591,7 +597,8 @@ class HuizuoLampScene(Huizuo):
         default_output=format_output("Switch on or increase color temperature"),
     )
     def on_or_increase_colortemp(self):
-        """Switch on or increase color temperature (only for models with scenes support)."""
+        """Switch on or increase color temperature (only for models with scenes
+        support)."""
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_or_increase_colortemp", 0)
 

@@ -49,8 +49,7 @@ class AirHumidifierStatus:
     """Container for status reports from the air humidifier mjjsq."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Air Humidifier (deerma.humidifier.mjjsq):
+        """Response of a Air Humidifier (deerma.humidifier.mjjsq):
 
         {'Humidifier_Gear': 4, 'Humidity_Value': 44, 'HumiSet_Value': 54,
          'Led_State': 1, 'OnOff_State': 0, 'TemperatureValue': 21,
@@ -71,7 +70,10 @@ class AirHumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either low, medium, high or humidity."""
+        """Operation mode.
+
+        Can be either low, medium, high or humidity.
+        """
         return OperationMode(self.data["Humidifier_Gear"])
 
     @property
