@@ -120,7 +120,7 @@ class ViomiPositionPoint:
         return self.pos_y - offset + img_center
 
     def __repr__(self) -> str:
-        return "<ViomiPositionPoint x: {}, y: {}, phi: {}, update {}".format(
+        return "<ViomiPositionPoint x: {}, y: {}, phi: {}, update {}>".format(
             self.pos_x, self.pos_y, self.phi, self.update
         )
 
@@ -305,7 +305,7 @@ class ViomiVacuumStatus:
 
     @property
     def edge_state(self) -> ViomiEdgeState:
-        """Vaccum along the edges
+        """Vaccum along the edges.
 
         The settings is valid once
         0: Off
@@ -400,7 +400,7 @@ class ViomiVacuumStatus:
 
     @property
     def charging(self) -> bool:
-        """True if battery is charging
+        """True if battery is charging.
 
         Note: When the battery is at 100%, device reports that it is not charging.
         """
@@ -710,7 +710,7 @@ class ViomiVacuum(Device):
         self.send("set_suction", [watergrade.value])
 
     def get_positions(self, plan_multiplicator=1) -> [ViomiPositionPoint]:
-        """Return the last positions
+        """Return the last positions.
 
         returns: [x, y, phi, update, x, y, phi, update, x, y, phi, update, ...]
         """
@@ -725,7 +725,7 @@ class ViomiVacuum(Device):
 
     @command()
     def get_current_position(self) -> ViomiPositionPoint:
-        """Return the current position"""
+        """Return the current position."""
         positions = self.get_positions()
         if positions:
             return positions[-1]
@@ -759,8 +759,7 @@ class ViomiVacuum(Device):
     def set_edge(self, state: ViomiEdgeState):
         """Set or Unset edge mode.
 
-        Vacuum along the edges
-        The settings is valid once
+        Vacuum along the edges The settings is valid once
         """
         return self.send("set_mode", [state.value])
 
