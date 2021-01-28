@@ -109,9 +109,6 @@ class AirQualityMonitorCGDN1Status:
 
     def __init__(self, data):
         self.data = data
-        self._monitoring_frequency_options = MonitoringFrequencyCGDN1
-        self._screen_off_options = ScreenOffCGDN1
-        self._device_off_options = DeviceOffCGDN1
 
     @property
     def humidity(self) -> int:
@@ -210,6 +207,9 @@ class AirQualityMonitorCGDN1(MiotDevice):
         lazy_discover: bool = True,
     ) -> None:
         super().__init__(_MAPPING_CGDN1, ip, token, start_id, debug, lazy_discover)
+        self._monitoring_frequency_options = MonitoringFrequencyCGDN1
+        self._screen_off_options = ScreenOffCGDN1
+        self._device_off_options = DeviceOffCGDN1
 
     @command(
         default_output=format_output(
