@@ -285,6 +285,7 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
     """Container for status reports from the air purifier."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        print(data)
         super().__init__(data)
 
     @property
@@ -293,7 +294,7 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
         return self.data["led_brightness_level"]
 
     @property
-    def favorite_level(self) -> int:
+    def favorite_rpm(self) -> int:
         """Return favorite rpm level."""
         return self.data["favorite_rpm"]
 
@@ -537,8 +538,8 @@ class AirPurifierMB4(BasicAirPurifierMiot):
         )
 
     @command(
-        click.argument("led_brightness_level", type=int),
-        default_output=format_output("Setting LED brightness level to {brightness}"),
+        click.argument("level", type=int),
+        default_output=format_output("Setting LED brightness level to {level}"),
     )
     def set_led_brightness_level(self, level: int):
         """Set led brightness level."""
