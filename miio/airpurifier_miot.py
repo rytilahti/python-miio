@@ -282,11 +282,38 @@ class AirPurifierMiotStatus(BasicAirPurifierMiotStatus):
 
 
 class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
-    """Container for status reports from the air purifier."""
+    """
+    Container for status reports from the  Mi Air Purifier 3C (zhimi.airpurifier.mb4).
 
-    def __init__(self, data: Dict[str, Any]) -> None:
-        print(data)
-        super().__init__(data)
+    {
+        'power': True,
+        'mode': 1,
+        'aqi': 2,
+        'filter_life_remaining': 97,
+        'filter_hours_used': 100,
+        'buzzer': True,
+        'led_brightness_level': 8,
+        'child_lock': False,
+        'motor_speed': 392,
+        'favorite_rpm': 500
+    }
+
+    Response (MIoT format)
+
+    [
+        {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
+        {'did': 'mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
+        {'did': 'aqi', 'siid': 3, 'piid': 4, 'code': 0, 'value': 3},
+        {'did': 'filter_life_remaining', 'siid': 4, 'piid': 1, 'code': 0, 'value': 97},
+        {'did': 'filter_hours_used', 'siid': 4, 'piid': 3, 'code': 0, 'value': 100},
+        {'did': 'buzzer', 'siid': 6, 'piid': 1, 'code': 0, 'value': True},
+        {'did': 'led_brightness_level', 'siid': 7, 'piid': 2, 'code': 0, 'value': 8},
+        {'did': 'child_lock', 'siid': 8, 'piid': 1, 'code': 0, 'value': False},
+        {'did': 'motor_speed', 'siid': 9, 'piid': 1, 'code': 0, 'value': 388},
+        {'did': 'favorite_rpm', 'siid': 9, 'piid': 3, 'code': 0, 'value': 500}
+    ]
+
+    """
 
     @property
     def led_brightness_level(self) -> int:
