@@ -29,32 +29,30 @@ class SubDevice:
     these devices are connected through zigbee.
     """
 
-    _zigbee_model = "unknown"
-    _model = "unknown"
-    _name = "unknown"
-
-    @attr.s(auto_attribs=True)
-    class props:
-        """Defines properties of the specific device."""
-
     def __init__(
         self,
         gw: Gateway = None,
         dev_info: SubDeviceInfo = None,
+        model_info: dict = {},
     ) -> None:
-
-        from . import DeviceType
 
         self._gw = gw
         self.sid = dev_info.sid
+        self._model_info = model_info
         self._battery = None
         self._voltage = None
         self._fw_ver = dev_info.fw_ver
-        self._props = self.props()
-        try:
-            self.type = DeviceType(dev_info.type_id)
-        except ValueError:
-            self.type = DeviceType.Unknown
+        
+        self._model = model_info.get("model", "unknown")
+        self._name = model_info.get("name", "unknown")
+        self._zigbee_model = model_info.get("zigbee_id", "unknown")
+        
+        self._props = {}
+        self.get_prop_exp_list = []
+        for prop in model_info.get("properties", []):
+            self._props[prop["property"]] = prop.get("default", None)
+            if prop.get("get") == "get_property_exp":
+                self.get_prop_exp_list.append(prop["property"])
 
     def __repr__(self):
         return "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>" % (
@@ -71,12 +69,12 @@ class SubDevice:
     @property
     def status(self):
         """Return sub-device status as a dict containing all properties."""
-        return attr.asdict(self._props)
+        return self._props
 
     @property
     def device_type(self):
         """Return the device type name."""
-        return self.type.name
+        return self._model_info.get('type')
 
     @property
     def name(self):
@@ -110,11 +108,19 @@ class SubDevice:
 
     @command()
     def update(self):
-        """Update the device-specific properties."""
-        _LOGGER.debug(
-            "Subdevice '%s' does not have a device specific update method defined",
-            self.device_type,
-        )
+        """Update all device properties."""
+        if self.get_prop_exp_list: 
+            values = self.get_property_exp(self.get_prop_exp_list)
+            try:
+                i = 0
+                for prop in self._model_info["properties"]:
+                    self._props[prop["property"]] = values[i] / prop.get("devisor", 1)
+                    i = i+1
+            except Exception as ex:
+                raise GatewayException(
+                    "One or more unexpected results while "
+                    "fetching properties %s: %s" % (self.get_prop_exp_list, values)
+                ) from ex
 
     @command()
     def send(self, command):

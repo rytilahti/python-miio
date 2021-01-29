@@ -2,7 +2,10 @@
 
 import logging
 
+import os
+import sys
 import click
+import yaml
 
 from ..click_common import command
 from ..device import Device
@@ -17,7 +20,6 @@ GATEWAY_MODEL_AQARA = "lumi.gateway.aqhm01"
 GATEWAY_MODEL_AC_V1 = "lumi.acpartner.v1"
 GATEWAY_MODEL_AC_V2 = "lumi.acpartner.v2"
 GATEWAY_MODEL_AC_V3 = "lumi.acpartner.v3"
-
 
 class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
@@ -88,6 +90,20 @@ class Gateway(Device):
         self._light = Light(parent=self)
         self._devices = {}
         self._info = None
+        self._subdevice_model_map = None
+
+    def _get_subdevice_model_map(self):
+        if self._subdevice_model_map is None:
+            filedata = open(os.path.dirname(__file__) + '\devices\subdevices.yaml', 'r')
+            self._subdevice_model_map = yaml.safe_load(filedata)
+        return self._subdevice_model_map
+
+    def _get_unknown_model(self):
+        self._get_subdevice_model_map()
+        
+        for model_info in self._subdevice_model_map:
+            if model_info.get('type_id') == -1:
+                return model_info
 
     @property
     def alarm(self) -> "GatewayAlarm":  # noqa: F821
@@ -148,37 +164,40 @@ class Gateway(Device):
             devices_raw = self.send("get_device_list")
 
             for device in devices_raw:
-                # Match 'model' to get the type_id
-                type_id = self.match_zigbee_model(device["model"])
+                # Match 'model' to get the model_info
+                model_info = self.match_zigbee_model(device["model"])
 
                 # Extract discovered information
-                dev_info = SubDeviceInfo(device["did"], type_id, -1, -1, -1)
+                dev_info = SubDeviceInfo(device["did"], model_info["type_id"], -1, -1, -1)
 
                 # Setup the device
-                self.setup_device(dev_info)
+                self.setup_device(dev_info, model_info)
         else:
             devices_raw = self.get_prop("device_list")
 
             for x in range(0, len(devices_raw), 5):
                 # Extract discovered information
                 dev_info = SubDeviceInfo(*devices_raw[x : x + 5])
-
+                
+                # Match 'type_id' to get the model_info
+                model_info = self.match_type_id(dev_info.type_id)
+                
                 # Setup the device
-                self.setup_device(dev_info)
+                self.setup_device(dev_info, model_info)
 
         return self._devices
 
     @command(click.argument("zigbee_model"))
     def match_zigbee_model(self, zigbee_model):
         """
-        Match the zigbee_model to obtain the type_id
+        Match the zigbee_model to obtain the model_info
         """
-
-        from .devices import DeviceType, DeviceTypeMapping
-
-        for type_id in DeviceTypeMapping:
-            if DeviceTypeMapping[type_id]._zigbee_model == zigbee_model:
-                return type_id
+        
+        self._get_subdevice_model_map()
+        
+        for model_info in self._subdevice_model_map:
+            if model_info.get('zigbee_id') == zigbee_model:
+                return model_info
 
         _LOGGER.warning(
             "Unknown subdevice discovered, could not match zigbee_model '%s' "
@@ -186,47 +205,55 @@ class Gateway(Device):
             zigbee_model,
             self.ip,
         )
-        return DeviceType.Unknown
+        return self._get_unknown_model()
 
-    @command(click.argument("dev_info"))
-    def setup_device(self, dev_info):
+    @command(click.argument("type_id"))
+    def match_type_id(self, type_id):
         """
-        Setup a device using the SubDeviceInfo
+        Match the type_id to obtain the model_info
+        """
+        
+        self._get_subdevice_model_map()
+        
+        for model_info in self._subdevice_model_map:
+            if model_info.get('type_id') == type_id:
+                return model_info
+
+        _LOGGER.warning(
+            "Unknown subdevice discovered, could not match type_id '%i' "
+            "of Xiaomi gateway with ip: %s",
+            type_id,
+            self.ip,
+        )
+        return self._get_unknown_model()
+
+    @command(click.argument("dev_info", "model_info"))
+    def setup_device(self, dev_info, model_info):
+        """
+        Setup a device using the SubDeviceInfo and model_info
         """
 
-        from .devices import DeviceType, DeviceTypeMapping, SubDevice
-
-        # Construct DeviceType
-        try:
-            device_type = DeviceType(dev_info.type_id)
-        except ValueError:
-            _LOGGER.warning(
-                "Unknown subdevice type %s discovered, "
-                "of Xiaomi gateway with ip: %s",
-                dev_info,
-                self.ip,
-            )
-            device_type = DeviceType(-1)
+        from .devices import SubDevice
 
         # Obtain the correct subdevice class, ignoring the gateway itself
-        subdevice_cls = DeviceTypeMapping.get(device_type)
-        if subdevice_cls is None and device_type != DeviceType.Gateway:
+        subdevice_cls = getattr(sys.modules['miio.gateway.devices'], model_info.get("class"))
+        if subdevice_cls is None and model_info.get('type') != "Gateway":
             subdevice_cls = SubDevice
             _LOGGER.info(
                 "Gateway device type '%s' "
                 "does not have device specific methods defined, "
                 "only basic default methods will be available",
-                device_type.name,
+                model_info.get('type'),
             )
 
         # Initialize and save the subdevice, ignoring the gateway itself
-        if device_type != DeviceType.Gateway:
-            self._devices[dev_info.sid] = subdevice_cls(self, dev_info)
+        if model_info.get('type') != "Gateway":
+            self._devices[dev_info.sid] = subdevice_cls(self, dev_info, model_info)
             if self._devices[dev_info.sid].status == {}:
                 _LOGGER.info(
                     "Discovered subdevice type '%s', has no device specific properties defined, "
                     "this device has not been fully implemented yet (model: %s, name: %s).",
-                    device_type.name,
+                    model_info.get('type'),
                     self._devices[dev_info.sid].model,
                     self._devices[dev_info.sid].name,
                 )

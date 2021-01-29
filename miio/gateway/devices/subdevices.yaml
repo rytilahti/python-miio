@@ -1,0 +1,279 @@
+# Default
+- zigbee_id: unknown
+  model: unknown
+  type_id: -1
+  name: unknown
+  type: unknown
+  class: SubDevice
+
+# Weather sensor
+- zigbee_id: lumi.sensor_ht.v1
+  model: WSDCGQ01LM
+  type_id: 10
+  name: Weather sensor
+  type: SensorHT
+  class: SubDevice
+  getter: get_prop_sensor_ht
+  properties:
+    - property: temperature
+      unit: degrees celsius
+      get: get_property_exp
+      devisor: 100
+    - property: humidity
+      unit: percent
+      get: get_property_exp
+      devisor: 100
+    
+- zigbee_id: lumi.weather.v1
+  model: WSDCGQ11LM
+  type_id: 19
+  name: Weather sensor
+  type: AqaraHT
+  class: SubDevice
+  getter: get_prop_sensor_ht
+  properties:
+    - property: temperature
+      unit: degrees celsius
+      get: get_property_exp
+      devisor: 100
+    - property: humidity
+      unit: percent
+      get: get_property_exp
+      devisor: 100
+    - property: pressure
+      unit: hpa
+      get: get_property_exp
+      devisor: 100
+
+# Door sensor
+- zigbee_id: lumi.sensor_magnet
+  model: MCCGQ01LM
+  type_id: 3
+  name: Door sensor
+  type: Magnet
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_magnet.aq2
+  model: MCCGQ11LM
+  type_id: 53
+  name: Door sensor
+  type: AqaraMagnet
+  class: SubDevice
+
+# Cube
+- zigbee_id: lumi.sensor_cube.v1
+  model: MFKZQ01LM
+  type_id: 8
+  name: Cube
+  type: Cube
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_cube.aqgl01
+  model: MFKZQ01LM
+  type_id: 68
+  name: Cube
+  type: CubeV2
+  class: SubDevice
+
+# Curtain
+- zigbee_id: lumi.curtain
+  model: ZNCLDJ11LM
+  type_id: 13
+  name: Curtain
+  type: CurtainV1
+  class: SubDevice
+
+- zigbee_id: lumi.curtain.aq2
+  model: ZNGZDJ11LM
+  type_id: 71
+  name: Curtain
+  type: Curtain
+  class: SubDevice
+
+- zigbee_id: lumi.curtain.hagl04
+  model: ZNCLDJ12LM
+  type_id: 72
+  name: Curtain B1
+  type: CurtainB1
+  class: SubDevice
+
+# LightBulb
+- zigbee_id: lumi.light.aqcn02
+  model: ZNLDP12LM
+  type_id: 66
+  name: Smart bulb E27
+  type: AqaraSmartBulbE27
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1545g12
+  model: LED1545G12
+  type_id: 82
+  name: Ikea smart bulb E27 white
+  type: IkeaBulb82
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1546g12
+  model: LED1546G12
+  type_id: 83
+  name: Ikea smart bulb E27 white
+  type: IkeaBulb83
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1536g5
+  model: LED1536G5
+  type_id: 84
+  name: Ikea smart bulb E12 white
+  type: IkeaBulb84
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1537r6
+  model: LED1537R6
+  type_id: 85
+  name: Ikea smart bulb GU10 white
+  type: IkeaBulb85
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1623g12
+  model: LED1623G12
+  type_id: 86
+  name: Ikea smart bulb E27 white
+  type: IkeaBulb86
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1650r5
+  model: LED1650R5
+  type_id: 87
+  name: Ikea smart bulb GU10 white
+  type: IkeaBulb87
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1649c5
+  model: LED1649C5
+  type_id: 88
+  name: Ikea smart bulb E12 white
+  type: IkeaBulb88
+  class: LightBulb
+  properties:
+    - property: status     # 'on' / 'off'
+    - property: brightness
+      unit: percent
+    - property: color_temp
+      unit: cct
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+
+
+
+
+
+
+
+- zigbee_id: 
+  model: 
+  type_id: 
+  name: 
+  type: 
+  class: SubDevice
+
+# 166 - lumi.lock.acn05
+# 167 - lumi.switch.b1lacn02
+# 168 - lumi.switch.b2lacn02
+# 169 - lumi.switch.b1nacn02
+# 170 - lumi.switch.b2nacn02
+# 202 - lumi.dimmer.rgbegl01
+# 203 - lumi.dimmer.c3egl01
+# 204 - lumi.dimmer.cwegl01
+# 205 - lumi.airrtc.vrfegl01
+# 206 - lumi.airrtc.tcpecn01
+
+
+# from https://github.com/aholstenson/miio/issues/26

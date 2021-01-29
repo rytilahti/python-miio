@@ -1,19 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 # flake8: noqa
-from .cube import Cube, CubeV2
-from .curtain import Curtain, CurtainB1, CurtainV1
-from .door_sensor import AqaraMagnet, Magnet
-from .light import (
-    AqaraSmartBulbE27,
-    IkeaBulb82,
-    IkeaBulb83,
-    IkeaBulb84,
-    IkeaBulb85,
-    IkeaBulb86,
-    IkeaBulb87,
-    IkeaBulb88,
-)
+from .light import LightBulb
 from .lock import DoorLockS1, LockS2, LockS2Pro, LockV1
 from .motion_sensor import AqaraMotion, Motion
 from .remote_switch import (
@@ -44,7 +32,6 @@ from .switch import (
     SwitchTwoChannels,
 )
 from .thermostat import ThermostatS2
-from .weather_sensor import AqaraHT, SensorHT
 
 from .subdevice import SubDevice, SubDeviceInfo  # isort:skip
-from .subdevice_mapping import DeviceType, DeviceTypeMapping  # isort:skip
+from .subdevice_mapping import DeviceType  # isort:skip
