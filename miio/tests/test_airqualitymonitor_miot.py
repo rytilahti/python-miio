@@ -6,7 +6,7 @@ from miio import AirQualityMonitorCGDN1
 from miio.airqualitymonitor_miot import (
     AirQualityMonitorMiotException,
     ChargingState,
-    DisplayTemeratureUnitCGDN1,
+    DisplayTemperatureUnitCGDN1,
 )
 
 from .dummies import DummyMiotDevice
@@ -39,7 +39,7 @@ class DummyAirQualityMonitorCGDN1(DummyMiotDevice, AirQualityMonitorCGDN1):
             ),
             "set_device_off_duration": lambda x: self._set_state("device_off", x),
             "set_screen_off_duration": lambda x: self._set_state("screen_off", x),
-            "set_display_temerature_unit": lambda x: self._set_state(
+            "set_display_temperature_unit": lambda x: self._set_state(
                 "temperature_unit", x
             ),
         }
@@ -65,7 +65,7 @@ class TestAirQualityMonitor(TestCase):
         assert status.monitoring_frequency is _INITIAL_STATE["monitoring_frequency"]
         assert status.screen_off is _INITIAL_STATE["screen_off"]
         assert status.device_off is _INITIAL_STATE["device_off"]
-        assert status.display_temperature_unit is DisplayTemeratureUnitCGDN1(
+        assert status.display_temperature_unit is DisplayTemperatureUnitCGDN1(
             _INITIAL_STATE["temperature_unit"]
         )
 
@@ -126,12 +126,12 @@ class TestAirQualityMonitor(TestCase):
         with pytest.raises(AirQualityMonitorMiotException):
             self.device.set_screen_off_duration(301)
 
-    def test_set_display_temerature_unit(self):
-        def display_temerature_unit():
+    def test_set_display_temperature_unit(self):
+        def display_temperature_unit():
             return self.device.status().display_temperature_unit
 
-        self.device.set_display_temerature_unit(DisplayTemeratureUnitCGDN1.Celcius)
-        assert display_temerature_unit() == DisplayTemeratureUnitCGDN1.Celcius
+        self.device.set_display_temperature_unit(DisplayTemperatureUnitCGDN1.Celcius)
+        assert display_temperature_unit() == DisplayTemperatureUnitCGDN1.Celcius
 
-        self.device.set_display_temerature_unit(DisplayTemeratureUnitCGDN1.Fahrenheit)
-        assert display_temerature_unit() == DisplayTemeratureUnitCGDN1.Fahrenheit
+        self.device.set_display_temperature_unit(DisplayTemperatureUnitCGDN1.Fahrenheit)
+        assert display_temperature_unit() == DisplayTemperatureUnitCGDN1.Fahrenheit

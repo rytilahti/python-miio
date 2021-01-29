@@ -79,7 +79,7 @@ class DeviceOffCGDN1(enum.Enum):  # Official spec options
     Never = 0
 
 
-class DisplayTemeratureUnitCGDN1(enum.Enum):
+class DisplayTemperatureUnitCGDN1(enum.Enum):
     Celcius = "c"
     Fahrenheit = "f"
 
@@ -163,7 +163,7 @@ class AirQualityMonitorCGDN1Status:
     @property
     def display_temperature_unit(self):
         """Return display temperature unit."""
-        return DisplayTemeratureUnitCGDN1(self.data["temperature_unit"])
+        return DisplayTemperatureUnitCGDN1(self.data["temperature_unit"])
 
     def __repr__(self) -> str:
         s = (
@@ -177,7 +177,7 @@ class AirQualityMonitorCGDN1Status:
             "monitoring_frequency=%s"
             "screen_off=%s"
             "device_off=%s"
-            "display_temerature_unit=%s>"
+            "display_temperature_unit=%s>"
             % (
                 self.humidity,
                 self.pm25,
@@ -207,9 +207,9 @@ class AirQualityMonitorCGDN1(MiotDevice):
         lazy_discover: bool = True,
     ) -> None:
         super().__init__(_MAPPING_CGDN1, ip, token, start_id, debug, lazy_discover)
-        self._monitoring_frequency_options = MonitoringFrequencyCGDN1
-        self._screen_off_options = ScreenOffCGDN1
-        self._device_off_options = DeviceOffCGDN1
+        self.monitoring_frequency_options = MonitoringFrequencyCGDN1
+        self.screen_off_options = ScreenOffCGDN1
+        self.device_off_options = DeviceOffCGDN1
 
     @command(
         default_output=format_output(
@@ -276,11 +276,11 @@ class AirQualityMonitorCGDN1(MiotDevice):
     @command(
         click.argument(
             "unit",
-            type=click.Choice(DisplayTemeratureUnitCGDN1.__members__),
-            callback=lambda c, p, v: getattr(DisplayTemeratureUnitCGDN1, v),
+            type=click.Choice(DisplayTemperatureUnitCGDN1.__members__),
+            callback=lambda c, p, v: getattr(DisplayTemperatureUnitCGDN1, v),
         ),
         default_output=format_output("Setting display temperature unit to {unit.name}"),
     )
-    def set_display_temerature_unit(self, unit: DisplayTemeratureUnitCGDN1):
-        """Set display temerature unit."""
+    def set_display_temperature_unit(self, unit: DisplayTemperatureUnitCGDN1):
+        """Set display temperature unit."""
         return self.set_property("temperature_unit", unit.value)
