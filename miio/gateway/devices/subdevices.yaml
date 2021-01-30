@@ -6,6 +6,14 @@
   type: unknown
   class: SubDevice
 
+# Gateway
+- zigbee_id: lumi.0
+  model: Gateway
+  type_id: 0
+  name: Gateway
+  type: Gateway
+  class: None
+
 # Weather sensor
 - zigbee_id: lumi.sensor_ht.v1
   model: WSDCGQ01LM
@@ -58,6 +66,21 @@
   type_id: 53
   name: Door sensor
   type: AqaraMagnet
+  class: SubDevice
+
+# Motion sensor
+- zigbee_id: lumi.sensor_motion
+  model: RTCGQ01LM
+  type_id: 2
+  name: Motion sensor
+  type: Motion
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_motion.aq2
+  model: RTCGQ11LM
+  type_id: 52
+  name: Motion sensor
+  type: AqaraMotion
   class: SubDevice
 
 # Cube
@@ -250,20 +273,350 @@
       unit: cct
       default: 500
 
+# Lock
+- zigbee_id: lumi.lock.aq1
+  model: ZNMS11LM
+  type_id: 59
+  name: Door lock S1
+  type: DoorLockS1
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
 
+- zigbee_id: lumi.lock.acn02
+  model: ZNMS12LM
+  type_id: 70
+  name: Door lock S2
+  type: LockS2
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
 
+- zigbee_id: lumi.lock.v1
+  model: A6121
+  type_id: 81
+  name: Vima cylinder lock
+  type: LockV1
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
 
+- zigbee_id: lumi.lock.acn03
+  model: ZNMS13LM
+  type_id: 163
+  name: Door lock S2 pro
+  type: LockS2Pro
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
 
-
-
-
-- zigbee_id: 
-  model: 
-  type_id: 
-  name: 
-  type: 
+# Sensors
+- zigbee_id: lumi.sensor_smoke
+  model: JTYJ-GD-01LM/BW
+  type_id: 15
+  name: Honeywell smoke detector
+  type: SensorSmoke
   class: SubDevice
 
+- zigbee_id: lumi.sensor_natgas
+  model: JTQJ-BF-01LM/BW
+  type_id: 18
+  name: Honeywell natural gas detector
+  type: SensorNatgas
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_wleak.aq1
+  model: SJCGQ11LM
+  type_id: 55
+  name: Water leak sensor
+  type: AqaraWaterLeak
+  class: SubDevice
+
+- zigbee_id: lumi.vibration.aq1
+  model: DJT11LM
+  type_id: 56
+  name: Vibration sensor
+  type: AqaraVibration
+  class: SubDevice
+
+# Thermostats
+- zigbee_id: lumi.airrtc.tcpecn02
+  model: KTWKQ03ES
+  type_id: 207
+  name: Thermostat S2
+  type: ThermostatS2
+  class: SubDevice
+
+# Remote Switch
+- zigbee_id: lumi.sensor_86sw2.v1
+  model: WXKG02LM 2016
+  type_id: 12
+  name: Remote switch double
+  type: RemoteSwitchDoubleV1
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_86sw1.v1
+  model: WXKG03LM 2016
+  type_id: 14
+  name: Remote switch single
+  type: RemoteSwitchSingleV1
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b186acn01
+  model: WXKG03LM 2018
+  type_id: 134
+  name: Remote switch single
+  type: RemoteSwitchSingle
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b286acn01
+  model: WXKG02LM 2018
+  type_id: 135
+  name: Remote switch double
+  type: RemoteSwitchDouble
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b186acn02
+  model: WXKG06LM
+  type_id: 171
+  name: D1 remote switch single
+  type: D1RemoteSwitchSingle
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b286acn02
+  model: WXKG07LM
+  type_id: 172
+  name: D1 remote switch double
+  type: D1RemoteSwitchDouble
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_switch
+  model: WXKG01LM
+  type_id: 1
+  name: Button
+  type: Switch
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_switch.aq2
+  model: WXKG11LM 2015
+  type_id: 51
+  name: Button
+  type: AqaraSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_switch.aq3
+  model: WXKG12LM
+  type_id: 62
+  name: Button
+  type: AqaraSquareButtonV3
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b1acn01
+  model: WXKG11LM 2018
+  type_id: 133
+  name: Button
+  type: AqaraSquareButton
+  class: SubDevice
+
+# Switches
+- zigbee_id: lumi.ctrl_neutral2
+  model: QBKG03LM
+  type_id: 7
+  name: Wall switch double no neutral
+  type: SwitchTwoChannels
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_neutral1.v1
+  model: QBKG04LM
+  type_id: 9
+  name: Wall switch no neutral
+  type: SwitchOneChannel
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln1
+  model: QBKG11LM
+  type_id: 20
+  name: Wall switch single
+  type: SwitchLiveOneChannel
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln2
+  model: QBKG12LM
+  type_id: 21
+  name: Wall switch double
+  type: SwitchLiveTwoChannels
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln1.aq1
+  model: QBKG11LM
+  type_id: 63
+  name: Wall switch single
+  type: AqaraSwitchOneChannel
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln2.aq1
+  model: QBKG12LM
+  type_id: 64
+  name: Wall switch double
+  type: AqaraSwitchTwoChannels
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.switch.n3acn3
+  model: QBKG26LM
+  type_id: 176
+  name: D1 wall switch triple
+  type: D1WallSwitchTriple
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: neutral_2 # 'on' / 'off'
+      name: status_ch2
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.switch.l3acn3
+  model: QBKG25LM
+  type_id: 177
+  name: D1 wall switch triple no neutral
+  type: D1WallSwitchTripleNN
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: neutral_2 # 'on' / 'off'
+      name: status_ch2
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.plug
+  model: ZNCZ02LM
+  type_id: 11
+  name: Plug
+  type: Plug
+  class: Switch
+  getter: get_prop_plug
+  setter: toggle_plug
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_86plug.v1
+  model: QBCZ11LM
+  type_id: 17
+  name: Wall outlet
+  type: AqaraWallOutletV1
+  class: Switch
+  setter: toggle_plug
+  properties:
+    - property: channel_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_86plug.aq1
+  model: QBCZ11LM
+  type_id: 65 
+  name: Wall outlet
+  type: AqaraWallOutlet
+  class: Switch
+  setter: toggle_plug
+  properties:
+    - property: channel_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.relay.c2acn01
+  model: LLKZMK11LM
+  type_id: 54
+  name: Relay
+  type: AqaraRelayTwoChannels
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: channel_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: channel_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+
+# from https://github.com/aholstenson/miio/issues/26
 # 166 - lumi.lock.acn05
 # 167 - lumi.switch.b1lacn02
 # 168 - lumi.switch.b2lacn02
@@ -274,6 +627,3 @@
 # 204 - lumi.dimmer.cwegl01
 # 205 - lumi.airrtc.vrfegl01
 # 206 - lumi.airrtc.tcpecn01
-
-
-# from https://github.com/aholstenson/miio/issues/26

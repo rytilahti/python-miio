@@ -48,11 +48,14 @@ class SubDevice:
         self._zigbee_model = model_info.get("zigbee_id", "unknown")
         
         self._props = {}
-        self.get_prop_exp_list = []
+        self.get_prop_exp_dict = {}
         for prop in model_info.get("properties", []):
-            self._props[prop["property"]] = prop.get("default", None)
+            prop_name = prop.get("name", prop["property"])
+            self._props[prop_name] = prop.get("default", None)
             if prop.get("get") == "get_property_exp":
-                self.get_prop_exp_list.append(prop["property"])
+                self.get_prop_exp_dict[prop["property"]] = prop
+
+        self.setter = model_info.get("setter")
 
     def __repr__(self):
         return "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>" % (
@@ -109,17 +112,21 @@ class SubDevice:
     @command()
     def update(self):
         """Update all device properties."""
-        if self.get_prop_exp_list: 
-            values = self.get_property_exp(self.get_prop_exp_list)
+        if self.get_prop_exp_dict: 
+            values = self.get_property_exp(list(self.get_prop_exp_dict.keys()))
             try:
                 i = 0
-                for prop in self._model_info["properties"]:
-                    self._props[prop["property"]] = values[i] / prop.get("devisor", 1)
+                for prop in self.get_prop_exp_dict.values():
+                    result = values[i]
+                    if prop.get("devisor"):
+                        result = values[i] / prop.get("devisor")
+                    prop_name = prop.get("name", prop["property"])
+                    self._props[prop_name] = result
                     i = i+1
             except Exception as ex:
                 raise GatewayException(
                     "One or more unexpected results while "
-                    "fetching properties %s: %s" % (self.get_prop_exp_list, values)
+                    "fetching properties %s: %s" % (self.get_prop_exp_dict, values)
                 ) from ex
 
     @command()

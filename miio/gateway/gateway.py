@@ -165,7 +165,7 @@ class Gateway(Device):
 
             for device in devices_raw:
                 # Match 'model' to get the model_info
-                model_info = self.match_zigbee_model(device["model"])
+                model_info = self.match_zigbee_model(device["model"], device["did"])
 
                 # Extract discovered information
                 dev_info = SubDeviceInfo(device["did"], model_info["type_id"], -1, -1, -1)
@@ -178,17 +178,17 @@ class Gateway(Device):
             for x in range(0, len(devices_raw), 5):
                 # Extract discovered information
                 dev_info = SubDeviceInfo(*devices_raw[x : x + 5])
-                
+
                 # Match 'type_id' to get the model_info
-                model_info = self.match_type_id(dev_info.type_id)
-                
+                model_info = self.match_type_id(dev_info.type_id, dev_info.sid)
+
                 # Setup the device
                 self.setup_device(dev_info, model_info)
 
         return self._devices
 
-    @command(click.argument("zigbee_model"))
-    def match_zigbee_model(self, zigbee_model):
+    @command(click.argument("zigbee_model", "sid"))
+    def match_zigbee_model(self, zigbee_model, sid):
         """
         Match the zigbee_model to obtain the model_info
         """
@@ -201,14 +201,15 @@ class Gateway(Device):
 
         _LOGGER.warning(
             "Unknown subdevice discovered, could not match zigbee_model '%s' "
-            "of Xiaomi gateway with ip: %s",
+            "of subdevice sid '%s' from Xiaomi gateway with ip: %s",
             zigbee_model,
+            sid,
             self.ip,
         )
         return self._get_unknown_model()
 
-    @command(click.argument("type_id"))
-    def match_type_id(self, type_id):
+    @command(click.argument("type_id", "sid"))
+    def match_type_id(self, type_id, sid):
         """
         Match the type_id to obtain the model_info
         """
@@ -221,8 +222,9 @@ class Gateway(Device):
 
         _LOGGER.warning(
             "Unknown subdevice discovered, could not match type_id '%i' "
-            "of Xiaomi gateway with ip: %s",
+            "of subdevice sid '%s' from Xiaomi gateway with ip: %s",
             type_id,
+            sid,
             self.ip,
         )
         return self._get_unknown_model()
@@ -235,9 +237,13 @@ class Gateway(Device):
 
         from .devices import SubDevice
 
-        # Obtain the correct subdevice class, ignoring the gateway itself
+        if model_info.get('type') == "Gateway":
+            # ignore the gateway itself
+            return
+
+        # Obtain the correct subdevice class
         subdevice_cls = getattr(sys.modules['miio.gateway.devices'], model_info.get("class"))
-        if subdevice_cls is None and model_info.get('type') != "Gateway":
+        if subdevice_cls is None:
             subdevice_cls = SubDevice
             _LOGGER.info(
                 "Gateway device type '%s' "
@@ -246,17 +252,16 @@ class Gateway(Device):
                 model_info.get('type'),
             )
 
-        # Initialize and save the subdevice, ignoring the gateway itself
-        if model_info.get('type') != "Gateway":
-            self._devices[dev_info.sid] = subdevice_cls(self, dev_info, model_info)
-            if self._devices[dev_info.sid].status == {}:
-                _LOGGER.info(
-                    "Discovered subdevice type '%s', has no device specific properties defined, "
-                    "this device has not been fully implemented yet (model: %s, name: %s).",
-                    model_info.get('type'),
-                    self._devices[dev_info.sid].model,
-                    self._devices[dev_info.sid].name,
-                )
+        # Initialize and save the subdevice
+        self._devices[dev_info.sid] = subdevice_cls(self, dev_info, model_info)
+        if self._devices[dev_info.sid].status == {}:
+            _LOGGER.info(
+                "Discovered subdevice type '%s', has no device specific properties defined, "
+                "this device has not been fully implemented yet (model: %s, name: %s).",
+                model_info.get('type'),
+                self._devices[dev_info.sid].model,
+                self._devices[dev_info.sid].name,
+            )
 
         return self._devices[dev_info.sid]
 
