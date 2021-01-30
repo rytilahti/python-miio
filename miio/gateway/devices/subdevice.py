@@ -30,7 +30,10 @@ class SubDevice:
     """
 
     def __init__(
-        self, gw: Gateway = None, dev_info: SubDeviceInfo = None, model_info: dict = {},
+        self,
+        gw: Gateway = None,
+        dev_info: SubDeviceInfo = None,
+        model_info: dict = {},
     ) -> None:
 
         self._gw = gw
@@ -55,18 +58,15 @@ class SubDevice:
         self.setter = model_info.get("setter")
 
     def __repr__(self):
-        return (
-            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>"
-            % (
-                self.device_type,
-                self.sid,
-                self.model,
-                self.zigbee_model,
-                self.firmware_version,
-                self.get_battery(),
-                self.get_voltage(),
-                self.status,
-            )
+        return "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>" % (
+            self.device_type,
+            self.sid,
+            self.model,
+            self.zigbee_model,
+            self.firmware_version,
+            self.get_battery(),
+            self.get_voltage(),
+            self.status,
         )
 
     @property
@@ -210,7 +210,8 @@ class SubDevice:
             self._battery = self.send("get_battery").pop()
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_battery", self._gw.model,
+                "Gateway model '%s' does not (yet) support get_battery",
+                self._gw.model,
             )
         return self._battery
 
@@ -221,7 +222,8 @@ class SubDevice:
             self._voltage = self.get_property("voltage").pop() / 1000
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_voltage", self._gw.model,
+                "Gateway model '%s' does not (yet) support get_voltage",
+                self._gw.model,
             )
         return self._voltage
 
