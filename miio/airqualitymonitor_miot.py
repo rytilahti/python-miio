@@ -207,9 +207,6 @@ class AirQualityMonitorCGDN1(MiotDevice):
         lazy_discover: bool = True,
     ) -> None:
         super().__init__(_MAPPING_CGDN1, ip, token, start_id, debug, lazy_discover)
-        self.monitoring_frequency_options = MonitoringFrequencyCGDN1
-        self.screen_off_options = ScreenOffCGDN1
-        self.device_off_options = DeviceOffCGDN1
 
     @command(
         default_output=format_output(
