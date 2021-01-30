@@ -1,9 +1,9 @@
 """Xiaomi Gateway implementation using Miio protecol."""
 
 import logging
-
 import os
 import sys
+
 import click
 import yaml
 
@@ -95,7 +95,7 @@ class Gateway(Device):
 
     def _get_subdevice_model_map(self):
         if self._subdevice_model_map is None:
-            filedata = open(os.path.dirname(__file__) + "\devices\subdevices.yaml", "r")
+            filedata = open(os.path.dirname(__file__) + "/devices/subdevices.yaml", "r")
             self._subdevice_model_map = yaml.safe_load(filedata)
         return self._subdevice_model_map
 
