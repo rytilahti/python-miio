@@ -5,6 +5,7 @@ import os
 import sys
 
 import click
+
 import yaml
 
 from ..click_common import command
