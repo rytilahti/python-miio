@@ -38,6 +38,3 @@ class LightBulb(SubDevice):
     def set_brightness(self, brightness):
         """Set the brightness of the bulb 1-100."""
         return self.send_arg("set_bright", [brightness]).pop()
-
-
-

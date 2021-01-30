@@ -30,10 +30,7 @@ class SubDevice:
     """
 
     def __init__(
-        self,
-        gw: Gateway = None,
-        dev_info: SubDeviceInfo = None,
-        model_info: dict = {},
+        self, gw: Gateway = None, dev_info: SubDeviceInfo = None, model_info: dict = {},
     ) -> None:
 
         self._gw = gw
@@ -42,11 +39,11 @@ class SubDevice:
         self._battery = None
         self._voltage = None
         self._fw_ver = dev_info.fw_ver
-        
+
         self._model = model_info.get("model", "unknown")
         self._name = model_info.get("name", "unknown")
         self._zigbee_model = model_info.get("zigbee_id", "unknown")
-        
+
         self._props = {}
         self.get_prop_exp_dict = {}
         for prop in model_info.get("properties", []):
@@ -58,15 +55,18 @@ class SubDevice:
         self.setter = model_info.get("setter")
 
     def __repr__(self):
-        return "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>" % (
-            self.device_type,
-            self.sid,
-            self.model,
-            self.zigbee_model,
-            self.firmware_version,
-            self.get_battery(),
-            self.get_voltage(),
-            self.status,
+        return (
+            "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>"
+            % (
+                self.device_type,
+                self.sid,
+                self.model,
+                self.zigbee_model,
+                self.firmware_version,
+                self.get_battery(),
+                self.get_voltage(),
+                self.status,
+            )
         )
 
     @property
@@ -77,7 +77,7 @@ class SubDevice:
     @property
     def device_type(self):
         """Return the device type name."""
-        return self._model_info.get('type')
+        return self._model_info.get("type")
 
     @property
     def name(self):
@@ -112,7 +112,7 @@ class SubDevice:
     @command()
     def update(self):
         """Update all device properties."""
-        if self.get_prop_exp_dict: 
+        if self.get_prop_exp_dict:
             values = self.get_property_exp(list(self.get_prop_exp_dict.keys()))
             try:
                 i = 0
@@ -122,7 +122,7 @@ class SubDevice:
                         result = values[i] / prop.get("devisor")
                     prop_name = prop.get("name", prop["property"])
                     self._props[prop_name] = result
-                    i = i+1
+                    i = i + 1
             except Exception as ex:
                 raise GatewayException(
                     "One or more unexpected results while "
@@ -210,8 +210,7 @@ class SubDevice:
             self._battery = self.send("get_battery").pop()
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_battery",
-                self._gw.model,
+                "Gateway model '%s' does not (yet) support get_battery", self._gw.model,
             )
         return self._battery
 
@@ -222,8 +221,7 @@ class SubDevice:
             self._voltage = self.get_property("voltage").pop() / 1000
         else:
             _LOGGER.info(
-                "Gateway model '%s' does not (yet) support get_voltage",
-                self._gw.model,
+                "Gateway model '%s' does not (yet) support get_voltage", self._gw.model,
             )
         return self._voltage
 

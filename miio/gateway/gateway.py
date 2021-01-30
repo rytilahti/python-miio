@@ -21,6 +21,7 @@ GATEWAY_MODEL_AC_V1 = "lumi.acpartner.v1"
 GATEWAY_MODEL_AC_V2 = "lumi.acpartner.v2"
 GATEWAY_MODEL_AC_V3 = "lumi.acpartner.v3"
 
+
 class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
 
@@ -94,15 +95,15 @@ class Gateway(Device):
 
     def _get_subdevice_model_map(self):
         if self._subdevice_model_map is None:
-            filedata = open(os.path.dirname(__file__) + '\devices\subdevices.yaml', 'r')
+            filedata = open(os.path.dirname(__file__) + "\devices\subdevices.yaml", "r")
             self._subdevice_model_map = yaml.safe_load(filedata)
         return self._subdevice_model_map
 
     def _get_unknown_model(self):
         self._get_subdevice_model_map()
-        
+
         for model_info in self._subdevice_model_map:
-            if model_info.get('type_id') == -1:
+            if model_info.get("type_id") == -1:
                 return model_info
 
     @property
@@ -168,7 +169,9 @@ class Gateway(Device):
                 model_info = self.match_zigbee_model(device["model"], device["did"])
 
                 # Extract discovered information
-                dev_info = SubDeviceInfo(device["did"], model_info["type_id"], -1, -1, -1)
+                dev_info = SubDeviceInfo(
+                    device["did"], model_info["type_id"], -1, -1, -1
+                )
 
                 # Setup the device
                 self.setup_device(dev_info, model_info)
@@ -192,11 +195,11 @@ class Gateway(Device):
         """
         Match the zigbee_model to obtain the model_info
         """
-        
+
         self._get_subdevice_model_map()
-        
+
         for model_info in self._subdevice_model_map:
-            if model_info.get('zigbee_id') == zigbee_model:
+            if model_info.get("zigbee_id") == zigbee_model:
                 return model_info
 
         _LOGGER.warning(
@@ -213,11 +216,11 @@ class Gateway(Device):
         """
         Match the type_id to obtain the model_info
         """
-        
+
         self._get_subdevice_model_map()
-        
+
         for model_info in self._subdevice_model_map:
-            if model_info.get('type_id') == type_id:
+            if model_info.get("type_id") == type_id:
                 return model_info
 
         _LOGGER.warning(
@@ -237,19 +240,21 @@ class Gateway(Device):
 
         from .devices import SubDevice
 
-        if model_info.get('type') == "Gateway":
+        if model_info.get("type") == "Gateway":
             # ignore the gateway itself
             return
 
         # Obtain the correct subdevice class
-        subdevice_cls = getattr(sys.modules['miio.gateway.devices'], model_info.get("class"))
+        subdevice_cls = getattr(
+            sys.modules["miio.gateway.devices"], model_info.get("class")
+        )
         if subdevice_cls is None:
             subdevice_cls = SubDevice
             _LOGGER.info(
                 "Gateway device type '%s' "
                 "does not have device specific methods defined, "
                 "only basic default methods will be available",
-                model_info.get('type'),
+                model_info.get("type"),
             )
 
         # Initialize and save the subdevice
@@ -258,7 +263,7 @@ class Gateway(Device):
             _LOGGER.info(
                 "Discovered subdevice type '%s', has no device specific properties defined, "
                 "this device has not been fully implemented yet (model: %s, name: %s).",
-                model_info.get('type'),
+                model_info.get("type"),
                 self._devices[dev_info.sid].model,
                 self._devices[dev_info.sid].name,
             )
