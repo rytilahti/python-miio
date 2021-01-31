@@ -69,7 +69,7 @@
   class: SubDevice
 
 # Motion sensor
-- zigbee_id: lumi.sensor_motion
+- zigbee_id: lumi.sensor_motion.v2
   model: RTCGQ01LM
   type_id: 2
   name: Motion sensor
@@ -390,7 +390,7 @@
   type: D1RemoteSwitchDouble
   class: SubDevice
 
-- zigbee_id: lumi.sensor_switch
+- zigbee_id: lumi.sensor_switch.v2
   model: WXKG01LM
   type_id: 1
   name: Button
