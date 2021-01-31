@@ -54,7 +54,7 @@
       devisor: 100
 
 # Door sensor
-- zigbee_id: lumi.sensor_magnet
+- zigbee_id: lumi.sensor_magnet.v2
   model: MCCGQ01LM
   type_id: 3
   name: Door sensor
