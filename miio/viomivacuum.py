@@ -742,7 +742,7 @@ class ViomiVacuum(Device):
         raise NotImplementedError()
 
     @command()
-    def set_scheduled_cleanup(self):
+    def add_timer(self):
         """Not implemented yet."""
         # Needs to reads and understand:
         # self.send("set_ordertime", [????])
