@@ -709,7 +709,7 @@ class ViomiVacuum(Device):
         """
         self.send("set_suction", [watergrade.value])
 
-    def get_positions(self, plan_multiplicator=1) -> [ViomiPositionPoint]:
+    def get_positions(self, plan_multiplicator=1) -> List[ViomiPositionPoint]:
         """Return the last positions.
 
         returns: [x, y, phi, update, x, y, phi, update, x, y, phi, update, ...]
