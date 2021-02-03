@@ -819,7 +819,7 @@ class ViomiVacuum(Device):
 
     @command(click.argument("state", type=bool))
     def set_remember(self, state: bool):
-        """Set remenber map state."""
+        """Set remember map state."""
         return self.send("set_remember", [int(state)])
 
     # MISSING: Virtual wall/restricted area
