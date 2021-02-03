@@ -757,9 +757,9 @@ class ViomiVacuum(Device):
 
     @command(click.argument("state", type=EnumType(ViomiEdgeState)))
     def set_edge(self, state: ViomiEdgeState):
-        """Set or Unset edge mode.
+        """Vacuum along edges.
 
-        Vacuum along the edges The settings is valid once
+        This is valid for a single cleaning.
         """
         return self.send("set_mode", [state.value])
 
