@@ -103,7 +103,7 @@ class ViomiPositionPoint:
 
     @property
     def pos_x(self):
-        """X coordonate with multiplicator."""
+        """X coordinate with multiplicator."""
         return self._pos_x * self._plan_multiplicator
 
     @property
