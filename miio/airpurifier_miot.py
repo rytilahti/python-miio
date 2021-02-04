@@ -84,6 +84,8 @@ class AirPurifierMiotStatus:
     @property
     def aqi(self) -> int:
         """Air quality index."""
+        # zhimi-airpurifier-mb3 returns 1 as AQI value if the measurement was 
+        # unsuccessful
         if self.data["aqi"] == 1:
             return None
         return self.data["aqi"]
