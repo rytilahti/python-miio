@@ -84,6 +84,8 @@ class AirPurifierMiotStatus:
     @property
     def aqi(self) -> int:
         """Air quality index."""
+        if self.data["aqi"] == 1:
+            return None
         return self.data["aqi"]
 
     @property
