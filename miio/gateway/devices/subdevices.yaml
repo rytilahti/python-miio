@@ -337,7 +337,7 @@
   type_id: 56
   name: Vibration sensor
   type: AqaraVibration
-  class: SubDevice
+  class: Vibration
 
 # Thermostats
 - zigbee_id: lumi.airrtc.tcpecn02
