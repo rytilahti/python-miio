@@ -19,10 +19,10 @@ Settings:
 - Cleaning history - MISSING (cleanRecord)
 - Scheduled cleanup - get_ordertime
 - Vacuum along the edges - get_mode/set_mode
-- Secondary cleanup - set_repeat/repeat_state
+- Secondary cleanup - set_repeat/repeat_cleaning
 - Mop or vacuum & mod mode - set_moproute/mop_route
 - DND(DoNotDisturb) - set_notdisturb/get_notdisturb
-- Voice On/Off - set_voice/voice_state
+- Voice On/Off - set_sound_volume/voice_state
 - Remember Map - voice_state
 - Virtual wall/restricted area - MISSING
 - Map list - get_maps/rename_map/delete_map/set_map
@@ -94,7 +94,7 @@ class ViomiVacuumException(DeviceException):
 
 
 class ViomiPositionPoint:
-    """Vacuum position coordonate."""
+    """Vacuum position coordinate."""
 
     def __init__(self, pos_x, pos_y, phi, update, plan_multiplicator=1):
         self._pos_x = pos_x
@@ -110,15 +110,15 @@ class ViomiPositionPoint:
 
     @property
     def pos_y(self):
-        """Y coordonate with multiplicator."""
+        """Y coordinate with multiplicator."""
         return self._pos_y * self._plan_multiplicator
 
     def image_pos_x(self, offset, img_center):
-        """X coordonate on an image."""
+        """X coordinate on an image."""
         return self.pos_x - offset + img_center
 
     def image_pos_y(self, offset, img_center):
-        """Y coordonate on an image."""
+        """Y coordinate on an image."""
         return self.pos_y - offset + img_center
 
     def __repr__(self) -> str:
@@ -716,7 +716,7 @@ class ViomiVacuum(Device):
     def get_positions(self, plan_multiplicator=1) -> List[ViomiPositionPoint]:
         """Return the last positions.
 
-        returns: [x, y, phi, update, x, y, phi, update, x, y, phi, update, ...]
+        plan_multiplicator scale up the coordinates values
         """
         results = self.send("get_curpos", [])
         positions = []
@@ -814,7 +814,7 @@ class ViomiVacuum(Device):
         )
 
     @command(click.argument("state", type=EnumType(ViomiVoiceState)))
-    def set_voice(self, state: ViomiVoiceState):
+    def set_sound_volume(self, state: ViomiVoiceState):
         """Switch the voice on or off."""
         enabled = 1
         if state.value == 0:
@@ -864,7 +864,7 @@ class ViomiVacuum(Device):
         """Rename map."""
         maps = self.get_maps()
         if map_id not in [m["id"] for m in maps]:
-            raise ViomiVacuumException("Map id {} doesn't exists".format(map_id))
+            raise ViomiVacuumException(f"Map id {map_id} doesn't exists")
         return self.send("rename_map", {"mapID": map_id, "name": map_name})
 
     @command(
@@ -881,23 +881,18 @@ class ViomiVacuum(Device):
         if map_name:
             map_id = None
             maps = self.get_maps()
-            for map_ in maps:
-                if map_["name"] == map_name:
-                    map_id = map_["id"]
-            if map_id is None:
+            map_ids = [map_["id"] for map_ in maps if map_["name"] == map_name]
+            if not map_ids:
+                map_names = ", ".join([m["name"] for m in maps])
                 raise ViomiVacuumException(
-                    "Error: Bad map name, should be in {}".format(
-                        ", ".join([m["name"] for m in maps])
-                    )
+                    f"Error: Bad map name, should be in {map_names}"
                 )
+            map_id = map_ids[0]
         elif map_id:
             maps = self.get_maps()
             if map_id not in [m["id"] for m in maps]:
-                raise ViomiVacuumException(
-                    "Error: Bad map id, should be in {}".format(
-                        ", ".join([str(m["id"]) for m in maps])
-                    )
-                )
+                map_ids = ", ".join([str(m["id"]) for m in maps])
+                raise ViomiVacuumException(f"Error: Bad map id, should be in {map_ids}")
         # Get scheduled cleanup
         schedules = self.send("get_ordertime", [])
         scheduled_found, rooms = _get_rooms_from_schedules(schedules)
