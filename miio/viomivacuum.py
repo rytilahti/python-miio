@@ -94,6 +94,8 @@ class ViomiVacuumException(DeviceException):
 
 
 class ViomiPositionPoint:
+    """Vacuum position coordonate."""
+
     def __init__(self, pos_x, pos_y, phi, update, plan_multiplicator=1):
         self._pos_x = pos_x
         self._pos_y = pos_y
@@ -435,8 +437,11 @@ class ViomiVacuumStatus:
         return self.data["order_time"]
 
     @property
-    def repeat_state(self) -> bool:
-        """Secondary clean up state."""
+    def repeat_cleaning(self) -> bool:
+        """Secondary clean up state.
+
+        True if the cleaning is performed twice
+        """
         return self.data["repeat_state"]
 
     @property
@@ -517,7 +522,6 @@ def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
 class ViomiVacuum(Device):
     """Interface for Viomi vacuums (viomi.vacuum.v7)."""
 
-    _cache = {"edge_state": None, "rooms": {}, "maps": {}}
     timeout = 5
     retry_count = 10
 
@@ -526,6 +530,7 @@ class ViomiVacuum(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
+        self._cache = {"edge_state": None, "rooms": {}, "maps": {}}
         # self.model = None
         # self._fanspeeds = FanspeedV1
 
@@ -547,7 +552,7 @@ class ViomiVacuum(Device):
             "Mop installed: {result.mop_installed}\n"
             "Vacuum along the edges: {result.edge_state}\n"
             "Mop route pattern: {result.mop_route}\n"
-            "Secondary Cleanup: {result.repeat_state}\n"
+            "Secondary Cleanup: {result.repeat_cleaning}\n"
             "Voice state: {result.voice_state}\n"
             "Clean time: {result.clean_time}\n"
             "Clean area: {result.clean_area} m²\n"
@@ -657,11 +662,10 @@ class ViomiVacuum(Device):
             elif room in reverse_rooms:
                 room_ids.append(reverse_rooms[room])
             else:
-                return "Rooms {} is unknown, it should be in '{}' " "or in '{}'".format(
-                    room,
-                    ", ".join(self._cache["rooms"].keys()),
-                    ", ".join(self._cache["rooms"].values()),
-                )
+                room_keys = ", ".join(self._cache["rooms"].keys())
+                room_ids = ", ".join(self._cache["rooms"].values())
+                raise f"Room {room} is unknown, it must be in {room_keys} or {room_ids}"
+
         self._cache["edge_state"] = self.get_properties(["mode"])
         self.send(
             "set_mode_withroom",
@@ -765,7 +769,7 @@ class ViomiVacuum(Device):
 
     @command(click.argument("state", type=bool))
     def set_repeat(self, state: bool):
-        """Set or Unset repeat mode."""
+        """Set or Unset repeat mode (Secondary cleanup)."""
         return self.send("set_repeat", [int(state)])
 
     @command(click.argument("mop_mode", type=EnumType(ViomiRoutePattern)))
