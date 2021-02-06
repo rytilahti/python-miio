@@ -431,10 +431,10 @@ class ViomiVacuumStatus:
         """Pattern mode."""
         return ViomiRoutePattern(self.data["mop_route"])
 
-    @property
-    def order_time(self) -> int:
-        """FIXME: ??? int or bool."""
-        return self.data["order_time"]
+    # @property
+    # def order_time(self) -> int:
+    #    """FIXME: ??? int or bool."""
+    #    return self.data["order_time"]
 
     @property
     def repeat_cleaning(self) -> bool:
@@ -444,25 +444,25 @@ class ViomiVacuumStatus:
         """
         return self.data["repeat_state"]
 
-    @property
-    def start_time(self) -> int:
-        """FIXME: ??? int or bool."""
-        return self.data["start_time"]
+    # @property
+    # def start_time(self) -> int:
+    #    """FIXME: ??? int or bool."""
+    #    return self.data["start_time"]
 
     @property
     def voice_state(self) -> ViomiVoiceState:
         """Voice volume level (from 0 to 100%, 0 means Off)."""
         return ViomiVoiceState(self.data["v_state"])
 
-    @property
-    def water_percent(self) -> int:
-        """FIXME: ??? int or bool."""
-        return self.data["water_percent"]
+    # @property
+    # def water_percent(self) -> int:
+    #    """FIXME: ??? int or bool."""
+    #    return self.data["water_percent"]
 
-    @property
-    def zone_data(self) -> int:
-        """FIXME: ??? int or bool."""
-        return self.data["zone_data"]
+    # @property
+    # def zone_data(self) -> int:
+    #    """FIXME: ??? int or bool."""
+    #    return self.data["zone_data"]
 
 
 def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
@@ -568,10 +568,10 @@ class ViomiVacuum(Device):
             "Unknown properties\n"
             "=================\n\n"
             "Light state: {result.light_state}\n"
-            "Order time: {result.order_time}\n"
-            "Start time: {result.start_time}\n"
-            "water_percent: {result.water_percent}\n"
-            "zone_data: {result.zone_data}\n",
+            # "Order time: {result.order_time}\n"
+            # "Start time: {result.start_time}\n"
+            # "water_percent: {result.water_percent}\n"
+            # "zone_data: {result.zone_data}\n",
         )
     )
     def status(self) -> ViomiVacuumStatus:
@@ -592,18 +592,18 @@ class ViomiVacuum(Device):
             "mode",
             "mop_route",
             "mop_type",
-            "order_time",
+            # "order_time",
             "remember_map",
             "repeat_state",
             "run_state",
             "s_area",
             "s_time",
-            "start_time",
+            # "start_time",
             "suction_grade",
             "v_state",
             "water_grade",
-            "water_percent",
-            "zone_data",
+            # "water_percent",
+            # "zone_data",
             # The following list of properties existing but
             # there are not used in the code
             # "sw_info",
