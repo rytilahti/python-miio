@@ -1,7 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 import attr
 import click
