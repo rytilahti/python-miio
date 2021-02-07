@@ -131,6 +131,7 @@ Supported devices
 -  Xiaomi Xiaomi Mi Smart Space Heater S (zhimi.heater.mc2)
 -  Yeelight Dual Control Module (yeelink.switch.sw1)
 -  Scishare coffee maker (scishare.coffee.s1102)
+-  Qingping Air Monitor Lite (cgllc.airm.cgdn1)
 
 
 *Feel free to create a pull request to add support for new devices as

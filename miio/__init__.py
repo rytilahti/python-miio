@@ -23,6 +23,7 @@ from miio.airpurifier import AirPurifier
 from miio.airpurifier_airdog import AirDogX3, AirDogX5, AirDogX7SM
 from miio.airpurifier_miot import AirPurifierMiot
 from miio.airqualitymonitor import AirQualityMonitor
+from miio.airqualitymonitor_miot import AirQualityMonitorCGDN1
 from miio.aqaracamera import AqaraCamera
 from miio.ceil import Ceil
 from miio.chuangmi_camera import ChuangmiCamera
