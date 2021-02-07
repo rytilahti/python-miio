@@ -27,7 +27,7 @@ class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
 
 
-from .devices import SubDevice, SubDeviceInfo
+from .devices import SubDevice, SubDeviceInfo  # noqa: E402 isort:skip
 
 
 class Gateway(Device):
@@ -70,7 +70,8 @@ class Gateway(Device):
     * get_device_prop_exp [[sid, list, of, properties]]
 
     ## scene
-    * get_lumi_bind ["scene", <page number>] for rooms/devices"""
+    * get_lumi_bind ["scene", <page number>] for rooms/devices
+    """
 
     def __init__(
         self,
@@ -146,10 +147,7 @@ class Gateway(Device):
 
     @command()
     def discover_devices(self):
-        """
-        Discovers SubDevices
-        and returns a list of the discovered devices.
-        """
+        """Discovers SubDevices and returns a list of the discovered devices."""
 
         self._devices = {}
 
@@ -194,9 +192,7 @@ class Gateway(Device):
 
     @command(click.argument("zigbee_model", "sid"))
     def match_zigbee_model(self, zigbee_model, sid):
-        """
-        Match the zigbee_model to obtain the model_info
-        """
+        """Match the zigbee_model to obtain the model_info."""
 
         for model_info in self.subdevice_model_map:
             if model_info.get("zigbee_id") == zigbee_model:
@@ -213,9 +209,7 @@ class Gateway(Device):
 
     @command(click.argument("type_id", "sid"))
     def match_type_id(self, type_id, sid):
-        """
-        Match the type_id to obtain the model_info
-        """
+        """Match the type_id to obtain the model_info."""
 
         for model_info in self.subdevice_model_map:
             if model_info.get("type_id") == type_id:
@@ -232,9 +226,7 @@ class Gateway(Device):
 
     @command(click.argument("dev_info", "model_info"))
     def setup_device(self, dev_info, model_info):
-        """
-        Setup a device using the SubDeviceInfo and model_info
-        """
+        """Setup a device using the SubDeviceInfo and model_info."""
 
         if model_info.get("type") == "Gateway":
             # ignore the gateway itself
@@ -283,7 +275,7 @@ class Gateway(Device):
 
     @command()
     def clock(self):
-        """Alarm clock"""
+        """Alarm clock."""
         # payload of clock volume ("get_clock_volume")
         # already in get_clock response
         return self.send("get_clock")
@@ -304,7 +296,8 @@ class Gateway(Device):
 
     @command()
     def enable_telnet(self):
-        """Enable root telnet acces to the operating system, use login "admin" or "app", no password."""
+        """Enable root telnet acces to the operating system, use login "admin" or "app",
+        no password."""
         try:
             return self.send("enable_telnet_service")
         except DeviceError:
@@ -321,7 +314,10 @@ class Gateway(Device):
 
     @command()
     def get_illumination(self):
-        """Get illumination. In lux?"""
+        """Get illumination.
+
+        In lux?
+        """
         try:
             return self.send("get_illumination").pop()
         except Exception as ex:
