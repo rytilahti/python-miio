@@ -5,7 +5,6 @@ import os
 import sys
 
 import click
-
 import yaml
 
 from ..click_common import command
@@ -83,12 +82,7 @@ class Gateway(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-        from . import (
-            Alarm,
-            Radio,
-            Zigbee,
-            Light,
-        )
+        from . import Alarm, Light, Radio, Zigbee
 
         self._alarm = Alarm(parent=self)
         self._radio = Radio(parent=self)
@@ -141,8 +135,9 @@ class Gateway(Device):
     def subdevice_model_map(self):
         """Return the subdevice model map."""
         if self._subdevice_model_map is None:
-            filedata = open(os.path.dirname(__file__) + "/devices/subdevices.yaml", "r")
-            self._subdevice_model_map = yaml.safe_load(filedata)
+            subdevice_file = os.path.dirname(__file__) + "/devices/subdevices.yaml"
+            with open(subdevice_file) as filedata:
+                self._subdevice_model_map = yaml.safe_load(filedata)
         return self._subdevice_model_map
 
     @command()
