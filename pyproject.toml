@@ -25,6 +25,7 @@ python = "^3.6.5"
 click = "^7"
 cryptography = "^3"
 construct = "^2.10.56"
+micloud = "^0.3"
 zeroconf = "^0.28"
 attrs = "*"
 pytz = "*"
@@ -70,6 +71,7 @@ known_third_party = ["appdirs",
   "construct",
   "croniter",
   "cryptography",
+  "micloud",
   "netifaces",
   "pytest",
   "pytz",
