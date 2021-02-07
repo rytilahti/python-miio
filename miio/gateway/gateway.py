@@ -136,7 +136,6 @@ class Gateway(Device):
     @property
     def subdevice_model_map(self):
         """Return the subdevice model map."""
-        # Check if catch already has the subdevice_model_map, otherwise read it.
         if self._subdevice_model_map is None:
             filedata = open(os.path.dirname(__file__) + "/devices/subdevices.yaml", "r")
             self._subdevice_model_map = yaml.safe_load(filedata)
