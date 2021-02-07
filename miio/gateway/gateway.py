@@ -94,16 +94,8 @@ class Gateway(Device):
         self._info = None
         self._subdevice_model_map = None
 
-    def _get_subdevice_model_map(self):
-        if self._subdevice_model_map is None:
-            filedata = open(os.path.dirname(__file__) + "/devices/subdevices.yaml", "r")
-            self._subdevice_model_map = yaml.safe_load(filedata)
-        return self._subdevice_model_map
-
     def _get_unknown_model(self):
-        self._get_subdevice_model_map()
-
-        for model_info in self._subdevice_model_map:
+        for model_info in self.subdevice_model_map:
             if model_info.get("type_id") == -1:
                 return model_info
 
@@ -140,6 +132,15 @@ class Gateway(Device):
         if self._info is None:
             self._info = self.info()
         return self._info.model
+
+    @property
+    def subdevice_model_map(self):
+        """Return the subdevice model map."""
+        # Check if catch already has the subdevice_model_map, otherwise read it.
+        if self._subdevice_model_map is None:
+            filedata = open(os.path.dirname(__file__) + "/devices/subdevices.yaml", "r")
+            self._subdevice_model_map = yaml.safe_load(filedata)
+        return self._subdevice_model_map
 
     @command()
     def discover_devices(self):
@@ -197,9 +198,7 @@ class Gateway(Device):
         Match the zigbee_model to obtain the model_info
         """
 
-        self._get_subdevice_model_map()
-
-        for model_info in self._subdevice_model_map:
+        for model_info in self.subdevice_model_map:
             if model_info.get("zigbee_id") == zigbee_model:
                 return model_info
 
@@ -218,9 +217,7 @@ class Gateway(Device):
         Match the type_id to obtain the model_info
         """
 
-        self._get_subdevice_model_map()
-
-        for model_info in self._subdevice_model_map:
+        for model_info in self.subdevice_model_map:
             if model_info.get("type_id") == type_id:
                 return model_info
 
