@@ -49,20 +49,20 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
     def set_aled_v_of_uid(self, args):
         uid, color = args
         if uid:
-            if uid in self.users:
-                self.users.setdefault("ambient_light", AmbientLightColor(color).name)
-            else:
+            if uid not in self.users:
                 raise ValueError("This user is not bind.")
+
+            self.users.setdefault("ambient_light", AmbientLightColor(color).name)
         else:
             return self._set_state("ambient_light", [AmbientLightColor(color).name])
 
     def get_aled_v_of_uid(self, args):
         uid = args[0]
         if uid:
-            if uid in self.users:
-                color = self.users.get("ambient_light")
-            else:
-                raise ValueError("This user is not bind.")
+            if uid not in self.users:
+                raise ValueError("This user is not b.")
+
+            color = self.users.get("ambient_light")
         else:
             color = self._get_state(["ambient_light"])
         if not AmbientLightColor._member_map_.get(color[0]):
@@ -71,6 +71,9 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
 
     def uid_mac_op(self, args):
         xiaomi_id, band_mac, alias, operating = args
+        if operating not in ["bind", "unbind"]:
+            raise ValueError("operating not bind or unbind, but %s" % operating)
+
         if operating == "bind":
             info = self.users.setdefault(
                 xiaomi_id, {"rssi": -50, "set": "3-0-2-2-0-0-5-5"}
@@ -78,8 +81,6 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
             info.update(mac=band_mac, name=alias)
         elif operating == "unbind":
             self.users.pop(xiaomi_id)
-        else:
-            raise ValueError("operating error")
 
     def get_all_user_info(self):
         users = {}
@@ -141,7 +142,7 @@ class TestToiletlidV1(TestCase):
 
     def test_get_all_user_info(self):
         users = self.device.get_all_user_info()
-        for name, info in users.items():
+        for _name, info in users.items():
             assert info["uid"] in self.MOCK_USER
             data = self.MOCK_USER[info["uid"]]
             assert info["name"] == data["name"]

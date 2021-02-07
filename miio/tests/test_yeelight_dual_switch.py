@@ -38,7 +38,6 @@ def switch(request):
 class TestYeelightDualControlModule(TestCase):
     def test_1_on(self):
         self.device.off(Switch.First)  # ensure off
-        print(self.device.status())
         assert self.device.status().switch_1_state is False
 
         self.device.on(Switch.First)

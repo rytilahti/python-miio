@@ -169,17 +169,17 @@ class TestAirHumidifierJsq(TestCase):
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_mode(Bunch(value=10))
-        assert "10 is not a valid OperationMode value" == str(excinfo.value)
+        assert str(excinfo.value) == "10 is not a valid OperationMode value"
         assert mode() == OperationMode.Level3
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_mode(Bunch(value=-1))
-        assert "-1 is not a valid OperationMode value" == str(excinfo.value)
+        assert str(excinfo.value) == "-1 is not a valid OperationMode value"
         assert mode() == OperationMode.Level3
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_mode(Bunch(value="smth"))
-        assert "smth is not a valid OperationMode value" == str(excinfo.value)
+        assert str(excinfo.value) == "smth is not a valid OperationMode value"
         assert mode() == OperationMode.Level3
 
     def test_set_led_brightness(self):
@@ -204,17 +204,17 @@ class TestAirHumidifierJsq(TestCase):
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_led_brightness(Bunch(value=10))
-        assert "10 is not a valid LedBrightness value" == str(excinfo.value)
+        assert str(excinfo.value) == "10 is not a valid LedBrightness value"
         assert led_brightness() == LedBrightness.Low
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_led_brightness(Bunch(value=-10))
-        assert "-10 is not a valid LedBrightness value" == str(excinfo.value)
+        assert str(excinfo.value) == "-10 is not a valid LedBrightness value"
         assert led_brightness() == LedBrightness.Low
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_led_brightness(Bunch(value="smth"))
-        assert "smth is not a valid LedBrightness value" == str(excinfo.value)
+        assert str(excinfo.value) == "smth is not a valid LedBrightness value"
         assert led_brightness() == LedBrightness.Low
 
     def test_set_led(self):

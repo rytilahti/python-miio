@@ -94,9 +94,6 @@ class VacuumTUI:
         elif ctl == Control.RightFast:
             self.rot = 0 if self.rot > 0 else self.rot_min
 
-        else:
-            raise RuntimeError("unreachable")
-
         self.vac.manual_control(rotation=self.rot, velocity=self.vel, duration=self.dur)
         return False
 

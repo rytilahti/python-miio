@@ -31,7 +31,7 @@
       unit: percent
       get: get_property_exp
       devisor: 100
-    
+
 - zigbee_id: lumi.weather.v1
   model: WSDCGQ11LM
   type_id: 19
@@ -584,7 +584,7 @@
 
 - zigbee_id: lumi.ctrl_86plug.aq1
   model: QBCZ11LM
-  type_id: 65 
+  type_id: 65
   name: Wall outlet
   type: AqaraWallOutlet
   class: Switch

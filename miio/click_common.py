@@ -18,7 +18,7 @@ import miio
 from .exceptions import DeviceError
 
 if sys.version_info < (3, 5):
-    print(
+    click.echo(
         "To use this script you need python 3.5 or newer, got %s" % (sys.version_info,)
     )
     sys.exit(1)
@@ -124,7 +124,7 @@ class DeviceGroupMeta(type):
 
         def _get_commands_for_namespace(namespace):
             commands = {}
-            for key, val in namespace.items():
+            for _, val in namespace.items():
                 if not callable(val):
                     continue
                 device_group_command = getattr(val, "_device_group_command", None)

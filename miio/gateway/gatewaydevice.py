@@ -9,10 +9,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class GatewayDevice(Device):
-    """
-    GatewayDevice class
-    Specifies the init method for all gateway device functionalities.
-    """
+    """GatewayDevice class Specifies the init method for all gateway device
+    functionalities."""
 
     def __init__(
         self,

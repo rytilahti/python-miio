@@ -1,4 +1,5 @@
 import ast
+import contextlib
 import json
 import logging
 import pathlib
@@ -20,6 +21,7 @@ from miio.click_common import (
     validate_token,
 )
 from miio.device import UpdateState
+from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
 
@@ -56,14 +58,13 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         sys.exit(-1)
 
     start_id = manual_seq = 0
-    try:
-        with open(id_file, "r") as f:
-            x = json.load(f)
-            start_id = x.get("seq", 0)
-            manual_seq = x.get("manual_seq", 0)
-            _LOGGER.debug("Read stored sequence ids: %s", x)
-    except (FileNotFoundError, TypeError, ValueError):
-        pass
+    with open(id_file, "r") as f, contextlib.suppress(
+        FileNotFoundError, TypeError, ValueError
+    ):
+        x = json.load(f)
+        start_id = x.get("seq", 0)
+        manual_seq = x.get("manual_seq", 0)
+        _LOGGER.debug("Read stored sequence ids: %s", x)
 
     vac = miio.Vacuum(ip, token, start_id, debug)
 
@@ -85,12 +86,11 @@ def cleanup(vac: miio.Vacuum, *args, **kwargs):
     id_file = kwargs["id_file"]
     seqs = {"seq": vac.raw_id, "manual_seq": vac.manual_seqnum}
     _LOGGER.debug("Writing %s to %s", seqs, id_file)
+
     path_obj = pathlib.Path(id_file)
     dir = path_obj.parents[0]
-    try:
-        dir.mkdir(parents=True)
-    except FileExistsError:
-        pass  # after dropping py3.4 support, use exist_ok for mkdir
+    dir.mkdir(parents=True, exist_ok=True)
+
     with open(id_file, "w") as f:
         json.dump(seqs, f)
 
@@ -313,7 +313,7 @@ def dnd(
     """Query and adjust do-not-disturb mode."""
     if cmd == "off":
         click.echo("Disabling DND..")
-        print(vac.disable_dnd())
+        click.echo(vac.disable_dnd())
     elif cmd == "on":
         click.echo(
             "Enabling DND %s:%s to %s:%s" % (start_hr, start_min, end_hr, end_min)
@@ -424,7 +424,7 @@ def info(vac: miio.Vacuum):
 
         click.echo("%s" % res)
         _LOGGER.debug("Full response: %s", pf(res.raw))
-    except TypeError:
+    except DeviceInfoUnavailableException:
         click.echo(
             "Unable to fetch info, this can happen when the vacuum "
             "is not connected to the Xiaomi cloud."
@@ -511,7 +511,7 @@ def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int, ip: str):
     progress = vac.sound_install_progress()
     while progress.is_installing:
         progress = vac.sound_install_progress()
-        print("%s (%s %%)" % (progress.state.name, progress.progress))
+        click.echo("%s (%s %%)" % (progress.state.name, progress.progress))
         time.sleep(1)
 
     progress = vac.sound_install_progress()

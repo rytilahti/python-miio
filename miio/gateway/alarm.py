@@ -29,10 +29,8 @@ class Alarm(GatewayDevice):
 
     @command()
     def arming_time(self) -> int:
-        """
-        Return time in seconds the alarm stays 'oning'
-        before transitioning to 'on'
-        """
+        """Return time in seconds the alarm stays 'oning' before transitioning to
+        'on'."""
         # Response: 5, 15, 30, 60
         return self._gateway.send("get_arm_wait_time").pop()
 
@@ -54,10 +52,7 @@ class Alarm(GatewayDevice):
 
     @command()
     def triggering_light(self) -> int:
-        """
-        Return the time the gateway light blinks
-        when the alarm is triggerd
-        """
+        """Return the time the gateway light blinks when the alarm is triggerd."""
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._gateway.get_prop("en_alarm_light").pop()
 
@@ -79,7 +74,5 @@ class Alarm(GatewayDevice):
 
     @command()
     def last_status_change_time(self) -> datetime:
-        """
-        Return the last time the alarm changed status.
-        """
+        """Return the last time the alarm changed status."""
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())

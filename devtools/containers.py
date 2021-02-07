@@ -13,7 +13,7 @@ def python_type_for_type(x):
         return "int"
     if x == "string":
         return "str"
-    if x == "float" or x == "bool":
+    if x in ["float", "bool"]:
         return x
 
     return f"unknown type {x}"
@@ -40,10 +40,11 @@ class ModelMapping(DataClassJsonMixin):
     instances: List[InstanceInfo]
 
     def urn_for_model(self, model: str):
-        matches = [inst.type for inst in self.instances if inst.model == model]
+        matches = [inst for inst in self.instances if inst.model == model]
         if len(matches) > 1:
-            print(
-                "WARNING more than a single match for model %s: %s" % (model, matches)
+            print(  # noqa: T001
+                "WARNING more than a single match for model %s, using the first one: %s"
+                % (model, matches)
             )
 
         return matches[0]

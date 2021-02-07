@@ -1,7 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Dict, Optional
 
 import attr
 import click
@@ -33,11 +33,13 @@ class SubDevice:
         self,
         gw: "Gateway" = None,
         dev_info: SubDeviceInfo = None,
-        model_info: dict = {},
+        model_info: Optional[Dict] = None,
     ) -> None:
 
         self._gw = gw
         self.sid = dev_info.sid
+        if model_info is None:
+            model_info = {}
         self._model_info = model_info
         self._battery = None
         self._voltage = None

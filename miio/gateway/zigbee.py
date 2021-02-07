@@ -30,7 +30,10 @@ class Zigbee(GatewayDevice):
         return self._gateway.send("start_zigbee_join", [timeout])
 
     def send_to_zigbee(self):
-        """How does this differ from writing? Unknown."""
+        """How does this differ from writing?
+
+        Unknown.
+        """
         raise NotImplementedError()
         return self._gateway.send("send_to_zigbee")
 

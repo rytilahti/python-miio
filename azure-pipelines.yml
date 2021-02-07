@@ -42,6 +42,10 @@ stages:
       displayName: 'Order of imports (isort)'
 
     - script: |
+        poetry run pre-commit run docformatter --all-files
+      displayName: 'Docstring formating (docformatter)'
+
+    - script: |
         poetry run sphinx-build docs/ generated_docs
       displayName: 'Documentation build (sphinx)'
 
