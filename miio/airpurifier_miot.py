@@ -356,16 +356,6 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
 class BasicAirPurifierMiot(MiotDevice):
     """Main class representing the air purifier which uses MIoT protocol."""
 
-    def __init__(
-        self,
-        attributes: dict = [],
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(attributes, ip, token, start_id, debug, lazy_discover)
 
     @command(default_output=format_output("Powering on"))
     def on(self):
