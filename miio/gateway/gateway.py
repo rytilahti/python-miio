@@ -97,6 +97,7 @@ class Gateway(Device):
         self._devices = {}
         self._info = None
         self._subdevice_model_map = None
+        self._did = None
 
     def _get_unknown_model(self):
         for model_info in self.subdevice_model_map:
@@ -130,9 +131,15 @@ class Gateway(Device):
         return self._devices
 
     @property
+    def mac(self):
+        """Return the mac address of the gateway."""
+        if self._info is None:
+            self._info = self.info()
+        return self._info.mac_address
+
+    @property
     def model(self):
         """Return the zigbee model of the gateway."""
-        # Check if catch already has the gateway info, otherwise get it from the device
         if self._info is None:
             self._info = self.info()
         return self._info.model
@@ -154,7 +161,8 @@ class Gateway(Device):
         # Skip the models which do not support getting the device list
         if self.model == GATEWAY_MODEL_EU:
             _LOGGER.warning(
-                "Gateway model '%s' does not (yet) support getting the device list",
+                "Gateway model '%s' does not (yet) support getting the device list, "
+                "try using the get_devices_from_dict function with micloud",
                 self.model,
             )
             return self._devices
@@ -184,6 +192,49 @@ class Gateway(Device):
 
                 # Match 'type_id' to get the model_info
                 model_info = self.match_type_id(dev_info.type_id, dev_info.sid)
+
+                # Setup the device
+                self.setup_device(dev_info, model_info)
+
+        return self._devices
+
+    @command()
+    def get_devices_from_dict(self, device_dict):
+        """Get SubDevices from a dict containing at least "mac", "did", "parent_id" and
+        "model".
+
+        This dict can be obtained with the micloud package:
+        https://github.com/squachen/micloud
+        """
+
+        self._devices = {}
+
+        # find the gateway
+        for device in device_dict:
+            if device["mac"] == self.mac:
+                self._did = device["did"]
+                break
+
+        # check if the gateway is found
+        if self._did is None:
+            _LOGGER.error(
+                "Could not find gateway with ip '%s', mac '%s', model '%s' in the cloud device list response",
+                self.ip,
+                self.mac,
+                self.model,
+            )
+            return self._devices
+
+        # find the subdevices belonging to this gateway
+        for device in device_dict:
+            if device.get("parent_id") == self._did:
+                # Match 'model' to get the type_id
+                model_info = self.match_zigbee_model(device["model"], device["did"])
+
+                # Extract discovered information
+                dev_info = SubDeviceInfo(
+                    device["did"], model_info["type_id"], -1, -1, -1
+                )
 
                 # Setup the device
                 self.setup_device(dev_info, model_info)
