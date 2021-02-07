@@ -33,14 +33,13 @@ class ScishareCoffee(Device):
     def status(self) -> int:
         """Device status."""
         status_code = self.send("Query_Machine_Status")[1]
-        _LOGGER.warning(
-            "Status code unknown, please report the state of the machine for code %s",
-            status_code,
-        )
         try:
             return Status(status_code)
         except ValueError:
-            _LOGGER.error("Unknown status: %s", status_code)
+            _LOGGER.warning(
+                "Status code unknown, please report the state of the machine for code %s",
+                status_code,
+            )
             return Status.Unknown
 
     @command(
