@@ -596,11 +596,21 @@ class Vacuum(Device):
     def timezone(self):
         """Get the timezone."""
         res = self.send("get_timezone")[0]
+
+        def _fallback_timezone(data):
+            fallback = "UTC"
+            _LOGGER.error(
+                "Unsupported timezone format (%s), falling back to %s", data, fallback
+            )
+            return fallback
+
+        if isinstance(res, int):
+            return _fallback_timezone(res)
         if isinstance(res, dict):
             # Xiaowa E25 example
             # {'olson': 'Europe/Berlin', 'posix': 'CET-1CEST,M3.5.0,M10.5.0/3'}
             if "olson" not in res:
-                raise VacuumException("Unsupported timezone format: %s" % res)
+                return _fallback_timezone(res)
 
             return res["olson"]
 
