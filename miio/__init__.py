@@ -47,6 +47,7 @@ from miio.philips_rwread import PhilipsRwread
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.pwzn_relay import PwznRelay
+from miio.scishare_coffeemaker import ScishareCoffee
 from miio.toiletlid import Toiletlid
 from miio.vacuum import Vacuum, VacuumException
 from miio.vacuum_tui import VacuumTUI

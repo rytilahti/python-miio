@@ -130,6 +130,7 @@ Supported devices
 -  Xiaomiyoupin Curtain Controller (Wi-Fi) (lumi.curtain.hagl05)
 -  Xiaomi Xiaomi Mi Smart Space Heater S (zhimi.heater.mc2)
 -  Yeelight Dual Control Module (yeelink.switch.sw1)
+-  Scishare coffee maker (scishare.coffee.s1102)
 
 
 *Feel free to create a pull request to add support for new devices as
