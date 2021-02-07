@@ -353,7 +353,6 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
 class BasicAirPurifierMiot(MiotDevice):
     """Main class representing the air purifier which uses MIoT protocol."""
 
-
     @command(default_output=format_output("Powering on"))
     def on(self):
         """Power on."""
