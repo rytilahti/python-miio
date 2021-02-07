@@ -7,7 +7,7 @@ import attr
 import click
 
 from ...click_common import command
-from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, Gateway, GatewayException
+from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class SubDevice:
 
     def __init__(
         self,
-        gw: Gateway = None,
+        gw: "Gateway" = None,
         dev_info: SubDeviceInfo = None,
         model_info: dict = {},
     ) -> None:

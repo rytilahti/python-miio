@@ -26,6 +26,7 @@ GATEWAY_MODEL_AC_V3 = "lumi.acpartner.v3"
 class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
 
+from .devices import SubDevice, SubDeviceInfo
 
 class Gateway(Device):
     """Main class representing the Xiaomi Gateway.
@@ -148,8 +149,6 @@ class Gateway(Device):
         and returns a list of the discovered devices.
         """
 
-        from .devices import SubDeviceInfo
-
         self._devices = {}
 
         # Skip the models which do not support getting the device list
@@ -234,8 +233,6 @@ class Gateway(Device):
         """
         Setup a device using the SubDeviceInfo and model_info
         """
-
-        from .devices import SubDevice
 
         if model_info.get("type") == "Gateway":
             # ignore the gateway itself
