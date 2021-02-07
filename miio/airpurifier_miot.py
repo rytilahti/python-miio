@@ -559,7 +559,7 @@ class AirPurifierMB4(BasicAirPurifierMiot):
         default_output=format_output("Setting LED brightness level to {level}"),
     )
     def set_led_brightness_level(self, level: int):
-        """Set led brightness level."""
+        """Set led brightness level (0..8)."""
         if level < 0 or level > 8:
             raise AirPurifierMiotException("Invalid brightness level: %s" % level)
 
