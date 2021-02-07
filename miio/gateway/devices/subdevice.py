@@ -1,7 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import attr
 import click
@@ -12,6 +12,8 @@ from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
 _LOGGER = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from ..gateway import Gateway
+
+
 @attr.s(auto_attribs=True)
 class SubDeviceInfo:
     """SubDevice discovery info."""
@@ -24,10 +26,8 @@ class SubDeviceInfo:
 
 
 class SubDevice:
-    """
-    Base class for all subdevices of the gateway
-    these devices are connected through zigbee.
-    """
+    """Base class for all subdevices of the gateway these devices are connected through
+    zigbee."""
 
     def __init__(
         self,
