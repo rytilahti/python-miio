@@ -822,7 +822,7 @@ class ViomiVacuum(Device):
         return self.send("set_voice", [enabled, state.value])
 
     @command(click.argument("state", type=bool))
-    def set_remember(self, state: bool):
+    def set_remember_map(self, state: bool):
         """Set remember map state."""
         return self.send("set_remember", [int(state)])
 
