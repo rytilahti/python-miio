@@ -10,8 +10,8 @@ from ...click_common import command
 from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
 
 _LOGGER = logging.getLogger(__name__)
-
-
+if TYPE_CHECKING:
+    from ..gateway import Gateway
 @attr.s(auto_attribs=True)
 class SubDeviceInfo:
     """SubDevice discovery info."""
