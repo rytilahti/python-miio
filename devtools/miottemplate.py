@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 
 import click
-
 import requests
 from containers import Device, ModelMapping
 

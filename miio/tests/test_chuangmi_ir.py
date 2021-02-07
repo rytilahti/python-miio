@@ -78,9 +78,8 @@ class TestChuangmiIr(TestCase):
                 )
 
         for args in test_data["test_pronto_exception"]:
-            with self.subTest():
-                with pytest.raises(ChuangmiIrException):
-                    ChuangmiIr.pronto_to_raw(*args["in"])
+            with self.subTest(), pytest.raises(ChuangmiIrException):
+                ChuangmiIr.pronto_to_raw(*args["in"])
 
     def test_play_pronto(self):
         for args in test_data["test_pronto_ok"]:
