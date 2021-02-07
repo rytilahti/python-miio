@@ -148,9 +148,6 @@ class BasicAirPurifierMiotStatus:
 class AirPurifierMiotStatus(BasicAirPurifierMiotStatus):
     """Container for status reports from the air purifier."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
-        super().__init__(data)
-
     @property
     def average_aqi(self) -> int:
         """Average of the air quality index."""
