@@ -266,20 +266,6 @@ class ViomiRoutePattern(Enum):
     Y = 1
 
 
-class ViomiVoiceState(Enum):
-    Off = 0
-    Level_10 = 1
-    Level_20 = 2
-    Level_30 = 3
-    Level_40 = 4
-    Level_50 = 5
-    Level_60 = 6
-    Level_70 = 7
-    Level_80 = 8
-    Level_90 = 9
-    Level_100 = 10
-
-
 class ViomiEdgeState(Enum):
     Off = 0
     Unknown = 1
@@ -592,20 +578,20 @@ class ViomiVacuum(Device):
             "mode",
             "mop_route",
             "mop_type",
-            # "order_time",
             "remember_map",
             "repeat_state",
             "run_state",
             "s_area",
             "s_time",
-            # "start_time",
             "suction_grade",
             "v_state",
             "water_grade",
-            # "water_percent",
-            # "zone_data",
             # The following list of properties existing but
             # there are not used in the code
+            # "order_time",
+            # "start_time",
+            # "water_percent",
+            # "zone_data",
             # "sw_info",
             # "main_brush_hours",
             # "main_brush_life",
