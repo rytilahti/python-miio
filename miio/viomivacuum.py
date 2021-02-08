@@ -475,20 +475,6 @@ def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
     More information:
     * https://github.com/homebridge-xiaomi-roborock-vacuum/homebridge-xiaomi-roborock-vacuum/blob/d73925c0106984a995d290e91a5ba4fcfe0b6444/index.js#L969
     * https://github.com/homebridge-xiaomi-roborock-vacuum/homebridge-xiaomi-roborock-vacuum#semi-automatic
-
-
-    >>> _parse_schedules(['1_0_32_0_0_0_1_1_11_0_1594139992_2_11_room1_13_room2'])
-    (True, {'11': 'room1', '13': 'room2'})
-    >>> _parse_schedules(['1_0_32_0_0_0_1_1_11_0_1594139992_2_11_room1_13_room2', '1_0_32_0_0_0_1_1_11_0_1594139992_2_10_room3_14_room4'])
-    (True, {'11': 'room1', '13': 'room2', '10': 'room3', '14': 'room4'})
-    >>> _parse_schedules(['1_1_32_0_0_0_1_1_11_0_1594139992_2_11_room1_13_room2', '1_0_32_0_0_0_1_1_11_0_1594139992_2_10_room3_14_room4'])
-    (True, {'10': 'room3', '14': 'room4'})
-    >>> _parse_schedules(['1_0_32_2_0_0_1_1_11_0_1594139992_2_11_room1_13_room2', '1_0_32_0_4_0_1_1_11_0_1594139992_2_10_room3_14_room4'])
-    (False, {})
-    >>> _parse_schedules(['1_1_32_0_0_0_1_1_11_0_1594139992_2_11_room1_13_room2'])
-    (False, {})
-    >>> _parse_schedules([])
-    (False, {})
     """
     rooms = {}
     scheduled_found = False
