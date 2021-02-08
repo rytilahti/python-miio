@@ -22,8 +22,8 @@ Settings:
 - Secondary cleanup - set_repeat/repeat_cleaning
 - Mop or vacuum & mod mode - set_moproute/mop_route
 - DND(DoNotDisturb) - set_notdisturb/get_notdisturb
-- Voice On/Off - set_sound_volume/voice_state
-- Remember Map - voice_state
+- Voice On/Off - set_sound_volume/sound_volume
+- Remember Map - remember_map
 - Virtual wall/restricted area - MISSING
 - Map list - get_maps/rename_map/delete_map/set_map
 - Area editor - MISSING
@@ -450,9 +450,9 @@ class ViomiVacuumStatus:
     #    return self.data["start_time"]
 
     @property
-    def voice_state(self) -> ViomiVoiceState:
+    def sound_volume(self) -> int:
         """Voice volume level (from 0 to 100%, 0 means Off)."""
-        return ViomiVoiceState(self.data["v_state"])
+        return self.data["v_state"]
 
     # @property
     # def water_percent(self) -> int:
@@ -553,7 +553,7 @@ class ViomiVacuum(Device):
             "Vacuum along the edges: {result.edge_state}\n"
             "Mop route pattern: {result.mop_route}\n"
             "Secondary Cleanup: {result.repeat_cleaning}\n"
-            "Voice state: {result.voice_state}\n"
+            "Sound Volume: {result.sound_volume}\n"
             "Clean time: {result.clean_time}\n"
             "Clean area: {result.clean_area} m²\n"
             "\n"
@@ -813,13 +813,13 @@ class ViomiVacuum(Device):
             [0 if disable else 1, start_hr, start_min, end_hr, end_min],
         )
 
-    @command(click.argument("state", type=EnumType(ViomiVoiceState)))
-    def set_sound_volume(self, state: ViomiVoiceState):
+    @command(click.argument("volume", type=click.IntRange(0, 10)))
+    def set_sound_volume(self, volume: int):
         """Switch the voice on or off."""
         enabled = 1
-        if state.value == 0:
+        if volume == 0:
             enabled = 0
-        return self.send("set_voice", [enabled, state.value])
+        return self.send("set_voice", [enabled, volume])
 
     @command(click.argument("state", type=bool))
     def set_remember_map(self, state: bool):
