@@ -55,7 +55,7 @@ class OneShotServer:
         with open(file, "rb") as f:
             self.payload = f.read()
             self.server.payload = self.payload
-            self.md5 = hashlib.md5(self.payload).hexdigest()
+            self.md5 = hashlib.md5(self.payload).hexdigest()  # nosec
             _LOGGER.info("Using local %s (md5: %s)" % (file, self.md5))
 
     @staticmethod
@@ -93,5 +93,5 @@ class OneShotServer:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    upd = OneShotServer("/tmp/test")
+    upd = OneShotServer("/tmp/test")  # nosec
     upd.serve_once()
