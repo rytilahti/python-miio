@@ -93,6 +93,7 @@ class WaterFlow(enum.Enum):
 
 
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
+ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 
 
@@ -149,6 +150,7 @@ class Vacuum(Device):
             self._autodetect_model()
 
         SKIP_PAUSE = [
+            ROCKROBO_S5,
             ROCKROBO_S6_MAXV,
         ]
 
