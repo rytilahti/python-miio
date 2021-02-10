@@ -46,8 +46,13 @@ stages:
       displayName: 'Docstring formating (docformatter)'
 
     - script: |
+        poetry run pre-commit run bandit --all-files
+      displayName: 'Potential security issues (bandit)'
+
+    - script: |
         poetry run sphinx-build docs/ generated_docs
       displayName: 'Documentation build (sphinx)'
+
 
 - stage: "Tests"
   jobs:

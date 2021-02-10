@@ -57,7 +57,7 @@ class Utils:
     @staticmethod
     def md5(data: bytes) -> bytes:
         """Calculates a md5 hashsum for the given bytes object."""
-        checksum = hashlib.md5()
+        checksum = hashlib.md5()  # nosec
         checksum.update(data)
         return checksum.digest()
 

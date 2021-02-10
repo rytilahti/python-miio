@@ -627,7 +627,8 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
             try:
                 state = vac.update_state()
                 progress = vac.update_progress()
-            except:  # we may not get our messages through during upload # noqa
+            except:  # noqa # nosec
+                # we may not get our messages through during uploads
                 continue
 
             if state == UpdateState.Installing:

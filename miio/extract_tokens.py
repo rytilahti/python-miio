@@ -2,12 +2,12 @@ import json
 import logging
 import sqlite3
 import tempfile
-import xml.etree.ElementTree as ET
 from pprint import pformat as pf
 from typing import Iterator
 
 import attr
 import click
+import defusedxml.ElementTree as ET
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -80,7 +80,9 @@ class BackupDatabaseReader:
 
         keystring = "00000000000000000000000000000000"
         key = bytes.fromhex(keystring)
-        cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
+        cipher = Cipher(  # nosec
+            algorithms.AES(key), modes.ECB(), backend=default_backend()
+        )
         decryptor = cipher.decryptor()
         token = decryptor.update(bytes.fromhex(ztoken[:64])) + decryptor.finalize()
 
