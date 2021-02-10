@@ -7,7 +7,7 @@ import click
 
 from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class AirPurifierStatus:
+class AirPurifierStatus(DeviceStatus):
     """Container for status reports from the air purifier."""
 
     _filter_type_cache = {}
@@ -295,73 +295,6 @@ class AirPurifierStatus:
     def button_pressed(self) -> Optional[str]:
         """Last pressed button."""
         return self.data["button_pressed"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirPurifierStatus power=%s, "
-            "aqi=%s, "
-            "average_aqi=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "mode=%s, "
-            "led=%s, "
-            "led_brightness=%s, "
-            "illuminance=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "favorite_level=%s, "
-            "filter_life_remaining=%s, "
-            "filter_hours_used=%s, "
-            "use_time=%s, "
-            "purify_volume=%s, "
-            "motor_speed=%s, "
-            "motor2_speed=%s, "
-            "volume=%s, "
-            "filter_rfid_product_id=%s, "
-            "filter_rfid_tag=%s, "
-            "filter_type=%s, "
-            "learn_mode=%s, "
-            "sleep_mode=%s, "
-            "sleep_time=%s, "
-            "sleep_mode_learn_count=%s, "
-            "extra_features=%s, "
-            "turbo_mode_supported=%s, "
-            "auto_detect=%s, "
-            "button_pressed=%s>"
-            % (
-                self.power,
-                self.aqi,
-                self.average_aqi,
-                self.temperature,
-                self.humidity,
-                self.mode,
-                self.led,
-                self.led_brightness,
-                self.illuminance,
-                self.buzzer,
-                self.child_lock,
-                self.favorite_level,
-                self.filter_life_remaining,
-                self.filter_hours_used,
-                self.use_time,
-                self.purify_volume,
-                self.motor_speed,
-                self.motor2_speed,
-                self.volume,
-                self.filter_rfid_product_id,
-                self.filter_rfid_tag,
-                self.filter_type,
-                self.learn_mode,
-                self.sleep_mode,
-                self.sleep_time,
-                self.sleep_mode_learn_count,
-                self.extra_features,
-                self.turbo_mode_supported,
-                self.auto_detect,
-                self.button_pressed,
-            )
-        )
-        return s
 
 
 class AirPurifier(Device):

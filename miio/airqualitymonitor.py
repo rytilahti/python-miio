@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ class AirQualityMonitorException(DeviceException):
     pass
 
 
-class AirQualityMonitorStatus:
+class AirQualityMonitorStatus(DeviceStatus):
     """Container of air quality monitor status."""
 
     def __init__(self, data):
@@ -146,35 +146,6 @@ class AirQualityMonitorStatus:
     def tvoc(self) -> Optional[int]:
         """Return tvoc value."""
         return self.data.get("tvoc", None)
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirQualityMonitorStatus power=%s, "
-            "usb_power=%s, "
-            "battery=%s, "
-            "aqi=%s, "
-            "temperature=%s, "
-            "humidity=%s, "
-            "co2=%s, "
-            "co2e=%s, "
-            "pm2.5=%s, "
-            "tvoc=%s, "
-            "display_clock=%s>"
-            % (
-                self.power,
-                self.usb_power,
-                self.battery,
-                self.aqi,
-                self.temperature,
-                self.humidity,
-                self.co2,
-                self.co2e,
-                self.pm25,
-                self.tvoc,
-                self.display_clock,
-            )
-        )
-        return s
 
 
 class AirQualityMonitor(Device):

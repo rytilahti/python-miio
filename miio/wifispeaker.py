@@ -5,7 +5,7 @@ import warnings
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class TransportChannel(enum.Enum):
     Qplay = "QPLAY"
 
 
-class WifiSpeakerStatus:
+class WifiSpeakerStatus(DeviceStatus):
     """Container of a speaker state.
 
     This contains information such as the name of the device, and what is currently
@@ -90,33 +90,6 @@ class WifiSpeakerStatus:
     def transport_channel(self) -> TransportChannel:
         """Transport channel, e.g. PLAYLIST."""
         return TransportChannel(self.data["transport_channel"])
-
-    def __repr__(self) -> str:
-        s = (
-            "<WifiSpeakerStatus "
-            "device_name=%s, "
-            "channel=%s, "
-            "state=%s, "
-            "play_mode=%s, "
-            "track_artist=%s, "
-            "track_title=%s, "
-            "track_duration=%s, "
-            "transport_channel=%s, "
-            "hardware_version=%s>"
-            % (
-                self.device_name,
-                self.channel,
-                self.state,
-                self.play_mode,
-                self.track_artist,
-                self.track_title,
-                self.track_duration,
-                self.transport_channel,
-                self.hardware_version,
-            )
-        )
-
-        return s
 
 
 class WifiSpeaker(Device):

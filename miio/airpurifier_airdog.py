@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ class OperationModeMapping(enum.Enum):
     Idle = 2
 
 
-class AirDogStatus:
+class AirDogStatus(DeviceStatus):
     """Container for status reports from the air dog x3."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -97,27 +97,6 @@ class AirDogStatus:
             return self.data["hcho"]
 
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirDogStatus power=%s, "
-            "mode=%s, "
-            "speed=%s, "
-            "child_lock=%s, "
-            "clean_filters=%s, "
-            "pm25=%s, "
-            "hcho=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.speed,
-                self.child_lock,
-                self.clean_filters,
-                self.pm25,
-                self.hcho,
-            )
-        )
-        return s
 
 
 class AirDogX3(Device):

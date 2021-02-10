@@ -5,7 +5,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ class PhilipsEyecareException(DeviceException):
     pass
 
 
-class PhilipsEyecareStatus:
+class PhilipsEyecareStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips Eyecare Smart Lamp 2."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -73,31 +73,6 @@ class PhilipsEyecareStatus:
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""
         return self.data["dvalue"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<PhilipsEyecareStatus power=%s, "
-            "brightness=%s, "
-            "ambient=%s, "
-            "ambient_brightness=%s, "
-            "eyecare=%s, "
-            "scene=%s, "
-            "reminder=%s, "
-            "smart_night_light=%s, "
-            "delay_off_countdown=%s>"
-            % (
-                self.power,
-                self.brightness,
-                self.ambient,
-                self.ambient_brightness,
-                self.eyecare,
-                self.scene,
-                self.reminder,
-                self.smart_night_light,
-                self.delay_off_countdown,
-            )
-        )
-        return s
 
 
 class PhilipsEyecare(Device):

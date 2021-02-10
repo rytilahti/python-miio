@@ -7,7 +7,7 @@ import click
 from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -85,7 +85,7 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class BasicAirPurifierMiotStatus:
+class BasicAirPurifierMiotStatus(DeviceStatus):
     """Container for status reports from the air purifier."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -256,55 +256,6 @@ class AirPurifierMiotStatus(BasicAirPurifierMiotStatus):
             self.filter_rfid_tag, self.filter_rfid_product_id
         )
 
-    def __repr__(self) -> str:
-        s = (
-            "<AirPurifierMiotStatus power=%s, "
-            "aqi=%s, "
-            "average_aqi=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "fan_level=%s, "
-            "mode=%s, "
-            "led=%s, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "buzzer_volume=%s, "
-            "child_lock=%s, "
-            "favorite_level=%s, "
-            "filter_life_remaining=%s, "
-            "filter_hours_used=%s, "
-            "use_time=%s, "
-            "purify_volume=%s, "
-            "motor_speed=%s, "
-            "filter_rfid_product_id=%s, "
-            "filter_rfid_tag=%s, "
-            "filter_type=%s>"
-            % (
-                self.power,
-                self.aqi,
-                self.average_aqi,
-                self.temperature,
-                self.humidity,
-                self.fan_level,
-                self.mode,
-                self.led,
-                self.led_brightness,
-                self.buzzer,
-                self.buzzer_volume,
-                self.child_lock,
-                self.favorite_level,
-                self.filter_life_remaining,
-                self.filter_hours_used,
-                self.use_time,
-                self.purify_volume,
-                self.motor_speed,
-                self.filter_rfid_product_id,
-                self.filter_rfid_tag,
-                self.filter_type,
-            )
-        )
-        return s
-
 
 class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
     """
@@ -349,33 +300,6 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
     def favorite_rpm(self) -> int:
         """Return favorite rpm level."""
         return self.data["favorite_rpm"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirPurifierMiotStatus power=%s, "
-            "aqi=%s, "
-            "mode=%s, "
-            "led_brightness_level=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "filter_life_remaining=%s, "
-            "filter_hours_used=%s, "
-            "motor_speed=%s, "
-            "favorite_rpm=%s>"
-            % (
-                self.power,
-                self.aqi,
-                self.mode,
-                self.led_brightness_level,
-                self.buzzer,
-                self.child_lock,
-                self.filter_life_remaining,
-                self.filter_hours_used,
-                self.motor_speed,
-                self.favorite_rpm,
-            )
-        )
-        return s
 
 
 class BasicAirPurifierMiot(MiotDevice):

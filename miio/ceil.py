@@ -5,7 +5,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ class CeilException(DeviceException):
     pass
 
 
-class CeilStatus:
+class CeilStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -65,27 +65,6 @@ class CeilStatus:
     def automatic_color_temperature(self) -> bool:
         """Automatic color temperature state."""
         return self.data["ac"] == 1
-
-    def __repr__(self) -> str:
-        s = (
-            "<CeilStatus power=%s, "
-            "brightness=%s, "
-            "color_temperature=%s, "
-            "scene=%s, "
-            "delay_off_countdown=%s, "
-            "smart_night_light=%s, "
-            "automatic_color_temperature=%s>"
-            % (
-                self.power,
-                self.brightness,
-                self.color_temperature,
-                self.scene,
-                self.delay_off_countdown,
-                self.smart_night_light,
-                self.automatic_color_temperature,
-            )
-        )
-        return s
 
 
 class Ceil(Device):

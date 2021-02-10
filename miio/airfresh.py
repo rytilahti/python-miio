@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,7 +62,7 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class AirFreshStatus:
+class AirFreshStatus(DeviceStatus):
     """Container for status reports from the air fresh."""
 
     def __init__(self, data: Dict[str, Any], model: str) -> None:
@@ -213,49 +213,6 @@ class AirFreshStatus:
     @property
     def extra_features(self) -> Optional[int]:
         return self.data["app_extra"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirFreshStatus power=%s, "
-            "ptc=%s, "
-            "aqi=%s, "
-            "average_aqi=%s, "
-            "temperature=%s, "
-            "ntc_temperature=%s, "
-            "humidity=%s%%, "
-            "co2=%s, "
-            "mode=%s, "
-            "led=%s, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "filter_life_remaining=%s, "
-            "filter_hours_used=%s, "
-            "use_time=%s, "
-            "motor_speed=%s, "
-            "extra_features=%s>"
-            % (
-                self.power,
-                self.ptc,
-                self.aqi,
-                self.average_aqi,
-                self.temperature,
-                self.ntc_temperature,
-                self.humidity,
-                self.co2,
-                self.mode,
-                self.led,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.filter_life_remaining,
-                self.filter_hours_used,
-                self.use_time,
-                self.motor_speed,
-                self.extra_features,
-            )
-        )
-        return s
 
 
 class AirFresh(Device):

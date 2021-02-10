@@ -6,7 +6,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class MotionDetectionSensitivity(enum.Enum):
     High = 3
 
 
-class PhilipsRwreadStatus:
+class PhilipsRwreadStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips RW Read."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -78,27 +78,6 @@ class PhilipsRwreadStatus:
     def child_lock(self) -> bool:
         """True if child lock is enabled."""
         return self.data["chl"] == 1
-
-    def __repr__(self) -> str:
-        s = (
-            "<PhilipsRwreadStatus power=%s, "
-            "brightness=%s, "
-            "delay_off_countdown=%s, "
-            "scene=%s, "
-            "motion_detection=%s, "
-            "motion_detection_sensitivity=%s, "
-            "child_lock=%s>"
-            % (
-                self.power,
-                self.brightness,
-                self.delay_off_countdown,
-                self.scene,
-                self.motion_detection,
-                self.motion_detection_sensitivity,
-                self.child_lock,
-            )
-        )
-        return s
 
 
 class PhilipsRwread(Device):

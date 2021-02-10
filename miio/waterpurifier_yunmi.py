@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import Any, Dict, List
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ ERROR_DESCRIPTION = [
 ]
 
 
-class OperationStatus:
+class OperationStatus(DeviceStatus):
     def __init__(self, operation_status: int):
         """Operation status parser.
 
@@ -96,12 +96,8 @@ class OperationStatus:
     def errors(self) -> List:
         return self.err_list
 
-    def __repr__(self) -> str:
-        s = "<OperationStatus errors=%s>" % (self.errors)
-        return s
 
-
-class WaterPurifierYunmiStatus:
+class WaterPurifierYunmiStatus(DeviceStatus):
     """Container for status reports from the water purifier (Yunmi model)."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -239,64 +235,6 @@ class WaterPurifierYunmiStatus:
     def tds_warn_thd(self) -> int:
         """TDS warning threshold."""
         return self.data["tds_warn_thd"]
-
-    def __repr__(self) -> str:
-        return (
-            "<WaterPurifierYunmiStatus "
-            "operation_status=%s, "
-            "filter1_life_total=%s, "
-            "filter1_life_used=%s, "
-            "filter1_life_remaining=%s, "
-            "filter1_flow_total=%s, "
-            "filter1_flow_used=%s, "
-            "filter1_flow_remaining=%s, "
-            "filter2_life_total=%s, "
-            "filter2_life_used=%s, "
-            "filter2_life_remaining=%s, "
-            "filter2_flow_total=%s, "
-            "filter2_flow_used=%s, "
-            "filter2_flow_remaining=%s, "
-            "filter3_life_total=%s, "
-            "filter3_life_used=%s, "
-            "filter3_life_remaining=%s, "
-            "filter3_flow_total=%s, "
-            "filter3_flow_used=%s, "
-            "filter3_flow_remaining=%s, "
-            "tds_in=%s, "
-            "tds_out=%s, "
-            "rinse=%s, "
-            "temperature=%s, "
-            "tds_warn_thd=%s>"
-            % (
-                self.operation_status,
-                self.filter1_life_total,
-                self.filter1_life_used,
-                self.filter1_life_remaining,
-                self.filter1_flow_total,
-                self.filter1_flow_used,
-                self.filter1_flow_remaining,
-                self.filter2_life_total,
-                self.filter2_life_used,
-                self.filter2_life_remaining,
-                self.filter2_flow_total,
-                self.filter2_flow_used,
-                self.filter2_flow_remaining,
-                self.filter3_life_total,
-                self.filter3_life_used,
-                self.filter3_life_remaining,
-                self.filter3_flow_total,
-                self.filter3_flow_used,
-                self.filter3_flow_remaining,
-                self.tds_in,
-                self.tds_out,
-                self.rinse,
-                self.temperature,
-                self.tds_warn_thd,
-            )
-        )
-
-    def __json__(self):
-        return self.data
 
 
 class WaterPurifierYunmi(Device):

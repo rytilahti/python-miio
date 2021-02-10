@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class OperationMode(enum.Enum):
     Humidity = 4
 
 
-class AirHumidifierStatus:
+class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier mjjsq."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -118,33 +118,6 @@ class AirHumidifierStatus:
             return self.data["wet_and_protect"] == 1
 
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "target_humidity=%s%%, "
-            "no_water=%s, "
-            "water_tank_detached=%s,"
-            "wet_protection=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.led,
-                self.buzzer,
-                self.target_humidity,
-                self.no_water,
-                self.water_tank_detached,
-                self.wet_protection,
-            )
-        )
-        return s
 
 
 class AirHumidifierMjjsq(Device):

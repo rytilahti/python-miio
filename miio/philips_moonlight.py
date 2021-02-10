@@ -5,7 +5,7 @@ from typing import Any, Dict, Tuple
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import int_to_rgb
 
@@ -16,7 +16,7 @@ class PhilipsMoonlightException(DeviceException):
     pass
 
 
-class PhilipsMoonlightStatus:
+class PhilipsMoonlightStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips Zhirui Bedside Lamp."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -85,23 +85,6 @@ class PhilipsMoonlightStatus:
     def wake_up_time(self) -> [int, int, int]:
         # Example: [weekdays?, hour, minute]
         return self.data["wkp"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<PhilipsMoonlightStatus power=%s, "
-            "brightness=%s, "
-            "color_temperature=%s, "
-            "rgb=%s, "
-            "scene=%s>"
-            % (
-                self.power,
-                self.brightness,
-                self.color_temperature,
-                self.rgb,
-                self.scene,
-            )
-        )
-        return s
 
 
 class PhilipsMoonlight(Device):

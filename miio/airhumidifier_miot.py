@@ -6,7 +6,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -61,7 +61,7 @@ class PressedButton(enum.Enum):
     Power = 2
 
 
-class AirHumidifierMiotStatus:
+class AirHumidifierMiotStatus(DeviceStatus):
     """Container for status reports from the air humidifier.
 
     Xiaomi Smartmi Evaporation Air Humidifier 2 (zhimi.humidifier.ca4) respone (MIoT format)
@@ -228,50 +228,6 @@ class AirHumidifierMiotStatus:
     def clean_mode(self) -> bool:
         """Return True if clean mode is active."""
         return self.data["clean_mode"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidifierMiotStatus"
-            "power=%s, "
-            "error=%s, "
-            "mode=%s, "
-            "target_humidity=%s, "
-            "water_level=%s, "
-            "dry=%s, "
-            "use_time=%s, "
-            "button_pressed=%s, "
-            "motor_speed=%s, "
-            "temperature=%s, "
-            "fahrenheit=%s, "
-            "humidity=%s, "
-            "buzzer=%s, "
-            "led_brightness=%s, "
-            "child_lock=%s, "
-            "actual_speed=%s, "
-            "power_time=%s, "
-            "clean_mode=%s>"
-            % (
-                self.power,
-                self.error,
-                self.mode,
-                self.target_humidity,
-                self.water_level,
-                self.dry,
-                self.use_time,
-                self.button_pressed,
-                self.motor_speed,
-                self.temperature,
-                self.fahrenheit,
-                self.humidity,
-                self.buzzer,
-                self.led_brightness,
-                self.child_lock,
-                self.actual_speed,
-                self.power_time,
-                self.clean_mode,
-            )
-        )
-        return s
 
 
 class AirHumidifierMiot(MiotDevice):

@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 
 from croniter import croniter
 
+from .device import DeviceStatus
 from .utils import pretty_seconds, pretty_time
 
 
@@ -40,7 +41,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 }
 
 
-class VacuumStatus:
+class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -179,14 +180,8 @@ class VacuumStatus:
         """True if an error has occured."""
         return self.error_code != 0
 
-    def __repr__(self) -> str:
-        s = "<VacuumStatus state=%s, error=%s " % (self.state, self.error)
-        s += "bat=%s%%, fan=%s%% " % (self.battery, self.fanspeed)
-        s += "cleaned %s m² in %s>" % (self.clean_area, self.clean_time)
-        return s
 
-
-class CleaningSummary:
+class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
 
     def __init__(self, data: List[Any]) -> None:
@@ -218,14 +213,8 @@ class CleaningSummary:
         """A list of available cleaning IDs, see also :class:`CleaningDetails`."""
         return list(self.data[3])
 
-    def __repr__(self) -> str:
-        return (
-            "<CleaningSummary: %s times, total time: %s, total area: %s, ids: %s>"
-            % (self.count, self.total_duration, self.total_area, self.ids)  # noqa: E501
-        )
 
-
-class CleaningDetails:
+class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
     def __init__(self, data: List[Any]) -> None:
@@ -271,16 +260,8 @@ class CleaningDetails:
         """
         return bool(self.data[5] == 1)
 
-    def __repr__(self) -> str:
-        return "<CleaningDetails: %s (duration: %s, done: %s), area: %s>" % (
-            self.start,
-            self.duration,
-            self.complete,
-            self.area,
-        )
 
-
-class ConsumableStatus:
+class ConsumableStatus(DeviceStatus):
     """Container for consumable status information, including information about brushes
     and duration until they should be changed. The methods returning time left are based
     on the following lifetimes:
@@ -341,19 +322,8 @@ class ConsumableStatus:
     def sensor_dirty_left(self) -> timedelta:
         return self.sensor_dirty_total - self.sensor_dirty
 
-    def __repr__(self) -> str:
-        return (
-            "<ConsumableStatus main: %s, side: %s, filter: %s, sensor dirty: %s>"
-            % (  # noqa: E501
-                self.main_brush,
-                self.side_brush,
-                self.filter,
-                self.sensor_dirty,
-            )
-        )
 
-
-class DNDStatus:
+class DNDStatus(DeviceStatus):
     """A container for the do-not-disturb status."""
 
     def __init__(self, data: Dict[str, Any]):
@@ -376,15 +346,8 @@ class DNDStatus:
         """End time of DnD."""
         return time(hour=self.data["end_hour"], minute=self.data["end_minute"])
 
-    def __repr__(self):
-        return "<DNDStatus enabled: %s - between %s and %s>" % (
-            self.enabled,
-            self.start,
-            self.end,
-        )
 
-
-class Timer:
+class Timer(DeviceStatus):
     """A container for scheduling.
 
     The timers are accessed using an integer ID, which is based on the unix timestamp of
@@ -437,16 +400,8 @@ class Timer:
         """Next schedule for the timer."""
         return self.croniter.get_next(ret_type=datetime)
 
-    def __repr__(self) -> str:
-        return "<Timer %s: %s - enabled: %s - cron: %s>" % (
-            self.id,
-            self.ts,
-            self.enabled,
-            self.cron,
-        )
 
-
-class SoundStatus:
+class SoundStatus(DeviceStatus):
     """Container for sound status."""
 
     def __init__(self, data):
@@ -461,12 +416,6 @@ class SoundStatus:
     def being_installed(self):
         return self.data["sid_in_progress"]
 
-    def __repr__(self):
-        return "<SoundStatus current: %s installing: %s>" % (
-            self.current,
-            self.being_installed,
-        )
-
 
 class SoundInstallState(IntEnum):
     Unknown = 0
@@ -476,7 +425,7 @@ class SoundInstallState(IntEnum):
     Error = 4
 
 
-class SoundInstallStatus:
+class SoundInstallStatus(DeviceStatus):
     """Container for sound installation status."""
 
     def __init__(self, data):
@@ -523,14 +472,8 @@ class SoundInstallStatus:
         """True if the state has an error, use `error` to access it."""
         return self.state == SoundInstallState.Error
 
-    def __repr__(self) -> str:
-        return (
-            "<SoundInstallStatus sid: %s (state: %s, error: %s)"
-            " - progress: %s>" % (self.sid, self.state, self.error, self.progress)
-        )
 
-
-class CarpetModeStatus:
+class CarpetModeStatus(DeviceStatus):
     """Container for carpet mode status."""
 
     def __init__(self, data):
@@ -558,17 +501,3 @@ class CarpetModeStatus:
     @property
     def current_integral(self) -> int:
         return self.data["current_integral"]
-
-    def __repr__(self):
-        return (
-            "<CarpetModeStatus enabled=%s, "
-            "stall_time: %s, "
-            "current (low, high, integral): (%s, %s, %s)>"
-            % (
-                self.enabled,
-                self.stall_time,
-                self.current_low,
-                self.current_high,
-                self.current_integral,
-            )
-        )

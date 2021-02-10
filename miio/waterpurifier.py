@@ -2,12 +2,12 @@ import logging
 from typing import Any, Dict
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class WaterPurifierStatus:
+class WaterPurifierStatus(DeviceStatus):
     """Container for status reports from the water purifier."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -88,47 +88,6 @@ class WaterPurifierStatus:
     @property
     def valve(self) -> str:
         return self.data["elecval_state"]
-
-    def __repr__(self) -> str:
-        return (
-            "<WaterPurifierStatus "
-            "power=%s, "
-            "mode=%s, "
-            "tds=%s, "
-            "filter_life_remaining=%s, "
-            "filter_state=%s, "
-            "filter2_life_remaining=%s, "
-            "filter2_state=%s, "
-            "life=%s, "
-            "state=%s, "
-            "level=%s, "
-            "volume=%s, "
-            "filter=%s, "
-            "usage=%s, "
-            "temperature=%s, "
-            "uv_filter_life_remaining=%s, "
-            "uv_filter_state=%s, "
-            "valve=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.tds,
-                self.filter_life_remaining,
-                self.filter_state,
-                self.filter2_life_remaining,
-                self.filter2_state,
-                self.life,
-                self.state,
-                self.level,
-                self.volume,
-                self.filter,
-                self.usage,
-                self.temperature,
-                self.uv_filter_life_remaining,
-                self.uv_filter_state,
-                self.valve,
-            )
-        )
 
 
 class WaterPurifier(Device):

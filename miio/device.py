@@ -1,3 +1,4 @@
+import inspect
 import logging
 from enum import Enum
 from typing import Any, Optional  # noqa: F401
@@ -98,6 +99,29 @@ class DeviceInfo:
     def raw(self):
         """Raw data as returned by the device."""
         return self.data
+
+
+class DeviceStatus:
+    """Base class for status containers.
+
+    All status container classes should inherit from this class. The __repr__
+    implementation returns all defined properties and their values.
+    """
+
+    def __repr__(self):
+        props = inspect.getmembers(self.__class__, lambda o: isinstance(o, property))
+
+        s = f"<{self.__class__.__name__}"
+        for prop_tuple in props:
+            name, prop = prop_tuple
+            try:
+                prop_value = prop.fget(self)
+            except Exception as ex:
+                prop_value = ex.__class__.__name__
+
+            s += f" {name}={prop_value}"
+        s += ">"
+        return s
 
 
 class Device(metaclass=DeviceGroupMeta):

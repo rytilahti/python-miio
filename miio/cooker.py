@@ -8,7 +8,7 @@ from typing import List, Optional
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -97,7 +97,7 @@ class OperationMode(enum.Enum):
     Cancel = "Отмена"
 
 
-class TemperatureHistory:
+class TemperatureHistory(DeviceStatus):
     def __init__(self, data: str):
         """Container of temperatures recorded every 10-15 seconds while cooking.
 
@@ -141,12 +141,8 @@ class TemperatureHistory:
     def __str__(self) -> str:
         return str(self.data)
 
-    def __repr__(self) -> str:
-        s = "<TemperatureHistory temperatures=%s>" % str(self.data)
-        return s
 
-
-class CookerCustomizations:
+class CookerCustomizations(DeviceStatus):
     def __init__(self, custom: str):
         """Container of different user customizations.
 
@@ -200,27 +196,8 @@ class CookerCustomizations:
     def __str__(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.custom])
 
-    def __repr__(self) -> str:
-        s = (
-            "<CookerCustomizations jingzhu_appointment=%s, "
-            "kuaizhu_appointment=%s, "
-            "zhuzhou_appointment=%s, "
-            "zhuzhou_cooking=%s, "
-            "favorite_appointment=%s, "
-            "favorite_cooking=%s>"
-            % (
-                self.jingzhu_appointment,
-                self.kuaizhu_appointment,
-                self.zhuzhou_appointment,
-                self.zhuzhou_cooking,
-                self.favorite_appointment,
-                self.favorite_cooking,
-            )
-        )
-        return s
 
-
-class CookingStage:
+class CookingStage(DeviceStatus):
     def __init__(self, stage: str):
         """Container of cooking stages.
 
@@ -279,50 +256,8 @@ class CookingStage:
     def raw(self) -> str:
         return self.stage
 
-    def __str__(self) -> str:
-        s = (
-            "name=%s, "
-            "description=%s, "
-            "state=%s, "
-            "rice_id=%s, "
-            "taste=%s, "
-            "taste_phase=%s, "
-            "raw=%s"
-            % (
-                self.name,
-                self.description,
-                self.state,
-                self.rice_id,
-                self.taste,
-                self.taste_phase,
-                self.raw,
-            )
-        )
-        return s
 
-    def __repr__(self) -> str:
-        s = (
-            "<CookingStage name=%s, "
-            "description=%s, "
-            "state=%s, "
-            "rice_id=%s, "
-            "taste=%s, "
-            "taste_phase=%s, "
-            "raw=%s>"
-            % (
-                self.name,
-                self.description,
-                self.state,
-                self.rice_id,
-                self.taste,
-                self.taste_phase,
-                self.stage,
-            )
-        )
-        return s
-
-
-class InteractionTimeouts:
+class InteractionTimeouts(DeviceStatus):
     def __init__(self, timeouts: str = None):
         """Example timeouts: 05040f, 05060f.
 
@@ -366,17 +301,8 @@ class InteractionTimeouts:
     def __str__(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.timeouts])
 
-    def __repr__(self) -> str:
-        s = (
-            "<InteractionTimeouts led_off=%s, "
-            "lid_open=%s, "
-            "lid_open_warning=%s>"
-            % (self.led_off, self.lid_open, self.lid_open_warning)
-        )
-        return s
 
-
-class CookerSettings:
+class CookerSettings(DeviceStatus):
     def __init__(self, settings: str = None):
         """Example settings: 1407, 0607, 0207.
 
@@ -505,33 +431,8 @@ class CookerSettings:
     def __str__(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.settings])
 
-    def __repr__(self) -> str:
-        s = (
-            "<CookerSettings pressure_supported=%s, "
-            "led_on=%s, "
-            "lid_open_warning=%s, "
-            "lid_open_warning_delayed=%s, "
-            "auto_keep_warm=%s, "
-            "jingzhu_auto_keep_warm=%s, "
-            "kuaizhu_auto_keep_warm=%s, "
-            "zhuzhou_auto_keep_warm=%s, "
-            "favorite_auto_keep_warm=%s>"
-            % (
-                self.pressure_supported,
-                self.led_on,
-                self.lid_open_warning,
-                self.lid_open_warning_delayed,
-                self.auto_keep_warm,
-                self.jingzhu_auto_keep_warm,
-                self.kuaizhu_auto_keep_warm,
-                self.zhuzhou_auto_keep_warm,
-                self.favorite_auto_keep_warm,
-            )
-        )
-        return s
 
-
-class CookerStatus:
+class CookerStatus(DeviceStatus):
     def __init__(self, data):
         """Responses of a chunmi.cooker.normal2 (fw_ver: 1.2.8):
 
@@ -674,41 +575,6 @@ class CookerStatus:
             return CookerCustomizations(custom)
 
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<CookerStatus mode=%s "
-            "menu=%s, "
-            "stage=%s, "
-            "temperature=%s, "
-            "start_time=%s"
-            "remaining=%s, "
-            "cooking_delayed=%s, "
-            "cooking_temperature=%s, "
-            "settings=%s, "
-            "interaction_timeouts=%s, "
-            "hardware_version=%s, "
-            "firmware_version=%s, "
-            "favorite=%s, "
-            "custom=%s>"
-            % (
-                self.mode,
-                self.menu,
-                self.stage,
-                self.temperature,
-                self.start_time,
-                self.remaining,
-                self.cooking_delayed,
-                self.duration,
-                self.settings,
-                self.interaction_timeouts,
-                self.hardware_version,
-                self.firmware_version,
-                self.favorite,
-                self.custom,
-            )
-        )
-        return s
 
 
 class Cooker(Device):

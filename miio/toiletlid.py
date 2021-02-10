@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class ToiletlidOperatingMode(enum.Enum):
     NozzleClean = 6
 
 
-class ToiletlidStatus:
+class ToiletlidStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
         # {"work_state": 1,"filter_use_flux": 100,"filter_use_time": 180, "ambient_light": "Red"}
         self.data = data
@@ -68,24 +68,6 @@ class ToiletlidStatus:
     def ambient_light(self) -> str:
         """Ambient light color."""
         return self.data["ambient_light"]
-
-    def __repr__(self) -> str:
-        return (
-            "<ToiletlidStatus work=%s, "
-            "state=%s, "
-            "work_mode=%s, "
-            "ambient_light=%s, "
-            "filter_use_percentage=%s, "
-            "filter_remaining_time=%s>"
-            % (
-                self.is_on,
-                self.work_state,
-                self.work_mode,
-                self.ambient_light,
-                self.filter_use_percentage,
-                self.filter_remaining_time,
-            )
-        )
 
 
 class Toiletlid(Device):

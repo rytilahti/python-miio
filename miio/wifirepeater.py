@@ -3,7 +3,7 @@ import logging
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ class WifiRepeaterException(DeviceException):
     pass
 
 
-class WifiRepeaterStatus:
+class WifiRepeaterStatus(DeviceStatus):
     def __init__(self, data):
         """
         Response of a xiaomi.repeater.v2:
@@ -47,7 +47,7 @@ class WifiRepeaterStatus:
         return s
 
 
-class WifiRepeaterConfiguration:
+class WifiRepeaterConfiguration(DeviceStatus):
     def __init__(self, data):
         """Response of a xiaomi.repeater.v2:
 
@@ -66,14 +66,6 @@ class WifiRepeaterConfiguration:
     @property
     def ssid_hidden(self) -> bool:
         return self.data["hidden"] == 1
-
-    def __repr__(self) -> str:
-        s = (
-            "<WifiRepeaterConfiguration ssid=%s, "
-            "password=%s, "
-            "ssid_hidden=%s>" % (self.ssid, self.password, self.ssid_hidden)
-        )
-        return s
 
 
 class WifiRepeater(Device):

@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceInfo
+from .device import Device, DeviceInfo, DeviceStatus
 from .exceptions import DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class AirHumidifierStatus:
+class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier."""
 
     def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
@@ -219,49 +219,6 @@ class AirHumidifierStatus:
         if "button_pressed" in self.data and self.data["button_pressed"] is not None:
             return self.data["button_pressed"]
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "target_humidity=%s%%, "
-            "trans_level=%s, "
-            "motor_speed=%s, "
-            "depth=%s, "
-            "dry=%s, "
-            "use_time=%s, "
-            "hardware_version=%s, "
-            "button_pressed=%s, "
-            "strong_mode_enabled=%s, "
-            "firmware_version_major=%s, "
-            "firmware_version_minor=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.target_humidity,
-                self.trans_level,
-                self.motor_speed,
-                self.depth,
-                self.dry,
-                self.use_time,
-                self.hardware_version,
-                self.button_pressed,
-                self.strong_mode_enabled,
-                self.firmware_version_major,
-                self.firmware_version_minor,
-            )
-        )
-        return s
 
 
 class AirHumidifier(Device):

@@ -15,7 +15,7 @@ import attr
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class MotionDetectionSensitivity(IntEnum):
     Low = 11000000
 
 
-class CameraStatus:
+class CameraStatus(DeviceStatus):
     """Container for status reports from the Aqara Camera."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -151,31 +151,6 @@ class CameraStatus:
     def av_password(self) -> str:
         """TODO: What is this? Password for the cloud?"""
         return self.data["avPass"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<CameraStatus is_on=%s, "
-            "type=%s, "
-            "offset=%s, "
-            "ir=%s, "
-            "md=%s, "
-            "md_sensitivity=%s, "
-            "led=%s, "
-            "flip=%s, "
-            "fullstop=%s>"
-            % (
-                self.is_on,
-                self.type,
-                self.offsets,
-                self.ir,
-                self.md,
-                self.md_sensitivity,
-                self.led,
-                self.flipped,
-                self.fullstop,
-            )
-        )
-        return s
 
 
 class AqaraCamera(Device):

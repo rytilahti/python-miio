@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class PhilipsBulbException(DeviceException):
     pass
 
 
-class PhilipsBulbStatus:
+class PhilipsBulbStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -63,23 +63,6 @@ class PhilipsBulbStatus:
     @property
     def delay_off_countdown(self) -> int:
         return self.data["dv"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<PhilipsBulbStatus power=%s, "
-            "brightness=%s, "
-            "delay_off_countdown=%s, "
-            "color_temperature=%s, "
-            "scene=%s>"
-            % (
-                self.power,
-                self.brightness,
-                self.delay_off_countdown,
-                self.color_temperature,
-                self.scene,
-            )
-        )
-        return s
 
 
 class PhilipsWhiteBulb(Device):

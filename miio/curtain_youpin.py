@@ -5,7 +5,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import EnumType, command, format_output
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -47,7 +47,7 @@ class Polarity(enum.Enum):
     Reverse = 1
 
 
-class CurtainStatus:
+class CurtainStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
         """Response from device.
 
@@ -109,30 +109,6 @@ class CurtainStatus:
     def adjust_value(self) -> int:
         """Adjust value."""
         return self.data["adjust_value"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<CurtainStatus"
-            "status=%s,"
-            "polarity=%s,"
-            "is_position_limited=%s,"
-            "night_tip_light=%s,"
-            "run_time=%s,"
-            "current_position=%s,"
-            "target_position=%s,"
-            "adjust_value=%s>"
-            % (
-                self.status,
-                self.polarity,
-                self.is_position_limited,
-                self.night_tip_light,
-                self.run_time,
-                self.current_position,
-                self.target_position,
-                self.adjust_value,
-            )
-        )
-        return s
 
 
 class CurtainMiot(MiotDevice):
