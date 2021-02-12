@@ -630,9 +630,9 @@ class ViomiVacuum(Device):
         room_ids = []
         for room in rooms:
             if room in self._cache["rooms"]:
-                room_ids.append(room)
+                room_ids.append(int(room))
             elif room in reverse_rooms:
-                room_ids.append(reverse_rooms[room])
+                room_ids.append(int(reverse_rooms[room]))
             else:
                 room_keys = ", ".join(self._cache["rooms"].keys())
                 room_ids = ", ".join(self._cache["rooms"].values())
@@ -641,7 +641,7 @@ class ViomiVacuum(Device):
         self._cache["edge_state"] = self.get_properties(["mode"])
         self.send(
             "set_mode_withroom",
-            self._cache["edge_state"] + [1, 0, len(room_ids)] + room_ids,
+            self._cache["edge_state"] + [1, len(room_ids)] + room_ids,
         )
 
     @command()
