@@ -1,5 +1,6 @@
 import datetime
 from unittest import TestCase
+from unittest.mock import patch
 
 import pytest
 
@@ -152,62 +153,18 @@ class TestVacuum(TestCase):
         )
         assert self.status().state_code == self.device.STATE_ZONED_CLEAN
 
-    @pytest.mark.xfail
-    def test_manual_control(self):
-        self.fail()
-
-    @pytest.mark.skip("unknown handling")
-    def test_log_upload(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_consumable_status(self):
-        self.fail()
-
-    @pytest.mark.skip("consumable reset is not implemented")
-    def test_consumable_reset(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_map(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_clean_history(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_clean_details(self):
-        self.fail()
-
-    @pytest.mark.skip("hard to test")
-    def test_find(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_timer(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_dnd(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_fan_speed(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_sound_info(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_serial_number(self):
-        self.fail()
-
-    @pytest.mark.xfail
     def test_timezone(self):
-        self.fail()
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                {"olson": "Europe/Berlin", "posix": "CET-1CEST,M3.5.0,M10.5.0/3"}
+            ],
+        ):
+            assert self.device.timezone() == "Europe/Berlin"
 
-    @pytest.mark.xfail
-    def test_raw_command(self):
-        self.fail()
+        with patch.object(self.device, "send", return_value=["Europe/Berlin"]):
+            assert self.device.timezone() == "Europe/Berlin"
+
+        with patch.object(self.device, "send", return_value=[0]):
+            assert self.device.timezone() == "UTC"
