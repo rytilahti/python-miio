@@ -198,15 +198,7 @@ class AirQualityMonitorCGDN1Status:
 class AirQualityMonitorCGDN1(MiotDevice):
     """Qingping Air Monitor Lite."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(_MAPPING_CGDN1, ip, token, start_id, debug, lazy_discover)
+    mapping = _MAPPING_CGDN1
 
     @command(
         default_output=format_output(
