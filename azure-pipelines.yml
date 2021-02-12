@@ -71,6 +71,10 @@ stages:
           python.version: '3.8'
           vmImage: 'ubuntu-latest'
 
+        Python 3.9 Ubuntu:
+          python.version: '3.9'
+          vmImage: 'ubuntu-latest'
+
         PyPy Ubuntu:
           python.version: pypy3
           vmImage: 'ubuntu-latest'
@@ -87,6 +91,10 @@ stages:
           python.version: '3.8'
           vmImage: 'windows-latest'
 
+        Python 3.9 Windows:
+          python.version: '3.9'
+          vmImage: 'windows-latest'
+
         Python 3.6 OSX:
           python.version: '3.6'
           vmImage: 'macOS-latest'
@@ -97,6 +105,10 @@ stages:
 
         Python 3.8 OSX:
           python.version: '3.8'
+          vmImage: 'macOS-latest'
+
+        Python 3.9 OSX:
+          python.version: '3.9'
           vmImage: 'macOS-latest'
 
     pool:
