@@ -36,7 +36,7 @@
   model: WSDCGQ11LM
   type_id: 19
   name: Weather sensor
-  type: AqaraHT
+  type: SensorHT
   class: SubDevice
   getter: get_prop_sensor_ht
   properties:
@@ -65,7 +65,7 @@
   model: MCCGQ11LM
   type_id: 53
   name: Door sensor
-  type: AqaraMagnet
+  type: Magnet
   class: SubDevice
 
 # Motion sensor
@@ -80,7 +80,7 @@
   model: RTCGQ11LM
   type_id: 52
   name: Motion sensor
-  type: AqaraMotion
+  type: Motion
   class: SubDevice
 
 # Cube
@@ -95,7 +95,7 @@
   model: MFKZQ01LM
   type_id: 68
   name: Cube
-  type: CubeV2
+  type: Cube
   class: SubDevice
 
 # Curtain
@@ -103,7 +103,7 @@
   model: ZNCLDJ11LM
   type_id: 13
   name: Curtain
-  type: CurtainV1
+  type: Curtain
   class: SubDevice
 
 - zigbee_id: lumi.curtain.aq2
@@ -117,7 +117,7 @@
   model: ZNCLDJ12LM
   type_id: 72
   name: Curtain B1
-  type: CurtainB1
+  type: Curtain
   class: SubDevice
 
 # LightBulb
@@ -125,7 +125,7 @@
   model: ZNLDP12LM
   type_id: 66
   name: Smart bulb E27
-  type: AqaraSmartBulbE27
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -144,7 +144,7 @@
   model: LED1545G12
   type_id: 82
   name: Ikea smart bulb E27 white
-  type: IkeaBulb82
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -163,7 +163,7 @@
   model: LED1546G12
   type_id: 83
   name: Ikea smart bulb E27 white
-  type: IkeaBulb83
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -182,7 +182,7 @@
   model: LED1536G5
   type_id: 84
   name: Ikea smart bulb E12 white
-  type: IkeaBulb84
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -201,7 +201,7 @@
   model: LED1537R6
   type_id: 85
   name: Ikea smart bulb GU10 white
-  type: IkeaBulb85
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -220,7 +220,7 @@
   model: LED1623G12
   type_id: 86
   name: Ikea smart bulb E27 white
-  type: IkeaBulb86
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -239,7 +239,7 @@
   model: LED1650R5
   type_id: 87
   name: Ikea smart bulb GU10 white
-  type: IkeaBulb87
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -258,7 +258,7 @@
   model: LED1649C5
   type_id: 88
   name: Ikea smart bulb E12 white
-  type: IkeaBulb88
+  type: LightBulb
   class: LightBulb
   properties:
     - property: status     # 'on' / 'off'
@@ -278,7 +278,7 @@
   model: ZNMS11LM
   type_id: 59
   name: Door lock S1
-  type: DoorLockS1
+  type: Lock
   class: SubDevice
   properties:
     - property: status     # 'locked' / 'unlocked'
@@ -287,7 +287,7 @@
   model: ZNMS12LM
   type_id: 70
   name: Door lock S2
-  type: LockS2
+  type: Lock
   class: SubDevice
   properties:
     - property: status     # 'locked' / 'unlocked'
@@ -296,7 +296,7 @@
   model: A6121
   type_id: 81
   name: Vima cylinder lock
-  type: LockV1
+  type: Lock
   class: SubDevice
   properties:
     - property: status     # 'locked' / 'unlocked'
@@ -305,7 +305,7 @@
   model: ZNMS13LM
   type_id: 163
   name: Door lock S2 pro
-  type: LockS2Pro
+  type: Lock
   class: SubDevice
   properties:
     - property: status     # 'locked' / 'unlocked'
@@ -315,28 +315,28 @@
   model: JTYJ-GD-01LM/BW
   type_id: 15
   name: Honeywell smoke detector
-  type: SensorSmoke
+  type: SmokeSensor
   class: SubDevice
 
 - zigbee_id: lumi.sensor_natgas
   model: JTQJ-BF-01LM/BW
   type_id: 18
   name: Honeywell natural gas detector
-  type: SensorNatgas
+  type: NatgasSensor
   class: SubDevice
 
 - zigbee_id: lumi.sensor_wleak.aq1
   model: SJCGQ11LM
   type_id: 55
   name: Water leak sensor
-  type: AqaraWaterLeak
+  type: WaterLeakSensor
   class: SubDevice
 
 - zigbee_id: lumi.vibration.aq1
   model: DJT11LM
   type_id: 56
   name: Vibration sensor
-  type: AqaraVibration
+  type: VibrationSensor
   class: Vibration
 
 # Thermostats
@@ -344,7 +344,7 @@
   model: KTWKQ03ES
   type_id: 207
   name: Thermostat S2
-  type: ThermostatS2
+  type: Thermostat
   class: SubDevice
 
 # Remote Switch
@@ -352,70 +352,70 @@
   model: WXKG02LM 2016
   type_id: 12
   name: Remote switch double
-  type: RemoteSwitchDoubleV1
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.sensor_86sw1.v1
   model: WXKG03LM 2016
   type_id: 14
   name: Remote switch single
-  type: RemoteSwitchSingleV1
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.remote.b186acn01
   model: WXKG03LM 2018
   type_id: 134
   name: Remote switch single
-  type: RemoteSwitchSingle
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.remote.b286acn01
   model: WXKG02LM 2018
   type_id: 135
   name: Remote switch double
-  type: RemoteSwitchDouble
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.remote.b186acn02
   model: WXKG06LM
   type_id: 171
   name: D1 remote switch single
-  type: D1RemoteSwitchSingle
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.remote.b286acn02
   model: WXKG07LM
   type_id: 172
   name: D1 remote switch double
-  type: D1RemoteSwitchDouble
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.sensor_switch.v2
   model: WXKG01LM
   type_id: 1
   name: Button
-  type: Switch
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.sensor_switch.aq2
   model: WXKG11LM 2015
   type_id: 51
   name: Button
-  type: AqaraSwitch
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.sensor_switch.aq3
   model: WXKG12LM
   type_id: 62
   name: Button
-  type: AqaraSquareButtonV3
+  type: RemoteSwitch
   class: SubDevice
 
 - zigbee_id: lumi.remote.b1acn01
   model: WXKG11LM 2018
   type_id: 133
   name: Button
-  type: AqaraSquareButton
+  type: RemoteSwitch
   class: SubDevice
 
 # Switches
@@ -423,7 +423,7 @@
   model: QBKG03LM
   type_id: 7
   name: Wall switch double no neutral
-  type: SwitchTwoChannels
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -438,7 +438,7 @@
   model: QBKG04LM
   type_id: 9
   name: Wall switch no neutral
-  type: SwitchOneChannel
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -450,7 +450,7 @@
   model: QBKG11LM
   type_id: 20
   name: Wall switch single
-  type: SwitchLiveOneChannel
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -465,7 +465,7 @@
   model: QBKG12LM
   type_id: 21
   name: Wall switch double
-  type: SwitchLiveTwoChannels
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -483,7 +483,7 @@
   model: QBKG11LM
   type_id: 63
   name: Wall switch single
-  type: AqaraSwitchOneChannel
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -498,7 +498,7 @@
   model: QBKG12LM
   type_id: 64
   name: Wall switch double
-  type: AqaraSwitchTwoChannels
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -516,7 +516,7 @@
   model: QBKG26LM
   type_id: 176
   name: D1 wall switch triple
-  type: D1WallSwitchTriple
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -537,7 +537,7 @@
   model: QBKG25LM
   type_id: 177
   name: D1 wall switch triple no neutral
-  type: D1WallSwitchTripleNN
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
@@ -558,7 +558,7 @@
   model: ZNCZ02LM
   type_id: 11
   name: Plug
-  type: Plug
+  type: Switch
   class: Switch
   getter: get_prop_plug
   setter: toggle_plug
@@ -574,7 +574,7 @@
   model: QBCZ11LM
   type_id: 17
   name: Wall outlet
-  type: AqaraWallOutletV1
+  type: Switch
   class: Switch
   setter: toggle_plug
   properties:
@@ -586,7 +586,7 @@
   model: QBCZ11LM
   type_id: 65
   name: Wall outlet
-  type: AqaraWallOutlet
+  type: Switch
   class: Switch
   setter: toggle_plug
   properties:
@@ -601,7 +601,7 @@
   model: LLKZMK11LM
   type_id: 54
   name: Relay
-  type: AqaraRelayTwoChannels
+  type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
   properties:
