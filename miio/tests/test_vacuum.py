@@ -166,5 +166,5 @@ class TestVacuum(TestCase):
         with patch.object(self.device, "send", return_value=["Europe/Berlin"]):
             assert self.device.timezone() == "Europe/Berlin"
 
-        with patch.object(self.device, "send", return_value=[0]):
+        with patch.object(self.device, "send", return_value=0):
             assert self.device.timezone() == "UTC"
