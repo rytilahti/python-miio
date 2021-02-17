@@ -96,6 +96,7 @@ Supported devices
 -  Xiaomi Aqara Gateway (basic implementation, alarm, lights)
 -  Xiaomi Mijia 360 1080p
 -  Xiaomi Mijia STYJ02YM (Viomi)
+-  Xiaomi Mijia 1C STYTJ01ZHM (Dreame)
 -  Xiaomi Mi Smart WiFi Socket
 -  Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port)
 -  Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports)

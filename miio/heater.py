@@ -163,7 +163,7 @@ class Heater(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-        if model in SUPPORTED_MODELS.keys():
+        if model in SUPPORTED_MODELS:
             self.model = model
         else:
             self.model = MODEL_HEATER_ZA1
