@@ -57,3 +57,19 @@ The connectivity will get restored by device's internal watchdog restarting the 
 .. hint::
 
     If you want to keep your device out from the Internet, use REJECT instead of DROP in your firewall confinguration.
+
+
+Roborock Vacuum not detected
+----------------------------
+
+It seems that a Roborock vacuum connected through the Roborock app (and not the Xiaomi Home app) won't allow control over local network, even with a valid token, leading to the following exception:
+
+.. code-block:: text
+
+    mirobo.device.DeviceException: Unable to discover the device x.x.x.x
+    
+Resetting the device's wifi and pairing it again with the Xiaomi Home app should solve the issue.
+
+.. hint::
+
+    A new pairing process will generate a new token. You will have to extract it as your previous one won't be valid anymore.
