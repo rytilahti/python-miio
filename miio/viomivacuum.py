@@ -277,7 +277,7 @@ class ViomiEdgeState(Enum):
 
 class ViomiVacuumStatus:
     def __init__(self, data):
-        # ["run_state","mode","err_state","battary_life","box_type","mop_type","s_time","s_area",
+        # ["run_state","mode","err_state","battery_life","box_type","mop_type","s_time","s_area",
         # "suction_grade","water_grade","remember_map","has_map","is_mop","has_newmap"]'
         # 1,               11,           1,            1,         1,       0          ]
         self.data = data
@@ -324,7 +324,7 @@ class ViomiVacuumStatus:
     @property
     def battery(self) -> int:
         """Battery in percentage."""
-        return self.data["battary_life"]
+        return self.data["battery_life"]
 
     @property
     def bin_type(self) -> ViomiBinType:
@@ -549,7 +549,7 @@ class ViomiVacuum(Device):
     def status(self) -> ViomiVacuumStatus:
         """Retrieve properties."""
         properties = [
-            "battary_life",
+            "battery_life",
             "box_type",
             "cur_mapid",
             "err_state",
