@@ -70,7 +70,7 @@ class AirPurifierStatus:
          'rfid_product_id': '0:0:30:33', 'rfid_tag': '80:6a:a9:e2:37:92:4',
          'act_sleep': None, 'sleep_mode': None, 'sleep_time': None,
          'sleep_data_num': None, 'app_extra': 0, 'act_det': None,
-         'button_pressed': None})
+         'button_pressed': None}
 
         Response of a Air Purifier 2 (zhimi.airpurifier.m1):
 
@@ -82,6 +82,18 @@ class AirPurifierStatus:
         'buzzer': 'off', 'child_lock': 'off', 'volume': None,
         'rfid_product_id': None, 'rfid_tag': None,
         'act_sleep': 'close'}
+
+        Response of a Air Purifier 2 (zhimi.airpurifier.m2):
+
+        {'power': 'on', 'aqi': 10, 'average_aqi': 8, 'humidity': 42,
+         'temp_dec': 223, 'mode': 'favorite', 'favorite_level': 2,
+         'filter1_life': 63, 'f1_hour_used': 1282, 'use_time': 16361416,
+         'motor1_speed': 747, 'motor2_speed': None, 'purify_volume': 421580,
+         'f1_hour': 3500, 'led': 'on', 'led_b': 1, 'bright': None,
+         'buzzer': 'off', 'child_lock': 'off', 'volume': None,
+         'rfid_product_id': None, 'rfid_tag': None, 'act_sleep': 'close',
+         'sleep_mode': 'idle', 'sleep_time': 86168, 'sleep_data_num': 30,
+         'app_extra': 0, 'act_det': None, 'button_pressed': None}
 
         Response of a Air Purifier V3 (zhimi.airpurifier.v3)
 
