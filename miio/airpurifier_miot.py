@@ -146,7 +146,35 @@ class BasicAirPurifierMiotStatus:
 
 
 class AirPurifierMiotStatus(BasicAirPurifierMiotStatus):
-    """Container for status reports from the air purifier."""
+    """Container for status reports from the air purifier.
+
+    Mi Air Purifier 3/3H (zhimi.airpurifier.mb3) response (MIoT format)
+
+    [
+        {'did': 'power', 'siid': 2, 'piid': 2, 'code': 0, 'value': True},
+        {'did': 'fan_level', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
+        {'did': 'mode', 'siid': 2, 'piid': 5, 'code': 0, 'value': 2},
+        {'did': 'humidity', 'siid': 3, 'piid': 7, 'code': 0, 'value': 38},
+        {'did': 'temperature', 'siid': 3, 'piid': 8, 'code': 0, 'value': 22.299999},
+        {'did': 'aqi', 'siid': 3, 'piid': 6, 'code': 0, 'value': 2},
+        {'did': 'filter_life_remaining', 'siid': 4, 'piid': 3, 'code': 0, 'value': 45},
+        {'did': 'filter_hours_used', 'siid': 4, 'piid': 5, 'code': 0, 'value': 1915},
+        {'did': 'buzzer', 'siid': 5, 'piid': 1, 'code': 0, 'value': False},
+        {'did': 'buzzer_volume', 'siid': 5, 'piid': 2, 'code': -4001},
+        {'did': 'led_brightness', 'siid': 6, 'piid': 1, 'code': 0, 'value': 1},
+        {'did': 'led', 'siid': 6, 'piid': 6, 'code': 0, 'value': True},
+        {'did': 'child_lock', 'siid': 7, 'piid': 1, 'code': 0, 'value': False},
+        {'did': 'favorite_level', 'siid': 10, 'piid': 10, 'code': 0, 'value': 2},
+        {'did': 'favorite_rpm', 'siid': 10, 'piid': 7, 'code': 0, 'value': 770},
+        {'did': 'motor_speed', 'siid': 10, 'piid': 8, 'code': 0, 'value': 769},
+        {'did': 'use_time', 'siid': 12, 'piid': 1, 'code': 0, 'value': 6895800},
+        {'did': 'purify_volume', 'siid': 13, 'piid': 1, 'code': 0, 'value': 222564},
+        {'did': 'average_aqi', 'siid': 13, 'piid': 2, 'code': 0, 'value': 2},
+        {'did': 'filter_rfid_tag', 'siid': 14, 'piid': 1, 'code': 0, 'value': '81:6b:3f:32:84:4b:4'},
+        {'did': 'filter_rfid_product_id', 'siid': 14, 'piid': 3, 'code': 0, 'value': '0:0:31:31'},
+        {'did': 'app_extra', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0}
+    ]
+    """
 
     @property
     def average_aqi(self) -> int:
