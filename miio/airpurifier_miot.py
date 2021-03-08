@@ -437,15 +437,7 @@ class BasicAirPurifierMiot(MiotDevice):
 class AirPurifierMiot(BasicAirPurifierMiot):
     """Main class representing the air purifier which uses MIoT protocol."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
+    mapping = _MAPPING
 
     @command(
         default_output=format_output(
@@ -541,17 +533,7 @@ class AirPurifierMiot(BasicAirPurifierMiot):
 class AirPurifierMB4(BasicAirPurifierMiot):
     """Main class representing the air purifier which uses MIoT protocol."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(
-            _MODEL_AIRPURIFIER_MB4, ip, token, start_id, debug, lazy_discover
-        )
+    mapping = _MODEL_AIRPURIFIER_MB4
 
     @command(
         default_output=format_output(

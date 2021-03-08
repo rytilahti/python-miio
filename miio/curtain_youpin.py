@@ -138,15 +138,7 @@ class CurtainStatus:
 class CurtainMiot(MiotDevice):
     """Main class representing the lumi.curtain.hagl05 curtain."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
+    mapping = _MAPPING
 
     @command(
         default_output=format_output(

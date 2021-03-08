@@ -233,6 +233,8 @@ class Huizuo(MiotDevice):
     If your device does't support some properties, the 'None' will be returned
     """
 
+    mapping = _MAPPING
+
     def __init__(
         self,
         ip: str = None,
@@ -244,15 +246,15 @@ class Huizuo(MiotDevice):
     ) -> None:
 
         if model in MODELS_WITH_FAN_WY:
-            _MAPPING.update(_ADDITIONAL_MAPPING_FAN_WY)
+            self.mapping.update(_ADDITIONAL_MAPPING_FAN_WY)
         if model in MODELS_WITH_FAN_WY2:
-            _MAPPING.update(_ADDITIONAL_MAPPING_FAN_WY2)
+            self.mapping.update(_ADDITIONAL_MAPPING_FAN_WY2)
         if model in MODELS_WITH_SCENES:
-            _MAPPING.update(_ADDITIONAL_MAPPING_SCENE)
+            self.mapping.update(_ADDITIONAL_MAPPING_SCENE)
         if model in MODELS_WITH_HEATER:
-            _MAPPING.update(_ADDITIONAL_MAPPING_HEATER)
+            self.mapping.update(_ADDITIONAL_MAPPING_HEATER)
 
-        super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
+        super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in MODELS_SUPPORTED:
             self.model = model
