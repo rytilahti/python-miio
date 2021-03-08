@@ -46,9 +46,11 @@ class DummyVacuum(DummyDevice, Vacuum):
             "app_goto_target": lambda x: self.change_mode("goto"),
             "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
             "app_charge": lambda x: self.change_mode("charge"),
+            "miIO.info": "dummy info",
         }
 
         super().__init__(args, kwargs)
+        self.model = None
 
     def change_mode(self, new_mode):
         if new_mode == "spot":
