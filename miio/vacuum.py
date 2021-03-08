@@ -94,6 +94,8 @@ class WaterFlow(enum.Enum):
 
 
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
+ROCKROBO_S5 = "roborock.vacuum.s5"
+ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 
 
 class Vacuum(Device):
@@ -145,7 +147,17 @@ class Vacuum(Device):
     @command()
     def home(self):
         """Stop cleaning and return home."""
-        self.send("app_pause")
+        if self.model is None:
+            self._autodetect_model()
+
+        SKIP_PAUSE = [
+            ROCKROBO_S5,
+            ROCKROBO_S6_MAXV,
+        ]
+
+        if self.model not in SKIP_PAUSE:
+            self.send("app_pause")
+
         return self.send("app_charge")
 
     @command(click.argument("x_coord", type=int), click.argument("y_coord", type=int))
@@ -514,12 +526,12 @@ class Vacuum(Device):
             # cloud-blocked vacuums will not return proper payloads
             self._fanspeeds = FanspeedV1
             self.model = ROCKROBO_V1
-            _LOGGER.debug("Unable to query model, falling back to %s", self._fanspeeds)
+            _LOGGER.warning("Unable to query model, falling back to %s", self.model)
             return
+        finally:
+            _LOGGER.debug("Model: %s", self.model)
 
-        _LOGGER.info("model: %s", self.model)
-
-        if info.model == ROCKROBO_V1:
+        if self.model == ROCKROBO_V1:
             _LOGGER.debug("Got robov1, checking for firmware version")
             fw_version = info.firmware_version
             version, build = fw_version.split("_")
@@ -530,7 +542,7 @@ class Vacuum(Device):
                 self._fanspeeds = FanspeedV2
             else:
                 self._fanspeeds = FanspeedV1
-        elif info.model == "roborock.vacuum.e2":
+        elif self.model == "roborock.vacuum.e2":
             self._fanspeeds = FanspeedE2
         else:
             self._fanspeeds = FanspeedV2
