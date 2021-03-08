@@ -184,7 +184,6 @@ class FanMiot(MiotDevice):
         super().__init__(ip, token, start_id, debug, lazy_discover)
         self.model = model
 
-
     @command(
         default_output=format_output(
             "",

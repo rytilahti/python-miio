@@ -99,8 +99,8 @@ class MiotDevice(Device):
     ):
         """Set a single property (siid/piid) to given value.
 
-        value_type can be given to convert the value to wanted type,
-        allowed types are: int, float, bool, str
+        value_type can be given to convert the value to wanted type, allowed types are:
+        int, float, bool, str
         """
         if value_type is not None:
             value = value_type.value(value)
