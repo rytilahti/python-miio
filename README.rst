@@ -67,7 +67,7 @@ All functionality is accessible through the `miio` module::
 Each separate device type inherits from `miio.Device`
 (and in case of miOT devices, `miio.MiotDevice`) which provides common API.
 
-Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/miio.html>`__ for more information.
+Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/api/miio.html>`__ for more information.
 
 
 Troubleshooting
