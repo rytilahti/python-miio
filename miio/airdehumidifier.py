@@ -236,11 +236,19 @@ class AirDehumidifier(Device):
 
     @command(
         click.argument("fan_speed", type=EnumType(FanSpeed)),
-        default_output=format_output("Setting fan level to {fan_level}"),
+        default_output=format_output("Setting fan level to {fan_speed}"),
     )
     def set_fan_speed(self, fan_speed: FanSpeed):
         """Set the fan speed."""
-        return self.send("set_fan_level", [fan_speed.value])
+        try:
+            return self.send("set_fan_level", [fan_speed.value])
+        except DeviceError as ex:
+            if ex.code == -10000:
+                raise AirDehumidifierException(
+                    "Unable to set fan speed, this can happen if device is turned off."
+                ) from ex
+
+            raise
 
     @command(
         click.argument("led", type=bool),
