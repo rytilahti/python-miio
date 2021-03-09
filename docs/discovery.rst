@@ -260,6 +260,15 @@ The command for decrypting the token manually is:
 
     echo '0: <YOUR 32 CHARACTER TOKEN>' | xxd -r -p | openssl enc -d -aes-128-ecb -nopad -nosalt -K 00000000000000000000000000000000
 
+.. _rooted_tokens:
+
+Tokens from rooted device
+=========================
+
+If a device is rooted via `dustcloud <https://github.com/dgiese/dustcloud>`_ (e.g. for running the cloud-free control webinterface `Valetudo <https://valetudo.cloud/>`_), the token can be extracted by connecting to the device via SSH and reading the file: :code:`printf $(cat /mnt/data/miio/device.token) | xxd -p`
+
+See also `"How can I get the token from the robots FileSystem?" in the FAQ for Veltudo <https://valetudo.cloud/pages/faq.html#how-can-i-get-the-token-from-the-robots-filesystem>`_.
+
 Environment variables for command-line tools
 ============================================
 
