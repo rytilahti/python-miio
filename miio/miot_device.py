@@ -6,6 +6,7 @@ from typing import Any, Union
 import click
 
 from .click_common import EnumType, LiteralParamType, command
+from .device import Device, DeviceStatus  # noqa: F401
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
