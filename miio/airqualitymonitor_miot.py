@@ -5,7 +5,7 @@ import click
 
 from .click_common import command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -84,7 +84,7 @@ class DisplayTemperatureUnitCGDN1(enum.Enum):
     Fahrenheit = "f"
 
 
-class AirQualityMonitorCGDN1Status:
+class AirQualityMonitorCGDN1Status(DeviceStatus):
     """
     Container of air quality monitor CGDN1 status.
 
@@ -164,35 +164,6 @@ class AirQualityMonitorCGDN1Status:
     def display_temperature_unit(self):
         """Return display temperature unit."""
         return DisplayTemperatureUnitCGDN1(self.data["temperature_unit"])
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirQualityMonitorCGDN1Status humidity=%s, "
-            "pm25=%s, "
-            "pm10=%s, "
-            "temperature=%s, "
-            "co2=%s, "
-            "battery=%s, "
-            "charging_state=%s"
-            "monitoring_frequency=%s"
-            "screen_off=%s"
-            "device_off=%s"
-            "display_temperature_unit=%s>"
-            % (
-                self.humidity,
-                self.pm25,
-                self.pm10,
-                self.temperature,
-                self.co2,
-                self.battery,
-                self.charging_state,
-                self.monitoring_frequency,
-                self.screen_off,
-                self.device_off,
-                self.display_temperature_unit,
-            )
-        )
-        return s
 
 
 class AirQualityMonitorCGDN1(MiotDevice):

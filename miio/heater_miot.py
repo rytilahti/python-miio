@@ -6,7 +6,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -41,7 +41,7 @@ class HeaterMiotException(DeviceException):
     pass
 
 
-class HeaterMiotStatus:
+class HeaterMiotStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Smart Space Heater S."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -99,27 +99,6 @@ class HeaterMiotStatus:
     def led_brightness(self) -> LedBrightness:
         """LED indicator brightness."""
         return LedBrightness(self.data["led_brightness"])
-
-    def __repr__(self) -> str:
-        s = (
-            "<HeaterMiotStatus power=%s, "
-            "target_temperature=%s, "
-            "temperature=%s, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "delay_off_countdown=%s "
-            % (
-                self.power,
-                self.target_temperature,
-                self.temperature,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.delay_off_countdown,
-            )
-        )
-        return s
 
 
 class HeaterMiot(MiotDevice):

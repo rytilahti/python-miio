@@ -4,7 +4,7 @@ import time
 import click
 
 from .click_common import EnumType, command
-from .device import Device
+from .device import Device, DeviceStatus
 
 
 class HourlySystem(enum.Enum):
@@ -29,7 +29,7 @@ class Tone(enum.Enum):
     Seventh = "a7.mp3"
 
 
-class Nightmode:
+class Nightmode(DeviceStatus):
     def __init__(self, data):
         self._enabled = bool(data[0])
         self._start = data[1]
@@ -47,24 +47,13 @@ class Nightmode:
     def end(self):
         return self._end
 
-    def __repr__(self):
-        return "<Nightmode enabled:%s %s-%s>" % (self.enabled, self.start, self.end)
 
-
-class RingTone:
+class RingTone(DeviceStatus):
     def __init__(self, data):
         # {'type': 'reminder', 'ringtone': 'a2.mp3', 'smart_clock': 0}]
         self.type = AlarmType(data["type"])
         self.tone = Tone(data["ringtone"])
         self.smart_clock = data["smart_clock"]
-
-    def __repr__(self):
-        return "<%s %s tone: %s smart: %s>" % (
-            self.__class__.__name__,
-            self.type,
-            self.tone,
-            self.smart_clock,
-        )
 
 
 class AlarmClock(Device):

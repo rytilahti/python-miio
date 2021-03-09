@@ -5,7 +5,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .fan_common import FanException, MoveDirection, OperationMode
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
@@ -63,7 +63,7 @@ class OperationModeMiot(enum.Enum):
     Nature = 1
 
 
-class FanStatusMiot:
+class FanStatusMiot(DeviceStatus):
     """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker P9/P10."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -139,31 +139,6 @@ class FanStatusMiot:
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<FanStatus power=%s, "
-            "mode=%s, "
-            "speed=%s, "
-            "oscillate=%s, "
-            "angle=%s, "
-            "led=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "delay_off_countdown=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.speed,
-                self.oscillate,
-                self.angle,
-                self.led,
-                self.buzzer,
-                self.child_lock,
-                self.delay_off_countdown,
-            )
-        )
-        return s
 
 
 class FanMiot(MiotDevice):

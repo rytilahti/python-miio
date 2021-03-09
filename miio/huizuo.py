@@ -11,7 +11,7 @@ import click
 
 from .click_common import command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -117,7 +117,7 @@ class HuizuoException(DeviceException):
     pass
 
 
-class HuizuoStatus:
+class HuizuoStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
 
@@ -187,29 +187,6 @@ class HuizuoStatus:
         if "heat_level" in self.data:
             return self.data["heat_level"]
         return None
-
-    def __repr__(self):
-        parameters = []
-        device_properties = [
-            "is_on",
-            "brightness",
-            "color_temp",
-            "is_fan_on",
-            "fan_speed_level",
-            "fan_mode",
-            "is_fan_reverse",
-            "is_heater_on",
-            "heat_level",
-            "heater_fault_code",
-        ]
-
-        for prop in device_properties:
-            val = getattr(self, prop)
-            if val is not None:
-                parameters.append(f"{prop}={val}")
-
-        s = "<Huizuo " + " ".join(parameters) + ">"
-        return s
 
 
 class Huizuo(MiotDevice):

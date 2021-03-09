@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .fan_common import FanException, LedBrightness, MoveDirection, OperationMode
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class FanStatus:
+class FanStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -205,53 +205,8 @@ class FanStatus:
             return self.data["button_pressed"]
         return None
 
-    def __repr__(self) -> str:
-        s = (
-            "<FanStatus power=%s, "
-            "temperature=%s, "
-            "humidity=%s, "
-            "led=%s, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "natural_speed=%s, "
-            "direct_speed=%s, "
-            "speed=%s, "
-            "oscillate=%s, "
-            "angle=%s, "
-            "ac_power=%s, "
-            "battery=%s, "
-            "battery_charge=%s, "
-            "battery_state=%s, "
-            "use_time=%s, "
-            "delay_off_countdown=%s, "
-            "button_pressed=%s>"
-            % (
-                self.power,
-                self.temperature,
-                self.humidity,
-                self.led,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.natural_speed,
-                self.direct_speed,
-                self.speed,
-                self.oscillate,
-                self.angle,
-                self.ac_power,
-                self.battery,
-                self.battery_charge,
-                self.battery_state,
-                self.use_time,
-                self.delay_off_countdown,
-                self.button_pressed,
-            )
-        )
-        return s
 
-
-class FanStatusP5:
+class FanStatusP5(DeviceStatus):
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker P5."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -312,31 +267,6 @@ class FanStatusP5:
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<FanStatus power=%s, "
-            "mode=%s, "
-            "speed=%s, "
-            "oscillate=%s, "
-            "angle=%s, "
-            "led=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "delay_off_countdown=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.speed,
-                self.oscillate,
-                self.angle,
-                self.led,
-                self.buzzer,
-                self.child_lock,
-                self.delay_off_countdown,
-            )
-        )
-        return s
 
 
 class Fan(Device):

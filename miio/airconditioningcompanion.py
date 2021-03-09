@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ DEVICE_COMMAND_TEMPLATES = {
 }
 
 
-class AirConditioningCompanionStatus:
+class AirConditioningCompanionStatus(DeviceStatus):
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
@@ -222,44 +222,6 @@ class AirConditioningCompanionStatus:
             return OperationMode(mode)
         except TypeError:
             return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirConditioningCompanionStatus "
-            "power=%s, "
-            "power_socket=%s, "
-            "load_power=%s, "
-            "air_condition_model=%s, "
-            "model_format=%s, "
-            "device_type=%s, "
-            "air_condition_brand=%s, "
-            "air_condition_remote=%s, "
-            "state_format=%s, "
-            "air_condition_configuration=%s, "
-            "led=%s, "
-            "target_temperature=%s, "
-            "swing_mode=%s, "
-            "fan_speed=%s, "
-            "mode=%s>"
-            % (
-                self.power,
-                self.power_socket,
-                self.load_power,
-                self.air_condition_model.hex(),
-                self.model_format,
-                self.device_type,
-                self.air_condition_brand,
-                self.air_condition_remote,
-                self.state_format,
-                self.air_condition_configuration,
-                self.led,
-                self.target_temperature,
-                self.swing_mode,
-                self.fan_speed,
-                self.mode,
-            )
-        )
-        return s
 
 
 class AirConditioningCompanion(Device):

@@ -7,7 +7,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ CONST_HIGH_SENSITIVITY = [MotionDetectionSensitivity.High] * 32
 CONST_LOW_SENSITIVITY = [MotionDetectionSensitivity.Low] * 32
 
 
-class CameraStatus:
+class CameraStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Chuangmi Camera."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -143,40 +143,6 @@ class CameraStatus:
     def mini_level(self) -> int:
         """Unknown."""
         return self.data["mini_level"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<CameraStatus "
-            "power=%s, "
-            "motion_record=%s, "
-            "light=%s, "
-            "full_color=%s, "
-            "flip=%s, "
-            "improve_program=%s, "
-            "wdr=%s, "
-            "track=%s, "
-            "watermark=%s, "
-            "sdcard_status=%s, "
-            "max_client=%s, "
-            "night_mode=%s, "
-            "mini_level=%s>"
-            % (
-                self.power,
-                self.motion_record,
-                self.light,
-                self.full_color,
-                self.flip,
-                self.improve_program,
-                self.wdr,
-                self.track,
-                self.sdcard_status,
-                self.watermark,
-                self.max_client,
-                self.night_mode,
-                self.mini_level,
-            )
-        )
-        return s
 
 
 class ChuangmiCamera(Device):

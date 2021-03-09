@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class Brightness(enum.Enum):
     Off = 2
 
 
-class HeaterStatus:
+class HeaterStatus(DeviceStatus):
     """Container for status reports from the Smartmi Zhimi Heater."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -122,31 +122,6 @@ class HeaterStatus:
             return self.data["poweroff_level"]
 
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<HeaterStatus power=%s, "
-            "target_temperature=%s, "
-            "temperature=%s, "
-            "humidity=%s, "
-            "brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "use_time=%s, "
-            "delay_off_countdown=%s>"
-            % (
-                self.power,
-                self.target_temperature,
-                self.temperature,
-                self.humidity,
-                self.brightness,
-                self.buzzer,
-                self.child_lock,
-                self.use_time,
-                self.delay_off_countdown,
-            )
-        )
-        return s
 
 
 class Heater(Device):

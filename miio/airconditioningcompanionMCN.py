@@ -4,7 +4,7 @@ import random
 from typing import Any, Optional
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class SwingMode(enum.Enum):
     Off = "off"
 
 
-class AirConditioningCompanionStatus:
+class AirConditioningCompanionStatus(DeviceStatus):
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
@@ -97,26 +97,6 @@ class AirConditioningCompanionStatus:
             return SwingMode(mode)
         except TypeError:
             return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirConditioningCompanionStatus "
-            "power=%s, "
-            "load_power=%s, "
-            "target_temperature=%s, "
-            "swing_mode=%s, "
-            "fan_speed=%s, "
-            "mode=%s>"
-            % (
-                self.power,
-                self.load_power,
-                self.target_temperature,
-                self.swing_mode,
-                self.fan_speed,
-                self.mode,
-            )
-        )
-        return s
 
 
 class AirConditioningCompanionMcn02(Device):

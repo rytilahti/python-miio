@@ -6,7 +6,7 @@ import click
 
 from .airhumidifier import AirHumidifierException
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class LedBrightness(enum.Enum):
     High = 2
 
 
-class AirHumidifierStatus:
+class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier jsq."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -128,31 +128,6 @@ class AirHumidifierStatus:
     def lid_opened(self) -> bool:
         """True if the water tank is detached."""
         return self.data["lid_opened"] == 1
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "no_water=%s, "
-            "lid_opened=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.no_water,
-                self.lid_opened,
-            )
-        )
-        return s
 
 
 class AirHumidifierJsq(Device):

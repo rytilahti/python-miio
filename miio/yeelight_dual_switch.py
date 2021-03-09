@@ -5,7 +5,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 
 class YeelightDualControlModuleException(DeviceException):
@@ -36,7 +36,7 @@ _MAPPING = {
 }
 
 
-class DualControlModuleStatus:
+class DualControlModuleStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
         """
         Response of Yeelight Dual Control Module
@@ -101,32 +101,6 @@ class DualControlModuleStatus:
     def rc_list(self) -> str:
         """List of paired remote controls."""
         return self.data["rc_list"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<YeelightDualControlModuleStatus "
-            "switch_1_state=%s, "
-            "switch_1_default_state=%s, "
-            "switch_1_off_delay=%s, "
-            "switch_2_state=%s, "
-            "switch_2_default_state=%s, "
-            "switch_2_off_delay=%s, "
-            "interlock=%s, "
-            "flex_mode=%s, "
-            "rc_list=%s>"
-            % (
-                self.switch_1_state,
-                self.switch_1_default_state,
-                self.switch_1_off_delay,
-                self.switch_2_state,
-                self.switch_2_default_state,
-                self.switch_2_off_delay,
-                self.interlock,
-                self.flex_mode,
-                self.rc_list,
-            )
-        )
-        return s
 
 
 class YeelightDualControlModule(MiotDevice):

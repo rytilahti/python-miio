@@ -7,7 +7,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -52,7 +52,7 @@ class AirConditionerMiotException(DeviceException):
     pass
 
 
-class CleaningStatus:
+class CleaningStatus(DeviceStatus):
     def __init__(self, status: str):
         """Auto clean mode indicator.
 
@@ -92,16 +92,6 @@ class CleaningStatus:
     def cancellable(self) -> bool:
         return bool(self.status[3])
 
-    def __repr__(self) -> str:
-        s = (
-            "<CleaningStage cleaning=%s, "
-            "progress=%s, "
-            "stage=%s, "
-            "cancellable=%s>"
-            % (self.cleaning, self.progress, self.stage, self.cancellable)
-        )
-        return s
-
 
 class OperationMode(enum.Enum):
     Cool = 2
@@ -121,7 +111,7 @@ class FanSpeed(enum.Enum):
     Level7 = 7
 
 
-class TimerStatus:
+class TimerStatus(DeviceStatus):
     def __init__(self, status):
         """Countdown timer indicator.
 
@@ -159,18 +149,8 @@ class TimerStatus:
     def time_left(self) -> timedelta:
         return timedelta(minutes=self.status[3])
 
-    def __repr__(self) -> str:
-        s = (
-            "<TimerStatus enabled=%s, "
-            "countdown=%s, "
-            "power_on=%s, "
-            "time_left=%s>"
-            % (self.enabled, self.countdown, self.power_on, self.time_left)
-        )
-        return s
 
-
-class AirConditionerMiotStatus:
+class AirConditionerMiotStatus(DeviceStatus):
     """Container for status reports from the air conditioner (MIoT)."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -288,50 +268,6 @@ class AirConditionerMiotStatus:
     def timer(self) -> TimerStatus:
         """Countdown timer indicator."""
         return TimerStatus(self.data["timer"])
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirConditionerMiotStatus power=%s, "
-            "mode=%s, "
-            "target_temperature=%s, "
-            "eco=%s, "
-            "heater=%s, "
-            "dryer=%s, "
-            "sleep_mode=%s, "
-            "fan_speed=%s, "
-            "vertical_swing=%s, "
-            "temperature=%s, "
-            "buzzer=%s, "
-            "led=%s"
-            "electricity=%s"
-            "clean=%s"
-            "total_running_duration=%s"
-            "fan_speed_percent=%s"
-            "timer=%s"
-            % (
-                self.power,
-                self.mode,
-                self.target_temperature,
-                self.eco,
-                self.heater,
-                self.dryer,
-                self.sleep_mode,
-                self.fan_speed,
-                self.vertical_swing,
-                self.temperature,
-                self.buzzer,
-                self.led,
-                self.electricity,
-                self.clean,
-                self.total_running_duration,
-                self.fan_speed_percent,
-                self.timer,
-            )
-        )
-        return s
-
-    def __json__(self):
-        return self.data
 
 
 class AirConditionerMiot(MiotDevice):

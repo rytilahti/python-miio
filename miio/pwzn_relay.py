@@ -5,7 +5,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class PwznRelayStatus:
+class PwznRelayStatus(DeviceStatus):
     """Container for status reports from the plug."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -92,15 +92,6 @@ class PwznRelayStatus:
         """Number of on relay."""
         if "on_count" in self.data:
             return self.data["on_count"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<PwznRelayStatus "
-            "relay_status=%s, "
-            "relay_names=%s, "
-            "on_count=%s>" % (self.relay_state, self.relay_names, self.on_count)
-        )
-        return s
 
 
 class PwznRelay(Device):

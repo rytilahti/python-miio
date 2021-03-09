@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceInfo
+from .device import Device, DeviceInfo, DeviceStatus
 from .exceptions import DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ class FanSpeed(enum.Enum):
     Strong = 4
 
 
-class AirDehumidifierStatus:
+class AirDehumidifierStatus(DeviceStatus):
     """Container for status reports from the air dehumidifier."""
 
     def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
@@ -153,41 +153,6 @@ class AirDehumidifierStatus:
     def alarm(self) -> str:
         """Alarm."""
         return self.data["alarm"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirDehumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "buzzer=%s, "
-            "led=%s, "
-            "child_lock=%s, "
-            "target_humidity=%s%%, "
-            "fan_speed=%s, "
-            "tank_full=%s, "
-            "compressor_status=%s, "
-            "defrost_status=%s, "
-            "fan_st=%s, "
-            "alarm=%s, "
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.buzzer,
-                self.led,
-                self.child_lock,
-                self.target_humidity,
-                self.fan_speed,
-                self.tank_full,
-                self.compressor_status,
-                self.defrost_status,
-                self.fan_st,
-                self.alarm,
-            )
-        )
-        return s
 
 
 class AirDehumidifier(Device):

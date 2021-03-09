@@ -52,7 +52,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import pretty_seconds
 from .vacuumcontainers import ConsumableStatus, DNDStatus
@@ -183,17 +183,6 @@ class ViomiConsumableStatus(ConsumableStatus):
         """How long until the mop should be changed."""
         return self.sensor_dirty_total - self.sensor_dirty
 
-    def __repr__(self) -> str:
-        return (
-            "<ConsumableStatus main: %s, side: %s, filter: %s, mop: %s>"
-            % (  # noqa: E501
-                self.main_brush,
-                self.side_brush,
-                self.filter,
-                self.mop,
-            )
-        )
-
 
 class ViomiVacuumSpeed(Enum):
     Silent = 0
@@ -275,7 +264,7 @@ class ViomiEdgeState(Enum):
     Unknown2 = 5
 
 
-class ViomiVacuumStatus:
+class ViomiVacuumStatus(DeviceStatus):
     def __init__(self, data):
         # ["run_state","mode","err_state","battary_life","box_type","mop_type","s_time","s_area",
         # "suction_grade","water_grade","remember_map","has_map","is_mop","has_newmap"]'

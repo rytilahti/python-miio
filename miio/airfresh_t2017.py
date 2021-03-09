@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class DisplayOrientation(enum.Enum):
     LandscapeRight = "right"
 
 
-class AirFreshStatus:
+class AirFreshStatus(DeviceStatus):
     """Container for status reports from the air fresh t2017."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -219,49 +219,6 @@ class AirFreshStatus:
             return DisplayOrientation(self.data["screen_direction"])
         except (KeyError, ValueError):
             return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirFreshStatus power=%s, "
-            "mode=%s, "
-            "pm25=%s, "
-            "co2=%s, "
-            "temperature=%s °C, "
-            "favorite_speed=%s, "
-            "control_speed=%s, "
-            "dust_filter_life_remaining=%s, "
-            "dust_filter_life_remaining_days=%s, "
-            "upper_filter_life_remaining=%s, "
-            "upper_filter_life_remaining_days=%s, "
-            "ptc=%s, "
-            "ptc_level=%s, "
-            "ptc_status=%s, "
-            "child_lock=%s, "
-            "buzzer=%s, "
-            "display=%s, "
-            "display_orientation=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.pm25,
-                self.co2,
-                self.temperature,
-                self.favorite_speed,
-                self.control_speed,
-                self.dust_filter_life_remaining,
-                self.dust_filter_life_remaining_days,
-                self.upper_filter_life_remaining,
-                self.upper_filter_life_remaining_days,
-                self.ptc,
-                self.ptc_level,
-                self.ptc_status,
-                self.child_lock,
-                self.buzzer,
-                self.display,
-                self.display_orientation,
-            )
-        )
-        return s
 
 
 class AirFreshA1(Device):

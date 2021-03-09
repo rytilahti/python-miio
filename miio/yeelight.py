@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import int_to_rgb, rgb_to_int
 
@@ -20,7 +20,7 @@ class YeelightMode(IntEnum):
     HSV = 3
 
 
-class YeelightStatus:
+class YeelightStatus(DeviceStatus):
     def __init__(self, data):
         # ['power', 'bright', 'ct',   'rgb',      'hue', 'sat', 'color_mode', 'name', 'lan_ctrl', 'save_state']
         # ['on',    '100',    '3584', '16711680', '359', '100', '2',          'name', '1',        '1']
@@ -81,24 +81,6 @@ class YeelightStatus:
     def name(self) -> str:
         """Return the internal name of the bulb."""
         return self.data["name"]
-
-    def __repr__(self):
-        s = (
-            "<Yeelight on=%s mode=%s brightness=%s color_temp=%s "
-            "rgb=%s hsv=%s dev=%s save_state=%s name=%s>"
-            % (
-                self.is_on,
-                self.color_mode,
-                self.brightness,
-                self.color_temp,
-                self.rgb,
-                self.hsv,
-                self.developer_mode,
-                self.save_state_on_change,
-                self.name,
-            )
-        )
-        return s
 
 
 class Yeelight(Device):

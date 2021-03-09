@@ -5,7 +5,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class OperationMode(enum.Enum):
     Natural = 3
 
 
-class FanLeshowStatus:
+class FanLeshowStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Rosou SS4 Ventilator."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -88,27 +88,6 @@ class FanLeshowStatus:
     def error_detected(self) -> bool:
         """True if a fault was detected."""
         return self.data["fault"] == 1
-
-    def __repr__(self) -> str:
-        s = (
-            "<FanLeshowStatus power=%s, "
-            "mode=%s, "
-            "speed=%s, "
-            "buzzer=%s, "
-            "oscillate=%s, "
-            "delay_off_countdown=%s, "
-            "error_detected=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.speed,
-                self.buzzer,
-                self.oscillate,
-                self.delay_off_countdown,
-                self.error_detected,
-            )
-        )
-        return s
 
 
 class FanLeshow(Device):
