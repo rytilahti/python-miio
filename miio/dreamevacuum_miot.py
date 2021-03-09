@@ -4,6 +4,7 @@ import logging
 from enum import Enum
 
 from .click_common import command, format_output
+from .miot_device import DeviceStatus as DeviceStatusContainer
 from .miot_device import MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -75,7 +76,7 @@ class DeviceStatus(Enum):
     Charging = 6
 
 
-class DreameVacuumStatus:
+class DreameVacuumStatus(DeviceStatusContainer):
     def __init__(self, data):
         self.data = data
 
@@ -187,10 +188,7 @@ class DreameVacuumStatus:
 class DreameVacuumMiot(MiotDevice):
     """Interface for Vacuum 1C STYTJ01ZHM (dreame.vacuum.mc1808)"""
 
-    def __init__(
-        self, ip: str, token: str = None, start_id: int = 0, debug: int = 0
-    ) -> None:
-        super().__init__(_MAPPING, ip, token, start_id, debug)
+    mapping = _MAPPING
 
     @command(
         default_output=format_output(
