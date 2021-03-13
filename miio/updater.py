@@ -3,8 +3,6 @@ import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from os.path import basename
 
-import netifaces
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -60,6 +58,14 @@ class OneShotServer:
 
     @staticmethod
     def find_local_ip():
+        try:
+            import netifaces
+        except Exception:
+            _LOGGER.error(
+                "Unable to import netifaces, please install netifaces library"
+            )
+            raise
+
         ifaces_without_lo = [
             x for x in netifaces.interfaces() if not x.startswith("lo")
         ]
