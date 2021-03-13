@@ -30,7 +30,7 @@ attrs = "*"
 pytz = "*"
 appdirs = "^1"
 tqdm = "^4"
-netifaces = "^0"
+netifaces = { version = "^0", optional = true }
 android_backup = { version = "^0", optional = true }
 importlib_metadata = { version = "^1", markers = "python_version <= '3.7'" }
 croniter = "^0"
