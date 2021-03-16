@@ -93,10 +93,14 @@ class MiIOProtocol:
     def discover(addr: str = None, is_broadcast: bool = True, timeout: int = 5) -> Any:
         """Scan for devices in the network. This method is used to discover supported
         devices by sending a handshake message to the broadcast address on port 54321.
-        If the target IP address is given, the handshake will be send as an unicast
-        packet.
+        If the target IP address is given and is_broadcast is False, the handshake 
+        will be send as a unicast packet. 
+        If is_broadcast is True, then addr can optionally specify the target network
+        to send the broadcast to. This is necessary for Windows platforms.
 
-        :param str addr: Target IP address
+        :param str addr: Target IP address or network
+        :param bool is_broadcast: True to broadcast, False to unicast
+        :param int timeout: Time to wait for discovering new devices
         """
         seen_addrs = []  # type: List[str]
         if is_broadcast:
