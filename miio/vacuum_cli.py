@@ -58,9 +58,9 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         sys.exit(-1)
 
     start_id = manual_seq = 0
-    with open(id_file, "r") as f, contextlib.suppress(
-        FileNotFoundError, TypeError, ValueError
-    ):
+    with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
+        id_file, "r"
+    ) as f:
         x = json.load(f)
         start_id = x.get("seq", 0)
         manual_seq = x.get("manual_seq", 0)
