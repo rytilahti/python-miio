@@ -82,7 +82,6 @@ class TestWalkingpad(TestCase):
 
     def test_status(self):
         self.device._reset_state()
-        print(self.state())
 
         # Because we get a set of status values from the walkingpad via 'all' the dummy device doesnt work for testing.
         # TODO Need to figure out how to test this properly.
