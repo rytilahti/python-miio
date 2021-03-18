@@ -3,7 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import Walkingpad
-from miio.walkingpad import WalkingpadException, WalkingpadStatus
+from miio.walkingpad import OperationMode, WalkingpadException, WalkingpadStatus
 
 from .dummies import DummyDevice
 
@@ -100,11 +100,11 @@ class TestWalkingpad(TestCase):
         def mode():
             return self.device.status().mode
 
-        self.device.set_mode(1)
-        assert mode() == 1
+        self.device.set_mode(OperationMode.Auto)
+        assert mode() == OperationMode.Auto.value
 
-        self.device.set_mode(0)
-        assert mode() == 0
+        self.device.set_mode(OperationMode.Manual)
+        assert mode() == OperationMode.Manual.value
 
         with pytest.raises(WalkingpadException):
             self.device.set_mode(-1)

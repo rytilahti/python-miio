@@ -1,10 +1,11 @@
+import enum
 import logging
 from collections import defaultdict
 from typing import Any, Dict
 
 import click
 
-from .click_common import command, format_output
+from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
@@ -13,6 +14,12 @@ _LOGGER = logging.getLogger(__name__)
 
 class WalkingpadException(DeviceException):
     pass
+
+
+class OperationMode(enum.Enum):
+    Auto = 0
+    Manual = 1
+    Off = 2
 
 
 class WalkingpadStatus(DeviceStatus):
@@ -57,7 +64,7 @@ class WalkingpadStatus(DeviceStatus):
 
     @property
     def time(self) -> int:
-        """Current lock status."""
+        """Current walking time."""
         return self.data["time"]
 
     @property
@@ -71,7 +78,7 @@ class WalkingpadStatus(DeviceStatus):
         return self.data["mode"]
 
     @property
-    def step(self) -> int:
+    def step_count(self) -> int:
         """Current steps."""
         return self.data["step"]
 
@@ -106,9 +113,6 @@ class Walkingpad(Device):
     def status(self) -> WalkingpadStatus:
         """Retrieve properties."""
 
-        properties_received = []
-        values_received = []
-
         # Walkingpad A1 allows you to retrieve a subset of values with "all"
         # eg ['mode:1', 'time:1387', 'sp:3.0', 'dist:1150', 'cal:71710', 'step:2117']
 
@@ -124,20 +128,18 @@ class Walkingpad(Device):
         if any(isinstance(el, list) for el in values):
             values = values[0]
 
+        data = {}
         for x in values:
-            prop_split, value = x.split(":")
-            properties_received.append(prop_split)
-            values_received.append(value)
+            prop, value = x.split(":")
+            data[prop] = value
 
         properties_additional = ["power", "mode"]
-
         values_additional = self.get_properties(properties_additional, max_properties=1)
 
-        properties_received = properties_received + properties_additional
-        values_received = values_received + values_additional
-        return WalkingpadStatus(
-            defaultdict(lambda: None, zip(properties_received, values_received))
-        )
+        for i in range(len(properties_additional)):
+            data[properties_additional[i]] = values_additional[i]
+
+        return WalkingpadStatus(defaultdict(lambda: None, data))
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -160,18 +162,16 @@ class Walkingpad(Device):
         return self.send("set_state", ["stop"])
 
     @command(
-        click.argument("mode", type=int),
-        default_output=format_output("Setting mode to {mode}"),
+        click.argument("mode", type=EnumType(OperationMode)),
+        default_output=format_output("Setting mode to '{mode.name}'"),
     )
-    def set_mode(self, mode: int):
+    def set_mode(self, mode: OperationMode):
         """Set mode (auto/manual)."""
 
-        if not isinstance(mode, int):
+        if not isinstance(mode, OperationMode):
             raise WalkingpadException("Invalid mode: %s" % mode)
 
-        elif mode < 0 or mode >= 3:
-            raise WalkingpadException("Invalid mode: %s" % mode)
-        return self.send("set_mode", [mode])
+        return self.send("set_mode", [mode.value])
 
     @command(
         click.argument("speed", type=float),
@@ -183,7 +183,7 @@ class Walkingpad(Device):
         if not isinstance(speed, float):
             raise WalkingpadException("Invalid speed: %s" % speed)
 
-        elif speed < 0 or speed > 6:
+        if speed < 0 or speed > 6:
             raise WalkingpadException("Invalid speed: %s" % speed)
 
         return self.send("set_speed", [speed])
