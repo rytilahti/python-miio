@@ -1,6 +1,5 @@
 import enum
 import logging
-from collections import defaultdict
 from typing import Any, Dict
 
 import click
