@@ -136,7 +136,7 @@ class Walkingpad(Device):
         for i in range(len(properties_additional)):
             data[properties_additional[i]] = values_additional[i]
 
-        return WalkingpadStatus(defaultdict(lambda: None, data))
+        return WalkingpadStatus(data)
 
     @command(default_output=format_output("Powering on"))
     def on(self):
