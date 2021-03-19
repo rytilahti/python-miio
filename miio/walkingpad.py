@@ -96,15 +96,12 @@ class WalkingpadStatus(DeviceStatus):
 class Walkingpad(Device):
     """Main class representing Xiaomi Walkingpad."""
 
-    # TODO: - Auto On/Off Not Supported
-    #       - Adjust Scenes with Wall Switch Not Supported
-
     @command(
         default_output=format_output(
             "",
             "Mode: {result.mode}\n"
             "Time: {result.time}\n"
-            "Steps: {result.step}\n"
+            "Steps: {result.step_count}\n"
             "Speed: {result.speed}\n"
             "Distance: {result.distance}\n"
             "Calories: {result.calories}  ",
@@ -125,8 +122,8 @@ class Walkingpad(Device):
         # When running the tests, for some reason the list provided is passed within another list, so I take
         # care of this here.
 
-        if any(isinstance(el, list) for el in values):
-            values = values[0]
+        if len(values) <= 1:
+            values = values.pop()
 
         data = {}
         for x in values:
