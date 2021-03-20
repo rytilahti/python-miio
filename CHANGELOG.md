@@ -1,5 +1,23 @@
 # Change Log
 
+## [0.5.5.1](https://github.com/rytilahti/python-miio/tree/0.5.5.1) (2021-03-20)
+
+This release fixes a single regression of non-existing sequence file for those users who never used mirobo/miiocli vacuum previously.
+Users of the library do not need this upgrade.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.5...0.5.5.1)
+
+**Implemented enhancements:**
+
+- Release new version of the library [\#969](https://github.com/rytilahti/python-miio/issues/969)
+- Support for Mi Robot S1 [\#517](https://github.com/rytilahti/python-miio/issues/517)
+
+**Fixed bugs:**
+
+- Unable to decrypt token for S55 Vacuum [\#973](https://github.com/rytilahti/python-miio/issues/973)
+- \[BUG\] No such file or directory: '/home/username/.cache/python-miio/python-mirobo.seq' when trying to update firmware [\#972](https://github.com/rytilahti/python-miio/issues/972)
+- Fix wrong ordering of contextmanagers [\#976](https://github.com/rytilahti/python-miio/pull/976) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.5.5](https://github.com/rytilahti/python-miio/tree/0.5.5) (2021-03-13)
 
 This release adds support for several new devices, and contains improvements and fixes on several existing integrations.
