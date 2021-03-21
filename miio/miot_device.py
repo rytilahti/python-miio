@@ -30,7 +30,7 @@ class MiotDevice(Device):
 
     mapping = None
 
-    def get_properties_for_mapping(self) -> list:
+    def get_properties_for_mapping(self, max_properties=15) -> list:
         """Retrieve raw properties based on mapping."""
 
         # We send property key in "did" because it's sent back via response and we can identify the property.
@@ -39,7 +39,7 @@ class MiotDevice(Device):
         ]
 
         return self.get_properties(
-            properties, property_getter="get_properties", max_properties=15
+            properties, property_getter="get_properties", max_properties=max_properties
         )
 
     @command(
