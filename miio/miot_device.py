@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
 from functools import partial
-from typing import Any, Union
+from typing import Any, Dict, Union
 
 import click
 
@@ -29,6 +29,23 @@ class MiotDevice(Device):
     """Main class representing a MIoT device."""
 
     mapping = None
+
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        timeout: int = None,
+        *,
+        mapping: Dict = None,
+    ):
+        """Overloaded to accept keyword-only `mapping` parameter."""
+        if mapping is not None:
+            self.mapping = mapping
+
+        super().__init__(ip, token, start_id, debug, lazy_discover, timeout)
 
     def get_properties_for_mapping(self, *, max_properties=15) -> list:
         """Retrieve raw properties based on mapping."""

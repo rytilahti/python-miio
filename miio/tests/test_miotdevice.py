@@ -11,6 +11,18 @@ def dev(module_mocker):
     return device
 
 
+def test_ctor_mapping():
+    """Make sure the constructor accepts the mapping parameter."""
+    dev = MiotDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    assert dev.mapping is None
+
+    test_mapping = {}
+    dev2 = MiotDevice(
+        "127.0.0.1", "68ffffffffffffffffffffffffffffff", mapping=test_mapping
+    )
+    assert dev2.mapping == test_mapping
+
+
 def test_get_property_by(dev):
     siid = 1
     piid = 2
