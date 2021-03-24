@@ -3,7 +3,7 @@ python-miio
 
 |Chat| |PyPI version| |Build Status| |Coverage Status| |Docs| |Black| |Hound|
 
-This library (and its accompanying cli tool) can be used to interface with devices using Xiaomi's `miIO <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__ and miOT protocols.
+This library (and its accompanying cli tool) can be used to interface with devices using Xiaomi's `miIO <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__ and MIoT protocols.
 
 
 Getting started
@@ -28,7 +28,7 @@ For example, executing it without any extra arguments will print out options and
       airconditioningcompanion
       ..
 
-You can get some information from any miIO/miOT device, including its device model, using the `info` command::
+You can get some information from any miIO/MIoT device, including its device model, using the `info` command::
 
     miiocli device --ip <ip> --token <token> info
 
@@ -65,7 +65,7 @@ All functionality is accessible through the `miio` module::
     vac.start()
 
 Each separate device type inherits from `miio.Device`
-(and in case of miOT devices, `miio.MiotDevice`) which provides common API.
+(and in case of MIoT devices, `miio.MiotDevice`) which provides common API.
 
 Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/api/miio.html>`__ for more information.
 
@@ -154,6 +154,7 @@ Home Assistant support
 -  `Xiaomi Mi Smart Pedestal Fan <https://github.com/syssi/xiaomi_fan>`__
 -  `Xiaomi Mi Smart Rice Cooker <https://github.com/syssi/xiaomi_cooker>`__
 -  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
+-  `Xiaomi MIoT Devices <https://github.com/ha0y/xiaomi_miot_raw>`__
 
 
 .. |Chat| image:: https://matrix.to/img/matrix-badge.svg
