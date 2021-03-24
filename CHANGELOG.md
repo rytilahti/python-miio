@@ -1,5 +1,26 @@
 # Change Log
 
+## [0.5.5.2](https://github.com/rytilahti/python-miio/tree/0.5.5.2) (2021-03-24)
+
+This release is mainly to re-add mapping parameter to MiotDevice constructor for backwards-compatibility reasons,
+but adds also PyYAML dependency and improves MiOT support to allow limiting how many properties to query at once.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.5.1...0.5.5.2)
+
+**Implemented enhancements:**
+
+- Please add back the mapping parameter to `MiotDevice` constructor [\#982](https://github.com/rytilahti/python-miio/issues/982)
+
+**Fixed bugs:**
+
+- Missing dependency: pyyaml [\#986](https://github.com/rytilahti/python-miio/issues/986)
+
+**Merged pull requests:**
+
+- Add pyyaml dependency [\#987](https://github.com/rytilahti/python-miio/pull/987) ([rytilahti](https://github.com/rytilahti))
+- Re-add mapping parameter to MiotDevice ctor [\#985](https://github.com/rytilahti/python-miio/pull/985) ([rytilahti](https://github.com/rytilahti))
+- Move hardcoded parameter `max\_properties` [\#981](https://github.com/rytilahti/python-miio/pull/981) ([ha0y](https://github.com/ha0y))
+
 ## [0.5.5.1](https://github.com/rytilahti/python-miio/tree/0.5.5.1) (2021-03-20)
 
 This release fixes a single regression of non-existing sequence file for those users who never used mirobo/miiocli vacuum previously.
