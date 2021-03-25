@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*#
 from datetime import datetime, time, timedelta
 from enum import IntEnum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from croniter import croniter
 
@@ -184,14 +184,23 @@ class VacuumStatus(DeviceStatus):
 class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
 
-    def __init__(self, data: List[Any]) -> None:
+    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
         # total duration, total area, amount of cleans
         # [ list, of, ids ]
         # { "result": [ 174145, 2410150000, 82,
         # [ 1488240000, 1488153600, 1488067200, 1487980800,
         #  1487894400, 1487808000, 1487548800 ] ],
         #  "id": 1 }
-        self.data = data
+        # newer models return a dict
+        if type(data) is dict:
+            self.data = [
+                data["clean_time"],
+                data["clean_area"],
+                data["clean_count"],
+                data["records"],
+            ]
+        else:
+            self.data = data
 
     @property
     def total_duration(self) -> timedelta:

@@ -170,3 +170,50 @@ class TestVacuum(TestCase):
 
         with patch.object(self.device, "send", return_value=0):
             assert self.device.timezone() == "UTC"
+
+    def test_history(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                174145,
+                2410150000,
+                82,
+                [
+                    1488240000,
+                    1488153600,
+                    1488067200,
+                    1487980800,
+                    1487894400,
+                    1487808000,
+                    1487548800,
+                ],
+            ],
+        ):
+            assert self.device.clean_history().total_duration == datetime.timedelta(
+                days=2, seconds=1345
+            )
+
+    def test_history_dict(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value={
+                "clean_time": 174145,
+                "clean_area": 2410150000,
+                "clean_count": 82,
+                "dust_collection_count": 5,
+                "records": [
+                    1488240000,
+                    1488153600,
+                    1488067200,
+                    1487980800,
+                    1487894400,
+                    1487808000,
+                    1487548800,
+                ],
+            },
+        ):
+            assert self.device.clean_history().total_duration == datetime.timedelta(
+                days=2, seconds=1345
+            )

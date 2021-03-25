@@ -86,7 +86,7 @@ To ease the process of setting up a development environment we have prepared `a 
 Supported devices
 -----------------
 
--  Xiaomi Mi Robot Vacuum V1, S5, M1S
+-  Xiaomi Mi Robot Vacuum V1, S5, M1S, S7
 -  Xiaomi Mi Home Air Conditioner Companion
 -  Xiaomi Mi Smart Air Conditioner A (xiaomi.aircondition.mc1, mc2, mc4, mc5)
 -  Xiaomi Mi Air Purifier 2, 3H, 3C, Pro (zhimi.airpurifier.m2, mb3, mb4, v7)
