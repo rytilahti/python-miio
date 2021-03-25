@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*#
 from datetime import datetime, time, timedelta
 from enum import IntEnum
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from croniter import croniter
 
@@ -192,35 +192,43 @@ class CleaningSummary(DeviceStatus):
         #  1487894400, 1487808000, 1487548800 ] ],
         #  "id": 1 }
         # newer models return a dict
-        if type(data) is dict:
-            self.data = [
-                data["clean_time"],
-                data["clean_area"],
-                data["clean_count"],
-                data["records"],
-            ]
+        if type(data) is list:
+            self.data = {
+                "clean_time": data[0],
+                "clean_area": data[1],
+                "clean_count": data[2],
+                "records": data[3],
+            }
         else:
             self.data = data
 
     @property
     def total_duration(self) -> timedelta:
         """Total cleaning duration."""
-        return pretty_seconds(self.data[0])
+        return pretty_seconds(self.data["clean_time"])
 
     @property
     def total_area(self) -> float:
         """Total cleaned area."""
-        return pretty_area(self.data[1])
+        return pretty_area(self.data["clean_area"])
 
     @property
     def count(self) -> int:
         """Number of cleaning runs."""
-        return int(self.data[2])
+        return int(self.data["clean_count"])
 
     @property
     def ids(self) -> List[int]:
         """A list of available cleaning IDs, see also :class:`CleaningDetails`."""
-        return list(self.data[3])
+        return list(self.data["records"])
+
+    @property
+    def dust_collection_count(self) -> Optional[int]:
+        """Total number of dust collections."""
+        if "dust_collection_count" in self.data:
+            return int(self.data["dust_collection_count"])
+        else:
+            None
 
 
 class CleaningDetails(DeviceStatus):
