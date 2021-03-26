@@ -117,6 +117,8 @@ Deleting a timer
 Cleaning history
 ~~~~~~~~~~~~~~~~
 
+Will also report amount of times the dust was collected if available.
+
 ::
 
     $ mirobo cleaning-history
