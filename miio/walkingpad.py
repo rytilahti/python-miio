@@ -28,10 +28,22 @@ class OperationSensitivity(enum.Enum):
 
 
 class WalkingpadStatus(DeviceStatus):
-    """Container for status reports from Xiaomi Walkingpad."""
+    """Container for status reports from Xiaomi Walkingpad.
+
+    Input data dictionary to initialise this class:
+
+    {'cal': '0',
+     'dist': '0',
+     'mode': 2,
+     'power': 'off',
+     'sensitivity': 1,
+     'sp': '0.0',
+     'start_speed': 3.0,
+     'step': '0',
+     'time': '0'}
+    """
 
     def __init__(self, data: Dict[str, Any]) -> None:
-
         # NOTE: Only 1 property can be requested at the same time
         self.data = data
 
