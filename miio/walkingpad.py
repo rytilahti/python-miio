@@ -1,5 +1,6 @@
 import enum
 import logging
+from datetime import timedelta
 from typing import Any, Dict
 
 import click
@@ -57,8 +58,8 @@ class WalkingpadStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    def time(self) -> int:
-        """Current walking time in seconds."""
+    def walking_time(self) -> timedelta:
+        """Current walking duration in seconds."""
         return int(self.data["time"])
 
     @property

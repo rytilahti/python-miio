@@ -121,7 +121,7 @@ class TestWalkingpad(TestCase):
         assert self.state().step_count == self.device.start_state["step"]
         assert self.state().distance == self.device.start_state["dist"]
         assert self.state().sensitivity == self.device.start_state["sensitivity"]
-        assert self.state().time == self.device.start_state["time"]
+        assert self.state().walking_time == self.device.start_state["time"]
 
     def test_set_mode(self):
         def mode():
