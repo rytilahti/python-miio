@@ -32,19 +32,18 @@ class WalkingpadStatus(DeviceStatus):
 
     Input data dictionary to initialise this class:
 
-    {'cal': '0',
-     'dist': '0',
-     'mode': 2,
-     'power': 'off',
+    {'cal': 6130,
+     'dist': 90,
+     'mode': 1,
+     'power': 'on',
      'sensitivity': 1,
-     'sp': '0.0',
+     'sp': 3.0,
      'start_speed': 3.0,
-     'step': '0',
-     'time': '0'}
+     'step': 180,
+     'time': 121}
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        # NOTE: Only 1 property can be requested at the same time
         self.data = data
 
     @property
@@ -59,13 +58,13 @@ class WalkingpadStatus(DeviceStatus):
 
     @property
     def time(self) -> int:
-        """Current walking time."""
-        return self.data["time"]
+        """Current walking time in seconds."""
+        return int(self.data["time"])
 
     @property
     def speed(self) -> float:
         """Current speed."""
-        return self.data["sp"]
+        return float(self.data["sp"])
 
     @property
     def start_speed(self) -> float:
@@ -85,17 +84,17 @@ class WalkingpadStatus(DeviceStatus):
     @property
     def step_count(self) -> int:
         """Current steps."""
-        return self.data["step"]
+        return int(self.data["step"])
 
     @property
     def distance(self) -> int:
-        """Current distance."""
-        return self.data["dist"]
+        """Current distance in meters."""
+        return int(self.data["dist"])
 
     @property
     def calories(self) -> int:
         """Current calories burnt."""
-        return self.data["cal"]
+        return int(self.data["cal"])
 
 
 class Walkingpad(Device):
@@ -104,6 +103,7 @@ class Walkingpad(Device):
     @command(
         default_output=format_output(
             "",
+            "Power: {result.power}\n"
             "Mode: {result.mode}\n"
             "Time: {result.time}\n"
             "Steps: {result.step_count}\n"
@@ -117,16 +117,9 @@ class Walkingpad(Device):
     def status(self) -> WalkingpadStatus:
         """Retrieve properties."""
 
-        properties = ["all"]
+        data = self._get_quick_status()
 
-        # Walkingpad A1 only allows 1 property to be read at a time
-        values = self.get_properties(properties, max_properties=1)
-
-        data = {}
-        for x in values:
-            prop, value = x.split(":")
-            data[prop] = value
-
+        # The quick status only retrieves a subset of the properties. The rest of them are retrieved here.
         properties_additional = ["power", "mode", "start_speed", "sensitivity"]
         values_additional = self.get_properties(properties_additional, max_properties=1)
 
@@ -147,20 +140,19 @@ class Walkingpad(Device):
         )
     )
     def quick_status(self) -> WalkingpadStatus:
-        """Retrieve quick properties."""
+        """Retrieve quick properties. The walkingpad provides the option to retrieve a
+        subset of.
 
-        # Walkingpad A1 allows you to retrieve a subset of values with "all"
+        properties in one call - steps, mode, speed, distance, calories and time.
+        If you can, use this instead of the full status request, as it is much
+        faster.
+        """
+
+        # Walkingpad A1 allows you to quickly retrieve a subset of values with "all"
+        # all other properties need to be retrieved one by one and are therefore slower
         # eg ['mode:1', 'time:1387', 'sp:3.0', 'dist:1150', 'cal:71710', 'step:2117']
 
-        properties = ["all"]
-
-        # Walkingpad A1 only allows 1 property to be read at a time
-        values = self.get_properties(properties, max_properties=1)
-        # print(values)
-        data = {}
-        for x in values:
-            prop, value = x.split(":")
-            data[prop] = value
+        data = self._get_quick_status()
 
         return WalkingpadStatus(data)
 
@@ -187,7 +179,12 @@ class Walkingpad(Device):
     @command(default_output=format_output("Starting the treadmill"))
     def start(self):
         """Starting Up."""
-        return self.send("set_state", ["run"])
+        if not self.status().is_on:
+            raise WalkingpadException(
+                "Can't start the treadmill, it's not turned on - try issuing an 'on' command first"
+            )
+        else:
+            return self.send("set_state", ["run"])
 
     @command(default_output=format_output("Stopping the treadmill"))
     def stop(self):
@@ -247,3 +244,36 @@ class Walkingpad(Device):
             raise WalkingpadException("Invalid mode: %s" % sensitivity)
 
         return self.send("set_sensitivity", [sensitivity.value])
+
+    def _get_quick_status(self):
+
+        # internal helper to get the quick status via the "all" property
+
+        properties = ["all"]
+
+        values = self.get_properties(properties, max_properties=1)
+
+        data = {}
+        for x in values:
+            prop, value = x.split(":")
+
+            if prop not in ["sp", "step", "cal", "time", "dist", "mode"]:
+                raise WalkingpadException("Invalid data received: %s" % value)
+
+            # Ensure that he different properties are correctly typed
+            if prop == "sp":
+                value = float(value)
+            elif prop == "step":
+                value = int(value)
+            elif prop == "cal":
+                value = int(value)
+            elif prop == "time":
+                value = int(value)
+            elif prop == "dist":
+                value = int(value)
+            elif prop == "mode":
+                value = int(value)
+
+            data[prop] = value
+
+        return data

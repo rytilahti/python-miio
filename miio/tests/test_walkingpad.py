@@ -117,11 +117,11 @@ class TestWalkingpad(TestCase):
         assert self.is_on() is True
         assert self.state().power == self.device.start_state["power"]
         assert self.state().mode == self.device.start_state["mode"]
-        assert self.state().speed == str(self.device.start_state["sp"])
-        assert self.state().step_count == str(self.device.start_state["step"])
-        assert self.state().distance == str(self.device.start_state["dist"])
+        assert self.state().speed == self.device.start_state["sp"]
+        assert self.state().step_count == self.device.start_state["step"]
+        assert self.state().distance == self.device.start_state["dist"]
         assert self.state().sensitivity == self.device.start_state["sensitivity"]
-        assert self.state().time == str(self.device.start_state["time"])
+        assert self.state().time == self.device.start_state["time"]
 
     def test_set_mode(self):
         def mode():
@@ -147,7 +147,7 @@ class TestWalkingpad(TestCase):
             return self.device.status().speed
 
         self.device.set_speed(3.055)
-        assert speed() == str(3.055)
+        assert speed() == 3.055
 
         with pytest.raises(WalkingpadException):
             self.device.set_speed(7.6)
