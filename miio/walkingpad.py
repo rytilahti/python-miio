@@ -69,7 +69,7 @@ class WalkingpadStatus(DeviceStatus):
 
     @property
     def start_speed(self) -> float:
-        """Current speed."""
+        """Current start speed."""
         return self.data["start_speed"]
 
     @property

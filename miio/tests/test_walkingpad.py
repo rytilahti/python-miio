@@ -113,7 +113,6 @@ class TestWalkingpad(TestCase):
         self.device._reset_state()
 
         assert repr(self.state()) == repr(WalkingpadStatus(self.device.start_state))
-
         assert self.is_on() is True
         assert self.state().power == self.device.start_state["power"]
         assert self.state().mode == self.device.start_state["mode"]
