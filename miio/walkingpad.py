@@ -21,30 +21,14 @@ class OperationMode(enum.Enum):
     Off = 2
 
 
+class OperationSensitivity(enum.Enum):
+    High = 1
+    Medium = 2
+    Low = 3
+
+
 class WalkingpadStatus(DeviceStatus):
     """Container for status reports from Xiaomi Walkingpad."""
-
-    # raw_command set_start_speed '["1.0"]' finally made my WalkingPad autostart on speed 1! Hurray!
-    #
-    # raw_command get_prop '["mode"]' returns
-    #
-    # [0] while mode is auto
-    #     [1] while mode is manual
-    #     [2] when in standby
-    # raw_command get_prop '["step"]' returns [2303]
-    # raw_command get_prop '["time"]' returns [1970] (while time is 32:50)
-    # raw_command get_prop '["dist"]' returns [1869]
-    # raw_command get_prop '["cal"]' returns [67340]
-    # raw_command get_prop '["goal"]' returns [0, 60]
-    # raw_command get_prop '["max"]' returns [6.0]
-    # raw_command get_prop '["initial"]' returns [3]
-    # raw_command get_prop '["offline"]' returns [0]
-    # raw_command get_prop '["sensitivity"]' returns [2]
-    # raw_command get_prop '["sp"]' returns [1.0]
-    # raw_command get_prop '["start_speed"]' returns [1.0]
-    # raw_command get_prop '["auto"]' returns [1]
-    # raw_command get_prop '["disp"]' returns [19]
-    # raw_command get_prop '["lock"]' returns [0]
 
     def __init__(self, data: Dict[str, Any]) -> None:
 
@@ -72,9 +56,19 @@ class WalkingpadStatus(DeviceStatus):
         return self.data["sp"]
 
     @property
-    def mode(self) -> int:
+    def start_speed(self) -> float:
+        """Current speed."""
+        return self.data["start_speed"]
+
+    @property
+    def mode(self) -> OperationMode:
         """Current mode."""
         return self.data["mode"]
+
+    @property
+    def sensitivity(self) -> OperationSensitivity:
+        """Current sensitivity."""
+        return self.data["sensitivity"]
 
     @property
     def step_count(self) -> int:
@@ -88,7 +82,7 @@ class WalkingpadStatus(DeviceStatus):
 
     @property
     def calories(self) -> int:
-        """Current distance."""
+        """Current calories burnt."""
         return self.data["cal"]
 
 
@@ -102,12 +96,46 @@ class Walkingpad(Device):
             "Time: {result.time}\n"
             "Steps: {result.step_count}\n"
             "Speed: {result.speed}\n"
+            "Start Speed: {result.start_speed}\n"
+            "Sensitivity: {result.sensitivity}\n"
             "Distance: {result.distance}\n"
-            "Calories: {result.calories}  ",
+            "Calories: {result.calories}",
         )
     )
     def status(self) -> WalkingpadStatus:
         """Retrieve properties."""
+
+        properties = ["all"]
+
+        # Walkingpad A1 only allows 1 property to be read at a time
+        values = self.get_properties(properties, max_properties=1)
+
+        data = {}
+        for x in values:
+            prop, value = x.split(":")
+            data[prop] = value
+
+        properties_additional = ["power", "mode", "start_speed", "sensitivity"]
+        values_additional = self.get_properties(properties_additional, max_properties=1)
+
+        additional_props = dict(zip(properties_additional, values_additional))
+        data.update(additional_props)
+
+        return WalkingpadStatus(data)
+
+    @command(
+        default_output=format_output(
+            "",
+            "Mode: {result.mode}\n"
+            "Time: {result.time}\n"
+            "Steps: {result.step_count}\n"
+            "Speed: {result.speed}\n"
+            "Distance: {result.distance}\n"
+            "Calories: {result.calories}",
+        )
+    )
+    def quick_status(self) -> WalkingpadStatus:
+        """Retrieve quick properties."""
 
         # Walkingpad A1 allows you to retrieve a subset of values with "all"
         # eg ['mode:1', 'time:1387', 'sp:3.0', 'dist:1150', 'cal:71710', 'step:2117']
@@ -115,25 +143,12 @@ class Walkingpad(Device):
         properties = ["all"]
 
         # Walkingpad A1 only allows 1 property to be read at a time
-
         values = self.get_properties(properties, max_properties=1)
-
-        # When running the tests, for some reason the list provided is passed within another list, so I take
-        # care of this here.
-
-        if len(values) <= 1:
-            values = values.pop()
-
+        # print(values)
         data = {}
         for x in values:
             prop, value = x.split(":")
             data[prop] = value
-
-        properties_additional = ["power", "mode"]
-        values_additional = self.get_properties(properties_additional, max_properties=1)
-
-        for i in range(len(properties_additional)):
-            data[properties_additional[i]] = values_additional[i]
 
         return WalkingpadStatus(data)
 
@@ -146,6 +161,16 @@ class Walkingpad(Device):
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
+
+    @command(default_output=format_output("Locking"))
+    def lock(self):
+        """Lock device."""
+        return self.send("set_lock", [1])
+
+    @command(default_output=format_output("Unlocking"))
+    def unlock(self):
+        """Unlock device."""
+        return self.send("set_lock", [0])
 
     @command(default_output=format_output("Starting the treadmill"))
     def start(self):
@@ -183,3 +208,30 @@ class Walkingpad(Device):
             raise WalkingpadException("Invalid speed: %s" % speed)
 
         return self.send("set_speed", [speed])
+
+    @command(
+        click.argument("speed", type=float),
+        default_output=format_output("Setting start speed to {speed}"),
+    )
+    def set_start_speed(self, speed: float):
+        """Set start speed."""
+
+        if not isinstance(speed, float):
+            raise WalkingpadException("Invalid start speed: %s" % speed)
+
+        if speed < 0 or speed > 6:
+            raise WalkingpadException("Invalid start speed: %s" % speed)
+
+        return self.send("set_start_speed", [speed])
+
+    @command(
+        click.argument("sensitivity", type=EnumType(OperationSensitivity)),
+        default_output=format_output("Setting sensitivity to {sensitivity}"),
+    )
+    def set_sensitivity(self, sensitivity: OperationSensitivity):
+        """Set sensitivity."""
+
+        if not isinstance(sensitivity, OperationSensitivity):
+            raise WalkingpadException("Invalid mode: %s" % sensitivity)
+
+        return self.send("set_sensitivity", [sensitivity.value])
