@@ -179,7 +179,7 @@ class Walkingpad(Device):
 
     @command(default_output=format_output("Starting the treadmill"))
     def start(self):
-        """Starting Up."""
+        """Start the treadmill."""
         if not self.status().is_on:
             raise WalkingpadException(
                 "Can't start the treadmill, it's not turned on - try issuing an 'on' command first"
@@ -189,7 +189,7 @@ class Walkingpad(Device):
 
     @command(default_output=format_output("Stopping the treadmill"))
     def stop(self):
-        """Starting Up."""
+        """Stop the treadmill."""
         return self.send("set_state", ["stop"])
 
     @command(
