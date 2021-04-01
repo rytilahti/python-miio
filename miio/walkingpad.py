@@ -29,7 +29,7 @@ class OperationSensitivity(enum.Enum):
 
 
 class WalkingpadStatus(DeviceStatus):
-    """Container for status reports from Xiaomi Walkingpad.
+    """Container for status reports from Xiaomi Walkingpad A1 (ksmb.walkingpad.v3).
 
     Input data dictionary to initialise this class:
 
@@ -75,12 +75,12 @@ class WalkingpadStatus(DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Current mode."""
-        return self.data["mode"]
+        return OperationMode(self.data["mode"])
 
     @property
     def sensitivity(self) -> OperationSensitivity:
         """Current sensitivity."""
-        return self.data["sensitivity"]
+        return OperationSensitivity(self.data["sensitivity"])
 
     @property
     def step_count(self) -> int:
@@ -105,12 +105,12 @@ class Walkingpad(Device):
         default_output=format_output(
             "",
             "Power: {result.power}\n"
-            "Mode: {result.mode}\n"
-            "Time: {result.time}\n"
+            "Mode: {result.mode.name}\n"
+            "Time: {result.walking_time}\n"
             "Steps: {result.step_count}\n"
             "Speed: {result.speed}\n"
             "Start Speed: {result.start_speed}\n"
-            "Sensitivity: {result.sensitivity}\n"
+            "Sensitivity: {result.sensitivity.name}\n"
             "Distance: {result.distance}\n"
             "Calories: {result.calories}",
         )
@@ -132,8 +132,8 @@ class Walkingpad(Device):
     @command(
         default_output=format_output(
             "",
-            "Mode: {result.mode}\n"
-            "Time: {result.time}\n"
+            "Mode: {result.mode.name}\n"
+            "Time: {result.walking_time}\n"
             "Steps: {result.step_count}\n"
             "Speed: {result.speed}\n"
             "Distance: {result.distance}\n"
@@ -141,17 +141,12 @@ class Walkingpad(Device):
         )
     )
     def quick_status(self) -> WalkingpadStatus:
-        """Retrieve quick properties. The walkingpad provides the option to retrieve a
-        subset of.
+        """Retrieve quick properties. The walkingpad provides the option.
 
-        properties in one call - steps, mode, speed, distance, calories and time.
-        If you can, use this instead of the full status request, as it is much
-        faster.
+        to retrieve a subset of properties in one call - steps, mode,
+        speed, distance, calories and time. If you can, use this instead
+        of the full status request, as it is way faster.
         """
-
-        # Walkingpad A1 allows you to quickly retrieve a subset of values with "all"
-        # all other properties need to be retrieved one by one and are therefore slower
-        # eg ['mode:1', 'time:1387', 'sp:3.0', 'dist:1150', 'cal:71710', 'step:2117']
 
         data = self._get_quick_status()
 
@@ -247,34 +242,34 @@ class Walkingpad(Device):
         return self.send("set_sensitivity", [sensitivity.value])
 
     def _get_quick_status(self):
+        """Internal helper to get the quick status via the "all" property."""
 
-        # internal helper to get the quick status via the "all" property
+        # Walkingpad A1 allows you to quickly retrieve a subset of values with "all"
+        # all other properties need to be retrieved one by one and are therefore slower
+        # eg ['mode:1', 'time:1387', 'sp:3.0', 'dist:1150', 'cal:71710', 'step:2117']
 
         properties = ["all"]
 
         values = self.get_properties(properties, max_properties=1)
 
+        value_map = {
+            "sp": float,
+            "step": int,
+            "cal": int,
+            "time": int,
+            "dist": int,
+            "mode": int,
+        }
+
         data = {}
         for x in values:
             prop, value = x.split(":")
 
-            if prop not in ["sp", "step", "cal", "time", "dist", "mode"]:
+            if prop not in value_map:
                 raise WalkingpadException("Invalid data received: %s" % value)
-
-            # Ensure that he different properties are correctly typed
-            if prop == "sp":
-                value = float(value)
-            elif prop == "step":
-                value = int(value)
-            elif prop == "cal":
-                value = int(value)
-            elif prop == "time":
-                value = int(value)
-            elif prop == "dist":
-                value = int(value)
-            elif prop == "mode":
-                value = int(value)
 
             data[prop] = value
 
-        return data
+        converted_data = {key: value_map[key](value) for key, value in data.items()}
+
+        return converted_data

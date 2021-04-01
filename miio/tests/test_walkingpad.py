@@ -38,7 +38,7 @@ class DummyWalkingpad(DummyDevice, Walkingpad):
     def __init__(self, *args, **kwargs):
         self.state = {
             "power": "on",
-            "mode": 1,
+            "mode": OperationMode.Manual,
             "time": 1387,
             "step": 2117,
             "sensitivity": OperationSensitivity.Low,
@@ -47,7 +47,7 @@ class DummyWalkingpad(DummyDevice, Walkingpad):
             "cal": 71710,
             "start_speed": 3.1,
             "all": [
-                "mode:1",
+                "mode:" + str(OperationMode.Manual.value),
                 "time:1387",
                 "sp:3.15",
                 "dist:1150",
@@ -127,10 +127,10 @@ class TestWalkingpad(TestCase):
             return self.device.status().mode
 
         self.device.set_mode(OperationMode.Auto)
-        assert mode() == OperationMode.Auto.value
+        assert mode() == OperationMode.Auto
 
         self.device.set_mode(OperationMode.Manual)
-        assert mode() == OperationMode.Manual.value
+        assert mode() == OperationMode.Manual
 
         with pytest.raises(WalkingpadException):
             self.device.set_mode(-1)
@@ -178,10 +178,10 @@ class TestWalkingpad(TestCase):
             return self.device.status().sensitivity
 
         self.device.set_sensitivity(OperationSensitivity.High)
-        assert sensitivity() == OperationSensitivity.High.value
+        assert sensitivity() == OperationSensitivity.High
 
         self.device.set_sensitivity(OperationSensitivity.Medium)
-        assert sensitivity() == OperationSensitivity.Medium.value
+        assert sensitivity() == OperationSensitivity.Medium
 
         with pytest.raises(WalkingpadException):
             self.device.set_sensitivity(-1)
