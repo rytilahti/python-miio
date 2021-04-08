@@ -93,6 +93,13 @@ class WaterFlow(enum.Enum):
     Maximum = 203
 
 
+class MopMode(enum.Enum):
+    """Mop routing on S7."""
+
+    Standard = 300
+    Deep = 301
+
+
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S6 = "roborock.vacuum.s6"
@@ -746,6 +753,19 @@ class Vacuum(Device):
     def set_waterflow(self, waterflow: WaterFlow):
         """Set water flow setting."""
         return self.send("set_water_box_custom_mode", [waterflow.value])
+
+    @command()
+    def mop_mode(self) -> Optional[MopMode]:
+        """Get mop mode setting."""
+        try:
+            return MopMode(self.send("get_mop_mode")[0])
+        except ValueError:
+            return None
+
+    @command(click.argument("mop_mode", type=EnumType(MopMode)))
+    def set_mop_mode(self, mop_mode: MopMode):
+        """Set mop mode setting."""
+        return self.send("set_mop_mode", [mop_mode.value])
 
     @classmethod
     def get_device_group(cls):
