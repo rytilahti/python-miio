@@ -438,6 +438,8 @@ def cleaning_history(vac: miio.Vacuum):
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
     click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration, res.total_area))
+    if res.dust_collection_count is not None:
+        click.echo("Emptied dust collection bin: %s times" % res.dust_collection_count)
     click.echo()
     for idx, id_ in enumerate(res.ids):
         details = vac.clean_details(id_, return_list=False)
