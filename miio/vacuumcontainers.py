@@ -228,7 +228,7 @@ class CleaningSummary(DeviceStatus):
         if "dust_collection_count" in self.data:
             return int(self.data["dust_collection_count"])
         else:
-            None
+            return None
 
 
 class CleaningDetails(DeviceStatus):
