@@ -124,6 +124,8 @@ def status(vac: miio.Vacuum):
     # click.echo("Map present: %s" % res.map)
     # click.echo("in_cleaning: %s" % res.in_cleaning)
     click.echo("Water box attached: %s" % res.is_water_box_attached)
+    if res.is_water_box_carriage_attached is not None:
+        click.echo("Mop attached: %s" % res.is_water_box_carriage_attached)
 
 
 @cli.command()
