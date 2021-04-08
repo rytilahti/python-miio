@@ -84,6 +84,13 @@ class FanspeedE2(enum.Enum):
     Turbo = 100
 
 
+class FanspeedS7(enum.Enum):
+    Quiet = 101
+    Balanced = 102
+    Turbo = 103
+    Max = 104
+
+
 class WaterFlow(enum.Enum):
     """Water flow strength on s5 max."""
 
@@ -104,6 +111,7 @@ ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S6 = "roborock.vacuum.s6"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
+ROCKROBO_S7 = "roborock.vacuum.a15"
 
 
 class Vacuum(Device):
@@ -553,6 +561,8 @@ class Vacuum(Device):
                 self._fanspeeds = FanspeedV1
         elif self.model == "roborock.vacuum.e2":
             self._fanspeeds = FanspeedE2
+        elif self.model == ROCKROBO_S7:
+            self._fanspeeds = FanspeedS7
         else:
             self._fanspeeds = FanspeedV2
 
