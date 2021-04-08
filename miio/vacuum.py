@@ -777,6 +777,16 @@ class Vacuum(Device):
         """Set mop mode setting."""
         return self.send("set_mop_mode", [mop_mode.value])
 
+    @command()
+    def child_lock(self) -> bool:
+        """Get child lock setting."""
+        return self.send("get_child_lock_status")["lock_status"] == 1
+
+    @command(click.argument("lock", type=bool))
+    def set_child_lock(self, lock: bool) -> bool:
+        """Set child lock setting."""
+        return self.send("set_child_lock_status", {"lock_status": int(lock)})[0] == "ok"
+
     @classmethod
     def get_device_group(cls):
         @click.pass_context
