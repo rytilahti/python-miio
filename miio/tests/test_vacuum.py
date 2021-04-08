@@ -196,6 +196,8 @@ class TestVacuum(TestCase):
 
             assert self.device.clean_history().dust_collection_count is None
 
+            assert self.device.clean_history().ids[0] == 1488240000
+
     def test_history_dict(self):
         with patch.object(
             self.device,
@@ -221,6 +223,8 @@ class TestVacuum(TestCase):
             )
 
             assert self.device.clean_history().dust_collection_count == 5
+
+            assert self.device.clean_history().ids[0] == 1488240000
 
     def test_history_details(self):
         with patch.object(
@@ -269,3 +273,5 @@ class TestVacuum(TestCase):
             assert self.device.clean_history().total_duration == datetime.timedelta(
                 days=2, seconds=1345
             )
+
+            assert len(self.device.clean_history().ids) == 0
