@@ -172,7 +172,7 @@ class AirDogX3(Device):
         if speed < 1 or speed > max_speed:
             raise AirDogException("Invalid speed: %s" % speed)
 
-        return self.send("set_wind", [OperationModeMapping[mode.name], speed])
+        return self.send("set_wind", [OperationModeMapping[mode.name].value, speed])
 
     @command(
         click.argument("lock", type=bool),
