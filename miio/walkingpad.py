@@ -141,11 +141,13 @@ class Walkingpad(Device):
         )
     )
     def quick_status(self) -> WalkingpadStatus:
-        """Retrieve quick properties. The walkingpad provides the option.
+        """Retrieve quick status.
 
-        to retrieve a subset of properties in one call - steps, mode,
-        speed, distance, calories and time. If you can, use this instead
-        of the full status request, as it is way faster.
+        The walkingpad provides the option to retrieve a subset of properties in one call:
+        steps, mode, speed, distance, calories and time.
+
+        `status()` will do four more separate I/O requests for power, mode, start_speed, and sensitivity.
+        If you don't need any of that, prefer this method for status updates.
         """
 
         data = self._get_quick_status()
@@ -175,12 +177,12 @@ class Walkingpad(Device):
     @command(default_output=format_output("Starting the treadmill"))
     def start(self):
         """Start the treadmill."""
+
+        # In case the treadmill is not already turned on, turn it on.
         if not self.status().is_on:
-            raise WalkingpadException(
-                "Can't start the treadmill, it's not turned on - try issuing an 'on' command first"
-            )
-        else:
-            return self.send("set_state", ["run"])
+            self.on(self)
+
+        return self.send("set_state", ["run"])
 
     @command(default_output=format_output("Stopping the treadmill"))
     def stop(self):
@@ -266,7 +268,7 @@ class Walkingpad(Device):
             prop, value = x.split(":")
 
             if prop not in value_map:
-                raise WalkingpadException("Invalid data received: %s" % value)
+                _LOGGER.warning("Received unknown data from device: %s=%s", prop, value)
 
             data[prop] = value
 
