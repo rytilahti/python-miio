@@ -313,6 +313,8 @@ class Device(metaclass=DeviceGroupMeta):
                 value = valid_properties[property] = resp
                 if value is None:
                     fail("None")
+                elif not value:
+                    fail("Empty response")
                 else:
                     ok(f"{value} {type(value)}")
             except Exception as ex:
