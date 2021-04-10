@@ -283,5 +283,84 @@ class Device(metaclass=DeviceGroupMeta):
 
         return values
 
+    @command(
+        click.argument("properties", type=str, nargs=-1, required=True),
+    )
+    def test_properties(self, properties):
+        """Helper to test device properties."""
+
+        def ok(x):
+            click.echo(click.style(x, fg="green", bold=True))
+
+        def fail(x):
+            click.echo(click.style(x, fg="red", bold=True))
+
+        try:
+            model = self.info().model
+        except Exception as ex:
+            _LOGGER.warning("Unable to obtain device model: %s", ex)
+            model = "<unavailable>"
+
+        click.echo(f"Testing properties {properties} for {model}")
+        valid_properties = {}
+        for property in properties:
+            try:
+                click.echo(f"Testing {property}.. ", nl=False)
+                resp = self.get_properties([property])
+                # Handle responses with one-element lists
+                if isinstance(resp, list) and len(resp) == 1:
+                    resp = resp.pop()
+                value = valid_properties[property] = resp
+                if value is None:
+                    fail("None")
+                else:
+                    ok(f"{value} {type(value)}")
+            except Exception as ex:
+                _LOGGER.warning("Unable to request %s: %s", property, ex)
+
+        from pprint import pformat as pf
+
+        click.echo(
+            f"Found {len(valid_properties)} valid properties, testing max_properties.."
+        )
+
+        props_to_test = list(valid_properties.keys())
+        max_properties = -1
+        while len(props_to_test) > 1:
+            try:
+                click.echo(
+                    f"Testing {len(props_to_test)} properties at once.. ", nl=False
+                )
+                resp = self.get_properties(props_to_test)
+                if len(resp) == len(props_to_test):
+                    max_properties = len(props_to_test)
+                    ok(f"OK for {max_properties} properties")
+                    break
+                else:
+                    fail("Got different amount of properties than requested")
+
+                props_to_test.pop()
+            except Exception as ex:
+                _LOGGER.warning("Unable to request properties: %s", ex)
+                fail(ex)
+                props_to_test.pop()
+
+        non_empty_properties = {
+            k: v for k, v in valid_properties.items() if v is not None
+        }
+
+        click.echo(
+            click.style("\nPlease copy the results below to your report", bold=True)
+        )
+        click.echo("### Results ###")
+        click.echo(f"Model: {model}")
+        _LOGGER.debug(f"All responsive properties:\n{pf(valid_properties)}")
+        click.echo(f"Total responsives: {len(valid_properties)}")
+        click.echo(f"Total non-empty: {len(non_empty_properties)}")
+        click.echo(f"All non-empty properties:\n{pf(non_empty_properties)}")
+        click.echo(f"Max properties: {max_properties}")
+
+        return "Done"
+
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
