@@ -197,10 +197,14 @@ class CleaningSummary(DeviceStatus):
                 "clean_time": data[0],
                 "clean_area": data[1],
                 "clean_count": data[2],
-                "records": data[3],
             }
+            if len(data) > 3:
+                self.data["records"] = data[3]
         else:
             self.data = data
+
+        if "records" not in self.data:
+            self.data["records"] = []
 
     @property
     def total_duration(self) -> timedelta:
@@ -234,40 +238,51 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: List[Any]) -> None:
+    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
-        self.data = data
+        # newer models return a dict
+        if type(data) is list:
+            self.data = {
+                "begin": data[0],
+                "end": data[1],
+                "duration": data[2],
+                "area": data[3],
+                "error": data[4],
+                "complete": data[5],
+            }
+        else:
+            self.data = data
 
     @property
     def start(self) -> datetime:
         """When cleaning was started."""
-        return pretty_time(self.data[0])
+        return pretty_time(self.data["begin"])
 
     @property
     def end(self) -> datetime:
         """When cleaning was finished."""
-        return pretty_time(self.data[1])
+        return pretty_time(self.data["end"])
 
     @property
     def duration(self) -> timedelta:
         """Total duration of the cleaning run."""
-        return pretty_seconds(self.data[2])
+        return pretty_seconds(self.data["duration"])
 
     @property
     def area(self) -> float:
         """Total cleaned area."""
-        return pretty_area(self.data[3])
+        return pretty_area(self.data["area"])
 
     @property
     def error_code(self) -> int:
         """Error code."""
-        return int(self.data[4])
+        return int(self.data["error"])
 
     @property
     def error(self) -> str:
         """Error state of this cleaning run."""
-        return error_codes[self.data[4]]
+        return error_codes[self.data["error"]]
 
     @property
     def complete(self) -> bool:
@@ -275,7 +290,7 @@ class CleaningDetails(DeviceStatus):
 
         see also :func:`error`.
         """
-        return bool(self.data[5] == 1)
+        return bool(self.data["complete"] == 1)
 
 
 class ConsumableStatus(DeviceStatus):

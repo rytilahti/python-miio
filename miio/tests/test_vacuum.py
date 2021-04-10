@@ -196,6 +196,8 @@ class TestVacuum(TestCase):
 
             assert self.device.clean_history().dust_collection_count is None
 
+            assert self.device.clean_history().ids[0] == 1488240000
+
     def test_history_dict(self):
         with patch.object(
             self.device,
@@ -221,3 +223,55 @@ class TestVacuum(TestCase):
             )
 
             assert self.device.clean_history().dust_collection_count == 5
+
+            assert self.device.clean_history().ids[0] == 1488240000
+
+    def test_history_details(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[[1488347071, 1488347123, 16, 0, 0, 0]],
+        ):
+            assert self.device.clean_details(
+                123123, return_list=False
+            ).duration == datetime.timedelta(seconds=16)
+
+    def test_history_details_dict(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                {
+                    "begin": 1616757243,
+                    "end": 1616758193,
+                    "duration": 950,
+                    "area": 10852500,
+                    "error": 0,
+                    "complete": 1,
+                    "start_type": 2,
+                    "clean_type": 1,
+                    "finish_reason": 52,
+                    "dust_collection_status": 0,
+                }
+            ],
+        ):
+            assert self.device.clean_details(
+                123123, return_list=False
+            ).duration == datetime.timedelta(seconds=950)
+
+    def test_history_empty(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value={
+                "clean_time": 174145,
+                "clean_area": 2410150000,
+                "clean_count": 82,
+                "dust_collection_count": 5,
+            },
+        ):
+            assert self.device.clean_history().total_duration == datetime.timedelta(
+                days=2, seconds=1345
+            )
+
+            assert len(self.device.clean_history().ids) == 0
