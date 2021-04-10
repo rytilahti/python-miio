@@ -43,6 +43,7 @@ class OperationMode(enum.Enum):
     Medium = 2
     High = 3
     Humidity = 4
+    WetAndProtect = 5
 
 
 class AirHumidifierStatus(DeviceStatus):
