@@ -203,6 +203,9 @@ class CleaningSummary(DeviceStatus):
         else:
             self.data = data
 
+        if "records" not in self.data:
+            self.data["records"] = []
+
     @property
     def total_duration(self) -> timedelta:
         """Total cleaning duration."""
@@ -221,10 +224,7 @@ class CleaningSummary(DeviceStatus):
     @property
     def ids(self) -> List[int]:
         """A list of available cleaning IDs, see also :class:`CleaningDetails`."""
-        if "records" in self.data:
-            return list(self.data["records"])
-        else:
-            return []
+        return list(self.data["records"])
 
     @property
     def dust_collection_count(self) -> Optional[int]:
