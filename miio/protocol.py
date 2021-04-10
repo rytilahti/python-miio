@@ -172,7 +172,8 @@ class EncryptionAdapter(Adapter):
             decrypted = Utils.decrypt(obj, context["_"]["token"])
             decrypted = decrypted.rstrip(b"\x00")
         except Exception:
-            _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
+            if obj:
+                _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
             return obj
 
         # list of adaption functions for malformed json payload (quirks)
