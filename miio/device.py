@@ -1,6 +1,7 @@
 import inspect
 import logging
 from enum import Enum
+from pprint import pformat as pf
 from typing import Any, Optional  # noqa: F401
 
 import click
@@ -319,8 +320,6 @@ class Device(metaclass=DeviceGroupMeta):
                     ok(f"{value} {type(value)}")
             except Exception as ex:
                 _LOGGER.warning("Unable to request %s: %s", property, ex)
-
-        from pprint import pformat as pf
 
         click.echo(
             f"Found {len(valid_properties)} valid properties, testing max_properties.."
