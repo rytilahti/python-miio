@@ -57,6 +57,12 @@ MIOT_MAPPING = {
     },
 }
 
+SUPPORTED_ANGLES = {
+    MODEL_FAN_P9: [30, 60, 90, 120, 150],
+    MODEL_FAN_P10: [30, 60, 90, 120, 140],
+    MODEL_FAN_P11: [30, 60, 90, 120, 140],
+}
+
 
 class OperationModeMiot(enum.Enum):
     Normal = 0
@@ -217,9 +223,10 @@ class FanMiot(MiotDevice):
     )
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
-        if angle not in [30, 60, 90, 120, 140]:
+        if angle not in SUPPORTED_ANGLES[self.model]:
             raise FanException(
-                "Unsupported angle. Supported values: 30, 60, 90, 120, 140"
+                "Unsupported angle. Supported values: "
+                + ", ".join("{0}".format(i) for i in SUPPORTED_ANGLES[self.model])
             )
 
         return self.set_property("swing_mode_angle", angle)

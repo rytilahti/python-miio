@@ -3,7 +3,13 @@ from unittest import TestCase
 import pytest
 
 from miio import FanMiot
-from miio.fan_miot import MODEL_FAN_P9, FanException, OperationMode
+from miio.fan_miot import (
+    MODEL_FAN_P9,
+    MODEL_FAN_P10,
+    MODEL_FAN_P11,
+    FanException,
+    OperationMode,
+)
 
 from .dummies import DummyMiotDevice
 
@@ -16,7 +22,7 @@ class DummyFanMiot(DummyMiotDevice, FanMiot):
             "mode": 0,
             "fan_speed": 35,
             "swing_mode": False,
-            "swing_mode_angle": 140,
+            "swing_mode_angle": 30,
             "power_off_time": 0,
             "light": True,
             "buzzer": False,
@@ -105,8 +111,8 @@ class TestFanMiot(TestCase):
         assert angle() == 90
         self.device.set_angle(120)
         assert angle() == 120
-        self.device.set_angle(140)
-        assert angle() == 140
+        self.device.set_angle(150)
+        assert angle() == 150
 
         with pytest.raises(FanException):
             self.device.set_angle(-1)
@@ -118,7 +124,10 @@ class TestFanMiot(TestCase):
             self.device.set_angle(31)
 
         with pytest.raises(FanException):
-            self.device.set_angle(141)
+            self.device.set_angle(140)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(151)
 
     def test_set_oscillate(self):
         def oscillate():
@@ -173,3 +182,63 @@ class TestFanMiot(TestCase):
 
         with pytest.raises(FanException):
             self.device.delay_off(-1)
+
+
+class DummyFanMiotP10(DummyFanMiot, FanMiot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.model = MODEL_FAN_P10
+
+
+@pytest.fixture(scope="class")
+def fanmiotp10(request):
+    request.cls.device = DummyFanMiotP10()
+
+
+@pytest.mark.usefixtures("fanmiotp10")
+class TestFanMiotP10(TestCase):
+    def test_set_angle(self):
+        def angle():
+            return self.device.status().angle
+
+        self.device.set_angle(30)
+        assert angle() == 30
+        self.device.set_angle(60)
+        assert angle() == 60
+        self.device.set_angle(90)
+        assert angle() == 90
+        self.device.set_angle(120)
+        assert angle() == 120
+        self.device.set_angle(140)
+        assert angle() == 140
+
+        with pytest.raises(FanException):
+            self.device.set_angle(-1)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(1)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(31)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(150)
+
+        with pytest.raises(FanException):
+            self.device.set_angle(141)
+
+
+class DummyFanMiotP11(DummyFanMiot, FanMiot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.model = MODEL_FAN_P11
+
+
+@pytest.fixture(scope="class")
+def fanmiotp11(request):
+    request.cls.device = DummyFanMiotP11()
+
+
+@pytest.mark.usefixtures("fanmiotp11")
+class TestFanMiotP11(TestFanMiotP10, TestCase):
+    pass
