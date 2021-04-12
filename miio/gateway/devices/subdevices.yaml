@@ -128,11 +128,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153
@@ -147,11 +153,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153
@@ -166,11 +178,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153
@@ -185,11 +203,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153
@@ -204,11 +228,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153
@@ -223,11 +253,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153
@@ -242,11 +278,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153
@@ -261,11 +303,17 @@
   type: LightBulb
   class: LightBulb
   properties:
-    - property: status     # 'on' / 'off'
-    - property: brightness
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
       unit: percent
-    - property: color_temp
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
       unit: cct
+      get: get_property_exp
     - property: cct_min
       unit: cct
       default: 153

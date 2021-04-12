@@ -10,16 +10,6 @@ class LightBulb(SubDevice):
     """Base class for subdevice light bulbs."""
 
     @command()
-    def update(self):
-        """Update all device properties."""
-        self._props["brightness"] = self.send("get_bright").pop()
-        self._props["color_temp"] = self.send("get_ct").pop()
-        if self._props["brightness"] > 0 and self._props["brightness"] <= 100:
-            self._props["status"] = "on"
-        else:
-            self._props["status"] = "off"
-
-    @command()
     def on(self):
         """Turn bulb on."""
         return self.send_arg("set_power", ["on"]).pop()
