@@ -183,6 +183,10 @@ class TestWalkingpad(TestCase):
         with pytest.raises(WalkingpadException):
             self.device.set_start_speed("blah")
 
+        with pytest.raises(WalkingpadException):
+            self.device.off()
+            self.device.set_start_speed(3.4)
+
     def test_set_sensitivity(self):
         def sensitivity():
             return self.device.status().sensitivity
