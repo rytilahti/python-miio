@@ -41,7 +41,7 @@ class WalkingpadStatus(DeviceStatus):
      'sp': 3.0,
      'start_speed': 3.0,
      'step': 180,
-     'time': 121}
+     'walking_time': 121}
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -60,7 +60,7 @@ class WalkingpadStatus(DeviceStatus):
     @property
     def walking_time(self) -> timedelta:
         """Current walking duration in seconds."""
-        return int(self.data["time"])
+        return timedelta(seconds=int(self.data["time"]))
 
     @property
     def speed(self) -> float:
@@ -133,7 +133,7 @@ class Walkingpad(Device):
         default_output=format_output(
             "",
             "Mode: {result.mode.name}\n"
-            "Time: {result.walking_time}\n"
+            "Walking time: {result.walking_time}\n"
             "Steps: {result.step_count}\n"
             "Speed: {result.speed}\n"
             "Distance: {result.distance}\n"
@@ -180,7 +180,7 @@ class Walkingpad(Device):
 
         # In case the treadmill is not already turned on, turn it on.
         if not self.status().is_on:
-            self.on(self)
+            self.on()
 
         return self.send("set_state", ["run"])
 
@@ -208,6 +208,10 @@ class Walkingpad(Device):
     def set_speed(self, speed: float):
         """Set speed."""
 
+        # In case the treadmill is not already turned on, throw an exception.
+        if not self.status().is_on:
+            raise WalkingpadException("Cannot set the speed, device is turned off")
+
         if not isinstance(speed, float):
             raise WalkingpadException("Invalid speed: %s" % speed)
 
@@ -222,6 +226,12 @@ class Walkingpad(Device):
     )
     def set_start_speed(self, speed: float):
         """Set start speed."""
+
+        # In case the treadmill is not already turned on, throw an exception.
+        if not self.status().is_on:
+            raise WalkingpadException(
+                "Cannot set the start speed, device is turned off"
+            )
 
         if not isinstance(speed, float):
             raise WalkingpadException("Invalid start speed: %s" % speed)
