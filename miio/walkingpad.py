@@ -41,7 +41,7 @@ class WalkingpadStatus(DeviceStatus):
      'sp': 3.0,
      'start_speed': 3.0,
      'step': 180,
-     'walking_time': 121}
+     'time': 121}
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:
