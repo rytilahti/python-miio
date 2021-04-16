@@ -1,6 +1,7 @@
 import codecs
 import inspect
 import logging
+import time
 from functools import partial
 from ipaddress import ip_address
 from typing import Callable, Dict, Optional, Union  # noqa: F401
@@ -287,16 +288,16 @@ class Discovery:
     """
 
     @staticmethod
-    def discover_mdns() -> Dict[str, Device]:
+    def discover_mdns(*, timeout=5) -> Dict[str, Device]:
         """Discover devices with mdns until any keyboard input."""
-        _LOGGER.info("Discovering devices with mDNS, press any key to quit...")
+        _LOGGER.info("Discovering devices with mDNS for %s seconds...", timeout)
 
         listener = Listener()
         browser = zeroconf.ServiceBrowser(
             zeroconf.Zeroconf(), "_miio._udp.local.", listener
         )
 
-        input()  # to keep execution running until a key is pressed
+        time.sleep(timeout)
         browser.cancel()
 
         return listener.found_devices

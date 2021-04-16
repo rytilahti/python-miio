@@ -2,12 +2,14 @@ import logging
 
 import click
 
+from miio import Discovery
 from miio.click_common import (
     DeviceGroupMeta,
     ExceptionHandlerGroup,
     GlobalContextObject,
     json_output,
 )
+from miio.miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,6 +41,22 @@ def cli(ctx, debug: int, output: str):
 
 for device_class in DeviceGroupMeta.device_classes:
     cli.add_command(device_class.get_device_group())
+
+
+@click.command()
+@click.option("--mdns/--no-mdns", default=True, is_flag=True)
+@click.option("--handshake/--no-handshake", default=True, is_flag=True)
+@click.option("--network", default=None)
+@click.option("--timeout", type=int, default=5)
+def discover(mdns, handshake, network, timeout):
+    """Discover devices using both handshake and mdns methods."""
+    if handshake:
+        MiIOProtocol.discover(addr=network, timeout=timeout)
+    if mdns:
+        Discovery.discover_mdns(timeout=timeout)
+
+
+cli.add_command(discover)
 
 
 def create_cli():
