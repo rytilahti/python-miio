@@ -1,3 +1,4 @@
+from datetime import timedelta
 from unittest import TestCase
 
 import pytest
@@ -120,7 +121,9 @@ class TestWalkingpad(TestCase):
         assert self.state().step_count == self.device.start_state["step"]
         assert self.state().distance == self.device.start_state["dist"]
         assert self.state().sensitivity == self.device.start_state["sensitivity"]
-        assert self.state().walking_time == self.device.start_state["time"]
+        assert self.state().walking_time == timedelta(
+            seconds=self.device.start_state["time"]
+        )
 
     def test_set_mode(self):
         def mode():
@@ -145,6 +148,7 @@ class TestWalkingpad(TestCase):
         def speed():
             return self.device.status().speed
 
+        self.device.on()
         self.device.set_speed(3.055)
         assert speed() == 3.055
 
@@ -157,9 +161,15 @@ class TestWalkingpad(TestCase):
         with pytest.raises(WalkingpadException):
             self.device.set_speed("blah")
 
+        with pytest.raises(WalkingpadException):
+            self.device.off()
+            self.device.set_speed(3.4)
+
     def test_set_start_speed(self):
         def speed():
             return self.device.status().start_speed
+
+        self.device.on()
 
         self.device.set_start_speed(3.055)
         assert speed() == 3.055
@@ -172,6 +182,10 @@ class TestWalkingpad(TestCase):
 
         with pytest.raises(WalkingpadException):
             self.device.set_start_speed("blah")
+
+        with pytest.raises(WalkingpadException):
+            self.device.off()
+            self.device.set_start_speed(3.4)
 
     def test_set_sensitivity(self):
         def sensitivity():
