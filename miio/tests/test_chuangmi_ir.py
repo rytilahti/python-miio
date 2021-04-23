@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import platform
 from unittest import TestCase
 
 import pytest
@@ -9,6 +10,11 @@ from miio import ChuangmiIr, ChuangmiRemote, ChuangmiRemoteV2
 from miio.chuangmi_ir import ChuangmiIrException
 
 from .dummies import DummyDevice
+
+pytestmark = pytest.mark.skipif(
+    platform.python_implementation() == "PyPy",
+    reason="heatshrink2 does not support pypy",
+)
 
 with open(os.path.join(os.path.dirname(__file__), "test_chuangmi_ir.json")) as inp:
     test_data = json.load(inp)
