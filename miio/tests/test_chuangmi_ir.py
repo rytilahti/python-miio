@@ -1,20 +1,26 @@
 import base64
 import json
 import os
+import platform
 from unittest import TestCase
 
 import pytest
 
-from miio import ChuangmiIr
+from miio import ChuangmiIr, ChuangmiRemote, ChuangmiRemoteV2
 from miio.chuangmi_ir import ChuangmiIrException
 
 from .dummies import DummyDevice
+
+pytestmark = pytest.mark.skipif(
+    platform.python_implementation() == "PyPy",
+    reason="heatshrink2 does not support pypy",
+)
 
 with open(os.path.join(os.path.dirname(__file__), "test_chuangmi_ir.json")) as inp:
     test_data = json.load(inp)
 
 
-class DummyChuangmiIr(DummyDevice, ChuangmiIr):
+class DummyChuangmiBase(DummyDevice):
     def __init__(self, *args, **kwargs):
         self.state = {"last_ir_played": None}
         self.return_values = {
@@ -33,10 +39,32 @@ class DummyChuangmiIr(DummyDevice, ChuangmiIr):
             return False
 
 
+class DummyChuangmiIr(DummyChuangmiBase, ChuangmiIr):
+    pass
+
+
+class DummyChuangmiRemote(DummyChuangmiBase, ChuangmiRemote):
+    pass
+
+
+class DummyChuangmiRemoteV2(DummyChuangmiBase, ChuangmiRemoteV2):
+    pass
+
+
 @pytest.fixture(scope="class")
 def chuangmiir(request):
     request.cls.device = DummyChuangmiIr()
     # TODO add ability to test on a real device
+
+
+@pytest.fixture(scope="class")
+def chuangmiremote(request):
+    request.cls.device = DummyChuangmiRemote()
+
+
+@pytest.fixture(scope="class")
+def chuangmiremotev2(request):
+    request.cls.device = DummyChuangmiRemoteV2()
 
 
 @pytest.mark.usefixtures("chuangmiir")
@@ -125,3 +153,23 @@ class TestChuangmiIr(TestCase):
 
         with pytest.raises(ChuangmiIrException):
             self.device.play("pronto:command:invalidargument")
+
+
+@pytest.mark.usefixtures("chuangmiremote")
+class TestChuangmiRemote(TestCase):
+    def test_pronto_to_raw(self):
+        for args in test_data["test_pronto_ok_chuangmi_remote"]:
+            with self.subTest():
+                self.assertSequenceEqual(
+                    ChuangmiRemote.pronto_to_raw(*args["in"]), args["out"]
+                )
+
+
+@pytest.mark.usefixtures("chuangmiremotev2")
+class TestChuangmiRemoteV2(TestCase):
+    def test_pronto_to_raw(self):
+        for args in test_data["test_pronto_ok_chuangmi_remote_v2"]:
+            with self.subTest():
+                self.assertSequenceEqual(
+                    ChuangmiRemoteV2.pronto_to_raw(*args["in"]), args["out"]
+                )

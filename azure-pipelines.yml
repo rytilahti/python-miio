@@ -22,7 +22,7 @@ stages:
 
     - script: |
         python -m pip install --upgrade pip poetry
-        poetry install --extras docs
+        poetry install --extras dev
       displayName: 'Install dependencies'
 
     - script: |
@@ -122,7 +122,7 @@ stages:
 
     - script: |
         python -m pip install --upgrade pip poetry
-        poetry install
+        poetry install --extras dev
       displayName: 'Install dependencies'
 
     - script: |

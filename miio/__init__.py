@@ -27,7 +27,7 @@ from miio.airqualitymonitor_miot import AirQualityMonitorCGDN1
 from miio.aqaracamera import AqaraCamera
 from miio.ceil import Ceil
 from miio.chuangmi_camera import ChuangmiCamera
-from miio.chuangmi_ir import ChuangmiIr
+from miio.chuangmi_ir import ChuangmiIr, ChuangmiRemote, ChuangmiRemoteV2
 from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot

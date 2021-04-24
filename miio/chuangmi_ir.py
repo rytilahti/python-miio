@@ -1,7 +1,14 @@
 import base64
 import re
+from typing import List, Tuple
 
 import click
+
+try:
+    import heatshrink2
+except Exception:
+    heatshrink2 = None
+
 from construct import (
     Adapter,
     Array,
@@ -87,33 +94,45 @@ class ChuangmiIr(Device):
         return self.play_raw(*self.pronto_to_raw(pronto, repeats))
 
     @classmethod
-    def pronto_to_raw(cls, pronto: str, repeats: int = 1):
-        """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
-        starting with 0000.
-
-        :param str pronto: Pronto Hex string.
-        :param int repeats: Number of extra signal repeats.
-        """
-        if repeats < 0:
-            raise ChuangmiIrException("Invalid repeats value")
-
+    def _parse_pronto(
+        cls, pronto: str
+    ) -> Tuple[List["ProntoBurstPair"], List["ProntoBurstPair"], int]:
+        """Parses Pronto Hex encoded IR command and returns a tuple containing a list of
+        intro pairs, a list of repeat pairs and a signal carrier frequency."""
         try:
             pronto_data = Pronto.parse(bytearray.fromhex(pronto))
         except Exception as ex:
             raise ChuangmiIrException("Invalid Pronto command") from ex
 
-        if len(pronto_data.intro) == 0:
+        return pronto_data.intro, pronto_data.repeat, int(round(pronto_data.frequency))
+
+    @classmethod
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+        """Takes a Pronto Hex encoded IR command and number of repeats and returns a
+        tuple containing a string encoded IR signal accepted by controller and
+        frequency. Supports only raw Pronto format, starting with 0000.
+
+        :param str pronto: Pronto Hex string.
+        :param int repeats: Number of extra signal repeats.
+        """
+
+        if repeats < 0:
+            raise ChuangmiIrException("Invalid repeats value")
+
+        intro_pairs, repeat_pairs, frequency = cls._parse_pronto(pronto)
+
+        if len(intro_pairs) == 0:
             repeats += 1
 
         times = set()
-        for pair in pronto_data.intro + pronto_data.repeat * (1 if repeats else 0):
+        for pair in intro_pairs + repeat_pairs * (1 if repeats else 0):
             times.add(pair.pulse)
             times.add(pair.gap)
 
         times = sorted(times)
         times_map = {t: idx for idx, t in enumerate(times)}
         edge_pairs = []
-        for pair in pronto_data.intro + pronto_data.repeat * repeats:
+        for pair in intro_pairs + repeat_pairs * repeats:
             edge_pairs.append(
                 {"pulse": times_map[pair.pulse], "gap": times_map[pair.gap]}
             )
@@ -127,7 +146,7 @@ class ChuangmiIr(Device):
             )
         ).decode()
 
-        return signal_code, int(round(pronto_data.frequency))
+        return signal_code, frequency
 
     @command(
         click.argument("command", type=str),
@@ -183,6 +202,79 @@ class ChuangmiIr(Device):
     def get_indicator_led(self):
         """Get the indicator led status."""
         return self.send("get_indicatorLamp")
+
+
+class ChuangmiRemote(ChuangmiIr):
+    """Class representing new type of Chuangmi IR Remote Controller identified by model
+    "chuangmi-remote-h102a03_".
+
+    The new controller uses different format for learned IR commands, which actually is
+    the old format but with additional layer of compression.
+    """
+
+    @classmethod
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+        """Takes a Pronto Hex encoded IR command and number of repeats and returns a
+        tuple containing a string encoded IR signal accepted by controller and
+        frequency. Supports only raw Pronto format, starting with 0000.
+
+        :raises ChuangmiIrException if heatshrink2 package is not installed.
+
+        :param str pronto: Pronto Hex string.
+        :param int repeats: Number of extra signal repeats.
+        """
+
+        if heatshrink2 is None:
+            raise ChuangmiIrException("heatshrink2 library is missing")
+        raw, frequency = super().pronto_to_raw(pronto, repeats)
+        return (
+            base64.b64encode(
+                heatshrink2.encode("learn{}".format(raw).encode())
+            ).decode(),
+            frequency,
+        )
+
+
+class ChuangmiRemoteV2(ChuangmiIr):
+    """Class representing new type of Chuangmi IR Remote Controller identified by model
+    "chuangmi-remote-v2".
+
+    The new controller uses different format for learned IR commands, which compresses
+    an ASCII list of comma separated edge timings.
+    """
+
+    @classmethod
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+        """Takes a Pronto Hex encoded IR command and number of repeats and returns a
+        tuple containing a string encoded IR signal accepted by controller and
+        frequency. Supports only raw Pronto format, starting with 0000.
+
+        :raises ChuangmiIrException if heatshrink package is not installed.
+
+        :param str pronto: Pronto Hex string.
+        :param int repeats: Number of extra signal repeats.
+        """
+
+        if heatshrink2 is None:
+            raise ChuangmiIrException("heatshrink2 library is missing")
+
+        if repeats < 0:
+            raise ChuangmiIrException("Invalid repeats value")
+
+        intro_pairs, repeat_pairs, frequency = cls._parse_pronto(pronto)
+
+        if len(intro_pairs) == 0:
+            repeats += 1
+
+        timings = []
+        for pair in intro_pairs + repeat_pairs * repeats:
+            timings.append(pair.pulse)
+            timings.append(pair.gap)
+        timings[-1] = 0
+
+        timings = "{}\0".format(",".join(map(str, timings))).encode()
+
+        return base64.b64encode(heatshrink2.encode(timings)).decode(), frequency
 
 
 class ProntoPulseAdapter(Adapter):
