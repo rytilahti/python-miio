@@ -309,9 +309,18 @@ class Device(metaclass=DeviceGroupMeta):
             try:
                 click.echo(f"Testing {property:{max_property_len+2}} ", nl=False)
                 value = self.get_properties([property])
-                # Handle responses with one-element lists
-                if isinstance(value, list) and len(value) == 1:
-                    value = value.pop()
+                # Handle list responses
+                if isinstance(value, list):
+                    # unwrap single-element lists
+                    if len(value) == 1:
+                        value = value.pop()
+                    # report on unexpected multi-element lists
+                    elif len(value) > 1:
+                        _LOGGER.error("Got an array as response: %s", value)
+                    # otherwise we received an empty list, which we consider here as None
+                    else:
+                        value = None
+
                 if value is None:
                     fail("None")
                 else:
@@ -341,7 +350,7 @@ class Device(metaclass=DeviceGroupMeta):
                 else:
                     removed_property = props_to_test.pop()
                     fail(
-                        f"Got different amount of properties ({len(props_to_test)}) than requested ({len(resp)}, removing {removed_property}"
+                        f"Got different amount of properties ({len(props_to_test)}) than requested ({len(resp)}), removing {removed_property}"
                     )
 
             except Exception as ex:
