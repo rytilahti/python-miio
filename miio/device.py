@@ -314,7 +314,7 @@ class Device(metaclass=DeviceGroupMeta):
                 value = valid_properties[property] = resp
                 if value is None:
                     fail("None")
-                elif not value:
+                elif isinstance(value, str) and value == "":
                     fail("Empty response")
                 else:
                     ok(f"{value} {type(value)}")
@@ -338,13 +338,16 @@ class Device(metaclass=DeviceGroupMeta):
                     ok(f"OK for {max_properties} properties")
                     break
                 else:
-                    fail("Got different amount of properties than requested")
+                    removed_property = props_to_test.pop()
+                    fail(
+                        f"Got different amount of properties ({len(props_to_test)}) than requested ({len(resp)}, removing {removed_property}"
+                    )
 
-                props_to_test.pop()
             except Exception as ex:
-                _LOGGER.warning("Unable to request properties: %s", ex)
+                removed_property = props_to_test.pop()
+                msg = f"Unable to request properties: {ex} - removing {removed_property} for next try"
+                _LOGGER.warning(msg)
                 fail(ex)
-                props_to_test.pop()
 
         non_empty_properties = {
             k: v for k, v in valid_properties.items() if v is not None
