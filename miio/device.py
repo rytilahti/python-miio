@@ -308,14 +308,14 @@ class Device(metaclass=DeviceGroupMeta):
         for property in properties:
             try:
                 click.echo(f"Testing {property:{max_property_len+2}} ", nl=False)
-                resp = self.get_properties([property])
+                value = self.get_properties([property])
                 # Handle responses with one-element lists
-                if isinstance(resp, list) and len(resp) == 1:
-                    resp = resp.pop()
-                value = valid_properties[property] = resp
+                if isinstance(value, list) and len(value) == 1:
+                    value = value.pop()
                 if value is None:
                     fail("None")
                 else:
+                    valid_properties[property] = value
                     ok(f"{repr(value)} {type(value)}")
             except Exception as ex:
                 _LOGGER.warning("Unable to request %s: %s", property, ex)
