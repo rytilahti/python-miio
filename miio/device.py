@@ -315,10 +315,8 @@ class Device(metaclass=DeviceGroupMeta):
                 value = valid_properties[property] = resp
                 if value is None:
                     fail("None")
-                elif isinstance(value, str) and value == "":
-                    fail("Empty response")
                 else:
-                    ok(f"{value} {type(value)}")
+                    ok(f"{repr(value)} {type(value)}")
             except Exception as ex:
                 _LOGGER.warning("Unable to request %s: %s", property, ex)
 
