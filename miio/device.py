@@ -330,9 +330,11 @@ class Device(metaclass=DeviceGroupMeta):
         while len(props_to_test) > 1:
             try:
                 click.echo(
-                    f"Testing {len(props_to_test)} properties at once.. ", nl=False
+                    f"Testing {len(props_to_test)} properties at once ({' '.join(props_to_test)}): ",
+                    nl=False,
                 )
                 resp = self.get_properties(props_to_test)
+
                 if len(resp) == len(props_to_test):
                     max_properties = len(props_to_test)
                     ok(f"OK for {max_properties} properties")
