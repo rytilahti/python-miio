@@ -197,7 +197,7 @@ class FanStatusC1(DeviceStatus):
 
     @property
     def led(self) -> bool:
-        """True if LED is turned on, if available."""
+        """True if LED is turned on."""
         return self.data["light"]
 
     @property
