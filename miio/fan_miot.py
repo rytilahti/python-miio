@@ -135,6 +135,7 @@ class FanStatusMiot(DeviceStatus):
 
     @property
     def angle(self) -> int:
+        """Oscillation angle."""
         return self.data["swing_mode_angle"]
 
     @property
