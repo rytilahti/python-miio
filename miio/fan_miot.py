@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import click
 
@@ -134,14 +134,8 @@ class FanStatusMiot(DeviceStatus):
         return self.data["swing_mode"]
 
     @property
-    def angle(self) -> Optional[int]:
-        """Oscillation angle."""
-        if (
-            "swing_mode_angle" in self.data
-            and self.data["swing_mode_angle"] is not None
-        ):
-            return self.data["swing_mode_angle"]
-        return None
+    def angle(self) -> int:
+        return self.data["swing_mode_angle"]
 
     @property
     def delay_off_countdown(self) -> int:
