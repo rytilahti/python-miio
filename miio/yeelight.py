@@ -70,7 +70,10 @@ class YeelightStatus(DeviceStatus):
     @property
     def developer_mode(self) -> bool:
         """Return whether the developer mode is active."""
-        return bool(int(self.data["lan_ctrl"]))
+        lan_ctrl = self.data["lan_ctrl"]
+        if lan_ctrl:
+            return bool(int(lan_ctrl))
+        return None
 
     @property
     def save_state_on_change(self) -> bool:
