@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -134,13 +134,18 @@ class FanStatusMiot(DeviceStatus):
         return self.data["swing_mode"]
 
     @property
-    def angle(self) -> int:
+    def angle(self) -> Optional[int]:
         """Oscillation angle."""
-        return self.data["swing_mode_angle"]
+        if (
+            "swing_mode_angle" in self.data
+            and self.data["swing_mode_angle"] is not None
+        ):
+            return self.data["swing_mode_angle"]
+        return None
 
     @property
     def delay_off_countdown(self) -> int:
-        """Countdown until turning off in seconds."""
+        """Countdown until turning off in minutes."""
         return self.data["power_off_time"]
 
     @property
@@ -192,7 +197,7 @@ class FanStatusC1(DeviceStatus):
 
     @property
     def delay_off_countdown(self) -> int:
-        """Countdown until turning off in seconds."""
+        """Countdown until turning off in minutes."""
         return self.data["power_off_time"]
 
     @property
@@ -353,7 +358,7 @@ class FanMiot(MiotDevice):
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
 
-        if minutes < 0:
+        if minutes < 0 or minutes > 480:
             raise FanException("Invalid value for a delayed turn off: %s" % minutes)
 
         return self.set_property("power_off_time", minutes)
@@ -493,7 +498,7 @@ class FanC1(MiotDevice):
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
 
-        if minutes < 0:
+        if minutes < 0 or minutes > 480:
             raise FanException("Invalid value for a delayed turn off: %s" % minutes)
 
-        return self.set_property("power_off_time", minutes * 60)
+        return self.set_property("power_off_time", minutes)
