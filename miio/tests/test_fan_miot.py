@@ -2,9 +2,9 @@ from unittest import TestCase
 
 import pytest
 
-from miio import FanC1, FanMiot
+from miio import Fan1C, FanMiot
 from miio.fan_miot import (
-    MODEL_FAN_C1,
+    MODEL_FAN_1C,
     MODEL_FAN_P9,
     MODEL_FAN_P10,
     MODEL_FAN_P11,
@@ -233,9 +233,9 @@ class TestFanMiotP11(TestFanMiotP10, TestCase):
     pass
 
 
-class DummyFanC1(DummyMiotDevice, FanC1):
+class DummyFan1C(DummyMiotDevice, Fan1C):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_FAN_C1
+        self.model = MODEL_FAN_1C
         self.state = {
             "power": True,
             "mode": 0,
@@ -250,12 +250,12 @@ class DummyFanC1(DummyMiotDevice, FanC1):
 
 
 @pytest.fixture(scope="class")
-def fanc1(request):
-    request.cls.device = DummyFanC1()
+def fan1c(request):
+    request.cls.device = DummyFan1C()
 
 
-@pytest.mark.usefixtures("fanc1")
-class TestFanC1(TestCase):
+@pytest.mark.usefixtures("fan1c")
+class TestFan1C(TestCase):
     def is_on(self):
         return self.device.status().is_on
 

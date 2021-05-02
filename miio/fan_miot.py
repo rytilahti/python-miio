@@ -10,10 +10,10 @@ from .miot_device import DeviceStatus, MiotDevice
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
 MODEL_FAN_P11 = "dmaker.fan.p11"
-MODEL_FAN_C1 = "dmaker.fan.1c"
+MODEL_FAN_1C = "dmaker.fan.1c"
 
 MIOT_MAPPING = {
-    MODEL_FAN_C1: {
+    MODEL_FAN_1C: {
         # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-1c:1
         "power": {"siid": 2, "piid": 1},
         "fan_level": {"siid": 2, "piid": 2},
@@ -164,11 +164,29 @@ class FanStatusMiot(DeviceStatus):
         return self.data["child_lock"]
 
 
-class FanStatusC1(DeviceStatus):
-    """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker C1."""
+class FanStatus1C(DeviceStatus):
+    """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker 1C."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
+        """
+        Response of a Fan1C (dmaker.fan.1c):
+
+        {
+          'id': 1,
+          'result': [
+            {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
+            {'did': 'fan_level', 'siid': 2, 'piid': 2, 'code': 0, 'value': 2},
+            {'did': 'child_lock', 'siid': 3, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'swing_mode', 'siid': 2, 'piid': 3, 'code': 0, 'value': False},
+            {'did': 'power_off_time', 'siid': 2, 'piid': 10, 'code': 0, 'value': 0},
+            {'did': 'buzzer', 'siid': 2, 'piid': 11, 'code': 0, 'value': False},
+            {'did': 'light', 'siid': 2, 'piid': 12, 'code': 0, 'value': True},
+            {'did': 'mode', 'siid': 2, 'piid': 7, 'code': 0, 'value': 0},
+          ],
+          'exe_time': 280
+        }
+        """
 
     @property
     def power(self) -> str:
@@ -383,8 +401,8 @@ class FanP11(FanMiot):
     mapping = MIOT_MAPPING[MODEL_FAN_P11]
 
 
-class FanC1(MiotDevice):
-    mapping = MIOT_MAPPING[MODEL_FAN_C1]
+class Fan1C(MiotDevice):
+    mapping = MIOT_MAPPING[MODEL_FAN_1C]
 
     def __init__(
         self,
@@ -393,7 +411,7 @@ class FanC1(MiotDevice):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        model: str = MODEL_FAN_C1,
+        model: str = MODEL_FAN_1C,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
         self.model = model
@@ -411,9 +429,9 @@ class FanC1(MiotDevice):
             "Power-off time: {result.delay_off_countdown}\n",
         )
     )
-    def status(self) -> FanStatusC1:
+    def status(self) -> FanStatus1C:
         """Retrieve properties."""
-        return FanStatusC1(
+        return FanStatus1C(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping()
