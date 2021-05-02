@@ -21,7 +21,7 @@ class DummyFanMiot(DummyMiotDevice, FanMiot):
         self.state = {
             "power": True,
             "mode": 0,
-            "fan_speed": 33,
+            "fan_speed": 35,
             "swing_mode": False,
             "swing_mode_angle": 30,
             "power_off_time": 0,
