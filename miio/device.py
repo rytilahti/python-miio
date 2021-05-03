@@ -304,20 +304,28 @@ class Device(metaclass=DeviceGroupMeta):
 
         click.echo(f"Testing properties {properties} for {model}")
         valid_properties = {}
+        max_property_len = max([len(p) for p in properties])
         for property in properties:
             try:
-                click.echo(f"Testing {property}.. ", nl=False)
-                resp = self.get_properties([property])
-                # Handle responses with one-element lists
-                if isinstance(resp, list) and len(resp) == 1:
-                    resp = resp.pop()
-                value = valid_properties[property] = resp
+                click.echo(f"Testing {property:{max_property_len+2}} ", nl=False)
+                value = self.get_properties([property])
+                # Handle list responses
+                if isinstance(value, list):
+                    # unwrap single-element lists
+                    if len(value) == 1:
+                        value = value.pop()
+                    # report on unexpected multi-element lists
+                    elif len(value) > 1:
+                        _LOGGER.error("Got an array as response: %s", value)
+                    # otherwise we received an empty list, which we consider here as None
+                    else:
+                        value = None
+
                 if value is None:
                     fail("None")
-                elif not value:
-                    fail("Empty response")
                 else:
-                    ok(f"{value} {type(value)}")
+                    valid_properties[property] = value
+                    ok(f"{repr(value)} {type(value)}")
             except Exception as ex:
                 _LOGGER.warning("Unable to request %s: %s", property, ex)
 
@@ -330,21 +338,26 @@ class Device(metaclass=DeviceGroupMeta):
         while len(props_to_test) > 1:
             try:
                 click.echo(
-                    f"Testing {len(props_to_test)} properties at once.. ", nl=False
+                    f"Testing {len(props_to_test)} properties at once ({' '.join(props_to_test)}): ",
+                    nl=False,
                 )
                 resp = self.get_properties(props_to_test)
+
                 if len(resp) == len(props_to_test):
                     max_properties = len(props_to_test)
                     ok(f"OK for {max_properties} properties")
                     break
                 else:
-                    fail("Got different amount of properties than requested")
+                    removed_property = props_to_test.pop()
+                    fail(
+                        f"Got different amount of properties ({len(props_to_test)}) than requested ({len(resp)}), removing {removed_property}"
+                    )
 
-                props_to_test.pop()
             except Exception as ex:
-                _LOGGER.warning("Unable to request properties: %s", ex)
+                removed_property = props_to_test.pop()
+                msg = f"Unable to request properties: {ex} - removing {removed_property} for next try"
+                _LOGGER.warning(msg)
                 fail(ex)
-                props_to_test.pop()
 
         non_empty_properties = {
             k: v for k, v in valid_properties.items() if v is not None
