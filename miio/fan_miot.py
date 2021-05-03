@@ -130,12 +130,12 @@ class FanStatusP8(DeviceStatus):
         return self.data["power"]
 
     @property
-    def mode(self) -> OperationMode:
+    def mode(self) -> OperationModeP8:
         """Operation mode."""
-        return OperationMode[OperationModeP8(self.data["mode"]).name]
+        return OperationModeP8(self.data["mode"])
 
     @property
-    def speed_level(self) -> int:
+    def speed(self) -> int:
         """Returns the speed level."""
         return self.data["fan_level"]
 
@@ -357,10 +357,10 @@ class FanP8(MiotDevice):
         return self.set_property("power", False)
 
     @command(
-        click.argument("mode", type=EnumType(OperationMode)),
+        click.argument("mode", type=EnumType(OperationModeP8)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
-    def set_mode(self, mode: OperationMode):
+    def set_mode(self, mode: OperationModeP8):
         """Set mode."""
         return self.set_property("mode", OperationModeP8[mode.name].value)
 
@@ -490,9 +490,9 @@ class FanP9(Fan1C):
     ) -> None:
         if model not in MIOT_MAPPING:
             raise FanException("Invalid FanMiot model: %s" % model)
-        else:
-            self.model = model
-        super().__init__(MIOT_MAPPING[model], ip, token, start_id, debug, lazy_discover)
+
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+        self.model = model
 
     @command(
         default_output=format_output(
