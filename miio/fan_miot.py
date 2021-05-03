@@ -6,6 +6,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .fan_common import FanException, MoveDirection, OperationMode
 from .miot_device import DeviceStatus, MiotDevice
+from .utils import deprecated
 
 MODEL_FAN_P8 = "dmaker.fan.p8"
 MODEL_FAN_P9 = "dmaker.fan.p9"
@@ -565,5 +566,6 @@ class FanP11(FanP9):
     mapping = MIOT_MAPPING[MODEL_FAN_P11]
 
 
+@deprecated("This device class is deprecated. Please use the FanP10 in future.")
 class FanMiot(FanP9):
     mapping = MIOT_MAPPING[MODEL_FAN_P10]
