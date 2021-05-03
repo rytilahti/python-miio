@@ -24,6 +24,7 @@ MIOT_MAPPING = {
         "buzzer": {"siid": 2, "piid": 11},
         "light": {"siid": 2, "piid": 12},
         "mode": {"siid": 2, "piid": 7},
+    },
     MODEL_FAN_P8: {
         # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p8:1
         "power": {"siid": 2, "piid": 1},
@@ -307,6 +308,8 @@ class FanStatus1C(DeviceStatus):
 
 
 class FanP8(MiotDevice):
+    mapping = MIOT_MAPPING[MODEL_FAN_P8]
+
     def __init__(
         self,
         ip: str = None,
@@ -361,15 +364,15 @@ class FanP8(MiotDevice):
         return self.set_property("mode", OperationModeP8[mode.name].value)
 
     @command(
-        click.argument("speed_level", type=int),
-        default_output=format_output("Setting speed to {speed_level}"),
+        click.argument("speed", type=int),
+        default_output=format_output("Setting speed to {speed}"),
     )
-    def set_speed_level(self, speed_level: int):
-        """Set speed level."""
+    def set_speed(self, speed: int):
+        """Set speed."""
         if speed not in (1, 2, 3):
             raise FanException("Invalid speed level: %s" % speed)
 
-        return self.set_property("fan_level", speed_level)
+        return self.set_property("fan_level", speed)
 
     @command(
         click.argument("oscillate", type=bool),
@@ -406,8 +409,8 @@ class FanP8(MiotDevice):
         return self.set_property("power_off_time", minutes)
 
 
-class FanMiot(FanP8):
-    mapping = MIOT_MAPPING[MODEL_FAN_P10]
+class Fan1C(FanP8):
+    mapping = MIOT_MAPPING[MODEL_FAN_1C]
 
     def __init__(
         self,
@@ -416,12 +419,78 @@ class FanMiot(FanP8):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        model: str = MODEL_FAN_P10,
+        model: str = MODEL_FAN_1C,
     ) -> None:
-        if model in MIOT_MAPPING:
-            self.model = model
-        else:
+        super().__init__(ip, token, start_id, debug, lazy_discover)
+        self.model = model
+
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Operation mode: {result.mode}\n"
+            "Speed level: {result.speed}\n"
+            "Oscillate: {result.oscillate}\n"
+            "LED: {result.led}\n"
+            "Buzzer: {result.buzzer}\n"
+            "Child lock: {result.child_lock}\n"
+            "Power-off time: {result.delay_off_countdown}\n",
+        )
+    )
+    def status(self) -> FanStatus1C:
+        """Retrieve properties."""
+        return FanStatus1C(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping()
+            }
+        )
+
+    @command(
+        click.argument("mode", type=EnumType(OperationMode)),
+        default_output=format_output("Setting mode to '{mode.value}'"),
+    )
+    def set_mode(self, mode: OperationMode):
+        """Set mode."""
+        return self.set_property("mode", OperationModeMiot[mode.name].value)
+
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
+    )
+    def set_led(self, led: bool):
+        """Turn led on/off."""
+        return self.set_property("light", led)
+
+    @command(
+        click.argument("buzzer", type=bool),
+        default_output=format_output(
+            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+        ),
+    )
+    def set_buzzer(self, buzzer: bool):
+        """Set buzzer on/off."""
+        return self.set_property("buzzer", buzzer)
+
+
+class FanP9(Fan1C):
+    mapping = MIOT_MAPPING[MODEL_FAN_P9]
+
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MODEL_FAN_P9,
+    ) -> None:
+        if model not in MIOT_MAPPING:
             raise FanException("Invalid FanMiot model: %s" % model)
+        else:
+            self.model = model
         super().__init__(MIOT_MAPPING[model], ip, token, start_id, debug, lazy_discover)
 
     @command(
@@ -481,26 +550,6 @@ class FanMiot(FanP8):
         return self.set_property("swing_mode_angle", angle)
 
     @command(
-        click.argument("led", type=bool),
-        default_output=format_output(
-            lambda led: "Turning on LED" if led else "Turning off LED"
-        ),
-    )
-    def set_led(self, led: bool):
-        """Turn led on/off."""
-        return self.set_property("light", led)
-
-    @command(
-        click.argument("buzzer", type=bool),
-        default_output=format_output(
-            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
-        ),
-    )
-    def set_buzzer(self, buzzer: bool):
-        """Set buzzer on/off."""
-        return self.set_property("buzzer", buzzer)
-
-    @command(
         click.argument("direction", type=EnumType(MoveDirection)),
         default_output=format_output("Rotating the fan to the {direction}"),
     )
@@ -508,134 +557,13 @@ class FanMiot(FanP8):
         return self.set_property("set_move", [direction.value])
 
 
-class FanP9(FanMiot):
-    mapping = MIOT_MAPPING[MODEL_FAN_P9]
-
-
-class FanP10(FanMiot):
+class FanP10(FanP9):
     mapping = MIOT_MAPPING[MODEL_FAN_P10]
 
 
-class FanP11(FanMiot):
+class FanP11(FanP9):
     mapping = MIOT_MAPPING[MODEL_FAN_P11]
 
 
-class Fan1C(MiotDevice):
-    mapping = MIOT_MAPPING[MODEL_FAN_1C]
-
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_FAN_1C,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-        self.model = model
-
-    @command(
-        default_output=format_output(
-            "",
-            "Power: {result.power}\n"
-            "Operation mode: {result.mode}\n"
-            "Speed: {result.speed}\n"
-            "Oscillate: {result.oscillate}\n"
-            "LED: {result.led}\n"
-            "Buzzer: {result.buzzer}\n"
-            "Child lock: {result.child_lock}\n"
-            "Power-off time: {result.delay_off_countdown}\n",
-        )
-    )
-    def status(self) -> FanStatus1C:
-        """Retrieve properties."""
-        return FanStatus1C(
-            {
-                prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping()
-            }
-        )
-
-    @command(default_output=format_output("Powering on"))
-    def on(self):
-        """Power on."""
-        return self.set_property("power", True)
-
-    @command(default_output=format_output("Powering off"))
-    def off(self):
-        """Power off."""
-        return self.set_property("power", False)
-
-    @command(
-        click.argument("mode", type=EnumType(OperationMode)),
-        default_output=format_output("Setting mode to '{mode.value}'"),
-    )
-    def set_mode(self, mode: OperationMode):
-        """Set mode."""
-        return self.set_property("mode", OperationModeMiot[mode.name].value)
-
-    @command(
-        click.argument("speed", type=int),
-        default_output=format_output("Setting speed to {speed}"),
-    )
-    def set_speed(self, speed: int):
-        """Set speed."""
-        if speed not in (1, 2, 3):
-            raise FanException("Invalid speed level: %s" % speed)
-
-        return self.set_property("fan_level", speed)
-
-    @command(
-        click.argument("oscillate", type=bool),
-        default_output=format_output(
-            lambda oscillate: "Turning on oscillate"
-            if oscillate
-            else "Turning off oscillate"
-        ),
-    )
-    def set_oscillate(self, oscillate: bool):
-        """Set oscillate on/off."""
-        return self.set_property("swing_mode", oscillate)
-
-    @command(
-        click.argument("led", type=bool),
-        default_output=format_output(
-            lambda led: "Turning on LED" if led else "Turning off LED"
-        ),
-    )
-    def set_led(self, led: bool):
-        """Turn led on/off."""
-        return self.set_property("light", led)
-
-    @command(
-        click.argument("buzzer", type=bool),
-        default_output=format_output(
-            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
-        ),
-    )
-    def set_buzzer(self, buzzer: bool):
-        """Set buzzer on/off."""
-        return self.set_property("buzzer", buzzer)
-
-    @command(
-        click.argument("lock", type=bool),
-        default_output=format_output(
-            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
-        ),
-    )
-    def set_child_lock(self, lock: bool):
-        """Set child lock on/off."""
-        return self.set_property("child_lock", lock)
-
-    @command(
-        click.argument("minutes", type=int),
-        default_output=format_output("Setting delayed turn off to {minutes} minutes"),
-    )
-    def delay_off(self, minutes: int):
-        """Set delay off minutes."""
-
-        if minutes < 0 or minutes > 480:
-            raise FanException("Invalid value for a delayed turn off: %s" % minutes)
-
-        return self.set_property("power_off_time", minutes)
+class FanMiot(FanP9):
+    mapping = MIOT_MAPPING[MODEL_FAN_P10]
