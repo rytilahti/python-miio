@@ -1,5 +1,49 @@
 # Change Log
 
+## [0.5.6](https://github.com/rytilahti/python-miio/tree/0.5.6) (2021-05-05)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.5.2...0.5.6)
+
+**Implemented enhancements:**
+
+- RFC: Add a script to simplify finding supported properties for miio [\#919](https://github.com/rytilahti/python-miio/issues/919)
+- Improve test\_properties output [\#1024](https://github.com/rytilahti/python-miio/pull/1024) ([rytilahti](https://github.com/rytilahti))
+- Relax zeroconf version requirement [\#1023](https://github.com/rytilahti/python-miio/pull/1023) ([rytilahti](https://github.com/rytilahti))
+- Add test\_properties command to device class [\#1014](https://github.com/rytilahti/python-miio/pull/1014) ([rytilahti](https://github.com/rytilahti))
+- Add discover command to miiocli [\#1013](https://github.com/rytilahti/python-miio/pull/1013) ([rytilahti](https://github.com/rytilahti))
+- Fix supported oscillation angles of the dmaker.fan.p9 [\#1011](https://github.com/rytilahti/python-miio/pull/1011) ([syssi](https://github.com/syssi))
+- Add additional operation mode of the deerma.humidifier.jsq1 [\#1010](https://github.com/rytilahti/python-miio/pull/1010) ([syssi](https://github.com/syssi))
+- Roborock S7: Parse history details returned as dict [\#1006](https://github.com/rytilahti/python-miio/pull/1006) ([fettlaus](https://github.com/fettlaus))
+
+**Fixed bugs:**
+
+- zeroconf 0.29.0 which is incompatible [\#1022](https://github.com/rytilahti/python-miio/issues/1022)
+- Remove superfluous decryption failure for handshake responses [\#1008](https://github.com/rytilahti/python-miio/issues/1008)
+- Skip pausing on Roborock S50 [\#1005](https://github.com/rytilahti/python-miio/issues/1005)
+- Roborock S7 after Firmware Update 4.1.2-0928 - KeyError [\#1004](https://github.com/rytilahti/python-miio/issues/1004)
+- No air quality value when aqi is 1 [\#958](https://github.com/rytilahti/python-miio/issues/958)
+- Fix exception on devices with removed lan\_ctrl [\#1028](https://github.com/rytilahti/python-miio/pull/1028) ([Kirmas](https://github.com/Kirmas))
+- Fix start bug and improve error handling in walkingpad integration [\#1017](https://github.com/rytilahti/python-miio/pull/1017) ([dewgenenny](https://github.com/dewgenenny))
+- gateway: fix zigbee lights [\#1016](https://github.com/rytilahti/python-miio/pull/1016) ([starkillerOG](https://github.com/starkillerOG))
+- Silence unable to decrypt warning for handshake responses [\#1015](https://github.com/rytilahti/python-miio/pull/1015) ([rytilahti](https://github.com/rytilahti))
+- Fix set\_mode\_and\_speed mode for airdog airpurifier [\#993](https://github.com/rytilahti/python-miio/pull/993) ([alexeypetrenko](https://github.com/alexeypetrenko))
+
+**Closed issues:**
+
+- Add Dafang camera \(isa.camera.df3\) support [\#996](https://github.com/rytilahti/python-miio/issues/996)
+- Roborock S7 [\#989](https://github.com/rytilahti/python-miio/issues/989)
+- WalkingPad A1 Pro [\#797](https://github.com/rytilahti/python-miio/issues/797)
+
+**Merged pull requests:**
+
+- Add basic dmaker.fan.1c support [\#1012](https://github.com/rytilahti/python-miio/pull/1012) ([syssi](https://github.com/syssi))
+- Always return aqi value \[Revert PR\#930\] [\#1007](https://github.com/rytilahti/python-miio/pull/1007) ([bieniu](https://github.com/bieniu))
+- Added S6 to skip pause on docking [\#1002](https://github.com/rytilahti/python-miio/pull/1002) ([Sian-Lee-SA](https://github.com/Sian-Lee-SA))
+- Added number of dust collections to CleaningSummary if available [\#992](https://github.com/rytilahti/python-miio/pull/992) ([fettlaus](https://github.com/fettlaus))
+- Reformat history data if returned as a dict/Roborock S7 Support \(\#989\) [\#990](https://github.com/rytilahti/python-miio/pull/990) ([fettlaus](https://github.com/fettlaus))
+- Add support for Walkingpad A1 \(ksmb.walkingpad.v3\) [\#975](https://github.com/rytilahti/python-miio/pull/975) ([dewgenenny](https://github.com/dewgenenny))
+
+
 ## [0.5.5.2](https://github.com/rytilahti/python-miio/tree/0.5.5.2) (2021-03-24)
 
 This release is mainly to re-add mapping parameter to MiotDevice constructor for backwards-compatibility reasons,
