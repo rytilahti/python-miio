@@ -1,7 +1,7 @@
 python-miio
 ===========
 
-|Chat| |PyPI version| |Build Status| |Coverage Status| |Docs| |Black| |Hound|
+|Chat| |PyPI version| |PyPI downloads| |Build Status| |Coverage Status| |Docs| |Black|
 
 This library (and its accompanying cli tool) can be used to interface with devices using Xiaomi's `miIO <https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md>`__ and MIoT protocols.
 
@@ -139,38 +139,53 @@ Supported devices
 *Feel free to create a pull request to add support for new devices as
 well as additional features for supported devices.*
 
+Projects using this library
+---------------------------
 
-Home Assistant support
-----------------------
+This library is used by various projects to support MiIO/MiOT devices.
+If you are using this library for your project, feel free to open a PR to get it listed here!
 
--  `Xiaomi Mi Robot Vacuum <https://home-assistant.io/components/vacuum.xiaomi_miio/>`__
--  `Xiaomi Philips Light <https://home-assistant.io/components/light.xiaomi_miio/>`__
--  `Xiaomi Mi Air Purifier and Air Humidifier <https://home-assistant.io/components/fan.xiaomi_miio/>`__
--  `Xiaomi Smart WiFi Socket and Smart Power Strip <https://home-assistant.io/components/switch.xiaomi_miio/>`__
--  `Xiaomi Universal IR Remote Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__
--  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__
--  `Xiaomi Aqara Gateway Alarm <https://home-assistant.io/components/alarm_control_panel.xiaomi_miio/>`__
+Home Assistant (official)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Home Assistant uses this library to support several platforms out-of-the-box.
+This list is incomplete as the platforms (in parentheses) may also support other devices listed above.
+
+-  `Xiaomi Mi Robot Vacuum <https://home-assistant.io/components/vacuum.xiaomi_miio/>`__ (vacuum)
+-  `Xiaomi Philips Light <https://home-assistant.io/components/light.xiaomi_miio/>`__ (light)
+-  `Xiaomi Mi Air Purifier and Air Humidifier <https://home-assistant.io/components/fan.xiaomi_miio/>`__ (fan)
+-  `Xiaomi Smart WiFi Socket and Smart Power Strip <https://home-assistant.io/components/switch.xiaomi_miio/>`__ (switch)
+-  `Xiaomi Universal IR Remote Controller <https://home-assistant.io/components/remote.xiaomi_miio/>`__ (remote)
+-  `Xiaomi Mi Air Quality Monitor (PM2.5) <https://home-assistant.io/components/sensor.xiaomi_miio/>`__ (sensor)
+-  `Xiaomi Aqara Gateway Alarm <https://home-assistant.io/components/alarm_control_panel.xiaomi_miio/>`__ (alarm_control_panel)
+-  `Xiaomi Mi WiFi Repeater 2 <https://www.home-assistant.io/components/device_tracker.xiaomi_miio/>`__ (device_tracker)
+
+Home Assistant (custom)
+^^^^^^^^^^^^^^^^^^^^^^^
+
 -  `Xiaomi Mi Home Air Conditioner Companion <https://github.com/syssi/xiaomi_airconditioningcompanion>`__
--  `Xiaomi Mi WiFi Repeater 2 <https://www.home-assistant.io/components/device_tracker.xiaomi_miio/>`__
 -  `Xiaomi Mi Smart Pedestal Fan <https://github.com/syssi/xiaomi_fan>`__
 -  `Xiaomi Mi Smart Rice Cooker <https://github.com/syssi/xiaomi_cooker>`__
 -  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
 -  `Xiaomi MIoT Devices <https://github.com/ha0y/xiaomi_miot_raw>`__
 
+Other projects
+^^^^^^^^^^^^^^
 
-.. |Chat| image:: https://matrix.to/img/matrix-badge.svg
+-  `Your project here? Feel free to open a PR! <https://github.com/rytilahti/python-miio/pulls>`__
+
+.. |Chat| image:: https://img.shields.io/matrix/python-miio-chat:matrix.org
    :target: https://matrix.to/#/#python-miio-chat:matrix.org
 .. |PyPI version| image:: https://badge.fury.io/py/python-miio.svg
    :target: https://badge.fury.io/py/python-miio
-.. |Build Status| image:: https://travis-ci.org/rytilahti/python-miio.svg?branch=master
-   :target: https://travis-ci.org/rytilahti/python-miio
+.. |PyPI downloads| image:: https://img.shields.io/pypi/dw/python-miio
+   :target: https://pypi.org/project/python-miio/
+.. |Build Status| image:: https://img.shields.io/azure-devops/build/python-miio/608e6099-f1ed-403c-9158-8fdcb2a0e477/1
+   :target: https://dev.azure.com/python-miio/python-miio/
 .. |Coverage Status| image:: https://coveralls.io/repos/github/rytilahti/python-miio/badge.svg?branch=master
    :target: https://coveralls.io/github/rytilahti/python-miio?branch=master
 .. |Docs| image:: https://readthedocs.org/projects/python-miio/badge/?version=latest
    :alt: Documentation status
    :target: https://python-miio.readthedocs.io/en/latest/?badge=latest
-.. |Hound| image:: https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg
-   :alt: Hound
-   :target: https://houndci.com
 .. |Black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
