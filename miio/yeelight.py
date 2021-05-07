@@ -100,7 +100,7 @@ class YeelightStatus(DeviceStatus):
     @property
     def delay_off(self) -> int:
         """Return delay in minute before bulb is off."""
-        return self.data["delayoff"]
+        return int(self.data["delayoff"])
 
     @property
     def music_mode(self) -> Optional[bool]:
