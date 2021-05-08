@@ -127,6 +127,46 @@ class YeelightStatus(DeviceStatus):
         self.data = data
 
     @property
+    def is_on(self) -> bool:
+        """Return whether the light is on or off."""
+        return self.lights[0].is_on
+
+    @property
+    def brightness(self) -> int:
+        """Return current brightness."""
+        return self.lights[0].brightness
+
+    @property
+    def rgb(self) -> Optional[Tuple[int, int, int]]:
+        """Return color in RGB if RGB mode is active."""
+        return self.lights[0].rgb
+
+    @property
+    def color_mode(self) -> YeelightMode:
+        """Return current color mode."""
+        return self.lights[0].color_mode
+
+    @property
+    def hsv(self) -> Optional[Tuple[int, int, int]]:
+        """Return current color in HSV if HSV mode is active."""
+        return self.lights[0].hsv
+
+    @property
+    def color_temp(self) -> Optional[int]:
+        """Return current color temperature, if applicable."""
+        return self.lights[0].color_temp
+
+    @property
+    def color_flowing(self) -> bool:
+        """Return whether the color flowing is active."""
+        return self.lights[0].color_flowing
+
+    @property
+    def color_flow_params(self) -> Optional[str]:
+        """Return color flowing params."""
+        return self.lights[0].color_flow_params
+
+    @property
     def developer_mode(self) -> Optional[bool]:
         """Return whether the developer mode is active."""
         lan_ctrl = self.data["lan_ctrl"]
