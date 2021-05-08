@@ -22,8 +22,14 @@ class YeelightMode(IntEnum):
 
 class YeelightStatus(DeviceStatus):
     def __init__(self, data):
-        # ['name', 'lan_ctrl', 'save_state', 'delayoff', 'music_on', 'power', 'bright', 'color_mode', 'rgb',      'hue', 'sat', 'ct',   'flowing', 'flow_params', 'active_mode', 'nl_br', 'bg_power', 'bg_bright', 'bg_lmode', 'bg_rgb',   'bg_hue', 'bg_sat', 'bg_ct', 'bg_flowing', 'bg_flow_params']
-        # ['name', '1',        '1',          '60',       '1',        'on',    '100',    '2',          '16711680', '359', '100', '3584', '1',       '[0, 24, 0]',  '1',           '100',   'on',       '100',       '2',        '16711680', '359',    '100',    '3584',  '1',          '[0, 24, 0]']
+        # yeelink.light.ceiling4, yeelink.light.ceiling20
+        # {'name': '', 'lan_ctrl': '1', 'save_state': '1', 'delayoff': '0', 'music_on': '',  'power': 'off', 'bright': '1',   'color_mode': '2', 'rgb': '',        'hue': '',    'sat': '',   'ct': '4115', 'flowing': '0', 'flow_params': '0,0,2000,3,0,33,2000,3,0,100',                                                                                                          'active_mode': '1', 'nl_br': '1', 'bg_power': 'off', 'bg_bright': '100', 'bg_lmode': '1', 'bg_rgb': '15531811', 'bg_hue': '65',  'bg_sat': '86', 'bg_ct': '4000', 'bg_flowing': '0', 'bg_flow_params': '0,0,3000,4,16711680,100,3000,4,65280,100,3000,4,255,100'}
+        # yeelink.light.ceiling1
+        # {'name': '', 'lan_ctrl': '1', 'save_state': '1', 'delayoff': '0', 'music_on': '',  'power': 'off', 'bright': '100', 'color_mode': '2', 'rgb': '',        'hue': '',    'sat': '',   'ct': '5200', 'flowing': '0', 'flow_params': '',                                                                                                                                      'active_mode': '0', 'nl_br': '0', 'bg_power': '',    'bg_bright': '',    'bg_lmode': '',  'bg_rgb': '', 'bg_hue': '', 'bg_sat': '', 'bg_ct': '', 'bg_flowing': '', 'bg_flow_params': ''}
+        # yeelink.light.ceiling22 - like yeelink.light.ceiling1 but without "lan_ctrl"
+        # {'name': '', 'lan_ctrl': '',  'save_state': '1', 'delayoff': '0', 'music_on': '',  'power': 'off', 'bright': '84',  'color_mode': '2', 'rgb': '',        'hue': '',    'sat': '',   'ct': '4000', 'flowing': '0', 'flow_params': '0,0,800,2,2700,50,800,2,2700,30,1200,2,2700,80,800,2,2700,60,1200,2,2700,90,2400,2,2700,50,1200,2,2700,80,800,2,2700,60,400,2,2700,70', 'active_mode': '0', 'nl_br': '0', 'bg_power': '',    'bg_bright': '',    'bg_lmode': '',  'bg_rgb': '', 'bg_hue': '', 'bg_sat': '', 'bg_ct': '', 'bg_flowing': '', 'bg_flow_params': ''}
+        # yeelink.light.color3, yeelink.light.color4, yeelink.light.color5, yeelink.light.strip2
+        # {'name': '', 'lan_ctrl': '1', 'save_state': '1', 'delayoff': '0', 'music_on': '0', 'power': 'off', 'bright': '100', 'color_mode': '1', 'rgb': '2353663', 'hue': '186', 'sat': '86', 'ct': '6500', 'flowing': '0', 'flow_params': '0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100',                                                                               'active_mode': '',  'nl_br': '',  'bg_power': '',    'bg_bright': '',    'bg_lmode': '',  'bg_rgb': '', 'bg_hue': '', 'bg_sat': '', 'bg_ct': '', 'bg_flowing': '', 'bg_flow_params': ''}
         self.data = data
 
     @property
