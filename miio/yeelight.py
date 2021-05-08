@@ -214,19 +214,34 @@ class YeelightStatus(DeviceStatus):
         return sub_lights
 
     @property
-    def cli_format_lights(self) -> str:
+    def cli_format(self) -> str:
         """Return human readable sub lights string."""
-        s = ""
+        s = f"Name: {self.name}\n"
+        s += f"Update default on change: {self.save_state_on_change}\n"
+        s += f"Delay in minute before off: {self.delay_off}\n"
+        if self.music_mode is not None:
+            s += f"Music mode: {self.music_mode}\n"
+        if self.developer_mode is not None:
+            s += f"Developer mode: {self.developer_mode}\n"
         for light in self.lights:
             s += f"{light.type.name} light\n"
             s += f"   Power: {light.is_on}\n"
             s += f"   Brightness: {light.brightness}\n"
             s += f"   Color mode: {light.color_mode}\n"
-            s += f"   RGB: {light.rgb}\n"
-            s += f"   HSV: {light.hsv}\n"
-            s += f"   Temperature: {light.color_temp}\n"
+            if light.color_mode == YeelightMode.RGB:
+                s += f"   RGB: {light.rgb}\n"
+            elif light.color_mode == YeelightMode.HSV:
+                s += f"   HSV: {light.hsv}\n"
+            else:
+                s += f"   Temperature: {light.color_temp}\n"
             s += f"   Color flowing mode: {light.color_flowing}\n"
-            s += f"   Color flowing parameters: {light.color_flow_params}\n"
+            if light.color_flowing:
+                s += f"   Color flowing parameters: {light.color_flow_params}\n"
+        if self.moonlight_mode is not None:
+            s += "Moonlight\n"
+            s += f"   Is in mode: {self.moonlight_mode}\n"
+            s += f"   Moonlight mode brightness: {self.moonlight_mode_brightness}\n"
+        s += "\n"
         return s
 
 
@@ -249,21 +264,7 @@ class Yeelight(Device):
         )
         super().__init__(*args, **kwargs)
 
-    @command(
-        default_output=format_output(
-            "",
-            "Name: {result.name}\n"
-            "Developer mode: {result.developer_mode}\n"
-            "Update default on change: {result.save_state_on_change}\n"
-            "Delay in minute before off: {result.delay_off}\n"
-            "Music mode: {result.music_mode}\n"
-            "{result.cli_format_lights}"
-            "Moonlight\n"
-            "   Is in mode: {result.moonlight_mode}\n"
-            "   Moonlight mode brightness: {result.moonlight_mode_brightness}\n"
-            "\n",
-        )
-    )
+    @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
         properties = [
