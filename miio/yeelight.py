@@ -36,23 +36,10 @@ class YeelightMode(IntEnum):
     HSV = 3
 
 
-class YeelightSubLight:
+class YeelightSubLight(DeviceStatus):
     def __init__(self, data, type):
         self.data = data
         self.type = type
-
-    def __repr__(self):
-        s = "\n"
-        s += f"   Sub Light - {self.type.name} \n"
-        s += f"      Power: {self.is_on}\n"
-        s += f"      Brightness: {self.brightness}\n"
-        s += f"      Color mode: {self.color_mode}\n"
-        s += f"      RGB: {self.rgb}\n"
-        s += f"      HSV: {self.hsv}\n"
-        s += f"      Temperature: {self.color_temp}\n"
-        s += f"      Color flowing mode: {self.color_flowing}\n"
-        s += f"      Color flowing parameters: {self.color_flow_params}\n"
-        return s
 
     def get_prop_name(self, prop) -> str:
         if prop == "color_mode":
@@ -226,6 +213,22 @@ class YeelightStatus(DeviceStatus):
             )
         return sub_lights
 
+    @property
+    def cli_format_lights(self) -> str:
+        """Return human readable sub lights string."""
+        s = ""
+        for light in self.lights:
+            s += f"{light.type.name} light\n"
+            s += f"   Power: {light.is_on}\n"
+            s += f"   Brightness: {light.brightness}\n"
+            s += f"   Color mode: {light.color_mode}\n"
+            s += f"   RGB: {light.rgb}\n"
+            s += f"   HSV: {light.hsv}\n"
+            s += f"   Temperature: {light.color_temp}\n"
+            s += f"   Color flowing mode: {light.color_flowing}\n"
+            s += f"   Color flowing parameters: {light.color_flow_params}\n"
+        return s
+
 
 class Yeelight(Device):
     """A rudimentary support for Yeelight bulbs.
@@ -254,7 +257,7 @@ class Yeelight(Device):
             "Update default on change: {result.save_state_on_change}\n"
             "Delay in minute before off: {result.delay_off}\n"
             "Music mode: {result.music_mode}\n"
-            "Lights: \n{result.lights}\n"
+            "{result.cli_format_lights}"
             "Moonlight\n"
             "   Is in mode: {result.moonlight_mode}\n"
             "   Moonlight mode brightness: {result.moonlight_mode_brightness}\n"
