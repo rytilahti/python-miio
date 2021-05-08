@@ -41,6 +41,19 @@ class YeelightSubLight:
         self.data = data
         self.type = type
 
+    def __repr__(self):
+        s = "\n"
+        s += f"   Sub Light - {self.type.name} \n"
+        s += f"      Power: {self.is_on}\n"
+        s += f"      Brightness: {self.brightness}\n"
+        s += f"      Color mode: {self.color_mode}\n"
+        s += f"      RGB: {self.rgb}\n"
+        s += f"      HSV: {self.hsv}\n"
+        s += f"      Temperature: {self.color_temp}\n"
+        s += f"      Color flowing mode: {self.color_flowing}\n"
+        s += f"      Color flowing parameters: {self.color_flow_params}\n"
+        return s
+
     def get_prop_name(self, prop) -> str:
         if prop == "color_mode":
             return SUBLIGHT_COLOR_MODE_PROP[self.type]
@@ -201,28 +214,10 @@ class Yeelight(Device):
             "Update default on change: {result.save_state_on_change}\n"
             "Delay in minute before off: {result.delay_off}\n"
             "Music mode: {result.music_mode}\n"
-            "Light\n"
-            "   Power: {result.lights[0].is_on}\n"
-            "   Brightness: {result.lights[0].brightness}\n"
-            "   Color mode: {result.lights[0].color_mode}\n"
-            "   RGB: {result.lights[0].rgb}\n"
-            "   HSV: {result.lights[0].hsv}\n"
-            "   Temperature: {result.lights[0].color_temp}\n"
-            "   Color flowing mode: {result.lights[0].color_flowing}\n"
-            "   Color flowing parameters: {result.lights[0].color_flow_params}\n"
+            "Lights: \n{result.lights}\n"
             "Moonlight\n"
             "   Is in mode: {result.moonlight_mode}\n"
             "   Moonlight mode brightness: {result.moonlight_mode_brightness}\n"
-            # Have no any idea how it must be
-            # "Background light\n"
-            # "   Power: {result.lights[1].is_on}\n"
-            # "   Brightness: {result.lights[1].brightness}\n"
-            # "   Color mode: {result.lights[1].color_mode}\n"
-            # "   RGB: {result.lights[1].rgb}\n"
-            # "   HSV: {result.lights[1].hsv}\n"
-            # "   Temperature: {result.lights[1].color_temp}\n"
-            # "   Color flowing mode: {result.lights[1].color_flowing}\n"
-            # "   Color flowing parameters: {result.lights[1].color_flow_params}\n"
             "\n",
         )
     )
