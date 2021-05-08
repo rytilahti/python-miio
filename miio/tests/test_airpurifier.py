@@ -17,6 +17,7 @@ from .dummies import DummyDevice
 
 class DummyAirPurifier(DummyDevice, AirPurifier):
     def __init__(self, *args, **kwargs):
+        self._model = "missing.model.airpurifier"
         self.state = {
             "power": "on",
             "aqi": 10,

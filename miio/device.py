@@ -2,7 +2,7 @@ import inspect
 import logging
 from enum import Enum
 from pprint import pformat as pf
-from typing import Any, Optional  # noqa: F401
+from typing import Any, List, Optional  # noqa: F401
 
 import click
 
@@ -54,6 +54,7 @@ class Device(metaclass=DeviceGroupMeta):
 
     retry_count = 3
     timeout = 5
+    _supported_models = []
 
     def __init__(
         self,
@@ -135,15 +136,24 @@ class Device(metaclass=DeviceGroupMeta):
         This includes information about connected wlan network, and hardware and
         software versions.
 
-        :param force bool: Skip the cache
+        :param skip_cache bool: Skip the cache
         """
         if self._info is not None and not skip_cache:
             return self._info
 
+        return self._fetch_info()
+
+    def _fetch_info(self):
         try:
             devinfo = DeviceInfo(self.send("miIO.info"))
             self._info = devinfo
             _LOGGER.info("Detected model %s", devinfo.model)
+            if devinfo.model not in self.supported_models:
+                _LOGGER.warning(
+                    "Found an unsupported model %s, if this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
+                    self.model,
+                )
+
             return devinfo
         except PayloadDecodeException as ex:
             raise DeviceInfoUnavailableException(
@@ -154,6 +164,11 @@ class Device(metaclass=DeviceGroupMeta):
     def raw_id(self) -> int:
         """Return the last used protocol sequence id."""
         return self._protocol.raw_id
+
+    @property
+    def supported_models(self) -> List[str]:
+        """Return a list of supported models."""
+        return self._supported_models
 
     @property
     def model(self) -> str:

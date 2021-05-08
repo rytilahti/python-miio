@@ -10,6 +10,8 @@ from .dummies import DummyDevice
 
 class DummyLight(DummyDevice, Yeelight):
     def __init__(self, *args, **kwargs):
+        self._model = "missing.model.yeelight"
+
         self.return_values = {
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),
@@ -70,10 +72,13 @@ class DummyCommonBulb(DummyLight):
         super().__init__(*args, **kwargs)
 
 
+
 @pytest.fixture(scope="class")
 def dummycommonbulb(request):
     request.cls.device = DummyCommonBulb()
     # TODO add ability to test on a real device
+
+
 
 
 @pytest.mark.usefixtures("dummycommonbulb")
@@ -304,6 +309,7 @@ class TestYeelightLightColor(TestCase):
         self.device.set_hsv()
 
 
+
 class DummyLightCeilingV1(DummyLight):  # without background light
     def __init__(self, *args, **kwargs):
         self.state = {
@@ -336,10 +342,13 @@ class DummyLightCeilingV1(DummyLight):  # without background light
         super().__init__(*args, **kwargs)
 
 
+
 @pytest.fixture(scope="class")
 def dummylightceilingv1(request):
     request.cls.device = DummyLightCeilingV1()
     # TODO add ability to test on a real device
+
+
 
 
 @pytest.mark.usefixtures("dummylightceilingv1")
@@ -349,6 +358,7 @@ class TestYeelightLightCeilingV1(TestCase):
         status = self.device.status()  # type: YeelightStatus
 
         assert repr(status) == repr(YeelightStatus(self.device.start_state))
+
 
         assert status.name == self.device.start_state["name"]
         assert status.developer_mode is True
@@ -386,6 +396,7 @@ class TestYeelightLightCeilingV1(TestCase):
         # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params
         assert status.moonlight_mode is True
         assert status.moonlight_mode_brightness == 100
+
 
 
 class DummyLightCeilingV2(DummyLight):  # without background light

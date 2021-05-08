@@ -1,3 +1,4 @@
+
 from enum import IntEnum
 from typing import List, Optional, Tuple
 
@@ -7,6 +8,8 @@ from .click_common import command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import int_to_rgb, rgb_to_int
+
+SUPPORTED_MODELS = ["yeelink.light.color1"]
 
 
 class YeelightException(DeviceException):
@@ -37,6 +40,7 @@ class YeelightMode(IntEnum):
 
 class YeelightSubLight(DeviceStatus):
     def __init__(self, data, type):
+
         self.data = data
         self.type = type
 
@@ -256,7 +260,10 @@ class Yeelight(Device):
     which however requires enabling the developer mode on the bulbs.
     """
 
+    _supported_models = SUPPORTED_MODELS
+
     @command(default_output=format_output("", "{result.cli_format}"))
+
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
         properties = [

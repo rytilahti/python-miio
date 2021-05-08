@@ -9,6 +9,7 @@ from miio.wifirepeater import WifiRepeaterConfiguration, WifiRepeaterStatus
 
 class DummyWifiRepeater(DummyDevice, WifiRepeater):
     def __init__(self, *args, **kwargs):
+        self._model = "xiaomi.repeater.v2"
         self.state = {
             "sta": {"count": 2, "access_policy": 0},
             "mat": [
@@ -75,6 +76,12 @@ class DummyWifiRepeater(DummyDevice, WifiRepeater):
         self.start_config = self.config.copy()
         self.start_device_info = self.device_info.copy()
         super().__init__(args, kwargs)
+
+    def info(self):
+        """This device has custom miIO.info response."""
+        from miio.deviceinfo import DeviceInfo
+
+        return DeviceInfo(self.device_info)
 
     def _reset_state(self):
         """Revert back to the original state."""

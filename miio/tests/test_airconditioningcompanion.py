@@ -67,6 +67,7 @@ class DummyAirConditioningCompanion(DummyDevice, AirConditioningCompanion):
     def __init__(self, *args, **kwargs):
         self.state = ["010500978022222102", "01020119A280222221", "2"]
         self.last_ir_played = None
+        self._model = "missing.model.airconditioningcompanion"
 
         self.return_values = {
             "get_model_and_state": self._get_state,

@@ -23,6 +23,7 @@ class DummyVacuum(DummyDevice, Vacuum):
     STATE_MANUAL = 7
 
     def __init__(self, *args, **kwargs):
+        self._model = "missing.model.vacuum"
         self.state = {
             "state": 8,
             "dnd_enabled": 1,

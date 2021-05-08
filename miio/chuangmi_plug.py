@@ -101,9 +101,9 @@ class ChuangmiPlug(Device):
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model in AVAILABLE_PROPERTIES:
-            self.model = model
+            self._model = model
         else:
-            self.model = MODEL_CHUANGMI_PLUG_M1
+            self._model = MODEL_CHUANGMI_PLUG_M1
 
     @command(
         default_output=format_output(
@@ -182,6 +182,8 @@ class Plug(ChuangmiPlug):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        *,
+        model: str = None
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, model=MODEL_CHUANGMI_PLUG_M1

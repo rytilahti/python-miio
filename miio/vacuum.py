@@ -123,9 +123,20 @@ ROCKROBO_S7 = "roborock.vacuum.a15"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 ROCKROBO_E2 = "roborock.vacuum.e2"
 
+SUPPORTED_MODELS = [
+    ROCKROBO_V1,
+    ROCKROBO_S5,
+    ROCKROBO_S6,
+    ROCKROBO_S7,
+    ROCKROBO_S6_MAXV,
+    ROCKROBO_E2,
+]
+
 
 class Vacuum(Device):
     """Main class representing the vacuum."""
+
+    _supported_models = SUPPORTED_MODELS
 
     def __init__(
         self,
