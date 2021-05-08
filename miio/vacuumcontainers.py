@@ -200,6 +200,14 @@ class VacuumStatus(DeviceStatus):
             return None
 
     @property
+    def is_water_shortage(self) -> Optional[bool]:
+        """Returns True if water is low in the tank, None if sensor not present."""
+        if "water_shortage_status" in self.data:
+            return self.data["water_shortage_status"] == 1
+        else:
+            return None
+
+    @property
     def is_child_lock(self) -> bool:
         """Returns True if the child lock is active."""
         return self.data["lock_status"] == 1

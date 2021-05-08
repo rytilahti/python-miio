@@ -115,6 +115,8 @@ def status(vac: miio.Vacuum):
 
     if res.error_code:
         click.echo(click.style("Error: %s !" % res.error, bold=True, fg="red"))
+    if res.is_water_shortage:
+        click.echo(click.style("Water is running low!", bold=True, fg="blue"))
     click.echo(click.style("State: %s" % res.state, bold=True))
     click.echo("Battery: %s %%" % res.battery)
     click.echo("Fanspeed: %s %%" % res.fanspeed)
