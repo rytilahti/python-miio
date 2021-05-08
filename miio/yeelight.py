@@ -1,6 +1,6 @@
 import warnings
 from enum import IntEnum
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 
 import click
 
@@ -14,10 +14,91 @@ class YeelightException(DeviceException):
     pass
 
 
+class YeelightSubLightType(IntEnum):
+    Main = 1
+    Background = 2
+
+
+SUBLIGHT_PROP_PREFIX = {
+    YeelightSubLightType.Main: "",
+    YeelightSubLightType.Background: "bg_",
+}
+
+SUBLIGHT_COLOR_MODE_PROP = {
+    YeelightSubLightType.Main: "color_mode",
+    YeelightSubLightType.Background: "bg_lmode",
+}
+
+
 class YeelightMode(IntEnum):
     RGB = 1
     ColorTemperature = 2
     HSV = 3
+
+
+class YeelightSubLight:
+    def __init__(self, data, type):
+        self.data = data
+        self.type = type
+
+    def get_prop_name(self, prop) -> str:
+        if prop == "color_mode":
+            return SUBLIGHT_COLOR_MODE_PROP[self.type]
+        else:
+            return SUBLIGHT_PROP_PREFIX[self.type] + prop
+
+    @property
+    def is_on(self) -> bool:
+        """Return whether the light is on or off."""
+        return self.data[self.get_prop_name("power")] == "on"
+
+    @property
+    def brightness(self) -> int:
+        """Return current brightness."""
+        return int(self.data[self.get_prop_name("bright")])
+
+    @property
+    def rgb(self) -> Optional[Tuple[int, int, int]]:
+        """Return color in RGB if RGB mode is active."""
+        rgb = self.data[self.get_prop_name("rgb")]
+        if self.color_mode == YeelightMode.RGB and rgb:
+            return int_to_rgb(int(rgb))
+        return None
+
+    @property
+    def color_mode(self) -> YeelightMode:
+        """Return current color mode."""
+        return YeelightMode(int(self.data[self.get_prop_name("color_mode")]))
+
+    @property
+    def hsv(self) -> Optional[Tuple[int, int, int]]:
+        """Return current color in HSV if HSV mode is active."""
+        hue = self.data[self.get_prop_name("hue")]
+        sat = self.data[self.get_prop_name("sat")]
+        brightness = self.data[self.get_prop_name("bright")]
+        if self.color_mode == YeelightMode.HSV and (hue or sat or brightness):
+            return hue, sat, brightness
+        return None
+
+    @property
+    def color_temp(self) -> Optional[int]:
+        """Return current color temperature, if applicable."""
+        ct = self.data[self.get_prop_name("ct")]
+        if self.color_mode == YeelightMode.ColorTemperature and ct:
+            return int(ct)
+        return None
+
+    @property
+    def color_flowing(self) -> bool:
+        """Return whether the color flowing is active."""
+        return bool(int(self.data[self.get_prop_name("flowing")]))
+
+    @property
+    def color_flow_params(self) -> Optional[str]:
+        """Return color flowing params."""
+        if self.color_flowing:
+            return self.data[self.get_prop_name("flow_params")]
+        return None
 
 
 class YeelightStatus(DeviceStatus):
@@ -31,47 +112,6 @@ class YeelightStatus(DeviceStatus):
         # yeelink.light.color3, yeelink.light.color4, yeelink.light.color5, yeelink.light.strip2
         # {'name': '', 'lan_ctrl': '1', 'save_state': '1', 'delayoff': '0', 'music_on': '0', 'power': 'off', 'bright': '100', 'color_mode': '1', 'rgb': '2353663', 'hue': '186', 'sat': '86', 'ct': '6500', 'flowing': '0', 'flow_params': '0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100',                                                                               'active_mode': '',  'nl_br': '',  'bg_power': '',    'bg_bright': '',    'bg_lmode': '',  'bg_rgb': '', 'bg_hue': '', 'bg_sat': '', 'bg_ct': '', 'bg_flowing': '', 'bg_flow_params': ''}
         self.data = data
-
-    @property
-    def is_on(self) -> bool:
-        """Return whether the bulb is on or off."""
-        return self.data["power"] == "on"
-
-    @property
-    def brightness(self) -> int:
-        """Return current brightness."""
-        return int(self.data["bright"])
-
-    @property
-    def rgb(self) -> Optional[Tuple[int, int, int]]:
-        """Return color in RGB if RGB mode is active."""
-        rgb = self.data["rgb"]
-        if self.color_mode == YeelightMode.RGB and rgb:
-            return int_to_rgb(int(rgb))
-        return None
-
-    @property
-    def color_mode(self) -> YeelightMode:
-        """Return current color mode."""
-        return YeelightMode(int(self.data["color_mode"]))
-
-    @property
-    def hsv(self) -> Optional[Tuple[int, int, int]]:
-        """Return current color in HSV if HSV mode is active."""
-        hue = self.data["hue"]
-        sat = self.data["sat"]
-        brightness = self.data["bright"]
-        if self.color_mode == YeelightMode.HSV and (hue or sat or brightness):
-            return hue, sat, brightness
-        return None
-
-    @property
-    def color_temp(self) -> Optional[int]:
-        """Return current color temperature, if applicable."""
-        ct = self.data["ct"]
-        if self.color_mode == YeelightMode.ColorTemperature and ct:
-            return int(ct)
-        return None
 
     @property
     def developer_mode(self) -> Optional[bool]:
@@ -90,18 +130,6 @@ class YeelightStatus(DeviceStatus):
     def name(self) -> str:
         """Return the internal name of the bulb."""
         return self.data["name"]
-
-    @property
-    def color_flowing(self) -> bool:
-        """Return whether the color flowing is active."""
-        return bool(int(self.data["flowing"]))
-
-    @property
-    def color_flow_params(self) -> Optional[str]:
-        """Return color flowing params."""
-        if self.color_flowing:
-            return self.data["flow_params"]
-        return None
 
     @property
     def delay_off(self) -> int:
@@ -133,66 +161,17 @@ class YeelightStatus(DeviceStatus):
         return None
 
     @property
-    def is_bg_on(self) -> Optional[bool]:
-        """Return whether the background light is on or off."""
-        bg_power = self.data["bg_power"]
+    def lights(self) -> List[YeelightSubLight]:
+        """Return list of sub lights."""
+        sub_lights = list({YeelightSubLight(self.data, YeelightSubLightType.Main)})
+        bg_power = self.data[
+            "bg_power"
+        ]  # to do: change this to model spec in the future.
         if bg_power:
-            return bg_power == "on"
-        return None
-
-    @property
-    def bg_brightness(self) -> Optional[int]:
-        """Return current background lights brightness."""
-        if self.is_bg_on is not None:
-            return int(self.data["bg_bright"])
-        return None
-
-    @property
-    def bg_rgb(self) -> Optional[Tuple[int, int, int]]:
-        """Return background lights color in RGB if RGB mode is active."""
-        rgb = self.data["bg_rgb"]
-        if self.bg_color_mode == YeelightMode.RGB and rgb:
-            return int_to_rgb(int(rgb))
-        return None
-
-    @property
-    def bg_color_mode(self) -> Optional[YeelightMode]:
-        """Return current background lights color mode."""
-        if self.is_bg_on is not None:
-            return YeelightMode(int(self.data["bg_lmode"]))
-        return None
-
-    @property
-    def bg_hsv(self) -> Optional[Tuple[int, int, int]]:
-        """Return current background lights color in HSV if HSV mode is active."""
-        hue = self.data["bg_hue"]
-        sat = self.data["bg_sat"]
-        brightness = self.data["bg_bright"]
-        if self.bg_color_mode == YeelightMode.HSV and (hue or sat or brightness):
-            return hue, sat, brightness
-        return None
-
-    @property
-    def bg_color_temp(self) -> Optional[int]:
-        """Return current background lights color temperature, if applicable."""
-        ct = self.data["bg_ct"]
-        if self.bg_color_mode == YeelightMode.ColorTemperature and ct:
-            return int(ct)
-        return None
-
-    @property
-    def bg_color_flowing(self) -> Optional[bool]:
-        """Return whether the flowing mode is active for background lights."""
-        if self.is_bg_on is not None:
-            return bool(int(self.data["bg_flowing"]))
-        return None
-
-    @property
-    def bg_color_flow_params(self) -> Optional[str]:
-        """Return color flowing params for background lights."""
-        if self.bg_color_flowing:
-            return self.data["bg_flow_params"]
-        return None
+            sub_lights.append(
+                YeelightSubLight(self.data, YeelightSubLightType.Background)
+            )
+        return sub_lights
 
 
 class Yeelight(Device):
@@ -223,26 +202,27 @@ class Yeelight(Device):
             "Delay in minute before off: {result.delay_off}\n"
             "Music mode: {result.music_mode}\n"
             "Light\n"
-            "   Power: {result.is_on}\n"
-            "   Brightness: {result.brightness}\n"
-            "   Color mode: {result.color_mode}\n"
-            "   RGB: {result.rgb}\n"
-            "   HSV: {result.hsv}\n"
-            "   Temperature: {result.color_temp}\n"
-            "   Color flowing mode: {result.color_flowing}\n"
-            "   Color flowing parameters: {result.color_flow_params}\n"
+            "   Power: {result.lights[0].is_on}\n"
+            "   Brightness: {result.lights[0].brightness}\n"
+            "   Color mode: {result.lights[0].color_mode}\n"
+            "   RGB: {result.lights[0].rgb}\n"
+            "   HSV: {result.lights[0].hsv}\n"
+            "   Temperature: {result.lights[0].color_temp}\n"
+            "   Color flowing mode: {result.lights[0].color_flowing}\n"
+            "   Color flowing parameters: {result.lights[0].color_flow_params}\n"
             "Moonlight\n"
             "   Is in mode: {result.moonlight_mode}\n"
             "   Moonlight mode brightness: {result.moonlight_mode_brightness}\n"
-            "Background light\n"
-            "   Power: {result.is_bg_on}\n"
-            "   Brightness: {result.bg_brightness}\n"
-            "   Color mode: {result.bg_color_mode}\n"
-            "   RGB: {result.bg_rgb}\n"
-            "   HSV: {result.bg_hsv}\n"
-            "   Temperature: {result.bg_color_temp}\n"
-            "   Color flowing mode: {result.bg_color_flowing}\n"
-            "   Color flowing parameters: {result.bg_color_flow_params}\n"
+            # Have no any idea how it must be
+            # "Background light\n"
+            # "   Power: {result.lights[1].is_on}\n"
+            # "   Brightness: {result.lights[1].brightness}\n"
+            # "   Color mode: {result.lights[1].color_mode}\n"
+            # "   RGB: {result.lights[1].rgb}\n"
+            # "   HSV: {result.lights[1].hsv}\n"
+            # "   Temperature: {result.lights[1].color_temp}\n"
+            # "   Color flowing mode: {result.lights[1].color_flowing}\n"
+            # "   Color flowing parameters: {result.lights[1].color_flow_params}\n"
             "\n",
         )
     )
