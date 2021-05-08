@@ -227,7 +227,7 @@ class YeelightStatus(DeviceStatus):
             s += f"{light.type.name} light\n"
             s += f"   Power: {light.is_on}\n"
             s += f"   Brightness: {light.brightness}\n"
-            s += f"   Color mode: {light.color_mode}\n"
+            s += f"   Color mode: {light.color_mode.name}\n"
             if light.color_mode == YeelightMode.RGB:
                 s += f"   RGB: {light.rgb}\n"
             elif light.color_mode == YeelightMode.HSV:
