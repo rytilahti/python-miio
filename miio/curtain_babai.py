@@ -13,10 +13,10 @@ _MAPPING = {
     # http://miot-spec.org/miot-spec-v2/instances?status=all
     # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:babai-190812:1:0000C805
     # Curtain
+    "mode": {"siid": 2, "piid": 4},  # 0 - Normal,  1 - Reversal, 2 - Calibrate
     "motor_control": {"siid": 2, "piid": 1},  # 0 - Pause, 1 - Open, 2 - Close
     "current_position": {"siid": 2, "piid": 2},  # Range: [0, 100, 1]
     "target_position": {"siid": 2, "piid": 3},  # Range: [0, 100, 1]
-    "mode": {"siid": 2, "piid": 4},  # 0 - Normal,  1 - Reversal, 2 - Calibrate
 }
 
 # Model: "OnViz Curtain Controller (Wi-Fi)"
@@ -45,18 +45,24 @@ class CurtainStatus(DeviceStatus):
 
     @property
     def status(self) -> MotorControl:
-        """Device status."""
+        """Device motor_control."""
         return MotorControl(self.data["motor_control"])
 
     @property
-    def is_open(self) -> bool:
-        """Device status."""
-        return self.motor_control == MotorControl.Open
+    def is_opening(self) -> bool:
+        return self.status == MotorControl.Open
+
+    @property
+    def is_closing(self) -> bool:
+        return self.status == MotorControl.Close
+
+    @property
+    def is_opened(self) -> bool:
+        return self.current_position > 0
 
     @property
     def is_closed(self) -> bool:
-        """Device status."""
-        return self.motor_control == MotorControl.Close
+        return self.current_position == 0
 
     @property
     def mode(self) -> Mode:
@@ -91,24 +97,30 @@ class CurtainBabai(MiotDevice):
     def status(self) -> CurtainStatus:
         """Retrieve properties."""
         # if use get_properties_for_mapping and max_len>1 then code -4004.
-        data = []
-        for k, v in self.mapping.items():
-            if "aiid" not in v:
-                data.extend(self.get_property(k))
-                # data[k] = prop["value"] if prop["code"] == 0 else None
-        return CurtainStatus(self._extract_property_value(data))
+        # if e.code = -9999, use get_*
+        return CurtainStatus(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping(max_properties=1)
+            }
+        )
 
     def get_property(self, name: str) -> List[Dict[str, Any]]:
         if name not in self.mapping:
             raise ValueError("key %s not in MAPING", name)
         v = self.mapping[name]
-        try:
-            prop = self.get_property_by(siid=v["siid"], piid=v["piid"])
-        except DeviceError as e:
-            if e.code != -9999:
-                raise
-            sleep(5)
-            prop = self.get_property_by(siid=v["siid"], piid=v["piid"])
+        i = 0
+        prop = []
+        while i < 6:
+            try:
+                prop = self.get_property_by(siid=v["siid"], piid=v["piid"])
+            except DeviceError as e:
+                if e.code != -9999 or i > 5:
+                    raise
+                sleep(1)
+                i += 1
+            else:
+                i = 10
         for p in prop:
             p["did"] = name
         return prop
