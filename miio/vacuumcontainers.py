@@ -196,8 +196,7 @@ class VacuumStatus(DeviceStatus):
         present."""
         if "water_box_carriage_status" in self.data:
             return self.data["water_box_carriage_status"] == 1
-        else:
-            return None
+        return None
 
     @property
     def is_water_shortage(self) -> Optional[bool]:
