@@ -1,11 +1,9 @@
 from enum import Enum
-from time import sleep
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import click
 
 from .click_common import EnumType, command, format_output
-from .exceptions import DeviceError
 from .miot_device import DeviceStatus, MiotDevice
 
 _MAPPING = {
@@ -49,14 +47,6 @@ class CurtainStatus(DeviceStatus):
         return MotorControl(self.data["motor_control"])
 
     @property
-    def is_opening(self) -> bool:
-        return self.status == MotorControl.Open
-
-    @property
-    def is_closing(self) -> bool:
-        return self.status == MotorControl.Close
-
-    @property
     def is_opened(self) -> bool:
         return self.current_position > 0
 
@@ -96,62 +86,12 @@ class CurtainBabai(MiotDevice):
     )
     def status(self) -> CurtainStatus:
         """Retrieve properties."""
-        # if use get_properties_for_mapping and max_len>1 then code -4004.
-        # if e.code = -9999, use get_*
         return CurtainStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping(max_properties=1)
             }
         )
-
-    def get_property(self, name: str) -> List[Dict[str, Any]]:
-        if name not in self.mapping:
-            raise ValueError("key %s not in MAPING", name)
-        v = self.mapping[name]
-        i = 0
-        prop = []
-        while i < 6:
-            try:
-                prop = self.get_property_by(siid=v["siid"], piid=v["piid"])
-            except DeviceError as e:
-                if e.code != -9999 or i > 5:
-                    raise
-                sleep(1)
-                i += 1
-            else:
-                i = 10
-        for p in prop:
-            p["did"] = name
-        return prop
-
-    @staticmethod
-    def _extract_property_value(prop: List[Dict[str, Any]]) -> Dict[str, Any]:
-        return {p["did"]: p["value"] if p["code"] == 0 else None for p in prop}
-
-    def _get_property_value(self, name: str) -> Any:
-        prop = self.get_property(name)
-        return self._extract_property_value(prop).get(name)
-
-    @property
-    def motor_control(self) -> MotorControl:
-        """Device status."""
-        return MotorControl(self._get_property_value("motor_control"))
-
-    @property
-    def mode(self) -> Mode:
-        """Motor rotation polarity."""
-        return Mode(self._get_property_value("mode"))
-
-    @property
-    def current_position(self) -> int:
-        """Run time of the motor."""
-        return self._get_property_value("current_position")
-
-    @property
-    def target_position(self) -> int:
-        """Target curtain position."""
-        return self._get_property_value("target_position")
 
     @command(
         click.argument("motor_control", type=EnumType(MotorControl)),
@@ -176,16 +116,6 @@ class CurtainBabai(MiotDevice):
     def set_close(self):
         """Set motor control."""
         return self.set_motor_control(MotorControl.Close)
-
-    @property
-    def is_open(self) -> bool:
-        """Device status."""
-        return self.motor_control == MotorControl.Open
-
-    @property
-    def is_close(self) -> bool:
-        """Device status."""
-        return self.motor_control == MotorControl.Close
 
     @command(
         click.argument("target_position", type=int),

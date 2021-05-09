@@ -1,4 +1,3 @@
-from typing import Any, Dict, List
 from unittest import TestCase
 
 import pytest
@@ -17,31 +16,7 @@ class DummyCurtainBabai(DummyMiotDevice, CurtainBabai):
             "mode": 0,
         }
 
-        self.return_values = {
-            "get_prop": self._get_state,
-            "get_properties": self.get_property_value_mock,
-        }
-
-        self.test_mapping = {
-            f"{v.get('siid')}-{v.get('piid')}": k for k, v in self.mapping.items()
-        }
-
         super().__init__(*args, **kwargs)
-
-    def get_property_value_mock(self, x: List[Dict[str, Any]]) -> Any:
-        r = x.pop()
-        key = f"{r.get('siid')}-{r.get('piid')}"
-        prop_name = self.test_mapping.get(key)
-        data = [x for x in self.state if x["did"] == prop_name]
-        for x in data:
-            x["did"] = key
-        return data
-
-    def set_config(self, x):
-        key, value = x
-        config_mapping = {"cfg_lan_ctrl": "lan_ctrl", "cfg_save_state": "save_state"}
-
-        self._set_state(config_mapping[key], [value])
 
     def set_open(self):
         key = "current_position"
