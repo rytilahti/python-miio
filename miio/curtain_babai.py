@@ -43,15 +43,17 @@ class CurtainStatus(DeviceStatus):
 
     @property
     def status(self) -> MotorControl:
-        """Device motor_control."""
+        """Device motor_control. Curtain is Opening, Closing or Pause now."""
         return MotorControl(self.data["motor_control"])
 
     @property
     def is_opened(self) -> bool:
+        """Curtain is opened"""
         return self.current_position > 0
 
     @property
     def is_closed(self) -> bool:
+        """Curtain is closed"""
         return self.current_position == 0
 
     @property
@@ -106,7 +108,7 @@ class CurtainBabai(MiotDevice):
         default_output=format_output("Open curtain"),
     )
     def set_open(self):
-        """Set motor control."""
+        """Set open."""
         return self.set_motor_control(MotorControl.Open)
 
     @command(
@@ -114,7 +116,7 @@ class CurtainBabai(MiotDevice):
         default_output=format_output("Close curtain"),
     )
     def set_close(self):
-        """Set motor control."""
+        """Set close."""
         return self.set_motor_control(MotorControl.Close)
 
     @command(
