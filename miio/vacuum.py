@@ -85,10 +85,10 @@ class FanspeedE2(enum.Enum):
 
 
 class FanspeedS7(enum.Enum):
-    Quiet = 101
-    Balanced = 102
-    Turbo = 103
-    Max = 104
+    Silent = 101
+    Standard = 102
+    Medium = 103
+    Turbo = 104
 
 
 class WaterFlow(enum.Enum):
