@@ -208,11 +208,6 @@ class VacuumStatus(DeviceStatus):
             return None
 
     @property
-    def is_child_lock(self) -> bool:
-        """Returns True if the child lock is active."""
-        return self.data["lock_status"] == 1
-
-    @property
     def got_error(self) -> bool:
         """True if an error has occured."""
         return self.error_code != 0
