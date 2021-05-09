@@ -107,6 +107,14 @@ class MopMode(enum.Enum):
     Deep = 301
 
 
+class CarpetCleaningMode(enum.Enum):
+    """Type of carpet cleaning/avoidance."""
+
+    Avoid = 0
+    Rise = 1
+    Ignore = 2
+
+
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S6 = "roborock.vacuum.s6"
@@ -697,6 +705,24 @@ class Vacuum(Device):
             "current_integral": integral,
         }
         return self.send("set_carpet_mode", [data])[0] == "ok"
+
+    @command()
+    def carpet_cleaning_mode(self):
+        """Get carpet cleaning mode/avoidance setting."""
+        try:
+            return CarpetCleaningMode(
+                self.send("get_carpet_clean_mode")[0]["carpet_clean_mode"]
+            )
+        except TypeError:
+            return None
+
+    @command(click.argument("mode", type=EnumType(CarpetCleaningMode)))
+    def set_carpet_cleaning_mode(self, mode: CarpetCleaningMode):
+        """Set carpet cleaning mode/avoidance setting."""
+        return (
+            self.send("set_carpet_clean_mode", {"carpet_clean_mode": mode.value})[0]
+            == "ok"
+        )
 
     @command()
     def stop_zoned_clean(self):

@@ -562,6 +562,25 @@ def carpet_mode(vac: miio.Vacuum, enabled=None):
 
 
 @cli.command()
+@click.argument("mode", required=False, type=str)
+@pass_dev
+def carpet_cleaning_mode(vac: miio.Vacuum, mode=None):
+    """Query or set the carpet cleaning/avoidance mode.
+
+    Allowed values: Avoid, Rise, Ignore
+    """
+    from miio.vacuum import CarpetCleaningMode
+
+    if mode is None:
+        click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode().name)
+    else:
+        click.echo(
+            "Setting carpet cleaning mode: %s"
+            % vac.set_carpet_cleaning_mode(CarpetCleaningMode[mode])
+        )
+
+
+@cli.command()
 @click.argument("ssid", required=True)
 @click.argument("password", required=True)
 @click.argument("uid", type=int, required=False)

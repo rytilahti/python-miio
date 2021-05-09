@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from miio import Vacuum, VacuumStatus
+from miio.vacuum import CarpetCleaningMode
 
 from .dummies import DummyDevice
 
@@ -275,3 +276,16 @@ class TestVacuum(TestCase):
             )
 
             assert len(self.device.clean_history().ids) == 0
+
+    def test_carpet_cleaning_mode(self):
+        with patch.object(self.device, "send", return_value=[{"carpet_clean_mode": 0}]):
+            assert self.device.carpet_cleaning_mode() == CarpetCleaningMode.Avoid
+
+        with patch.object(self.device, "send", return_value="unknown_method"):
+            assert self.device.carpet_cleaning_mode() is None
+
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_carpet_cleaning_mode(CarpetCleaningMode.Rise) is True
+            mock_method.assert_called_once_with(
+                "set_carpet_clean_mode", {"carpet_clean_mode": 1}
+            )
