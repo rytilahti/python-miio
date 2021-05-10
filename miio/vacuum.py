@@ -713,7 +713,8 @@ class Vacuum(Device):
             return CarpetCleaningMode(
                 self.send("get_carpet_clean_mode")[0]["carpet_clean_mode"]
             )
-        except TypeError:
+        except Exception as err:
+            _LOGGER.warning("Error while requesting carpet clean mode: %s", err)
             return None
 
     @command(click.argument("mode", type=EnumType(CarpetCleaningMode)))

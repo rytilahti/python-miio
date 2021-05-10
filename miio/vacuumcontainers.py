@@ -203,8 +203,7 @@ class VacuumStatus(DeviceStatus):
         """Returns True if water is low in the tank, None if sensor not present."""
         if "water_shortage_status" in self.data:
             return self.data["water_shortage_status"] == 1
-        else:
-            return None
+        return None
 
     @property
     def got_error(self) -> bool:
