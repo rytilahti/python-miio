@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from miio import Vacuum, VacuumStatus
-from miio.vacuum import CarpetCleaningMode
+from miio.vacuum import CarpetCleaningMode, MopMode
 
 from .dummies import DummyDevice
 
@@ -289,3 +289,14 @@ class TestVacuum(TestCase):
             mock_method.assert_called_once_with(
                 "set_carpet_clean_mode", {"carpet_clean_mode": 1}
             )
+
+    def test_mop_mode(self):
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_mop_mode(MopMode.Deep) is True
+            mock_method.assert_called_once_with("set_mop_mode", [301])
+
+        with patch.object(self.device, "send", return_value=[300]):
+            assert self.device.mop_mode() == MopMode.Standard
+
+        with patch.object(self.device, "send", return_value=[32453]):
+            assert self.device.mop_mode() is None

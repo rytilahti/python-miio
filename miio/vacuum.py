@@ -795,13 +795,14 @@ class Vacuum(Device):
         """Get mop mode setting."""
         try:
             return MopMode(self.send("get_mop_mode")[0])
-        except ValueError:
+        except ValueError as err:
+            _LOGGER.warning("Device returned unknown MopMode: %s", err)
             return None
 
     @command(click.argument("mop_mode", type=EnumType(MopMode)))
     def set_mop_mode(self, mop_mode: MopMode):
         """Set mop mode setting."""
-        return self.send("set_mop_mode", [mop_mode.value])
+        return self.send("set_mop_mode", [mop_mode.value])[0] == "ok"
 
     @command()
     def child_lock(self) -> bool:
