@@ -572,7 +572,7 @@ def carpet_cleaning_mode(vac: miio.Vacuum, mode=None):
     from miio.vacuum import CarpetCleaningMode
 
     if mode is None:
-        click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode().name)
+        click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode())
     else:
         click.echo(
             "Setting carpet cleaning mode: %s"
