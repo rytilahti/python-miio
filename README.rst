@@ -180,10 +180,10 @@ Other projects
    :target: https://badge.fury.io/py/python-miio
 .. |PyPI downloads| image:: https://img.shields.io/pypi/dw/python-miio
    :target: https://pypi.org/project/python-miio/
-.. |Build Status| image:: https://img.shields.io/azure-devops/build/python-miio/608e6099-f1ed-403c-9158-8fdcb2a0e477/1
-   :target: https://dev.azure.com/python-miio/python-miio/
-.. |Coverage Status| image:: https://coveralls.io/repos/github/rytilahti/python-miio/badge.svg?branch=master
-   :target: https://coveralls.io/github/rytilahti/python-miio?branch=master
+.. |Build Status| image:: https://github.com/rytilahti/python-miio/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/rytilahti/python-miio/actions/workflows/ci.yml
+.. |Coverage Status| image:: https://codecov.io/gh/rytilahti/python-miio/branch/master/graph/badge.svg?token=lYKWubxkLU
+   :target: https://codecov.io/gh/rytilahti/python-miio
 .. |Docs| image:: https://readthedocs.org/projects/python-miio/badge/?version=latest
    :alt: Documentation status
    :target: https://python-miio.readthedocs.io/en/latest/?badge=latest
