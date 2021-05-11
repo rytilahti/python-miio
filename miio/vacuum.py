@@ -707,7 +707,7 @@ class Vacuum(Device):
         return self.send("set_carpet_mode", [data])[0] == "ok"
 
     @command()
-    def carpet_cleaning_mode(self):
+    def carpet_cleaning_mode(self) -> CarpetCleaningMode:
         """Get carpet cleaning mode/avoidance setting."""
         try:
             return CarpetCleaningMode(
