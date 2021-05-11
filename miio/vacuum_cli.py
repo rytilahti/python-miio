@@ -24,6 +24,7 @@ from miio.device import UpdateState
 from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
+from miio.vacuum import CarpetCleaningMode
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
@@ -115,6 +116,8 @@ def status(vac: miio.Vacuum):
 
     if res.error_code:
         click.echo(click.style("Error: %s !" % res.error, bold=True, fg="red"))
+    if res.is_water_shortage:
+        click.echo(click.style("Water is running low!", bold=True, fg="blue"))
     click.echo(click.style("State: %s" % res.state, bold=True))
     click.echo("Battery: %s %%" % res.battery)
     click.echo("Fanspeed: %s %%" % res.fanspeed)
@@ -124,6 +127,8 @@ def status(vac: miio.Vacuum):
     # click.echo("Map present: %s" % res.map)
     # click.echo("in_cleaning: %s" % res.in_cleaning)
     click.echo("Water box attached: %s" % res.is_water_box_attached)
+    if res.is_water_box_carriage_attached is not None:
+        click.echo("Mop attached: %s" % res.is_water_box_carriage_attached)
 
 
 @cli.command()
@@ -555,6 +560,24 @@ def carpet_mode(vac: miio.Vacuum, enabled=None):
         click.echo(vac.carpet_mode())
     else:
         click.echo(vac.set_carpet_mode(enabled))
+
+
+@cli.command()
+@click.argument("mode", required=False, type=str)
+@pass_dev
+def carpet_cleaning_mode(vac: miio.Vacuum, mode=None):
+    """Query or set the carpet cleaning/avoidance mode.
+
+    Allowed values: Avoid, Rise, Ignore
+    """
+
+    if mode is None:
+        click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode())
+    else:
+        click.echo(
+            "Setting carpet cleaning mode: %s"
+            % vac.set_carpet_cleaning_mode(CarpetCleaningMode[mode])
+        )
 
 
 @cli.command()
