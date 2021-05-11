@@ -24,6 +24,7 @@ from miio.device import UpdateState
 from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
+from miio.vacuum import CarpetCleaningMode
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
@@ -569,7 +570,6 @@ def carpet_cleaning_mode(vac: miio.Vacuum, mode=None):
 
     Allowed values: Avoid, Rise, Ignore
     """
-    from miio.vacuum import CarpetCleaningMode
 
     if mode is None:
         click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode())
