@@ -69,13 +69,19 @@ class ChuangmiIr(Device):
             raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_read", {"key": str(key)})
 
-    def play_raw(self, command: str, frequency: int = 38400):
+    def play_raw(self, command: str, frequency: int = 38400, length: int = -1):
         """Play a captured command.
 
         :param str command: Command to execute
         :param int frequency: Execution frequency
+                :param int length: Length of the command. -1 means not sending the length parameter.
         """
-        return self.send("miIO.ir_play", {"freq": frequency, "code": command})
+        if length < 0:
+            return self.send("miIO.ir_play", {"freq": frequency, "code": command})
+        else:
+            return self.send(
+                "miIO.ir_play", {"freq": frequency, "code": command, "length": length}
+            )
 
     def play_pronto(self, pronto: str, repeats: int = 1):
         """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
