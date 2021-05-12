@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import click
 
@@ -82,7 +82,7 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["mb"] == 1
 
     @property
-    def wake_up_time(self) -> [int, int, int]:
+    def wake_up_time(self) -> List[int]:
         # Example: [weekdays?, hour, minute]
         return self.data["wkp"]
 

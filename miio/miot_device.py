@@ -12,23 +12,25 @@ from .exceptions import DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 
-def _str2bool(x):
-    """Helper to convert string to boolean."""
-    return x.lower() in ("true", "1")
-
-
 # partial is required here for str2bool, see https://stackoverflow.com/a/40339397
 class MiotValueType(Enum):
+    def _str2bool(x):
+        """Helper to convert string to boolean."""
+        return x.lower() in ("true", "1")
+
     Int = int
     Float = float
     Bool = partial(_str2bool)
     Str = str
 
 
+MiotMapping = Dict[str, Dict[str, Any]]
+
+
 class MiotDevice(Device):
     """Main class representing a MIoT device."""
 
-    mapping = None
+    mapping: MiotMapping
 
     def __init__(
         self,
@@ -39,13 +41,18 @@ class MiotDevice(Device):
         lazy_discover: bool = True,
         timeout: int = None,
         *,
-        mapping: Dict = None,
+        mapping: MiotMapping = None,
     ):
         """Overloaded to accept keyword-only `mapping` parameter."""
+        super().__init__(ip, token, start_id, debug, lazy_discover, timeout)
+
+        if mapping is None and not hasattr(self, "mapping"):
+            raise DeviceException(
+                "Neither the class nor the parameter defines the mapping"
+            )
+
         if mapping is not None:
             self.mapping = mapping
-
-        super().__init__(ip, token, start_id, debug, lazy_discover, timeout)
 
     def get_properties_for_mapping(self, *, max_properties=15) -> list:
         """Retrieve raw properties based on mapping."""
@@ -65,7 +72,11 @@ class MiotDevice(Device):
     )
     def call_action(self, name: str, params=None):
         """Call an action by a name in the mapping."""
-        action = self.mapping.get(name)
+        if name not in self.mapping:
+            raise DeviceException(f"Unable to find {name} in the mapping")
+
+        action = self.mapping[name]
+
         if "siid" not in action or "aiid" not in action:
             raise DeviceException(f"{name} is not an action (missing siid or aiid)")
 

@@ -60,7 +60,7 @@ class Property(DataClassJsonMixin):
 
     value_list: Optional[List[Dict[str, Any]]] = field(
         default_factory=list, metadata=config(field_name="value-list")
-    )
+    )  # type: ignore
     value_range: Optional[List[int]] = field(
         default=None, metadata=config(field_name="value-range")
     )

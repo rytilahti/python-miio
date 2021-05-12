@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -70,10 +70,11 @@ class PwznRelayStatus(DeviceStatus):
         self.data = data
 
     @property
-    def relay_state(self) -> int:
+    def relay_state(self) -> Optional[int]:
         """Current relay state."""
         if "relay_status" in self.data:
             return self.data["relay_status"]
+        return None
 
     @property
     def relay_names(self) -> Dict[int, str]:
@@ -88,10 +89,11 @@ class PwznRelayStatus(DeviceStatus):
         }
 
     @property
-    def on_count(self) -> int:
+    def on_count(self) -> Optional[int]:
         """Number of on relay."""
         if "on_count" in self.data:
             return self.data["on_count"]
+        return None
 
 
 class PwznRelay(Device):

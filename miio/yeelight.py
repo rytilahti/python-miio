@@ -1,4 +1,4 @@
-import warnings
+
 from enum import IntEnum
 from typing import List, Optional, Tuple
 
@@ -257,12 +257,6 @@ class Yeelight(Device):
     which however requires enabling the developer mode on the bulbs.
     """
 
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "Please consider using python-yeelight " "for more complete support.",
-            stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
 
     @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:

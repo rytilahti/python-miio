@@ -312,14 +312,14 @@ class AirConditioningCompanion(Device):
         :param int slot: Unknown internal register or slot
         """
         try:
-            model = bytes.fromhex(model)
+            model_bytes = bytes.fromhex(model)
         except ValueError:
             raise AirConditioningCompanionException(
                 "Invalid model. A hexadecimal string must be provided"
             )
 
         try:
-            code = bytes.fromhex(code)
+            code_bytes = bytes.fromhex(code)
         except ValueError:
             raise AirConditioningCompanionException(
                 "Invalid code. A hexadecimal string must be provided"
@@ -328,23 +328,23 @@ class AirConditioningCompanion(Device):
         if slot < 0 or slot > 134:
             raise AirConditioningCompanionException("Invalid slot: %s" % slot)
 
-        slot = bytes([121 + slot])
+        slot_bytes = bytes([121 + slot])
 
         # FE + 0487 + 00007145 + 9470 + 1FFF + 7F + FF + 06 + 0042 + 27 + 4E + 0025002D008500AC01...
-        command = (
-            code[0:1]
-            + model[2:8]
+        command_bytes = (
+            code_bytes[0:1]
+            + model_bytes[2:8]
             + b"\x94\x70\x1F\xFF"
-            + slot
+            + slot_bytes
             + b"\xFF"
-            + code[13:16]
+            + code_bytes[13:16]
             + b"\x27"
         )
 
-        checksum = sum(command) & 0xFF
-        command = command + bytes([checksum]) + code[18:]
+        checksum = sum(command_bytes) & 0xFF
+        command_bytes = command_bytes + bytes([checksum]) + code_bytes[18:]
 
-        return self.send("send_ir_code", [command.hex().upper()])
+        return self.send("send_ir_code", [command_bytes.hex().upper()])
 
     @command(
         click.argument("command", type=str),

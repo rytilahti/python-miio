@@ -31,8 +31,8 @@ class SubDevice:
 
     def __init__(
         self,
-        gw: "Gateway" = None,
-        dev_info: SubDeviceInfo = None,
+        gw: "Gateway",
+        dev_info: SubDeviceInfo,
         model_info: Optional[Dict] = None,
     ) -> None:
 

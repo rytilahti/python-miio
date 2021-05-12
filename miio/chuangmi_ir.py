@@ -1,5 +1,6 @@
 import base64
 import re
+from typing import Callable, Set
 
 import click
 from construct import (
@@ -112,13 +113,13 @@ class ChuangmiIr(Device):
         if len(pronto_data.intro) == 0:
             repeats += 1
 
-        times = set()
+        times: Set[int] = set()
         for pair in pronto_data.intro + pronto_data.repeat * (1 if repeats else 0):
             times.add(pair.pulse)
             times.add(pair.gap)
 
-        times = sorted(times)
-        times_map = {t: idx for idx, t in enumerate(times)}
+        times_sorted = sorted(times)
+        times_map = {t: idx for idx, t in enumerate(times_sorted)}
         edge_pairs = []
         for pair in pronto_data.intro + pronto_data.repeat * repeats:
             edge_pairs.append(
@@ -128,7 +129,7 @@ class ChuangmiIr(Device):
         signal_code = base64.b64encode(
             ChuangmiIrSignal.build(
                 {
-                    "times_index": times + [0] * (16 - len(times)),
+                    "times_index": times_sorted + [0] * (16 - len(times)),
                     "edge_pairs": edge_pairs,
                 }
             )
@@ -158,6 +159,7 @@ class ChuangmiIr(Device):
         if command_type not in ["raw", "pronto"]:
             raise ChuangmiIrException("Invalid command type")
 
+        play_method: Callable
         if command_type == "raw":
             play_method = self.play_raw
 
@@ -165,11 +167,11 @@ class ChuangmiIr(Device):
             play_method = self.play_pronto
 
         try:
-            command_args = [t(v) for v, t in zip(command_args, arg_types)]
+            converted_command_args = [t(v) for v, t in zip(command_args, arg_types)]
         except Exception as ex:
             raise ChuangmiIrException("Invalid command arguments") from ex
 
-        return play_method(command, *command_args)
+        return play_method(command, *converted_command_args)
 
     @command(
         click.argument("indicator_led", type=bool),

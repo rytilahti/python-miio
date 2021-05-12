@@ -5,9 +5,9 @@ and discover devices (MiIOProtocol).
 """
 import binascii
 import codecs
-import datetime
 import logging
 import socket
+from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
 import construct
@@ -39,16 +39,16 @@ class MiIOProtocol:
         self.port = 54321
         if token is None:
             token = 32 * "0"
-        if token is not None:
-            self.token = bytes.fromhex(token)
+        self.token = bytes.fromhex(token)
         self.debug = debug
         self.lazy_discover = lazy_discover
-
         self._timeout = timeout
-        self._discovered = False
-        self._device_ts = None  # type: datetime.datetime
         self.__id = start_id
-        self._device_id = None
+
+        self._discovered = False
+        # these come from the device, but we initialize them here to make mypy happy
+        self._device_ts: datetime = datetime.utcnow()
+        self._device_id = bytes()
 
     def send_handshake(self, *, retry_count=3) -> Message:
         """Send a handshake to the device.
@@ -116,20 +116,20 @@ class MiIOProtocol:
             s.sendto(helobytes, (addr, 54321))
         while True:
             try:
-                data, addr = s.recvfrom(1024)
+                data, recv_addr = s.recvfrom(1024)
                 m = Message.parse(data)  # type: Message
                 _LOGGER.debug("Got a response: %s", m)
                 if not is_broadcast:
                     return m
 
-                if addr[0] not in seen_addrs:
+                if recv_addr[0] not in seen_addrs:
                     _LOGGER.info(
                         "  IP %s (ID: %s) - token: %s",
-                        addr[0],
+                        recv_addr[0],
                         binascii.hexlify(m.header.value.device_id).decode(),
                         codecs.encode(m.checksum, "hex"),
                     )
-                    seen_addrs.append(addr[0])
+                    seen_addrs.append(recv_addr[0])
             except socket.timeout:
                 if is_broadcast:
                     _LOGGER.info("Discovery done")
@@ -162,7 +162,7 @@ class MiIOProtocol:
 
         request = self._create_request(command, parameters, extra_parameters)
 
-        send_ts = self._device_ts + datetime.timedelta(seconds=1)
+        send_ts = self._device_ts + timedelta(seconds=1)
         header = {
             "length": 0,
             "unknown": 0x00000000,
@@ -197,7 +197,7 @@ class MiIOProtocol:
             payload = m.data.value
 
             self.__id = payload["id"]
-            self._device_ts = header.ts
+            self._device_ts = header["ts"]  # type: ignore  # ts uses timeadapter
 
             if self.debug > 1:
                 _LOGGER.debug("recv from %s: %s", addr[0], m)
@@ -206,7 +206,7 @@ class MiIOProtocol:
                 "%s:%s (ts: %s, id: %s) << %s",
                 self.ip,
                 self.port,
-                header.ts,
+                header["ts"],
                 payload["id"],
                 payload,
             )

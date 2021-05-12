@@ -1,21 +1,28 @@
 import pytest
 
-from miio import MiotDevice
+from miio import DeviceException, MiotDevice
 from miio.miot_device import MiotValueType
 
 
 @pytest.fixture(scope="module")
 def dev(module_mocker):
-    device = MiotDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    DUMMY_MAPPING = {}
+    device = MiotDevice(
+        "127.0.0.1", "68ffffffffffffffffffffffffffffff", mapping=DUMMY_MAPPING
+    )
     module_mocker.patch.object(device, "send")
     return device
 
 
+def test_missing_mapping():
+    """Make sure ctor raises exception if neither class nor parameter defines the
+    mapping."""
+    with pytest.raises(DeviceException):
+        _ = MiotDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+
+
 def test_ctor_mapping():
     """Make sure the constructor accepts the mapping parameter."""
-    dev = MiotDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-    assert dev.mapping is None
-
     test_mapping = {}
     dev2 = MiotDevice(
         "127.0.0.1", "68ffffffffffffffffffffffffffffff", mapping=test_mapping
