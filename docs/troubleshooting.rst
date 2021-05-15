@@ -15,6 +15,7 @@ This behaviour has been experienced on the following device types:
 - Xiaomi Zhimi Humidifier (aka ``zhimi.humidifier.v1``)
 - Xiaomi Smartmi Evaporative Humidifier 2 (aka ``zhimi.humidifier.ca1``)
 - Xiaomi IR Remote (aka ``chuangmi_ir``)
+- RoboRock S7 (aka ``roborock.vacuum.a15``)
 
 It's currently unclear if this is a bug or a security feature of the Xiaomi device.
 

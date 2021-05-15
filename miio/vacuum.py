@@ -84,6 +84,13 @@ class FanspeedE2(enum.Enum):
     Turbo = 100
 
 
+class FanspeedS7(enum.Enum):
+    Silent = 101
+    Standard = 102
+    Medium = 103
+    Turbo = 104
+
+
 class WaterFlow(enum.Enum):
     """Water flow strength on s5 max."""
 
@@ -93,10 +100,26 @@ class WaterFlow(enum.Enum):
     Maximum = 203
 
 
+class MopMode(enum.Enum):
+    """Mop routing on S7."""
+
+    Standard = 300
+    Deep = 301
+
+
+class CarpetCleaningMode(enum.Enum):
+    """Type of carpet cleaning/avoidance."""
+
+    Avoid = 0
+    Rise = 1
+    Ignore = 2
+
+
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S6 = "roborock.vacuum.s6"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
+ROCKROBO_S7 = "roborock.vacuum.a15"
 
 
 class Vacuum(Device):
@@ -546,6 +569,8 @@ class Vacuum(Device):
                 self._fanspeeds = FanspeedV1
         elif self.model == "roborock.vacuum.e2":
             self._fanspeeds = FanspeedE2
+        elif self.model == ROCKROBO_S7:
+            self._fanspeeds = FanspeedS7
         else:
             self._fanspeeds = FanspeedV2
 
@@ -682,6 +707,25 @@ class Vacuum(Device):
         return self.send("set_carpet_mode", [data])[0] == "ok"
 
     @command()
+    def carpet_cleaning_mode(self) -> CarpetCleaningMode:
+        """Get carpet cleaning mode/avoidance setting."""
+        try:
+            return CarpetCleaningMode(
+                self.send("get_carpet_clean_mode")[0]["carpet_clean_mode"]
+            )
+        except Exception as err:
+            _LOGGER.warning("Error while requesting carpet clean mode: %s", err)
+            return None
+
+    @command(click.argument("mode", type=EnumType(CarpetCleaningMode)))
+    def set_carpet_cleaning_mode(self, mode: CarpetCleaningMode):
+        """Set carpet cleaning mode/avoidance setting."""
+        return (
+            self.send("set_carpet_clean_mode", {"carpet_clean_mode": mode.value})[0]
+            == "ok"
+        )
+
+    @command()
     def stop_zoned_clean(self):
         """Stop cleaning a zone."""
         return self.send("stop_zoned_clean")
@@ -746,6 +790,30 @@ class Vacuum(Device):
     def set_waterflow(self, waterflow: WaterFlow):
         """Set water flow setting."""
         return self.send("set_water_box_custom_mode", [waterflow.value])
+
+    @command()
+    def mop_mode(self) -> Optional[MopMode]:
+        """Get mop mode setting."""
+        try:
+            return MopMode(self.send("get_mop_mode")[0])
+        except ValueError as err:
+            _LOGGER.warning("Device returned unknown MopMode: %s", err)
+            return None
+
+    @command(click.argument("mop_mode", type=EnumType(MopMode)))
+    def set_mop_mode(self, mop_mode: MopMode):
+        """Set mop mode setting."""
+        return self.send("set_mop_mode", [mop_mode.value])[0] == "ok"
+
+    @command()
+    def child_lock(self) -> bool:
+        """Get child lock setting."""
+        return self.send("get_child_lock_status")["lock_status"] == 1
+
+    @command(click.argument("lock", type=bool))
+    def set_child_lock(self, lock: bool) -> bool:
+        """Set child lock setting."""
+        return self.send("set_child_lock_status", {"lock_status": int(lock)})[0] == "ok"
 
     @classmethod
     def get_device_group(cls):
