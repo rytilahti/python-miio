@@ -38,6 +38,144 @@ class DummyLight(DummyDevice, Yeelight):
             self.state["power"] = "on"
 
 
+class DummyCommonBulb(DummyLight):
+    def __init__(self, *args, **kwargs):
+        self.state = {
+            "name": "test name",
+            "lan_ctrl": "1",
+            "save_state": "1",
+            "delayoff": "0",
+            "music_on": "1",
+            "power": "off",
+            "bright": "100",
+            "color_mode": "2",
+            "rgb": "",
+            "hue": "",
+            "sat": "",
+            "ct": "3584",
+            "flowing": "",
+            "flow_params": "",
+            "active_mode": "",
+            "nl_br": "",
+            "bg_power": "",
+            "bg_bright": "",
+            "bg_lmode": "",
+            "bg_rgb": "",
+            "bg_hue": "",
+            "bg_sat": "",
+            "bg_ct": "",
+            "bg_flowing": "",
+            "bg_flow_params": "",
+        }
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="class")
+def dummycommonbulb(request):
+    request.cls.device = DummyCommonBulb()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("dummycommonbulb")
+class TestYeelightCommon(TestCase):
+    def test_on(self):
+        self.device.off()  # make sure we are off
+        assert self.device.status().is_on is False
+
+        self.device.on()
+        assert self.device.status().is_on is True
+
+    def test_off(self):
+        self.device.on()  # make sure we are on
+        assert self.device.status().is_on is True
+
+        self.device.off()
+        assert self.device.status().is_on is False
+
+    def test_set_brightness(self):
+        def brightness():
+            return self.device.status().brightness
+
+        self.device.set_brightness(50)
+        assert brightness() == 50
+        self.device.set_brightness(0)
+        assert brightness() == 0
+        self.device.set_brightness(100)
+
+        with pytest.raises(YeelightException):
+            self.device.set_brightness(-100)
+
+        with pytest.raises(YeelightException):
+            self.device.set_brightness(200)
+
+    def test_set_color_temp(self):
+        def color_temp():
+            return self.device.status().color_temp
+
+        self.device.set_color_temp(2000)
+        assert color_temp() == 2000
+        self.device.set_color_temp(6500)
+        assert color_temp() == 6500
+
+        with pytest.raises(YeelightException):
+            self.device.set_color_temp(1000)
+
+        with pytest.raises(YeelightException):
+            self.device.set_color_temp(7000)
+
+    def test_set_developer_mode(self):
+        def dev_mode():
+            return self.device.status().developer_mode
+
+        orig_mode = dev_mode()
+        self.device.set_developer_mode(not orig_mode)
+        new_mode = dev_mode()
+        assert new_mode is not orig_mode
+        self.device.set_developer_mode(not new_mode)
+        assert new_mode is not dev_mode()
+
+    def test_set_save_state_on_change(self):
+        def save_state():
+            return self.device.status().save_state_on_change
+
+        orig_state = save_state()
+        self.device.set_save_state_on_change(not orig_state)
+        new_state = save_state()
+        assert new_state is not orig_state
+        self.device.set_save_state_on_change(not new_state)
+        new_state = save_state()
+        assert new_state is orig_state
+
+    def test_set_name(self):
+        def name():
+            return self.device.status().name
+
+        assert name() == "test name"
+        self.device.set_name("new test name")
+        assert name() == "new test name"
+
+    def test_toggle(self):
+        def is_on():
+            return self.device.status().is_on
+
+        orig_state = is_on()
+        self.device.toggle()
+        new_state = is_on()
+        assert orig_state != new_state
+
+        self.device.toggle()
+        new_state = is_on()
+        assert new_state == orig_state
+
+    @pytest.mark.skip("cannot be tested easily")
+    def test_set_default(self):
+        self.fail()
+
+    @pytest.mark.skip("set_scene is not implemented")
+    def test_set_scene(self):
+        self.fail()
+
+
 class DummyLightСolor(DummyLight):
     def __init__(self, *args, **kwargs):
         self.state = {
@@ -121,51 +259,6 @@ class TestYeelightLightColor(TestCase):
         assert status.moonlight_mode is None
         assert status.moonlight_mode_brightness is None
 
-    def test_on(self):
-        self.device.off()  # make sure we are off
-        assert self.device.status().is_on is False
-
-        self.device.on()
-        assert self.device.status().is_on is True
-
-    def test_off(self):
-        self.device.on()  # make sure we are on
-        assert self.device.status().is_on is True
-
-        self.device.off()
-        assert self.device.status().is_on is False
-
-    def test_set_brightness(self):
-        def brightness():
-            return self.device.status().brightness
-
-        self.device.set_brightness(50)
-        assert brightness() == 50
-        self.device.set_brightness(0)
-        assert brightness() == 0
-        self.device.set_brightness(100)
-
-        with pytest.raises(YeelightException):
-            self.device.set_brightness(-100)
-
-        with pytest.raises(YeelightException):
-            self.device.set_brightness(200)
-
-    def test_set_color_temp(self):
-        def color_temp():
-            return self.device.status().color_temp
-
-        self.device.set_color_temp(2000)
-        assert color_temp() == 2000
-        self.device.set_color_temp(6500)
-        assert color_temp() == 6500
-
-        with pytest.raises(YeelightException):
-            self.device.set_color_temp(1000)
-
-        with pytest.raises(YeelightException):
-            self.device.set_color_temp(7000)
-
     def test_set_rgb(self):
         def rgb():
             return self.device.status().rgb
@@ -209,58 +302,6 @@ class TestYeelightLightColor(TestCase):
         assert val == 100
 
         self.device.set_hsv()
-
-    def test_set_developer_mode(self):
-        def dev_mode():
-            return self.device.status().developer_mode
-
-        orig_mode = dev_mode()
-        self.device.set_developer_mode(not orig_mode)
-        new_mode = dev_mode()
-        assert new_mode is not orig_mode
-        self.device.set_developer_mode(not new_mode)
-        assert new_mode is not dev_mode()
-
-    def test_set_save_state_on_change(self):
-        def save_state():
-            return self.device.status().save_state_on_change
-
-        orig_state = save_state()
-        self.device.set_save_state_on_change(not orig_state)
-        new_state = save_state()
-        assert new_state is not orig_state
-        self.device.set_save_state_on_change(not new_state)
-        new_state = save_state()
-        assert new_state is orig_state
-
-    def test_set_name(self):
-        def name():
-            return self.device.status().name
-
-        assert name() == "test name"
-        self.device.set_name("new test name")
-        assert name() == "new test name"
-
-    def test_toggle(self):
-        def is_on():
-            return self.device.status().is_on
-
-        orig_state = is_on()
-        self.device.toggle()
-        new_state = is_on()
-        assert orig_state != new_state
-
-        self.device.toggle()
-        new_state = is_on()
-        assert new_state == orig_state
-
-    @pytest.mark.skip("cannot be tested easily")
-    def test_set_default(self):
-        self.fail()
-
-    @pytest.mark.skip("set_scene is not implemented")
-    def test_set_scene(self):
-        self.fail()
 
 
 class DummyLightCeilingV1(DummyLight):  # without background light
@@ -345,95 +386,6 @@ class TestYeelightLightCeilingV1(TestCase):
         # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params
         assert status.moonlight_mode is True
         assert status.moonlight_mode_brightness == 100
-
-    def test_on(self):
-        self.device.off()  # make sure we are off
-        assert self.device.status().is_on is False
-
-        self.device.on()
-        assert self.device.status().is_on is True
-
-    def test_off(self):
-        self.device.on()  # make sure we are on
-        assert self.device.status().is_on is True
-
-        self.device.off()
-        assert self.device.status().is_on is False
-
-    def test_set_brightness(self):
-        def brightness():
-            return self.device.status().brightness
-
-        self.device.set_brightness(50)
-        assert brightness() == 50
-        self.device.set_brightness(0)
-        assert brightness() == 0
-        self.device.set_brightness(100)
-
-        with pytest.raises(YeelightException):
-            self.device.set_brightness(-100)
-
-        with pytest.raises(YeelightException):
-            self.device.set_brightness(200)
-
-    def test_set_color_temp(self):
-        def color_temp():
-            return self.device.status().color_temp
-
-        self.device.set_color_temp(2000)
-        assert color_temp() == 2000
-        self.device.set_color_temp(6500)
-        assert color_temp() == 6500
-
-        with pytest.raises(YeelightException):
-            self.device.set_color_temp(1000)
-
-        with pytest.raises(YeelightException):
-            self.device.set_color_temp(7000)
-
-    def test_set_developer_mode(self):
-        def dev_mode():
-            return self.device.status().developer_mode
-
-        orig_mode = dev_mode()
-        self.device.set_developer_mode(not orig_mode)
-        new_mode = dev_mode()
-        assert new_mode is not orig_mode
-        self.device.set_developer_mode(not new_mode)
-        assert new_mode is not dev_mode()
-
-    def test_set_save_state_on_change(self):
-        def save_state():
-            return self.device.status().save_state_on_change
-
-        orig_state = save_state()
-        self.device.set_save_state_on_change(not orig_state)
-        new_state = save_state()
-        assert new_state is not orig_state
-        self.device.set_save_state_on_change(not new_state)
-        new_state = save_state()
-        assert new_state is orig_state
-
-    def test_set_name(self):
-        def name():
-            return self.device.status().name
-
-        assert name() == "test name"
-        self.device.set_name("new test name")
-        assert name() == "new test name"
-
-    def test_toggle(self):
-        def is_on():
-            return self.device.status().is_on
-
-        orig_state = is_on()
-        self.device.toggle()
-        new_state = is_on()
-        assert orig_state != new_state
-
-        self.device.toggle()
-        new_state = is_on()
-        assert new_state == orig_state
 
 
 class DummyLightCeilingV2(DummyLight):  # without background light
@@ -529,92 +481,3 @@ class TestYeelightLightCeilingV2(TestCase):
         assert status.lights[1].color_flow_params is None
         assert status.moonlight_mode is True
         assert status.moonlight_mode_brightness == 100
-
-    def test_on(self):
-        self.device.off()  # make sure we are off
-        assert self.device.status().is_on is False
-
-        self.device.on()
-        assert self.device.status().is_on is True
-
-    def test_off(self):
-        self.device.on()  # make sure we are on
-        assert self.device.status().is_on is True
-
-        self.device.off()
-        assert self.device.status().is_on is False
-
-    def test_set_brightness(self):
-        def brightness():
-            return self.device.status().brightness
-
-        self.device.set_brightness(50)
-        assert brightness() == 50
-        self.device.set_brightness(0)
-        assert brightness() == 0
-        self.device.set_brightness(100)
-
-        with pytest.raises(YeelightException):
-            self.device.set_brightness(-100)
-
-        with pytest.raises(YeelightException):
-            self.device.set_brightness(200)
-
-    def test_set_color_temp(self):
-        def color_temp():
-            return self.device.status().color_temp
-
-        self.device.set_color_temp(2000)
-        assert color_temp() == 2000
-        self.device.set_color_temp(6500)
-        assert color_temp() == 6500
-
-        with pytest.raises(YeelightException):
-            self.device.set_color_temp(1000)
-
-        with pytest.raises(YeelightException):
-            self.device.set_color_temp(7000)
-
-    def test_set_developer_mode(self):
-        def dev_mode():
-            return self.device.status().developer_mode
-
-        orig_mode = dev_mode()
-        self.device.set_developer_mode(not orig_mode)
-        new_mode = dev_mode()
-        assert new_mode is not orig_mode
-        self.device.set_developer_mode(not new_mode)
-        assert new_mode is not dev_mode()
-
-    def test_set_save_state_on_change(self):
-        def save_state():
-            return self.device.status().save_state_on_change
-
-        orig_state = save_state()
-        self.device.set_save_state_on_change(not orig_state)
-        new_state = save_state()
-        assert new_state is not orig_state
-        self.device.set_save_state_on_change(not new_state)
-        new_state = save_state()
-        assert new_state is orig_state
-
-    def test_set_name(self):
-        def name():
-            return self.device.status().name
-
-        assert name() == "test name"
-        self.device.set_name("new test name")
-        assert name() == "new test name"
-
-    def test_toggle(self):
-        def is_on():
-            return self.device.status().is_on
-
-        orig_state = is_on()
-        self.device.toggle()
-        new_state = is_on()
-        assert orig_state != new_state
-
-        self.device.toggle()
-        new_state = is_on()
-        assert new_state == orig_state
