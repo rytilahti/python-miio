@@ -10,19 +10,6 @@ from .dummies import DummyDevice
 
 class DummyLight(DummyDevice, Yeelight):
     def __init__(self, *args, **kwargs):
-        self.state = {
-            "power": "off",
-            "bright": "100",
-            "ct": "3584",
-            "rgb": "16711680",
-            "hue": "359",
-            "sat": "100",
-            "color_mode": "2",
-            "name": "test name",
-            "lan_ctrl": "1",
-            "save_state": "1",
-        }
-
         self.return_values = {
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),
@@ -51,33 +38,46 @@ class DummyLight(DummyDevice, Yeelight):
             self.state["power"] = "on"
 
 
+class DummyCommonBulb(DummyLight):
+    def __init__(self, *args, **kwargs):
+        self.state = {
+            "name": "test name",
+            "lan_ctrl": "1",
+            "save_state": "1",
+            "delayoff": "0",
+            "music_on": "1",
+            "power": "off",
+            "bright": "100",
+            "color_mode": "2",
+            "rgb": "",
+            "hue": "",
+            "sat": "",
+            "ct": "3584",
+            "flowing": "",
+            "flow_params": "",
+            "active_mode": "",
+            "nl_br": "",
+            "bg_power": "",
+            "bg_bright": "",
+            "bg_lmode": "",
+            "bg_rgb": "",
+            "bg_hue": "",
+            "bg_sat": "",
+            "bg_ct": "",
+            "bg_flowing": "",
+            "bg_flow_params": "",
+        }
+        super().__init__(*args, **kwargs)
+
+
 @pytest.fixture(scope="class")
-def dummylight(request):
-    request.cls.device = DummyLight()
+def dummycommonbulb(request):
+    request.cls.device = DummyCommonBulb()
     # TODO add ability to test on a real device
 
 
-@pytest.mark.usefixtures("dummylight")
-class TestYeelight(TestCase):
-    def test_status(self):
-        self.device._reset_state()
-        status = self.device.status()  # type: YeelightStatus
-
-        assert repr(status) == repr(YeelightStatus(self.device.start_state))
-
-        assert status.name == self.device.start_state["name"]
-        assert status.is_on is False
-        assert status.brightness == 100
-        assert status.color_temp == 3584
-        assert status.color_mode == YeelightMode.ColorTemperature
-        assert status.rgb is None
-        assert status.developer_mode is True
-        assert status.save_state_on_change is True
-
-        # following are tested in set mode tests
-        # assert status.rgb == 16711680
-        # assert status.hsv == (359, 100, 100)
-
+@pytest.mark.usefixtures("dummycommonbulb")
+class TestYeelightCommon(TestCase):
     def test_on(self):
         self.device.off()  # make sure we are off
         assert self.device.status().is_on is False
@@ -122,50 +122,6 @@ class TestYeelight(TestCase):
 
         with pytest.raises(YeelightException):
             self.device.set_color_temp(7000)
-
-    def test_set_rgb(self):
-        def rgb():
-            return self.device.status().rgb
-
-        self.device._reset_state()
-        self.device._set_state("color_mode", [1])
-
-        assert rgb() == (255, 0, 0)
-
-        self.device.set_rgb((0, 0, 1))
-        assert rgb() == (0, 0, 1)
-        self.device.set_rgb((255, 255, 0))
-        assert rgb() == (255, 255, 0)
-        self.device.set_rgb((255, 255, 255))
-        assert rgb() == (255, 255, 255)
-
-        with pytest.raises(YeelightException):
-            self.device.set_rgb((-1, 0, 0))
-
-        with pytest.raises(YeelightException):
-            self.device.set_rgb((256, 0, 0))
-
-        with pytest.raises(YeelightException):
-            self.device.set_rgb((0, -1, 0))
-
-        with pytest.raises(YeelightException):
-            self.device.set_rgb((0, 256, 0))
-
-        with pytest.raises(YeelightException):
-            self.device.set_rgb((0, 0, -1))
-
-        with pytest.raises(YeelightException):
-            self.device.set_rgb((0, 0, 256))
-
-    @pytest.mark.skip("hsv is not properly implemented")
-    def test_set_hsv(self):
-        self.reset_state()
-        hue, sat, val = self.device.status().hsv
-        assert hue == 359
-        assert sat == 100
-        assert val == 100
-
-        self.device.set_hsv()
 
     def test_set_developer_mode(self):
         def dev_mode():
@@ -218,3 +174,310 @@ class TestYeelight(TestCase):
     @pytest.mark.skip("set_scene is not implemented")
     def test_set_scene(self):
         self.fail()
+
+
+class DummyLightСolor(DummyLight):
+    def __init__(self, *args, **kwargs):
+        self.state = {
+            "name": "test name",
+            "lan_ctrl": "1",
+            "save_state": "1",
+            "delayoff": "0",
+            "music_on": "1",
+            "power": "off",
+            "bright": "100",
+            "color_mode": "2",
+            "rgb": "16711680",
+            "hue": "359",
+            "sat": "100",
+            "ct": "3584",
+            "flowing": "0",
+            "flow_params": "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100",
+            "active_mode": "",
+            "nl_br": "",
+            "bg_power": "",
+            "bg_bright": "",
+            "bg_lmode": "",
+            "bg_rgb": "",
+            "bg_hue": "",
+            "bg_sat": "",
+            "bg_ct": "",
+            "bg_flowing": "",
+            "bg_flow_params": "",
+        }
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="class")
+def dummylightcolor(request):
+    request.cls.device = DummyLightСolor()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("dummylightcolor")
+class TestYeelightLightColor(TestCase):
+    def test_status(self):
+        self.device._reset_state()
+        status = self.device.status()  # type: YeelightStatus
+
+        assert repr(status) == repr(YeelightStatus(self.device.start_state))
+
+        assert status.name == self.device.start_state["name"]
+        assert status.developer_mode is True
+        assert status.save_state_on_change is True
+        assert status.delay_off == 0
+        assert status.music_mode is True
+        assert len(status.lights) == 1
+        assert status.is_on is False and status.is_on == status.lights[0].is_on
+        assert (
+            status.brightness == 100
+            and status.brightness == status.lights[0].brightness
+        )
+        assert (
+            status.color_mode == YeelightMode.ColorTemperature
+            and status.color_mode == status.lights[0].color_mode
+        )
+        assert (
+            status.color_temp == 3584
+            and status.color_temp == status.lights[0].color_temp
+        )
+        assert status.rgb is None and status.rgb == status.lights[0].rgb
+        assert status.hsv is None and status.hsv == status.lights[0].hsv
+        # following are tested in set mode tests
+        # assert status.rgb == 16711680
+        # assert status.hsv == (359, 100, 100)
+        assert (
+            status.color_flowing is False
+            and status.color_flowing == status.lights[0].color_flowing
+        )
+        assert (
+            status.color_flow_params is None
+            and status.color_flow_params == status.lights[0].color_flow_params
+        )
+        # color_flow_params will be tested after future implementation
+        # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params
+        assert status.moonlight_mode is None
+        assert status.moonlight_mode_brightness is None
+
+    def test_set_rgb(self):
+        def rgb():
+            return self.device.status().rgb
+
+        self.device._reset_state()
+        self.device._set_state("color_mode", [1])
+
+        assert rgb() == (255, 0, 0)
+
+        self.device.set_rgb((0, 0, 1))
+        assert rgb() == (0, 0, 1)
+        self.device.set_rgb((255, 255, 0))
+        assert rgb() == (255, 255, 0)
+        self.device.set_rgb((255, 255, 255))
+        assert rgb() == (255, 255, 255)
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((-1, 0, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((256, 0, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, -1, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, 256, 0))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, 0, -1))
+
+        with pytest.raises(YeelightException):
+            self.device.set_rgb((0, 0, 256))
+
+    @pytest.mark.skip("hsv is not properly implemented")
+    def test_set_hsv(self):
+        self.reset_state()
+        hue, sat, val = self.device.status().hsv
+        assert hue == 359
+        assert sat == 100
+        assert val == 100
+
+        self.device.set_hsv()
+
+
+class DummyLightCeilingV1(DummyLight):  # without background light
+    def __init__(self, *args, **kwargs):
+        self.state = {
+            "name": "test name",
+            "lan_ctrl": "1",
+            "save_state": "1",
+            "delayoff": "0",
+            "music_on": "",
+            "power": "off",
+            "bright": "100",
+            "color_mode": "2",
+            "rgb": "",
+            "hue": "",
+            "sat": "",
+            "ct": "3584",
+            "flowing": "0",
+            "flow_params": "0,0,2000,3,0,33,2000,3,0,100",
+            "active_mode": "1",
+            "nl_br": "100",
+            "bg_power": "",
+            "bg_bright": "",
+            "bg_lmode": "",
+            "bg_rgb": "",
+            "bg_hue": "",
+            "bg_sat": "",
+            "bg_ct": "",
+            "bg_flowing": "",
+            "bg_flow_params": "",
+        }
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="class")
+def dummylightceilingv1(request):
+    request.cls.device = DummyLightCeilingV1()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("dummylightceilingv1")
+class TestYeelightLightCeilingV1(TestCase):
+    def test_status(self):
+        self.device._reset_state()
+        status = self.device.status()  # type: YeelightStatus
+
+        assert repr(status) == repr(YeelightStatus(self.device.start_state))
+
+        assert status.name == self.device.start_state["name"]
+        assert status.developer_mode is True
+        assert status.save_state_on_change is True
+        assert status.delay_off == 0
+        assert status.music_mode is None
+        assert len(status.lights) == 1
+        assert status.is_on is False and status.is_on == status.lights[0].is_on
+        assert (
+            status.brightness == 100
+            and status.brightness == status.lights[0].brightness
+        )
+        assert (
+            status.color_mode == YeelightMode.ColorTemperature
+            and status.color_mode == status.lights[0].color_mode
+        )
+        assert (
+            status.color_temp == 3584
+            and status.color_temp == status.lights[0].color_temp
+        )
+        assert status.rgb is None and status.rgb == status.lights[0].rgb
+        assert status.hsv is None and status.hsv == status.lights[0].hsv
+        # following are tested in set mode tests
+        # assert status.rgb == 16711680
+        # assert status.hsv == (359, 100, 100)
+        assert (
+            status.color_flowing is False
+            and status.color_flowing == status.lights[0].color_flowing
+        )
+        assert (
+            status.color_flow_params is None
+            and status.color_flow_params == status.lights[0].color_flow_params
+        )
+        # color_flow_params will be tested after future implementation
+        # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params
+        assert status.moonlight_mode is True
+        assert status.moonlight_mode_brightness == 100
+
+
+class DummyLightCeilingV2(DummyLight):  # without background light
+    def __init__(self, *args, **kwargs):
+        self.state = {
+            "name": "test name",
+            "lan_ctrl": "1",
+            "save_state": "1",
+            "delayoff": "0",
+            "music_on": "",
+            "power": "off",
+            "bright": "100",
+            "color_mode": "2",
+            "rgb": "",
+            "hue": "",
+            "sat": "",
+            "ct": "3584",
+            "flowing": "0",
+            "flow_params": "0,0,2000,3,0,33,2000,3,0,100",
+            "active_mode": "1",
+            "nl_br": "100",
+            "bg_power": "off",
+            "bg_bright": "100",
+            "bg_lmode": "2",
+            "bg_rgb": "15531811",
+            "bg_hue": "65",
+            "bg_sat": "86",
+            "bg_ct": "4000",
+            "bg_flowing": "0",
+            "bg_flow_params": "0,0,3000,4,16711680,100,3000,4,65280,100,3000,4,255,100",
+        }
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="class")
+def dummylightceilingv2(request):
+    request.cls.device = DummyLightCeilingV2()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("dummylightceilingv2")
+class TestYeelightLightCeilingV2(TestCase):
+    def test_status(self):
+        self.device._reset_state()
+        status = self.device.status()  # type: YeelightStatus
+
+        assert repr(status) == repr(YeelightStatus(self.device.start_state))
+
+        assert status.name == self.device.start_state["name"]
+        assert status.developer_mode is True
+        assert status.save_state_on_change is True
+        assert status.delay_off == 0
+        assert status.music_mode is None
+        assert len(status.lights) == 2
+        assert status.is_on is False and status.is_on == status.lights[0].is_on
+        assert (
+            status.brightness == 100
+            and status.brightness == status.lights[0].brightness
+        )
+        assert (
+            status.color_mode == YeelightMode.ColorTemperature
+            and status.color_mode == status.lights[0].color_mode
+        )
+        assert (
+            status.color_temp == 3584
+            and status.color_temp == status.lights[0].color_temp
+        )
+        assert status.rgb is None and status.rgb == status.lights[0].rgb
+        assert status.hsv is None and status.hsv == status.lights[0].hsv
+        # following are tested in set mode tests
+        # assert status.rgb == 16711680
+        # assert status.hsv == (359, 100, 100)
+        assert (
+            status.color_flowing is False
+            and status.color_flowing == status.lights[0].color_flowing
+        )
+        assert (
+            status.color_flow_params is None
+            and status.color_flow_params == status.lights[0].color_flow_params
+        )
+        # color_flow_params will be tested after future implementation
+        # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params
+        assert status.lights[1].is_on is False
+        assert status.lights[1].brightness == 100
+        assert status.lights[1].color_mode == YeelightMode.ColorTemperature
+        assert status.lights[1].color_temp == 4000
+        assert status.lights[1].rgb is None
+        assert status.lights[1].hsv is None
+        # following are tested in set mode tests
+        # assert status.rgb == 15531811
+        # assert status.hsv == (65, 86, 100)
+        assert status.lights[1].color_flowing is False
+        assert status.lights[1].color_flow_params is None
+        assert status.moonlight_mode is True
+        assert status.moonlight_mode_brightness == 100

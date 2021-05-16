@@ -7,4 +7,5 @@ max-line-length = 88
 select = C,E,F,W,B,SIM,T
 # the line lengths are enforced by black and docformatter
 # therefore we ignore E501 and B950 here
-ignore = E501,B950,W503,E203
+# SIM119 - are irrelevant as we still support python 3.6 series
+ignore = E501,B950,W503,E203,SIM119
