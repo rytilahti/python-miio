@@ -1,4 +1,3 @@
-
 from enum import IntEnum
 from typing import List, Optional, Tuple
 
@@ -256,7 +255,6 @@ class Yeelight(Device):
     (https://yeelight.readthedocs.io/en/latest/),
     which however requires enabling the developer mode on the bulbs.
     """
-
 
     @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:

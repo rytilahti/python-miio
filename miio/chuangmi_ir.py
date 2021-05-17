@@ -1,6 +1,6 @@
 import base64
 import re
-from typing import Callable, Set
+from typing import Callable, Set, Tuple
 
 import click
 from construct import (
@@ -92,10 +92,11 @@ class ChuangmiIr(Device):
         :param int repeats: Number of extra signal repeats.
         :param int length: Length of the command. -1 means not sending the length parameter.
         """
-        return self.play_raw(*self.pronto_to_raw(pronto, repeats), length)
+        command, frequency = self.pronto_to_raw(pronto, repeats)
+        return self.play_raw(command, frequency, length)
 
     @classmethod
-    def pronto_to_raw(cls, pronto: str, repeats: int = 1):
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
         """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
         starting with 0000.
 
