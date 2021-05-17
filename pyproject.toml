@@ -57,7 +57,7 @@ tox = "^3"
 isort = "^4"
 cffi = "^1"
 docformatter = "^1"
-mypy = "^0"
+mypy = {version = "^0", markers = "platform_python_implementation == 'CPython'"}
 
 [tool.isort]
 multi_line_output = 3
