@@ -44,9 +44,9 @@ jobs:
       - name: "Documentation build (sphinx)"
         run: |
           poetry run sphinx-build docs/ generated_docs
-      # - name: "Typing checks (mypy)"
-      #   run: |
-      #     poetry run pre-commit run mypy --all-files
+      - name: "Typing checks (mypy)"
+        run: |
+          poetry run pre-commit run mypy --all-files
 
   tests:
     name: "Python ${{ matrix.python-version}} on ${{ matrix.os }}"
