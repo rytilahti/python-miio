@@ -178,6 +178,7 @@ class Vacuum(Device):
             ROCKROBO_S5,
             ROCKROBO_S6,
             ROCKROBO_S6_MAXV,
+            ROCKROBO_S7,
         ]
 
         if self.model not in SKIP_PAUSE:
