@@ -174,13 +174,11 @@ class Vacuum(Device):
         if self.model is None:
             self._autodetect_model()
 
-        SKIP_PAUSE = [
-            ROCKROBO_S5,
-            ROCKROBO_S6,
-            ROCKROBO_S6_MAXV,
+        PAUSE_BEFORE_HOME = [
+            ROCKROBO_V1,
         ]
 
-        if self.model not in SKIP_PAUSE:
+        if self.model in PAUSE_BEFORE_HOME:
             self.send("app_pause")
 
         return self.send("app_charge")
