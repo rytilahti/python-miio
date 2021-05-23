@@ -214,19 +214,15 @@ class YeelightStatus(DeviceStatus):
         ]  # TODO: change this to model spec in the future.
 
         if bg_power:
-            return list(
-                {
-                    YeelightSubLightStatus(
-                        self.data, YeelightSubLightType.Main, "main_power"
-                    ),
-                    YeelightSubLightStatus(
-                        self.data, YeelightSubLightType.Background, "bg_power"
-                    ),
-                }
-            )
-        return list(
-            {YeelightSubLightStatus(self.data, YeelightSubLightType.Main, "power")}
-        )
+            return [
+                YeelightSubLightStatus(
+                    self.data, YeelightSubLightType.Main, "main_power"
+                ),
+                YeelightSubLightStatus(
+                    self.data, YeelightSubLightType.Background, "bg_power"
+                ),
+            ]
+        return [YeelightSubLightStatus(self.data, YeelightSubLightType.Main, "power")]
 
     @property
     def cli_format(self) -> str:
