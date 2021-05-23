@@ -36,14 +36,17 @@ class YeelightMode(IntEnum):
     HSV = 3
 
 
-class YeelightSubLight(DeviceStatus):
-    def __init__(self, data, type):
+class YeelightSubLightStatus(DeviceStatus):
+    def __init__(self, data, type, power_prop):
         self.data = data
         self.type = type
+        self.power_prop = power_prop
 
     def get_prop_name(self, prop) -> str:
         if prop == "color_mode":
             return SUBLIGHT_COLOR_MODE_PROP[self.type]
+        elif prop == "power":
+            return self.power_prop
         else:
             return SUBLIGHT_PROP_PREFIX[self.type] + prop
 
@@ -115,8 +118,11 @@ class YeelightStatus(DeviceStatus):
 
     @property
     def is_on(self) -> bool:
-        """Return whether the light is on or off."""
-        return self.lights[0].is_on
+        """Return whether the light is on or off.
+
+        It could be main light or/and background
+        """
+        return self.data["power"] == "on"
 
     @property
     def brightness(self) -> int:
@@ -201,22 +207,32 @@ class YeelightStatus(DeviceStatus):
         return None
 
     @property
-    def lights(self) -> List[YeelightSubLight]:
+    def lights(self) -> List[YeelightSubLightStatus]:
         """Return list of sub lights."""
-        sub_lights = list({YeelightSubLight(self.data, YeelightSubLightType.Main)})
         bg_power = self.data[
             "bg_power"
-        ]  # to do: change this to model spec in the future.
+        ]  # TODO: change this to model spec in the future.
+
         if bg_power:
-            sub_lights.append(
-                YeelightSubLight(self.data, YeelightSubLightType.Background)
+            return list(
+                {
+                    YeelightSubLightStatus(
+                        self.data, YeelightSubLightType.Main, "main_power"
+                    ),
+                    YeelightSubLightStatus(
+                        self.data, YeelightSubLightType.Background, "bg_power"
+                    ),
+                }
             )
-        return sub_lights
+        return list(
+            {YeelightSubLightStatus(self.data, YeelightSubLightType.Main, "power")}
+        )
 
     @property
     def cli_format(self) -> str:
         """Return human readable sub lights string."""
         s = f"Name: {self.name}\n"
+        s += f"Power: {self.is_on}\n"
         s += f"Update default on change: {self.save_state_on_change}\n"
         s += f"Delay in minute before off: {self.delay_off}\n"
         if self.music_mode is not None:
@@ -274,8 +290,9 @@ class Yeelight(Device):
             "save_state",
             "delayoff",
             "music_on",
-            # light properties
             "power",
+            # light properties
+            "main_power",
             "bright",
             "color_mode",
             "rgb",
@@ -300,18 +317,20 @@ class Yeelight(Device):
         ]
 
         values = self.get_properties(properties)
-
         return YeelightStatus(dict(zip(properties, values)))
 
     @command(
         click.option("--transition", type=int, required=False, default=0),
         click.option("--mode", type=int, required=False, default=0),
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
         default_output=format_output("Powering on"),
     )
-    def on(self, transition=0, mode=0):
+    def on(self, transition=0, mode=0, lamp=YeelightSubLightType.Main):
         """Power on."""
         """
-        set_power ["on|off", "smooth", time_in_ms, mode]
+        set_power ["on|off", "sudden|smooth", time_in_ms, mode]
         where mode:
         0: last mode
         1: normal mode
@@ -320,63 +339,117 @@ class Yeelight(Device):
         4: color flow
         5: moonlight
         """
-        if transition > 0 or mode > 0:
-            return self.send("set_power", ["on", "smooth", transition, mode])
-        return self.send("set_power", ["on"])
+
+        miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_power"
+        miio_param = ["on"]
+        if transition > 0:
+            miio_param += ["smooth", transition]
+        else:
+            miio_param += ["sudden", 0]
+        if mode > 0:
+            miio_param += [mode]
+        return self.send(miio_command, miio_param)
 
     @command(
         click.option("--transition", type=int, required=False, default=0),
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
         default_output=format_output("Powering off"),
     )
-    def off(self, transition=0):
+    def off(self, transition=0, lamp=YeelightSubLightType.Main):
         """Power off."""
+        miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_power"
+        miio_param = ["off"]
         if transition > 0:
-            return self.send("set_power", ["off", "smooth", transition])
-        return self.send("set_power", ["off"])
+            miio_param += ["smooth", transition]
+        return self.send(miio_command, miio_param)
 
     @command(
         click.argument("level", type=int),
         click.option("--transition", type=int, required=False, default=0),
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
         default_output=format_output("Setting brightness to {level}"),
     )
-    def set_brightness(self, level, transition=0):
+    def set_brightness(self, level, transition=0, lamp=YeelightSubLightType.Main):
         """Set brightness."""
         if level < 0 or level > 100:
             raise YeelightException("Invalid brightness: %s" % level)
+        miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_bright"
+        miio_param = [level]
         if transition > 0:
-            return self.send("set_bright", [level, "smooth", transition])
-        return self.send("set_bright", [level])
+            miio_param += ["smooth", transition]
+        return self.send(miio_command, miio_param)
 
     @command(
         click.argument("level", type=int),
         click.option("--transition", type=int, required=False, default=0),
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
         default_output=format_output("Setting color temperature to {level}"),
     )
-    def set_color_temp(self, level, transition=500):
+    def set_color_temp(self, level, transition=500, lamp=YeelightSubLightType.Main):
         """Set color temp in kelvin."""
-        if level > 6500 or level < 1700:
+        if level > 6500 or level < 1700:  # TODO: change to specification base on lamp
             raise YeelightException("Invalid color temperature: %s" % level)
+        miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_ct_abx"
+        miio_param = [level]
         if transition > 0:
-            return self.send("set_ct_abx", [level, "smooth", transition])
+            miio_param += ["smooth", transition]
         else:
             # Bedside lamp requires transition
-            return self.send("set_ct_abx", [level, "sudden", 0])
+            miio_param += ["sudden", 0]
+
+        return self.send(miio_command, miio_param)
 
     @command(
         click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
+        click.option("--transition", type=int, required=False, default=0),
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
         default_output=format_output("Setting color to {rgb}"),
     )
-    def set_rgb(self, rgb: Tuple[int, int, int]):
+    def set_rgb(
+        self, rgb: Tuple[int, int, int], transition=0, lamp=YeelightSubLightType.Main
+    ):
         """Set color in RGB."""
         for color in rgb:
             if color < 0 or color > 255:
                 raise YeelightException("Invalid color: %s" % color)
 
-        return self.send("set_rgb", [rgb_to_int(rgb)])
+        miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_rgb"
+        miio_param = [rgb_to_int(rgb)]
+        if transition > 0:
+            miio_param += ["smooth", transition]
 
-    def set_hsv(self, hsv):
+        return self.send(miio_command, miio_param)
+
+    @command(
+        click.argument("hue", default=359, type=int),
+        click.argument("sat", default=100, type=int),
+        click.option("--transition", type=int, required=False, default=0),
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
+        default_output=format_output("Setting hsv to {hue} {sat}"),
+    )
+    def set_hsv(self, hue, sat, transition=0, lamp=YeelightSubLightType.Main):
         """Set color in HSV."""
-        return self.send("set_hsv", [hsv])
+        if hue < 0 or hue > 359:
+            raise YeelightException("Invalid hue: %s" % hue)
+        if sat < 0 or sat > 100:
+            raise YeelightException("Invalid sat: %s" % sat)
+
+        miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_hsv"
+        miio_param = [hue, sat]
+        if transition > 0:
+            miio_param += ["smooth", transition]
+
+        return self.send(miio_command, miio_param)
 
     @command(
         click.argument("enable", type=bool),
@@ -402,15 +475,30 @@ class Yeelight(Device):
         """Set an internal name for the bulb."""
         return self.send("set_name", [name])
 
-    @command(default_output=format_output("Toggling the bulb"))
-    def toggle(self):
+    @command(
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
+        default_output=format_output("Toggling the bulb"),
+    )
+    def toggle(self, lamp=YeelightSubLightType.Main):
         """Toggle bulb state."""
-        return self.send("toggle")
+        if lamp == YeelightSubLightType.Main:
+            return self.send("toggle")
+        elif lamp == YeelightSubLightType.Background:
+            return self.send("bg_toggle")
 
-    @command(default_output=format_output("Setting current settings to default"))
-    def set_default(self):
+        return self.send("dev_toggle")
+
+    @command(
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
+        default_output=format_output("Setting current settings to default"),
+    )
+    def set_default(self, lamp=YeelightSubLightType.Main):
         """Set current state as default."""
-        return self.send("set_default")
+        return self.send(SUBLIGHT_PROP_PREFIX[lamp] + "set_default")
 
     def set_scene(self, scene, *vals):
         """Set the scene."""
