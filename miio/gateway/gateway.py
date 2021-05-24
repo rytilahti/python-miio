@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+from typing import Dict
 
 import click
 import yaml
@@ -10,6 +11,10 @@ import yaml
 from ..click_common import command
 from ..device import Device
 from ..exceptions import DeviceError, DeviceException
+from .alarm import Alarm
+from .light import Light
+from .radio import Radio
+from .zigbee import Zigbee
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -82,13 +87,11 @@ class Gateway(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-        from . import Alarm, Light, Radio, Zigbee
-
         self._alarm = Alarm(parent=self)
         self._radio = Radio(parent=self)
         self._zigbee = Zigbee(parent=self)
         self._light = Light(parent=self)
-        self._devices = {}
+        self._devices: Dict[str, SubDevice] = {}
         self._info = None
         self._subdevice_model_map = None
         self._did = None
@@ -99,23 +102,23 @@ class Gateway(Device):
                 return model_info
 
     @property
-    def alarm(self) -> "GatewayAlarm":  # noqa: F821
+    def alarm(self) -> Alarm:
         """Return alarm control interface."""
         # example: gateway.alarm.on()
         return self._alarm
 
     @property
-    def radio(self) -> "GatewayRadio":  # noqa: F821
+    def radio(self) -> Radio:
         """Return radio control interface."""
         return self._radio
 
     @property
-    def zigbee(self) -> "GatewayZigbee":  # noqa: F821
+    def zigbee(self) -> Zigbee:
         """Return zigbee control interface."""
         return self._zigbee
 
     @property
-    def light(self) -> "GatewayLight":  # noqa: F821
+    def light(self) -> Light:
         """Return light control interface."""
         return self._light
 

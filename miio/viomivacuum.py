@@ -135,52 +135,45 @@ class ViomiPositionPoint:
 
 
 class ViomiConsumableStatus(ConsumableStatus):
+    """Consumable container for viomi vacuums.
+
+    Note that this exposes `mop` and `mop_left` that are not available in the base
+    class, while returning zeroed timedeltas for `sensor_dirty` and `sensor_dirty_left`
+    which it doesn't report.
+    """
+
     def __init__(self, data: List[int]) -> None:
         # [17, 17, 17, 17]
-        self.data = [d * 60 * 60 for d in data]
+        self.data = {
+            "main_brush_work_time": data[0] * 60 * 60,
+            "side_brush_work_time": data[1] * 60 * 60,
+            "filter_work_time": data[2] * 60 * 60,
+            "mop_dirty_time": data[3] * 60 * 60,
+        }
         self.side_brush_total = timedelta(hours=180)
         self.main_brush_total = timedelta(hours=360)
         self.filter_total = timedelta(hours=180)
         self.mop_total = timedelta(hours=180)
-
-    @property
-    def main_brush(self) -> timedelta:
-        """Main brush usage time."""
-        return pretty_seconds(self.data[0])
-
-    @property
-    def main_brush_left(self) -> timedelta:
-        """How long until the main brush should be changed."""
-        return self.main_brush_total - self.main_brush
-
-    @property
-    def side_brush(self) -> timedelta:
-        """Side brush usage time."""
-        return pretty_seconds(self.data[1])
-
-    @property
-    def side_brush_left(self) -> timedelta:
-        """How long until the side brush should be changed."""
-        return self.side_brush_total - self.side_brush
-
-    @property
-    def filter(self) -> timedelta:
-        """Filter usage time."""
-        return pretty_seconds(self.data[2])
-
-    @property
-    def filter_left(self) -> timedelta:
-        """How long until the filter should be changed."""
-        return self.filter_total - self.filter
+        self.sensor_dirty_total = timedelta(seconds=0)
 
     @property
     def mop(self) -> timedelta:
         """Return ``sensor_dirty_time``"""
-        return pretty_seconds(self.data[3])
+        return pretty_seconds(self.data["mop_dirty_time"])
 
     @property
     def mop_left(self) -> timedelta:
         """How long until the mop should be changed."""
+        return self.mop_total - self.mop
+
+    @property
+    def sensor_dirty(self) -> timedelta:
+        """Viomi has no sensor dirty, so we return zero here."""
+        return timedelta(seconds=0)
+
+    @property
+    def sensor_dirty_left(self) -> timedelta:
+        """Viomi has no sensor dirty, so we return zero here."""
         return self.sensor_dirty_total - self.sensor_dirty
 
 
@@ -491,9 +484,7 @@ class ViomiVacuum(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug)
         self.manual_seqnum = -1
-        self._cache = {"edge_state": None, "rooms": {}, "maps": {}}
-        # self.model = None
-        # self._fanspeeds = FanspeedV1
+        self._cache: Dict[str, Any] = {"edge_state": None, "rooms": {}, "maps": {}}
 
     @command(
         default_output=format_output(
@@ -625,7 +616,9 @@ class ViomiVacuum(Device):
             else:
                 room_keys = ", ".join(self._cache["rooms"].keys())
                 room_ids = ", ".join(self._cache["rooms"].values())
-                raise f"Room {room} is unknown, it must be in {room_keys} or {room_ids}"
+                raise DeviceException(
+                    f"Room {room} is unknown, it must be in {room_keys} or {room_ids}"
+                )
 
         self._cache["edge_state"] = self.get_properties(["mode"])
         self.send(
@@ -682,14 +675,16 @@ class ViomiVacuum(Device):
         results = self.send("get_curpos", [])
         positions = []
         # Group result 4 by 4
-        for result in [i for i in zip(*(results[i::4] for i in range(4)))]:
+        for res in [i for i in zip(*(results[i::4] for i in range(4)))]:
+            # ignore type require for mypy error
+            # "ViomiPositionPoint" gets multiple values for keyword argument "plan_multiplicator"
             positions.append(
-                ViomiPositionPoint(*result, plan_multiplicator=plan_multiplicator)
+                ViomiPositionPoint(*res, plan_multiplicator=plan_multiplicator)  # type: ignore
             )
         return positions
 
     @command()
-    def get_current_position(self) -> ViomiPositionPoint:
+    def get_current_position(self) -> Optional[ViomiPositionPoint]:
         """Return the current position."""
         positions = self.get_positions()
         if positions:
@@ -839,8 +834,9 @@ class ViomiVacuum(Device):
         """Return room ids and names."""
         if self._cache["rooms"] and not refresh:
             return self._cache["rooms"]
+
+        # TODO: map_name and map_id are just dead code here?
         if map_name:
-            map_id = None
             maps = self.get_maps()
             map_ids = [map_["id"] for map_ in maps if map_["name"] == map_name]
             if not map_ids:
@@ -848,12 +844,13 @@ class ViomiVacuum(Device):
                 raise ViomiVacuumException(
                     f"Error: Bad map name, should be in {map_names}"
                 )
-            map_id = map_ids[0]
         elif map_id:
             maps = self.get_maps()
             if map_id not in [m["id"] for m in maps]:
-                map_ids = ", ".join([str(m["id"]) for m in maps])
-                raise ViomiVacuumException(f"Error: Bad map id, should be in {map_ids}")
+                map_ids_str = ", ".join([str(m["id"]) for m in maps])
+                raise ViomiVacuumException(
+                    f"Error: Bad map id, should be in {map_ids_str}"
+                )
         # Get scheduled cleanup
         schedules = self.send("get_ordertime", [])
         scheduled_found, rooms = _get_rooms_from_schedules(schedules)

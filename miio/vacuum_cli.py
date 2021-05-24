@@ -243,17 +243,17 @@ def tui(vac: miio.Vacuum):
     miio.VacuumTUI(vac).run()
 
 
-@manual.command()
+@manual.command(name="start")
 @pass_dev
-def start(vac: miio.Vacuum):  # noqa: F811  # redef of start
+def manual_start(vac: miio.Vacuum):  # noqa: F811  # redef of start
     """Activate the manual mode."""
     click.echo("Activating manual controls")
     return vac.manual_start()
 
 
-@manual.command()
+@manual.command(name="stop")
 @pass_dev
-def stop(vac: miio.Vacuum):  # noqa: F811  # redef of stop
+def manual_stop(vac: miio.Vacuum):  # noqa: F811  # redef of stop
     """Deactivate the manual mode."""
     click.echo("Deactivating manual controls")
     return vac.manual_stop()
@@ -646,7 +646,7 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
     else:
         click.echo("Starting the update failed: %s" % update_res)
 
-    with tqdm(total=100) as t:
+    with tqdm(total=100) as pbar:
         state = vac.update_state()
         while state == UpdateState.Downloading:
             try:
@@ -660,8 +660,8 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
                 click.echo("Installation started, please wait until the vacuum reboots")
                 break
 
-            t.update(progress - t.n)
-            t.set_description("%s" % state.name)
+            pbar.update(progress - pbar.n)
+            pbar.set_description("%s" % state.name)
             time.sleep(1)
 
 

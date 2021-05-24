@@ -38,9 +38,9 @@ class CameraOffset:
 class ArmStatus:
     """Container for arm statuses."""
 
-    is_armed = attr.ib(converter=bool)
-    arm_wait_time = attr.ib(converter=int)
-    alarm_volume = attr.ib(converter=int)
+    is_armed: bool = attr.ib(converter=bool)
+    arm_wait_time: int = attr.ib(converter=int)
+    alarm_volume: int = attr.ib(converter=int)
 
 
 class SDCardStatus(IntEnum):

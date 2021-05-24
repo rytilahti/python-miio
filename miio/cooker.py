@@ -278,21 +278,21 @@ class InteractionTimeouts(DeviceStatus):
     def led_off(self) -> int:
         return self.timeouts[0]
 
-    @property
-    def lid_open(self) -> int:
-        return self.timeouts[1]
-
-    @property
-    def lid_open_warning(self) -> int:
-        return self.timeouts[2]
-
     @led_off.setter
     def led_off(self, delay: int):
         self.timeouts[0] = delay
 
+    @property
+    def lid_open(self) -> int:
+        return self.timeouts[1]
+
     @lid_open.setter
     def lid_open(self, timeout: int):
         self.timeouts[1] = timeout
+
+    @property
+    def lid_open_warning(self) -> int:
+        return self.timeouts[2]
 
     @lid_open_warning.setter
     def lid_open_warning(self, timeout: int):
@@ -333,44 +333,16 @@ class CookerSettings(DeviceStatus):
     def pressure_supported(self) -> bool:
         return self.settings[0] & 1 != 0
 
-    @property
-    def led_on(self) -> bool:
-        return self.settings[0] & 2 != 0
-
-    @property
-    def auto_keep_warm(self) -> bool:
-        return self.settings[0] & 4 != 0
-
-    @property
-    def lid_open_warning(self) -> bool:
-        return self.settings[0] & 8 != 0
-
-    @property
-    def lid_open_warning_delayed(self) -> bool:
-        return self.settings[0] & 16 != 0
-
-    @property
-    def jingzhu_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 1 != 0
-
-    @property
-    def kuaizhu_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 2 != 0
-
-    @property
-    def zhuzhou_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 4 != 0
-
-    @property
-    def favorite_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 8 != 0
-
     @pressure_supported.setter
     def pressure_supported(self, supported: bool):
         if supported:
             self.settings[0] |= 1
         else:
             self.settings[0] &= 254
+
+    @property
+    def led_on(self) -> bool:
+        return self.settings[0] & 2 != 0
 
     @led_on.setter
     def led_on(self, on: bool):
@@ -379,12 +351,20 @@ class CookerSettings(DeviceStatus):
         else:
             self.settings[0] &= 253
 
+    @property
+    def auto_keep_warm(self) -> bool:
+        return self.settings[0] & 4 != 0
+
     @auto_keep_warm.setter
     def auto_keep_warm(self, keep_warm: bool):
         if keep_warm:
             self.settings[0] |= 4
         else:
             self.settings[0] &= 251
+
+    @property
+    def lid_open_warning(self) -> bool:
+        return self.settings[0] & 8 != 0
 
     @lid_open_warning.setter
     def lid_open_warning(self, alarm: bool):
@@ -393,12 +373,20 @@ class CookerSettings(DeviceStatus):
         else:
             self.settings[0] &= 247
 
+    @property
+    def lid_open_warning_delayed(self) -> bool:
+        return self.settings[0] & 16 != 0
+
     @lid_open_warning_delayed.setter
     def lid_open_warning_delayed(self, alarm: bool):
         if alarm:
             self.settings[0] |= 16
         else:
             self.settings[0] &= 239
+
+    @property
+    def jingzhu_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 1 != 0
 
     @jingzhu_auto_keep_warm.setter
     def jingzhu_auto_keep_warm(self, auto_keep_warm: bool):
@@ -407,6 +395,10 @@ class CookerSettings(DeviceStatus):
         else:
             self.settings[1] &= 254
 
+    @property
+    def kuaizhu_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 2 != 0
+
     @kuaizhu_auto_keep_warm.setter
     def kuaizhu_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
@@ -414,12 +406,20 @@ class CookerSettings(DeviceStatus):
         else:
             self.settings[1] &= 253
 
+    @property
+    def zhuzhou_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 4 != 0
+
     @zhuzhou_auto_keep_warm.setter
     def zhuzhou_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
             self.settings[1] |= 4
         else:
             self.settings[1] &= 251
+
+    @property
+    def favorite_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 8 != 0
 
     @favorite_auto_keep_warm.setter
     def favorite_auto_keep_warm(self, auto_keep_warm: bool):

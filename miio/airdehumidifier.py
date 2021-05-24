@@ -174,7 +174,7 @@ class AirDehumidifier(Device):
         else:
             self.model = MODEL_DEHUMIDIFIER_V1
 
-        self.device_info = None
+        self.device_info: DeviceInfo
 
     @command(
         default_output=format_output(

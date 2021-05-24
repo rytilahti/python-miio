@@ -158,6 +158,9 @@ class AirHumidifierStatus(DeviceStatus):
 
         For example 1.2.9_5033.
         """
+        if self.device_info.firmware_version is None:
+            raise AirHumidifierException("Missing firmware information")
+
         return self.device_info.firmware_version
 
     @property
@@ -240,7 +243,8 @@ class AirHumidifier(Device):
         else:
             self.model = MODEL_HUMIDIFIER_V1
 
-        self.device_info = None
+        # TODO: convert to use generic device info in the future
+        self.device_info: Optional[DeviceInfo] = None
 
     @command(
         default_output=format_output(
@@ -264,7 +268,6 @@ class AirHumidifier(Device):
     )
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
-
         if self.device_info is None:
             self.device_info = self.info()
 

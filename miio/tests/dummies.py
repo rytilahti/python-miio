@@ -60,10 +60,12 @@ class DummyMiotDevice(DummyDevice):
         self.state = [{"did": k, "value": v, "code": 0} for k, v in self.state.items()]
         super().__init__(*args, **kwargs)
 
-    def get_properties_for_mapping(self):
+    def get_properties_for_mapping(self, *, max_properties=15):
         return self.state
 
-    def get_properties(self, properties):
+    def get_properties(
+        self, properties, *, property_getter="get_prop", max_properties=None
+    ):
         """Return values only for listed properties."""
         keys = [p["did"] for p in properties]
         props = []
