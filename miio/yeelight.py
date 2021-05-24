@@ -404,6 +404,21 @@ class Yeelight(Device):
         """Set current state as default."""
         return self.send("set_default")
 
+    @command(click.argument("table", default="evtRuleTbl"))
+    def dump_ble_debug(self, table):
+        """Dump the BLE debug table, defaults to evtRuleTbl.
+
+        Some Yeelight devices offer support for BLE remotes.
+        This command allows dumping the information about paired remotes,
+        that can be used to decrypt the beacon payloads from these devices.
+
+        Example:
+
+        [{'mac': 'xxx', 'evtid': 4097, 'pid': 950, 'beaconkey': 'xxx'},
+         {'mac': 'xxx', 'evtid': 4097, 'pid': 339, 'beaconkey': 'xxx'}]
+        """
+        return self.send("ble_dbg_tbl_dump", {"table": table})
+
     def set_scene(self, scene, *vals):
         """Set the scene."""
         raise NotImplementedError("Setting the scene is not implemented yet.")
