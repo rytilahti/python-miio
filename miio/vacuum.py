@@ -66,6 +66,7 @@ class FanspeedV2(enum.Enum):
     Medium = 103
     Turbo = 104
     Gentle = 105
+    Auto = 106
 
 
 class FanspeedV3(enum.Enum):
