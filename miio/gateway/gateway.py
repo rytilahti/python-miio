@@ -170,17 +170,20 @@ class Gateway(Device):
             # self.send("get_device_list") does work for the GATEWAY_MODEL_ZIG3 but gives slightly diffrent return values
             devices_raw = self.send("get_device_list")
 
-            for device in devices_raw:
-                # Match 'model' to get the model_info
-                model_info = self.match_zigbee_model(device["model"], device["did"])
+            if type(devices_raw) == list:
+                for device in devices_raw:
+                    # Match 'model' to get the model_info
+                    model_info = self.match_zigbee_model(device["model"], device["did"])
 
-                # Extract discovered information
-                dev_info = SubDeviceInfo(
-                    device["did"], model_info["type_id"], -1, -1, -1
-                )
+                    # Extract discovered information
+                    dev_info = SubDeviceInfo(
+                        device["did"], model_info["type_id"], -1, -1, -1
+                    )
 
-                # Setup the device
-                self.setup_device(dev_info, model_info)
+                    # Setup the device
+                    self.setup_device(dev_info, model_info)
+            else:
+                _LOGGER.debug("Gateway response to 'get_device_list' not a list type, no zigbee devices connected.")
         else:
             devices_raw = self.get_prop("device_list")
 
