@@ -28,6 +28,8 @@ class OperationMode(enum.Enum):
     Medium = "medium"
     High = "high"
     Strong = "strong"
+    # Additional supported modes of the Air Purifier Super 2
+    Low = "low"
 
 
 class SleepMode(enum.Enum):
