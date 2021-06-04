@@ -171,7 +171,9 @@ class Gateway(Device):
             devices_raw = self.send("get_device_list")
 
             if type(devices_raw) != list:
-                _LOGGER.debug("Gateway response to 'get_device_list' not a list type, no zigbee devices connected.")
+                _LOGGER.debug(
+                    "Gateway response to 'get_device_list' not a list type, no zigbee devices connected."
+                )
                 return self._devices
 
             for device in devices_raw:
