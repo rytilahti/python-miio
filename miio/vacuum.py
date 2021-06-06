@@ -66,6 +66,7 @@ class FanspeedV2(enum.Enum):
     Medium = 103
     Turbo = 104
     Gentle = 105
+    Auto = 106
 
 
 class FanspeedV3(enum.Enum):
@@ -705,7 +706,7 @@ class Vacuum(Device):
         return self.send("set_carpet_mode", [data])[0] == "ok"
 
     @command()
-    def carpet_cleaning_mode(self) -> CarpetCleaningMode:
+    def carpet_cleaning_mode(self) -> Optional[CarpetCleaningMode]:
         """Get carpet cleaning mode/avoidance setting."""
         try:
             return CarpetCleaningMode(

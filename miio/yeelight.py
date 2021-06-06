@@ -1,4 +1,3 @@
-import warnings
 from enum import IntEnum
 from typing import List, Optional, Tuple
 
@@ -269,13 +268,6 @@ class Yeelight(Device):
     which however requires enabling the developer mode on the bulbs.
     """
 
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "Please consider using python-yeelight " "for more complete support.",
-            stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
-
     @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
@@ -495,6 +487,21 @@ class Yeelight(Device):
     def set_default(self, lamp=YeelightSubLightType.Main):
         """Set current state as default."""
         return self.send(SUBLIGHT_PROP_PREFIX[lamp] + "set_default")
+
+    @command(click.argument("table", default="evtRuleTbl"))
+    def dump_ble_debug(self, table):
+        """Dump the BLE debug table, defaults to evtRuleTbl.
+
+        Some Yeelight devices offer support for BLE remotes.
+        This command allows dumping the information about paired remotes,
+        that can be used to decrypt the beacon payloads from these devices.
+
+        Example:
+
+        [{'mac': 'xxx', 'evtid': 4097, 'pid': 950, 'beaconkey': 'xxx'},
+         {'mac': 'xxx', 'evtid': 4097, 'pid': 339, 'beaconkey': 'xxx'}]
+        """
+        return self.send("ble_dbg_tbl_dump", {"table": table})
 
     def set_scene(self, scene, *vals):
         """Set the scene."""

@@ -1,7 +1,9 @@
 try:
     import curses
+
+    curses_available = True
 except ImportError:
-    curses = None
+    curses_available = False
 
 import enum
 from typing import Tuple
@@ -24,7 +26,7 @@ class Control(enum.Enum):
 
 class VacuumTUI:
     def __init__(self, vac: Vacuum):
-        if curses is None:
+        if not curses_available:
             raise ImportError("curses library is not available")
 
         self.vac = vac

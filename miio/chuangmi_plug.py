@@ -6,6 +6,7 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
+from .exceptions import DeviceException
 from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,8 +50,10 @@ class ChuangmiPlugStatus(DeviceStatus):
         """Current power state."""
         if "on" in self.data:
             return self.data["on"] is True or self.data["on"] == "on"
-        if "power" in self.data:
+        elif "power" in self.data:
             return self.data["power"] == "on"
+
+        raise DeviceException("There was neither 'on' or 'power' in data")
 
     @property
     def is_on(self) -> bool:

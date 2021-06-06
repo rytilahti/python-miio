@@ -4,7 +4,7 @@ import logging
 import time
 from functools import partial
 from ipaddress import ip_address
-from typing import Callable, Dict, Optional, Union  # noqa: F401
+from typing import Callable, Dict, Optional, Type, Union  # noqa: F401
 
 import zeroconf
 
@@ -33,6 +33,7 @@ from . import (
     Fan,
     FanLeshow,
     FanMiot,
+    Gateway,
     Heater,
     PhilipsBulb,
     PhilipsEyecare,
@@ -94,7 +95,7 @@ from .toiletlid import MODEL_TOILETLID_V1
 _LOGGER = logging.getLogger(__name__)
 
 
-DEVICE_MAP = {
+DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
     "roborock-vacuum-m1s": Vacuum,
@@ -192,14 +193,12 @@ DEVICE_MAP = {
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),
     "cgllc-airmonitor-s1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_S1),
-    "lumi-gateway-": lambda x: other_package_info(
-        x, "https://github.com/Danielhiversen/PyXiaomiGateway"
-    ),
+    "lumi-gateway-": Gateway,
     "viomi-vacuum-v7": ViomiVacuum,
     "viomi-vacuum-v8": ViomiVacuum,
     "zhimi.heater.za1": partial(Heater, model=MODEL_HEATER_ZA1),
     "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
-}  # type: Dict[str, Union[Callable, Device]]
+}
 
 
 def pretty_token(token):
@@ -240,7 +239,7 @@ def create_device(name: str, addr: str, device_cls: partial) -> Device:
     return dev
 
 
-class Listener:
+class Listener(zeroconf.ServiceListener):
     """mDNS listener creating Device objects based on detected devices."""
 
     def __init__(self):
@@ -254,7 +253,7 @@ class Listener:
             if name.startswith(identifier):
                 if inspect.isclass(v):
                     return create_device(name, addr, partial(v))
-                elif type(v) is partial and inspect.isclass(v.func):
+                elif isinstance(v, partial) and inspect.isclass(v.func):
                     return create_device(name, addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)

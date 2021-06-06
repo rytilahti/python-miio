@@ -28,6 +28,8 @@ class OperationMode(enum.Enum):
     Medium = "medium"
     High = "high"
     Strong = "strong"
+    # Additional supported modes of the Air Purifier Super 2
+    Low = "low"
 
 
 class SleepMode(enum.Enum):
@@ -44,8 +46,6 @@ class LedBrightness(enum.Enum):
 
 class AirPurifierStatus(DeviceStatus):
     """Container for status reports from the air purifier."""
-
-    _filter_type_cache = {}
 
     def __init__(self, data: Dict[str, Any]) -> None:
         """Response of a Air Purifier Pro (zhimi.airpurifier.v6):

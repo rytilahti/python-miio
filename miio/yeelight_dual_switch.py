@@ -5,7 +5,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
-from .miot_device import DeviceStatus, MiotDevice
+from .miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 
 class YeelightDualControlModuleException(DeviceException):
@@ -17,7 +17,7 @@ class Switch(enum.Enum):
     Second = 1
 
 
-_MAPPING = {
+_MAPPING: MiotMapping = {
     # http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:yeelink-sw1:1:0000C809
     # First Switch (siid=2)
     "switch_1_state": {"siid": 2, "piid": 1},  # bool

@@ -25,7 +25,7 @@ AVAILABLE_PROPERTIES_COMMON = [
 AVAILABLE_PROPERTIES_ZA1 = ["poweroff_time", "relative_humidity"]
 AVAILABLE_PROPERTIES_MA1 = ["poweroff_level", "poweroff_value"]
 
-SUPPORTED_MODELS = {
+SUPPORTED_MODELS: Dict[str, Dict[str, Any]] = {
     MODEL_HEATER_ZA1: {
         "available_properties": AVAILABLE_PROPERTIES_COMMON + AVAILABLE_PROPERTIES_ZA1,
         "temperature_range": (16, 32),
@@ -188,6 +188,8 @@ class Heater(Device):
     )
     def set_target_temperature(self, temperature: int):
         """Set target temperature."""
+        min_temp: int
+        max_temp: int
         min_temp, max_temp = SUPPORTED_MODELS[self.model]["temperature_range"]
         if not min_temp <= temperature <= max_temp:
             raise HeaterException("Invalid target temperature: %s" % temperature)
@@ -234,6 +236,8 @@ class Heater(Device):
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
+        min_delay: int
+        max_delay: int
         min_delay, max_delay = SUPPORTED_MODELS[self.model]["delay_off_range"]
         if not min_delay <= seconds <= max_delay:
             raise HeaterException("Invalid delay time: %s" % seconds)

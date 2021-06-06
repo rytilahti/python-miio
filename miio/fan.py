@@ -141,12 +141,14 @@ class FanStatus(DeviceStatus):
         """Speed level in natural mode."""
         if "natural_level" in self.data and self.data["natural_level"] is not None:
             return self.data["natural_level"]
+        return None
 
     @property
     def direct_speed(self) -> Optional[int]:
         """Speed level in direct mode."""
         if "speed_level" in self.data and self.data["speed_level"] is not None:
             return self.data["speed_level"]
+        return None
 
     @property
     def oscillate(self) -> bool:
@@ -158,6 +160,7 @@ class FanStatus(DeviceStatus):
         """Current battery level."""
         if "battery" in self.data and self.data["battery"] is not None:
             return self.data["battery"]
+        return None
 
     @property
     def battery_charge(self) -> Optional[str]:

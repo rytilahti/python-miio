@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*#
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, tzinfo
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Union
 
@@ -222,7 +222,7 @@ class CleaningSummary(DeviceStatus):
         #  1487894400, 1487808000, 1487548800 ] ],
         #  "id": 1 }
         # newer models return a dict
-        if type(data) is list:
+        if isinstance(data, list):
             self.data = {
                 "clean_time": data[0],
                 "clean_area": data[1],
@@ -272,7 +272,7 @@ class CleaningDetails(DeviceStatus):
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
-        if type(data) is list:
+        if isinstance(data, list):
             self.data = {
                 "begin": data[0],
                 "end": data[1],
@@ -339,6 +339,7 @@ class ConsumableStatus(DeviceStatus):
         #  'sensor_dirty_time': 3798,
         # 'side_brush_work_time': 32454,
         #  'main_brush_work_time': 32454}]}
+        # TODO this should be generalized to allow different time limits
         self.data = data
         self.main_brush_total = timedelta(hours=300)
         self.side_brush_total = timedelta(hours=200)
@@ -416,7 +417,7 @@ class Timer(DeviceStatus):
     the creation time.
     """
 
-    def __init__(self, data: List[Any], timezone: "datetime.tzinfo") -> None:
+    def __init__(self, data: List[Any], timezone: tzinfo) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
         #  ['1488667777661', 'off', ['49 21 * * 3,4,5,6', ['start_clean', '']]
@@ -424,10 +425,11 @@ class Timer(DeviceStatus):
         self.data = data
         self.timezone = timezone
 
+        # ignoring the type here, as the localize is not provided directly by datetime.tzinfo
+        localized_ts = timezone.localize(datetime.now())  # type: ignore
+
         # Initialize croniter to cause an exception on invalid entries (#847)
-        self.croniter = croniter(
-            self.cron, start_time=timezone.localize(datetime.now())
-        )
+        self.croniter = croniter(self.cron, start_time=localized_ts)
 
     @property
     def id(self) -> int:
