@@ -65,6 +65,7 @@ Submodules
    miio.powerstrip
    miio.protocol
    miio.pwzn_relay
+   miio.roidmivacuum_miot
    miio.scishare_coffeemaker
    miio.toiletlid
    miio.updater
