@@ -77,7 +77,7 @@ def test_forced_model(mocker):
     DUMMY_MODEL = "dummy.model"
 
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=DUMMY_MODEL)
-    d._fetch_info()
+    d.raw_command("dummy", {})
 
     assert d.model == DUMMY_MODEL
     info.assert_not_called()
