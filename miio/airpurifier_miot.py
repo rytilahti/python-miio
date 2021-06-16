@@ -141,7 +141,7 @@ class BasicAirPurifierMiotStatus(DeviceStatus):
         return self.data["motor_speed"]
     
     @property
-    def favorite_rpm(self) -> int:
+    def favorite_rpm(self) -> Optional[int]:
         """Return favorite rpm level."""
         return self.data.get("favorite_rpm")
 
