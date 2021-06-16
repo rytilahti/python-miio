@@ -77,12 +77,7 @@ class PhilipsWhiteBulb(Device):
         lazy_discover: bool = True,
         model: str = MODEL_PHILIPS_LIGHT_HBULB,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_PHILIPS_LIGHT_HBULB
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(
@@ -148,12 +143,7 @@ class PhilipsBulb(PhilipsWhiteBulb):
         lazy_discover: bool = True,
         model: str = MODEL_PHILIPS_LIGHT_BULB,
     ) -> None:
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_PHILIPS_LIGHT_BULB
-
-        super().__init__(ip, token, start_id, debug, lazy_discover, self.model)
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         click.argument("level", type=int),

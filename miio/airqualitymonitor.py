@@ -160,18 +160,12 @@ class AirQualityMonitor(Device):
         lazy_discover: bool = True,
         model: str = MODEL_AIRQUALITYMONITOR_V1,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        elif model is not None:
-            self.model = MODEL_AIRQUALITYMONITOR_V1
+        if model not in AVAILABLE_PROPERTIES:
             _LOGGER.error(
                 "Device model %s unsupported. Falling back to %s.", model, self.model
             )
-        else:
-            # Force autodetection.
-            self.model = None
 
     @command(
         default_output=format_output(
@@ -191,11 +185,6 @@ class AirQualityMonitor(Device):
     )
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
-
-        if self.model is None:
-            info = self.info()
-            self.model = info.model
-
         properties = AVAILABLE_PROPERTIES[self.model]
 
         if self.model == MODEL_AIRQUALITYMONITOR_B1:

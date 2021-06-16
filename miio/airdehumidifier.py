@@ -167,12 +167,7 @@ class AirDehumidifier(Device):
         lazy_discover: bool = True,
         model: str = MODEL_DEHUMIDIFIER_V1,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_DEHUMIDIFIER_V1
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
         self.device_info: DeviceInfo
 

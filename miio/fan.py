@@ -284,12 +284,7 @@ class Fan(Device):
         lazy_discover: bool = True,
         model: str = MODEL_FAN_V3,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_FAN_V3
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(
@@ -532,12 +527,7 @@ class FanP5(Device):
         lazy_discover: bool = True,
         model: str = MODEL_FAN_P5,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_FAN_P5
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(

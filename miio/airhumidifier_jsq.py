@@ -142,9 +142,9 @@ class AirHumidifierJsq(Device):
         lazy_discover: bool = True,
         model: str = MODEL_HUMIDIFIER_JSQ001,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        self.model = model if model in AVAILABLE_PROPERTIES else MODEL_HUMIDIFIER_JSQ001
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+        if model not in AVAILABLE_PROPERTIES:
+            self._model = MODEL_HUMIDIFIER_JSQ001
 
     @command(
         default_output=format_output(

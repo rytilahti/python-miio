@@ -1,4 +1,3 @@
-
 from enum import IntEnum
 from typing import List, Optional, Tuple
 
@@ -263,7 +262,6 @@ class Yeelight(Device):
     _supported_models = SUPPORTED_MODELS
 
     @command(default_output=format_output("", "{result.cli_format}"))
-
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
         properties = [

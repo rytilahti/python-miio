@@ -7,7 +7,7 @@ import math
 import os
 import pathlib
 import time
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Type, Union
 
 import click
 import pytz
@@ -53,14 +53,18 @@ class Consumable(enum.Enum):
     SensorDirty = "sensor_dirty_time"
 
 
-class FanspeedV1(enum.Enum):
+class FanspeedEnum(enum.Enum):
+    pass
+
+
+class FanspeedV1(FanspeedEnum):
     Silent = 38
     Standard = 60
     Medium = 77
     Turbo = 90
 
 
-class FanspeedV2(enum.Enum):
+class FanspeedV2(FanspeedEnum):
     Silent = 101
     Standard = 102
     Medium = 103
@@ -69,14 +73,14 @@ class FanspeedV2(enum.Enum):
     Auto = 106
 
 
-class FanspeedV3(enum.Enum):
+class FanspeedV3(FanspeedEnum):
     Silent = 38
     Standard = 60
     Medium = 75
     Turbo = 100
 
 
-class FanspeedE2(enum.Enum):
+class FanspeedE2(FanspeedEnum):
     # Original names from the app: Gentle, Silent, Standard, Strong, Max
     Gentle = 41
     Silent = 50
@@ -85,7 +89,7 @@ class FanspeedE2(enum.Enum):
     Turbo = 100
 
 
-class FanspeedS7(enum.Enum):
+class FanspeedS7(FanspeedEnum):
     Silent = 101
     Standard = 102
     Medium = 103
@@ -149,7 +153,6 @@ class Vacuum(Device):
     ):
         super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
-
 
     @command()
     def start(self):
@@ -220,7 +223,6 @@ class Vacuum(Device):
 
         PAUSE_BEFORE_HOME = [
             ROCKROBO_V1,
-
         ]
 
         if self.model in PAUSE_BEFORE_HOME:
@@ -585,14 +587,13 @@ class Vacuum(Device):
     def fan_speed_presets(self) -> Dict[str, int]:
         """Return dictionary containing supported fan speeds."""
 
-        def _enum_as_dict(speed_enum):
-            return {x.name: x.value for x in list(speed_enum)}
+        def _enum_as_dict(cls):
+            return {x.name: x.value for x in list(cls)}
 
         if self.model is None:
             return _enum_as_dict(FanspeedV1)
 
-        fanspeeds = FanspeedV1
-
+        fanspeeds: Type[FanspeedEnum] = FanspeedV1
 
         if self.model == ROCKROBO_V1:
             _LOGGER.debug("Got robov1, checking for firmware version")
@@ -612,9 +613,7 @@ class Vacuum(Device):
         else:
             fanspeeds = FanspeedV2
 
-
         _LOGGER.debug("Using fanspeeds %s for %s", fanspeeds, self.model)
-
 
         return _enum_as_dict(fanspeeds)
 

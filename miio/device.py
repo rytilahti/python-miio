@@ -54,7 +54,7 @@ class Device(metaclass=DeviceGroupMeta):
 
     retry_count = 3
     timeout = 5
-    _supported_models = []
+    _supported_models: List[str] = []
 
     def __init__(
         self,

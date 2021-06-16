@@ -53,7 +53,6 @@ class DummyVacuum(DummyDevice, Vacuum):
 
         super().__init__(args, kwargs)
 
-
     def change_mode(self, new_mode):
         if new_mode == "spot":
             self.state["state"] = DummyVacuum.STATE_SPOT
@@ -285,10 +284,10 @@ class TestVacuum(TestCase):
         assert self.device.carpet_cleaning_mode() is None
         with patch("miio.Device.info", side_effect=DeviceInfoUnavailableException()):
             assert self.device.info().model == "rockrobo.vacuum.v1"
-            
+
     def test_carpet_cleaning_mode(self):
         with patch.object(self.device, "send", return_value=[{"carpet_clean_mode": 0}]):
-            assert self.device.carpet_cleaning_mode() == CarpetCleaningMode.Avoid        
+            assert self.device.carpet_cleaning_mode() == CarpetCleaningMode.Avoid
 
         with patch.object(self.device, "send", return_value="unknown_method"):
             assert self.device.carpet_cleaning_mode() is None

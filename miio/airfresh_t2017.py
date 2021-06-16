@@ -233,12 +233,7 @@ class AirFreshA1(Device):
         lazy_discover: bool = True,
         model: str = MODEL_AIRFRESH_A1,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_AIRFRESH_A1
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(
@@ -380,12 +375,7 @@ class AirFreshT2017(AirFreshA1):
         lazy_discover: bool = True,
         model: str = MODEL_AIRFRESH_T2017,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_AIRFRESH_T2017
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(
