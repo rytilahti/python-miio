@@ -139,7 +139,7 @@ class BasicAirPurifierMiotStatus(DeviceStatus):
     def motor_speed(self) -> int:
         """Speed of the motor."""
         return self.data["motor_speed"]
-    
+
     @property
     def favorite_rpm(self) -> Optional[int]:
         """Return favorite rpm level."""
@@ -296,7 +296,6 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
     def led_brightness_level(self) -> int:
         """Return brightness level."""
         return self.data["led_brightness_level"]
-
 
 
 class BasicAirPurifierMiot(MiotDevice):
