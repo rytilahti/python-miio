@@ -1,6 +1,3 @@
-from miio.deviceinfo import DeviceInfo
-
-
 class DummyMiIOProtocol:
     """DummyProtocol allows you mock MiIOProtocol."""
 
@@ -40,40 +37,15 @@ class DummyDevice:
         self.start_state = self.state.copy()
         self._protocol = DummyMiIOProtocol(self)
         self._info = None
+        # TODO: ugly hack to check for pre-existing _model
+        if getattr(self, "_model", None) is None:
+            self._model = "dummy.model"
         self.token = "ffffffffffffffffffffffffffffffff"
         self.ip = "192.0.2.1"
 
     def _reset_state(self):
         """Revert back to the original state."""
         self.state = self.start_state.copy()
-
-    def info(self):
-        if self._model is None:
-            self._model = "dummy.model"
-
-        # Dummy model information taken from test_airhumidifer_jsq
-        dummy_device_info = DeviceInfo(
-            {
-                "life": 575661,
-                "token": "68ffffffffffffffffffffffffffffff",
-                "mac": "78:11:FF:FF:FF:FF",
-                "fw_ver": "1.3.9",
-                "hw_ver": "ESP8266",
-                "uid": "1111111111",
-                "model": self._model,
-                "mcu_fw_ver": "0001",
-                "wifi_fw_ver": "1.5.0-dev(7efd021)",
-                "ap": {"rssi": -71, "ssid": "ap", "bssid": "FF:FF:FF:FF:FF:FF"},
-                "netif": {
-                    "gw": "192.168.0.1",
-                    "localIp": "192.168.0.25",
-                    "mask": "255.255.255.0",
-                },
-                "mmfree": 228248,
-            }
-        )
-
-        return dummy_device_info
 
     def _set_state(self, var, value):
         """Set a state of a variable, the value is expected to be an array with length
