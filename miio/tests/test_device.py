@@ -77,7 +77,18 @@ def test_forced_model(mocker):
     DUMMY_MODEL = "dummy.model"
 
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=DUMMY_MODEL)
-    d.raw_command("dummy", {})
+    d._fetch_info()
 
     assert d.model == DUMMY_MODEL
     info.assert_not_called()
+
+
+def test_missing_supported(mocker, caplog):
+    """Make sure warning is logged if the device is unsupported for the class."""
+    _ = mocker.patch("miio.Device.send")
+
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d._fetch_info()
+
+    assert "Found an unsupported model" in caplog.text
+    assert "for class 'Device'" in caplog.text

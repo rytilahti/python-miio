@@ -144,14 +144,16 @@ class Device(metaclass=DeviceGroupMeta):
         return self._fetch_info()
 
     def _fetch_info(self):
+        """Perform miIO.info query on the device and cache the result."""
         try:
             devinfo = DeviceInfo(self.send("miIO.info"))
             self._info = devinfo
-            _LOGGER.info("Detected model %s", devinfo.model)
+            _LOGGER.debug("Detected model %s", devinfo.model)
             if devinfo.model not in self.supported_models:
                 _LOGGER.warning(
-                    "Found an unsupported model %s, if this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
+                    "Found an unsupported model '%s' for class '%s'. If this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
                     self.model,
+                    self.__class__.__name__,
                 )
 
             return devinfo
