@@ -136,6 +136,8 @@ class PowerStripStatus(DeviceStatus):
 class PowerStrip(Device):
     """Main class representing the smart power strip."""
 
+    _supported_models = [MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2]
+
     def __init__(
         self,
         ip: str = None,
