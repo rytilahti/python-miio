@@ -190,7 +190,7 @@ class MiIOProtocol:
             raise DeviceException from ex
 
         try:
-            data, addr = s.recvfrom(1024)
+            data, addr = s.recvfrom(4096)
             m = Message.parse(data, token=self.token)
 
             header = m.header.value
