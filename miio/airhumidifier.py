@@ -187,8 +187,9 @@ class AirHumidifierStatus(DeviceStatus):
     def depth(self) -> Optional[int]:
         """The remaining amount of water in percent."""
 
-        # MODEL_HUMIDIFIER_CB2 127 without water tank. 125 = 100% water
-        if self.device_info.model == MODEL_HUMIDIFIER_CB2:
+        # MODEL_HUMIDIFIER_CA1 and MODEL_HUMIDIFIER_CB2
+        # 127 without water tank. 125 = 100% water
+        if self.device_info.model in[MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB2]:
             return int(int(self.data["depth"]) / 1.25)
 
         if "depth" in self.data and self.data["depth"] is not None:
