@@ -194,7 +194,7 @@ class AirHumidifierStatus(DeviceStatus):
             MODEL_HUMIDIFIER_CB1,
             MODEL_HUMIDIFIER_CB2,
         ]:
-            return int(int(self.data["depth"]) / 1.25)
+            return round(int(self.data["depth"]) / 1.25)
 
         if "depth" in self.data and self.data["depth"] is not None:
             return self.data["depth"]
