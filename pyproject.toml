@@ -34,7 +34,7 @@ netifaces = { version = "^0", optional = true }
 android_backup = { version = "^0", optional = true }
 importlib_metadata = { version = "^1", markers = "python_version <= '3.7'" }
 croniter = "^0"
-defusedxml = "^0.6"
+defusedxml = "^0"
 
 sphinx = { version = "^3", optional = true }
 sphinx_click = { version = "^2", optional = true }
