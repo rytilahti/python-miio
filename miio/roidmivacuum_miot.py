@@ -1,60 +1,63 @@
 """Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
-# https://github.com/rytilahti/python-miio/issues/543#issuecomment-755767331
 
 import json
 import logging
 import math
+from datetime import timedelta
 from enum import Enum
 
 import click
 
-from .click_common import EnumType, command, format_output
-from .miot_device import DeviceStatus as DeviceStatusContainer
-from .miot_device import MiotDevice, MiotMapping
+from .click_common import EnumType, command
+from .miot_device import DeviceStatus, MiotDevice, MiotMapping
+from .vacuumcontainers import DNDStatus
 
 _LOGGER = logging.getLogger(__name__)
 
 _MAPPING: MiotMapping = {
     "battery_level": {"siid": 3, "piid": 1},
     "charging_state": {"siid": 3, "piid": 2},
-    "device_fault": {"siid": 2, "piid": 2},
-    "device_status": {"siid": 2, "piid": 1},
+    "error_code": {"siid": 2, "piid": 2},
+    "state": {"siid": 2, "piid": 1},
     "filter_life_level": {"siid": 10, "piid": 1},
-    "filter_left_time": {"siid": 10, "piid": 2},
-    "brush_left_time": {"siid": 11, "piid": 1},
-    "brush_life_level": {"siid": 11, "piid": 2},
-    "brush_left_time2": {"siid": 12, "piid": 1},
-    "brush_life_level2": {"siid": 12, "piid": 2},
-    "brush_left_time3": {"siid": 15, "piid": 1},
-    "brush_life_level3": {"siid": 15, "piid": 2},
+    "filter_left_minutes": {"siid": 10, "piid": 2},
+    "main_brush_left_minutes": {"siid": 11, "piid": 1},
+    "main_brush_life_level": {"siid": 11, "piid": 2},
+    "side_brushes_left_minutes": {"siid": 12, "piid": 1},
+    "side_brushes_life_level": {"siid": 12, "piid": 2},
+    "sensor_dirty_time_left_minutes": {
+        "siid": 15,
+        "piid": 1,
+    },  # named brush_left_time in the spec
+    "sensor_dirty_remaning_level": {"siid": 15, "piid": 2},
     "sweep_mode": {"siid": 14, "piid": 1},
-    "cleaning_mode": {"siid": 2, "piid": 4},
+    "fanspeed_mode": {"siid": 2, "piid": 4},
     "sweep_type": {"siid": 2, "piid": 8},
     "path_mode": {"siid": 13, "piid": 8},
     "mop_present": {"siid": 8, "piid": 1},
     "work_station_freq": {"siid": 8, "piid": 2},  # Range: [0, 3, 1]
-    "timing": {"siid": 8, "piid": 6},  # str (example: {"tz":2,"tzs":7200})
+    "timing": {"siid": 8, "piid": 6},
     "clean_area": {"siid": 8, "piid": 7},  # uint32
-    # "uid": {"siid": 8, "piid": 8}, # str
-    "auto_boost": {"siid": 8, "piid": 9},  # bool (auto boost on carpet)
+    "uid": {"siid": 8, "piid": 8},  # str
+    "auto_boost": {"siid": 8, "piid": 9},
     "forbid_mode": {"siid": 8, "piid": 10},  # str
     "water_level": {"siid": 8, "piid": 11},
-    # "siid8_13": {"siid": 8, "piid": 13}, # no-name: (uint32, unit: seconds) (acc: ['read', 'notify'])
-    # "siid8_14": {"siid": 8, "piid": 14}, # no-name: (uint32, unit: none) (acc: ['read', 'notify'])
+    "total_clean_time_sec": {"siid": 8, "piid": 13},
+    "total_clean_areas": {"siid": 8, "piid": 14},
     "clean_counts": {"siid": 8, "piid": 18},
-    # "siid8_19": {"siid": 8, "piid": 19}, # no-name: (uint32, unit: seconds) (acc: ['read', 'notify'])
+    "clean_time_sec": {"siid": 8, "piid": 19},
     "double_clean": {"siid": 8, "piid": 20},
     "edge_sweep": {"siid": 8, "piid": 21},
     "led_switch": {"siid": 8, "piid": 22},
     "lidar_collision": {"siid": 8, "piid": 23},
     "station_key": {"siid": 8, "piid": 24},
     "station_led": {"siid": 8, "piid": 25},
-    "current_audio": {"siid": 8, "piid": 26},  # str (example: girl_en)
+    "current_audio": {"siid": 8, "piid": 26},
     "progress": {"siid": 8, "piid": 28},
-    # "station_type": {"siid": 8, "piid": 29}, # uint32
-    # "voice_conf": {"siid": 8, "piid": 30},
-    # "switch_status": {"siid": 2, "piid": 10},
+    "station_type": {"siid": 8, "piid": 29},  # uint32
+    # "voice_conf": {"siid": 8, "piid": 30}, # Always return file not exist !!!
+    # "switch_status": {"siid": 2, "piid": 10}, # Enum with only one value: Open
     "volume": {"siid": 9, "piid": 1},
     "mute": {"siid": 9, "piid": 2},
 }
@@ -67,7 +70,7 @@ class ChargingState(Enum):
     NotChargeable = 4
 
 
-class CleaningMode(Enum):
+class FanSpeed(Enum):
     Unknown = -1
     Silent = 1
     Basic = 2
@@ -81,11 +84,6 @@ class SweepType(Enum):
     Sweep = 0
     Mop = 1
     MopAndSweep = 2
-
-
-class SwitchStatus(Enum):
-    Unknown = -1
-    Open = 1
 
 
 class PathMode(Enum):
@@ -117,37 +115,37 @@ class SweepMode(Enum):
     Idle = 0
 
 
-class FaultStatus(Enum):
-    Unknown = -1
-    NoFaults = 0
-    LowBatteryFindCharger = 1
-    LowBatteryAndPoweroff = 2
-    WheelRap = 3
-    CollisionError = 4
-    TileDoTask = 5
-    LidarPointError = 6
-    FrontWallError = 7
-    PsdDirty = 8
-    MiddleBrushFatal = 9
-    SidBrush = 10
-    FanSpeedError = 11
-    LidarCover = 12
-    GarbageBoxFull = 13
-    GarbageBoxOut = 14
-    GarbageBoxFullOut = 15
-    PhysicalTrapped = 16
-    PickUpDoTask = 17
-    NoWaterBoxDoTask = 18
-    WaterBoxEmpty = 19
-    CleanCannotArrive = 20
-    StartFormForbid = 21
-    Drop = 22
-    KitWaterPump = 23
-    FindChargerFailed = 24
-    LowPowerClean = 25
+error_codes = {
+    0: "NoFaults",
+    1: "LowBatteryFindCharger",
+    2: "LowBatteryAndPoweroff",
+    3: "WheelRap",
+    4: "CollisionError",
+    5: "TileDoTask",
+    6: "LidarPointError",
+    7: "FrontWallError",
+    8: "PsdDirty",
+    9: "MiddleBrushFatal",
+    10: "SideBrush",
+    11: "FanSpeedError",
+    12: "LidarCover",
+    13: "GarbageBoxFull",
+    14: "GarbageBoxOut",
+    15: "GarbageBoxFullOut",
+    16: "PhysicalTrapped",
+    17: "PickUpDoTask",
+    18: "NoWaterBoxDoTask",
+    19: "WaterBoxEmpty",
+    20: "CleanCannotArrive",
+    21: "StartFormForbid",
+    22: "Drop",
+    23: "KitWaterPump",
+    24: "FindChargerFailed",
+    25: "LowPowerClean",
+}
 
 
-class DeviceStatus(Enum):
+class RoidmiState(Enum):
     Unknown = -1
     Dormant = 1
     Idle = 2
@@ -162,56 +160,33 @@ class DeviceStatus(Enum):
     FindChargerPause = 11
 
 
-class RoidmiVacuumStatus(DeviceStatusContainer):
+class RoidmiVacuumStatus(DeviceStatus):
+    """Container for status reports from the vacuum."""
+
     def __init__(self, data):
         self.data = data
 
     @property
-    def battery_level(self) -> int:
+    def battery(self) -> int:
+        """Remaining battery in percentage."""
         return self.data["battery_level"]
 
     @property
-    def filter_left_time(self) -> int:
-        return self.data["filter_left_time"]
+    def error_code(self) -> int:
+        """Error code as returned by the device."""
+        return int(self.data["error_code"])
 
     @property
-    def filter_life_level(self) -> int:
-        return self.data["filter_life_level"]
-
-    @property
-    def brush_left_time(self) -> int:
-        return self.data["brush_left_time"]
-
-    @property
-    def brush_life_level(self) -> int:
-        return self.data["brush_life_level"]
-
-    @property
-    def brush_left_time2(self) -> int:
-        return self.data["brush_left_time2"]
-
-    @property
-    def brush_life_level2(self) -> int:
-        return self.data["brush_life_level2"]
-
-    @property
-    def brush_left_time3(self) -> int:
-        return self.data["brush_left_time3"]
-
-    @property
-    def brush_life_level3(self) -> int:
-        return self.data["brush_life_level3"]
-
-    @property
-    def device_fault(self) -> FaultStatus:
+    def error(self) -> str:
+        """Human readable error description, see also :func:`error_code`."""
         try:
-            return FaultStatus(self.data["device_fault"])
-        except ValueError:
-            _LOGGER.error("Unknown FaultStatus (%s)", self.data["device_fault"])
-            return FaultStatus.Unknown
+            return error_codes[self.error_code]
+        except KeyError:
+            return "Definition missing for error %s" % self.error_code
 
     @property
     def charging_state(self) -> ChargingState:
+        """Charging state (Charging/Discharging)"""
         try:
             return ChargingState(self.data["charging_state"])
         except ValueError:
@@ -220,6 +195,7 @@ class RoidmiVacuumStatus(DeviceStatusContainer):
 
     @property
     def sweep_mode(self) -> SweepMode:
+        """Sweep mode point/area/total etc."""
         try:
             return SweepMode(self.data["sweep_mode"])
         except ValueError:
@@ -227,15 +203,17 @@ class RoidmiVacuumStatus(DeviceStatusContainer):
             return SweepMode.Unknown
 
     @property
-    def cleaning_mode(self) -> CleaningMode:
+    def fanspeed(self) -> FanSpeed:
+        """Current fan speed."""
         try:
-            return CleaningMode(self.data["cleaning_mode"])
+            return FanSpeed(self.data["fanspeed_mode"])
         except ValueError:
-            _LOGGER.error("Unknown CleaningMode (%s)", self.data["cleaning_mode"])
-            return CleaningMode.Unknown
+            _LOGGER.error("Unknown FanSpeed (%s)", self.data["fanspeed_mode"])
+            return FanSpeed.Unknown
 
     @property
     def sweep_type(self) -> SweepType:
+        """Current sweep type sweep/mop/sweep&mop."""
         try:
             return SweepType(self.data["sweep_type"])
         except ValueError:
@@ -244,6 +222,7 @@ class RoidmiVacuumStatus(DeviceStatusContainer):
 
     @property
     def path_mode(self) -> PathMode:
+        """Current path-mode:  normal/y-mopping etc."""
         try:
             return PathMode(self.data["path_mode"])
         except ValueError:
@@ -252,130 +231,263 @@ class RoidmiVacuumStatus(DeviceStatusContainer):
 
     @property
     def mop_present(self) -> bool:
+        """Return True is mop (water box) is installed."""
         return self.data["mop_present"]
 
     @property
     def work_station_freq(self) -> int:
+        """work_station_freq (2 means base dust colect every second time)."""
         return self.data["work_station_freq"]
 
     @property
     def timing(self) -> str:
+        """Repeated cleaning
+        Example: {"time":[[32400,1,3,0,[1,2,3,4,5],0,[12,10],null],[57600,0,1,2,[1,2,3,4,5,6,0],2,[],null]],"tz":2,"tzs":7200}
+        Cleaning 1:
+            32400 = startTime(9:00)
+            1=Enabled
+            3=FanSpeed.Strong
+            0=SweepType.Sweep
+            [1,2,3,4,5]=Monday-Friday
+            0=WaterLevel
+            [12,10]=List of rooms
+            null: ?Might be related to "Customize"?
+        Cleaning 2:
+            57600 = startTime(16:00)
+            0=Disabled
+            1=FanSpeed.Silent
+            2=SweepType.MopAndSweep
+            [1,2,3,4,5,6,0]=Monday-Sunday
+            2=WaterLevel.Second
+            []=All rooms
+            null: ?Might be related to "Customize"?
+        tz/tzs= time-zone
+        """
         return self.data["timing"]
 
     @property
-    def clean_area(self) -> int:
-        return self.data["clean_area"]
-
-    @property
-    def uid(self) -> int:
+    def uid_unknown(self) -> int:
+        """This UID is unknown."""
         return self.data["uid"]
 
     @property
-    def auto_boost(self) -> int:
+    def auto_boost(self) -> bool:
+        """Auto boost on carpet."""
         return self.data["auto_boost"]
 
-    def parseForbidMode(self, val):
-        def secToClock(val):
+    def _parse_forbid_mode(self, val):
+        # Example data: {"time":[75600,21600,1],"tz":2,"tzs":7200}
+        def _secToHourMinute(val):
             hour = math.floor(val / 3600)
             minut = math.floor((val - hour * 3600) / 60)
-            return "{}:{:02}".format(hour, minut)
+            return (hour, minut)
 
         asDict = json.loads(val)
-        active = bool(asDict["time"][2])
-        begin = secToClock(asDict["time"][0])
-        end = secToClock(asDict["time"][1])
-        return json.dumps(
-            {"enabled": active, "begin": begin, "end": end, "tz": asDict["tz"]}
+        enabled = bool(asDict["time"][2])
+        start = _secToHourMinute(asDict["time"][0])
+        end = _secToHourMinute(asDict["time"][1])
+        return DNDStatus(
+            dict(
+                enabled=enabled,
+                start_hour=start[0],
+                start_minute=start[1],
+                end_hour=end[0],
+                end_minute=end[1],
+            )
         )
 
     @property
-    def forbid_mode(self) -> int:
-        # Example data: {"time":[75600,21600,1],"tz":2,"tzs":7200}
-        return self.parseForbidMode(self.data["forbid_mode"])
+    def dnd_status(self):
+        """Returns do-not-disturb status."""
+        return self._parse_forbid_mode(self.data["forbid_mode"])
 
     @property
     def water_level(self) -> WaterLevel:
+        """Get current water level."""
         try:
             return WaterLevel(self.data["water_level"])
         except ValueError:
             _LOGGER.error("Unknown WaterLevel (%s)", self.data["water_level"])
             return WaterLevel.Unknown
 
-    # @property
-    # def siid8_13(self) -> int:
-    #     return self.data["siid8_13"]
-
-    # @property
-    # def siid8_14(self) -> int:
-    #     return self.data["siid8_14"]
-
-    @property
-    def clean_counts(self) -> int:
-        return self.data["clean_counts"]
-
-    # @property
-    # def siid8_19(self) -> int:
-    #     return self.data["siid8_19"]
-
     @property
     def double_clean(self) -> bool:
+        """Is double clean enabled."""
         return self.data["double_clean"]
 
     @property
     def edge_sweep(self) -> bool:
+        """Is edge clean enabled."""
         return self.data["edge_sweep"]
 
     @property
     def led_switch(self) -> bool:
+        """The LED on the robot will be always on."""
         return self.data["led_switch"]
 
     @property
     def lidar_collision(self) -> bool:
+        """When ON, the robot will use lidar as the main detection sensor to help reduce
+        collisions."""
         return self.data["lidar_collision"]
 
     @property
     def station_key(self) -> bool:
+        """When ON: long press the display will turn on dust collection."""
         return self.data["station_key"]
 
     @property
     def station_led(self) -> bool:
+        """When OFF The station display will turn off."""
         return self.data["station_led"]
 
     @property
     def current_audio(self) -> str:
+        """E.g.
+
+        'girl_en'
+        """
         return self.data["current_audio"]
 
     @property
+    def clean_time(self) -> timedelta:
+        """Time used for cleaning (if finished, shows how long it took)."""
+        return timedelta(seconds=self.data["clean_time_sec"])
+
+    @property
+    def clean_area(self) -> int:
+        """Cleaned area in m2."""
+        return self.data["clean_area"]
+
+    @property
     def progress(self) -> str:
+        """Always return None?"""
         return self.data["progress"]
 
     @property
-    def voice_conf(self) -> str:
-        return self.data["voice_conf"]
+    def state_code(self) -> int:
+        """State code as returned by the device."""
+        return int(self.data["state"])
 
     @property
-    def switch_status(self) -> SwitchStatus:
+    def state(self) -> RoidmiState:
+        """Human readable state description, see also :func:`state_code`."""
         try:
-            return SwitchStatus(self.data["switch_status"])
+            return RoidmiState(self.state_code)
         except TypeError:
-            _LOGGER.error("Unknown SwitchStatus (%s)", self.data["switch_status"])
-            return SwitchStatus.Unknown
-
-    @property
-    def device_status(self) -> DeviceStatus:
-        try:
-            return DeviceStatus(self.data["device_status"])
-        except TypeError:
-            _LOGGER.error("Unknown DeviceStatus (%s)", self.data["device_status"])
-            return DeviceStatus.Unknown
+            _LOGGER.error("Unknown RoidmiState (%s)", self.state_code)
+            return RoidmiState.Unknown
 
     @property
     def volume(self) -> int:
+        """Return device sound volumen level."""
         return self.data["volume"]
 
     @property
-    def mute(self) -> bool:
-        return self.data["mute"]
+    def is_mute(self) -> bool:
+        """True if device is muted."""
+        return bool(self.data["mute"])
+
+    @property
+    def is_paused(self) -> bool:
+        """Return True if vacuum is paused."""
+        return self.state in [RoidmiState.Paused, RoidmiState.FindChargerPause]
+
+    @property
+    def is_on(self) -> bool:
+        """True if device is currently cleaning in any mode."""
+        return self.state == RoidmiState.Sweeping
+
+    @property
+    def got_error(self) -> bool:
+        """True if an error has occured."""
+        return self.error_code != 0
+
+
+class RoidmiCleaningSummary(DeviceStatus):
+    """Contains summarized information about available cleaning runs."""
+
+    def __init__(self, data) -> None:
+        self.data = data
+
+    @property
+    def total_duration(self) -> timedelta:
+        """Total cleaning duration."""
+        return timedelta(seconds=self.data["total_clean_time_sec"])
+
+    @property
+    def total_area(self) -> int:
+        """Total cleaned area."""
+        return self.data["total_clean_areas"]
+
+    @property
+    def count(self) -> int:
+        """Number of cleaning runs."""
+        return self.data["clean_counts"]
+
+
+class RoidmiConsumableStatus(DeviceStatus):
+    """Container for consumable status information, including information about brushes
+    and duration until they should be changed.
+
+    The methods returning time left are based values returned from the device.
+    """
+
+    def __init__(self, data):
+        self.data = data
+
+    def _calcUsageTime(
+        self, renaning_time: timedelta, remaning_level: int
+    ) -> timedelta:
+        remaning_fraction = remaning_level / 100.0
+        original_total = renaning_time / remaning_fraction
+        return original_total * (1 - remaning_fraction)
+
+    @property
+    def filter(self) -> timedelta:
+        """Filter usage time."""
+        return self._calcUsageTime(self.filter_left, self.data["filter_life_level"])
+
+    @property
+    def filter_left(self) -> timedelta:
+        """How long until the filter should be changed."""
+        return timedelta(minutes=self.data["filter_left_minutes"])
+
+    @property
+    def main_brush(self) -> timedelta:
+        """Main brush usage time."""
+        return self._calcUsageTime(
+            self.main_brush_left, self.data["main_brush_life_level"]
+        )
+
+    @property
+    def main_brush_left(self) -> timedelta:
+        """How long until the main brush should be changed."""
+        return timedelta(minutes=self.data["main_brush_left_minutes"])
+
+    @property
+    def side_brush(self) -> timedelta:
+        """Main brush usage time."""
+        return self._calcUsageTime(
+            self.side_brush_left, self.data["side_brushes_life_level"]
+        )
+
+    @property
+    def side_brush_left(self) -> timedelta:
+        """How long until the side brushes should be changed."""
+        return timedelta(minutes=self.data["side_brushes_left_minutes"])
+
+    @property
+    def sensor_dirty(self) -> timedelta:
+        """Return time since last sensor clean."""
+        return self._calcUsageTime(
+            self.sensor_dirty_left, self.data["sensor_dirty_remaning_level"]
+        )
+
+    @property
+    def sensor_dirty_left(self) -> timedelta:
+        """How long until the sensors should be cleaned."""
+        return timedelta(minutes=self.data["sensor_dirty_time_left_minutes"])
 
 
 class RoidmiVacuumMiot(MiotDevice):
@@ -383,55 +495,32 @@ class RoidmiVacuumMiot(MiotDevice):
 
     mapping = _MAPPING
 
-    @command(
-        default_output=format_output(
-            "\n",
-            "Battery level: {result.battery_level}\n"
-            "Brush life level: {result.brush_life_level}\n"
-            "Brush left time: {result.brush_left_time}\n"
-            "Charging state: {result.charging_state.name}\n"
-            "Device fault: {result.device_fault.name}\n"
-            "Device status: {result.device_status.name}\n"
-            "Filter left level: {result.filter_left_time}\n"
-            "Filter life level: {result.filter_life_level}\n"
-            "Operating mode: {result.sweep_mode.name}\n"
-            "Right side cleaning brush left time: {result.brush_left_time2}\n"
-            "Right side cleaning brush life level: {result.brush_life_level2}\n"
-            "Left side cleaning brush left time: {result.brush_left_time3}\n"
-            "Left side cleaning brush life level: {result.brush_life_level3}\n"
-            "Cleaning mode: {result.cleaning_mode.name}\n"
-            "Sweep type: {result.sweep_type.name}\n"
-            "Path mode: {result.path_mode.name}\n"
-            "Sweep mode: {result.sweep_mode.name}\n"
-            "Mop present: {result.mop_present}\n"
-            "work_station_freq: {result.work_station_freq}\n"
-            "timing: {result.timing}\n"
-            "clean_area: {result.clean_area}\n"
-            # "uid: {result.uid}\n"
-            "auto_boost: {result.auto_boost}\n"
-            "forbid_mode: {result.forbid_mode}\n"
-            "Water level: {result.water_level.name}\n"
-            # "Unknown siid8_13 [sec]: {result.siid8_13}\n"
-            # "Unknown siid8_14 [uint32]: {result.siid8_14}\n"
-            "clean_counts: {result.clean_counts}\n"
-            # "Unknown siid8_19 [sec]: {result.siid8_19}\n"
-            "Double clean: {result.double_clean}\n"
-            "Edge sweep: {result.edge_sweep}\n"
-            "Led switch: {result.led_switch}\n"
-            "Lidar collision: {result.lidar_collision}\n"
-            "Station key: {result.station_key}\n"
-            "Station led: {result.station_led}\n"
-            "Current audio: {result.current_audio}\n"
-            "Progress: {result.progress}\n"
-            # "Voice config: {result.voice_conf}\n"
-            # "Switch status: {result.switch_status.name}\n"
-            "Volume: {result.volume}\n" "Mute: {result.mute}\n",
-        )
-    )
+    @command()
     def status(self) -> RoidmiVacuumStatus:
         """State of the vacuum."""
-
         return RoidmiVacuumStatus(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
+                for prop in self.get_properties_for_mapping(max_properties=10)
+            }
+        )
+
+    @command()
+    def consumable_status(self) -> RoidmiConsumableStatus:
+        """Return information about consumables."""
+        return RoidmiConsumableStatus(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
+                for prop in self.get_properties_for_mapping(max_properties=10)
+            }
+        )
+
+    @command()
+    def cleaning_summary(self) -> RoidmiCleaningSummary:
+        """Return information about cleaning runs."""
+        return RoidmiCleaningSummary(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
@@ -446,9 +535,9 @@ class RoidmiVacuumMiot(MiotDevice):
 
     @command(click.argument("roomstr", type=str))
     def start_room_sweep_unknown(self, roomstr: str) -> None:
-        """Start cleaning.
+        """Start room cleaning.
 
-        FIXME: the syntax of voice is unknown
+        FIXME: the syntax of room_sweep is unknown
         """
         return self.call_action_by(2, 3, roomstr)
 
@@ -483,10 +572,10 @@ class RoidmiVacuumMiot(MiotDevice):
         """Set sound volume [0-100]."""
         return self.set_property("volume", vol)
 
-    @command(click.argument("cleaning_mode", type=EnumType(CleaningMode)))
-    def set_cleaning_mode(self, cleaning_mode: CleaningMode):
-        """Set cleaning_mode."""
-        return self.set_property("cleaning_mode", cleaning_mode.value)
+    @command(click.argument("fanspeed_mode", type=EnumType(FanSpeed)))
+    def set_fanspeed(self, fanspeed_mode: FanSpeed):
+        """Set fan speed."""
+        return self.set_property("fanspeed_mode", fanspeed_mode.value)
 
     @command(click.argument("sweep_type", type=EnumType(SweepType)))
     def set_sweep_type(self, sweep_type: SweepType):
@@ -500,14 +589,18 @@ class RoidmiVacuumMiot(MiotDevice):
 
     @command(click.argument("work_station_freq", type=int))
     def set_work_station_freq(self, work_station_freq: int):
-        """Set work_station_freq (2 means Auto dust colect every second time)."""
+        """Set work_station_freq (2 means base dust colect every second time)."""
         return self.set_property("work_station_freq", work_station_freq)
 
     @command(click.argument("timing", type=str))
     def set_timing_unknown(self, timing: str):
-        """Set time zone.
+        """Set repeated clean timing.
 
-        FIXME: the syntax of timing is unknown
+        Set timing to 9:00 Monday-Friday, rooms:[12,10]
+        timing = '{"time":[[32400,1,3,0,[1,2,3,4,5],0,[12,10],null]],"tz":2,"tzs":7200}'
+        See also :func:`RoidmiVacuumStatus.timing`
+
+        NOTE: setting timing will override existing settings
         """
         return self.set_property("timing", timing)
 
@@ -516,25 +609,44 @@ class RoidmiVacuumMiot(MiotDevice):
         """Set auto boost on carpet."""
         return self.set_property("auto_boost", auto_boost)
 
-    @command(
-        click.argument("begin", type=str),
-        click.argument("end", type=str),
-        click.argument("active", type=bool, required=False, default=True),
-    )
-    def set_forbid_mode(self, begin: str, end: str, active: bool = True):
-        """Set do not disturbe.
-
-        E.g. begin="22:00" end="05:00"
-        """
-
-        def clockToSec(clock):
-            hour, minut = clock.split(":")
-            return int(hour) * 3600 + int(minut) * 60
-
-        begin_int = clockToSec(begin)
-        end_int = clockToSec(end)
-        value_str = json.dumps({"time": [begin_int, end_int, int(active)]})
+    def _set_dnd(self, start_int: int, end_int: int, active: bool):
+        value_str = json.dumps({"time": [start_int, end_int, int(active)]})
         return self.set_property("forbid_mode", value_str)
+
+    @command(
+        click.argument("start_hr", type=int),
+        click.argument("start_min", type=int),
+        click.argument("end_hr", type=int),
+        click.argument("end_min", type=int),
+    )
+    def set_dnd(self, start_hr: int, start_min: int, end_hr: int, end_min: int):
+        """Set do-not-disturb.
+
+        :param int start_hr: Start hour
+        :param int start_min: Start minute
+        :param int end_hr: End hour
+        :param int end_min: End minute
+        """
+        start_int = int(timedelta(hours=start_hr, minutes=start_min).total_seconds())
+        end_int = int(timedelta(hours=end_hr, minutes=end_min).total_seconds())
+        return self._set_dnd(start_int, end_int, active=True)
+
+    @command()
+    def disable_dnd(self):
+        """Disable do-not-disturb."""
+        # The current do not disturb is read back for a better user expierence,
+        # as start/end time must be set together with enabled=False
+        try:
+            current_dnd_str = self.get_property_by(**_MAPPING["forbid_mode"])[0][
+                "value"
+            ]
+            current_dnd_dict = json.loads(current_dnd_str)
+        except Exception:
+            # In case reading current DND back fails, DND is disabled anyway
+            return self._set_dnd(0, 0, active=False)
+        return self._set_dnd(
+            current_dnd_dict["time"][0], current_dnd_dict["time"][1], active=False
+        )
 
     @command(click.argument("water_level", type=EnumType(WaterLevel)))
     def set_water_level(self, water_level: WaterLevel):
@@ -585,6 +697,6 @@ class RoidmiVacuumMiot(MiotDevice):
         return self.call_action_by(12, 1)
 
     @command()
-    def reset_sidebrush_left_life(self) -> None:
-        """Reset side brush life."""
+    def reset_sensor_dirty_life(self) -> None:
+        """Reset sensor dirty life."""
         return self.call_action_by(15, 1)
