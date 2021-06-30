@@ -5,11 +5,11 @@ from enum import Enum
 
 from .click_common import command, format_output
 from .miot_device import DeviceStatus as DeviceStatusContainer
-from .miot_device import MiotDevice, MiotMapping
+from .miot_device import MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-_MAPPING: MiotMapping = {
+_MAPPING = {
     "battery_level": {"siid": 2, "piid": 1},
     "charging_state": {"siid": 2, "piid": 2},
     "device_fault": {"siid": 3, "piid": 1},
@@ -56,9 +56,13 @@ class CleaningMode(Enum):
 
 class OperatingMode(Enum):
     Unknown = -1
+    Paused = 1
     Cleaning = 2
     GoCharging = 3
-    Paused = 14
+    Charging = 6
+    ManualCleaning = 13
+    ZonedCleaning = 19
+    ManualPaused = 17
 
 
 class FaultStatus(Enum):
@@ -69,6 +73,7 @@ class FaultStatus(Enum):
 class DeviceStatus(Enum):
     Unknown = -1
     Sweeping = 1
+    ManualSweeping = 13
     Idle = 2
     Paused = 3
     Error = 4
@@ -275,13 +280,11 @@ class DreameVacuumMiot(MiotDevice):
         """Reset side brush life."""
         return self.send_action(28, 1)
 
-    def get_properties_for_mapping(self, *, max_properties=15) -> list:
+    def get_properties_for_mapping(self) -> list:
         """Retrieve raw properties based on mapping.
 
         Method was copied from the base class to change the value of max_properties to
         10. This change is needed to avoid "Checksum error" messages from the device.
-
-        # TODO: miotdevice class should have a possibility to define its max_properties value
         """
 
         # We send property key in "did" because it's sent back via response and we can identify the property.
