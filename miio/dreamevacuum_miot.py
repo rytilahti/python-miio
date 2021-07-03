@@ -5,11 +5,11 @@ from enum import Enum
 
 from .click_common import command, format_output
 from .miot_device import DeviceStatus as DeviceStatusContainer
-from .miot_device import MiotDevice
+from .miot_device import MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
 
-_MAPPING = {
+_MAPPING: MiotMapping = {
     "battery_level": {"siid": 2, "piid": 1},
     "charging_state": {"siid": 2, "piid": 2},
     "device_fault": {"siid": 3, "piid": 1},
@@ -61,8 +61,8 @@ class OperatingMode(Enum):
     GoCharging = 3
     Charging = 6
     ManualCleaning = 13
-    ZonedCleaning = 19
     ManualPaused = 17
+    ZonedCleaning = 19
 
 
 class FaultStatus(Enum):
@@ -73,12 +73,12 @@ class FaultStatus(Enum):
 class DeviceStatus(Enum):
     Unknown = -1
     Sweeping = 1
-    ManualSweeping = 13
     Idle = 2
     Paused = 3
     Error = 4
     GoCharging = 5
     Charging = 6
+    ManualSweeping = 13
 
 
 class DreameVacuumStatus(DeviceStatusContainer):
@@ -280,7 +280,7 @@ class DreameVacuumMiot(MiotDevice):
         """Reset side brush life."""
         return self.send_action(28, 1)
 
-    def get_properties_for_mapping(self) -> list:
+    def get_properties_for_mapping(self, *, max_properties = 15) -> list:
         """Retrieve raw properties based on mapping.
 
         Method was copied from the base class to change the value of max_properties to
