@@ -32,7 +32,9 @@ from miio.curtain_youpin import CurtainMiot
 from miio.device import Device
 from miio.exceptions import DeviceError, DeviceException
 from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
-from miio.fan_miot import FanMiot, FanP9, FanP10, FanP11
+from miio.fan_miot import Fan1C, FanMiot, FanP9, FanP10, FanP11
+from miio.fan_leshow import FanLeshow
+from miio.g1vacuum import G1Vacuum
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
