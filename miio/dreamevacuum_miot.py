@@ -61,6 +61,7 @@ class OperatingMode(Enum):
     GoCharging = 3
     Charging = 6
     ManualCleaning = 13
+    Sleeping = 14
     ManualPaused = 17
     ZonedCleaning = 19
 
