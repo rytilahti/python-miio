@@ -4,7 +4,7 @@ import random
 from typing import Any, Optional
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,15 +36,15 @@ class SwingMode(enum.Enum):
     Off = "off"
 
 
-class AirConditioningCompanionStatus:
+class AirConditioningCompanionStatus(DeviceStatus):
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
-        """
-        Device model: lumi.acpartner.mcn02
+        """Status constructor.
 
-        Response of "get_prop, params:['power', 'mode', 'tar_temp', 'fan_level', 'ver_swing', 'load_power']":
-        ['on', 'dry', 16, 'small_fan', 'off', 84.0]
+        Example response (lumi.acpartner.mcn02):
+        * ['power', 'mode', 'tar_temp', 'fan_level', 'ver_swing', 'load_power']
+        * ['on',    'dry',   16,        'small_fan', 'off',        84.0]
         """
         self.data = data
 
@@ -98,26 +98,6 @@ class AirConditioningCompanionStatus:
         except TypeError:
             return None
 
-    def __repr__(self) -> str:
-        s = (
-            "<AirConditioningCompanionStatus "
-            "power=%s, "
-            "load_power=%s, "
-            "target_temperature=%s, "
-            "swing_mode=%s, "
-            "fan_speed=%s, "
-            "mode=%s>"
-            % (
-                self.power,
-                self.load_power,
-                self.target_temperature,
-                self.swing_mode,
-                self.fan_speed,
-                self.mode,
-            )
-        )
-        return s
-
 
 class AirConditioningCompanionMcn02(Device):
     """Main class representing Xiaomi Air Conditioning Companion V1 and V2."""
@@ -126,11 +106,13 @@ class AirConditioningCompanionMcn02(Device):
         self,
         ip: str = None,
         token: str = None,
-        start_id: int = random.randint(0, 999),
+        start_id: int = None,
         debug: int = 0,
         lazy_discover: bool = True,
         model: str = MODEL_ACPARTNER_MCN02,
     ) -> None:
+        if start_id is None:
+            start_id = random.randint(0, 999)  # nosec
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
         if model != MODEL_ACPARTNER_MCN02:
@@ -174,5 +156,6 @@ class AirConditioningCompanionMcn02(Device):
     def send_command(self, command: str, parameters: Any = None) -> Any:
         """Send a command to the air conditioner.
 
-        :param str command: Command to execute"""
+        :param str command: Command to execute
+        """
         return self.send(command, parameters)

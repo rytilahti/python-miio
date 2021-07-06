@@ -6,10 +6,8 @@ from typing import Tuple
 
 
 def deprecated(reason):
-    """
-    This is a decorator which can be used to mark functions and classes
-    as deprecated. It will result in a warning being emitted
-    when the function is used.
+    """This is a decorator which can be used to mark functions and classes as
+    deprecated. It will result in a warning being emitted when the function is used.
 
     From https://stackoverflow.com/a/40301488
     """
@@ -47,7 +45,7 @@ def deprecated(reason):
 
         return decorator
 
-    elif inspect.isclass(reason) or inspect.isfunction(reason):
+    elif inspect.isclass(reason) or inspect.isfunction(reason):  # noqa: SIM106
 
         # The @deprecated is used without any 'reason'.
         #

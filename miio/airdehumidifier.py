@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceInfo
+from .device import Device, DeviceInfo, DeviceStatus
 from .exceptions import DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -51,12 +51,11 @@ class FanSpeed(enum.Enum):
     Strong = 4
 
 
-class AirDehumidifierStatus:
+class AirDehumidifierStatus(DeviceStatus):
     """Container for status reports from the air dehumidifier."""
 
     def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
-        """
-        Response of a Air Dehumidifier (nwt.derh.wdh318efw1):
+        """Response of a Air Dehumidifier (nwt.derh.wdh318efw1):
 
         {'on_off': 'on', 'mode': 'auto', 'fan_st': 2,
          'buzzer': 'off', 'led': 'on', 'child_lock': 'off',
@@ -80,7 +79,10 @@ class AirDehumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either on, auth or dry_cloth."""
+        """Operation mode.
+
+        Can be either on, auth or dry_cloth.
+        """
         return OperationMode(self.data["mode"])
 
     @property
@@ -112,7 +114,10 @@ class AirDehumidifierStatus:
 
     @property
     def target_humidity(self) -> Optional[int]:
-        """Target humiditiy. Can be either 40, 50, 60 percent."""
+        """Target humiditiy.
+
+        Can be either 40, 50, 60 percent.
+        """
         if "auto" in self.data and self.data["auto"] is not None:
             return self.data["auto"]
         return None
@@ -149,41 +154,6 @@ class AirDehumidifierStatus:
         """Alarm."""
         return self.data["alarm"]
 
-    def __repr__(self) -> str:
-        s = (
-            "<AirDehumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "buzzer=%s, "
-            "led=%s, "
-            "child_lock=%s, "
-            "target_humidity=%s%%, "
-            "fan_speed=%s, "
-            "tank_full=%s, "
-            "compressor_status=%s, "
-            "defrost_status=%s, "
-            "fan_st=%s, "
-            "alarm=%s, "
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.buzzer,
-                self.led,
-                self.child_lock,
-                self.target_humidity,
-                self.fan_speed,
-                self.tank_full,
-                self.compressor_status,
-                self.defrost_status,
-                self.fan_st,
-                self.alarm,
-            )
-        )
-        return s
-
 
 class AirDehumidifier(Device):
     """Implementation of Xiaomi Mi Air Dehumidifier."""
@@ -204,7 +174,7 @@ class AirDehumidifier(Device):
         else:
             self.model = MODEL_DEHUMIDIFIER_V1
 
-        self.device_info = None
+        self.device_info: DeviceInfo
 
     @command(
         default_output=format_output(
@@ -266,11 +236,19 @@ class AirDehumidifier(Device):
 
     @command(
         click.argument("fan_speed", type=EnumType(FanSpeed)),
-        default_output=format_output("Setting fan level to {fan_level}"),
+        default_output=format_output("Setting fan level to {fan_speed}"),
     )
     def set_fan_speed(self, fan_speed: FanSpeed):
         """Set the fan speed."""
-        return self.send("set_fan_level", [fan_speed.value])
+        try:
+            return self.send("set_fan_level", [fan_speed.value])
+        except DeviceError as ex:
+            if ex.code == -10000:
+                raise AirDehumidifierException(
+                    "Unable to set fan speed, this can happen if device is turned off."
+                ) from ex
+
+            raise
 
     @command(
         click.argument("led", type=bool),

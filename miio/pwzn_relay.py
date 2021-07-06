@@ -1,11 +1,11 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,12 +56,12 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class PwznRelayStatus:
+class PwznRelayStatus(DeviceStatus):
     """Container for status reports from the plug."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a PWZN Relay Apple (pwzn.relay.apple)
+        """Response of a PWZN Relay Apple (pwzn.relay.apple)
+
         { 'relay_status': 9, 'on_count': 2, 'name0': 'channel1', 'name1': '',
         'name2': '', 'name3': '', 'name4': '', 'name5': '', 'name6': '',
         'name7': '', 'name8': '', 'name9': '', 'name10': '', 'name11': '',
@@ -70,15 +70,16 @@ class PwznRelayStatus:
         self.data = data
 
     @property
-    def relay_state(self) -> int:
+    def relay_state(self) -> Optional[int]:
         """Current relay state."""
         if "relay_status" in self.data:
             return self.data["relay_status"]
+        return None
 
     @property
     def relay_names(self) -> Dict[int, str]:
         def _extract_index_from_key(name) -> int:
-            """extract the index from the variable"""
+            """extract the index from the variable."""
             return int(name[4:])
 
         return {
@@ -88,19 +89,11 @@ class PwznRelayStatus:
         }
 
     @property
-    def on_count(self) -> int:
+    def on_count(self) -> Optional[int]:
         """Number of on relay."""
         if "on_count" in self.data:
             return self.data["on_count"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<PwznRelayStatus "
-            "relay_status=%s, "
-            "relay_names=%s, "
-            "on_count=%s>" % (self.relay_state, self.relay_names, self.on_count)
-        )
-        return s
+        return None
 
 
 class PwznRelay(Device):

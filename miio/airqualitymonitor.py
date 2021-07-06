@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -41,12 +41,11 @@ class AirQualityMonitorException(DeviceException):
     pass
 
 
-class AirQualityMonitorStatus:
+class AirQualityMonitorStatus(DeviceStatus):
     """Container of air quality monitor status."""
 
     def __init__(self, data):
-        """
-        Response of a Xiaomi Air Quality Monitor (zhimi.airmonitor.v1):
+        """Response of a Xiaomi Air Quality Monitor (zhimi.airmonitor.v1):
 
         {'power': 'on', 'aqi': 34, 'battery': 100, 'usb_state': 'off', 'time_state': 'on'}
 
@@ -81,12 +80,12 @@ class AirQualityMonitorStatus:
 
     @property
     def aqi(self) -> Optional[int]:
-        """Air quality index value. (0...600)."""
+        """Air quality index value (0..600)."""
         return self.data.get("aqi", None)
 
     @property
     def battery(self) -> Optional[int]:
-        """Current battery level (0...100)."""
+        """Current battery level (0..100)."""
         return self.data.get("battery", None)
 
     @property
@@ -148,35 +147,6 @@ class AirQualityMonitorStatus:
         """Return tvoc value."""
         return self.data.get("tvoc", None)
 
-    def __repr__(self) -> str:
-        s = (
-            "<AirQualityMonitorStatus power=%s, "
-            "usb_power=%s, "
-            "battery=%s, "
-            "aqi=%s, "
-            "temperature=%s, "
-            "humidity=%s, "
-            "co2=%s, "
-            "co2e=%s, "
-            "pm2.5=%s, "
-            "tvoc=%s, "
-            "display_clock=%s>"
-            % (
-                self.power,
-                self.usb_power,
-                self.battery,
-                self.aqi,
-                self.temperature,
-                self.humidity,
-                self.co2,
-                self.co2e,
-                self.pm25,
-                self.tvoc,
-                self.display_clock,
-            )
-        )
-        return s
-
 
 class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
@@ -200,7 +170,7 @@ class AirQualityMonitor(Device):
                 "Device model %s unsupported. Falling back to %s.", model, self.model
             )
         else:
-            """Force autodetection"""
+            # Force autodetection.
             self.model = None
 
     @command(
@@ -223,7 +193,6 @@ class AirQualityMonitor(Device):
         """Return device status."""
 
         if self.model is None:
-            """Autodetection"""
             info = self.info()
             self.model = info.model
 

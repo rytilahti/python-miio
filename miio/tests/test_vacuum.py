@@ -1,9 +1,11 @@
 import datetime
 from unittest import TestCase
+from unittest.mock import patch
 
 import pytest
 
 from miio import Vacuum, VacuumStatus
+from miio.vacuum import CarpetCleaningMode, MopMode
 
 from .dummies import DummyDevice
 
@@ -45,9 +47,11 @@ class DummyVacuum(DummyDevice, Vacuum):
             "app_goto_target": lambda x: self.change_mode("goto"),
             "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
             "app_charge": lambda x: self.change_mode("charge"),
+            "miIO.info": "dummy info",
         }
 
         super().__init__(args, kwargs)
+        self.model = None
 
     def change_mode(self, new_mode):
         if new_mode == "spot":
@@ -152,62 +156,147 @@ class TestVacuum(TestCase):
         )
         assert self.status().state_code == self.device.STATE_ZONED_CLEAN
 
-    @pytest.mark.xfail
-    def test_manual_control(self):
-        self.fail()
-
-    @pytest.mark.skip("unknown handling")
-    def test_log_upload(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_consumable_status(self):
-        self.fail()
-
-    @pytest.mark.skip("consumable reset is not implemented")
-    def test_consumable_reset(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_map(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_clean_history(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_clean_details(self):
-        self.fail()
-
-    @pytest.mark.skip("hard to test")
-    def test_find(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_timer(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_dnd(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_fan_speed(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_sound_info(self):
-        self.fail()
-
-    @pytest.mark.xfail
-    def test_serial_number(self):
-        self.fail()
-
-    @pytest.mark.xfail
     def test_timezone(self):
-        self.fail()
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                {"olson": "Europe/Berlin", "posix": "CET-1CEST,M3.5.0,M10.5.0/3"}
+            ],
+        ):
+            assert self.device.timezone() == "Europe/Berlin"
 
-    @pytest.mark.xfail
-    def test_raw_command(self):
-        self.fail()
+        with patch.object(self.device, "send", return_value=["Europe/Berlin"]):
+            assert self.device.timezone() == "Europe/Berlin"
+
+        with patch.object(self.device, "send", return_value=0):
+            assert self.device.timezone() == "UTC"
+
+    def test_history(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                174145,
+                2410150000,
+                82,
+                [
+                    1488240000,
+                    1488153600,
+                    1488067200,
+                    1487980800,
+                    1487894400,
+                    1487808000,
+                    1487548800,
+                ],
+            ],
+        ):
+            assert self.device.clean_history().total_duration == datetime.timedelta(
+                days=2, seconds=1345
+            )
+
+            assert self.device.clean_history().dust_collection_count is None
+
+            assert self.device.clean_history().ids[0] == 1488240000
+
+    def test_history_dict(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value={
+                "clean_time": 174145,
+                "clean_area": 2410150000,
+                "clean_count": 82,
+                "dust_collection_count": 5,
+                "records": [
+                    1488240000,
+                    1488153600,
+                    1488067200,
+                    1487980800,
+                    1487894400,
+                    1487808000,
+                    1487548800,
+                ],
+            },
+        ):
+            assert self.device.clean_history().total_duration == datetime.timedelta(
+                days=2, seconds=1345
+            )
+
+            assert self.device.clean_history().dust_collection_count == 5
+
+            assert self.device.clean_history().ids[0] == 1488240000
+
+    def test_history_details(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[[1488347071, 1488347123, 16, 0, 0, 0]],
+        ):
+            assert self.device.clean_details(
+                123123, return_list=False
+            ).duration == datetime.timedelta(seconds=16)
+
+    def test_history_details_dict(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                {
+                    "begin": 1616757243,
+                    "end": 1616758193,
+                    "duration": 950,
+                    "area": 10852500,
+                    "error": 0,
+                    "complete": 1,
+                    "start_type": 2,
+                    "clean_type": 1,
+                    "finish_reason": 52,
+                    "dust_collection_status": 0,
+                }
+            ],
+        ):
+            assert self.device.clean_details(
+                123123, return_list=False
+            ).duration == datetime.timedelta(seconds=950)
+
+    def test_history_empty(self):
+        with patch.object(
+            self.device,
+            "send",
+            return_value={
+                "clean_time": 174145,
+                "clean_area": 2410150000,
+                "clean_count": 82,
+                "dust_collection_count": 5,
+            },
+        ):
+            assert self.device.clean_history().total_duration == datetime.timedelta(
+                days=2, seconds=1345
+            )
+
+            assert len(self.device.clean_history().ids) == 0
+
+    def test_carpet_cleaning_mode(self):
+        with patch.object(self.device, "send", return_value=[{"carpet_clean_mode": 0}]):
+            assert self.device.carpet_cleaning_mode() == CarpetCleaningMode.Avoid
+
+        with patch.object(self.device, "send", return_value="unknown_method"):
+            assert self.device.carpet_cleaning_mode() is None
+
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_carpet_cleaning_mode(CarpetCleaningMode.Rise) is True
+            mock_method.assert_called_once_with(
+                "set_carpet_clean_mode", {"carpet_clean_mode": 1}
+            )
+
+    def test_mop_mode(self):
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_mop_mode(MopMode.Deep) is True
+            mock_method.assert_called_once_with("set_mop_mode", [301])
+
+        with patch.object(self.device, "send", return_value=[300]):
+            assert self.device.mop_mode() == MopMode.Standard
+
+        with patch.object(self.device, "send", return_value=[32453]):
+            assert self.device.mop_mode() is None

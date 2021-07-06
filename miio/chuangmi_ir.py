@@ -1,5 +1,6 @@
 import base64
 import re
+from typing import Callable, Set, Tuple
 
 import click
 from construct import (
@@ -39,7 +40,8 @@ class ChuangmiIr(Device):
     def learn(self, key: int = 1):
         """Learn an infrared command.
 
-        :param int key: Storage slot, must be between 1 and 1000000"""
+        :param int key: Storage slot, must be between 1 and 1000000
+        """
 
         if key < 1 or key > 1000000:
             raise ChuangmiIrException("Invalid storage slot.")
@@ -61,34 +63,46 @@ class ChuangmiIr(Device):
         Negative response (chuangmi.ir.v2):
         {'error': {'code': -5003, 'message': 'learn timeout'}, 'id': 17}
 
-        :param int key: Slot to read from"""
+        :param int key: Slot to read from
+        """
 
         if key < 1 or key > 1000000:
             raise ChuangmiIrException("Invalid storage slot.")
         return self.send("miIO.ir_read", {"key": str(key)})
 
-    def play_raw(self, command: str, frequency: int = 38400):
+    def play_raw(self, command: str, frequency: int = 38400, length: int = -1):
         """Play a captured command.
 
         :param str command: Command to execute
-        :param int frequency: Execution frequency"""
-        return self.send("miIO.ir_play", {"freq": frequency, "code": command})
+        :param int frequency: Execution frequency
+        :param int length: Length of the command. -1 means not sending the length parameter.
+        """
+        if length < 0:
+            return self.send("miIO.ir_play", {"freq": frequency, "code": command})
+        else:
+            return self.send(
+                "miIO.ir_play", {"freq": frequency, "code": command, "length": length}
+            )
 
-    def play_pronto(self, pronto: str, repeats: int = 1):
-        """Play a Pronto Hex encoded IR command.
-        Supports only raw Pronto format, starting with 0000.
+    def play_pronto(self, pronto: str, repeats: int = 1, length: int = -1):
+        """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
+        starting with 0000.
 
         :param str pronto: Pronto Hex string.
-        :param int repeats: Number of extra signal repeats."""
-        return self.play_raw(*self.pronto_to_raw(pronto, repeats))
+        :param int repeats: Number of extra signal repeats.
+        :param int length: Length of the command. -1 means not sending the length parameter.
+        """
+        command, frequency = self.pronto_to_raw(pronto, repeats)
+        return self.play_raw(command, frequency, length)
 
     @classmethod
-    def pronto_to_raw(cls, pronto: str, repeats: int = 1):
-        """Play a Pronto Hex encoded IR command.
-        Supports only raw Pronto format, starting with 0000.
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+        """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
+        starting with 0000.
 
         :param str pronto: Pronto Hex string.
-        :param int repeats: Number of extra signal repeats."""
+        :param int repeats: Number of extra signal repeats.
+        """
         if repeats < 0:
             raise ChuangmiIrException("Invalid repeats value")
 
@@ -100,13 +114,13 @@ class ChuangmiIr(Device):
         if len(pronto_data.intro) == 0:
             repeats += 1
 
-        times = set()
+        times: Set[int] = set()
         for pair in pronto_data.intro + pronto_data.repeat * (1 if repeats else 0):
             times.add(pair.pulse)
             times.add(pair.gap)
 
-        times = sorted(times)
-        times_map = {t: idx for idx, t in enumerate(times)}
+        times_sorted = sorted(times)
+        times_map = {t: idx for idx, t in enumerate(times_sorted)}
         edge_pairs = []
         for pair in pronto_data.intro + pronto_data.repeat * repeats:
             edge_pairs.append(
@@ -116,7 +130,7 @@ class ChuangmiIr(Device):
         signal_code = base64.b64encode(
             ChuangmiIrSignal.build(
                 {
-                    "times_index": times + [0] * (16 - len(times)),
+                    "times_index": times_sorted + [0] * (16 - len(times)),
                     "edge_pairs": edge_pairs,
                 }
             )
@@ -139,24 +153,26 @@ class ChuangmiIr(Device):
         else:
             command_type, command, *command_args = command.split(":")
 
-        if command_type == "raw":
-            play_method = self.play_raw
-            arg_types = [int]
-        elif command_type == "pronto":
-            play_method = self.play_pronto
-            arg_types = [int]
-        else:
-            raise ChuangmiIrException("Invalid command type")
-
+        arg_types = [int]
         if len(command_args) > len(arg_types):
             raise ChuangmiIrException("Invalid command arguments count")
 
+        if command_type not in ["raw", "pronto"]:
+            raise ChuangmiIrException("Invalid command type")
+
+        play_method: Callable
+        if command_type == "raw":
+            play_method = self.play_raw
+
+        elif command_type == "pronto":
+            play_method = self.play_pronto
+
         try:
-            command_args = [t(v) for v, t in zip(command_args, arg_types)]
+            converted_command_args = [t(v) for v, t in zip(command_args, arg_types)]
         except Exception as ex:
             raise ChuangmiIrException("Invalid command arguments") from ex
 
-        return play_method(command, *command_args)
+        return play_method(command, *converted_command_args)
 
     @command(
         click.argument("indicator_led", type=bool),

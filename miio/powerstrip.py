@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -46,12 +46,11 @@ class PowerMode(enum.Enum):
     Normal = "normal"
 
 
-class PowerStripStatus:
+class PowerStripStatus(DeviceStatus):
     """Container for status reports from the power strip."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Supported device models: qmi.powerstrip.v1, zimi.powerstrip.v2
+        """Supported device models: qmi.powerstrip.v1, zimi.powerstrip.v2.
 
         Response of a Power Strip 2 (zimi.powerstrip.v2):
         {'power','on', 'temperature': 48.7, 'current': 0.05, 'mode': None,
@@ -76,7 +75,10 @@ class PowerStripStatus:
 
     @property
     def current(self) -> Optional[float]:
-        """Current, if available. Meaning and voltage reference unknown."""
+        """Current, if available.
+
+        Meaning and voltage reference unknown.
+        """
         if self.data["current"] is not None:
             return self.data["current"]
         return None
@@ -129,33 +131,6 @@ class PowerStripStatus:
         if "power_factor" in self.data and self.data["power_factor"] is not None:
             return self.data["power_factor"]
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<PowerStripStatus power=%s, "
-            "temperature=%s, "
-            "voltage=%s, "
-            "current=%s, "
-            "load_power=%s, "
-            "power_factor=%s "
-            "power_price=%s, "
-            "leakage_current=%s, "
-            "mode=%s, "
-            "wifi_led=%s>"
-            % (
-                self.power,
-                self.temperature,
-                self.voltage,
-                self.current,
-                self.load_power,
-                self.power_factor,
-                self.power_price,
-                self.leakage_current,
-                self.mode,
-                self.wifi_led,
-            )
-        )
-        return s
 
 
 class PowerStrip(Device):

@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*#
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, tzinfo
 from enum import IntEnum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Union
 
 from croniter import croniter
 
+from .device import DeviceStatus
 from .utils import pretty_seconds, pretty_time
 
 
@@ -40,7 +41,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 }
 
 
-class VacuumStatus:
+class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -68,6 +69,21 @@ class VacuumStatus:
         # 'map_present': 1, 'in_cleaning': 3, 'in_returning': 0,
         # 'in_fresh_state': 0, 'lab_status': 1, 'water_box_status': 0,
         # 'fan_power': 102, 'dnd_enabled': 0, 'map_status': 3, 'lock_status': 0}]
+
+        # Example of S7 in charging mode
+        # new items: is_locating, water_box_mode, water_box_carriage_status,
+        # mop_forbidden_enable, adbumper_status, water_shortage_status,
+        # dock_type, dust_collection_status, auto_dust_collection, mop_mode, debug_mode
+        #
+        # [{'msg_ver': 2, 'msg_seq': 1839, 'state': 8, 'battery': 100,
+        # 'clean_time': 2311, 'clean_area': 35545000, 'error_code': 0,
+        # 'map_present': 1, 'in_cleaning': 0, 'in_returning': 0,
+        # 'in_fresh_state': 1, 'lab_status': 3, 'water_box_status': 1,
+        # 'fan_power': 102, 'dnd_enabled': 0, 'map_status': 3, 'is_locating': 0,
+        # 'lock_status': 0, 'water_box_mode': 202, 'water_box_carriage_status': 0,
+        # 'mop_forbidden_enable': 0, 'adbumper_status': [0, 0, 0],
+        # 'water_shortage_status': 0, 'dock_type': 0, 'dust_collection_status': 0,
+        # 'auto_dust_collection': 1,  'mop_mode': 300, 'debug_mode': 0}]
         self.data = data
 
     @property
@@ -120,7 +136,7 @@ class VacuumStatus:
 
     @property
     def battery(self) -> int:
-        """Remaining battery in percentage. """
+        """Remaining battery in percentage."""
         return int(self.data["battery"])
 
     @property
@@ -175,114 +191,142 @@ class VacuumStatus:
         return "water_box_status" in self.data and self.data["water_box_status"] == 1
 
     @property
+    def is_water_box_carriage_attached(self) -> Optional[bool]:
+        """Return True if water box carriage (mop) is installed, None if sensor not
+        present."""
+        if "water_box_carriage_status" in self.data:
+            return self.data["water_box_carriage_status"] == 1
+        return None
+
+    @property
+    def is_water_shortage(self) -> Optional[bool]:
+        """Returns True if water is low in the tank, None if sensor not present."""
+        if "water_shortage_status" in self.data:
+            return self.data["water_shortage_status"] == 1
+        return None
+
+    @property
     def got_error(self) -> bool:
         """True if an error has occured."""
         return self.error_code != 0
 
-    def __repr__(self) -> str:
-        s = "<VacuumStatus state=%s, error=%s " % (self.state, self.error)
-        s += "bat=%s%%, fan=%s%% " % (self.battery, self.fanspeed)
-        s += "cleaned %s m² in %s>" % (self.clean_area, self.clean_time)
-        return s
 
-
-class CleaningSummary:
+class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
 
-    def __init__(self, data: List[Any]) -> None:
+    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
         # total duration, total area, amount of cleans
         # [ list, of, ids ]
         # { "result": [ 174145, 2410150000, 82,
         # [ 1488240000, 1488153600, 1488067200, 1487980800,
         #  1487894400, 1487808000, 1487548800 ] ],
         #  "id": 1 }
-        self.data = data
+        # newer models return a dict
+        if isinstance(data, list):
+            self.data = {
+                "clean_time": data[0],
+                "clean_area": data[1],
+                "clean_count": data[2],
+            }
+            if len(data) > 3:
+                self.data["records"] = data[3]
+        else:
+            self.data = data
+
+        if "records" not in self.data:
+            self.data["records"] = []
 
     @property
     def total_duration(self) -> timedelta:
         """Total cleaning duration."""
-        return pretty_seconds(self.data[0])
+        return pretty_seconds(self.data["clean_time"])
 
     @property
     def total_area(self) -> float:
         """Total cleaned area."""
-        return pretty_area(self.data[1])
+        return pretty_area(self.data["clean_area"])
 
     @property
     def count(self) -> int:
         """Number of cleaning runs."""
-        return int(self.data[2])
+        return int(self.data["clean_count"])
 
     @property
     def ids(self) -> List[int]:
         """A list of available cleaning IDs, see also :class:`CleaningDetails`."""
-        return list(self.data[3])
+        return list(self.data["records"])
 
-    def __repr__(self) -> str:
-        return (
-            "<CleaningSummary: %s times, total time: %s, total area: %s, ids: %s>"
-            % (self.count, self.total_duration, self.total_area, self.ids)  # noqa: E501
-        )
+    @property
+    def dust_collection_count(self) -> Optional[int]:
+        """Total number of dust collections."""
+        if "dust_collection_count" in self.data:
+            return int(self.data["dust_collection_count"])
+        else:
+            return None
 
 
-class CleaningDetails:
+class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: List[Any]) -> None:
+    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
-        self.data = data
+        # newer models return a dict
+        if isinstance(data, list):
+            self.data = {
+                "begin": data[0],
+                "end": data[1],
+                "duration": data[2],
+                "area": data[3],
+                "error": data[4],
+                "complete": data[5],
+            }
+        else:
+            self.data = data
 
     @property
     def start(self) -> datetime:
         """When cleaning was started."""
-        return pretty_time(self.data[0])
+        return pretty_time(self.data["begin"])
 
     @property
     def end(self) -> datetime:
         """When cleaning was finished."""
-        return pretty_time(self.data[1])
+        return pretty_time(self.data["end"])
 
     @property
     def duration(self) -> timedelta:
         """Total duration of the cleaning run."""
-        return pretty_seconds(self.data[2])
+        return pretty_seconds(self.data["duration"])
 
     @property
     def area(self) -> float:
         """Total cleaned area."""
-        return pretty_area(self.data[3])
+        return pretty_area(self.data["area"])
 
     @property
     def error_code(self) -> int:
         """Error code."""
-        return int(self.data[4])
+        return int(self.data["error"])
 
     @property
     def error(self) -> str:
         """Error state of this cleaning run."""
-        return error_codes[self.data[4]]
+        return error_codes[self.data["error"]]
 
     @property
     def complete(self) -> bool:
         """Return True if the cleaning run was complete (e.g. without errors).
 
-        see also :func:`error`."""
-        return bool(self.data[5] == 1)
-
-    def __repr__(self) -> str:
-        return "<CleaningDetails: %s (duration: %s, done: %s), area: %s>" % (
-            self.start,
-            self.duration,
-            self.complete,
-            self.area,
-        )
+        see also :func:`error`.
+        """
+        return bool(self.data["complete"] == 1)
 
 
-class ConsumableStatus:
-    """Container for consumable status information,
-    including information about brushes and duration until they should be changed.
-    The methods returning time left are based on the following lifetimes:
+class ConsumableStatus(DeviceStatus):
+    """Container for consumable status information, including information about brushes
+    and duration until they should be changed. The methods returning time left are based
+    on the following lifetimes:
 
     - Sensor cleanup time: XXX FIXME
     - Main brush: 300 hours
@@ -295,6 +339,7 @@ class ConsumableStatus:
         #  'sensor_dirty_time': 3798,
         # 'side_brush_work_time': 32454,
         #  'main_brush_work_time': 32454}]}
+        # TODO this should be generalized to allow different time limits
         self.data = data
         self.main_brush_total = timedelta(hours=300)
         self.side_brush_total = timedelta(hours=200)
@@ -340,19 +385,8 @@ class ConsumableStatus:
     def sensor_dirty_left(self) -> timedelta:
         return self.sensor_dirty_total - self.sensor_dirty
 
-    def __repr__(self) -> str:
-        return (
-            "<ConsumableStatus main: %s, side: %s, filter: %s, sensor dirty: %s>"
-            % (  # noqa: E501
-                self.main_brush,
-                self.side_brush,
-                self.filter,
-                self.sensor_dirty,
-            )
-        )
 
-
-class DNDStatus:
+class DNDStatus(DeviceStatus):
     """A container for the do-not-disturb status."""
 
     def __init__(self, data: Dict[str, Any]):
@@ -375,20 +409,15 @@ class DNDStatus:
         """End time of DnD."""
         return time(hour=self.data["end_hour"], minute=self.data["end_minute"])
 
-    def __repr__(self):
-        return "<DNDStatus enabled: %s - between %s and %s>" % (
-            self.enabled,
-            self.start,
-            self.end,
-        )
 
-
-class Timer:
+class Timer(DeviceStatus):
     """A container for scheduling.
-    The timers are accessed using an integer ID, which is based on the unix
-    timestamp of the creation time."""
 
-    def __init__(self, data: List[Any], timezone: "datetime.tzinfo") -> None:
+    The timers are accessed using an integer ID, which is based on the unix timestamp of
+    the creation time.
+    """
+
+    def __init__(self, data: List[Any], timezone: tzinfo) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
         #  ['1488667777661', 'off', ['49 21 * * 3,4,5,6', ['start_clean', '']]
@@ -396,10 +425,11 @@ class Timer:
         self.data = data
         self.timezone = timezone
 
+        # ignoring the type here, as the localize is not provided directly by datetime.tzinfo
+        localized_ts = timezone.localize(datetime.now())  # type: ignore
+
         # Initialize croniter to cause an exception on invalid entries (#847)
-        self.croniter = croniter(
-            self.cron, start_time=timezone.localize(datetime.now())
-        )
+        self.croniter = croniter(self.cron, start_time=localized_ts)
 
     @property
     def id(self) -> int:
@@ -424,7 +454,9 @@ class Timer:
     @property
     def action(self) -> str:
         """The action to be taken on the given time.
-        Note, this seems to be always 'start'."""
+
+        Note, this seems to be always 'start'.
+        """
         return str(self.data[2][1])
 
     @property
@@ -432,16 +464,8 @@ class Timer:
         """Next schedule for the timer."""
         return self.croniter.get_next(ret_type=datetime)
 
-    def __repr__(self) -> str:
-        return "<Timer %s: %s - enabled: %s - cron: %s>" % (
-            self.id,
-            self.ts,
-            self.enabled,
-            self.cron,
-        )
 
-
-class SoundStatus:
+class SoundStatus(DeviceStatus):
     """Container for sound status."""
 
     def __init__(self, data):
@@ -456,12 +480,6 @@ class SoundStatus:
     def being_installed(self):
         return self.data["sid_in_progress"]
 
-    def __repr__(self):
-        return "<SoundStatus current: %s installing: %s>" % (
-            self.current,
-            self.being_installed,
-        )
-
 
 class SoundInstallState(IntEnum):
     Unknown = 0
@@ -471,7 +489,7 @@ class SoundInstallState(IntEnum):
     Error = 4
 
 
-class SoundInstallStatus:
+class SoundInstallStatus(DeviceStatus):
     """Container for sound installation status."""
 
     def __init__(self, data):
@@ -518,14 +536,8 @@ class SoundInstallStatus:
         """True if the state has an error, use `error` to access it."""
         return self.state == SoundInstallState.Error
 
-    def __repr__(self) -> str:
-        return (
-            "<SoundInstallStatus sid: %s (state: %s, error: %s)"
-            " - progress: %s>" % (self.sid, self.state, self.error, self.progress)
-        )
 
-
-class CarpetModeStatus:
+class CarpetModeStatus(DeviceStatus):
     """Container for carpet mode status."""
 
     def __init__(self, data):
@@ -553,17 +565,3 @@ class CarpetModeStatus:
     @property
     def current_integral(self) -> int:
         return self.data["current_integral"]
-
-    def __repr__(self):
-        return (
-            "<CarpetModeStatus enabled=%s, "
-            "stall_time: %s, "
-            "current (low, high, integral): (%s, %s, %s)>"
-            % (
-                self.enabled,
-                self.stall_time,
-                self.current_low,
-                self.current_high,
-                self.current_integral,
-            )
-        )

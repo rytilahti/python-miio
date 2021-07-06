@@ -5,7 +5,8 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
+from .exceptions import DeviceException
 from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,12 +32,12 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class ChuangmiPlugStatus:
+class ChuangmiPlugStatus(DeviceStatus):
     """Container for status reports from the plug."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Chuangmi Plug V1 (chuangmi.plug.v1)
+        """Response of a Chuangmi Plug V1 (chuangmi.plug.v1)
+
         { 'power': True, 'usb_on': True, 'temperature': 32 }
 
         Response of a Chuangmi Plug V3 (chuangmi.plug.v3):
@@ -49,8 +50,10 @@ class ChuangmiPlugStatus:
         """Current power state."""
         if "on" in self.data:
             return self.data["on"] is True or self.data["on"] == "on"
-        if "power" in self.data:
+        elif "power" in self.data:
             return self.data["power"] == "on"
+
+        raise DeviceException("There was neither 'on' or 'power' in data")
 
     @property
     def is_on(self) -> bool:
@@ -81,24 +84,6 @@ class ChuangmiPlugStatus:
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<ChuangmiPlugStatus "
-            "power=%s, "
-            "usb_power=%s, "
-            "temperature=%s, "
-            "load_power=%s, "
-            "wifi_led=%s>"
-            % (
-                self.power,
-                self.usb_power,
-                self.temperature,
-                self.load_power,
-                self.wifi_led,
-            )
-        )
-        return s
 
 
 class ChuangmiPlug(Device):

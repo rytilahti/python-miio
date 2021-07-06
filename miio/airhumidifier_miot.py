@@ -6,7 +6,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
-from .miot_device import MiotDevice
+from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -34,6 +34,7 @@ _MAPPING = {
     # Other (siid=7)
     "actual_speed": {"siid": 7, "piid": 1},  # [0, 2000] step 1
     "power_time": {"siid": 7, "piid": 3},  # [0, 4294967295] step 1
+    "clean_mode": {"siid": 7, "piid": 5},  # bool
 }
 
 
@@ -60,8 +61,32 @@ class PressedButton(enum.Enum):
     Power = 2
 
 
-class AirHumidifierMiotStatus:
-    """Container for status reports from the air humidifier."""
+class AirHumidifierMiotStatus(DeviceStatus):
+    """Container for status reports from the air humidifier.
+
+    Xiaomi Smartmi Evaporation Air Humidifier 2 (zhimi.humidifier.ca4) respone (MIoT format)
+
+    [
+        {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
+        {'did': 'fault', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
+        {'did': 'mode', 'siid': 2, 'piid': 5, 'code': 0, 'value': 0},
+        {'did': 'target_humidity', 'siid': 2, 'piid': 6, 'code': 0, 'value': 50},
+        {'did': 'water_level', 'siid': 2, 'piid': 7, 'code': 0, 'value': 127},
+        {'did': 'dry', 'siid': 2, 'piid': 8, 'code': 0, 'value': False},
+        {'did': 'use_time', 'siid': 2, 'piid': 9, 'code': 0, 'value': 5140816},
+        {'did': 'button_pressed', 'siid': 2, 'piid': 10, 'code': 0, 'value': 2},
+        {'did': 'speed_level', 'siid': 2, 'piid': 11, 'code': 0, 'value': 790},
+        {'did': 'temperature', 'siid': 3, 'piid': 7, 'code': 0, 'value': 22.7},
+        {'did': 'fahrenheit', 'siid': 3, 'piid': 8, 'code': 0, 'value': 72.8},
+        {'did': 'humidity', 'siid': 3, 'piid': 9, 'code': 0, 'value': 39},
+        {'did': 'buzzer', 'siid': 4, 'piid': 1, 'code': 0, 'value': False},
+        {'did': 'led_brightness', 'siid': 5, 'piid': 2, 'code': 0, 'value': 2},
+        {'did': 'child_lock', 'siid': 6, 'piid': 1, 'code': 0, 'value': False},
+        {'did': 'actual_speed', 'siid': 7, 'piid': 1, 'code': 0, 'value': 0},
+        {'did': 'power_time', 'siid': 7, 'piid': 3, 'code': 0, 'value': 18520},
+        {'did': 'clean_mode', 'siid': 7, 'piid': 5, 'code': 0, 'value': True}
+    ]
+    """
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
@@ -199,61 +224,16 @@ class AirHumidifierMiotStatus:
         """Return how long the device has been powered in seconds."""
         return self.data["power_time"]
 
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidifierMiotStatus"
-            "power=%s, "
-            "fault=%s, "
-            "mode=%s, "
-            "target_humidity=%s, "
-            "water_level=%s, "
-            "dry=%s, "
-            "use_time=%s, "
-            "button_pressed=%s, "
-            "motor_speed=%s, "
-            "temperature=%s, "
-            "fahrenheit=%s, "
-            "humidity=%s, "
-            "buzzer=%s, "
-            "led_brightness=%s, "
-            "child_lock=%s, "
-            "actual_speed=%s, "
-            "power_time=%s>"
-            % (
-                self.power,
-                self.fault,
-                self.mode,
-                self.target_humidity,
-                self.water_level,
-                self.dry,
-                self.use_time,
-                self.button_pressed,
-                self.motor_speed,
-                self.temperature,
-                self.fahrenheit,
-                self.humidity,
-                self.buzzer,
-                self.led_brightness,
-                self.child_lock,
-                self.actual_speed,
-                self.power_time,
-            )
-        )
-        return s
+    @property
+    def clean_mode(self) -> bool:
+        """Return True if clean mode is active."""
+        return self.data["clean_mode"]
 
 
 class AirHumidifierMiot(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(_MAPPING, ip, token, start_id, debug, lazy_discover)
+    mapping = _MAPPING
 
     @command(
         default_output=format_output(
@@ -274,7 +254,8 @@ class AirHumidifierMiot(MiotDevice):
             "Target motor speed: {result.motor_speed} rpm\n"
             "Actual motor speed: {result.actual_speed} rpm\n"
             "Use time: {result.use_time} s\n"
-            "Power time: {result.power_time} s\n",
+            "Power time: {result.power_time} s\n"
+            "Clean mode: {result.clean_mode}\n",
         )
     )
     def status(self) -> AirHumidifierMiotStatus:
@@ -367,3 +348,15 @@ class AirHumidifierMiot(MiotDevice):
     def set_dry(self, dry: bool):
         """Set dry mode on/off."""
         return self.set_property("dry", dry)
+
+    @command(
+        click.argument("clean_mode", type=bool),
+        default_output=format_output(
+            lambda clean_mode: "Turning on clean mode"
+            if clean_mode
+            else "Turning off clean mode"
+        ),
+    )
+    def set_clean_mode(self, clean_mode: bool):
+        """Set clean mode on/off."""
+        return self.set_property("clean_mode", clean_mode)

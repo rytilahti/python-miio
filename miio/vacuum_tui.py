@@ -1,7 +1,9 @@
 try:
     import curses
+
+    curses_available = True
 except ImportError:
-    curses = None
+    curses_available = False
 
 import enum
 from typing import Tuple
@@ -24,7 +26,7 @@ class Control(enum.Enum):
 
 class VacuumTUI:
     def __init__(self, vac: Vacuum):
-        if curses is None:
+        if not curses_available:
             raise ImportError("curses library is not available")
 
         self.vac = vac
@@ -93,9 +95,6 @@ class VacuumTUI:
             self.rot = max(self.rot - self.rot_delta, self.rot_min)
         elif ctl == Control.RightFast:
             self.rot = 0 if self.rot > 0 else self.rot_min
-
-        else:
-            raise RuntimeError("unreachable")
 
         self.vac.manual_control(rotation=self.rot, velocity=self.vel, duration=self.dur)
         return False

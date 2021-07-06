@@ -1,11 +1,11 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import int_to_rgb
 
@@ -16,12 +16,11 @@ class PhilipsMoonlightException(DeviceException):
     pass
 
 
-class PhilipsMoonlightStatus:
+class PhilipsMoonlightStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips Zhirui Bedside Lamp."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Moonlight (philips.light.moonlight):
+        """Response of a Moonlight (philips.light.moonlight):
 
         {'pow': 'off', 'sta': 0, 'bri': 1, 'rgb': 16741971, 'cct': 1, 'snm': 0, 'spr': 0,
          'spt': 15, 'wke': 0, 'bl': 1, 'ms': 1, 'mb': 1, 'wkp': [0, 24, 0]}
@@ -55,8 +54,7 @@ class PhilipsMoonlightStatus:
 
     @property
     def sleep_assistant(self) -> int:
-        """
-        Example values:
+        """Example values:
 
         0: Unknown
         1: Unknown
@@ -84,26 +82,9 @@ class PhilipsMoonlightStatus:
         return self.data["mb"] == 1
 
     @property
-    def wake_up_time(self) -> [int, int, int]:
+    def wake_up_time(self) -> List[int]:
         # Example: [weekdays?, hour, minute]
         return self.data["wkp"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<PhilipsMoonlightStatus power=%s, "
-            "brightness=%s, "
-            "color_temperature=%s, "
-            "rgb=%s, "
-            "scene=%s>"
-            % (
-                self.power,
-                self.brightness,
-                self.color_temperature,
-                self.rgb,
-                self.scene,
-            )
-        )
-        return s
 
 
 class PhilipsMoonlight(Device):
@@ -131,7 +112,6 @@ class PhilipsMoonlight(Device):
     go_night                        # Night light / read mode
     get_wakeup_time
     enable_bl                       # Night light
-
     """
 
     @command(

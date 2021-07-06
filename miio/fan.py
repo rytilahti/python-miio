@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .fan_common import FanException, LedBrightness, MoveDirection, OperationMode
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,12 +63,11 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class FanStatus:
+class FanStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Fan (zhimi.fan.v3):
+        """Response of a Fan (zhimi.fan.v3):
 
         {'temp_dec': 232, 'humidity': 46, 'angle': 118, 'speed': 298,
          'poweroff_time': 0, 'power': 'on', 'ac_power': 'off', 'battery': 98,
@@ -142,12 +141,14 @@ class FanStatus:
         """Speed level in natural mode."""
         if "natural_level" in self.data and self.data["natural_level"] is not None:
             return self.data["natural_level"]
+        return None
 
     @property
     def direct_speed(self) -> Optional[int]:
         """Speed level in direct mode."""
         if "speed_level" in self.data and self.data["speed_level"] is not None:
             return self.data["speed_level"]
+        return None
 
     @property
     def oscillate(self) -> bool:
@@ -159,6 +160,7 @@ class FanStatus:
         """Current battery level."""
         if "battery" in self.data and self.data["battery"] is not None:
             return self.data["battery"]
+        return None
 
     @property
     def battery_charge(self) -> Optional[str]:
@@ -206,58 +208,13 @@ class FanStatus:
             return self.data["button_pressed"]
         return None
 
-    def __repr__(self) -> str:
-        s = (
-            "<FanStatus power=%s, "
-            "temperature=%s, "
-            "humidity=%s, "
-            "led=%s, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "natural_speed=%s, "
-            "direct_speed=%s, "
-            "speed=%s, "
-            "oscillate=%s, "
-            "angle=%s, "
-            "ac_power=%s, "
-            "battery=%s, "
-            "battery_charge=%s, "
-            "battery_state=%s, "
-            "use_time=%s, "
-            "delay_off_countdown=%s, "
-            "button_pressed=%s>"
-            % (
-                self.power,
-                self.temperature,
-                self.humidity,
-                self.led,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.natural_speed,
-                self.direct_speed,
-                self.speed,
-                self.oscillate,
-                self.angle,
-                self.ac_power,
-                self.battery,
-                self.battery_charge,
-                self.battery_state,
-                self.use_time,
-                self.delay_off_countdown,
-                self.button_pressed,
-            )
-        )
-        return s
 
-
-class FanStatusP5:
+class FanStatusP5(DeviceStatus):
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker P5."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Fan (dmaker.fan.p5):
+        """Response of a Fan (dmaker.fan.p5):
+
         {'power': False, 'mode': 'normal', 'speed': 35, 'roll_enable': False,
          'roll_angle': 140, 'time_off': 0, 'light': True, 'beep_sound': False,
          'child_lock': False}
@@ -313,31 +270,6 @@ class FanStatusP5:
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<FanStatus power=%s, "
-            "mode=%s, "
-            "speed=%s, "
-            "oscillate=%s, "
-            "angle=%s, "
-            "led=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "delay_off_countdown=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.speed,
-                self.oscillate,
-                self.angle,
-                self.led,
-                self.buzzer,
-                self.child_lock,
-                self.delay_off_countdown,
-            )
-        )
-        return s
 
 
 class Fan(Device):
@@ -476,7 +408,10 @@ class Fan(Device):
         ),
     )
     def set_led(self, led: bool):
-        """Turn led on/off. Not supported by model SA1."""
+        """Turn led on/off.
+
+        Not supported by model SA1.
+        """
         if led:
             return self.send("set_led", ["on"])
         else:

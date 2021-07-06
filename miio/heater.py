@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ AVAILABLE_PROPERTIES_COMMON = [
 AVAILABLE_PROPERTIES_ZA1 = ["poweroff_time", "relative_humidity"]
 AVAILABLE_PROPERTIES_MA1 = ["poweroff_level", "poweroff_value"]
 
-SUPPORTED_MODELS = {
+SUPPORTED_MODELS: Dict[str, Dict[str, Any]] = {
     MODEL_HEATER_ZA1: {
         "available_properties": AVAILABLE_PROPERTIES_COMMON + AVAILABLE_PROPERTIES_ZA1,
         "temperature_range": (16, 32),
@@ -49,12 +49,12 @@ class Brightness(enum.Enum):
     Off = 2
 
 
-class HeaterStatus:
+class HeaterStatus(DeviceStatus):
     """Container for status reports from the Smartmi Zhimi Heater."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Heater (zhimi.heater.za1):
+        """Response of a Heater (zhimi.heater.za1):
+
         {'power': 'off', 'target_temperature': 24, 'brightness': 1,
         'buzzer': 'on', 'child_lock': 'off', 'temperature': 22.3,
         'use_time': 43117, 'poweroff_time': 0, 'relative_humidity': 34}
@@ -123,31 +123,6 @@ class HeaterStatus:
 
         return None
 
-    def __repr__(self) -> str:
-        s = (
-            "<HeaterStatus power=%s, "
-            "target_temperature=%s, "
-            "temperature=%s, "
-            "humidity=%s, "
-            "brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "use_time=%s, "
-            "delay_off_countdown=%s>"
-            % (
-                self.power,
-                self.target_temperature,
-                self.temperature,
-                self.humidity,
-                self.brightness,
-                self.buzzer,
-                self.child_lock,
-                self.use_time,
-                self.delay_off_countdown,
-            )
-        )
-        return s
-
 
 class Heater(Device):
     """Main class representing the Smartmi Zhimi Heater."""
@@ -163,7 +138,7 @@ class Heater(Device):
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
 
-        if model in SUPPORTED_MODELS.keys():
+        if model in SUPPORTED_MODELS:
             self.model = model
         else:
             self.model = MODEL_HEATER_ZA1
@@ -213,6 +188,8 @@ class Heater(Device):
     )
     def set_target_temperature(self, temperature: int):
         """Set target temperature."""
+        min_temp: int
+        max_temp: int
         min_temp, max_temp = SUPPORTED_MODELS[self.model]["temperature_range"]
         if not min_temp <= temperature <= max_temp:
             raise HeaterException("Invalid target temperature: %s" % temperature)
@@ -259,6 +236,8 @@ class Heater(Device):
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
+        min_delay: int
+        max_delay: int
         min_delay, max_delay = SUPPORTED_MODELS[self.model]["delay_off_range"]
         if not min_delay <= seconds <= max_delay:
             raise HeaterException("Invalid delay time: %s" % seconds)

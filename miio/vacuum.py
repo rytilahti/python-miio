@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import enum
 import json
@@ -65,6 +66,14 @@ class FanspeedV2(enum.Enum):
     Medium = 103
     Turbo = 104
     Gentle = 105
+    Auto = 106
+
+
+class FanspeedV3(enum.Enum):
+    Silent = 38
+    Standard = 60
+    Medium = 75
+    Turbo = 100
 
 
 class FanspeedE2(enum.Enum):
@@ -76,8 +85,15 @@ class FanspeedE2(enum.Enum):
     Turbo = 100
 
 
+class FanspeedS7(enum.Enum):
+    Silent = 101
+    Standard = 102
+    Medium = 103
+    Turbo = 104
+
+
 class WaterFlow(enum.Enum):
-    """Water flow strength on s5 max. """
+    """Water flow strength on s5 max."""
 
     Minimum = 200
     Low = 201
@@ -85,7 +101,26 @@ class WaterFlow(enum.Enum):
     Maximum = 203
 
 
+class MopMode(enum.Enum):
+    """Mop routing on S7."""
+
+    Standard = 300
+    Deep = 301
+
+
+class CarpetCleaningMode(enum.Enum):
+    """Type of carpet cleaning/avoidance."""
+
+    Avoid = 0
+    Rise = 1
+    Ignore = 2
+
+
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
+ROCKROBO_S5 = "roborock.vacuum.s5"
+ROCKROBO_S6 = "roborock.vacuum.s6"
+ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
+ROCKROBO_S7 = "roborock.vacuum.a15"
 
 
 class Vacuum(Device):
@@ -108,8 +143,8 @@ class Vacuum(Device):
     def stop(self):
         """Stop cleaning.
 
-        Note, prefer 'pause' instead of this for wider support.
-        Some newer vacuum models do not support this command.
+        Note, prefer 'pause' instead of this for wider support. Some newer vacuum models
+        do not support this command.
         """
         return self.send("app_stop")
 
@@ -129,26 +164,41 @@ class Vacuum(Device):
         status = self.status()
         if status.in_zone_cleaning and (status.is_paused or status.got_error):
             return self.resume_zoned_clean()
+        if status.in_segment_cleaning and (status.is_paused or status.got_error):
+            return self.resume_segment_clean()
 
         return self.start()
 
     @command()
     def home(self):
         """Stop cleaning and return home."""
-        self.send("app_pause")
+        if self.model is None:
+            self._autodetect_model()
+
+        PAUSE_BEFORE_HOME = [
+            ROCKROBO_V1,
+        ]
+
+        if self.model in PAUSE_BEFORE_HOME:
+            self.send("app_pause")
+
         return self.send("app_charge")
 
     @command(click.argument("x_coord", type=int), click.argument("y_coord", type=int))
     def goto(self, x_coord: int, y_coord: int):
         """Go to specific target.
+
         :param int x_coord: x coordinate
-        :param int y_coord: y coordinate"""
+        :param int y_coord: y coordinate
+        """
         return self.send("app_goto_target", [x_coord, y_coord])
 
     @command(click.argument("zones", type=LiteralParamType(), required=True))
     def zoned_clean(self, zones: List):
         """Clean zones.
-        :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]"""
+
+        :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]
+        """
         return self.send("app_zoned_clean", zones)
 
     @command()
@@ -184,8 +234,8 @@ class Vacuum(Device):
     def manual_control_once(
         self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT
     ):
-        """Starts the remote control mode and executes
-        the action once before deactivating the mode."""
+        """Starts the remote control mode and executes the action once before
+        deactivating the mode."""
         number_of_tries = 3
         self.manual_start()
         while number_of_tries > 0:
@@ -271,22 +321,24 @@ class Vacuum(Device):
     @command(click.option("--version", default=1))
     def fresh_map(self, version):
         """Return fresh map?"""
+        if version not in [1, 2]:
+            raise VacuumException("Unknown map version: %s" % version)
+
         if version == 1:
             return self.send("get_fresh_map")
         elif version == 2:
             return self.send("get_fresh_map_v2")
-        else:
-            raise VacuumException("Unknown map version: %s" % version)
 
     @command(click.option("--version", default=1))
     def persist_map(self, version):
         """Return fresh map?"""
+        if version not in [1, 2]:
+            raise VacuumException("Unknown map version: %s" % version)
+
         if version == 1:
             return self.send("get_persist_map")
         elif version == 2:
             return self.send("get_persist_map_v2")
-        else:
-            raise VacuumException("Unknown map version: %s" % version)
 
     @command(
         click.argument("x1", type=int),
@@ -334,8 +386,8 @@ class Vacuum(Device):
     def enable_lab_mode(self, enable):
         """Enable persistent maps and software barriers.
 
-        This is required to use create_nogo_zone and create_software_barrier
-        commands."""
+        This is required to use create_nogo_zone and create_software_barrier commands.
+        """
         return self.send("set_lab_status", int(enable))["ok"]
 
     @command()
@@ -347,7 +399,8 @@ class Vacuum(Device):
     def last_clean_details(self) -> Optional[CleaningDetails]:
         """Return details from the last cleaning.
 
-        Returns None if there has been no cleanups."""
+        Returns None if there has been no cleanups.
+        """
         history = self.clean_history()
         if not history.ids:
             return None
@@ -414,7 +467,8 @@ class Vacuum(Device):
 
         :param cron: schedule in cron format
         :param command: ignored by the vacuum.
-        :param parameters: ignored by the vacuum."""
+        :param parameters: ignored by the vacuum.
+        """
         import time
 
         ts = int(round(time.time() * 1000))
@@ -424,7 +478,8 @@ class Vacuum(Device):
     def delete_timer(self, timer_id: int):
         """Delete a timer with given ID.
 
-        :param int timer_id: Timer ID"""
+        :param int timer_id: Timer ID
+        """
         return self.send("del_timer", [str(timer_id)])
 
     @command(
@@ -434,7 +489,8 @@ class Vacuum(Device):
         """Update a timer with given ID.
 
         :param int timer_id: Timer ID
-        :param TimerStae mode: either On or Off"""
+        :param TimerStae mode: either On or Off
+        """
         if mode != TimerState.On and mode != TimerState.Off:
             raise DeviceException("Only 'On' or 'Off' are  allowed")
         return self.send("upd_timer", [str(timer_id), mode.value])
@@ -458,7 +514,8 @@ class Vacuum(Device):
         :param int start_hr: Start hour
         :param int start_min: Start minute
         :param int end_hr: End hour
-        :param int end_min: End minute"""
+        :param int end_min: End minute
+        """
         return self.send("set_dnd_timer", [start_hr, start_min, end_hr, end_min])
 
     @command()
@@ -470,7 +527,8 @@ class Vacuum(Device):
     def set_fan_speed(self, speed: int):
         """Set fan speed.
 
-        :param int speed: Fan speed to set"""
+        :param int speed: Fan speed to set
+        """
         # speed = [38, 60 or 77]
         return self.send("set_custom_mode", [speed])
 
@@ -482,8 +540,9 @@ class Vacuum(Device):
     def _autodetect_model(self):
         """Detect the model of the vacuum.
 
-        For the moment this is used only for the fanspeeds,
-        but that could be extended to cover other supported features."""
+        For the moment this is used only for the fanspeeds, but that could be extended
+        to cover other supported features.
+        """
         try:
             info = self.info()
             self.model = info.model
@@ -491,22 +550,26 @@ class Vacuum(Device):
             # cloud-blocked vacuums will not return proper payloads
             self._fanspeeds = FanspeedV1
             self.model = ROCKROBO_V1
-            _LOGGER.debug("Unable to query model, falling back to %s", self._fanspeeds)
+            _LOGGER.warning("Unable to query model, falling back to %s", self.model)
             return
+        finally:
+            _LOGGER.debug("Model: %s", self.model)
 
-        _LOGGER.info("model: %s", self.model)
-
-        if info.model == ROCKROBO_V1:
+        if self.model == ROCKROBO_V1:
             _LOGGER.debug("Got robov1, checking for firmware version")
             fw_version = info.firmware_version
             version, build = fw_version.split("_")
             version = tuple(map(int, version.split(".")))
-            if version >= (3, 5, 7):
+            if version >= (3, 5, 8):
+                self._fanspeeds = FanspeedV3
+            elif version == (3, 5, 7):
                 self._fanspeeds = FanspeedV2
             else:
                 self._fanspeeds = FanspeedV1
-        elif info.model == "roborock.vacuum.e2":
+        elif self.model == "roborock.vacuum.e2":
             self._fanspeeds = FanspeedE2
+        elif self.model == ROCKROBO_S7:
+            self._fanspeeds = FanspeedS7
         else:
             self._fanspeeds = FanspeedV2
 
@@ -573,16 +636,27 @@ class Vacuum(Device):
     @command()
     def timezone(self):
         """Get the timezone."""
-        res = self.send("get_timezone")[0]
+        res = self.send("get_timezone")
+
+        def _fallback_timezone(data):
+            fallback = "UTC"
+            _LOGGER.error(
+                "Unsupported timezone format (%s), falling back to %s", data, fallback
+            )
+            return fallback
+
+        if isinstance(res, int):
+            return _fallback_timezone(res)
+
+        res = res[0]
         if isinstance(res, dict):
             # Xiaowa E25 example
             # {'olson': 'Europe/Berlin', 'posix': 'CET-1CEST,M3.5.0,M10.5.0/3'}
             if "olson" not in res:
-                raise VacuumException("Unsupported timezone format: %s" % res)
+                return _fallback_timezone(res)
 
             return res["olson"]
 
-        # Gen1 vacuum: ['Europe/Berlin']
         return res
 
     def set_timezone(self, new_zone):
@@ -602,7 +676,7 @@ class Vacuum(Device):
 
     @command()
     def carpet_mode(self):
-        """Get carpet mode settings"""
+        """Get carpet mode settings."""
         return CarpetModeStatus(self.send("get_carpet_mode")[0])
 
     @command(
@@ -632,6 +706,25 @@ class Vacuum(Device):
         return self.send("set_carpet_mode", [data])[0] == "ok"
 
     @command()
+    def carpet_cleaning_mode(self) -> Optional[CarpetCleaningMode]:
+        """Get carpet cleaning mode/avoidance setting."""
+        try:
+            return CarpetCleaningMode(
+                self.send("get_carpet_clean_mode")[0]["carpet_clean_mode"]
+            )
+        except Exception as err:
+            _LOGGER.warning("Error while requesting carpet clean mode: %s", err)
+            return None
+
+    @command(click.argument("mode", type=EnumType(CarpetCleaningMode)))
+    def set_carpet_cleaning_mode(self, mode: CarpetCleaningMode):
+        """Set carpet cleaning mode/avoidance setting."""
+        return (
+            self.send("set_carpet_clean_mode", {"carpet_clean_mode": mode.value})[0]
+            == "ok"
+        )
+
+    @command()
     def stop_zoned_clean(self):
         """Stop cleaning a zone."""
         return self.send("stop_zoned_clean")
@@ -649,7 +742,9 @@ class Vacuum(Device):
     @command(click.argument("segments", type=LiteralParamType(), required=True))
     def segment_clean(self, segments: List):
         """Clean segments.
-        :param List segments: List of segments to clean: [16,17,18]"""
+
+        :param List segments: List of segments to clean: [16,17,18]
+        """
         return self.send("app_segment_clean", segments)
 
     @command()
@@ -695,6 +790,30 @@ class Vacuum(Device):
         """Set water flow setting."""
         return self.send("set_water_box_custom_mode", [waterflow.value])
 
+    @command()
+    def mop_mode(self) -> Optional[MopMode]:
+        """Get mop mode setting."""
+        try:
+            return MopMode(self.send("get_mop_mode")[0])
+        except ValueError as err:
+            _LOGGER.warning("Device returned unknown MopMode: %s", err)
+            return None
+
+    @command(click.argument("mop_mode", type=EnumType(MopMode)))
+    def set_mop_mode(self, mop_mode: MopMode):
+        """Set mop mode setting."""
+        return self.send("set_mop_mode", [mop_mode.value])[0] == "ok"
+
+    @command()
+    def child_lock(self) -> bool:
+        """Get child lock setting."""
+        return self.send("get_child_lock_status")["lock_status"] == 1
+
+    @command(click.argument("lock", type=bool))
+    def set_child_lock(self, lock: bool) -> bool:
+        """Set child lock setting."""
+        return self.send("set_child_lock_status", {"lock_status": int(lock)})[0] == "ok"
+
     @classmethod
     def get_device_group(cls):
         @click.pass_context
@@ -704,14 +823,13 @@ class Vacuum(Device):
                 kwargs["debug"] = gco.debug
 
             start_id = manual_seq = 0
-            try:
-                with open(id_file, "r") as f:
-                    x = json.load(f)
-                    start_id = x.get("seq", 0)
-                    manual_seq = x.get("manual_seq", 0)
-                    _LOGGER.debug("Read stored sequence ids: %s", x)
-            except (FileNotFoundError, TypeError, ValueError):
-                pass
+            with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
+                id_file, "r"
+            ) as f:
+                x = json.load(f)
+                start_id = x.get("seq", 0)
+                manual_seq = x.get("manual_seq", 0)
+                _LOGGER.debug("Read stored sequence ids: %s", x)
 
             ctx.obj = cls(*args, start_id=start_id, **kwargs)
             ctx.obj.manual_seqnum = manual_seq

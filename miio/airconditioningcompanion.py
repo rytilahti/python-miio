@@ -5,7 +5,7 @@ from typing import Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -77,12 +77,11 @@ DEVICE_COMMAND_TEMPLATES = {
 }
 
 
-class AirConditioningCompanionStatus:
+class AirConditioningCompanionStatus(DeviceStatus):
     """Container for status reports of the Xiaomi AC Companion."""
 
     def __init__(self, data):
-        """
-        Device model: lumi.acpartner.v2
+        """Device model: lumi.acpartner.v2.
 
         Response of "get_model_and_state":
         ['010500978022222102', '010201190280222221', '2']
@@ -133,8 +132,7 @@ class AirConditioningCompanionStatus:
 
     @property
     def air_condition_brand(self) -> int:
-        """
-        Brand of the air conditioner.
+        """Brand of the air conditioner.
 
         Known brand ids are 0x0182, 0x0097, 0x0037, 0x0202, 0x02782, 0x0197, 0x0192.
         """
@@ -142,24 +140,22 @@ class AirConditioningCompanionStatus:
 
     @property
     def air_condition_remote(self) -> int:
-        """
+        """Remote id.
+
         Known remote ids:
-
-        0x80111111, 0x80111112 (brand: 0x0182)
-        0x80222221 (brand: 0x0097)
-        0x80333331 (brand: 0x0037)
-        0x80444441 (brand: 0x0202)
-        0x80555551 (brand: 0x2782)
-        0x80777771 (brand: 0x0197)
-        0x80666661 (brand: 0x0192)
-
+        * 0x80111111, 0x80111112 (brand: 0x0182)
+        * 0x80222221 (brand: 0x0097)
+        * 0x80333331 (brand: 0x0037)
+        * 0x80444441 (brand: 0x0202)
+        * 0x80555551 (brand: 0x2782)
+        * 0x80777771 (brand: 0x0197)
+        * 0x80666661 (brand: 0x0192)
         """
         return int(self.air_condition_model[4:8].hex(), 16)
 
     @property
     def state_format(self) -> int:
-        """
-        Version number of the state format.
+        """Version number of the state format.
 
         Known values are: 1, 2, 3
         """
@@ -226,44 +222,6 @@ class AirConditioningCompanionStatus:
             return OperationMode(mode)
         except TypeError:
             return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirConditioningCompanionStatus "
-            "power=%s, "
-            "power_socket=%s, "
-            "load_power=%s, "
-            "air_condition_model=%s, "
-            "model_format=%s, "
-            "device_type=%s, "
-            "air_condition_brand=%s, "
-            "air_condition_remote=%s, "
-            "state_format=%s, "
-            "air_condition_configuration=%s, "
-            "led=%s, "
-            "target_temperature=%s, "
-            "swing_mode=%s, "
-            "fan_speed=%s, "
-            "mode=%s>"
-            % (
-                self.power,
-                self.power_socket,
-                self.load_power,
-                self.air_condition_model.hex(),
-                self.model_format,
-                self.device_type,
-                self.air_condition_brand,
-                self.air_condition_remote,
-                self.state_format,
-                self.air_condition_configuration,
-                self.led,
-                self.target_temperature,
-                self.swing_mode,
-                self.fan_speed,
-                self.mode,
-            )
-        )
-        return s
 
 
 class AirConditioningCompanion(Device):
@@ -354,14 +312,14 @@ class AirConditioningCompanion(Device):
         :param int slot: Unknown internal register or slot
         """
         try:
-            model = bytes.fromhex(model)
+            model_bytes = bytes.fromhex(model)
         except ValueError:
             raise AirConditioningCompanionException(
                 "Invalid model. A hexadecimal string must be provided"
             )
 
         try:
-            code = bytes.fromhex(code)
+            code_bytes = bytes.fromhex(code)
         except ValueError:
             raise AirConditioningCompanionException(
                 "Invalid code. A hexadecimal string must be provided"
@@ -370,23 +328,23 @@ class AirConditioningCompanion(Device):
         if slot < 0 or slot > 134:
             raise AirConditioningCompanionException("Invalid slot: %s" % slot)
 
-        slot = bytes([121 + slot])
+        slot_bytes = bytes([121 + slot])
 
         # FE + 0487 + 00007145 + 9470 + 1FFF + 7F + FF + 06 + 0042 + 27 + 4E + 0025002D008500AC01...
-        command = (
-            code[0:1]
-            + model[2:8]
+        command_bytes = (
+            code_bytes[0:1]
+            + model_bytes[2:8]
             + b"\x94\x70\x1F\xFF"
-            + slot
+            + slot_bytes
             + b"\xFF"
-            + code[13:16]
+            + code_bytes[13:16]
             + b"\x27"
         )
 
-        checksum = sum(command) & 0xFF
-        command = command + bytes([checksum]) + code[18:]
+        checksum = sum(command_bytes) & 0xFF
+        command_bytes = command_bytes + bytes([checksum]) + code_bytes[18:]
 
-        return self.send("send_ir_code", [command.hex().upper()])
+        return self.send("send_ir_code", [command_bytes.hex().upper()])
 
     @command(
         click.argument("command", type=str),
@@ -395,7 +353,8 @@ class AirConditioningCompanion(Device):
     def send_command(self, command: str):
         """Send a command to the air conditioner.
 
-        :param str command: Command to execute"""
+        :param str command: Command to execute
+        """
         return self.send("send_cmd", [str(command)])
 
     @command(

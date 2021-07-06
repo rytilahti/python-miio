@@ -3,8 +3,6 @@ import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from os.path import basename
 
-import netifaces
-
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -35,13 +33,14 @@ class SingleFileHandler(BaseHTTPRequestHandler):
 class OneShotServer:
     """A simple HTTP server for serving an update file.
 
-    The server will be started in an emphemeral port, and will only accept
-    a single request to keep it simple."""
+    The server will be started in an emphemeral port, and will only accept a single
+    request to keep it simple.
+    """
 
     def __init__(self, file, interface=None):
         addr = ("", 0)
         self.server = HTTPServer(addr, SingleFileHandler)
-        setattr(self.server, "got_request", False)
+        setattr(self.server, "got_request", False)  # noqa: B010
 
         self.addr, self.port = self.server.server_address
         self.server.timeout = 10
@@ -54,11 +53,19 @@ class OneShotServer:
         with open(file, "rb") as f:
             self.payload = f.read()
             self.server.payload = self.payload
-            self.md5 = hashlib.md5(self.payload).hexdigest()
+            self.md5 = hashlib.md5(self.payload).hexdigest()  # nosec
             _LOGGER.info("Using local %s (md5: %s)" % (file, self.md5))
 
     @staticmethod
     def find_local_ip():
+        try:
+            import netifaces
+        except Exception:
+            _LOGGER.error(
+                "Unable to import netifaces, please install netifaces library"
+            )
+            raise
+
         ifaces_without_lo = [
             x for x in netifaces.interfaces() if not x.startswith("lo")
         ]
@@ -82,7 +89,7 @@ class OneShotServer:
 
     def serve_once(self):
         self.server.handle_request()
-        if getattr(self.server, "got_request"):
+        if getattr(self.server, "got_request"):  # noqa: B009
             _LOGGER.info("Got a request, should be downloading now.")
             return True
         else:
@@ -92,5 +99,5 @@ class OneShotServer:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    upd = OneShotServer("/tmp/test")
+    upd = OneShotServer("/tmp/test")  # nosec
     upd.serve_once()

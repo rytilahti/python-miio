@@ -15,6 +15,7 @@ This behaviour has been experienced on the following device types:
 - Xiaomi Zhimi Humidifier (aka ``zhimi.humidifier.v1``)
 - Xiaomi Smartmi Evaporative Humidifier 2 (aka ``zhimi.humidifier.ca1``)
 - Xiaomi IR Remote (aka ``chuangmi_ir``)
+- RoboRock S7 (aka ``roborock.vacuum.a15``)
 
 It's currently unclear if this is a bug or a security feature of the Xiaomi device.
 
@@ -57,3 +58,20 @@ The connectivity will get restored by device's internal watchdog restarting the 
 .. hint::
 
     If you want to keep your device out from the Internet, use REJECT instead of DROP in your firewall confinguration.
+
+
+Roborock Vacuum not detected
+----------------------------
+
+It seems that a Roborock vacuum connected through the Roborock app (and not the Xiaomi Home app) won't allow control over local network,
+ even with a valid token, leading to the following exception:
+
+.. code-block:: text
+
+    mirobo.device.DeviceException: Unable to discover the device x.x.x.x
+
+Resetting the device's wifi and pairing it again with the Xiaomi Home app should solve the issue.
+
+.. hint::
+
+    A new pairing process will generate a new token. You will have to extract it as your previous one won't be valid anymore.

@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceInfo
+from .device import Device, DeviceInfo, DeviceStatus
 from .exceptions import DeviceError, DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -14,6 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_HUMIDIFIER_V1 = "zhimi.humidifier.v1"
 MODEL_HUMIDIFIER_CA1 = "zhimi.humidifier.ca1"
 MODEL_HUMIDIFIER_CB1 = "zhimi.humidifier.cb1"
+MODEL_HUMIDIFIER_CB2 = "zhimi.humidifier.cb2"
 
 AVAILABLE_PROPERTIES_COMMON = [
     "power",
@@ -33,6 +34,8 @@ AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_CA1: AVAILABLE_PROPERTIES_COMMON
     + ["temp_dec", "speed", "depth", "dry"],
     MODEL_HUMIDIFIER_CB1: AVAILABLE_PROPERTIES_COMMON
+    + ["temperature", "speed", "depth", "dry"],
+    MODEL_HUMIDIFIER_CB2: AVAILABLE_PROPERTIES_COMMON
     + ["temperature", "speed", "depth", "dry"],
 }
 
@@ -55,12 +58,11 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class AirHumidifierStatus:
+class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier."""
 
     def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
-        """
-        Response of a Air Humidifier (zhimi.humidifier.v1):
+        """Response of a Air Humidifier (zhimi.humidifier.v1):
 
         {'power': 'off', 'mode': 'high', 'temp_dec': 294,
          'humidity': 33, 'buzzer': 'on', 'led_b': 0,
@@ -84,7 +86,10 @@ class AirHumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either silent, medium or high."""
+        """Operation mode.
+
+        Can be either silent, medium or high.
+        """
         return OperationMode(self.data["mode"])
 
     @property
@@ -120,13 +125,15 @@ class AirHumidifierStatus:
 
     @property
     def target_humidity(self) -> int:
-        """Target humidity. Can be either 30, 40, 50, 60, 70, 80 percent."""
+        """Target humidity.
+
+        Can be either 30, 40, 50, 60, 70, 80 percent.
+        """
         return self.data["limit_hum"]
 
     @property
     def trans_level(self) -> Optional[int]:
-        """
-        The meaning of the property is unknown.
+        """The meaning of the property is unknown.
 
         The property is used to determine the strong mode is enabled on old firmware.
         """
@@ -147,7 +154,13 @@ class AirHumidifierStatus:
 
     @property
     def firmware_version(self) -> str:
-        """Returns the fw_ver of miIO.info. For example 1.2.9_5033."""
+        """Returns the fw_ver of miIO.info.
+
+        For example 1.2.9_5033.
+        """
+        if self.device_info.firmware_version is None:
+            raise AirHumidifierException("Missing firmware information")
+
         return self.device_info.firmware_version
 
     @property
@@ -173,14 +186,20 @@ class AirHumidifierStatus:
     @property
     def depth(self) -> Optional[int]:
         """The remaining amount of water in percent."""
+
+        # MODEL_HUMIDIFIER_CA1 and MODEL_HUMIDIFIER_CB2
+        # 127 without water tank. 125 = 100% water
+        if self.device_info.model in [MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB2]:
+            return int(int(self.data["depth"]) / 1.25)
+
         if "depth" in self.data and self.data["depth"] is not None:
             return self.data["depth"]
         return None
 
     @property
     def dry(self) -> Optional[bool]:
-        """
-        Dry mode: The amount of water is not enough to continue to work for about 8 hours.
+        """Dry mode: The amount of water is not enough to continue to work for about 8
+        hours.
 
         Return True if dry mode is on if available.
         """
@@ -205,49 +224,6 @@ class AirHumidifierStatus:
             return self.data["button_pressed"]
         return None
 
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "target_humidity=%s%%, "
-            "trans_level=%s, "
-            "motor_speed=%s, "
-            "depth=%s, "
-            "dry=%s, "
-            "use_time=%s, "
-            "hardware_version=%s, "
-            "button_pressed=%s, "
-            "strong_mode_enabled=%s, "
-            "firmware_version_major=%s, "
-            "firmware_version_minor=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.target_humidity,
-                self.trans_level,
-                self.motor_speed,
-                self.depth,
-                self.dry,
-                self.use_time,
-                self.hardware_version,
-                self.button_pressed,
-                self.strong_mode_enabled,
-                self.firmware_version_major,
-                self.firmware_version_minor,
-            )
-        )
-        return s
-
 
 class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
@@ -268,7 +244,8 @@ class AirHumidifier(Device):
         else:
             self.model = MODEL_HUMIDIFIER_V1
 
-        self.device_info = None
+        # TODO: convert to use generic device info in the future
+        self.device_info: Optional[DeviceInfo] = None
 
     @command(
         default_output=format_output(
@@ -292,7 +269,6 @@ class AirHumidifier(Device):
     )
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
-
         if self.device_info is None:
             self.device_info = self.info()
 
@@ -302,8 +278,12 @@ class AirHumidifier(Device):
         # properties are divided into multiple requests
         _props_per_request = 15
 
-        # The CA1 and CB1 are limited to a single property per request
-        if self.model in [MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB1]:
+        # The CA1, CB1 and CB2 are limited to a single property per request
+        if self.model in [
+            MODEL_HUMIDIFIER_CA1,
+            MODEL_HUMIDIFIER_CB1,
+            MODEL_HUMIDIFIER_CB2,
+        ]:
             _props_per_request = 1
 
         values = self.get_properties(properties, max_properties=_props_per_request)
@@ -437,4 +417,18 @@ class AirHumidifierCB1(AirHumidifier):
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CB1
+        )
+
+
+class AirHumidifierCB2(AirHumidifier):
+    def __init__(
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+    ) -> None:
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CB2
         )

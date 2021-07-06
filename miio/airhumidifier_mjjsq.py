@@ -6,12 +6,13 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_HUMIDIFIER_MJJSQ = "deerma.humidifier.mjjsq"
+MODEL_HUMIDIFIER_JSQ = "deerma.humidifier.jsq"
 MODEL_HUMIDIFIER_JSQ1 = "deerma.humidifier.jsq1"
 
 MODEL_HUMIDIFIER_JSQ_COMMON = [
@@ -28,6 +29,7 @@ MODEL_HUMIDIFIER_JSQ_COMMON = [
 
 AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_MJJSQ: MODEL_HUMIDIFIER_JSQ_COMMON,
+    MODEL_HUMIDIFIER_JSQ: MODEL_HUMIDIFIER_JSQ_COMMON,
     MODEL_HUMIDIFIER_JSQ1: MODEL_HUMIDIFIER_JSQ_COMMON + ["wet_and_protect"],
 }
 
@@ -41,14 +43,14 @@ class OperationMode(enum.Enum):
     Medium = 2
     High = 3
     Humidity = 4
+    WetAndProtect = 5
 
 
-class AirHumidifierStatus:
+class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier mjjsq."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Air Humidifier (deerma.humidifier.mjjsq):
+        """Response of a Air Humidifier (deerma.humidifier.mjjsq):
 
         {'Humidifier_Gear': 4, 'Humidity_Value': 44, 'HumiSet_Value': 54,
          'Led_State': 1, 'OnOff_State': 0, 'TemperatureValue': 21,
@@ -69,7 +71,10 @@ class AirHumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either low, medium, high or humidity."""
+        """Operation mode.
+
+        Can be either low, medium, high or humidity.
+        """
         return OperationMode(self.data["Humidifier_Gear"])
 
     @property
@@ -114,33 +119,6 @@ class AirHumidifierStatus:
             return self.data["wet_and_protect"] == 1
 
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "target_humidity=%s%%, "
-            "no_water=%s, "
-            "water_tank_detached=%s,"
-            "wet_protection=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.led,
-                self.buzzer,
-                self.target_humidity,
-                self.no_water,
-                self.water_tank_detached,
-                self.wet_protection,
-            )
-        )
-        return s
 
 
 class AirHumidifierMjjsq(Device):

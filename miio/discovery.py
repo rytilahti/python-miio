@@ -1,9 +1,10 @@
 import codecs
 import inspect
-import ipaddress
 import logging
+import time
 from functools import partial
-from typing import Callable, Dict, Optional, Union  # noqa: F401
+from ipaddress import ip_address
+from typing import Callable, Dict, Optional, Type, Union  # noqa: F401
 
 import zeroconf
 
@@ -11,6 +12,9 @@ from . import (
     AirConditionerMiot,
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
+    AirDogX3,
+    AirDogX5,
+    AirDogX7SM,
     AirFresh,
     AirFreshT2017,
     AirHumidifier,
@@ -27,7 +31,9 @@ from . import (
     Cooker,
     Device,
     Fan,
+    FanLeshow,
     FanMiot,
+    Gateway,
     Heater,
     PhilipsBulb,
     PhilipsEyecare,
@@ -81,7 +87,7 @@ from .fan import (
     MODEL_FAN_ZA3,
     MODEL_FAN_ZA4,
 )
-from .fan_miot import MODEL_FAN_P9, MODEL_FAN_P10, MODEL_FAN_P11
+from .fan_miot import MODEL_FAN_1C, MODEL_FAN_P9, MODEL_FAN_P10, MODEL_FAN_P11
 from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
@@ -89,7 +95,7 @@ from .toiletlid import MODEL_TOILETLID_V1
 _LOGGER = logging.getLogger(__name__)
 
 
-DEVICE_MAP = {
+DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
     "roborock-vacuum-m1s": Vacuum,
@@ -108,6 +114,9 @@ DEVICE_MAP = {
     "xiaomi.aircondition.mc2": AirConditionerMiot,
     "xiaomi.aircondition.mc4": AirConditionerMiot,
     "xiaomi.aircondition.mc5": AirConditionerMiot,
+    "airdog-airpurifier-x3": AirDogX3,
+    "airdog-airpurifier-x5": AirDogX5,
+    "airdog-airpurifier-x7sm": AirDogX7SM,
     "zhimi-airpurifier-m1": AirPurifier,  # mini model
     "zhimi-airpurifier-m2": AirPurifier,  # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model
@@ -165,12 +174,14 @@ DEVICE_MAP = {
     ),
     "lumi-camera-aq2": AqaraCamera,
     "yeelink-light-": Yeelight,
+    "leshow-fan-ss4": FanLeshow,
     "zhimi-fan-v2": partial(Fan, model=MODEL_FAN_V2),
     "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
     "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
     "zhimi-fan-za3": partial(Fan, model=MODEL_FAN_ZA3),
     "zhimi-fan-za4": partial(Fan, model=MODEL_FAN_ZA4),
+    "dmaker-fan-1c": partial(FanMiot, model=MODEL_FAN_1C),
     "dmaker-fan-p5": partial(Fan, model=MODEL_FAN_P5),
     "dmaker-fan-p9": partial(FanMiot, model=MODEL_FAN_P9),
     "dmaker-fan-p10": partial(FanMiot, model=MODEL_FAN_P10),
@@ -182,14 +193,12 @@ DEVICE_MAP = {
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),
     "cgllc-airmonitor-s1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_S1),
-    "lumi-gateway-": lambda x: other_package_info(
-        x, "https://github.com/Danielhiversen/PyXiaomiGateway"
-    ),
+    "lumi-gateway-": Gateway,
     "viomi-vacuum-v7": ViomiVacuum,
     "viomi-vacuum-v8": ViomiVacuum,
     "zhimi.heater.za1": partial(Heater, model=MODEL_HEATER_ZA1),
     "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
-}  # type: Dict[str, Union[Callable, Device]]
+}
 
 
 def pretty_token(token):
@@ -197,9 +206,19 @@ def pretty_token(token):
     return codecs.encode(token, "hex").decode()
 
 
+def get_addr_from_info(info):
+    addrs = info.addresses
+    if len(addrs) > 1:
+        _LOGGER.warning(
+            "More than single IP address in the advertisement, using the first one"
+        )
+
+    return str(ip_address(addrs[0]))
+
+
 def other_package_info(info, desc):
     """Return information about another package supporting the device."""
-    return "%s @ %s, check %s" % (info.name, ipaddress.ip_address(info.address), desc)
+    return "Found %s at %s, check %s" % (info.name, get_addr_from_info(info), desc)
 
 
 def create_device(name: str, addr: str, device_cls: partial) -> Device:
@@ -220,21 +239,21 @@ def create_device(name: str, addr: str, device_cls: partial) -> Device:
     return dev
 
 
-class Listener:
+class Listener(zeroconf.ServiceListener):
     """mDNS listener creating Device objects based on detected devices."""
 
     def __init__(self):
         self.found_devices = {}  # type: Dict[str, Device]
 
     def check_and_create_device(self, info, addr) -> Optional[Device]:
-        """Create a corresponding :class:`Device` implementation
-        for a given info and address.."""
+        """Create a corresponding :class:`Device` implementation for a given info and
+        address.."""
         name = info.name
         for identifier, v in DEVICE_MAP.items():
             if name.startswith(identifier):
                 if inspect.isclass(v):
                     return create_device(name, addr, partial(v))
-                elif type(v) is partial and inspect.isclass(v.func):
+                elif isinstance(v, partial) and inspect.isclass(v.func):
                     return create_device(name, addr, v)
                 elif callable(v):
                     dev = Device(ip=addr)
@@ -253,7 +272,8 @@ class Listener:
 
     def add_service(self, zeroconf, type, name):
         info = zeroconf.get_service_info(type, name)
-        addr = str(ipaddress.ip_address(info.address))
+        addr = get_addr_from_info(info)
+
         if addr not in self.found_devices:
             dev = self.check_and_create_device(info, addr)
             self.found_devices[addr] = dev
@@ -261,21 +281,23 @@ class Listener:
 
 class Discovery:
     """mDNS discoverer for miIO based devices (_miio._udp.local).
-    Calling :func:`discover_mdns` will cause this to subscribe for updates
-    on ``_miio._udp.local`` until any key is pressed, after which a dict
-    of detected devices is returned."""
+
+    Calling :func:`discover_mdns` will cause this to subscribe for updates on
+    ``_miio._udp.local`` until any key is pressed, after which a dict of detected
+    devices is returned.
+    """
 
     @staticmethod
-    def discover_mdns() -> Dict[str, Device]:
-        """Discover devices with mdns until """
-        _LOGGER.info("Discovering devices with mDNS, press any key to quit...")
+    def discover_mdns(*, timeout=5) -> Dict[str, Device]:
+        """Discover devices with mdns until any keyboard input."""
+        _LOGGER.info("Discovering devices with mDNS for %s seconds...", timeout)
 
         listener = Listener()
         browser = zeroconf.ServiceBrowser(
             zeroconf.Zeroconf(), "_miio._udp.local.", listener
         )
 
-        input()  # to keep execution running until a key is pressed
+        time.sleep(timeout)
         browser.cancel()
 
         return listener.found_devices

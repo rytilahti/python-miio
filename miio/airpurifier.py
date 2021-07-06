@@ -7,7 +7,7 @@ import click
 
 from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -28,6 +28,8 @@ class OperationMode(enum.Enum):
     Medium = "medium"
     High = "high"
     Strong = "strong"
+    # Additional supported modes of the Air Purifier Super 2
+    Low = "low"
 
 
 class SleepMode(enum.Enum):
@@ -42,14 +44,11 @@ class LedBrightness(enum.Enum):
     Off = 2
 
 
-class AirPurifierStatus:
+class AirPurifierStatus(DeviceStatus):
     """Container for status reports from the air purifier."""
 
-    _filter_type_cache = {}
-
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Air Purifier Pro (zhimi.airpurifier.v6):
+        """Response of a Air Purifier Pro (zhimi.airpurifier.v6):
 
         {'power': 'off', 'aqi': 7, 'average_aqi': 18, 'humidity': 45,
          'temp_dec': 234, 'mode': 'auto', 'favorite_level': 17,
@@ -59,6 +58,19 @@ class AirPurifierStatus:
          'buzzer': None, 'child_lock': 'off', 'volume': 50,
          'rfid_product_id': '0:0:41:30', 'rfid_tag': '80:52:86:e2:d8:86:4',
          'act_sleep': 'close'}
+
+        Response of a Air Purifier Pro (zhimi.airpurifier.v7):
+
+        {'power': 'on', 'aqi': 2, 'average_aqi': 3, 'humidity': 42,
+         'temp_dec': 223, 'mode': 'favorite', 'favorite_level': 3,
+         'filter1_life': 56, 'f1_hour_used': 1538, 'use_time': None,
+         'motor1_speed': 300, 'motor2_speed': 898, 'purify_volume': None,
+         'f1_hour': 3500, 'led': 'on', 'led_b': None, 'bright': 45,
+         'buzzer': None, 'child_lock': 'off', 'volume': 0,
+         'rfid_product_id': '0:0:30:33', 'rfid_tag': '80:6a:a9:e2:37:92:4',
+         'act_sleep': None, 'sleep_mode': None, 'sleep_time': None,
+         'sleep_data_num': None, 'app_extra': 0, 'act_det': None,
+         'button_pressed': None}
 
         Response of a Air Purifier 2 (zhimi.airpurifier.m1):
 
@@ -70,6 +82,18 @@ class AirPurifierStatus:
         'buzzer': 'off', 'child_lock': 'off', 'volume': None,
         'rfid_product_id': None, 'rfid_tag': None,
         'act_sleep': 'close'}
+
+        Response of a Air Purifier 2 (zhimi.airpurifier.m2):
+
+        {'power': 'on', 'aqi': 10, 'average_aqi': 8, 'humidity': 42,
+         'temp_dec': 223, 'mode': 'favorite', 'favorite_level': 2,
+         'filter1_life': 63, 'f1_hour_used': 1282, 'use_time': 16361416,
+         'motor1_speed': 747, 'motor2_speed': None, 'purify_volume': 421580,
+         'f1_hour': 3500, 'led': 'on', 'led_b': 1, 'bright': None,
+         'buzzer': 'off', 'child_lock': 'off', 'volume': None,
+         'rfid_product_id': None, 'rfid_tag': None, 'act_sleep': 'close',
+         'sleep_mode': 'idle', 'sleep_time': 86168, 'sleep_data_num': 30,
+         'app_extra': 0, 'act_det': None, 'button_pressed': None}
 
         Response of a Air Purifier V3 (zhimi.airpurifier.v3)
 
@@ -131,7 +155,10 @@ class AirPurifierStatus:
 
     @property
     def sleep_mode(self) -> Optional[SleepMode]:
-        """Operation mode of the sleep state. (Idle vs. Silent)"""
+        """Operation mode of the sleep state.
+
+        (Idle vs. Silent)
+        """
         if self.data["sleep_mode"] is not None:
             return SleepMode(self.data["sleep_mode"])
 
@@ -156,7 +183,9 @@ class AirPurifierStatus:
     @property
     def illuminance(self) -> Optional[int]:
         """Environment illuminance level in lux [0-200].
-        Sensor value is updated only when device is turned on."""
+
+        Sensor value is updated only when device is turned on.
+        """
         return self.data["bright"]
 
     @property
@@ -266,73 +295,6 @@ class AirPurifierStatus:
     def button_pressed(self) -> Optional[str]:
         """Last pressed button."""
         return self.data["button_pressed"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<AirPurifierStatus power=%s, "
-            "aqi=%s, "
-            "average_aqi=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "mode=%s, "
-            "led=%s, "
-            "led_brightness=%s, "
-            "illuminance=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "favorite_level=%s, "
-            "filter_life_remaining=%s, "
-            "filter_hours_used=%s, "
-            "use_time=%s, "
-            "purify_volume=%s, "
-            "motor_speed=%s, "
-            "motor2_speed=%s, "
-            "volume=%s, "
-            "filter_rfid_product_id=%s, "
-            "filter_rfid_tag=%s, "
-            "filter_type=%s, "
-            "learn_mode=%s, "
-            "sleep_mode=%s, "
-            "sleep_time=%s, "
-            "sleep_mode_learn_count=%s, "
-            "extra_features=%s, "
-            "turbo_mode_supported=%s, "
-            "auto_detect=%s, "
-            "button_pressed=%s>"
-            % (
-                self.power,
-                self.aqi,
-                self.average_aqi,
-                self.temperature,
-                self.humidity,
-                self.mode,
-                self.led,
-                self.led_brightness,
-                self.illuminance,
-                self.buzzer,
-                self.child_lock,
-                self.favorite_level,
-                self.filter_life_remaining,
-                self.filter_hours_used,
-                self.use_time,
-                self.purify_volume,
-                self.motor_speed,
-                self.motor2_speed,
-                self.volume,
-                self.filter_rfid_product_id,
-                self.filter_rfid_tag,
-                self.filter_type,
-                self.learn_mode,
-                self.sleep_mode,
-                self.sleep_time,
-                self.sleep_mode_learn_count,
-                self.extra_features,
-                self.turbo_mode_supported,
-                self.auto_detect,
-                self.button_pressed,
-            )
-        )
-        return s
 
 
 class AirPurifier(Device):
@@ -525,7 +487,10 @@ class AirPurifier(Device):
         ),
     )
     def set_auto_detect(self, auto_detect: bool):
-        """Set auto detect on/off. It's a feature of the AirPurifier V1 & V3"""
+        """Set auto detect on/off.
+
+        It's a feature of the AirPurifier V1 & V3
+        """
         if auto_detect:
             return self.send("set_act_det", ["on"])
         else:

@@ -8,7 +8,7 @@ from typing import List, Optional
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -97,10 +97,9 @@ class OperationMode(enum.Enum):
     Cancel = "Отмена"
 
 
-class TemperatureHistory:
+class TemperatureHistory(DeviceStatus):
     def __init__(self, data: str):
-        """
-        Container of temperatures recorded every 10-15 seconds while cooking.
+        """Container of temperatures recorded every 10-15 seconds while cooking.
 
         Example values:
 
@@ -142,15 +141,10 @@ class TemperatureHistory:
     def __str__(self) -> str:
         return str(self.data)
 
-    def __repr__(self) -> str:
-        s = "<TemperatureHistory temperatures=%s>" % str(self.data)
-        return s
 
-
-class CookerCustomizations:
+class CookerCustomizations(DeviceStatus):
     def __init__(self, custom: str):
-        """
-        Container of different user customizations.
+        """Container of different user customizations.
 
         Example values:
 
@@ -202,30 +196,10 @@ class CookerCustomizations:
     def __str__(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.custom])
 
-    def __repr__(self) -> str:
-        s = (
-            "<CookerCustomizations jingzhu_appointment=%s, "
-            "kuaizhu_appointment=%s, "
-            "zhuzhou_appointment=%s, "
-            "zhuzhou_cooking=%s, "
-            "favorite_appointment=%s, "
-            "favorite_cooking=%s>"
-            % (
-                self.jingzhu_appointment,
-                self.kuaizhu_appointment,
-                self.zhuzhou_appointment,
-                self.zhuzhou_cooking,
-                self.favorite_appointment,
-                self.favorite_cooking,
-            )
-        )
-        return s
 
-
-class CookingStage:
+class CookingStage(DeviceStatus):
     def __init__(self, stage: str):
-        """
-        Container of cooking stages.
+        """Container of cooking stages.
 
         Example timeouts: 'null', 02000000ff, 03000000ff, 0a000000ff, 1000000000
 
@@ -282,53 +256,10 @@ class CookingStage:
     def raw(self) -> str:
         return self.stage
 
-    def __str__(self) -> str:
-        s = (
-            "name=%s, "
-            "description=%s, "
-            "state=%s, "
-            "rice_id=%s, "
-            "taste=%s, "
-            "taste_phase=%s, "
-            "raw=%s"
-            % (
-                self.name,
-                self.description,
-                self.state,
-                self.rice_id,
-                self.taste,
-                self.taste_phase,
-                self.raw,
-            )
-        )
-        return s
 
-    def __repr__(self) -> str:
-        s = (
-            "<CookingStage name=%s, "
-            "description=%s, "
-            "state=%s, "
-            "rice_id=%s, "
-            "taste=%s, "
-            "taste_phase=%s, "
-            "raw=%s>"
-            % (
-                self.name,
-                self.description,
-                self.state,
-                self.rice_id,
-                self.taste,
-                self.taste_phase,
-                self.stage,
-            )
-        )
-        return s
-
-
-class InteractionTimeouts:
+class InteractionTimeouts(DeviceStatus):
     def __init__(self, timeouts: str = None):
-        """
-        Example timeouts: 05040f, 05060f
+        """Example timeouts: 05040f, 05060f.
 
         Data structure:
 
@@ -347,21 +278,21 @@ class InteractionTimeouts:
     def led_off(self) -> int:
         return self.timeouts[0]
 
-    @property
-    def lid_open(self) -> int:
-        return self.timeouts[1]
-
-    @property
-    def lid_open_warning(self) -> int:
-        return self.timeouts[2]
-
     @led_off.setter
     def led_off(self, delay: int):
         self.timeouts[0] = delay
 
+    @property
+    def lid_open(self) -> int:
+        return self.timeouts[1]
+
     @lid_open.setter
     def lid_open(self, timeout: int):
         self.timeouts[1] = timeout
+
+    @property
+    def lid_open_warning(self) -> int:
+        return self.timeouts[2]
 
     @lid_open_warning.setter
     def lid_open_warning(self, timeout: int):
@@ -370,20 +301,10 @@ class InteractionTimeouts:
     def __str__(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.timeouts])
 
-    def __repr__(self) -> str:
-        s = (
-            "<InteractionTimeouts led_off=%s, "
-            "lid_open=%s, "
-            "lid_open_warning=%s>"
-            % (self.led_off, self.lid_open, self.lid_open_warning)
-        )
-        return s
 
-
-class CookerSettings:
+class CookerSettings(DeviceStatus):
     def __init__(self, settings: str = None):
-        """
-        Example settings: 1407, 0607, 0207
+        """Example settings: 1407, 0607, 0207.
 
         Data structure:
 
@@ -412,44 +333,16 @@ class CookerSettings:
     def pressure_supported(self) -> bool:
         return self.settings[0] & 1 != 0
 
-    @property
-    def led_on(self) -> bool:
-        return self.settings[0] & 2 != 0
-
-    @property
-    def auto_keep_warm(self) -> bool:
-        return self.settings[0] & 4 != 0
-
-    @property
-    def lid_open_warning(self) -> bool:
-        return self.settings[0] & 8 != 0
-
-    @property
-    def lid_open_warning_delayed(self) -> bool:
-        return self.settings[0] & 16 != 0
-
-    @property
-    def jingzhu_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 1 != 0
-
-    @property
-    def kuaizhu_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 2 != 0
-
-    @property
-    def zhuzhou_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 4 != 0
-
-    @property
-    def favorite_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 8 != 0
-
     @pressure_supported.setter
     def pressure_supported(self, supported: bool):
         if supported:
             self.settings[0] |= 1
         else:
             self.settings[0] &= 254
+
+    @property
+    def led_on(self) -> bool:
+        return self.settings[0] & 2 != 0
 
     @led_on.setter
     def led_on(self, on: bool):
@@ -458,12 +351,20 @@ class CookerSettings:
         else:
             self.settings[0] &= 253
 
+    @property
+    def auto_keep_warm(self) -> bool:
+        return self.settings[0] & 4 != 0
+
     @auto_keep_warm.setter
     def auto_keep_warm(self, keep_warm: bool):
         if keep_warm:
             self.settings[0] |= 4
         else:
             self.settings[0] &= 251
+
+    @property
+    def lid_open_warning(self) -> bool:
+        return self.settings[0] & 8 != 0
 
     @lid_open_warning.setter
     def lid_open_warning(self, alarm: bool):
@@ -472,12 +373,20 @@ class CookerSettings:
         else:
             self.settings[0] &= 247
 
+    @property
+    def lid_open_warning_delayed(self) -> bool:
+        return self.settings[0] & 16 != 0
+
     @lid_open_warning_delayed.setter
     def lid_open_warning_delayed(self, alarm: bool):
         if alarm:
             self.settings[0] |= 16
         else:
             self.settings[0] &= 239
+
+    @property
+    def jingzhu_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 1 != 0
 
     @jingzhu_auto_keep_warm.setter
     def jingzhu_auto_keep_warm(self, auto_keep_warm: bool):
@@ -486,6 +395,10 @@ class CookerSettings:
         else:
             self.settings[1] &= 254
 
+    @property
+    def kuaizhu_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 2 != 0
+
     @kuaizhu_auto_keep_warm.setter
     def kuaizhu_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
@@ -493,12 +406,20 @@ class CookerSettings:
         else:
             self.settings[1] &= 253
 
+    @property
+    def zhuzhou_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 4 != 0
+
     @zhuzhou_auto_keep_warm.setter
     def zhuzhou_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
             self.settings[1] |= 4
         else:
             self.settings[1] &= 251
+
+    @property
+    def favorite_auto_keep_warm(self) -> bool:
+        return self.settings[1] & 8 != 0
 
     @favorite_auto_keep_warm.setter
     def favorite_auto_keep_warm(self, auto_keep_warm: bool):
@@ -510,36 +431,10 @@ class CookerSettings:
     def __str__(self) -> str:
         return "".join(["{:02x}".format(value) for value in self.settings])
 
-    def __repr__(self) -> str:
-        s = (
-            "<CookerSettings pressure_supported=%s, "
-            "led_on=%s, "
-            "lid_open_warning=%s, "
-            "lid_open_warning_delayed=%s, "
-            "auto_keep_warm=%s, "
-            "jingzhu_auto_keep_warm=%s, "
-            "kuaizhu_auto_keep_warm=%s, "
-            "zhuzhou_auto_keep_warm=%s, "
-            "favorite_auto_keep_warm=%s>"
-            % (
-                self.pressure_supported,
-                self.led_on,
-                self.lid_open_warning,
-                self.lid_open_warning_delayed,
-                self.auto_keep_warm,
-                self.jingzhu_auto_keep_warm,
-                self.kuaizhu_auto_keep_warm,
-                self.zhuzhou_auto_keep_warm,
-                self.favorite_auto_keep_warm,
-            )
-        )
-        return s
 
-
-class CookerStatus:
+class CookerStatus(DeviceStatus):
     def __init__(self, data):
-        """
-        Responses of a chunmi.cooker.normal2 (fw_ver: 1.2.8):
+        """Responses of a chunmi.cooker.normal2 (fw_ver: 1.2.8):
 
         { 'func': 'precook',
           'menu': '0001',
@@ -601,8 +496,7 @@ class CookerStatus:
 
     @property
     def temperature(self) -> Optional[int]:
-        """
-        Current temperature, if idle.
+        """Current temperature, if idle.
 
         Example values: *29*, 031e0b23, 031e0b23031e
         """
@@ -614,11 +508,10 @@ class CookerStatus:
 
     @property
     def start_time(self) -> Optional[time]:
-        """
-        Start time of cooking?
+        """Start time of cooking?
 
-        The property "temp" is used for different purposes.
-        Example values: 29, *031e0b23*, 031e0b23031e
+        The property "temp" is used for different purposes. Example values: 29,
+        *031e0b23*, 031e0b23031e
         """
         value = self.data["temp"]
         if len(value) == 8:
@@ -668,7 +561,10 @@ class CookerStatus:
 
     @property
     def favorite(self) -> int:
-        """Favored recipe id. Can be compared with the menu property."""
+        """Favored recipe id.
+
+        Can be compared with the menu property.
+        """
         return int(self.data["favorite"], 16)
 
     @property
@@ -679,41 +575,6 @@ class CookerStatus:
             return CookerCustomizations(custom)
 
         return None
-
-    def __repr__(self) -> str:
-        s = (
-            "<CookerStatus mode=%s "
-            "menu=%s, "
-            "stage=%s, "
-            "temperature=%s, "
-            "start_time=%s"
-            "remaining=%s, "
-            "cooking_delayed=%s, "
-            "cooking_temperature=%s, "
-            "settings=%s, "
-            "interaction_timeouts=%s, "
-            "hardware_version=%s, "
-            "firmware_version=%s, "
-            "favorite=%s, "
-            "custom=%s>"
-            % (
-                self.mode,
-                self.menu,
-                self.stage,
-                self.temperature,
-                self.start_time,
-                self.remaining,
-                self.cooking_delayed,
-                self.duration,
-                self.settings,
-                self.interaction_timeouts,
-                self.hardware_version,
-                self.firmware_version,
-                self.favorite,
-                self.custom,
-            )
-        )
-        return s
 
 
 class Cooker(Device):
@@ -807,7 +668,10 @@ class Cooker(Device):
 
     # FIXME: Add unified CLI support
     def set_interaction(self, settings: CookerSettings, timeouts: InteractionTimeouts):
-        """Set interaction. Supported by all cookers except MODEL_PRESS1"""
+        """Set interaction.
+
+        Supported by all cookers except MODEL_PRESS1
+        """
         self.send(
             "set_interaction",
             [
@@ -823,7 +687,7 @@ class Cooker(Device):
         default_output=format_output("Setting menu to {profile}"),
     )
     def set_menu(self, profile: str):
-        """Select one of the default(?) cooking profiles"""
+        """Select one of the default(?) cooking profiles."""
         if not self._validate_profile(profile):
             raise CookerException("Invalid cooking profile: %s" % profile)
 
@@ -833,8 +697,8 @@ class Cooker(Device):
     def get_temperature_history(self) -> TemperatureHistory:
         """Retrieves a temperature history.
 
-        The temperature is only available while cooking.
-        Approx. six data points per minute.
+        The temperature is only available while cooking. Approx. six data points per
+        minute.
         """
         data = self.send("get_temp_history")
 

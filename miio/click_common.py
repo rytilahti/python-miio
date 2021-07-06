@@ -9,7 +9,7 @@ import logging
 import re
 import sys
 from functools import partial, wraps
-from typing import Union
+from typing import Callable, Set, Type, Union
 
 import click
 
@@ -18,7 +18,7 @@ import miio
 from .exceptions import DeviceError
 
 if sys.version_info < (3, 5):
-    print(
+    click.echo(
         "To use this script you need python 3.5 or newer, got %s" % (sys.version_info,)
     )
     sys.exit(1)
@@ -110,21 +110,21 @@ class LiteralParamType(click.ParamType):
 
 
 class GlobalContextObject:
-    def __init__(self, debug: int = 0, output: callable = None):
+    def __init__(self, debug: int = 0, output: Callable = None):
         self.debug = debug
         self.output = output
 
 
 class DeviceGroupMeta(type):
 
-    device_classes = set()
+    device_classes: Set[Type] = set()
 
-    def __new__(mcs, name, bases, namespace) -> type:
+    def __new__(mcs, name, bases, namespace):
         commands = {}
 
         def _get_commands_for_namespace(namespace):
             commands = {}
-            for key, val in namespace.items():
+            for _, val in namespace.items():
                 if not callable(val):
                     continue
                 device_group_command = getattr(val, "_device_group_command", None)
@@ -264,8 +264,8 @@ def command(*decorators, name=None, default_output=None, **kwargs):
 
 
 def format_output(
-    msg_fmt: Union[str, callable] = "",
-    result_msg_fmt: Union[str, callable] = "{result}",
+    msg_fmt: Union[str, Callable] = "",
+    result_msg_fmt: Union[str, Callable] = "{result}",
 ):
     def decorator(func):
         @wraps(func)

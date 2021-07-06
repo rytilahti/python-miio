@@ -1,0 +1,677 @@
+# Default
+- zigbee_id: unknown
+  model: unknown
+  type_id: -1
+  name: unknown
+  type: unknown
+  class: SubDevice
+
+# Gateway
+- zigbee_id: lumi.0
+  model: Gateway
+  type_id: 0
+  name: Gateway
+  type: Gateway
+  class: None
+
+# Weather sensor
+- zigbee_id: lumi.sensor_ht.v1
+  model: WSDCGQ01LM
+  type_id: 10
+  name: Weather sensor
+  type: SensorHT
+  class: SubDevice
+  getter: get_prop_sensor_ht
+  properties:
+    - property: temperature
+      unit: degrees celsius
+      get: get_property_exp
+      devisor: 100
+    - property: humidity
+      unit: percent
+      get: get_property_exp
+      devisor: 100
+
+- zigbee_id: lumi.weather.v1
+  model: WSDCGQ11LM
+  type_id: 19
+  name: Weather sensor
+  type: SensorHT
+  class: SubDevice
+  getter: get_prop_sensor_ht
+  properties:
+    - property: temperature
+      unit: degrees celsius
+      get: get_property_exp
+      devisor: 100
+    - property: humidity
+      unit: percent
+      get: get_property_exp
+      devisor: 100
+    - property: pressure
+      unit: hpa
+      get: get_property_exp
+      devisor: 100
+
+# Door sensor
+- zigbee_id: lumi.sensor_magnet.v2
+  model: MCCGQ01LM
+  type_id: 3
+  name: Door sensor
+  type: Magnet
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_magnet.aq2
+  model: MCCGQ11LM
+  type_id: 53
+  name: Door sensor
+  type: Magnet
+  class: SubDevice
+
+# Motion sensor
+- zigbee_id: lumi.sensor_motion.v2
+  model: RTCGQ01LM
+  type_id: 2
+  name: Motion sensor
+  type: Motion
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_motion.aq2
+  model: RTCGQ11LM
+  type_id: 52
+  name: Motion sensor
+  type: Motion
+  class: SubDevice
+
+# Cube
+- zigbee_id: lumi.sensor_cube.v1
+  model: MFKZQ01LM
+  type_id: 8
+  name: Cube
+  type: Cube
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_cube.aqgl01
+  model: MFKZQ01LM
+  type_id: 68
+  name: Cube
+  type: Cube
+  class: SubDevice
+
+# Curtain
+- zigbee_id: lumi.curtain
+  model: ZNCLDJ11LM
+  type_id: 13
+  name: Curtain
+  type: Curtain
+  class: SubDevice
+
+- zigbee_id: lumi.curtain.aq2
+  model: ZNGZDJ11LM
+  type_id: 71
+  name: Curtain
+  type: Curtain
+  class: SubDevice
+
+- zigbee_id: lumi.curtain.hagl04
+  model: ZNCLDJ12LM
+  type_id: 72
+  name: Curtain B1
+  type: Curtain
+  class: SubDevice
+
+# LightBulb
+- zigbee_id: lumi.light.aqcn02
+  model: ZNLDP12LM
+  type_id: 66
+  name: Smart bulb E27
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1545g12
+  model: LED1545G12
+  type_id: 82
+  name: Ikea smart bulb E27 white
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1546g12
+  model: LED1546G12
+  type_id: 83
+  name: Ikea smart bulb E27 white
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1536g5
+  model: LED1536G5
+  type_id: 84
+  name: Ikea smart bulb E12 white
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1537r6
+  model: LED1537R6
+  type_id: 85
+  name: Ikea smart bulb GU10 white
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1623g12
+  model: LED1623G12
+  type_id: 86
+  name: Ikea smart bulb E27 white
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1650r5
+  model: LED1650R5
+  type_id: 87
+  name: Ikea smart bulb GU10 white
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+- zigbee_id: ikea.light.led1649c5
+  model: LED1649C5
+  type_id: 88
+  name: Ikea smart bulb E12 white
+  type: LightBulb
+  class: LightBulb
+  properties:
+    - property: power_status # 'on' / 'off'
+      name: status
+      get: get_property_exp
+    - property: light_level
+      name: brightness
+      unit: percent
+      get: get_property_exp
+    - property: colour_temperature
+      name: color_temp
+      unit: cct
+      get: get_property_exp
+    - property: cct_min
+      unit: cct
+      default: 153
+    - property: cct_max
+      unit: cct
+      default: 500
+
+# Lock
+- zigbee_id: lumi.lock.aq1
+  model: ZNMS11LM
+  type_id: 59
+  name: Door lock S1
+  type: Lock
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
+
+- zigbee_id: lumi.lock.acn02
+  model: ZNMS12LM
+  type_id: 70
+  name: Door lock S2
+  type: Lock
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
+
+- zigbee_id: lumi.lock.v1
+  model: A6121
+  type_id: 81
+  name: Vima cylinder lock
+  type: Lock
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
+
+- zigbee_id: lumi.lock.acn03
+  model: ZNMS13LM
+  type_id: 163
+  name: Door lock S2 pro
+  type: Lock
+  class: SubDevice
+  properties:
+    - property: status     # 'locked' / 'unlocked'
+
+# Sensors
+- zigbee_id: lumi.sensor_smoke
+  model: JTYJ-GD-01LM/BW
+  type_id: 15
+  name: Honeywell smoke detector
+  type: SmokeSensor
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_natgas
+  model: JTQJ-BF-01LM/BW
+  type_id: 18
+  name: Honeywell natural gas detector
+  type: NatgasSensor
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_wleak.aq1
+  model: SJCGQ11LM
+  type_id: 55
+  name: Water leak sensor
+  type: WaterLeakSensor
+  class: SubDevice
+
+- zigbee_id: lumi.vibration.aq1
+  model: DJT11LM
+  type_id: 56
+  name: Vibration sensor
+  type: VibrationSensor
+  class: Vibration
+
+# Thermostats
+- zigbee_id: lumi.airrtc.tcpecn02
+  model: KTWKQ03ES
+  type_id: 207
+  name: Thermostat S2
+  type: Thermostat
+  class: SubDevice
+
+# Remote Switch
+- zigbee_id: lumi.sensor_86sw2.v1
+  model: WXKG02LM 2016
+  type_id: 12
+  name: Remote switch double
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_86sw1.v1
+  model: WXKG03LM 2016
+  type_id: 14
+  name: Remote switch single
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b186acn01
+  model: WXKG03LM 2018
+  type_id: 134
+  name: Remote switch single
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b286acn01
+  model: WXKG02LM 2018
+  type_id: 135
+  name: Remote switch double
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b186acn02
+  model: WXKG06LM
+  type_id: 171
+  name: D1 remote switch single
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b286acn02
+  model: WXKG07LM
+  type_id: 172
+  name: D1 remote switch double
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_switch.v2
+  model: WXKG01LM
+  type_id: 1
+  name: Button
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_switch.aq2
+  model: WXKG11LM 2015
+  type_id: 51
+  name: Button
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.sensor_switch.aq3
+  model: WXKG12LM
+  type_id: 62
+  name: Button
+  type: RemoteSwitch
+  class: SubDevice
+
+- zigbee_id: lumi.remote.b1acn01
+  model: WXKG11LM 2018
+  type_id: 133
+  name: Button
+  type: RemoteSwitch
+  class: SubDevice
+
+# Switches
+- zigbee_id: lumi.ctrl_neutral2
+  model: QBKG03LM
+  type_id: 7
+  name: Wall switch double no neutral
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_neutral1.v1
+  model: QBKG04LM
+  type_id: 9
+  name: Wall switch no neutral
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln1
+  model: QBKG11LM
+  type_id: 20
+  name: Wall switch single
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln2
+  model: QBKG12LM
+  type_id: 21
+  name: Wall switch double
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln1.aq1
+  model: QBKG11LM
+  type_id: 63
+  name: Wall switch single
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_ln2.aq1
+  model: QBKG12LM
+  type_id: 64
+  name: Wall switch double
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.switch.n3acn3
+  model: QBKG26LM
+  type_id: 176
+  name: D1 wall switch triple
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: neutral_2 # 'on' / 'off'
+      name: status_ch2
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.switch.l3acn3
+  model: QBKG25LM
+  type_id: 177
+  name: D1 wall switch triple no neutral
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: neutral_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: neutral_2 # 'on' / 'off'
+      name: status_ch2
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.plug
+  model: ZNCZ02LM
+  type_id: 11
+  name: Plug
+  type: Switch
+  class: Switch
+  getter: get_prop_plug
+  setter: toggle_plug
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_86plug.v1
+  model: QBCZ11LM
+  type_id: 17
+  name: Wall outlet
+  type: Switch
+  class: Switch
+  setter: toggle_plug
+  properties:
+    - property: channel_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+
+- zigbee_id: lumi.ctrl_86plug.aq1
+  model: QBCZ11LM
+  type_id: 65
+  name: Wall outlet
+  type: Switch
+  class: Switch
+  setter: toggle_plug
+  properties:
+    - property: channel_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+- zigbee_id: lumi.relay.c2acn01
+  model: LLKZMK11LM
+  type_id: 54
+  name: Relay
+  type: Switch
+  class: Switch
+  setter: toggle_ctrl_neutral
+  properties:
+    - property: channel_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: channel_1 # 'on' / 'off'
+      name: status_ch1
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
+
+# from https://github.com/aholstenson/miio/issues/26
+# 166 - lumi.lock.acn05
+# 167 - lumi.switch.b1lacn02
+# 168 - lumi.switch.b2lacn02
+# 169 - lumi.switch.b1nacn02
+# 170 - lumi.switch.b2nacn02
+# 202 - lumi.dimmer.rgbegl01
+# 203 - lumi.dimmer.c3egl01
+# 204 - lumi.dimmer.cwegl01
+# 205 - lumi.airrtc.vrfegl01
+# 206 - lumi.airrtc.tcpecn01

@@ -15,7 +15,7 @@ import attr
 import click
 
 from .click_common import command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,9 +38,9 @@ class CameraOffset:
 class ArmStatus:
     """Container for arm statuses."""
 
-    is_armed = attr.ib(converter=bool)
-    arm_wait_time = attr.ib(converter=int)
-    alarm_volume = attr.ib(converter=int)
+    is_armed: bool = attr.ib(converter=bool)
+    arm_wait_time: int = attr.ib(converter=int)
+    alarm_volume: int = attr.ib(converter=int)
 
 
 class SDCardStatus(IntEnum):
@@ -54,6 +54,7 @@ class SDCardStatus(IntEnum):
 
 class MotionDetectionSensitivity(IntEnum):
     """'Default' values for md sensitivity.
+
     Currently unused as the value can also be set arbitrarily.
     """
 
@@ -62,12 +63,11 @@ class MotionDetectionSensitivity(IntEnum):
     Low = 11000000
 
 
-class CameraStatus:
+class CameraStatus(DeviceStatus):
     """Container for status reports from the Aqara Camera."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a lumi.camera.aq1:
+        """Response of a lumi.camera.aq1:
 
         {"p2p_id":"#################","app_type":"celing",
         "offset_x":"0","offset_y":"0","offset_radius":"0",
@@ -151,31 +151,6 @@ class CameraStatus:
     def av_password(self) -> str:
         """TODO: What is this? Password for the cloud?"""
         return self.data["avPass"]
-
-    def __repr__(self) -> str:
-        s = (
-            "<CameraStatus is_on=%s, "
-            "type=%s, "
-            "offset=%s, "
-            "ir=%s, "
-            "md=%s, "
-            "md_sensitivity=%s, "
-            "led=%s, "
-            "flip=%s, "
-            "fullstop=%s>"
-            % (
-                self.is_on,
-                self.type,
-                self.offsets,
-                self.ir,
-                self.md,
-                self.md_sensitivity,
-                self.led,
-                self.flipped,
-                self.fullstop,
-            )
-        )
-        return s
 
 
 class AqaraCamera(Device):

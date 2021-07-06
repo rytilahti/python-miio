@@ -1,4 +1,5 @@
 import ast
+import contextlib
 import json
 import logging
 import pathlib
@@ -20,8 +21,10 @@ from miio.click_common import (
     validate_token,
 )
 from miio.device import UpdateState
+from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
+from miio.vacuum import CarpetCleaningMode
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
@@ -56,14 +59,13 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         sys.exit(-1)
 
     start_id = manual_seq = 0
-    try:
-        with open(id_file, "r") as f:
-            x = json.load(f)
-            start_id = x.get("seq", 0)
-            manual_seq = x.get("manual_seq", 0)
-            _LOGGER.debug("Read stored sequence ids: %s", x)
-    except (FileNotFoundError, TypeError, ValueError):
-        pass
+    with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
+        id_file, "r"
+    ) as f:
+        x = json.load(f)
+        start_id = x.get("seq", 0)
+        manual_seq = x.get("manual_seq", 0)
+        _LOGGER.debug("Read stored sequence ids: %s", x)
 
     vac = miio.Vacuum(ip, token, start_id, debug)
 
@@ -85,12 +87,11 @@ def cleanup(vac: miio.Vacuum, *args, **kwargs):
     id_file = kwargs["id_file"]
     seqs = {"seq": vac.raw_id, "manual_seq": vac.manual_seqnum}
     _LOGGER.debug("Writing %s to %s", seqs, id_file)
+
     path_obj = pathlib.Path(id_file)
     dir = path_obj.parents[0]
-    try:
-        dir.mkdir(parents=True)
-    except FileExistsError:
-        pass  # after dropping py3.4 support, use exist_ok for mkdir
+    dir.mkdir(parents=True, exist_ok=True)
+
     with open(id_file, "w") as f:
         json.dump(seqs, f)
 
@@ -115,6 +116,8 @@ def status(vac: miio.Vacuum):
 
     if res.error_code:
         click.echo(click.style("Error: %s !" % res.error, bold=True, fg="red"))
+    if res.is_water_shortage:
+        click.echo(click.style("Water is running low!", bold=True, fg="blue"))
     click.echo(click.style("State: %s" % res.state, bold=True))
     click.echo("Battery: %s %%" % res.battery)
     click.echo("Fanspeed: %s %%" % res.fanspeed)
@@ -124,6 +127,8 @@ def status(vac: miio.Vacuum):
     # click.echo("Map present: %s" % res.map)
     # click.echo("in_cleaning: %s" % res.in_cleaning)
     click.echo("Water box attached: %s" % res.is_water_box_attached)
+    if res.is_water_box_carriage_attached is not None:
+        click.echo("Mop attached: %s" % res.is_water_box_carriage_attached)
 
 
 @cli.command()
@@ -238,17 +243,17 @@ def tui(vac: miio.Vacuum):
     miio.VacuumTUI(vac).run()
 
 
-@manual.command()
+@manual.command(name="start")
 @pass_dev
-def start(vac: miio.Vacuum):  # noqa: F811  # redef of start
+def manual_start(vac: miio.Vacuum):  # noqa: F811  # redef of start
     """Activate the manual mode."""
     click.echo("Activating manual controls")
     return vac.manual_start()
 
 
-@manual.command()
+@manual.command(name="stop")
 @pass_dev
-def stop(vac: miio.Vacuum):  # noqa: F811  # redef of stop
+def manual_stop(vac: miio.Vacuum):  # noqa: F811  # redef of stop
     """Deactivate the manual mode."""
     click.echo("Deactivating manual controls")
     return vac.manual_stop()
@@ -296,7 +301,7 @@ def backward(vac: miio.Vacuum, amount: float):
 @click.argument("velocity", type=float)
 @click.argument("duration", type=int)
 def move(vac: miio.Vacuum, rotation: int, velocity: float, duration: int):
-    """Pass raw manual values"""
+    """Pass raw manual values."""
     return vac.manual_control(rotation, velocity, duration)
 
 
@@ -313,7 +318,7 @@ def dnd(
     """Query and adjust do-not-disturb mode."""
     if cmd == "off":
         click.echo("Disabling DND..")
-        print(vac.disable_dnd())
+        click.echo(vac.disable_dnd())
     elif cmd == "on":
         click.echo(
             "Enabling DND %s:%s to %s:%s" % (start_hr, start_min, end_hr, end_min)
@@ -424,7 +429,7 @@ def info(vac: miio.Vacuum):
 
         click.echo("%s" % res)
         _LOGGER.debug("Full response: %s", pf(res.raw))
-    except TypeError:
+    except DeviceInfoUnavailableException:
         click.echo(
             "Unable to fetch info, this can happen when the vacuum "
             "is not connected to the Xiaomi cloud."
@@ -438,6 +443,8 @@ def cleaning_history(vac: miio.Vacuum):
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
     click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration, res.total_area))
+    if res.dust_collection_count is not None:
+        click.echo("Emptied dust collection bin: %s times" % res.dust_collection_count)
     click.echo()
     for idx, id_ in enumerate(res.ids):
         details = vac.clean_details(id_, return_list=False)
@@ -511,7 +518,7 @@ def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int, ip: str):
     progress = vac.sound_install_progress()
     while progress.is_installing:
         progress = vac.sound_install_progress()
-        print("%s (%s %%)" % (progress.state.name, progress.progress))
+        click.echo("%s (%s %%)" % (progress.state.name, progress.progress))
         time.sleep(1)
 
     progress = vac.sound_install_progress()
@@ -556,6 +563,24 @@ def carpet_mode(vac: miio.Vacuum, enabled=None):
 
 
 @cli.command()
+@click.argument("mode", required=False, type=str)
+@pass_dev
+def carpet_cleaning_mode(vac: miio.Vacuum, mode=None):
+    """Query or set the carpet cleaning/avoidance mode.
+
+    Allowed values: Avoid, Rise, Ignore
+    """
+
+    if mode is None:
+        click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode())
+    else:
+        click.echo(
+            "Setting carpet cleaning mode: %s"
+            % vac.set_carpet_cleaning_mode(CarpetCleaningMode[mode])
+        )
+
+
+@cli.command()
 @click.argument("ssid", required=True)
 @click.argument("password", required=True)
 @click.argument("uid", type=int, required=False)
@@ -564,8 +589,9 @@ def carpet_mode(vac: miio.Vacuum, enabled=None):
 def configure_wifi(vac: miio.Vacuum, ssid: str, password: str, uid: int, timezone: str):
     """Configure the wifi settings.
 
-    Note that some newer firmwares may expect you to define the timezone
-    by using --timezone."""
+    Note that some newer firmwares may expect you to define the timezone by using
+    --timezone.
+    """
     click.echo("Configuring wifi to SSID: %s" % ssid)
     click.echo(vac.configure_wifi(ssid, password, uid, timezone))
 
@@ -620,21 +646,22 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
     else:
         click.echo("Starting the update failed: %s" % update_res)
 
-    with tqdm(total=100) as t:
+    with tqdm(total=100) as pbar:
         state = vac.update_state()
         while state == UpdateState.Downloading:
             try:
                 state = vac.update_state()
                 progress = vac.update_progress()
-            except:  # we may not get our messages through during upload # noqa
+            except:  # noqa # nosec
+                # we may not get our messages through during uploads
                 continue
 
             if state == UpdateState.Installing:
                 click.echo("Installation started, please wait until the vacuum reboots")
                 break
 
-            t.update(progress - t.n)
-            t.set_description("%s" % state.name)
+            pbar.update(progress - pbar.n)
+            pbar.set_description("%s" % state.name)
             time.sleep(1)
 
 

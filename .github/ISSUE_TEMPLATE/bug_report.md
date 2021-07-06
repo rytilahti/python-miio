@@ -15,7 +15,7 @@ A clear and concise description of what the bug is.
  - python-miio: [Use `miiocli --version` or `pip show python-miio`]
 
 **Device information:**
-If the issue is specific to a device [Use `miiocli device --ip <ip address> --token <token>`]:
+If the issue is specific to a device [Use `miiocli device --ip <ip address> --token <token> info`]:
   - Model:
   - Hardware version:
   - Firmware version:

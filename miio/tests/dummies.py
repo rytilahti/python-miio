@@ -1,7 +1,5 @@
 class DummyMiIOProtocol:
-    """
-    DummyProtocol allows you mock MiIOProtocol.
-    """
+    """DummyProtocol allows you mock MiIOProtocol."""
 
     def __init__(self, dummy_device):
         # TODO: Ideally, return_values should be passed in here. Passing in dummy_device (which must have
@@ -33,7 +31,6 @@ class DummyDevice:
             "get_prop": self._get_state,
             "power": lambda x: self._set_state("power", x)
         }
-
     """
 
     def __init__(self, *args, **kwargs):
@@ -45,13 +42,13 @@ class DummyDevice:
         self.state = self.start_state.copy()
 
     def _set_state(self, var, value):
-        """Set a state of a variable,
-        the value is expected to be an array with length of 1."""
+        """Set a state of a variable, the value is expected to be an array with length
+        of 1."""
         # print("setting %s = %s" % (var, value))
         self.state[var] = value.pop(0)
 
     def _get_state(self, props):
-        """Return wanted properties"""
+        """Return wanted properties."""
         return [self.state[x] for x in props if x in self.state]
 
 
@@ -63,8 +60,20 @@ class DummyMiotDevice(DummyDevice):
         self.state = [{"did": k, "value": v, "code": 0} for k, v in self.state.items()]
         super().__init__(*args, **kwargs)
 
-    def get_properties_for_mapping(self):
+    def get_properties_for_mapping(self, *, max_properties=15):
         return self.state
+
+    def get_properties(
+        self, properties, *, property_getter="get_prop", max_properties=None
+    ):
+        """Return values only for listed properties."""
+        keys = [p["did"] for p in properties]
+        props = []
+        for prop in self.state:
+            if prop["did"] in keys:
+                props.append(prop)
+
+        return props
 
     def set_property(self, property_key: str, value):
         for prop in self.state:

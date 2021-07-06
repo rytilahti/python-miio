@@ -19,8 +19,12 @@ do this on Debian-based systems (like Rasperry Pi) with
 
 Device discovery
 ================
-Devices already connected on the same network where the command-line tool
-is run are automatically detected when ``mirobo discover`` is invoked.
+Devices already connected to the same network where the command-line tool
+is run are automatically detected when ``miiocli discover`` is invoked.
+This command will execute two types of discovery: discovery by handshake and discovery by mDNS.
+mDNS discovery returns information that can be used to detect the device type which does not work with all devices.
+The handshake method works on all MiIO devices and may expose the token needed to communicate
+with the device, but does not provide device type information.
 
 To be able to communicate with devices their IP address and a device-specific
 encryption token must be known.
@@ -28,48 +32,6 @@ If the returned a token is with characters other than ``0``\ s or ``f``\ s,
 it is likely a valid token which can be used directly for communication.
 If not, the token needs to be extracted from the Mi Home Application,
 see :ref:`logged_tokens` for information how to do this.
-
-.. IMPORTANT::
-
-    For some devices (e.g. the vacuum cleaner) the automatic discovery works only before the device has been connected over the app to your local wifi.
-    This does not work starting from firmware version 3.3.9\_003077 onwards, in which case the procedure shown in :ref:`creating_backup` has to be used
-    to obtain the token.
-
-.. NOTE::
-
-    Some devices also do not announce themselves via mDNS (e.g. Philips' bulbs,
-    and the vacuum when not connected to the Internet),
-    but are nevertheless discoverable by using a miIO discovery.
-    See :ref:`handshake_discovery` for more information about the topic.
-
-.. _handshake_discovery:
-
-Discovery by a handshake
-------------------------
-
-The devices supporting miIO protocol answer to a broadcasted handshake packet,
-which also sometime contain the required token.
-
-Executing ``mirobo discover`` with ``--handshake 1`` option will send
-a broadcast handshake.
-Devices supporting the protocol will response with a message
-potentially containing a valid token.
-
-.. code-block:: bash
-
-    $ mirobo discover --handshake 1
-    INFO:miio.device:  IP 192.168.8.1: Xiaomi Mi Robot Vacuum - token: b'ffffffffffffffffffffffffffffffff'
-
-
-.. NOTE::
-    This method can also be useful for devices not yet connected to any network.
-    In those cases the device trying to do the discovery has to connect to the
-    network advertised by the corresponding device (e.g. rockrobo-XXXX for vacuum)
-
-
-Tokens full of ``0``\ s or ``f``\ s (as above) are either already paired
-with the mobile app or will not yield a token through this method.
-In those cases the procedure shown in :ref:`logged_tokens` has to be used.
 
 .. _logged_tokens:
 
@@ -259,6 +221,15 @@ The command for decrypting the token manually is:
 .. code-block:: bash
 
     echo '0: <YOUR 32 CHARACTER TOKEN>' | xxd -r -p | openssl enc -d -aes-128-ecb -nopad -nosalt -K 00000000000000000000000000000000
+
+.. _rooted_tokens:
+
+Tokens from rooted device
+=========================
+
+If a device is rooted via `dustcloud <https://github.com/dgiese/dustcloud>`_ (e.g. for running the cloud-free control webinterface `Valetudo <https://valetudo.cloud/>`_), the token can be extracted by connecting to the device via SSH and reading the file: :code:`printf $(cat /mnt/data/miio/device.token) | xxd -p`
+
+See also `"How can I get the token from the robots FileSystem?" in the FAQ for Valetudo <https://valetudo.cloud/pages/faq.html#how-can-i-get-the-token-from-the-robots-filesystem>`_.
 
 Environment variables for command-line tools
 ============================================

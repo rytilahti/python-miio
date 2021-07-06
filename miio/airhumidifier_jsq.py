@@ -6,7 +6,7 @@ import click
 
 from .airhumidifier import AirHumidifierException
 from .click_common import EnumType, command, format_output
-from .device import Device
+from .device import Device, DeviceStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,12 +43,12 @@ class LedBrightness(enum.Enum):
     High = 2
 
 
-class AirHumidifierStatus:
+class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier jsq."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Status of an Air Humidifier (shuii.humidifier.jsq001):
+        """Status of an Air Humidifier (shuii.humidifier.jsq001):
+
             [24, 30, 1, 1, 0, 2, 0, 0, 0]
 
         Parsed by AirHumidifierJsq device as:
@@ -70,7 +70,10 @@ class AirHumidifierStatus:
 
     @property
     def mode(self) -> OperationMode:
-        """Operation mode. Can be either low, medium, high or humidity."""
+        """Operation mode.
+
+        Can be either low, medium, high or humidity.
+        """
 
         try:
             mode = OperationMode(self.data["mode"])
@@ -126,36 +129,9 @@ class AirHumidifierStatus:
         """True if the water tank is detached."""
         return self.data["lid_opened"] == 1
 
-    def __repr__(self) -> str:
-        s = (
-            "<AirHumidiferStatus power=%s, "
-            "mode=%s, "
-            "temperature=%s, "
-            "humidity=%s%%, "
-            "led_brightness=%s, "
-            "buzzer=%s, "
-            "child_lock=%s, "
-            "no_water=%s, "
-            "lid_opened=%s>"
-            % (
-                self.power,
-                self.mode,
-                self.temperature,
-                self.humidity,
-                self.led_brightness,
-                self.buzzer,
-                self.child_lock,
-                self.no_water,
-                self.lid_opened,
-            )
-        )
-        return s
-
 
 class AirHumidifierJsq(Device):
-    """
-    Implementation of Xiaomi Zero Fog Humidifier: shuii.humidifier.jsq001
-    """
+    """Implementation of Xiaomi Zero Fog Humidifier: shuii.humidifier.jsq001."""
 
     def __init__(
         self,
