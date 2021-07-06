@@ -186,6 +186,9 @@ class AirHumidifierStatus(DeviceStatus):
     @property
     def depth(self) -> Optional[int]:
         """Return raw value of depth."""
+        _LOGGER.warning(
+            "The 'depth' property is deprecated and will be removed in the future. Use 'water_level' and 'water_tank_detached' properties instead."
+        )
         if "depth" in self.data:
             return self.data["depth"]
         return None
@@ -260,10 +263,6 @@ class AirHumidifier(Device):
 
         # TODO: convert to use generic device info in the future
         self.device_info: Optional[DeviceInfo] = None
-
-        _LOGGER.warning(
-            "The 'depth' property is deprecated and will be removed for 3 months (october 2021). Use 'water_level' and 'water_tank_detached' properties instead."
-        )
 
     @command(
         default_output=format_output(
