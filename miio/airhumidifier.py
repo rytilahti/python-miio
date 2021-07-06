@@ -262,7 +262,7 @@ class AirHumidifier(Device):
         self.device_info: Optional[DeviceInfo] = None
 
         _LOGGER.warning(
-            "The 'depth' property is deprecated and will be removed for 3 months (october 2021). Use 'water_level' property instead."
+            "The 'depth' property is deprecated and will be removed for 3 months (october 2021). Use 'water_level' and 'water_tank_detached' properties instead."
         )
 
     @command(
