@@ -261,6 +261,8 @@ class AirHumidifier(Device):
         # TODO: convert to use generic device info in the future
         self.device_info: Optional[DeviceInfo] = None
 
+        _LOGGER.warning("The 'depth' property is deprecated and will be removed for 3 months (october 2021). Use 'water_level' property instead.")
+
     @command(
         default_output=format_output(
             "",
