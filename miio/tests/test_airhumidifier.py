@@ -343,6 +343,10 @@ class TestAirHumidifierCA1(TestCase):
         assert self.state().trans_level is None
         assert self.state().motor_speed == self.device.start_state["speed"]
         assert self.state().depth == self.device.start_state["depth"]
+        assert self.state().water_level == int(self.device.start_state["depth"] / 1.25)
+        assert self.state().water_tank_detached == (
+            self.device.start_state["depth"] == 127
+        )
         assert self.state().dry == (self.device.start_state["dry"] == "on")
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().hardware_version == self.device.start_state["hw_version"]
