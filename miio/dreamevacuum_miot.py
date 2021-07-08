@@ -287,7 +287,7 @@ class DreameVacuumMiot(MiotDevice):
         Method was copied from the base class to change the value of max_properties to
         10. This change is needed to avoid "Checksum error" messages from the device.
 
-	#TODO: MiotDevice class should have a possibility to define its max_properties value
+	 #TODO: MiotDevice class should have a possibility to define its max_properties value
         """
 
         # We send property key in "did" because it's sent back via response and we can identify the property.
