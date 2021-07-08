@@ -228,7 +228,7 @@ class DreameVacuumMiot(MiotDevice):
         return DreameVacuumStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping()
+                for prop in self.get_properties_for_mapping(max_properties=10)
             }
         )
 
@@ -280,19 +280,3 @@ class DreameVacuumMiot(MiotDevice):
     def reset_sidebrush_life(self) -> None:
         """Reset side brush life."""
         return self.send_action(28, 1)
-
-    def get_properties_for_mapping(self, *, max_properties=15) -> list:
-        """Retrieve raw properties based on mapping.
-
-        Method was copied from the base class to change the value of max_properties to
-        10. This change is needed to avoid "Checksum error" messages from the device.
-
-	  #TODO: MiotDevice class should have a possibility to define its max_properties value
-        """
-
-        # We send property key in "did" because it's sent back via response and we can identify the property.
-        properties = [{"did": k, **v} for k, v in self.mapping.items()]
-
-        return self.get_properties(
-            properties, property_getter="get_properties", max_properties=10
-        )
