@@ -179,70 +179,7 @@ class G1Status(DeviceStatus):
     def water_level(self) -> G1WaterLevel:
         """Water Level."""
         return G1WaterLevel(self.data["water_level"])
- 
-    @property
-    def clean_area(self) -> int:
-        """Clean Area in cm2."""
-        return self.data["clean_area"]
-
-    @property
-    def clean_time(self) -> int:
-        """Clean Time in Minutes."""
-        return self.data["clean_time"]
-
-
-class G1CleaningSummary(DeviceStatus):
-    """Container for cleaning summary from Mijia Vacuum G1."""
-    """
-        Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
-        [
-           {'did': 'total_clean_area', 'siid': 9, 'piid': 3}, 
-           {'did': 'total_clean_time', 'siid': 9, 'piid': 4}, 
-           {'did': 'total_clean_count', 'siid': 9, 'piid': 5}
-            ]
-
-    """
-
-    def __init__(self, data) -> None:
-        self.data = data
-
-    @property
-    def total_clean_count(self) -> int:
-        """Total Number of Cleanings."""
-        return self.data["total_clean_count"]
-
-    @property
-    def total_clean_area(self) -> int:
-        """Total Area Cleaned in m2."""
-        return self.data["total_clean_area"]
-
-    @property
-    def total_clean_time(self) -> timedelta:
-        """Total Cleaning Time."""
-        return timedelta(hours=self.data["total_clean_area"])
-
-
-class G1ConsumableStatus(DeviceStatus):
-    """Container for consumable status information, including information about brushes
-    and duration until they should be changed.
-    The methods returning time left are based values returned from the device.
-    """
-    """
-        Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
-        [
-           {'did': 'side_brush_life_level', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0}, 
-           {'did': 'side_brush_time_left', 'siid': 15, 'piid': 2, 'code': 0, 'value': 0}, 
-           {'did': 'filter_life_level', 'siid': 11, 'piid': 1, 'code': 0, 'value': 99}, 
-           {'did': 'filter_time_left', 'siid': 11, 'piid': 2, 'code': 0, 'value': 8959}, 
-           {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0}, 
-           {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
-            ]
-
-    """
-
-    def __init__(self, data):
-        self.data = data
-
+    
     @property
     def main_brush_life_level(self) -> int:
         """Main Brush Life Level in %."""
@@ -272,8 +209,47 @@ class G1ConsumableStatus(DeviceStatus):
     def filter_time_left(self) -> timedelta:
         """Filter Remaining Time in Minutes."""
         return timedelta(minutes=self.data["filter_time_left"])
+ 
+    @property
+    def clean_area(self) -> int:
+        """Clean Area in cm2."""
+        return self.data["clean_area"]
+
+    @property
+    def clean_time(self) -> int:
+        """Clean Time in Minutes."""
+        return self.data["clean_time"]
 
 
+class G1CleaningSummary(DeviceStatus):
+    """Container for cleaning summary from Mijia Vacuum G1."""
+    """
+        Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
+        [
+          {'did': 'total_clean_area', 'siid': 9, 'piid': 3, 'code': 0, 'value': 0}, 
+          {'did': 'total_clean_time', 'siid': 9, 'piid': 4, 'code': 0, 'value': 0}, 
+          {'did': 'total_clean_count', 'siid': 9, 'piid': 5, 'code': 0, 'value': 0}
+            ]
+
+    """
+
+    def __init__(self, data) -> None:
+        self.data = data
+
+    @property
+    def total_clean_count(self) -> int:
+        """Total Number of Cleanings."""
+        return self.data["total_clean_count"]
+
+    @property
+    def total_clean_area(self) -> int:
+        """Total Area Cleaned in m2."""
+        return self.data["total_clean_area"]
+
+    @property
+    def total_clean_time(self) -> timedelta:
+        """Total Cleaning Time."""
+        return timedelta(hours=self.data["total_clean_area"])
 
 
 class G1Vacuum(MiotDevice):
@@ -305,6 +281,12 @@ class G1Vacuum(MiotDevice):
             "Charge Status: {result.charge_state}\n"
             "Fan speed: {result.fan_speed}\n"
             "Water level: {result.water_level}\n"
+            "Main Brush Life Level: {result.main_brush_life_level}%\n"
+            "Main Brush Life Time: {result.main_brush_time_left}\n"
+            "Side Brush Life Level: {result.side_brush_life_level}%\n"
+            "Side Brush Life Time: {result.side_brush_time_left}\n"
+            "Filter Life Level: {result.filter_life_level}%\n"
+            "Filter Life Time: {result.filter_time_left}\n"
             "Clean Area: {result.clean_area}\n"
             "Clean Time: {result.clean_time}\n"
          )
@@ -319,30 +301,6 @@ class G1Vacuum(MiotDevice):
                 for prop in self.get_properties_for_mapping(max_properties=10)
             }
         )
-
-    
-    @command( 
-        default_output=format_output(
-            "",
-            "Main Brush Life Level: {result.main_brush_life_level}%\n"
-            "Main Brush Life Time: {result.main_brush_time_left}\n"
-            "Side Brush Life Level: {result.side_brush_life_level}%\n"
-            "Side Brush Life Time: {result.side_brush_time_left}\n"
-            "Filter Life Level: {result.filter_life_level}%\n"
-            "Filter Life Time: {result.filter_time_left}\n"
-        )
-    )
-    def consumable_status(self) -> G1ConsumableStatus:
-        """Retrieve properties."""
-
-        return G1ConsumableStatus(
-            {
-                prop["did"]: prop["value"] if prop["code"] == 0 else None
-                # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
-                for prop in self.get_properties_for_mapping(max_properties=10)
-            }
-        )
-
 
     @command( 
         default_output=format_output(
