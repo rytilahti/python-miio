@@ -207,7 +207,7 @@ class G1Status(DeviceStatus):
 
     @property
     def filter_time_left(self) -> timedelta:
-        """Filter Remaining Time in Minutes."""
+        """Filter remaining time."""
         return timedelta(minutes=self.data["filter_time_left"])
  
     @property
