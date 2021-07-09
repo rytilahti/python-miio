@@ -120,12 +120,12 @@ class G1Status(DeviceStatus):
             {'did': 'water_level', 'siid': 2, 'piid': 5, 'code': 0, 'value': 2}, 
             {'did': 'main_brush_life_level', 'siid': 14, 'piid': 1, 'code': 0, 'value': 99}, 
             {'did': 'main_brush_time_left', 'siid': 14, 'piid': 2, 'code': 0, 'value': 17959},
-            {'did': 'side_brush_life_level', 'siid': 15, 'piid': 1}, 
-            {'did': 'side_brush_time_left', 'siid': 15, 'piid': 2}, 
-            {'did': 'filter_life_level', 'siid': 11, 'piid': 1}, 
-            {'did': 'filter_time_left', 'siid': 11, 'piid': 2},
-            {'did': 'clean_area', 'siid': 9, 'piid': 1}, 
-            {'did': 'clean_time', 'siid': 9, 'piid': 2}
+            {'did': 'side_brush_life_level', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0 }, 
+            {'did': 'side_brush_time_left', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0}, 
+            {'did': 'filter_life_level', 'siid': 11, 'piid': 1, 'code': 0, 'value': 99}, 
+            {'did': 'filter_time_left', 'siid': 11, 'piid': 2, 'code': 0, 'value': 8959},
+            {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0}, 
+            {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
             ]
 
     """
