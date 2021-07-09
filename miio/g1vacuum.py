@@ -188,7 +188,7 @@ class G1Status(DeviceStatus):
     @property
     def main_brush_time_left(self) -> timedelta:
         """Main Brush Remaining Time in Minutes."""
-        return timedelta(seconds=self.data["main_brush_time_left"])
+        return timedelta(minutes=self.data["main_brush_time_left"])
   
     @property
     def side_brush_life_level(self) -> int:
@@ -216,9 +216,9 @@ class G1Status(DeviceStatus):
         return self.data["clean_area"]
 
     @property
-    def clean_time(self) -> int:
+    def clean_time(self) -> timedelta:
         """Clean time."""
-        return self.data["clean_time"]
+        return timedelta(minutes=self.data["clean_time"])
 
 
 class G1CleaningSummary(DeviceStatus):
