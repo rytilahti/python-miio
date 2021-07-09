@@ -140,7 +140,7 @@ class G1Status(DeviceStatus):
     @property
     def charge_state(self) -> G1ChargeState:
         """Charging State."""
-        return G1ChargeState[G1ChargeState(self.data["charge_state"]).name]
+        return G1ChargeState(self.data["charge_state"])
 
     @property
     def error_code(self) -> int:
@@ -359,4 +359,3 @@ class G1Vacuum(MiotDevice):
     def set_fan_speed(self, fan_speed: G1FanSpeed):
         """Set fan speed."""
         return self.set_property("fan_speed", fan_speed.value)
-
