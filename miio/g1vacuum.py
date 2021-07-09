@@ -217,7 +217,7 @@ class G1Status(DeviceStatus):
 
     @property
     def clean_time(self) -> int:
-        """Clean Time in Minutes."""
+        """Clean time."""
         return self.data["clean_time"]
 
 
