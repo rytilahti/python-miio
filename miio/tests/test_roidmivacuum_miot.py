@@ -57,6 +57,7 @@ _INITIAL_STATE = {
     "total_clean_time_sec": 321456,
     "total_clean_areas": 345678,
     "clean_counts": 987,
+    "clean_time_sec": 32,
 }
 
 
@@ -71,46 +72,45 @@ def dummyroidmivacuum(request):
     request.cls.device = DummyRoidmiVacuumMiot()
 
 
-def assertEnum(a, b):
-    assert a == b
-    assert repr(a) == repr(b)
-
-
 @pytest.mark.usefixtures("dummyroidmivacuum")
 class TestRoidmiVacuum(TestCase):
-    def test_VacuumStatus(self):
+    def test_vacuum_status(self):
         status = self.device.status()
-        assert status.auto_boost == _INITIAL_STATE["auto_boost"]
+        assert status.carpet_mode == _INITIAL_STATE["auto_boost"]
         assert status.battery == _INITIAL_STATE["battery_level"]
-        assertEnum(
-            status.charging_state, ChargingState(_INITIAL_STATE["charging_state"])
-        )
-        assertEnum(status.fanspeed, FanSpeed(_INITIAL_STATE["fanspeed_mode"]))
+        assert status.charging_state == ChargingState(_INITIAL_STATE["charging_state"])
+        assert status.fan_speed == FanSpeed(_INITIAL_STATE["fanspeed_mode"])
         assert status.current_audio == _INITIAL_STATE["current_audio"]
         assert status.clean_area == _INITIAL_STATE["clean_area"]
+        assert status.clean_time.total_seconds() == _INITIAL_STATE["clean_time_sec"]
         assert status.error_code == _INITIAL_STATE["error_code"]
-        assertEnum(status.state, RoidmiState(_INITIAL_STATE["state"]))
+        assert status.error == "NoFaults"
+        assert status.state == RoidmiState(_INITIAL_STATE["state"])
         assert status.double_clean == _INITIAL_STATE["double_clean"]
         assert status.edge_sweep == _INITIAL_STATE["edge_sweep"]
         assert str(status.dnd_status) == str(
             status._parse_forbid_mode(_INITIAL_STATE["forbid_mode"])
         )
-        assert status.led_switch == _INITIAL_STATE["led_switch"]
-        assert status.lidar_collision == _INITIAL_STATE["lidar_collision"]
+        assert status.vacuum_led == _INITIAL_STATE["led_switch"]
+        assert status.is_lidar_collision_sensor == _INITIAL_STATE["lidar_collision"]
         assert status.mop_present == _INITIAL_STATE["mop_present"]
-        assert status.is_mute == _INITIAL_STATE["mute"]
+        assert status.is_muted == _INITIAL_STATE["mute"]
         assert status.station_key == _INITIAL_STATE["station_key"]
         assert status.station_led == _INITIAL_STATE["station_led"]
-        assertEnum(status.sweep_mode, SweepMode(_INITIAL_STATE["sweep_mode"]))
-        assertEnum(status.sweep_type, SweepType(_INITIAL_STATE["sweep_type"]))
+        assert status.sweep_mode == SweepMode(_INITIAL_STATE["sweep_mode"])
+        assert status.sweep_type == SweepType(_INITIAL_STATE["sweep_type"])
         assert status.timing == _INITIAL_STATE["timing"]
-        assertEnum(status.path_mode, PathMode(_INITIAL_STATE["path_mode"]))
+        assert status.path_mode == PathMode(_INITIAL_STATE["path_mode"])
         assert status.progress == _INITIAL_STATE["progress"]
-        assert status.work_station_freq == _INITIAL_STATE["work_station_freq"]
+        assert status.work_station_frequency == _INITIAL_STATE["work_station_freq"]
         assert status.volume == _INITIAL_STATE["volume"]
-        assertEnum(status.water_level, WaterLevel(_INITIAL_STATE["water_level"]))
+        assert status.water_level == WaterLevel(_INITIAL_STATE["water_level"])
 
-    def test_RoidmiCleaningSummary(self):
+        assert status.is_paused is True
+        assert status.is_on is False
+        assert status.got_error is False
+
+    def test_cleaning_summary(self):
         status = self.device.cleaning_summary()
         assert (
             status.total_duration.total_seconds()
@@ -119,7 +119,7 @@ class TestRoidmiVacuum(TestCase):
         assert status.total_area == _INITIAL_STATE["total_clean_areas"]
         assert status.count == _INITIAL_STATE["clean_counts"]
 
-    def test_RoidmiConsumableStatus(self):
+    def test_consumable_status(self):
         status = self.device.consumable_status()
         assert (
             status.main_brush_left.total_seconds() / 60
@@ -142,14 +142,13 @@ class TestRoidmiVacuum(TestCase):
         assert status.sensor_dirty == status._calcUsageTime(
             status.sensor_dirty_left, _INITIAL_STATE["sensor_dirty_remaning_level"]
         )
-        # assertEnum(
-        # status.charging_state, ChargingState(_INITIAL_STATE["charging_state"])
-        # )
         assert (
             status.filter_left.total_seconds() / 60
             == _INITIAL_STATE["filter_left_minutes"]
         )
-        # assert status.filter_life_level == _INITIAL_STATE["filter_life_level"]
+        assert status.filter == status._calcUsageTime(
+            status.filter_left, _INITIAL_STATE["filter_life_level"]
+        )
 
     def test__calcUsageTime(self):
         status = self.device.consumable_status()
@@ -186,3 +185,34 @@ class TestRoidmiVacuum(TestCase):
             )
         )
         assert str(status._parse_forbid_mode(value)) == str(expected_value)
+
+
+class DummyRoidmiVacuumMiot2(DummyMiotDevice, RoidmiVacuumMiot):
+    def __init__(self, *args, **kwargs):
+        self.state = _INITIAL_STATE
+        self.state["charging_state"] = -10
+        self.state["fanspeed_mode"] = -11
+        self.state["state"] = -12
+        self.state["sweep_mode"] = -13
+        self.state["sweep_type"] = -14
+        self.state["path_mode"] = -15
+        self.state["water_level"] = -16
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="function")
+def dummyroidmivacuum2(request):
+    request.cls.device = DummyRoidmiVacuumMiot2()
+
+
+@pytest.mark.usefixtures("dummyroidmivacuum2")
+class TestRoidmiVacuum2(TestCase):
+    def test_vacuum_status_unexpected_values(self):
+        status = self.device.status()
+        assert status.charging_state == ChargingState.Unknown
+        assert status.fan_speed == FanSpeed.Unknown
+        assert status.state == RoidmiState.Unknown
+        assert status.sweep_mode == SweepMode.Unknown
+        assert status.sweep_type == SweepType.Unknown
+        assert status.path_mode == PathMode.Unknown
+        assert status.water_level == WaterLevel.Unknown

@@ -39,7 +39,7 @@ _MAPPING: MiotMapping = {
     "work_station_freq": {"siid": 8, "piid": 2},  # Range: [0, 3, 1]
     "timing": {"siid": 8, "piid": 6},
     "clean_area": {"siid": 8, "piid": 7},  # uint32
-    "uid": {"siid": 8, "piid": 8},  # str
+    # "uid": {"siid": 8, "piid": 8},  # str - This UID is unknown
     "auto_boost": {"siid": 8, "piid": 9},
     "forbid_mode": {"siid": 8, "piid": 10},  # str
     "water_level": {"siid": 8, "piid": 11},
@@ -60,6 +60,18 @@ _MAPPING: MiotMapping = {
     # "switch_status": {"siid": 2, "piid": 10}, # Enum with only one value: Open
     "volume": {"siid": 9, "piid": 1},
     "mute": {"siid": 9, "piid": 2},
+    "start": {"siid": 2, "aiid": 1},
+    "stop": {"siid": 2, "aiid": 2},
+    "start_room_sweep": {"siid": 2, "aiid": 3},
+    "start_sweep": {"siid": 14, "aiid": 1},
+    "home": {"siid": 3, "aiid": 1},
+    "identify": {"siid": 8, "aiid": 1},
+    "start_station_dust_collection": {"siid": 8, "aiid": 6},
+    "set_voice": {"siid": 8, "aiid": 12},
+    "reset_filter_life": {"siid": 10, "aiid": 1},
+    "reset_main_brush_life": {"siid": 11, "aiid": 1},
+    "reset_side_brushes_life": {"siid": 12, "aiid": 1},
+    "reset_sensor_dirty_life": {"siid": 15, "aiid": 1},
 }
 
 
@@ -164,6 +176,50 @@ class RoidmiVacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
     def __init__(self, data):
+        """
+        Response (MIoT format) of a Roidme Eve Plus (roidmi.vacuum.v60)
+        [
+            {'did': 'battery_level', 'siid': 3, 'piid': 1},
+            {'did': 'charging_state', 'siid': 3, 'piid': 2},
+            {'did': 'error_code', 'siid': 2, 'piid': 2},
+            {'did': 'state', 'siid': 2, 'piid': 1},
+            {'did': 'filter_life_level', 'siid': 10, 'piid': 1},
+            {'did': 'filter_left_minutes', 'siid': 10, 'piid': 2},
+            {'did': 'main_brush_left_minutes', 'siid': 11, 'piid': 1},
+            {'did': 'main_brush_life_level', 'siid': 11, 'piid': 2},
+            {'did': 'side_brushes_left_minutes', 'siid': 12, 'piid': 1},
+            {'did': 'side_brushes_life_level', 'siid': 12, 'piid': 2},
+            {'did': 'sensor_dirty_time_left_minutes', 'siid': 15, 'piid': 1},
+            {'did': 'sensor_dirty_remaning_level', 'siid': 15, 'piid': 2},
+            {'did': 'sweep_mode', 'siid': 14, 'piid': 1},
+            {'did': 'fanspeed_mode', 'siid': 2, 'piid': 4},
+            {'did': 'sweep_type', 'siid': 2, 'piid': 8}
+            {'did': 'path_mode', 'siid': 13, 'piid': 8},
+            {'did': 'mop_present', 'siid': 8, 'piid': 1},
+            {'did': 'work_station_freq', 'siid': 8, 'piid': 2},
+            {'did': 'timing', 'siid': 8, 'piid': 6},
+            {'did': 'clean_area', 'siid': 8, 'piid': 7},
+            {'did': 'auto_boost', 'siid': 8, 'piid': 9},
+            {'did': 'forbid_mode', 'siid': 8, 'piid': 10},
+            {'did': 'water_level', 'siid': 8, 'piid': 11},
+            {'did': 'total_clean_time_sec', 'siid': 8, 'piid': 13},
+            {'did': 'total_clean_areas', 'siid': 8, 'piid': 14},
+            {'did': 'clean_counts', 'siid': 8, 'piid': 18},
+            {'did': 'clean_time_sec', 'siid': 8, 'piid': 19},
+            {'did': 'double_clean', 'siid': 8, 'piid': 20},
+            {'did': 'edge_sweep', 'siid': 8, 'piid': 21},
+            {'did': 'led_switch', 'siid': 8, 'piid': 22}
+            {'did': 'lidar_collision', 'siid': 8, 'piid': 23},
+            {'did': 'station_key', 'siid': 8, 'piid': 24},
+            {'did': 'station_led', 'siid': 8, 'piid': 25},
+            {'did': 'current_audio', 'siid': 8, 'piid': 26},
+            {'did': 'progress', 'siid': 8, 'piid': 28},
+            {'did': 'station_type', 'siid': 8, 'piid': 29},
+            {'did': 'volume', 'siid': 9, 'piid': 1},
+            {'did': 'mute', 'siid': 9, 'piid': 2}
+        ]
+
+        """
         self.data = data
 
     @property
@@ -203,7 +259,7 @@ class RoidmiVacuumStatus(DeviceStatus):
             return SweepMode.Unknown
 
     @property
-    def fanspeed(self) -> FanSpeed:
+    def fan_speed(self) -> FanSpeed:
         """Current fan speed."""
         try:
             return FanSpeed(self.data["fanspeed_mode"])
@@ -235,7 +291,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["mop_present"]
 
     @property
-    def work_station_freq(self) -> int:
+    def work_station_frequency(self) -> int:
         """work_station_freq (2 means base dust colect every second time)."""
         return self.data["work_station_freq"]
 
@@ -266,26 +322,21 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["timing"]
 
     @property
-    def uid_unknown(self) -> int:
-        """This UID is unknown."""
-        return self.data["uid"]
-
-    @property
-    def auto_boost(self) -> bool:
+    def carpet_mode(self) -> bool:
         """Auto boost on carpet."""
         return self.data["auto_boost"]
 
-    def _parse_forbid_mode(self, val):
+    def _parse_forbid_mode(self, val) -> DNDStatus:
         # Example data: {"time":[75600,21600,1],"tz":2,"tzs":7200}
-        def _secToHourMinute(val):
+        def _seconds_to_components(val):
             hour = math.floor(val / 3600)
             minut = math.floor((val - hour * 3600) / 60)
             return (hour, minut)
 
-        asDict = json.loads(val)
-        enabled = bool(asDict["time"][2])
-        start = _secToHourMinute(asDict["time"][0])
-        end = _secToHourMinute(asDict["time"][1])
+        as_dict = json.loads(val)
+        enabled = bool(as_dict["time"][2])
+        start = _seconds_to_components(as_dict["time"][0])
+        end = _seconds_to_components(as_dict["time"][1])
         return DNDStatus(
             dict(
                 enabled=enabled,
@@ -297,7 +348,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         )
 
     @property
-    def dnd_status(self):
+    def dnd_status(self) -> DNDStatus:
         """Returns do-not-disturb status."""
         return self._parse_forbid_mode(self.data["forbid_mode"])
 
@@ -321,12 +372,12 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["edge_sweep"]
 
     @property
-    def led_switch(self) -> bool:
-        """The LED on the robot will be always on."""
+    def vacuum_led(self) -> bool:
+        """Return if led/display on vaccum is on."""
         return self.data["led_switch"]
 
     @property
-    def lidar_collision(self) -> bool:
+    def is_lidar_collision_sensor(self) -> bool:
         """When ON, the robot will use lidar as the main detection sensor to help reduce
         collisions."""
         return self.data["lidar_collision"]
@@ -338,14 +389,14 @@ class RoidmiVacuumStatus(DeviceStatus):
 
     @property
     def station_led(self) -> bool:
-        """When OFF The station display will turn off."""
+        """Return if station display is on."""
         return self.data["station_led"]
 
     @property
     def current_audio(self) -> str:
-        """E.g.
+        """Current voice setting.
 
-        'girl_en'
+        E.g. 'girl_en'
         """
         return self.data["current_audio"]
 
@@ -374,7 +425,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         """Human readable state description, see also :func:`state_code`."""
         try:
             return RoidmiState(self.state_code)
-        except TypeError:
+        except ValueError:
             _LOGGER.error("Unknown RoidmiState (%s)", self.state_code)
             return RoidmiState.Unknown
 
@@ -384,7 +435,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["volume"]
 
     @property
-    def is_mute(self) -> bool:
+    def is_muted(self) -> bool:
         """True if device is muted."""
         return bool(self.data["mute"])
 
@@ -502,7 +553,7 @@ class RoidmiVacuumMiot(MiotDevice):
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
-                for prop in self.get_properties_for_mapping(max_properties=10)
+                for prop in self.get_properties_for_mapping()
             }
         )
 
@@ -513,7 +564,7 @@ class RoidmiVacuumMiot(MiotDevice):
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
-                for prop in self.get_properties_for_mapping(max_properties=10)
+                for prop in self.get_properties_for_mapping()
             }
         )
 
@@ -524,14 +575,14 @@ class RoidmiVacuumMiot(MiotDevice):
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
-                for prop in self.get_properties_for_mapping(max_properties=10)
+                for prop in self.get_properties_for_mapping()
             }
         )
 
     @command()
     def start(self) -> None:
         """Start cleaning."""
-        return self.call_action_by(2, 1)
+        return self.call_action("start")
 
     @command(click.argument("roomstr", type=str))
     def start_room_sweep_unknown(self, roomstr: str) -> None:
@@ -539,7 +590,7 @@ class RoidmiVacuumMiot(MiotDevice):
 
         FIXME: the syntax of room_sweep is unknown
         """
-        return self.call_action_by(2, 3, roomstr)
+        return self.call_action("start_room_sweep")
 
     @command(
         click.argument("sweep_mode", type=EnumType(SweepMode)),
@@ -550,27 +601,42 @@ class RoidmiVacuumMiot(MiotDevice):
 
         FIXME: the syntax of start sweep with mode is unknown
         """
-        return self.call_action_by(14, 1, [sweep_mode.value, clean_info])
+        return self.call_action("start_sweep", [sweep_mode.value, clean_info])
 
     @command()
     def stop(self) -> None:
         """Stop cleaning."""
-        return self.call_action_by(2, 2)
+        return self.call_action("stop")
 
     @command()
     def home(self) -> None:
         """Return to home."""
-        return self.call_action_by(3, 1)
+        return self.call_action("home")
 
     @command()
     def identify(self) -> None:
         """Locate the device (i am here)."""
-        return self.call_action_by(8, 1)
+        return self.call_action("identify")
+
+    @command(click.argument("on", type=bool))
+    def set_station_led(self, on: bool):
+        """Enable station led display."""
+        return self.set_property("station_led", on)
+
+    @command(click.argument("on", type=bool))
+    def set_vacuum_led(self, on: bool):
+        """Enable vacuum led."""
+        return self.set_property("led_switch", on)
 
     @command(click.argument("vol", type=int))
     def set_sound_volume(self, vol: int):
         """Set sound volume [0-100]."""
         return self.set_property("volume", vol)
+
+    @command(click.argument("value", type=bool))
+    def set_sound_muted(self, value: bool):
+        """Set sound volume muted."""
+        return self.set_property("mute", value)
 
     @command(click.argument("fanspeed_mode", type=EnumType(FanSpeed)))
     def set_fanspeed(self, fanspeed_mode: FanSpeed):
@@ -588,12 +654,12 @@ class RoidmiVacuumMiot(MiotDevice):
         return self.set_property("path_mode", path_mode.value)
 
     @command(click.argument("work_station_freq", type=int))
-    def set_work_station_freq(self, work_station_freq: int):
+    def work_station_frequency(self, work_station_freq: int):
         """Set work_station_freq (2 means base dust colect every second time)."""
         return self.set_property("work_station_freq", work_station_freq)
 
     @command(click.argument("timing", type=str))
-    def set_timing_unknown(self, timing: str):
+    def set_timing(self, timing: str):
         """Set repeated clean timing.
 
         Set timing to 9:00 Monday-Friday, rooms:[12,10]
@@ -605,7 +671,7 @@ class RoidmiVacuumMiot(MiotDevice):
         return self.set_property("timing", timing)
 
     @command(click.argument("auto_boost", type=bool))
-    def set_auto_boost(self, auto_boost: bool):
+    def set_carpet_mode(self, auto_boost: bool):
         """Set auto boost on carpet."""
         return self.set_property("auto_boost", auto_boost)
 
@@ -664,39 +730,40 @@ class RoidmiVacuumMiot(MiotDevice):
         return self.set_property("edge_sweep", edge_sweep)
 
     @command(click.argument("lidar_collision", type=bool))
-    def set_lidar_collision(self, lidar_collision: bool):
-        """Set lidar collision (True/False).."""
+    def set_lidar_collision_sensor(self, lidar_collision: bool):
+        """When ON, the robot will use lidar as the main detection sensor to help reduce
+        collisions."""
         return self.set_property("lidar_collision", lidar_collision)
 
     @command()
     def start_dust(self) -> None:
         """Start base dust collection."""
-        return self.call_action_by(8, 6)
+        return self.call_action("start_station_dust_collection")
 
     @command(click.argument("voice", type=str))
     def set_voice_unknown(self, voice: str) -> None:
         """Set voice.
 
-        FIXME: the syntax of voice is unknown
+        FIXME: the syntax of voice is unknown (assumed to be json format)
         """
-        return self.call_action_by(8, 12, voice)
+        return self.call_action("set_voice", voice)
 
     @command()
     def reset_filter_life(self) -> None:
         """Reset filter life."""
-        return self.call_action_by(10, 1)
+        return self.call_action("reset_filter_life")
 
     @command()
     def reset_mainbrush_life(self) -> None:
         """Reset main brush life."""
-        return self.call_action_by(11, 1)
+        return self.call_action("reset_main_brush_life")
 
     @command()
     def reset_sidebrush_life(self) -> None:
-        """Reset side brush life."""
-        return self.call_action_by(12, 1)
+        """Reset side brushes life."""
+        return self.call_action("reset_side_brushes_life")
 
     @command()
     def reset_sensor_dirty_life(self) -> None:
         """Reset sensor dirty life."""
-        return self.call_action_by(15, 1)
+        return self.call_action("reset_sensor_dirty_life")
