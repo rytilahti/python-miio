@@ -132,6 +132,7 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "zhimi-airpurifier-mc1": AirPurifier,  # mc1
     "zhimi-airpurifier-mb3": AirPurifierMiot,  # mb3 (3/3H)
     "zhimi-airpurifier-ma4": AirPurifierMiot,  # ma4 (3)
+    "zhimi-airpurifier-vb2": AirPurifierMiot,  # vb2 (Pro H)
     "chuangmi-camera-ipc009": ChuangmiCamera,
     "chuangmi-camera-ipc019": ChuangmiCamera,
     "chuangmi-ir-v2": ChuangmiIr,
