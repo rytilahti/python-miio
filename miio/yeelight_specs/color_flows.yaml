@@ -1,0 +1,71 @@
+candle_flicker:
+  count: 0
+  action: 0
+  is_for_color: False
+  flow_expression:
+  - duration: 800
+    mode: 2
+    value: 2700
+    brightness: 50
+  - duration: 800
+    mode: 2
+    value: 2700
+    brightness: 30
+  - duration: 1200
+    mode: 2
+    value: 2700
+    brightness: 80
+  - duration: 800
+    mode: 2
+    value: 2700
+    brightness: 60
+  - duration: 1200
+    mode: 2
+    value: 2700
+    brightness: 90
+  - duration: 2400
+    mode: 2
+    value: 2700
+    brightness: 50
+  - duration: 1200
+    mode: 2
+    value: 2700
+    brightness: 80
+  - duration: 800
+    mode: 2
+    value: 2700
+    brightness: 60
+  - duration: 400
+    mode: 2
+    value: 2700
+    brightness: 70
+romance:
+  count: 0
+  action: 1
+  is_for_color: True
+  flow_expression:
+  - duration: 4000
+    mode: 1
+    value: 5838189
+    brightness: 1
+  - duration: 4000
+    mode: 1
+    value: 6689834
+    brightness: 1
+birthday:
+  count: 0
+  action: 1
+  is_for_color: True
+  flow_expression:
+  - duration: 1996
+    mode: 1
+    value: 14438425
+    brightness: 80
+  - duration: 1996
+    mode: 1
+    value: 14448670
+    brightness: 80
+  - duration: 1996
+    mode: 1
+    value: 11153940
+    brightness: 80

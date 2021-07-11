@@ -1,5 +1,5 @@
 from enum import IntEnum
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 import click
 
@@ -7,6 +7,7 @@ from .click_common import command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import int_to_rgb, rgb_to_int
+from .yeelight_specs import YeelightModelInfo, get_flow_info, get_model_info
 
 
 class YeelightException(DeviceException):
@@ -268,6 +269,10 @@ class Yeelight(Device):
     which however requires enabling the developer mode on the bulbs.
     """
 
+    @property
+    def model_specs(self) -> YeelightModelInfo:
+        return get_model_info(self.info().model)
+
     @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
@@ -303,7 +308,6 @@ class Yeelight(Device):
             "bg_flowing",
             "bg_flow_params",
         ]
-
         values = self.get_properties(properties)
         return YeelightStatus(dict(zip(properties, values)))
 
@@ -327,6 +331,11 @@ class Yeelight(Device):
         4: color flow
         5: moonlight
         """
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
 
         miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_power"
         miio_param = ["on"]
@@ -335,6 +344,14 @@ class Yeelight(Device):
         else:
             miio_param += ["sudden", 0]
         if mode > 0:
+            if (
+                lamp == YeelightSubLightType.Main
+                and not self.model_specs.supports_color
+            ):
+                if mode == 2:
+                    raise YeelightException("RGB color not supported")
+                if mode == 3:
+                    raise YeelightException("HSV color not supported")
             miio_param += [mode]
         return self.send(miio_command, miio_param)
 
@@ -347,6 +364,11 @@ class Yeelight(Device):
     )
     def off(self, transition=0, lamp=YeelightSubLightType.Main):
         """Power off."""
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
         miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_power"
         miio_param = ["off"]
         if transition > 0:
@@ -363,6 +385,11 @@ class Yeelight(Device):
     )
     def set_brightness(self, level, transition=0, lamp=YeelightSubLightType.Main):
         """Set brightness."""
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
         if level < 0 or level > 100:
             raise YeelightException("Invalid brightness: %s" % level)
         miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_bright"
@@ -381,7 +408,15 @@ class Yeelight(Device):
     )
     def set_color_temp(self, level, transition=500, lamp=YeelightSubLightType.Main):
         """Set color temp in kelvin."""
-        if level > 6500 or level < 1700:  # TODO: change to specification base on lamp
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
+        if (
+            level < self.model_specs.color_temp[0]
+            or level > self.model_specs.color_temp[1]
+        ):
             raise YeelightException("Invalid color temperature: %s" % level)
         miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_ct_abx"
         miio_param = [level]
@@ -405,12 +440,20 @@ class Yeelight(Device):
         self, rgb: Tuple[int, int, int], transition=0, lamp=YeelightSubLightType.Main
     ):
         """Set color in RGB."""
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
+        if lamp == YeelightSubLightType.Main and not self.model_specs.supports_color:
+            raise YeelightException("RGB color not supported")
+
         for color in rgb:
             if color < 0 or color > 255:
                 raise YeelightException("Invalid color: %s" % color)
 
         miio_command = SUBLIGHT_PROP_PREFIX[lamp] + "set_rgb"
-        miio_param = [rgb_to_int(rgb)]
+        miio_param: List[Any] = [rgb_to_int(rgb)]
         if transition > 0:
             miio_param += ["smooth", transition]
 
@@ -427,6 +470,13 @@ class Yeelight(Device):
     )
     def set_hsv(self, hue, sat, transition=0, lamp=YeelightSubLightType.Main):
         """Set color in HSV."""
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
+        if lamp == YeelightSubLightType.Main and not self.model_specs.supports_color:
+            raise YeelightException("HSV color not supported")
         if hue < 0 or hue > 359:
             raise YeelightException("Invalid hue: %s" % hue)
         if sat < 0 or sat > 100:
@@ -471,11 +521,15 @@ class Yeelight(Device):
     )
     def toggle(self, lamp=YeelightSubLightType.Main):
         """Toggle bulb state."""
-        if lamp == YeelightSubLightType.Main:
-            return self.send("toggle")
-        elif lamp == YeelightSubLightType.Background:
+        if lamp == YeelightSubLightType.Background:
+            if not self.model_specs.has_background_light:
+                raise YeelightException("Background lamp not supported")
             return self.send("bg_toggle")
-
+        elif (
+            lamp == YeelightSubLightType.Main
+            or not self.model_specs.has_background_light
+        ):
+            return self.send("toggle")
         return self.send("dev_toggle")
 
     @command(
@@ -486,6 +540,11 @@ class Yeelight(Device):
     )
     def set_default(self, lamp=YeelightSubLightType.Main):
         """Set current state as default."""
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
         return self.send(SUBLIGHT_PROP_PREFIX[lamp] + "set_default")
 
     @command(click.argument("table", default="evtRuleTbl"))
@@ -503,7 +562,66 @@ class Yeelight(Device):
         """
         return self.send("ble_dbg_tbl_dump", {"table": table})
 
-    def set_scene(self, scene, *vals):
+    @command(
+        click.argument("name", type=str),
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
+        default_output=format_output("Start {name} color flowing"),
+    )
+    def start_color_flowing(self, name, lamp=YeelightSubLightType.Main):
+        """Start color flowing."""
+        flow = get_flow_info(name)
+        if flow is None:
+            raise YeelightException("Unknown flow")
+        if lamp == YeelightSubLightType.Background:
+            if not self.model_specs.has_background_light:
+                raise YeelightException("Background lamp not supported")
+        elif flow.is_for_color and not self.model_specs.supports_color:
+            raise YeelightException("Lamp not supported this color flow")
+        return self.send(
+            SUBLIGHT_PROP_PREFIX[lamp] + "start_cf",
+            [flow.count, flow.action, flow.expression_string],
+        )
+
+    @command(
+        click.option(
+            "--lamp", type=int, required=False, default=YeelightSubLightType.Main
+        ),
+        default_output=format_output("Stop current color flowing"),
+    )
+    def stop_color_flowing(self, lamp=YeelightSubLightType.Main):
+        """Stop color flowing."""
+        if (
+            lamp == YeelightSubLightType.Background
+            and not self.model_specs.has_background_light
+        ):
+            raise YeelightException("Background lamp not supported")
+        return self.send(SUBLIGHT_PROP_PREFIX[lamp] + "stop_cf")
+
+    @command(
+        click.argument("minutes", type=int),
+        default_output=format_output("Lamp will be turned off after {minutes} minutes"),
+    )
+    def cron_add(self, minutes: int):
+        """Ster cron command on the bulb, now support only off."""
+        return self.send("cron_add", [0, minutes])
+
+    @command(
+        default_output=format_output("Time too lamp will be turned off"),
+    )
+    def cron_get(self):
+        """Get cron status, now support only off."""
+        return self.send("cron_get", [0])
+
+    @command(
+        default_output=format_output("Cancel turning off lamp"),
+    )
+    def cron_del(self):
+        """Stop cron command, now support only off."""
+        return self.send("cron_del", [0])
+
+    def set_scene(self, scene, *vals, lamp=YeelightSubLightType.Main):
         """Set the scene."""
         raise NotImplementedError("Setting the scene is not implemented yet.")
-        # return self.send("set_scene", [scene, *vals])
+        # return self.send(SUBLIGHT_PROP_PREFIX[lamp] + "set_scene", [scene, *vals])
