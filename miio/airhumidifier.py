@@ -185,15 +185,32 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     def depth(self) -> Optional[int]:
-        """The remaining amount of water in percent."""
-
-        # MODEL_HUMIDIFIER_CA1 and MODEL_HUMIDIFIER_CB2
-        # 127 without water tank. 125 = 100% water
-        if self.device_info.model in [MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB2]:
-            return int(int(self.data["depth"]) / 1.25)
-
-        if "depth" in self.data and self.data["depth"] is not None:
+        """Return raw value of depth."""
+        _LOGGER.warning(
+            "The 'depth' property is deprecated and will be removed in the future. Use 'water_level' and 'water_tank_detached' properties instead."
+        )
+        if "depth" in self.data:
             return self.data["depth"]
+        return None
+
+    @property
+    def water_level(self) -> Optional[int]:
+        """Return current water level in percent.
+
+        If water tank is full, depth is 125.
+        """
+        if self.depth is not None and self.depth <= 125:
+            return int(self.depth / 1.25)
+        return None
+
+    @property
+    def water_tank_detached(self) -> Optional[bool]:
+        """True if the water tank is detached.
+
+        If water tank is detached, depth is 127.
+        """
+        if self.data.get("depth") is not None:
+            return self.data["depth"] == 127
         return None
 
     @property
@@ -261,6 +278,8 @@ class AirHumidifier(Device):
             "Trans level: {result.trans_level}\n"
             "Speed: {result.motor_speed}\n"
             "Depth: {result.depth}\n"
+            "Water Level: {result.water_level} %\n"
+            "Water tank detached: {result.water_tank_detached}\n"
             "Dry: {result.dry}\n"
             "Use time: {result.use_time}\n"
             "Hardware version: {result.hardware_version}\n"
