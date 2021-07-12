@@ -33,7 +33,6 @@ _INITIAL_STATE = {
     "error_code": 0,
     "state": RoidmiState.Paused.value,
     "double_clean": 0,
-    "edge_sweep": 0,
     "filter_left_minutes": 154,
     "filter_life_level": 66,
     "forbid_mode": '{"time":[75600,21600,1],"tz":2,"tzs":7200}',
@@ -49,7 +48,6 @@ _INITIAL_STATE = {
     "sweep_type": SweepType.MopAndSweep,
     "timing": '{"time":[[32400,1,3,0,[1,2,3,4,5],0,[12,10],null],[57600,0,1,2,[1,2,3,4,5,6,0],2,[],null]],"tz":2,"tzs":7200}',
     "path_mode": PathMode.Normal,
-    "progress": 57,
     "work_station_freq": 1,
     # "uid": "12345678",
     "volume": 4,
@@ -87,13 +85,12 @@ class TestRoidmiVacuum(TestCase):
         assert status.error == "NoFaults"
         assert status.state == RoidmiState(_INITIAL_STATE["state"])
         assert status.double_clean == _INITIAL_STATE["double_clean"]
-        assert status.edge_sweep == _INITIAL_STATE["edge_sweep"]
         assert str(status.dnd_status) == str(
             status._parse_forbid_mode(_INITIAL_STATE["forbid_mode"])
         )
-        assert status.vacuum_led == _INITIAL_STATE["led_switch"]
+        assert status.led == _INITIAL_STATE["led_switch"]
         assert status.is_lidar_collision_sensor == _INITIAL_STATE["lidar_collision"]
-        assert status.mop_present == _INITIAL_STATE["mop_present"]
+        assert status.is_mop_attached == _INITIAL_STATE["mop_present"]
         assert status.is_muted == _INITIAL_STATE["mute"]
         assert status.station_key == _INITIAL_STATE["station_key"]
         assert status.station_led == _INITIAL_STATE["station_led"]
@@ -101,8 +98,7 @@ class TestRoidmiVacuum(TestCase):
         assert status.sweep_type == SweepType(_INITIAL_STATE["sweep_type"])
         assert status.timing == _INITIAL_STATE["timing"]
         assert status.path_mode == PathMode(_INITIAL_STATE["path_mode"])
-        assert status.progress == _INITIAL_STATE["progress"]
-        assert status.work_station_frequency == _INITIAL_STATE["work_station_freq"]
+        assert status.dust_collection_frequency == _INITIAL_STATE["work_station_freq"]
         assert status.volume == _INITIAL_STATE["volume"]
         assert status.water_level == WaterLevel(_INITIAL_STATE["water_level"])
 

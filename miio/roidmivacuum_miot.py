@@ -48,13 +48,13 @@ _MAPPING: MiotMapping = {
     "clean_counts": {"siid": 8, "piid": 18},
     "clean_time_sec": {"siid": 8, "piid": 19},
     "double_clean": {"siid": 8, "piid": 20},
-    "edge_sweep": {"siid": 8, "piid": 21},
+    # "edge_sweep": {"siid": 8, "piid": 21}, # 2021-07-11: Roidmi Eve is not changing behavior when this bool is changed
     "led_switch": {"siid": 8, "piid": 22},
     "lidar_collision": {"siid": 8, "piid": 23},
     "station_key": {"siid": 8, "piid": 24},
     "station_led": {"siid": 8, "piid": 25},
     "current_audio": {"siid": 8, "piid": 26},
-    "progress": {"siid": 8, "piid": 28},
+    # "progress": {"siid": 8, "piid": 28}, # 2021-07-11: this is part of the spec, but not implemented in Roidme Eve
     "station_type": {"siid": 8, "piid": 29},  # uint32
     # "voice_conf": {"siid": 8, "piid": 30}, # Always return file not exist !!!
     # "switch_status": {"siid": 2, "piid": 10}, # Enum with only one value: Open
@@ -207,13 +207,11 @@ class RoidmiVacuumStatus(DeviceStatus):
             {'did': 'clean_counts', 'siid': 8, 'piid': 18},
             {'did': 'clean_time_sec', 'siid': 8, 'piid': 19},
             {'did': 'double_clean', 'siid': 8, 'piid': 20},
-            {'did': 'edge_sweep', 'siid': 8, 'piid': 21},
             {'did': 'led_switch', 'siid': 8, 'piid': 22}
             {'did': 'lidar_collision', 'siid': 8, 'piid': 23},
             {'did': 'station_key', 'siid': 8, 'piid': 24},
             {'did': 'station_led', 'siid': 8, 'piid': 25},
             {'did': 'current_audio', 'siid': 8, 'piid': 26},
-            {'did': 'progress', 'siid': 8, 'piid': 28},
             {'did': 'station_type', 'siid': 8, 'piid': 29},
             {'did': 'volume', 'siid': 9, 'piid': 1},
             {'did': 'mute', 'siid': 9, 'piid': 2}
@@ -286,13 +284,16 @@ class RoidmiVacuumStatus(DeviceStatus):
             return PathMode.Unknown
 
     @property
-    def mop_present(self) -> bool:
-        """Return True is mop (water box) is installed."""
+    def is_mop_attached(self) -> bool:
+        """Return True if mop is attached."""
         return self.data["mop_present"]
 
     @property
-    def work_station_frequency(self) -> int:
-        """work_station_freq (2 means base dust colect every second time)."""
+    def dust_collection_frequency(self) -> int:
+        """Frequency for emptying the dust bin.
+
+        Example: 2 means the dust bin is emptied every second cleaning.
+        """
         return self.data["work_station_freq"]
 
     @property
@@ -367,13 +368,8 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["double_clean"]
 
     @property
-    def edge_sweep(self) -> bool:
-        """Is edge clean enabled."""
-        return self.data["edge_sweep"]
-
-    @property
-    def vacuum_led(self) -> bool:
-        """Return if led/display on vaccum is on."""
+    def led(self) -> bool:
+        """Return True if led/display on vaccum is on."""
         return self.data["led_switch"]
 
     @property
@@ -409,11 +405,6 @@ class RoidmiVacuumStatus(DeviceStatus):
     def clean_area(self) -> int:
         """Cleaned area in m2."""
         return self.data["clean_area"]
-
-    @property
-    def progress(self) -> str:
-        """Always return None?"""
-        return self.data["progress"]
 
     @property
     def state_code(self) -> int:
@@ -584,24 +575,24 @@ class RoidmiVacuumMiot(MiotDevice):
         """Start cleaning."""
         return self.call_action("start")
 
-    @command(click.argument("roomstr", type=str))
-    def start_room_sweep_unknown(self, roomstr: str) -> None:
-        """Start room cleaning.
+    # @command(click.argument("roomstr", type=str, required=False))
+    # def start_room_sweep_unknown(self, roomstr: str=None) -> None:
+    #     """Start room cleaning.
 
-        FIXME: the syntax of room_sweep is unknown
-        """
-        return self.call_action("start_room_sweep")
+    #     roomstr: empty means start room clean of all rooms. FIXME: the syntax of an non-empty roomstr is still unknown
+    #     """
+    #     return self.call_action("start_room_sweep", roomstr)
 
-    @command(
-        click.argument("sweep_mode", type=EnumType(SweepMode)),
-        click.argument("clean_info", type=str),
-    )
-    def start_sweep_unknown(self, sweep_mode: SweepMode, clean_info: str) -> None:
-        """Start sweep with mode.
+    # @command(
+    # click.argument("sweep_mode", type=EnumType(SweepMode)),
+    # click.argument("clean_info", type=str),
+    # )
+    # def start_sweep_unknown(self, sweep_mode: SweepMode, clean_info: str=None) -> None:
+    #     """Start sweep with mode.
 
-        FIXME: the syntax of start sweep with mode is unknown
-        """
-        return self.call_action("start_sweep", [sweep_mode.value, clean_info])
+    #     FIXME: the syntax of start_sweep is unknown
+    #     """
+    #     return self.call_action("start_sweep", [sweep_mode.value, clean_info])
 
     @command()
     def stop(self) -> None:
@@ -624,7 +615,7 @@ class RoidmiVacuumMiot(MiotDevice):
         return self.set_property("station_led", on)
 
     @command(click.argument("on", type=bool))
-    def set_vacuum_led(self, on: bool):
+    def set_led(self, on: bool):
         """Enable vacuum led."""
         return self.set_property("led_switch", on)
 
@@ -653,10 +644,13 @@ class RoidmiVacuumMiot(MiotDevice):
         """Set path_mode."""
         return self.set_property("path_mode", path_mode.value)
 
-    @command(click.argument("work_station_freq", type=int))
-    def work_station_frequency(self, work_station_freq: int):
-        """Set work_station_freq (2 means base dust colect every second time)."""
-        return self.set_property("work_station_freq", work_station_freq)
+    @command(click.argument("dust_collection_frequency", type=int))
+    def set_dust_collection_frequency(self, dust_collection_frequency: int):
+        """Set frequency for emptying the dust bin.
+
+        Example: 2 means the dust bin is emptied every second cleaning.
+        """
+        return self.set_property("work_station_freq", dust_collection_frequency)
 
     @command(click.argument("timing", type=str))
     def set_timing(self, timing: str):
@@ -724,11 +718,6 @@ class RoidmiVacuumMiot(MiotDevice):
         """Set double clean (True/False)."""
         return self.set_property("double_clean", double_clean)
 
-    @command(click.argument("edge_sweep", type=bool))
-    def set_edge_sweep(self, edge_sweep: bool):
-        """Set edge_sweep (True/False)."""
-        return self.set_property("edge_sweep", edge_sweep)
-
     @command(click.argument("lidar_collision", type=bool))
     def set_lidar_collision_sensor(self, lidar_collision: bool):
         """When ON, the robot will use lidar as the main detection sensor to help reduce
@@ -740,13 +729,13 @@ class RoidmiVacuumMiot(MiotDevice):
         """Start base dust collection."""
         return self.call_action("start_station_dust_collection")
 
-    @command(click.argument("voice", type=str))
-    def set_voice_unknown(self, voice: str) -> None:
-        """Set voice.
+    # @command(click.argument("voice", type=str))
+    #     def set_voice_unknown(self, voice: str) -> None:
+    #     """Set voice.
 
-        FIXME: the syntax of voice is unknown (assumed to be json format)
-        """
-        return self.call_action("set_voice", voice)
+    #     FIXME: the syntax of voice is unknown (assumed to be json format)
+    #     """
+    #     return self.call_action("set_voice", voice)
 
     @command()
     def reset_filter_life(self) -> None:
