@@ -35,9 +35,9 @@ MIOT_MAPPING = {
         "find": {"siid": 6, "aiid": 1},
         "start": {"siid": 2, "aiid": 1},
         "stop": {"siid": 2, "aiid": 2},
-        "reset_main_brush_life_level":  {"siid": 14, "aiid": 1},
-        "reset_side_brush_life_level":  {"siid": 15, "aiid": 1},
-        "reset_filter_life_level":  {"siid": 11, "aiid": 1}
+        "reset_main_brush_life_level": {"siid": 14, "aiid": 1},
+        "reset_side_brush_life_level": {"siid": 15, "aiid": 1},
+        "reset_filter_life_level": {"siid": 11, "aiid": 1},
     }
 }
 
@@ -54,15 +54,21 @@ ERROR_CODES = {
     9: "Dustbin Error",
     10: "Charging Error",
     11: "No Water Error",
-    12: "Pick Up Error"
+    12: "Pick Up Error",
 }
+
+
 class G1ChargeState(Enum):
     """Charging Status"""
+
     Discharging = 0
     Charging = 1
     FullyCharged = 2
+
+
 class G1State(Enum):
     """Vacuum Status"""
+
     Idle = 1
     Sweeping = 2
     Paused = 3
@@ -70,44 +76,57 @@ class G1State(Enum):
     Charging = 5
     GoCharging = 6
 
+
 class G1Consumable(Enum):
     """Consumables"""
+
     MainBrush = "main_brush_life_level"
     SideBrush = "side_brush_life_level"
     Filter = "filter_life_level"
 
+
 class G1VacuumMode(Enum):
     """Vacuum Mode"""
+
     GlobalClean = 1
     SpotClean = 2
     Wiping = 3
 
+
 class G1WaterLevel(Enum):
     """Water Flow Level"""
+
     Level1 = 1
     Level2 = 2
     Level3 = 3
 
+
 class G1FanSpeed(Enum):
     """Fan speeds"""
+
     Mute = 0
     Standard = 1
     Medium = 2
     High = 3
 
+
 class G1Languages(Enum):
     """Languages"""
+
     Chinese = 0
     English = 1
 
+
 class G1MopState(Enum):
     """Mop Status"""
+
     Off = 0
     On = 1
 
 
 class G1Status(DeviceStatus):
     """Container for status reports from Mijia Vacuum G1."""
+
     """Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
         [
             {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
@@ -127,6 +146,7 @@ class G1Status(DeviceStatus):
             {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0},
             {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
             ]"""
+
     def __init__(self, data):
         self.data = data
 
@@ -221,6 +241,7 @@ class G1Status(DeviceStatus):
 
 class G1CleaningSummary(DeviceStatus):
     """Container for cleaning summary from Mijia Vacuum G1."""
+
     """Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
         [
           {'did': 'total_clean_area', 'siid': 9, 'piid': 3, 'code': 0, 'value': 0},
@@ -253,13 +274,13 @@ class G1Vacuum(MiotDevice):
     mapping = MIOT_MAPPING[MIJIA_VACUUM_V2]
 
     def __init__(
-            self,
-            ip: str = None,
-            token: str = None,
-            start_id: int = 0,
-            debug: int = 0,
-            lazy_discover: bool = True,
-            model: str = MIJIA_VACUUM_V2,
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
+        model: str = MIJIA_VACUUM_V2,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
         self.model = model
@@ -282,7 +303,7 @@ class G1Vacuum(MiotDevice):
             "Filter Life Level: {result.filter_life_level}%\n"
             "Filter Life Time: {result.filter_time_left}\n"
             "Clean Area: {result.clean_area}\n"
-            "Clean Time: {result.clean_time}\n"
+            "Clean Time: {result.clean_time}\n",
         )
     )
     def status(self) -> G1Status:
@@ -290,9 +311,9 @@ class G1Vacuum(MiotDevice):
 
         return G1Status(
             {
+                # max_properties limited to 10 to avoid "Checksum error"
+                # messages from the device.
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                             # max_properties limmit to 10 to avoid "Checksum error"
-                             # messages from the device.
                 for prop in self.get_properties_for_mapping(max_properties=10)
             }
         )
@@ -302,7 +323,7 @@ class G1Vacuum(MiotDevice):
             "",
             "Total Cleaning Count: {result.total_clean_count}\n"
             "Total Cleaning Time: {result.total_clean_time}\n"
-            "Total Cleaning Area: {result.total_clean_area}\n"
+            "Total Cleaning Area: {result.total_clean_area}\n",
         )
     )
     def cleaning_summary(self) -> G1CleaningSummary:
@@ -310,13 +331,12 @@ class G1Vacuum(MiotDevice):
 
         return G1CleaningSummary(
             {
+                # max_properties limited to 10 to avoid "Checksum error"
+                # messages from the device.
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                             # max_properties limmit to 10 to avoid "Checksum error"
-                             # messages from the device.
                 for prop in self.get_properties_for_mapping(max_properties=10)
             }
         )
-
 
     @command()
     def home(self):
