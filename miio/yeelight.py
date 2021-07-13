@@ -7,7 +7,7 @@ from .click_common import command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import int_to_rgb, rgb_to_int
-from .yeelight_specs import YeelightModelInfo, get_flow_info, get_model_info
+from .yeelight_specs.containers import YeelightModelInfo, get_flow_info, get_model_info
 
 
 class YeelightException(DeviceException):
