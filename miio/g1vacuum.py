@@ -361,7 +361,7 @@ class G1Vacuum(MiotDevice):
     @command(click.argument("consumable", type=G1Consumable))
     def consumable_reset(self, consumable: G1Consumable):
         """Reset consumable information.
-           CONSUMABLE=main_brush_life_level|side_brush_life_level|filter_life_level"""
+        CONSUMABLE=main_brush_life_level|side_brush_life_level|filter_life_level"""
         if consumable.name == G1Consumable.MainBrush:
             return self.call_action("reset_main_brush_life_level")
         elif consumable.name == G1Consumable.SideBrush:
