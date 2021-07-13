@@ -1,7 +1,9 @@
 import logging
 from datetime import timedelta
 from enum import Enum
+
 import click
+
 from .click_common import EnumType, command, format_output
 from .miot_device import DeviceStatus, MiotDevice
 
@@ -59,7 +61,7 @@ ERROR_CODES = {
 
 
 class G1ChargeState(Enum):
-    """Charging Status"""
+    """Charging Status."""
 
     Discharging = 0
     Charging = 1
@@ -67,7 +69,7 @@ class G1ChargeState(Enum):
 
 
 class G1State(Enum):
-    """Vacuum Status"""
+    """Vacuum Status."""
 
     Idle = 1
     Sweeping = 2
@@ -78,7 +80,7 @@ class G1State(Enum):
 
 
 class G1Consumable(Enum):
-    """Consumables"""
+    """Consumables."""
 
     MainBrush = "main_brush_life_level"
     SideBrush = "side_brush_life_level"
@@ -86,7 +88,7 @@ class G1Consumable(Enum):
 
 
 class G1VacuumMode(Enum):
-    """Vacuum Mode"""
+    """Vacuum Mode."""
 
     GlobalClean = 1
     SpotClean = 2
@@ -94,7 +96,7 @@ class G1VacuumMode(Enum):
 
 
 class G1WaterLevel(Enum):
-    """Water Flow Level"""
+    """Water Flow Level."""
 
     Level1 = 1
     Level2 = 2
@@ -102,7 +104,7 @@ class G1WaterLevel(Enum):
 
 
 class G1FanSpeed(Enum):
-    """Fan speeds"""
+    """Fan speeds."""
 
     Mute = 0
     Standard = 1
@@ -111,14 +113,14 @@ class G1FanSpeed(Enum):
 
 
 class G1Languages(Enum):
-    """Languages"""
+    """Languages."""
 
     Chinese = 0
     English = 1
 
 
 class G1MopState(Enum):
-    """Mop Status"""
+    """Mop Status."""
 
     Off = 0
     On = 1
@@ -345,12 +347,12 @@ class G1Vacuum(MiotDevice):
 
     @command()
     def start(self) -> None:
-        """Start Cleaning"""
+        """Start Cleaning."""
         return self.call_action("start")
 
     @command()
     def stop(self):
-        """Stop Cleaning"""
+        """Stop Cleaning."""
         return self.call_action("stop")
 
     @command()
@@ -361,7 +363,9 @@ class G1Vacuum(MiotDevice):
     @command(click.argument("consumable", type=G1Consumable))
     def consumable_reset(self, consumable: G1Consumable):
         """Reset consumable information.
-        CONSUMABLE=main_brush_life_level|side_brush_life_level|filter_life_level"""
+
+        CONSUMABLE=main_brush_life_level|side_brush_life_level|filter_life_level
+        """
         if consumable.name == G1Consumable.MainBrush:
             return self.call_action("reset_main_brush_life_level")
         elif consumable.name == G1Consumable.SideBrush:
