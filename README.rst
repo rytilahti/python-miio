@@ -98,6 +98,7 @@ Supported devices
 -  Xiaomi Mijia STYJ02YM (Viomi)
 -  Xiaomi Mijia 1C STYTJ01ZHM (Dreame)
 -  Xiaomi Mi Home (Mijia) G1 Robot Vacuum Mop MJSTG1 
+-  Xiaomi Roidmi Eve
 -  Xiaomi Mi Smart WiFi Socket
 -  Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port)
 -  Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports)

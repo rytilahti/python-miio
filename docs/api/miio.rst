@@ -43,6 +43,7 @@ Submodules
    miio.cooker
    miio.curtain_youpin
    miio.device
+   miio.deviceinfo
    miio.discovery
    miio.dreamevacuum_miot
    miio.exceptions
@@ -65,6 +66,7 @@ Submodules
    miio.powerstrip
    miio.protocol
    miio.pwzn_relay
+   miio.roidmivacuum_miot
    miio.scishare_coffeemaker
    miio.toiletlid
    miio.updater
