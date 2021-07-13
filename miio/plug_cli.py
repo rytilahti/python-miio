@@ -26,6 +26,10 @@ def cli(ctx, ip: str, token: str, debug: int):
     else:
         logging.basicConfig(level=logging.INFO)
 
+    _LOGGER.warning(
+        "This script is deprecated and will be removed soon, use `miiocli chuangmiplug` instead"
+    )
+
     # if we are scanning, we do not try to connect.
     if ctx.invoked_subcommand == "discover":
         return
