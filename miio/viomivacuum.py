@@ -486,6 +486,16 @@ class ViomiVacuum(Device):
         self.manual_seqnum = -1
         self._cache: Dict[str, Any] = {"edge_state": None, "rooms": {}, "maps": {}}
 
+    def get_properties(
+        self, properties, *, property_getter="get_prop", max_properties=None
+    ):
+        result = {}
+        for prop in properties:
+            value = self.send(property_getter, [prop])
+            result[prop] = value[0] if len(value) else None
+
+        return list(result.values())
+
     @command(
         default_output=format_output(
             "\n",
