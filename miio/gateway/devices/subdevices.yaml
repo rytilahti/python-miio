@@ -144,7 +144,7 @@
       default: 153
     - property: cct_max
       unit: cct
-      default: 500
+      default: 370
 
 - zigbee_id: ikea.light.led1545g12
   model: LED1545G12
