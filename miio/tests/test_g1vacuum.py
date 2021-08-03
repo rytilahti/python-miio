@@ -67,9 +67,9 @@ class TestG1Vacuum(TestCase):
         assert status.total_clean_area == _INITIAL_STATE["total_clean_area"]
         assert status.total_clean_time == _INITIAL_STATE["total_clean_time"]
         assert status.total_clean_count == _INITIAL_STATE["total_clean_count"]
-        assert status.charge_state == ChargingState(_INITIAL_STATE["charge_state"])
+        assert status.charge_state == G1ChargeState(_INITIAL_STATE["charge_state"])
         assert repr(status.charge_state) == repr(
-            ChargingState(_INITIAL_STATE["charge_state"])
+            G1ChargeState(_INITIAL_STATE["charge_state"])
         )
         assert status.fan_speed == G1FanSpeed(_INITIAL_STATE["fan_speed"])
         assert repr(status.fan_speed) == repr(G1FanSpeed(_INITIAL_STATE["fan_speed"]))
