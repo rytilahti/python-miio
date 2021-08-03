@@ -169,6 +169,7 @@ Home Assistant (custom)
 -  `Xiaomi Mi Smart Rice Cooker <https://github.com/syssi/xiaomi_cooker>`__
 -  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
 -  `Xiaomi MIoT Devices <https://github.com/ha0y/xiaomi_miot_raw>`__
+-  `Xiaomi Miot Auto <https://github.com/al-one/hass-xiaomi-miot>`__
 
 Other projects
 ^^^^^^^^^^^^^^
