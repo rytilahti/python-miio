@@ -36,7 +36,8 @@ _INITIAL_STATE = {
     "total_clean_area": 0,
     "total_clean_time": 0,
     "total_clean_count": 0,
- }
+}
+
 
 class DummyG1Vacuum(DummyMiotDevice, G1Vacuum):
     def __init__(self, *args, **kwargs):
@@ -71,21 +72,15 @@ class TestG1Vacuum(TestCase):
             ChargingState(_INITIAL_STATE["charge_state"])
         )
         assert status.fan_speed == G1FanSpeed(_INITIAL_STATE["fan_speed"])
-        assert repr(status.fan_speed) == repr(
-            G1FanSpeed(_INITIAL_STATE["fan_speed"])
-        )
+        assert repr(status.fan_speed) == repr(G1FanSpeed(_INITIAL_STATE["fan_speed"]))
         assert status.state == G1State(_INITIAL_STATE["state"])
-        assert repr(status.state) == repr(
-            G1State(_INITIAL_STATE["state"])
-        )
+        assert repr(status.state) == repr(G1State(_INITIAL_STATE["state"]))
         assert status.operating_mode == G1VacuumMode(_INITIAL_STATE["operating_mode"])
         assert repr(status.operating_mode) == repr(
             G1VacuumMode(_INITIAL_STATE["operating_mode"])
         )
         assert status.mop_state == G1MopState(_INITIAL_STATE["mop_state"])
-        assert repr(status.mop_state) == repr(
-            G1MopState(_INITIAL_STATE["mop_state"])
-        )
+        assert repr(status.mop_state) == repr(G1MopState(_INITIAL_STATE["mop_state"]))
         assert status.water_level == G1WaterLevel(_INITIAL_STATE["water_level"])
         assert repr(status.water_level) == repr(
             G1WaterLevel(_INITIAL_STATE["water_level"])
