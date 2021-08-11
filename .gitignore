@@ -10,3 +10,4 @@ __pycache__
 .coverage
 
 docs/_build/
+.vscode/settings.json
