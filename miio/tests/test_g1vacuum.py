@@ -2,13 +2,13 @@ from unittest import TestCase
 
 import pytest
 
-from miio import G1Vacuum
 from miio.g1vacuum import (
     G1ChargeState,
     G1FanSpeed,
-    G1State,
-    G1VacuumMode,
     G1MopState,
+    G1State,
+    G1Vacuum,
+    G1VacuumMode,
     G1WaterLevel,
 )
 
