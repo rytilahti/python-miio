@@ -153,7 +153,7 @@ class ChuangmiIr(Device):
         else:
             command_type, command, *command_args = command.split(":")
 
-        arg_types = [int]
+        arg_types = [int, int]
         if len(command_args) > len(arg_types):
             raise ChuangmiIrException("Invalid command arguments count")
 
