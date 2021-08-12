@@ -73,6 +73,7 @@ class AirPurifierMiotException(DeviceException):
 
 
 class OperationMode(enum.Enum):
+    Unknown = -1
     Auto = 0
     Silent = 1
     Favorite = 2
@@ -110,7 +111,12 @@ class BasicAirPurifierMiotStatus(DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Current operation mode."""
-        return OperationMode(self.data["mode"])
+        mode = self.data["mode"]
+        try:
+            return OperationMode(mode)
+        except ValueError:
+            _LOGGER.debug("Unknown mode: %s", mode)
+            return OperationMode.Unknown
 
     @property
     def buzzer(self) -> Optional[bool]:
