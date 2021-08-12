@@ -271,13 +271,18 @@ class Listener(zeroconf.ServiceListener):
         )
         return None
 
-    def add_service(self, zeroconf, type, name):
-        info = zeroconf.get_service_info(type, name)
+    def add_service(self, zeroconf: "zeroconf.Zeroconf", type_: str, name: str) -> None:
+        """Callback for discovery responses."""
+        info = zeroconf.get_service_info(type_, name)
         addr = get_addr_from_info(info)
 
         if addr not in self.found_devices:
             dev = self.check_and_create_device(info, addr)
-            self.found_devices[addr] = dev
+            if dev is not None:
+                self.found_devices[addr] = dev
+
+    def update_service(self, zc: "zeroconf.Zeroconf", type_: str, name: str) -> None:
+        """Callback for state updates, which we ignore for now."""
 
 
 class Discovery:
