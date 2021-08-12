@@ -99,6 +99,7 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
     "roborock-vacuum-m1s": Vacuum,
+    "roborock-vacuum-a10": Vacuum,
     "chuangmi-plug-m1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M1),
     "chuangmi-plug-m3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M3),
     "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
