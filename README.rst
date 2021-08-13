@@ -97,6 +97,7 @@ Supported devices
 -  Xiaomi Mijia 360 1080p
 -  Xiaomi Mijia STYJ02YM (Viomi)
 -  Xiaomi Mijia 1C STYTJ01ZHM (Dreame)
+-  Xiaomi Roidmi Eve
 -  Xiaomi Mi Smart WiFi Socket
 -  Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port)
 -  Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports)
@@ -168,6 +169,7 @@ Home Assistant (custom)
 -  `Xiaomi Mi Smart Rice Cooker <https://github.com/syssi/xiaomi_cooker>`__
 -  `Xiaomi Raw Sensor <https://github.com/syssi/xiaomi_raw>`__
 -  `Xiaomi MIoT Devices <https://github.com/ha0y/xiaomi_miot_raw>`__
+-  `Xiaomi Miot Auto <https://github.com/al-one/hass-xiaomi-miot>`__
 
 Other projects
 ^^^^^^^^^^^^^^

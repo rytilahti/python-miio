@@ -126,10 +126,22 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return self.data["target_humidity"]
 
     @property
-    def water_level(self) -> int:
-        """Return current water level."""
-        # 127 without water tank. 120 = 100% water
-        return int(self.data["water_level"] / 1.20)
+    def water_level(self) -> Optional[int]:
+        """Return current water level in percent.
+
+        If water tank is full, depth is 125.
+        """
+        if self.data["water_level"] <= 125:
+            return int(self.data["water_level"] / 1.25)
+        return None
+
+    @property
+    def water_tank_detached(self) -> bool:
+        """True if the water tank is detached.
+
+        If water tank is detached, water_level is 127.
+        """
+        return self.data["water_level"] == 127
 
     @property
     def dry(self) -> Optional[bool]:
@@ -245,6 +257,7 @@ class AirHumidifierMiot(MiotDevice):
             "Temperature: {result.temperature} °C\n"
             "Temperature: {result.fahrenheit} °F\n"
             "Water Level: {result.water_level} %\n"
+            "Water tank detached: {result.water_tank_detached}\n"
             "Mode: {result.mode}\n"
             "LED brightness: {result.led_brightness}\n"
             "Buzzer: {result.buzzer}\n"

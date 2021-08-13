@@ -72,15 +72,17 @@ class DeviceInfo:
 
     @property
     def mac_address(self) -> Optional[str]:
-        """MAC address if available."""
+        """MAC address, if available."""
         return self.data.get("mac")
 
     @property
     def ip_address(self) -> Optional[str]:
+        """IP address, if available."""
         return self.network_interface.get("localIp")
 
     @property
     def token(self) -> Optional[str]:
+        """Return the current device token."""
         return self.data.get("token")
 
     @property

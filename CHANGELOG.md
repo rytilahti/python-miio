@@ -1,5 +1,78 @@
 # Change Log
 
+## [0.5.7](https://github.com/rytilahti/python-miio/tree/0.5.7) (2021-08-13)
+
+This release improves several integrations (including yeelight, airpurifier_miot, dreamevacuum, rockrobo) and adds support for Roidmi Eve vacuums, see the full changelog for more details.
+
+Note that this will likely be the last release on the 0.5 series before breaking the API to reorganize the project structure and provide common device type specific interfaces.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.6...0.5.7)
+
+**Implemented enhancements:**
+
+- Add setting for carpet avoidance to vacuums [\#1040](https://github.com/rytilahti/python-miio/issues/1040)
+- Add  optional "Length" parameter to chuangmi\_ir.py play\_raw\(\).  for "chuangmi.remote.v2" to send some command properly  [\#820](https://github.com/rytilahti/python-miio/issues/820)
+- Add update\_service callback for zeroconf listener [\#1112](https://github.com/rytilahti/python-miio/pull/1112) ([rytilahti](https://github.com/rytilahti))
+- Add rockrobo-vacuum-a10 to mdns discovery list [\#1110](https://github.com/rytilahti/python-miio/pull/1110) ([rytilahti](https://github.com/rytilahti))
+- Added additional OperatingModes and FaultStatuses for dreamevacuum [\#1090](https://github.com/rytilahti/python-miio/pull/1090) ([StarterCraft](https://github.com/StarterCraft))
+- yeelight: add dump\_ble\_debug [\#1053](https://github.com/rytilahti/python-miio/pull/1053) ([rytilahti](https://github.com/rytilahti))
+- Convert codebase to pass mypy checks [\#1046](https://github.com/rytilahti/python-miio/pull/1046) ([rytilahti](https://github.com/rytilahti))
+- Add optional length parameter to play\_\* for chuangmi\_ir [\#1043](https://github.com/rytilahti/python-miio/pull/1043) ([Dozku](https://github.com/Dozku))
+- Add features for newer vacuums \(eg Roborock S7\) [\#1039](https://github.com/rytilahti/python-miio/pull/1039) ([fettlaus](https://github.com/fettlaus))
+
+**Fixed bugs:**
+
+- air purifier unknown oprating mode [\#1106](https://github.com/rytilahti/python-miio/issues/1106)
+- Missing Listener method for current zeroconf library [\#1101](https://github.com/rytilahti/python-miio/issues/1101)
+- DeviceError when trying to turn on my Xiaomi Mi Smart Pedestal Fan [\#1100](https://github.com/rytilahti/python-miio/issues/1100)
+- Unable to discover vacuum cleaner: Xiaomi Mi Robot Vacuum Mop \(aka dreame.vacuum.mc1808\) [\#1086](https://github.com/rytilahti/python-miio/issues/1086)
+- Crashes if no hw\_ver present [\#1084](https://github.com/rytilahti/python-miio/issues/1084)
+- Viomi S9 does not expose hv\_wer [\#1082](https://github.com/rytilahti/python-miio/issues/1082)
+- set\_rotate FanP10 sends the wrong command [\#1076](https://github.com/rytilahti/python-miio/issues/1076)
+- Vacuum 1C STYTJ01ZHM \(dreame.vacuum.mc1808\) is not update, 0% battery [\#1069](https://github.com/rytilahti/python-miio/issues/1069)
+- Requirement is pinned for python-miio 0.5.6: defusedxml\>=0.6,\<0.7 [\#1062](https://github.com/rytilahti/python-miio/issues/1062)
+- Problem with dmaker.fan.1c [\#1036](https://github.com/rytilahti/python-miio/issues/1036)
+- Yeelight Smart Dual Control Module \(yeelink.switch.sw1\) - discovered by HA but can not configure [\#1033](https://github.com/rytilahti/python-miio/issues/1033)
+- Update-firmware not working for Roborock S5 [\#1000](https://github.com/rytilahti/python-miio/issues/1000)
+- Roborock S7  [\#994](https://github.com/rytilahti/python-miio/issues/994)
+- airpurifier\_miot: return OperationMode.Unknown if mode is unknown [\#1111](https://github.com/rytilahti/python-miio/pull/1111) ([rytilahti](https://github.com/rytilahti))
+- Fix set\_rotate for dmaker.fan.p10 \(\#1076\) [\#1078](https://github.com/rytilahti/python-miio/pull/1078) ([pooyashahidi](https://github.com/pooyashahidi))
+
+**Closed issues:**
+
+- Xiaomi Roborock S6 MaxV [\#1108](https://github.com/rytilahti/python-miio/issues/1108)
+- dreame.vacuum.mb1808 unsupported [\#1104](https://github.com/rytilahti/python-miio/issues/1104)
+- The new way to get device token [\#1088](https://github.com/rytilahti/python-miio/issues/1088)
+- Add Air Conditioning Partner 2 support [\#1058](https://github.com/rytilahti/python-miio/issues/1058)
+- Please add support for the Mijia 1G Vacuum! [\#1057](https://github.com/rytilahti/python-miio/issues/1057)
+- ble\_dbg\_tbl\_dump user ack timeout [\#1051](https://github.com/rytilahti/python-miio/issues/1051)
+- Roborock S7 can't be added to Home Assistant [\#1041](https://github.com/rytilahti/python-miio/issues/1041)
+- Cannot get status from my zhimi.airpurifier.mb3\(Airpurifier 3H\) [\#1037](https://github.com/rytilahti/python-miio/issues/1037)
+- Xiaomi Mi Robot \(viomivacuum\), command stability [\#800](https://github.com/rytilahti/python-miio/issues/800)
+- \[meta\] list of miot-enabled devices [\#627](https://github.com/rytilahti/python-miio/issues/627)
+
+**Merged pull requests:**
+
+- Fix cct\_max for ZNLDP12LM [\#1098](https://github.com/rytilahti/python-miio/pull/1098) ([mouth4war](https://github.com/mouth4war))
+- deprecate old helper scripts in favor of miiocli [\#1096](https://github.com/rytilahti/python-miio/pull/1096) ([rytilahti](https://github.com/rytilahti))
+- Add link to the Home Assistant custom component hass-xiaomi-miot [\#1095](https://github.com/rytilahti/python-miio/pull/1095) ([al-one](https://github.com/al-one))
+- Update chuangmi\_ir.py to accept 2 arguments \(frequency and length\) [\#1091](https://github.com/rytilahti/python-miio/pull/1091) ([mpsOxygen](https://github.com/mpsOxygen))
+- Add `water_level` and `water_tank_detached` property for humidifiers, deprecate `depth` [\#1089](https://github.com/rytilahti/python-miio/pull/1089) ([bieniu](https://github.com/bieniu))
+- DeviceInfo refactor, do not crash on missing fields [\#1083](https://github.com/rytilahti/python-miio/pull/1083) ([rytilahti](https://github.com/rytilahti))
+- Calculate `depth` for zhimi.humidifier.ca1 [\#1077](https://github.com/rytilahti/python-miio/pull/1077) ([bieniu](https://github.com/bieniu))
+- increase socket buffer size 1024-\>4096 [\#1075](https://github.com/rytilahti/python-miio/pull/1075) ([starkillerOG](https://github.com/starkillerOG))
+- Loosen defusedxml version requirement [\#1073](https://github.com/rytilahti/python-miio/pull/1073) ([rytilahti](https://github.com/rytilahti))
+- Added support for Roidmi Eve [\#1072](https://github.com/rytilahti/python-miio/pull/1072) ([martin9000andersen](https://github.com/martin9000andersen))
+- airpurifier\_miot: Move favorite\_rpm from MB4 to Basic [\#1070](https://github.com/rytilahti/python-miio/pull/1070) ([SylvainPer](https://github.com/SylvainPer))
+- fix error on GATEWAY\_MODEL\_ZIG3 when no zigbee devices connected [\#1065](https://github.com/rytilahti/python-miio/pull/1065) ([starkillerOG](https://github.com/starkillerOG))
+- add fan speed enum 106 as "Auto" for Roborock S6 MaxV [\#1063](https://github.com/rytilahti/python-miio/pull/1063) ([RubenKelevra](https://github.com/RubenKelevra))
+- Add additional mode of Air Purifier Super 2 [\#1054](https://github.com/rytilahti/python-miio/pull/1054) ([daxingplay](https://github.com/daxingplay))
+- Fix home\(\) for Roborock S7 [\#1050](https://github.com/rytilahti/python-miio/pull/1050) ([whig0](https://github.com/whig0))
+- Added Roborock s7 to troubleshooting guide [\#1045](https://github.com/rytilahti/python-miio/pull/1045) ([Claustn](https://github.com/Claustn))
+- Add github flow for ci [\#1044](https://github.com/rytilahti/python-miio/pull/1044) ([rytilahti](https://github.com/rytilahti))
+- Improve Yeelight support \(expose more properties, add support for secondary lights\) [\#1035](https://github.com/rytilahti/python-miio/pull/1035) ([Kirmas](https://github.com/Kirmas))
+- README.md improvements [\#1032](https://github.com/rytilahti/python-miio/pull/1032) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.5.6](https://github.com/rytilahti/python-miio/tree/0.5.6) (2021-05-05)
 
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.5.2...0.5.6)

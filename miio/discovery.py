@@ -99,6 +99,7 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
     "roborock-vacuum-m1s": Vacuum,
+    "roborock-vacuum-a10": Vacuum,
     "chuangmi-plug-m1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M1),
     "chuangmi-plug-m3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M3),
     "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
@@ -270,13 +271,18 @@ class Listener(zeroconf.ServiceListener):
         )
         return None
 
-    def add_service(self, zeroconf, type, name):
-        info = zeroconf.get_service_info(type, name)
+    def add_service(self, zeroconf: "zeroconf.Zeroconf", type_: str, name: str) -> None:
+        """Callback for discovery responses."""
+        info = zeroconf.get_service_info(type_, name)
         addr = get_addr_from_info(info)
 
         if addr not in self.found_devices:
             dev = self.check_and_create_device(info, addr)
-            self.found_devices[addr] = dev
+            if dev is not None:
+                self.found_devices[addr] = dev
+
+    def update_service(self, zc: "zeroconf.Zeroconf", type_: str, name: str) -> None:
+        """Callback for state updates, which we ignore for now."""
 
 
 class Discovery:

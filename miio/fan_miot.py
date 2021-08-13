@@ -380,7 +380,17 @@ class FanMiot(MiotDevice):
         default_output=format_output("Rotating the fan to the {direction}"),
     )
     def set_rotate(self, direction: MoveDirection):
-        return self.set_property("set_move", [direction.value])
+        """Rotate fan to given direction."""
+        # Values for: P9,P10,P11,P15,P18,...
+        # { "value": 0, "description": "NONE" },
+        # { "value": 1, "description": "LEFT" },
+        # { "value": 2, "description": "RIGHT" }
+        value = 0
+        if direction == MoveDirection.Left:
+            value = 1
+        elif direction == MoveDirection.Right:
+            value = 2
+        return self.set_property("set_move", value)
 
 
 class FanP9(FanMiot):

@@ -73,6 +73,7 @@ class AirPurifierMiotException(DeviceException):
 
 
 class OperationMode(enum.Enum):
+    Unknown = -1
     Auto = 0
     Silent = 1
     Favorite = 2
@@ -110,7 +111,12 @@ class BasicAirPurifierMiotStatus(DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Current operation mode."""
-        return OperationMode(self.data["mode"])
+        mode = self.data["mode"]
+        try:
+            return OperationMode(mode)
+        except ValueError:
+            _LOGGER.debug("Unknown mode: %s", mode)
+            return OperationMode.Unknown
 
     @property
     def buzzer(self) -> Optional[bool]:
@@ -139,6 +145,11 @@ class BasicAirPurifierMiotStatus(DeviceStatus):
     def motor_speed(self) -> int:
         """Speed of the motor."""
         return self.data["motor_speed"]
+
+    @property
+    def favorite_rpm(self) -> Optional[int]:
+        """Return favorite rpm level."""
+        return self.data.get("favorite_rpm")
 
 
 class AirPurifierMiotStatus(BasicAirPurifierMiotStatus):
@@ -291,11 +302,6 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
     def led_brightness_level(self) -> int:
         """Return brightness level."""
         return self.data["led_brightness_level"]
-
-    @property
-    def favorite_rpm(self) -> int:
-        """Return favorite rpm level."""
-        return self.data["favorite_rpm"]
 
 
 class BasicAirPurifierMiot(MiotDevice):
