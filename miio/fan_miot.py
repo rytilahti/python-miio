@@ -345,10 +345,7 @@ class FanMiot(MiotDevice):
     )
     def set_oscillate(self, oscillate: bool):
         """Set oscillate on/off."""
-        if oscillate:
-            return self.set_property("swing_mode", True)
-        else:
-            return self.set_property("swing_mode", False)
+        return self.set_property("swing_mode", oscillate)
 
     @command(
         click.argument("led", type=bool),
@@ -358,10 +355,7 @@ class FanMiot(MiotDevice):
     )
     def set_led(self, led: bool):
         """Turn led on/off."""
-        if led:
-            return self.set_property("light", True)
-        else:
-            return self.set_property("light", False)
+        return self.set_property("light", led)
 
     @command(
         click.argument("buzzer", type=bool),
@@ -371,10 +365,7 @@ class FanMiot(MiotDevice):
     )
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
-        if buzzer:
-            return self.set_property("buzzer", True)
-        else:
-            return self.set_property("buzzer", False)
+        return self.set_property("buzzer", buzzer)
 
     @command(
         click.argument("lock", type=bool),
