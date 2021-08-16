@@ -136,6 +136,8 @@ class PowerStripStatus(DeviceStatus):
 class PowerStrip(Device):
     """Main class representing the smart power strip."""
 
+    _supported_models = [MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2]
+
     def __init__(
         self,
         ip: str = None,
@@ -145,12 +147,7 @@ class PowerStrip(Device):
         lazy_discover: bool = True,
         model: str = MODEL_POWER_STRIP_V1,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_POWER_STRIP_V1
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(

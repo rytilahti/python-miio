@@ -8,6 +8,8 @@ from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import int_to_rgb, rgb_to_int
 
+SUPPORTED_MODELS = ["yeelink.light.color1"]
+
 
 class YeelightException(DeviceException):
     pass
@@ -37,6 +39,7 @@ class YeelightMode(IntEnum):
 
 class YeelightSubLight(DeviceStatus):
     def __init__(self, data, type):
+
         self.data = data
         self.type = type
 
@@ -255,6 +258,8 @@ class Yeelight(Device):
     (https://yeelight.readthedocs.io/en/latest/),
     which however requires enabling the developer mode on the bulbs.
     """
+
+    _supported_models = SUPPORTED_MODELS
 
     @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:

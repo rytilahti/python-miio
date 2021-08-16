@@ -36,6 +36,7 @@ _INITIAL_STATE = {
 
 class DummyAirConditionerMiot(DummyMiotDevice, AirConditionerMiot):
     def __init__(self, *args, **kwargs):
+        self._model = "xiaomi.aircondition.mc1"
         self.state = _INITIAL_STATE
         self.return_values = {
             "get_prop": self._get_state,

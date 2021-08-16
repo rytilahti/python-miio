@@ -41,10 +41,13 @@ class MiotDevice(Device):
         lazy_discover: bool = True,
         timeout: int = None,
         *,
+        model: str = None,
         mapping: MiotMapping = None,
     ):
         """Overloaded to accept keyword-only `mapping` parameter."""
-        super().__init__(ip, token, start_id, debug, lazy_discover, timeout)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout, model=model
+        )
 
         if mapping is None and not hasattr(self, "mapping"):
             raise DeviceException(

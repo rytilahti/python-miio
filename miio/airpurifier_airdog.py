@@ -109,12 +109,7 @@ class AirDogX3(Device):
         lazy_discover: bool = True,
         model: str = MODEL_AIRDOG_X3,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_AIRDOG_X3
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(
@@ -200,12 +195,7 @@ class AirDogX5(AirDogX3):
         lazy_discover: bool = True,
         model: str = MODEL_AIRDOG_X5,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_AIRDOG_X5
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
 
 class AirDogX7SM(AirDogX3):
@@ -218,9 +208,4 @@ class AirDogX7SM(AirDogX3):
         lazy_discover: bool = True,
         model: str = MODEL_AIRDOG_X7SM,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_AIRDOG_X7SM
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)

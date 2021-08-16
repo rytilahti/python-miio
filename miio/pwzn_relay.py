@@ -108,12 +108,7 @@ class PwznRelay(Device):
         lazy_discover: bool = True,
         model: str = MODEL_PWZN_RELAY_APPLE,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_PWZN_RELAY_APPLE
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(default_output=format_output("", "on_count: {result.on_count}\n"))
     def status(self) -> PwznRelayStatus:

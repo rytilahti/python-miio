@@ -7,7 +7,7 @@ import math
 import os
 import pathlib
 import time
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Type, Union
 
 import click
 import pytz
@@ -20,7 +20,7 @@ from .click_common import (
     LiteralParamType,
     command,
 )
-from .device import Device
+from .device import Device, DeviceInfo
 from .exceptions import DeviceException, DeviceInfoUnavailableException
 from .vacuumcontainers import (
     CarpetModeStatus,
@@ -53,14 +53,18 @@ class Consumable(enum.Enum):
     SensorDirty = "sensor_dirty_time"
 
 
-class FanspeedV1(enum.Enum):
+class FanspeedEnum(enum.Enum):
+    pass
+
+
+class FanspeedV1(FanspeedEnum):
     Silent = 38
     Standard = 60
     Medium = 77
     Turbo = 90
 
 
-class FanspeedV2(enum.Enum):
+class FanspeedV2(FanspeedEnum):
     Silent = 101
     Standard = 102
     Medium = 103
@@ -69,14 +73,14 @@ class FanspeedV2(enum.Enum):
     Auto = 106
 
 
-class FanspeedV3(enum.Enum):
+class FanspeedV3(FanspeedEnum):
     Silent = 38
     Standard = 60
     Medium = 75
     Turbo = 100
 
 
-class FanspeedE2(enum.Enum):
+class FanspeedE2(FanspeedEnum):
     # Original names from the app: Gentle, Silent, Standard, Strong, Max
     Gentle = 41
     Silent = 50
@@ -85,7 +89,7 @@ class FanspeedE2(enum.Enum):
     Turbo = 100
 
 
-class FanspeedS7(enum.Enum):
+class FanspeedS7(FanspeedEnum):
     Silent = 101
     Standard = 102
     Medium = 103
@@ -119,20 +123,36 @@ class CarpetCleaningMode(enum.Enum):
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S6 = "roborock.vacuum.s6"
-ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 ROCKROBO_S7 = "roborock.vacuum.a15"
+ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
+ROCKROBO_E2 = "roborock.vacuum.e2"
+
+SUPPORTED_MODELS = [
+    ROCKROBO_V1,
+    ROCKROBO_S5,
+    ROCKROBO_S6,
+    ROCKROBO_S7,
+    ROCKROBO_S6_MAXV,
+    ROCKROBO_E2,
+]
 
 
 class Vacuum(Device):
     """Main class representing the vacuum."""
 
+    _supported_models = SUPPORTED_MODELS
+
     def __init__(
-        self, ip: str, token: str = None, start_id: int = 0, debug: int = 0
-    ) -> None:
-        super().__init__(ip, token, start_id, debug)
+        self,
+        ip: str,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        *,
+        model=None
+    ):
+        super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
-        self.model = None
-        self._fanspeeds = FanspeedV1
 
     @command()
     def start(self):
@@ -169,11 +189,37 @@ class Vacuum(Device):
 
         return self.start()
 
+    @command(skip_autodetect=True)
+    def info(self, *, force=False):
+        """Return info about the device.
+
+        This is overrides the base class info to account for gen1 devices that do not
+        respond to info query properly when not connected to the cloud.
+        """
+        try:
+            info = super().info(force=force)
+            return info
+        except (TypeError, DeviceInfoUnavailableException):
+            # cloud-blocked vacuums will not return proper payloads
+
+            dummy_v1 = DeviceInfo(
+                {
+                    "model": ROCKROBO_V1,
+                    "token": self.token,
+                    "netif": {"localIp": self.ip},
+                    "fw_ver": "1.0_dummy",
+                }
+            )
+
+            self._info = dummy_v1
+            _LOGGER.debug(
+                "Unable to query info, falling back to dummy %s", dummy_v1.model
+            )
+            return self._info
+
     @command()
     def home(self):
         """Stop cleaning and return home."""
-        if self.model is None:
-            self._autodetect_model()
 
         PAUSE_BEFORE_HOME = [
             ROCKROBO_V1,
@@ -526,53 +572,39 @@ class Vacuum(Device):
         """Return fan speed."""
         return self.send("get_custom_mode")[0]
 
-    def _autodetect_model(self):
-        """Detect the model of the vacuum.
-
-        For the moment this is used only for the fanspeeds, but that could be extended
-        to cover other supported features.
-        """
-        try:
-            info = self.info()
-            self.model = info.model
-        except (TypeError, DeviceInfoUnavailableException):
-            # cloud-blocked vacuums will not return proper payloads
-            self._fanspeeds = FanspeedV1
-            self.model = ROCKROBO_V1
-            _LOGGER.warning("Unable to query model, falling back to %s", self.model)
-            return
-        finally:
-            _LOGGER.debug("Model: %s", self.model)
-
-        if self.model == ROCKROBO_V1:
-            _LOGGER.debug("Got robov1, checking for firmware version")
-            fw_version = info.firmware_version
-            version, build = fw_version.split("_")
-            version = tuple(map(int, version.split(".")))
-            if version >= (3, 5, 8):
-                self._fanspeeds = FanspeedV3
-            elif version == (3, 5, 7):
-                self._fanspeeds = FanspeedV2
-            else:
-                self._fanspeeds = FanspeedV1
-        elif self.model == "roborock.vacuum.e2":
-            self._fanspeeds = FanspeedE2
-        elif self.model == ROCKROBO_S7:
-            self._fanspeeds = FanspeedS7
-        else:
-            self._fanspeeds = FanspeedV2
-
-        _LOGGER.debug(
-            "Using new fanspeed mapping %s for %s", self._fanspeeds, info.model
-        )
-
     @command()
     def fan_speed_presets(self) -> Dict[str, int]:
         """Return dictionary containing supported fan speeds."""
-        if self.model is None:
-            self._autodetect_model()
 
-        return {x.name: x.value for x in list(self._fanspeeds)}
+        def _enum_as_dict(cls):
+            return {x.name: x.value for x in list(cls)}
+
+        if self.model is None:
+            return _enum_as_dict(FanspeedV1)
+
+        fanspeeds: Type[FanspeedEnum] = FanspeedV1
+
+        if self.model == ROCKROBO_V1:
+            _LOGGER.debug("Got robov1, checking for firmware version")
+            fw_version = self.info().firmware_version
+            version, build = fw_version.split("_")
+            version = tuple(map(int, version.split(".")))
+            if version >= (3, 5, 8):
+                fanspeeds = FanspeedV3
+            elif version == (3, 5, 7):
+                fanspeeds = FanspeedV2
+            else:
+                fanspeeds = FanspeedV1
+        elif self.model == ROCKROBO_E2:
+            fanspeeds = FanspeedE2
+        elif self.model == ROCKROBO_S7:
+            self._fanspeeds = FanspeedS7
+        else:
+            fanspeeds = FanspeedV2
+
+        _LOGGER.debug("Using fanspeeds %s for %s", fanspeeds, self.model)
+
+        return _enum_as_dict(fanspeeds)
 
     @command()
     def sound_info(self):

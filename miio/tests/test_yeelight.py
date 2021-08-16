@@ -10,6 +10,8 @@ from .dummies import DummyDevice
 
 class DummyLight(DummyDevice, Yeelight):
     def __init__(self, *args, **kwargs):
+        self._model = "missing.model.yeelight"
+
         self.return_values = {
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),

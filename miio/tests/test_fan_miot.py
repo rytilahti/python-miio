@@ -19,7 +19,7 @@ from .dummies import DummyMiotDevice
 
 class DummyFanMiot(DummyMiotDevice, FanMiot):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_FAN_P9
+        self._model = MODEL_FAN_P9
         self.state = {
             "power": True,
             "mode": 0,
@@ -178,7 +178,7 @@ class TestFanMiot(TestCase):
 class DummyFanMiotP10(DummyFanMiot, FanMiot):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
-        self.model = MODEL_FAN_P10
+        self._model = MODEL_FAN_P10
 
 
 @pytest.fixture(scope="class")
@@ -222,7 +222,7 @@ class TestFanMiotP10(TestCase):
 class DummyFanMiotP11(DummyFanMiot, FanMiot):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
-        self.model = MODEL_FAN_P11
+        self._model = MODEL_FAN_P11
 
 
 @pytest.fixture(scope="class")
@@ -237,7 +237,7 @@ class TestFanMiotP11(TestFanMiotP10, TestCase):
 
 class DummyFan1C(DummyMiotDevice, Fan1C):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_FAN_1C
+        self._model = MODEL_FAN_1C
         self.state = {
             "power": True,
             "mode": 0,

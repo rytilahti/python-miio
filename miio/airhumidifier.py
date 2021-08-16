@@ -255,12 +255,7 @@ class AirHumidifier(Device):
         lazy_discover: bool = True,
         model: str = MODEL_HUMIDIFIER_V1,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self.model = model
-        else:
-            self.model = MODEL_HUMIDIFIER_V1
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
         # TODO: convert to use generic device info in the future
         self.device_info: Optional[DeviceInfo] = None

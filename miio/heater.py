@@ -136,12 +136,7 @@ class Heater(Device):
         lazy_discover: bool = True,
         model: str = MODEL_HEATER_ZA1,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in SUPPORTED_MODELS:
-            self.model = model
-        else:
-            self.model = MODEL_HEATER_ZA1
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(

@@ -2,7 +2,7 @@ import inspect
 import logging
 from enum import Enum
 from pprint import pformat as pf
-from typing import Any, Optional  # noqa: F401
+from typing import Any, List, Optional  # noqa: F401
 
 import click
 
@@ -54,6 +54,7 @@ class Device(metaclass=DeviceGroupMeta):
 
     retry_count = 3
     timeout = 5
+    _supported_models: List[str] = []
 
     def __init__(
         self,
@@ -63,9 +64,13 @@ class Device(metaclass=DeviceGroupMeta):
         debug: int = 0,
         lazy_discover: bool = True,
         timeout: int = None,
+        *,
+        model: str = None,
     ) -> None:
         self.ip = ip
         self.token = token
+        self._model = model
+        self._info = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -92,6 +97,7 @@ class Device(metaclass=DeviceGroupMeta):
         :param dict parameters: Parameters to send
         :param int retry_count: How many times to retry on error
         :param dict extra_parameters: Extra top-level parameters
+        :param str model: Force model to avoid autodetection
         """
         retry_count = retry_count if retry_count is not None else self.retry_count
         return self._protocol.send(
@@ -121,25 +127,58 @@ class Device(metaclass=DeviceGroupMeta):
             "Model: {result.model}\n"
             "Hardware version: {result.hardware_version}\n"
             "Firmware version: {result.firmware_version}\n",
-        )
+        ),
+        skip_autodetect=True,
     )
-    def info(self) -> DeviceInfo:
-        """Get miIO protocol information from the device.
+    def info(self, *, skip_cache=False) -> DeviceInfo:
+        """Get (and cache) miIO protocol information from the device.
 
         This includes information about connected wlan network, and hardware and
         software versions.
+
+        :param skip_cache bool: Skip the cache
         """
+        if self._info is not None and not skip_cache:
+            return self._info
+
+        return self._fetch_info()
+
+    def _fetch_info(self):
+        """Perform miIO.info query on the device and cache the result."""
         try:
-            return DeviceInfo(self.send("miIO.info"))
+            devinfo = DeviceInfo(self.send("miIO.info"))
+            self._info = devinfo
+            _LOGGER.debug("Detected model %s", devinfo.model)
+            if devinfo.model not in self.supported_models:
+                _LOGGER.warning(
+                    "Found an unsupported model '%s' for class '%s'. If this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
+                    self.model,
+                    self.__class__.__name__,
+                )
+
+            return devinfo
         except PayloadDecodeException as ex:
             raise DeviceInfoUnavailableException(
                 "Unable to request miIO.info from the device"
             ) from ex
 
     @property
-    def raw_id(self):
+    def raw_id(self) -> int:
         """Return the last used protocol sequence id."""
         return self._protocol.raw_id
+
+    @property
+    def supported_models(self) -> List[str]:
+        """Return a list of supported models."""
+        return self._supported_models
+
+    @property
+    def model(self) -> str:
+        """Return device model."""
+        if self._model is not None:
+            return self._model
+
+        return self.info().model
 
     def update(self, url: str, md5: str):
         """Start an OTA update."""
