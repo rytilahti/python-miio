@@ -6,6 +6,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
 from .fan_common import FanException, LedBrightness, MoveDirection, OperationMode
+from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -462,6 +463,7 @@ class Fan(Device):
         return self.send("set_poweroff_time", [seconds])
 
 
+@deprecated('use Fan(.., model="zhimi.fan.v2")')
 class FanV2(Fan):
     def __init__(
         self,
@@ -474,6 +476,7 @@ class FanV2(Fan):
         super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_V2)
 
 
+@deprecated('use Fan(.., model="zhimi.fan.sa1")')
 class FanSA1(Fan):
     def __init__(
         self,
@@ -486,6 +489,7 @@ class FanSA1(Fan):
         super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_SA1)
 
 
+@deprecated('use Fan(.., model="zhimi.fan.za1")')
 class FanZA1(Fan):
     def __init__(
         self,
@@ -498,6 +502,7 @@ class FanZA1(Fan):
         super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA1)
 
 
+@deprecated('use Fan(.., model="zhimi.fan.za3")')
 class FanZA3(Fan):
     def __init__(
         self,
@@ -510,6 +515,7 @@ class FanZA3(Fan):
         super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA3)
 
 
+@deprecated('use Fan(.., model="zhimi.fan.za4")')
 class FanZA4(Fan):
     def __init__(
         self,
