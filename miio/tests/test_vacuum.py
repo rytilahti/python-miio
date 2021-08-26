@@ -233,9 +233,9 @@ class TestVacuum(TestCase):
             "send",
             return_value=[[1488347071, 1488347123, 16, 0, 0, 0]],
         ):
-            assert self.device.clean_details(
-                123123, return_list=False
-            ).duration == datetime.timedelta(seconds=16)
+            assert self.device.clean_details(123123).duration == datetime.timedelta(
+                seconds=16
+            )
 
     def test_history_details_dict(self):
         with patch.object(
@@ -256,9 +256,9 @@ class TestVacuum(TestCase):
                 }
             ],
         ):
-            assert self.device.clean_details(
-                123123, return_list=False
-            ).duration == datetime.timedelta(seconds=950)
+            assert self.device.clean_details(123123).duration == datetime.timedelta(
+                seconds=950
+            )
 
     def test_history_empty(self):
         with patch.object(

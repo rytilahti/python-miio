@@ -406,35 +406,20 @@ class Vacuum(Device):
             return None
 
         last_clean_id = history.ids.pop(0)
-        return self.clean_details(last_clean_id, return_list=False)
+        return self.clean_details(last_clean_id)
 
     @command(
         click.argument("id_", type=int, metavar="ID"),
-        click.argument("return_list", type=bool, default=False),
     )
     def clean_details(
-        self, id_: int, return_list=True
+        self, id_: int
     ) -> Union[List[CleaningDetails], Optional[CleaningDetails]]:
         """Return details about specific cleaning."""
         details = self.send("get_clean_record", [id_])
 
         if not details:
-            _LOGGER.warning("No cleaning record found for id %s" % id_)
+            _LOGGER.warning("No cleaning record found for id %s", id_)
             return None
-
-        if return_list:
-            _LOGGER.warning(
-                "This method will be returning the details "
-                "without wrapping them into a list in the "
-                "near future. The current behavior can be "
-                "kept by passing return_list=True and this "
-                "warning will be removed when the default gets "
-                "changed."
-            )
-            return [CleaningDetails(entry) for entry in details]
-
-        if len(details) > 1:
-            _LOGGER.warning("Got multiple clean details, returning the first")
 
         res = CleaningDetails(details.pop())
         return res
