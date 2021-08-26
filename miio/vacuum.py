@@ -447,9 +447,13 @@ class Vacuum(Device):
     @command()
     def timer(self) -> List[Timer]:
         """Return a list of timers."""
-        timers = list()
+        timers: List[Timer] = list()
+        res = self.send("get_timer", [""])
+        if not res:
+            return timers
+
         timezone = pytz.timezone(self.timezone())
-        for rec in self.send("get_timer", [""]):
+        for rec in res:
             try:
                 timers.append(Timer(rec, timezone=timezone))
             except Exception as ex:
