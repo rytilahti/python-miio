@@ -199,8 +199,8 @@ class AirHumidifierStatus(DeviceStatus):
 
         If water tank is full, depth is 125.
         """
-        if self.depth is not None and self.depth <= 125:
-            return int(self.depth / 1.25)
+        if self.data.get("depth") is not None and self.data["depth"] <= 125:
+            return int(self.data["depth"] / 1.25)
         return None
 
     @property
