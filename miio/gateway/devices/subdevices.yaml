@@ -618,6 +618,22 @@
       unit: Watt
       get: get_property_exp
 
+- zigbee_id: lumi.plug.mmeu01
+  model: ZNCZ04LM
+  type_id: -2
+  name: Plug
+  type: Switch
+  class: Switch
+  getter: get_prop_plug
+  setter: toggle_plug
+  properties:
+    - property: neutral_0 # 'on' / 'off'
+      name: status_ch0
+      get: get_property_exp
+    - property: load_power
+      unit: Watt
+      get: get_property_exp
+
 - zigbee_id: lumi.ctrl_86plug.v1
   model: QBCZ11LM
   type_id: 17
