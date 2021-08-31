@@ -179,6 +179,7 @@ This is a list of other projects around the xiaomi ecosystem that you can find i
 -  `dustcloud <https://github.com/dgiese/dustcloud>`__ (reverse engineering and rooting xiaomi devices)
 -  `Valetudo <https://github.com/Hypfer/Valetudo>`__ (cloud free vacuum firmware)
 -  `micloud <https://github.com/Squachen/micloud>`__ (library to access xiaomi cloud services, can be used to obtain device tokens)
+-  `micloudfaker <https://github.com/unrelentingtech/micloudfaker>`__ (dummy cloud server, can be used to fix powerstrip status requests when without internet access)
 -  `Your project here? Feel free to open a PR! <https://github.com/rytilahti/python-miio/pulls>`__
 
 .. |Chat| image:: https://img.shields.io/matrix/python-miio-chat:matrix.org
