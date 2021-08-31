@@ -171,9 +171,14 @@ Home Assistant (custom)
 -  `Xiaomi MIoT Devices <https://github.com/ha0y/xiaomi_miot_raw>`__
 -  `Xiaomi Miot Auto <https://github.com/al-one/hass-xiaomi-miot>`__
 
-Other projects
-^^^^^^^^^^^^^^
+Other related projects
+----------------------
 
+This is a list of other projects around the xiaomi ecosystem that you can find interesting. Feel free to submit more related projects.
+
+-  `dustcloud <https://github.com/dgiese/dustcloud>`__ (reverse engineering and rooting xiaomi devices)
+-  `Valetudo <https://github.com/Hypfer/Valetudo>`__ (cloud free vacuum firmware)
+-  `micloud <https://github.com/Squachen/micloud>`__ (library to access xiaomi cloud services, can be used to obtain device tokens)
 -  `Your project here? Feel free to open a PR! <https://github.com/rytilahti/python-miio/pulls>`__
 
 .. |Chat| image:: https://img.shields.io/matrix/python-miio-chat:matrix.org
