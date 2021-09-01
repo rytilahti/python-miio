@@ -1,5 +1,27 @@
 # Change Log
 
+## [0.5.8](https://github.com/rytilahti/python-miio/tree/0.5.8) (2021-09-01)
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.7...0.5.8)
+
+**Implemented enhancements:**
+
+- vacuum: skip timezone call if there are no timers [\#1122](https://github.com/rytilahti/python-miio/pull/1122) ([rytilahti](https://github.com/rytilahti))
+
+**Closed issues:**
+
+- Smart Mi Standing fan 3 \(Xiaomi Pedestal Fan 3, zhimi.fan.za5\) [\#788](https://github.com/rytilahti/python-miio/issues/788)
+
+**Merged pull requests:**
+
+- readme: add micloudfaker to list of related projects [\#1127](https://github.com/rytilahti/python-miio/pull/1127) ([unrelentingtech](https://github.com/unrelentingtech))
+- Update readme with section for related projects [\#1126](https://github.com/rytilahti/python-miio/pull/1126) ([rytilahti](https://github.com/rytilahti))
+- add lumi.plug.mmeu01 - ZNCZ04LM [\#1125](https://github.com/rytilahti/python-miio/pull/1125) ([starkillerOG](https://github.com/starkillerOG))
+- Do not use deprecated `depth` property [\#1124](https://github.com/rytilahti/python-miio/pull/1124) ([bieniu](https://github.com/bieniu))
+- vacuum: remove long-deprecated 'return\_list' for clean\_details [\#1123](https://github.com/rytilahti/python-miio/pull/1123) ([rytilahti](https://github.com/rytilahti))
+- deprecate Fan{V2,SA1,ZA1,ZA3,ZA4} in favor of model kwarg [\#1119](https://github.com/rytilahti/python-miio/pull/1119) ([rytilahti](https://github.com/rytilahti))
+- Add support for Smartmi Standing Fan 3 \(zhimi.fan.za5\) [\#1087](https://github.com/rytilahti/python-miio/pull/1087) ([rnovatorov](https://github.com/rnovatorov))
+
 ## [0.5.7](https://github.com/rytilahti/python-miio/tree/0.5.7) (2021-08-13)
 
 This release improves several integrations (including yeelight, airpurifier_miot, dreamevacuum, rockrobo) and adds support for Roidmi Eve vacuums, see the full changelog for more details.
