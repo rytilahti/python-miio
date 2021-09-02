@@ -29,9 +29,6 @@ who have helped to extend this to cover not only the vacuum cleaner.
     discovery
     new_devices
     vacuum
-    plug
-    ceil
-    eyecare
     yeelight
     API <api/miio>
     troubleshooting
