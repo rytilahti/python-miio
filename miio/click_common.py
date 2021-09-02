@@ -117,7 +117,12 @@ class GlobalContextObject:
 
 class DeviceGroupMeta(type):
 
-    device_classes: Set[Type] = set()
+    _device_classes: Set[Type] = set()
+
+    @property
+    def device_classes(self) -> Set[Type]:
+        """Return the list of registered device classes."""
+        return self._device_classes
 
     def __new__(mcs, name, bases, namespace):
         commands = {}
@@ -150,7 +155,7 @@ class DeviceGroupMeta(type):
             namespace["get_device_group"] = classmethod(get_device_group)
 
         cls = super().__new__(mcs, name, bases, namespace)
-        mcs.device_classes.add(cls)
+        mcs._device_classes.add(cls)
         return cls
 
 
