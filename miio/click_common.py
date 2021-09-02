@@ -117,7 +117,7 @@ class GlobalContextObject:
 
 class DeviceGroupMeta(type):
 
-    device_classes: Set[Type] = set()
+    _device_classes: Set[Type] = set()
 
     def __new__(mcs, name, bases, namespace):
         commands = {}
@@ -150,7 +150,7 @@ class DeviceGroupMeta(type):
             namespace["get_device_group"] = classmethod(get_device_group)
 
         cls = super().__new__(mcs, name, bases, namespace)
-        mcs.device_classes.add(cls)
+        mcs._device_classes.add(cls)
         return cls
 
 

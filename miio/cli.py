@@ -39,7 +39,7 @@ def cli(ctx, debug: int, output: str):
     ctx.obj = GlobalContextObject(debug=debug, output=output_func)
 
 
-for device_class in DeviceGroupMeta.device_classes:
+for device_class in DeviceGroupMeta._device_classes:
     cli.add_command(device_class.get_device_group())
 
 
