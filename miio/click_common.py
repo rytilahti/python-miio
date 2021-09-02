@@ -119,12 +119,6 @@ class DeviceGroupMeta(type):
 
     _device_classes: Set[Type] = set()
 
-    @property
-    @classmethod
-    def device_classes(cls) -> Set[Type]:
-        """Return the list of registered device classes."""
-        return cls._device_classes
-
     def __new__(mcs, name, bases, namespace):
         commands = {}
 
