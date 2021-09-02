@@ -34,7 +34,6 @@ Submodules
    miio.alarmclock
    miio.aqaracamera
    miio.ceil
-   miio.ceil_cli
    miio.chuangmi_camera
    miio.chuangmi_ir
    miio.chuangmi_plug
@@ -59,10 +58,8 @@ Submodules
    miio.miot_device
    miio.philips_bulb
    miio.philips_eyecare
-   miio.philips_eyecare_cli
    miio.philips_moonlight
    miio.philips_rwread
-   miio.plug_cli
    miio.powerstrip
    miio.protocol
    miio.pwzn_relay
