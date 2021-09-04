@@ -41,7 +41,7 @@ class SubDevice:
         if model_info is None:
             model_info = {}
         self._model_info = model_info
-        self._battery_powered = model_info.get("battery", True)
+        self._battery_powered = model_info.get("battery_powered", True)
         self._battery = None
         self._voltage = None
         self._fw_ver = dev_info.fw_ver

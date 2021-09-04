@@ -127,7 +127,7 @@
   name: Smart bulb E27
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -153,7 +153,7 @@
   name: Ikea smart bulb E27 white
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -179,7 +179,7 @@
   name: Ikea smart bulb E27 white
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -205,7 +205,7 @@
   name: Ikea smart bulb E12 white
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -231,7 +231,7 @@
   name: Ikea smart bulb GU10 white
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -257,7 +257,7 @@
   name: Ikea smart bulb E27 white
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -283,7 +283,7 @@
   name: Ikea smart bulb GU10 white
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -309,7 +309,7 @@
   name: Ikea smart bulb E12 white
   type: LightBulb
   class: LightBulb
-  battery: false
+  battery_powered: false
   properties:
     - property: power_status # 'on' / 'off'
       name: status
@@ -482,7 +482,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -498,7 +498,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -511,7 +511,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -527,7 +527,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -546,7 +546,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -562,7 +562,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -581,7 +581,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -603,7 +603,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -626,7 +626,7 @@
   class: Switch
   getter: get_prop_plug
   setter: toggle_plug
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -643,7 +643,7 @@
   class: Switch
   getter: get_prop_plug
   setter: toggle_plug
-  battery: false
+  battery_powered: false
   properties:
     - property: neutral_0 # 'on' / 'off'
       name: status_ch0
@@ -659,7 +659,7 @@
   type: Switch
   class: Switch
   setter: toggle_plug
-  battery: false
+  battery_powered: false
   properties:
     - property: channel_0 # 'on' / 'off'
       name: status_ch0
@@ -672,7 +672,7 @@
   type: Switch
   class: Switch
   setter: toggle_plug
-  battery: false
+  battery_powered: false
   properties:
     - property: channel_0 # 'on' / 'off'
       name: status_ch0
@@ -688,7 +688,7 @@
   type: Switch
   class: Switch
   setter: toggle_ctrl_neutral
-  battery: false
+  battery_powered: false
   properties:
     - property: channel_0 # 'on' / 'off'
       name: status_ch0
