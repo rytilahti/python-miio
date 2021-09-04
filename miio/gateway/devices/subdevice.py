@@ -210,7 +210,7 @@ class SubDevice:
     def get_battery(self):
         """Update the battery level, if available."""
         if not self._battery_powered:
-            return self._battery
+            return None
 
         if self._gw.model not in [GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3]:
             self._battery = self.send("get_battery").pop()
