@@ -207,9 +207,13 @@ class SubDevice:
         return self.send("remove_device")
 
     @command()
-    def get_battery(self):
+    def get_battery(self) -> Optional[int]:
         """Update the battery level, if available."""
         if not self._battery_powered:
+            _LOGGER.debug(
+                "%s is not battery powered, get_battery not supported",
+                self.name,
+            )
             return None
 
         if self._gw.model not in [GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3]:
@@ -222,9 +226,13 @@ class SubDevice:
         return self._battery
 
     @command()
-    def get_voltage(self):
+    def get_voltage(self) -> Optional[float]:
         """Update the battery voltage, if available."""
         if not self._battery_powered:
+            _LOGGER.debug(
+                "%s is not battery powered, get_voltage not supported",
+                self.name,
+            )
             return None
 
         if self._gw.model in [GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3]:
