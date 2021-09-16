@@ -179,7 +179,7 @@ class SubDevice:
             ).pop()
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while fetching properties %s: %s" % (properties)
+                "Got an exception while fetching properties %s" % (properties)
             ) from ex
 
         if len(list(properties)) != len(response):
