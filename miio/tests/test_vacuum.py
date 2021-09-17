@@ -281,7 +281,9 @@ class TestVacuum(TestCase):
         """Test the info functionality for non-cloud connected device."""
         from miio.exceptions import DeviceInfoUnavailableException
 
-        with patch("miio.Device.info", side_effect=DeviceInfoUnavailableException()):
+        with patch(
+            "miio.Device._fetch_info", side_effect=DeviceInfoUnavailableException()
+        ):
             assert self.device.info().model == "rockrobo.vacuum.v1"
 
     def test_carpet_cleaning_mode(self):

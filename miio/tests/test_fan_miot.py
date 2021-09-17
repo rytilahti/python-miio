@@ -364,7 +364,7 @@ class TestFan1C(TestCase):
 
 class DummyFanZA5(DummyMiotDevice, FanZA5):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_FAN_ZA5
+        self._model = MODEL_FAN_ZA5
         self.state = {
             "anion": True,
             "buzzer": False,
