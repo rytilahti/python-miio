@@ -681,7 +681,7 @@ class FanZA5(MiotDevice):
         model: str = MODEL_FAN_ZA5,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
-        self.model = model
+        self._model = model
 
     @command(
         default_output=format_output(
