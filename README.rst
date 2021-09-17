@@ -55,6 +55,12 @@ You can get the list of available commands for any given module by passing `--he
       add_timer                Add a timer.
       ..
 
+Each command invocation will automatically detect the device model necessary for some actions by querying the device.
+You can avoid this by specifying the model manually::
+
+    miiocli vacuum --model roborock.vacuum.s5 --ip <ip> --token <token> start
+
+
 API usage
 ---------
 All functionality is accessible through the `miio` module::
@@ -65,7 +71,15 @@ All functionality is accessible through the `miio` module::
     vac.start()
 
 Each separate device type inherits from `miio.Device`
-(and in case of MIoT devices, `miio.MiotDevice`) which provides common API.
+(and in case of MIoT devices, `miio.MiotDevice`) which provides a common API.
+
+Each command invocation will automatically detect (and cache) the device model necessary for some actions
+by querying the device.
+You can avoid this by specifying the model manually::
+
+    from miio import Vacuum
+
+    vac = Vacuum("<ip address>", "<token>", model="roborock.vacuum.s5")
 
 Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/api/miio.html>`__ for more information.
 
@@ -175,7 +189,8 @@ Home Assistant (custom)
 Other related projects
 ----------------------
 
-This is a list of other projects around the xiaomi ecosystem that you can find interesting. Feel free to submit more related projects.
+This is a list of other projects around the xiaomi ecosystem that you can find interesting.
+Feel free to submit more related projects.
 
 -  `dustcloud <https://github.com/dgiese/dustcloud>`__ (reverse engineering and rooting xiaomi devices)
 -  `Valetudo <https://github.com/Hypfer/Valetudo>`__ (cloud free vacuum firmware)
