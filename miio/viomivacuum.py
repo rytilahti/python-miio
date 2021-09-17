@@ -480,9 +480,15 @@ class ViomiVacuum(Device):
     retry_count = 10
 
     def __init__(
-        self, ip: str, token: str = None, start_id: int = 0, debug: int = 0
+        self,
+        ip: str,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        *,
+        model: str = None,
     ) -> None:
-        super().__init__(ip, token, start_id, debug)
+        super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
         self._cache: Dict[str, Any] = {"edge_state": None, "rooms": {}, "maps": {}}
 

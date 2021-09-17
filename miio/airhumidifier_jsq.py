@@ -133,19 +133,6 @@ class AirHumidifierStatus(DeviceStatus):
 class AirHumidifierJsq(Device):
     """Implementation of Xiaomi Zero Fog Humidifier: shuii.humidifier.jsq001."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_HUMIDIFIER_JSQ001,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-        if model not in AVAILABLE_PROPERTIES:
-            self._model = MODEL_HUMIDIFIER_JSQ001
-
     @command(
         default_output=format_output(
             "",
@@ -178,7 +165,9 @@ class AirHumidifierJsq(Device):
         # status[7]: water level state (0: ok, 1: add water)
         # status[8]: lid state (0: ok, 1: lid is opened)
 
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_JSQ001]
+        )
         if len(properties) != len(values):
             _LOGGER.error(
                 "Count (%s) of requested properties (%s) does not match the "
