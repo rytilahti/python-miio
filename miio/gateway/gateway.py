@@ -84,8 +84,10 @@ class Gateway(Device):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        *,
+        model: str = None,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
         self._alarm = Alarm(parent=self)
         self._radio = Radio(parent=self)
@@ -133,13 +135,6 @@ class Gateway(Device):
         if self._info is None:
             self._info = self.info()
         return self._info.mac_address
-
-    @property
-    def model(self):
-        """Return the zigbee model of the gateway."""
-        if self._info is None:
-            self._info = self.info()
-        return self._info.model
 
     @property
     def subdevice_model_map(self):

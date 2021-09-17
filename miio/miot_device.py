@@ -50,9 +50,7 @@ class MiotDevice(Device):
         )
 
         if mapping is None and not hasattr(self, "mapping"):
-            raise DeviceException(
-                "Neither the class nor the parameter defines the mapping"
-            )
+            _LOGGER.warning("Neither the class nor the parameter defines the mapping")
 
         if mapping is not None:
             self.mapping = mapping

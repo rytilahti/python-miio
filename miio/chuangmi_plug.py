@@ -89,22 +89,6 @@ class ChuangmiPlugStatus(DeviceStatus):
 class ChuangmiPlug(Device):
     """Main class representing the Chuangmi Plug."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_CHUANGMI_PLUG_M1,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-
-        if model in AVAILABLE_PROPERTIES:
-            self._model = model
-        else:
-            self._model = MODEL_CHUANGMI_PLUG_M1
-
     @command(
         default_output=format_output(
             "",
@@ -117,7 +101,9 @@ class ChuangmiPlug(Device):
     )
     def status(self) -> ChuangmiPlugStatus:
         """Retrieve properties."""
-        properties = AVAILABLE_PROPERTIES[self.model].copy()
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_CHUANGMI_PLUG_M1]
+        ).copy()
         values = self.get_properties(properties)
 
         if self.model == MODEL_CHUANGMI_PLUG_V3:

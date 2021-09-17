@@ -92,3 +92,15 @@ def test_missing_supported(mocker, caplog):
 
     assert "Found an unsupported model" in caplog.text
     assert "for class 'Device'" in caplog.text
+
+
+@pytest.mark.parametrize("cls", Device.__subclasses__())
+def test_device_ctor_model(cls):
+    """Make sure that every device subclass ctor accepts model kwarg."""
+    ignore_classes = ["GatewayDevice", "CustomDevice"]
+    if cls.__name__ in ignore_classes:
+        return
+
+    dummy_model = "dummy"
+    dev = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=dummy_model)
+    assert dev.model == dummy_model
