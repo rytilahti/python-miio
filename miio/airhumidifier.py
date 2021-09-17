@@ -198,11 +198,12 @@ class AirHumidifierStatus(DeviceStatus):
     def water_level(self) -> Optional[int]:
         """Return current water level in percent.
 
-        If water tank is full, depth is 125.
+        If water tank is full, depth is 120.
+        If water tank is overfilled, depth is 125.
         """
         depth = self.data.get("depth")
         if depth is not None and depth <= 125:
-            return int(depth / 1.25)
+            return int(max(min(depth / 1.2, 100), 0))
         return None
 
     @property

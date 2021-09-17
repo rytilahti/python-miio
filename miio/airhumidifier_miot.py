@@ -129,10 +129,11 @@ class AirHumidifierMiotStatus(DeviceStatus):
     def water_level(self) -> Optional[int]:
         """Return current water level in percent.
 
-        If water tank is full, depth is 125.
+        If water tank is full, raw water_level value is 120.
+        If water tank is overfilled, raw water_level value is 125.
         """
         if self.data["water_level"] <= 125:
-            return int(self.data["water_level"] / 1.25)
+            return int(max(min(self.data["water_level"] / 1.2, 100), 0))
         return None
 
     @property
