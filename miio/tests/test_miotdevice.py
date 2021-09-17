@@ -1,6 +1,6 @@
 import pytest
 
-from miio import DeviceException, MiotDevice
+from miio import MiotDevice
 from miio.miot_device import MiotValueType
 
 
@@ -14,11 +14,11 @@ def dev(module_mocker):
     return device
 
 
-def test_missing_mapping():
+def test_missing_mapping(caplog):
     """Make sure ctor raises exception if neither class nor parameter defines the
     mapping."""
-    with pytest.raises(DeviceException):
-        _ = MiotDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    _ = MiotDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    assert "Neither the class nor the parameter defines the mapping" in caplog.text
 
 
 def test_ctor_mapping():
