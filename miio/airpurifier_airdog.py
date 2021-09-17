@@ -177,8 +177,8 @@ class AirDogX3(Device):
         return self.send("set_clean")
 
 
-@deprecated("Use AirDogX3(model='airdog.airpurifier.x5')")
 class AirDogX5(AirDogX3):
+    @deprecated("Use AirDogX3(model='airdog.airpurifier.x5')")
     def __init__(
         self,
         ip: str = None,
@@ -191,8 +191,8 @@ class AirDogX5(AirDogX3):
         super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
 
-@deprecated("Use AirDogX3(model='airdog.airpurifier.x7sm')")
 class AirDogX7SM(AirDogX3):
+    @deprecated("Use AirDogX3(model='airdog.airpurifier.x7sm')")
     def __init__(
         self,
         ip: str = None,
