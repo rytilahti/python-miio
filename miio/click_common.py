@@ -183,7 +183,7 @@ class DeviceGroup(click.MultiCommand):
                             "Unknown model, trying autodetection. %s %s"
                             % (self._model, self._info)
                         )
-                        self.info()
+                        self._fetch_info()
                     return func(self, *args, **kwargs)
 
                 # TODO HACK to make the command visible to cli
