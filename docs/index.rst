@@ -22,13 +22,13 @@ Furthermore thanks goes to contributors of this project
 who have helped to extend this to cover not only the vacuum cleaner.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :caption: Contents:
 
     Home <self>
     discovery
-    new_devices
-    vacuum
-    yeelight
-    API <api/miio>
     troubleshooting
+    contributing
+    device_docs/index
+
+    API <api/miio>
