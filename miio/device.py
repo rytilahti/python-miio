@@ -68,9 +68,9 @@ class Device(metaclass=DeviceGroupMeta):
         model: str = None,
     ) -> None:
         self.ip = ip
-        self.token = token
-        self._model = model
-        self._info = None
+        self.token: Optional[str] = token
+        self._model: Optional[str] = model
+        self._info: Optional[DeviceInfo] = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -143,7 +143,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         return self._fetch_info()
 
-    def _fetch_info(self):
+    def _fetch_info(self) -> DeviceInfo:
         """Perform miIO.info query on the device and cache the result."""
         try:
             devinfo = DeviceInfo(self.send("miIO.info"))

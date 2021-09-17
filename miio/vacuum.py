@@ -189,19 +189,17 @@ class Vacuum(Device):
 
         return self.start()
 
-    @command(skip_autodetect=True)
-    def info(self, *, force=False):
+    def _fetch_info(self) -> DeviceInfo:
         """Return info about the device.
 
         This is overrides the base class info to account for gen1 devices that do not
         respond to info query properly when not connected to the cloud.
         """
         try:
-            info = super().info(force=force)
+            info = super()._fetch_info()
             return info
         except (TypeError, DeviceInfoUnavailableException):
-            # cloud-blocked vacuums will not return proper payloads
-
+            # cloud-blocked gen1 vacuums will not return proper payloads
             dummy_v1 = DeviceInfo(
                 {
                     "model": ROCKROBO_V1,
