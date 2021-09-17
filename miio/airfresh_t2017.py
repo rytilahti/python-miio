@@ -224,17 +224,6 @@ class AirFreshStatus(DeviceStatus):
 class AirFreshA1(Device):
     """Main class representing the air fresh a1."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_AIRFRESH_A1,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -257,7 +246,9 @@ class AirFreshA1(Device):
     def status(self) -> AirFreshStatus:
         """Retrieve properties."""
 
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_AIRFRESH_A1]
+        )
         values = self.get_properties(properties, max_properties=15)
 
         return AirFreshStatus(defaultdict(lambda: None, zip(properties, values)))
@@ -366,17 +357,6 @@ class AirFreshA1(Device):
 class AirFreshT2017(AirFreshA1):
     """Main class representing the air fresh t2017."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_AIRFRESH_T2017,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -400,11 +380,6 @@ class AirFreshT2017(AirFreshA1):
             "Display orientation: {result.display_orientation}\n",
         )
     )
-    def status(self) -> AirFreshStatus:
-        """Retrieve properties."""
-
-        return super().status()
-
     @command(
         click.argument("speed", type=int),
         default_output=format_output("Setting favorite speed to {speed}"),

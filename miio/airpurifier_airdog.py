@@ -8,6 +8,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
+from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -100,17 +101,6 @@ class AirDogStatus(DeviceStatus):
 
 
 class AirDogX3(Device):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_AIRDOG_X3,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -126,7 +116,9 @@ class AirDogX3(Device):
     def status(self) -> AirDogStatus:
         """Retrieve properties."""
 
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_AIRDOG_X3]
+        )
         values = self.get_properties(properties, max_properties=10)
 
         return AirDogStatus(defaultdict(lambda: None, zip(properties, values)))
@@ -185,6 +177,7 @@ class AirDogX3(Device):
         return self.send("set_clean")
 
 
+@deprecated("Use AirDogX3(model='airdog.airpurifier.x5')")
 class AirDogX5(AirDogX3):
     def __init__(
         self,
@@ -198,6 +191,7 @@ class AirDogX5(AirDogX3):
         super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
 
+@deprecated("Use AirDogX3(model='airdog.airpurifier.x7sm')")
 class AirDogX7SM(AirDogX3):
     def __init__(
         self,

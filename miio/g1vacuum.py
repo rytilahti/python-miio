@@ -284,8 +284,7 @@ class G1Vacuum(MiotDevice):
         lazy_discover: bool = True,
         model: str = MIJIA_VACUUM_V2,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-        self._model = model
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(

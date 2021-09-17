@@ -122,16 +122,7 @@ class AirHumidifierStatus(DeviceStatus):
 
 
 class AirHumidifierMjjsq(Device):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_HUMIDIFIER_MJJSQ,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+    """Support for deerma.humidifier.(mj)jsq."""
 
     @command(
         default_output=format_output(
@@ -151,7 +142,9 @@ class AirHumidifierMjjsq(Device):
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
 
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_MJJSQ]
+        )
         values = self.get_properties(properties, max_properties=1)
 
         return AirHumidifierStatus(defaultdict(lambda: None, zip(properties, values)))

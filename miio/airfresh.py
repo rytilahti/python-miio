@@ -8,6 +8,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
+from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -218,17 +219,6 @@ class AirFreshStatus(DeviceStatus):
 class AirFresh(Device):
     """Main class representing the air fresh."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_AIRFRESH_VA2,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -254,7 +244,9 @@ class AirFresh(Device):
     def status(self) -> AirFreshStatus:
         """Retrieve properties."""
 
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_AIRFRESH_VA2]
+        )
         values = self.get_properties(properties, max_properties=15)
 
         return AirFreshStatus(
@@ -356,6 +348,9 @@ class AirFresh(Device):
             return self.send("set_ptc_state", ["off"])
 
 
+@deprecated(
+    "This will be removed in the future, use AirFresh(..., model='zhimi.airfresh.va4'"
+)
 class AirFreshVA4(AirFresh):
     """Main class representing the air fresh va4."""
 
