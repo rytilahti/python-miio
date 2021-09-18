@@ -127,17 +127,6 @@ class HeaterStatus(DeviceStatus):
 class Heater(Device):
     """Main class representing the Smartmi Zhimi Heater."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_HEATER_ZA1,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -153,7 +142,9 @@ class Heater(Device):
     )
     def status(self) -> HeaterStatus:
         """Retrieve properties."""
-        properties = SUPPORTED_MODELS[self.model]["available_properties"]
+        properties = SUPPORTED_MODELS.get(
+            self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
+        )["available_properties"]
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
@@ -185,7 +176,9 @@ class Heater(Device):
         """Set target temperature."""
         min_temp: int
         max_temp: int
-        min_temp, max_temp = SUPPORTED_MODELS[self.model]["temperature_range"]
+        min_temp, max_temp = SUPPORTED_MODELS.get(
+            self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
+        )["temperature_range"]
         if not min_temp <= temperature <= max_temp:
             raise HeaterException("Invalid target temperature: %s" % temperature)
 
@@ -233,7 +226,9 @@ class Heater(Device):
         """Set delay off seconds."""
         min_delay: int
         max_delay: int
-        min_delay, max_delay = SUPPORTED_MODELS[self.model]["delay_off_range"]
+        min_delay, max_delay = SUPPORTED_MODELS.get(
+            self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
+        )["delay_off_range"]
         if not min_delay <= seconds <= max_delay:
             raise HeaterException("Invalid delay time: %s" % seconds)
 

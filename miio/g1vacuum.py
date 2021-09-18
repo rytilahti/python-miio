@@ -275,18 +275,6 @@ class G1Vacuum(MiotDevice):
 
     mapping = MIOT_MAPPING[MIJIA_VACUUM_V2]
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MIJIA_VACUUM_V2,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-        self._model = model
-
     @command(
         default_output=format_output(
             "",

@@ -93,17 +93,6 @@ class FanLeshowStatus(DeviceStatus):
 class FanLeshow(Device):
     """Main class representing the Xiaomi Rosou SS4 Ventilator."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_FAN_LESHOW_SS4,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -118,7 +107,9 @@ class FanLeshow(Device):
     )
     def status(self) -> FanLeshowStatus:
         """Retrieve properties."""
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_FAN_LESHOW_SS4]
+        )
         values = self.get_properties(properties, max_properties=15)
 
         return FanLeshowStatus(dict(zip(properties, values)))

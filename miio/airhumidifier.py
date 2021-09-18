@@ -8,6 +8,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceInfo, DeviceStatus
 from .exceptions import DeviceError, DeviceException
+from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -246,20 +247,6 @@ class AirHumidifierStatus(DeviceStatus):
 class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_HUMIDIFIER_V1,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
-        # TODO: convert to use generic device info in the future
-        self.device_info: Optional[DeviceInfo] = None
-
     @command(
         default_output=format_output(
             "",
@@ -284,10 +271,10 @@ class AirHumidifier(Device):
     )
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
-        if self.device_info is None:
-            self.device_info = self.info()
 
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_V1]
+        )
 
         # A single request is limited to 16 properties. Therefore the
         # properties are divided into multiple requests
@@ -304,7 +291,7 @@ class AirHumidifier(Device):
         values = self.get_properties(properties, max_properties=_props_per_request)
 
         return AirHumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values)), self.device_info
+            defaultdict(lambda: None, zip(properties, values)), self.info()
         )
 
     @command(default_output=format_output("Powering on"))
@@ -407,6 +394,7 @@ class AirHumidifier(Device):
             return self.send("set_dry", ["off"])
 
 
+@deprecated("Use AirHumidifer(model='zhimi.humidifier.ca1")
 class AirHumidifierCA1(AirHumidifier):
     def __init__(
         self,
@@ -421,6 +409,7 @@ class AirHumidifierCA1(AirHumidifier):
         )
 
 
+@deprecated("Use AirHumidifer(model='zhimi.humidifier.cb1")
 class AirHumidifierCB1(AirHumidifier):
     def __init__(
         self,
@@ -435,6 +424,7 @@ class AirHumidifierCB1(AirHumidifier):
         )
 
 
+@deprecated("Use AirHumidifier(model='zhimi.humidifier.cb2')")
 class AirHumidifierCB2(AirHumidifier):
     def __init__(
         self,

@@ -99,22 +99,13 @@ class PwznRelayStatus(DeviceStatus):
 class PwznRelay(Device):
     """Main class representing the PWZN Relay."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_PWZN_RELAY_APPLE,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(default_output=format_output("", "on_count: {result.on_count}\n"))
     def status(self) -> PwznRelayStatus:
         """Retrieve properties."""
 
-        properties = AVAILABLE_PROPERTIES[self.model].copy()
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_PWZN_RELAY_APPLE]
+        ).copy()
         values = self.get_properties(properties)
 
         return PwznRelayStatus(defaultdict(lambda: None, zip(properties, values)))

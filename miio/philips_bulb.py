@@ -68,17 +68,6 @@ class PhilipsBulbStatus(DeviceStatus):
 class PhilipsWhiteBulb(Device):
     """Main class representing Xiaomi Philips White LED Ball Lamp."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_PHILIPS_LIGHT_HBULB,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -92,7 +81,9 @@ class PhilipsWhiteBulb(Device):
     def status(self) -> PhilipsBulbStatus:
         """Retrieve properties."""
 
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_PHILIPS_LIGHT_HBULB]
+        )
         values = self.get_properties(properties)
 
         return PhilipsBulbStatus(defaultdict(lambda: None, zip(properties, values)))
@@ -134,17 +125,6 @@ class PhilipsWhiteBulb(Device):
 
 
 class PhilipsBulb(PhilipsWhiteBulb):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_PHILIPS_LIGHT_BULB,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         click.argument("level", type=int),
         default_output=format_output("Setting color temperature to {level}"),

@@ -138,17 +138,6 @@ class PowerStrip(Device):
 
     _supported_models = [MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2]
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_POWER_STRIP_V1,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -166,7 +155,9 @@ class PowerStrip(Device):
     )
     def status(self) -> PowerStripStatus:
         """Retrieve properties."""
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_POWER_STRIP_V1]
+        )
         values = self.get_properties(properties)
 
         return PowerStripStatus(defaultdict(lambda: None, zip(properties, values)))

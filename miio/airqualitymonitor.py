@@ -151,22 +151,6 @@ class AirQualityMonitorStatus(DeviceStatus):
 class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_AIRQUALITYMONITOR_V1,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
-        if model not in AVAILABLE_PROPERTIES:
-            _LOGGER.error(
-                "Device model %s unsupported. Falling back to %s.", model, self.model
-            )
-
     @command(
         default_output=format_output(
             "",
@@ -185,7 +169,9 @@ class AirQualityMonitor(Device):
     )
     def status(self) -> AirQualityMonitorStatus:
         """Return device status."""
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_AIRQUALITYMONITOR_V1]
+        )
 
         if self.model == MODEL_AIRQUALITYMONITOR_B1:
             values = self.send("get_air_data")

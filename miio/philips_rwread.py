@@ -83,17 +83,6 @@ class PhilipsRwreadStatus(DeviceStatus):
 class PhilipsRwread(Device):
     """Main class representing Xiaomi Philips RW Read."""
 
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_PHILIPS_LIGHT_RWREAD,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
     @command(
         default_output=format_output(
             "",
@@ -108,7 +97,9 @@ class PhilipsRwread(Device):
     )
     def status(self) -> PhilipsRwreadStatus:
         """Retrieve properties."""
-        properties = AVAILABLE_PROPERTIES[self.model]
+        properties = AVAILABLE_PROPERTIES.get(
+            self.model, AVAILABLE_PROPERTIES[MODEL_PHILIPS_LIGHT_RWREAD]
+        )
         values = self.get_properties(properties)
 
         return PhilipsRwreadStatus(defaultdict(lambda: None, zip(properties, values)))
