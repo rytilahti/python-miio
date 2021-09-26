@@ -189,7 +189,7 @@ Home Assistant (custom)
 Other related projects
 ----------------------
 
-This is a list of other projects around the xiaomi ecosystem that you can find interesting.
+This is a list of other projects around the Xiaomi ecosystem that you can find interesting.
 Feel free to submit more related projects.
 
 -  `dustcloud <https://github.com/dgiese/dustcloud>`__ (reverse engineering and rooting xiaomi devices)
