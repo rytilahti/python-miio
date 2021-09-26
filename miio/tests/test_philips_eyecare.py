@@ -17,7 +17,6 @@ class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
             "ambstatus": "off",
             "ambvalue": 100,
             "eyecare": "on",
-            "scene_num": 3,
             "bls": "on",
             "dvalue": 0,
         }
@@ -77,7 +76,6 @@ class TestPhilipsEyecare(TestCase):
         assert self.state().ambient is (self.device.start_state["ambstatus"] == "on")
         assert self.state().ambient_brightness == self.device.start_state["ambvalue"]
         assert self.state().eyecare is (self.device.start_state["eyecare"] == "on")
-        assert self.state().scene == self.device.start_state["scene_num"]
         assert self.state().smart_night_light is (
             self.device.start_state["bls"] == "on"
         )
@@ -112,13 +110,8 @@ class TestPhilipsEyecare(TestCase):
             self.device.set_brightness(101)
 
     def test_set_scene(self):
-        def scene():
-            return self.device.status().scene
-
         self.device.set_scene(1)
-        assert scene() == 1
         self.device.set_scene(2)
-        assert scene() == 2
 
         with pytest.raises(PhilipsEyecareException):
             self.device.set_scene(-1)

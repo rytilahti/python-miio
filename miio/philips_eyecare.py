@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -60,9 +60,11 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["eyecare"] == "on"
 
     @property
-    def scene(self) -> int:
+    def scene(self) -> Optional[int]:
         """Current fixed scene."""
-        return self.data["scene_num"]
+        if "scene_num" in self.data and self.data["scene_num"] is not None:
+            return self.data["scene_num"]
+        return None
 
     @property
     def smart_night_light(self) -> bool:
@@ -97,13 +99,12 @@ class PhilipsEyecare(Device):
         properties = [
             "power",
             "bright",
-            "notifystatus",
             "ambstatus",
+            "notifystatus",
             "ambvalue",
-            "eyecare",
-            "scene_num",
-            "bls",
             "dvalue",
+            "eyecare",
+            "bls",
         ]
         values = self.get_properties(properties)
 
