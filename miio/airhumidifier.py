@@ -136,8 +136,7 @@ class AirHumidifierStatus(DeviceStatus):
     def trans_level(self) -> Optional[int]:
         """The meaning of the property is unknown.
 
-        The property is used to determine the strong mode is enabled on
-        old firmware.
+        The property is used to determine the strong mode is enabled on old firmware.
         """
         if "trans_level" in self.data and self.data["trans_level"] is not None:
             return self.data["trans_level"]
@@ -199,8 +198,7 @@ class AirHumidifierStatus(DeviceStatus):
     def water_level(self) -> Optional[int]:
         """Return current water level in percent.
 
-        If water tank is full, depth is 120. If water tank is
-        overfilled, depth is 125.
+        If water tank is full, depth is 120. If water tank is overfilled, depth is 125.
         """
         depth = self.data.get("depth")
         if depth is not None and depth <= 125:
@@ -219,8 +217,8 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     def dry(self) -> Optional[bool]:
-        """Dry mode: The amount of water is not enough to continue to work for
-        about 8 hours.
+        """Dry mode: The amount of water is not enough to continue to work for about 8
+        hours.
 
         Return True if dry mode is on if available.
         """
