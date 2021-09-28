@@ -270,7 +270,7 @@ class DummyAirHumidifierCA1(DummyDevice, AirHumidifier):
             "hw_version": 0,
             # Additional attributes of the zhimi.humidifier.ca1
             "speed": 100,
-            "depth": 1,
+            "depth": 60,
             "dry": "off",
         }
         self.return_values = {
@@ -467,6 +467,25 @@ class TestAirHumidifierCA1(TestCase):
         self.device.set_dry(False)
         assert dry() is False
 
+    def test_water_level(self):
+        self.device.state["depth"] = -1
+        assert self.state().water_level == 0
+
+        self.device.state["depth"] = 0
+        assert self.state().water_level == 0
+
+        self.device.state["depth"] = 60
+        assert self.state().water_level == 50
+
+        self.device.state["depth"] = 120
+        assert self.state().water_level == 100
+
+        self.device.state["depth"] = 125
+        assert self.state().water_level == 100
+
+        self.device.state["depth"] = 127
+        assert self.state().water_level is None
+
 
 class DummyAirHumidifierCB1(DummyDevice, AirHumidifier):
     def __init__(self, *args, **kwargs):
@@ -506,7 +525,7 @@ class DummyAirHumidifierCB1(DummyDevice, AirHumidifier):
             # Additional attributes of the zhimi.humidifier.cb1
             "temperature": 29.4,
             "speed": 100,
-            "depth": 1,
+            "depth": 60,
             "dry": "off",
         }
         self.return_values = {
@@ -579,6 +598,7 @@ class TestAirHumidifierCB1(TestCase):
         assert self.state().trans_level is None
         assert self.state().motor_speed == self.device.start_state["speed"]
         assert self.state().depth == self.device.start_state["depth"]
+        assert self.state().water_level == self.device.start_state["depth"] / 1.2
         assert self.state().dry == (self.device.start_state["dry"] == "on")
         assert self.state().use_time == self.device.start_state["use_time"]
         assert self.state().hardware_version == self.device.start_state["hw_version"]
@@ -694,3 +714,22 @@ class TestAirHumidifierCB1(TestCase):
 
         self.device.set_dry(False)
         assert dry() is False
+
+    def test_water_level(self):
+        self.device._set_state("depth", [-1])
+        assert self.state().water_level == 0
+
+        self.device._set_state("depth", [0])
+        assert self.state().water_level == 0
+
+        self.device._set_state("depth", [60])
+        assert self.state().water_level == 50
+
+        self.device._set_state("depth", [120])
+        assert self.state().water_level == 100
+
+        self.device._set_state("depth", [125])
+        assert self.state().water_level == 100
+
+        self.device._set_state("depth", [127])
+        assert self.state().water_level is None

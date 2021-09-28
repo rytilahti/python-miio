@@ -193,3 +193,22 @@ class TestAirHumidifier(TestCase):
 
         self.device.set_clean_mode(False)
         assert clean_mode() is False
+
+    def test_water_level(self):
+        self.device.set_property("water_level", -1)
+        assert self.device.status().water_level == 0
+
+        self.device.set_property("water_level", 0)
+        assert self.device.status().water_level == 0
+
+        self.device.set_property("water_level", 60)
+        assert self.device.status().water_level == 50
+
+        self.device.set_property("water_level", 120)
+        assert self.device.status().water_level == 100
+
+        self.device.set_property("water_level", 125)
+        assert self.device.status().water_level == 100
+
+        self.device.set_property("water_level", 127)
+        assert self.device.status().water_level is None
