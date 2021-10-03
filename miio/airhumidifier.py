@@ -201,9 +201,13 @@ class AirHumidifierStatus(DeviceStatus):
         If water tank is full, depth is 120. If water tank is overfilled, depth is 125.
         """
         depth = self.data.get("depth")
-        if depth is not None and depth <= 125:
-            return int(max(min(depth / 1.2, 100), 0))
-        return None
+        if depth is None or depth > 125:
+            return None
+
+        if depth < 0:
+            return 0
+
+        return int(min(depth / 1.2, 100))
 
     @property
     def water_tank_detached(self) -> Optional[bool]:

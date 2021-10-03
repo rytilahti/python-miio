@@ -132,9 +132,14 @@ class AirHumidifierMiotStatus(DeviceStatus):
         If water tank is full, raw water_level value is 120. If water tank is
         overfilled, raw water_level value is 125.
         """
-        if self.data["water_level"] <= 125:
-            return int(max(min(self.data["water_level"] / 1.2, 100), 0))
-        return None
+        water_level = self.data["water_level"]
+        if water_level > 125:
+            return None
+
+        if water_level < 0:
+            return 0
+
+        return int(min(water_level / 1.2, 100))
 
     @property
     def water_tank_detached(self) -> bool:
