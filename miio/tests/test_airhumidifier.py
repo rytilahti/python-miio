@@ -1,5 +1,3 @@
-from contextlib import nullcontext
-
 import pytest
 
 from miio import AirHumidifier, DeviceException
@@ -286,17 +284,17 @@ def test_set_dry(dev):
 
     # set_dry is not supported on V1
     if dev.model == MODEL_HUMIDIFIER_V1:
-        context = pytest.raises(DeviceException)
-    else:
-        context = nullcontext()
+        assert dry() is None
+        with pytest.raises(DeviceException):
+            dev.set_dry(True)
 
-    with context:
-        dev.set_dry(True)
-        assert dry() is True
+        return
 
-    with context:
-        dev.set_dry(False)
-        assert dry() is False
+    dev.set_dry(True)
+    assert dry() is True
+
+    dev.set_dry(False)
+    assert dry() is False
 
 
 @pytest.mark.parametrize(
