@@ -73,12 +73,10 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
             self.state["button_pressed"] = "led"
 
             # V1 doesn't support try, so return an error
-            from miio import DeviceError
-
             def raise_error():
-                raise DeviceError("blah")
+                raise DeviceException("v1 does not support set_dry")
 
-            self.return_values["set_dry"] = lambda x: raise_error
+            self.return_values["set_dry"] = lambda x: raise_error()
 
         elif model in [MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB1]:
             # Additional attributes of the CA1 & CB1
