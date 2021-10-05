@@ -76,21 +76,25 @@ DEFAULT_FIRE_LEVEL = 45
 
 DEFAULT_PHASE_MINUTES = 45
 
+START_REMIND_ON_BIT_STRING = 64
+START_REMIND_OFF_BIT_STRING = 190
 
 class IHCookerException(DeviceException):
     pass
 
 
 class StageMode(enum.Enum):
+    """Mode for current stage of recipe."""
     FireMode = 0
     TemperatureMode = 2
     Unknown1 = 4
-    TempAutoSmallPot = 8
-    TempAutoBigPot = 24
+    TempAutoSmallPot = 8  # TODO: verify this is the right behaviour.
+    TempAutoBigPot = 24  # TODO: verify this is the right behaviour.
     Unknown2 = 16
 
 
 class OperationMode(enum.Enum):
+    """Global mode the induction cooker is currently in"""
     Error = "error"
     Finish = "finish"
     Offline = "offline"
@@ -107,6 +111,7 @@ class OperationMode(enum.Enum):
 
 
 class CookProfile:
+    """Represents a recipe containing cooking time, 16 stages of temperature&timing settings and more."""
     def __init__(self, model, profile=None):
         self.model = model
         """Initialize a cooking profile from an existing one, or a new one."""
@@ -149,9 +154,9 @@ class CookProfile:
         else:
             i = OFFSET_SET_START_V2
         if value:
-            self.data[i] = self.data[i] | 64
+            self.data[i] = self.data[i] | START_REMIND_ON_BIT_STRING
         else:
-            self.data[i] = self.data[i] & 190
+            self.data[i] = self.data[i] & START_REMIND_OFF_BIT_STRING
 
     def set_sequence(self, location=9):
         """Favorite location. set to 9 to not save, just request confirmation with set_start_remind."""
@@ -209,7 +214,6 @@ class CookProfile:
                 self.data[o + 6] = DEFAULT_FIRE_ON_OFF
                 self.data[o + 7] = DEFAULT_FIRE_ON_OFF
             else:
-                # self.data[0] is the mode. There are 6 bits to set for the flag. I've only seen 2, 8, and 26 set.
                 phase = phases[phase_i]
                 temp_target = phase.get("temp", 0)
                 temp_threshold = phase.get("thresh", DEFAULT_THRESHOLD_CELCIUS)
@@ -227,7 +231,7 @@ class CookProfile:
                 self.data[o + 3] = temp_threshold
                 self.data[o + 4] = temp_target
                 self.data[o + 5] = fire
-                self.data[o + 6] = fire_off  # there is one recipe where these bits are set.
+                self.data[o + 6] = fire_off
                 self.data[o + 7] = fire_on
 
     def set_save_recipe(self, save: bool):
@@ -406,11 +410,11 @@ class IHCookerStatus:
         0: constant power output.
         2: Temperature control.
         4: Unknown.
-        8: Temp regulation and fire hard coded for small pot @coolibry
+        8: Temp regulation and fire hard coded for small pot , via @coolibry.
         16: Unknown.
-        24: Temp regulation and fire hard coded for big pot @coolibry
+        24: Temp regulation and fire hard coded for big pot, via @coolibry.
         """
-        # TODO: parse as separate properties when stage figured out.
+        # TODO: reverse engineer these flags in more detail.
         if not self.is_error:
             action = self.data["action"]
             if len(action) >= 8:
@@ -500,7 +504,7 @@ class IHCookerStatus:
                 return int.from_bytes(bytes.fromhex(play[16:18]), "little")
         return None
 
-    # TODO: Fully parse timer field.
+    # TODO: Fully parse timer field, perhaps cooking delay?
     @property
     def user_timer_hours(self) -> int:
         """Remaining hours of the user timer."""
