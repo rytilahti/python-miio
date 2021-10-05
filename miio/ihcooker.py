@@ -3,11 +3,12 @@ import enum
 import logging
 import random
 import warnings
-import crc16
 from collections import defaultdict
 from typing import Dict, List, Optional, Union
 
 import click
+
+import crc16
 
 from .click_common import command, format_output
 from .device import Device
@@ -79,12 +80,14 @@ DEFAULT_PHASE_MINUTES = 45
 START_REMIND_ON_BIT_STRING = 64
 START_REMIND_OFF_BIT_STRING = 190
 
+
 class IHCookerException(DeviceException):
     pass
 
 
 class StageMode(enum.Enum):
     """Mode for current stage of recipe."""
+
     FireMode = 0
     TemperatureMode = 2
     Unknown1 = 4
@@ -95,6 +98,7 @@ class StageMode(enum.Enum):
 
 class OperationMode(enum.Enum):
     """Global mode the induction cooker is currently in"""
+
     Error = "error"
     Finish = "finish"
     Offline = "offline"
@@ -112,6 +116,7 @@ class OperationMode(enum.Enum):
 
 class CookProfile:
     """Represents a recipe containing cooking time, 16 stages of temperature&timing settings and more."""
+
     def __init__(self, model, profile=None):
         self.model = model
         """Initialize a cooking profile from an existing one, or a new one."""
@@ -535,30 +540,30 @@ class IHCookerStatus:
 
     def __repr__(self) -> str:
         s = (
-                "<CookerStatus mode=%s "
-                "menu=%s, "
-                "stage=%s, "
-                "temperature=%s, "
-                # "start_time=%s"
-                # "remaining=%s, "
-                # "cooking_delayed=%s, "
-                "target_temperature=%s, "
-                "wifi_led_setting=%s, "
-                "hardware_version=%s, "
-                "firmware_version=%s>"
-                % (
-                    self.mode,
-                    self.recipe_name,
-                    self.stage,
-                    self.temperature,
-                    self.target_temp,
-                    # self.start_time,
-                    # self.remaining,
-                    # self.cooking_delayed,
-                    self.wifi_led_setting,
-                    self.hardware_version,
-                    self.firmware_version,
-                )
+            "<CookerStatus mode=%s "
+            "menu=%s, "
+            "stage=%s, "
+            "temperature=%s, "
+            # "start_time=%s"
+            # "remaining=%s, "
+            # "cooking_delayed=%s, "
+            "target_temperature=%s, "
+            "wifi_led_setting=%s, "
+            "hardware_version=%s, "
+            "firmware_version=%s>"
+            % (
+                self.mode,
+                self.recipe_name,
+                self.stage,
+                self.temperature,
+                self.target_temp,
+                # self.start_time,
+                # self.remaining,
+                # self.cooking_delayed,
+                self.wifi_led_setting,
+                self.hardware_version,
+                self.firmware_version,
+            )
         )
         return s
 
@@ -569,12 +574,12 @@ class IHCooker(Device):
     Custom recipes can be build with the CookProfile class."""
 
     def __init__(
-            self,
-            ip: str = None,
-            token: str = None,
-            start_id: int = 0,
-            debug: int = 0,
-            lazy_discover: bool = True,
+        self,
+        ip: str = None,
+        token: str = None,
+        start_id: int = 0,
+        debug: int = 0,
+        lazy_discover: bool = True,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
         self._model = None
@@ -634,7 +639,7 @@ class IHCooker(Device):
         click.argument("skip_confirmation", type=bool),
         default_output=format_output("Cooking profile started"),
     )
-    def start(self, profile: str, skip_confirmation=False):
+    def start(self, profile: Union[str, CookProfile], skip_confirmation=False):
         """Start cooking a profile.
 
         Please do not use skip_confirmation=True, as this is potentially unsafe."""
@@ -656,8 +661,8 @@ class IHCooker(Device):
         """Stop cooking."""
         self.send("set_func", ["end"])
 
-    @command(default_output=format_output("Cooking stopped"))
-    def stop(self, location):
+    @command(default_output=format_output("Recipe deleted"))
+    def delete_recipe(self, location):
         """Delete recipe at location [0,7]"""
         if location >= 8 or location < 0:
             raise IHCookerException("location %d must be in [0,7]." % location)
@@ -682,7 +687,7 @@ class IHCooker(Device):
         default_output=format_output("Setting menu to {profile}"),
     )
     def set_menu(
-            self, profile: Union[str, CookProfile], location: int, confirm_start=False
+        self, profile: Union[str, CookProfile], location: int, confirm_start=False
     ):
         """Updates one of the menu options with the profile.
 
@@ -698,7 +703,7 @@ class IHCooker(Device):
 
         self.send("set_menu1", [profile.to_hex()])
 
-    def _prepare_profile(self, profile):
+    def _prepare_profile(self, profile: Union[str, CookProfile]) -> CookProfile:
         if isinstance(profile, str):
             profile = CookProfile(self.model, profile)
         return profile
