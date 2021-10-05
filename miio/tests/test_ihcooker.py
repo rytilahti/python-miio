@@ -82,6 +82,11 @@ class TestIHCookerV2(TestCase):
         recipe = ihcooker.CookProfile(self.device.model)
         self.device.start(recipe)
 
+    def test_crc(self):
+        recipe = ihcooker.CookProfile(self.device.model)
+        # recipe.
+        self.device.start(recipe)
+
     def test_mode(self):
         self.assertEqual(ihcooker.OperationMode.Running, self.state().mode)
 

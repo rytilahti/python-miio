@@ -3,6 +3,7 @@ import enum
 import logging
 import random
 import warnings
+import crc16
 from collections import defaultdict
 from typing import Dict, List, Optional, Union
 
@@ -37,13 +38,43 @@ DEVICE_PREFIX = {k: "03%02d" % v for k, v in DEVICE_ID.items()}
 
 VERSION_1 = 1
 VERSION_2 = 2
-HARDWARE_VERSIONS = {
-    1: VERSION_1,
-    2: VERSION_2,  # Guess.
-    3: VERSION_2,  # Guess.
-    4: VERSION_2,
-    5: VERSION_2,  # Guess.
-}
+
+OFFSET_MYSTERY_BIT_V1 = 30
+OFFSET_MYSTERY_BIT_V2 = 46
+
+OFFSET_DURATION_MIN_V1 = 26
+OFFSET_DURATION_MIN_V2 = 42
+OFFSET_DURATION_MAX_V1 = 24
+OFFSET_DURATION_MAX_V2 = 40
+
+OFFSET_DURATION_V1 = 38
+OFFSET_DURATION_V2 = 22
+
+OFFSET_RECIPE_ID_V1 = 17
+OFFSET_RECIPE_ID_V2 = 33
+
+RECIPE_NAME_MAX_LEN_V1 = 13
+RECIPE_NAME_MAX_LEN_V2 = 28
+
+OFFSET_SET_START_V1 = 21
+OFFSET_SET_START_V2 = 37
+
+OFFSET_PHASE_V1 = 38
+OFFSET_PHASE_V2 = 48
+
+MAX_RECIPE_NAME_V1 = 28
+MAX_RECIPE_NAME_V2 = 58
+
+OFFSET_RECIPE_NAME = 3
+
+DEFAULT_FIRE_ON_OFF = 20
+
+DEFAULT_THRESHOLD_CELCIUS = 249
+DEFAULT_TEMP_TARGET_CELCIUS = 229
+
+DEFAULT_FIRE_LEVEL = 45
+
+DEFAULT_PHASE_MINUTES = 45
 
 
 class IHCookerException(DeviceException):
@@ -51,9 +82,12 @@ class IHCookerException(DeviceException):
 
 
 class StageMode(enum.Enum):
-    TimerMode = 8
-    TemperatureMode = 2
     FireMode = 0
+    TemperatureMode = 2
+    Unknown1 = 4
+    TempAutoSmallPot = 8
+    TempAutoBigPot = 24
+    Unknown2 = 16
 
 
 class OperationMode(enum.Enum):
@@ -61,51 +95,15 @@ class OperationMode(enum.Enum):
     Finish = "finish"
     Offline = "offline"
     Pause = "pause"
-    Pause_time = "pause_time"
+    TimerPaused = "pause_time"
     Precook = "precook"
     Running = "running"
-    Set_01 = "set01"
-    Set_02 = "set02"
-    Set_03 = "set03"
+    SetClock = "set01"
+    SetStartTime = "set02"
+    SetCookingTime = "set03"
     Shutdown = "shutdown"
     Timing = "timing"
     Waiting = "waiting"
-
-
-def calcrc(data, n):
-    """
-     public static int calcrc(byte[] bArr, int i) {
-        int i2 = 0;
-        int i3 = 0;
-        while (true) {
-            i--;
-            if (i < 0) {
-                return 65535 & i2;
-            }
-            int i4 = i3 + 1;
-            int i5 = i2 ^ (bArr[i3] << 8);
-            for (int i6 = 0; i6 < 8; i6++) {
-                i5 = (32768 & i5) != 0 ? (i5 << 1) ^ 4129 : i5 << 1;
-            }
-            i2 = i5;
-            i3 = i4;
-        }
-    }
-    """
-    i2 = 0
-    i3 = 0
-    while True:
-        n -= 1
-        if n < 0:
-            return 65535 & i2
-
-        i4 = i3 + 1
-        i5 = i2 ^ (data[i3] << 8)
-        for i6 in range(8):
-            i5 = ((i5 << 1) ^ 4129) if (32768 & i5) != 0 else (i5 << 1)
-
-        i2 = i5
-        i3 = i4
 
 
 class CookProfile:
@@ -118,19 +116,19 @@ class CookProfile:
             self.data = bytearray([0] * 179)
             # Initialize recipe phases.
             if self.is_v1:
-                offset = 38
+                offset = OFFSET_PHASE_V1
             else:
-                offset = 48
+                offset = OFFSET_PHASE_V2
 
-            for i in range(offset, 16 * 8, 8):
+            for i in range(offset, 15 * 8, 8):
                 self.data[i + 0] = 0
                 self.data[i + 1] = 0
                 self.data[i + 2] = 0
-                self.data[i + 3] = 249
-                self.data[i + 4] = 229
+                self.data[i + 3] = DEFAULT_THRESHOLD_CELCIUS
+                self.data[i + 4] = DEFAULT_TEMP_TARGET_CELCIUS
                 self.data[i + 5] = 0
-                self.data[i + 6] = 20
-                self.data[i + 7] = 20
+                self.data[i + 6] = DEFAULT_FIRE_ON_OFF
+                self.data[i + 7] = DEFAULT_FIRE_ON_OFF
             recipe_id = random.randint(0, 2 ** 32 - 1)
             self.set_recipe_id(recipe_id)
             self.set_recipe_name("Custom %d" % recipe_id)
@@ -147,9 +145,9 @@ class CookProfile:
     def set_start_remind(self, value):
         """Prompt user to start recipe, used with set_menu function."""
         if self.is_v1:
-            i = 21
+            i = OFFSET_SET_START_V1
         else:
-            i = 37
+            i = OFFSET_SET_START_V2
         if value:
             self.data[i] = self.data[i] | 64
         else:
@@ -165,15 +163,15 @@ class CookProfile:
         name = name.replace(" ", "\n")
         name_b = codecs.encode(name, "ascii")
         if self.is_v1:
-            max_len = 13
+            max_len = RECIPE_NAME_MAX_LEN_V1
         else:
-            max_len = 28
+            max_len = RECIPE_NAME_MAX_LEN_V2
         for i in range(max_len):
             if i < len(name_b):
                 print(name_b[i])
-                self.data[i + 3] = name_b[i]
+                self.data[i + OFFSET_RECIPE_NAME] = name_b[i]
             else:
-                self.data[i + 3] = 0
+                self.data[i + OFFSET_RECIPE_NAME] = 0
 
     def set_recipe_phases(self, phases: List[Dict[str, int]]):
         """Set up to 16 phases of this recipe.
@@ -185,93 +183,59 @@ class CookProfile:
         - phases is a list of up to 16 dicts representing each phase.
             A phase is consists of the following options:
             {
-                mode: heat_until_temp, heat_until_timer, continuous_output.
+                mode: StageMode.
                 temp: target temperature to heat to, in celsius.
                 thresh: temperature threshold for moving to next phase, in celcius.
                 mins: how long this phase lasts in minutes.
                 fire: power output between [0,99]
+                fire_on: [0,20] (untested)
+                fire_off: [0,20] (untested)
             }
-
-        Example for automatic rice cooking:
-        profile.set_recipe_phases([
-            # Heat at high power until 60 degrees.
-            {'mode': 'heat_until_temp', 'temp':95, 'thresh':60, 'fire':99,},
-            # Heat at low power until 80 degrees.
-            {'mode': 'heat_until_temp', 'temp':95, 'thresh':80, 'fire':20,},
-            # Heat at lower power until all water is cooked away (post-boiling point external temp of 91 depends on pot)
-            {'mode': 'heat_until_temp', 'temp':102, 'thresh':91, 'fire':10},
-            # Keep warm at 60 degrees for 60 minutes.
-            {'mode': 'heat_until_timer', 'temp':60, 'fire':10, 'mins': 60},}
-        ])
         """
         if self.is_v1:
-            offset = 38
+            offset = OFFSET_PHASE_V1
         else:
-            offset = 48
-        temp_target = 0
-        for phase_i in range(16):
+            offset = OFFSET_PHASE_V2
+        temp_target = DEFAULT_TEMP_TARGET_CELCIUS
+        for phase_i in range(15):
             o = offset + phase_i * 8
             if phase_i >= len(phases):
                 self.data[o + 0] = 0
-                self.data[o + 1] = 0  # 128
+                self.data[o + 1] = 0
                 self.data[o + 2] = 0
-                self.data[o + 3] = 229
+                self.data[o + 3] = DEFAULT_THRESHOLD_CELCIUS
                 self.data[o + 4] = temp_target
                 self.data[o + 5] = 0
-                self.data[o + 6] = 20
-                self.data[o + 7] = 20
+                self.data[o + 6] = DEFAULT_FIRE_ON_OFF
+                self.data[o + 7] = DEFAULT_FIRE_ON_OFF
             else:
                 # self.data[0] is the mode. There are 6 bits to set for the flag. I've only seen 2, 8, and 26 set.
                 phase = phases[phase_i]
                 temp_target = phase.get("temp", 0)
-                temp_threshold = phase.get("thresh", 229)
-                mode = phase.get("mode", 0)
-                fire = phase.get("fire", 45)
-                minutes = phase.get("mins", 0)
+                temp_threshold = phase.get("thresh", DEFAULT_THRESHOLD_CELCIUS)
+                mode = phase.get("mode", StageMode.FireMode)
+                fire = phase.get("fire", DEFAULT_FIRE_LEVEL)
+                minutes = phase.get("mins", DEFAULT_PHASE_MINUTES)
                 hours = minutes // 60
                 minutes = minutes % 60
+                fire_on = phase.get("fire_on", DEFAULT_FIRE_ON_OFF)  # values [0-20].
+                fire_off = phase.get("fire_off", DEFAULT_FIRE_ON_OFF)  # values [0-20].
 
-                if mode == "heat_until_temp" or mode == "2":
-                    self.data[o + 0] = 2  # not sure
-                    self.data[o + 1] = 128
-                    self.data[o + 2] = 45
-                    self.data[o + 3] = temp_threshold
-                elif mode == "16":
-                    self.data[o + 0] = 16  # not sure
-                    self.data[o + 1] = 128
-                    self.data[o + 2] = 45
-                    self.data[o + 3] = temp_threshold
-                elif mode == "10":
-                    self.data[o + 0] = 10  # not sure
-                    self.data[o + 1] = 128
-                    self.data[o + 2] = 45
-                    self.data[o + 3] = temp_threshold
-                elif mode == "26":
-                    self.data[o + 0] = 26
-                    self.data[o + 1] = 0
-                    self.data[o + 2] = 45
-                    self.data[o + 3] = temp_threshold
-                elif mode == "continuous_output" or mode == "0":
-                    self.data[o + 0] = 0
-                    self.data[o + 1] = 128 + hours
-                    self.data[o + 2] = minutes
-                    self.data[o + 3] = temp_threshold
-                elif mode == "heat_until_timer" or mode == "8":
-                    self.data[o + 0] = 8  # heat until time
-                    self.data[o + 1] = 128 + hours
-                    self.data[o + 2] = minutes
-                    self.data[o + 3] = 229
+                self.data[o + 0] = mode
+                self.data[o + 1] = 128 + hours
+                self.data[o + 2] = minutes
+                self.data[o + 3] = temp_threshold
                 self.data[o + 4] = temp_target
                 self.data[o + 5] = fire
-                self.data[o + 6] = 20  # there is one recipe where these bits are set.
-                self.data[o + 7] = 20
+                self.data[o + 6] = fire_off  # there is one recipe where these bits are set.
+                self.data[o + 7] = fire_on
 
     def set_save_recipe(self, save: bool):
         """Flag if recipe should be stored in menu"""
         if self.is_v1:
-            i = 21
+            i = OFFSET_SET_START_V1
         else:
-            i = 37
+            i = OFFSET_SET_START_V2
         if save:
             self.data[i] = self.data[i] | 0
         else:
@@ -280,9 +244,9 @@ class CookProfile:
     def set_recipe_id(self, j: int):
         """Set recipe identifier"""
         if self.is_v1:
-            i = 17
+            i = OFFSET_RECIPE_ID_V1
         else:
-            i = 33
+            i = OFFSET_RECIPE_ID_V2
         self.data[i + 0] = (j >> 24) & 255
         self.data[i + 1] = (j >> 16) & 255
         self.data[i + 2] = (j >> 8) & 255
@@ -293,9 +257,9 @@ class CookProfile:
         hours = minutes // 60
         mins = minutes % 60
         if self.is_v1:
-            i = 22
+            i = OFFSET_DURATION_V1
         else:
-            i = 38
+            i = OFFSET_DURATION_V2
         self.data[i] = hours
         self.data[i + 1] = mins
 
@@ -304,9 +268,9 @@ class CookProfile:
         hours = minutes // 60
         mins = minutes % 60
         if self.is_v1:
-            i = 26
+            i = OFFSET_DURATION_MIN_V1
         else:
-            i = 42
+            i = OFFSET_DURATION_MIN_V2
         self.data[i] = hours
         self.data[i + 1] = mins
 
@@ -315,23 +279,22 @@ class CookProfile:
         hours = minutes // 60
         mins = minutes % 60
         if self.is_v1:
-            i = 24
+            i = OFFSET_DURATION_MAX_V1
         else:
-            i = 40
+            i = OFFSET_DURATION_MAX_V2
         self.data[i] = hours
         self.data[i + 1] = mins
 
     def to_hex(self):
-        n = len(self.data)
-
         self.data[0] = 3
         self.data[1] = DEVICE_ID[self.model]
         if self.is_v1:
-            mystery_bit_i = 30
+            mystery_bit_i = OFFSET_MYSTERY_BIT_V1
         else:
-            mystery_bit_i = 46
+            mystery_bit_i = OFFSET_MYSTERY_BIT_V2
         self.data[mystery_bit_i] = 1  # This bit is always set
-        crc = calcrc(self.data, n - 2)
+
+        crc = crc16.crc16xmodem(bytes(self.data[0:-2]))
 
         self.data[-2] = (crc >> 8) & 255
         self.data[-1] = crc & 255
@@ -362,6 +325,11 @@ class IHCookerStatus:
         """
         self.data = data
         self.model = model
+        if model not in MODEL_VERSION1 and model not in MODEL_VERSION2:
+            raise IHCookerException(
+                "Model %s currently unsupported, please report this on github."
+                % self.model
+            )
 
     @property
     def is_v1(self):
@@ -380,21 +348,17 @@ class IHCookerStatus:
     def recipe_id(self) -> int:
         """Selected recipe id."""
         if self.is_v1:
-            return int(self.data["menu"][28:], 16)
-        elif self.is_v2:
-            return int(self.data["menu"][58:], 16)
+            cap = RECIPE_NAME_MAX_LEN_V1 * 2 + 2
         else:
-            raise IHCookerException(
-                "Model %s currently unsupported, please report this on github."
-                % self.model
-            )
+            cap = RECIPE_NAME_MAX_LEN_V2 * 2 + 2
+        return int(self.data["menu"][cap:], 16)
 
     @property
     def recipe_name(self):
         if self.is_v1:
-            cap = 28
+            cap = RECIPE_NAME_MAX_LEN_V1 * 2 + 2
         else:
-            cap = 58
+            cap = RECIPE_NAME_MAX_LEN_V2 * 2 + 2
         name = bytes.fromhex(self.data["menu"][2:cap]).decode("ascii").strip("\x00")
         name = name.replace("\n", " ")
         return name
@@ -406,7 +370,7 @@ class IHCookerStatus:
     # Action-field parsing:
     @property
     def stage(self) -> Optional[int]:
-        """Cooking step/stage: one in range(16) steps."""
+        """Cooking step/stage: one in range(15) steps."""
         if not self.is_error:
             action = self.data["action"]
             if len(action) >= 6:
@@ -417,8 +381,6 @@ class IHCookerStatus:
     def temperature(self) -> Optional[int]:
         """
         Current temperature, if idle.
-
-        Example values: *29*, 031e0b23, 031e0b23031e
         """
         if not self.is_error:
             action = self.data["action"]
@@ -444,8 +406,9 @@ class IHCookerStatus:
         0: constant power output.
         2: Temperature control.
         4: Unknown.
-        8: Will progress to next stage when stage-timer runs out.
+        8: Temp regulation and fire hard coded for small pot @coolibry
         16: Unknown.
+        24: Temp regulation and fire hard coded for big pot @coolibry
         """
         # TODO: parse as separate properties when stage figured out.
         if not self.is_error:
@@ -534,7 +497,7 @@ class IHCookerStatus:
         if not self.is_error:
             play = self.data["play"]
             if len(play) == 18:
-                return int.from_bytes(bytes.fromhex(play[4:6]), "little")
+                return int.from_bytes(bytes.fromhex(play[16:18]), "little")
         return None
 
     # TODO: Fully parse timer field.
@@ -568,30 +531,30 @@ class IHCookerStatus:
 
     def __repr__(self) -> str:
         s = (
-            "<CookerStatus mode=%s "
-            "menu=%s, "
-            "stage=%s, "
-            "temperature=%s, "
-            # "start_time=%s"
-            # "remaining=%s, "
-            # "cooking_delayed=%s, "
-            "target_temperature=%s, "
-            "wifi_led_setting=%s, "
-            "hardware_version=%s, "
-            "firmware_version=%s>"
-            % (
-                self.mode,
-                self.recipe_name,
-                self.stage,
-                self.temperature,
-                self.target_temp,
-                # self.start_time,
-                # self.remaining,
-                # self.cooking_delayed,
-                self.wifi_led_setting,
-                self.hardware_version,
-                self.firmware_version,
-            )
+                "<CookerStatus mode=%s "
+                "menu=%s, "
+                "stage=%s, "
+                "temperature=%s, "
+                # "start_time=%s"
+                # "remaining=%s, "
+                # "cooking_delayed=%s, "
+                "target_temperature=%s, "
+                "wifi_led_setting=%s, "
+                "hardware_version=%s, "
+                "firmware_version=%s>"
+                % (
+                    self.mode,
+                    self.recipe_name,
+                    self.stage,
+                    self.temperature,
+                    self.target_temp,
+                    # self.start_time,
+                    # self.remaining,
+                    # self.cooking_delayed,
+                    self.wifi_led_setting,
+                    self.hardware_version,
+                    self.firmware_version,
+                )
         )
         return s
 
@@ -602,12 +565,12 @@ class IHCooker(Device):
     Custom recipes can be build with the CookProfile class."""
 
     def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
+            self,
+            ip: str = None,
+            token: str = None,
+            start_id: int = 0,
+            debug: int = 0,
+            lazy_discover: bool = True,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
         self._model = None
@@ -689,6 +652,13 @@ class IHCooker(Device):
         """Stop cooking."""
         self.send("set_func", ["end"])
 
+    @command(default_output=format_output("Cooking stopped"))
+    def stop(self, location):
+        """Delete recipe at location [0,7]"""
+        if location >= 8 or location < 0:
+            raise IHCookerException("location %d must be in [0,7]." % location)
+        self.send("set_delete1", [self.device_prefix + "%0d" % location])
+
     @command(default_output=format_output("Factory reset"))
     def factory_reset(self):
         """Reset device to factory settings, removing menu settings.
@@ -708,7 +678,7 @@ class IHCooker(Device):
         default_output=format_output("Setting menu to {profile}"),
     )
     def set_menu(
-        self, profile: Union[str, CookProfile], location: int, confirm_start=False
+            self, profile: Union[str, CookProfile], location: int, confirm_start=False
     ):
         """Updates one of the menu options with the profile.
 
@@ -722,7 +692,7 @@ class IHCooker(Device):
         profile.set_sequence(location)
         profile.set_start_remind(confirm_start)
 
-        self.send("set_menu%d" % location, [profile.to_hex()])
+        self.send("set_menu1", [profile.to_hex()])
 
     def _prepare_profile(self, profile):
         if isinstance(profile, str):
