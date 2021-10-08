@@ -184,7 +184,8 @@ for original firmwares.
 
 This feature works similarly to the sound updates,
 so passing a local file will create a self-hosting server
-and updating from an URL requires you to pass the md5 hash of the file.
+and updating from an URL requires you to pass the md5 hash of the file.  
+(If uploading works, but fails while in progress with ``BrokenPipeError``, instead of using the built-in HTTP server, hoste the file with a different server such as ``python2 -m SimpleHTTPServer`` (matching python2 running on device) and pass a link with md5 checksum instead. See `issue <https://github.com/rytilahti/python-miio/issues/1154>`_ for details.)
 
 ::
 
