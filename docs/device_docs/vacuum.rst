@@ -185,11 +185,17 @@ for original firmwares.
 This feature works similarly to the sound updates,
 so passing a local file will create a self-hosting server
 and updating from an URL requires you to pass the md5 hash of the file.  
-(If uploading works, but fails while in progress with ``BrokenPipeError``, instead of using the built-in HTTP server, hoste the file with a different server such as ``python2 -m SimpleHTTPServer`` (matching python2 running on device) and pass a link with md5 checksum instead. See `issue <https://github.com/rytilahti/python-miio/issues/1154>`_ for details.)
 
 ::
 
     mirobo update-firmware v11_003094.pkg
+
+If you can control the device but the firmware update is not working (e.g., you are receiving a ```BrokenPipeError`` during the update process <https://github.com/rytilahti/python-miio/issues/1154>`_ , you can host the file on any HTTP server (such as ``python2 -m SimpleHTTPServer``) by passing the URL and the md5sum of the file to the command:
+
+::
+
+    mirobo update-firmware http://example.com/firmware_update.pkg 5eb63bbbe01eeed093cb22bb8f5acdc3
+
 
 Manual control
 ~~~~~~~~~~~~~~
