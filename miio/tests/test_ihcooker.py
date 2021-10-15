@@ -2,16 +2,18 @@ import string
 from unittest import TestCase
 
 import pytest
+from construct import Container
 
 from miio import IHCooker, ihcooker
 
+# V2 state from @aquarat
+# ['running', '01484f54504f540000000000000000000000000000000000000000000000000001', '00306300b9', '0200013b00000000', '000a1404', '0000000100000002000000030000000400000005000000000000000000000000', '01', '0000ea4a6330303400'
+from ..ihcooker import OperationMode, StageMode
 from .dummies import DummyDevice
+
 
 # V1 state from @EUA
 # ['waiting', '02537465616d2f626f696c000000000002', '0013000000', '0100010000000000', '001b0a04', '00000001000000020000000300000004000000050000a4e000000dcc00000000', '00', '0000e60a0017130f00']
-
-# V2 state from @aquarat
-# ['running', '01484f54504f540000000000000000000000000000000000000000000000000001', '00306300b9', '0200013b00000000', '000a1404', '0000000100000002000000030000000400000005000000000000000000000000', '01', '0000ea4a6330303400'
 
 
 class DummyIHCookerV2(DummyDevice, IHCooker):
@@ -79,12 +81,94 @@ class TestIHCookerV2(TestCase):
         return self.device.status()
 
     def test_recipe(self):
-        recipe = ihcooker.CookProfile(self.device.model)
+        recipe = {}
         self.device.start(recipe)
 
+    def test_set_menu(self):
+        recipe = {}
+        self.device.set_menu(recipe, 1)
+
+    def test_start_temp(self):
+        self.device.start_temp(temperature=30, minutes=30)
+
+    def test_construct(self):
+        recipe = (
+            "030405546573740a52656369706500000000000000000000000000000000000000000003ea0000000"
+            "000000000000100008005323c111113028006333d121012188007343e130f11000000f93e00141400"
+            "0000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000"
+            "000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e0014140000"
+            "00f93e001414000000000000000000df87"
+        )
+
+        res = ihcooker.profile_v2.parse(bytes.fromhex(recipe))
+        self.assertEqual(ihcooker.profile_v2.parse(ihcooker.profile_v2.build(res)), res)
+        self.assertEqual(len(ihcooker.profile_v2.build(res)), len(recipe) // 2)
+        self.assertEqual(str(ihcooker.profile_v2.build(res).hex()), recipe)
+
+    def test_phases(self):
+        profile = dict(
+            device_version=4,
+            duration_minutes=115,
+            recipe_id=1002,
+            recipe_name="Test Recipe",
+            menu_location=5,
+            menu_settings=dict(save_recipe=True),
+            stages=[
+                dict(
+                    mode=StageMode.FireMode,
+                    temp_target=60,
+                    temp_threshold=50,
+                    minutes=115,
+                    power=17,
+                    fire_on=19,
+                    fire_off=17,
+                ),
+                dict(
+                    mode=StageMode.TemperatureMode,
+                    temp_target=61,
+                    temp_threshold=51,
+                    minutes=6,
+                    power=18,
+                    fire_on=18,
+                    fire_off=16,
+                ),
+                dict(
+                    mode=StageMode.TempAutoBigPot,
+                    temp_target=62,
+                    temp_threshold=52,
+                    minutes=7,
+                    power=19,
+                    fire_on=17,
+                    fire_off=15,
+                ),
+                dict(
+                    mode=StageMode.TempAutoBigPot,
+                    temp_target=62,
+                    temp_threshold=52,
+                    minutes=7,
+                    power=19,
+                    fire_on=17,
+                    fire_off=15,
+                ),
+            ],
+            crc=0,
+        )
+
+        bytes_recipe = ihcooker.profile_v2.build(profile)
+        hex_recipe = bytes_recipe.hex()
+        print(hex_recipe)
+        self.assertEqual(
+            "030405546573742052656369706500000000000000000000000000000000000000000003ea8001370000000000000100008137323c111113028006333d121012188007343e130f11188007343e130f11008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e50014140000000000000000002e2e",
+            hex_recipe,
+        )
+        self.assertEqual(
+            hex_recipe,
+            ihcooker.profile_v2.build(ihcooker.profile_v2.parse(bytes_recipe)).hex(),
+        )
+        self.assertEqual(115, ihcooker.profile_v2.parse(bytes_recipe).duration_minutes)
+
     def test_crc(self):
-        recipe = ihcooker.CookProfile(self.device.model)
-        # recipe.
+        recipe = {}
         self.device.start(recipe)
 
     def test_mode(self):
@@ -115,8 +199,82 @@ class TestIHCookerv1(TestCase):
         return self.device.status()
 
     def test_recipe(self):
-        recipe = ihcooker.CookProfile(self.device.model)
+        recipe = {}
         self.device.start(recipe)
+
+    def test_set_menu(self):
+        recipe = {}
+        self.device.set_menu(recipe, 1)
+
+    def test_start_temp(self):
+        self.device.start_temp(temperature=30, minutes=30)
+
+    def test_construct(self):
+        recipe = "030405546573740a52656369706500000000000000000000000000000000000000000000000000000000000000000100008005323c111113028006333d121012188007343e130f11000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e000000000000000000000000000000000000000071ba"
+        res = ihcooker.profile_v1.parse(bytes.fromhex(recipe))
+        self.assertEqual(len(ihcooker.profile_v1.build(res)), len(recipe) // 2)
+        self.assertEqual(str(ihcooker.profile_v1.build(res).hex()), recipe)
+
+    def test_phases(self):
+        profile = dict(
+            device_version=4,
+            duration_minutes=115,
+            recipe_id=1002,
+            recipe_name="Test Recipe",
+            menu_location=5,
+            menu_settings=dict(save_recipe=True),
+            stages=[
+                dict(
+                    mode=StageMode.FireMode,
+                    temp_target=60,
+                    temp_threshold=50,
+                    minutes=115,
+                    power=17,
+                    fire_on=19,
+                    fire_off=17,
+                ),
+                dict(
+                    mode=StageMode.TemperatureMode,
+                    temp_target=61,
+                    temp_threshold=51,
+                    minutes=6,
+                    power=18,
+                    fire_on=18,
+                    fire_off=16,
+                ),
+                dict(
+                    mode=StageMode.TempAutoBigPot,
+                    temp_target=62,
+                    temp_threshold=52,
+                    minutes=7,
+                    power=19,
+                    fire_on=17,
+                    fire_off=15,
+                ),
+                dict(
+                    mode=StageMode.TempAutoBigPot,
+                    temp_target=62,
+                    temp_threshold=52,
+                    minutes=7,
+                    power=19,
+                    fire_on=17,
+                    fire_off=15,
+                ),
+            ],
+            crc=0,
+        )
+
+        bytes_recipe = ihcooker.profile_v1.build(profile)
+        hex_recipe = bytes_recipe.hex()
+        print(hex_recipe)
+        self.assertEqual(
+            "0304055465737420526563697065000000000003ea8001370000000000000100000000000000008137323c111113028006333d121012188007343e130f11188007343e130f11008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e5001414008000f9e500141400000000000000000000000000000000000000c820",
+            hex_recipe,
+        )
+        self.assertEqual(
+            hex_recipe,
+            ihcooker.profile_v1.build(ihcooker.profile_v1.parse(bytes_recipe)).hex(),
+        )
 
     def test_mode(self):
         self.assertEqual(ihcooker.OperationMode.Waiting, self.state().mode)

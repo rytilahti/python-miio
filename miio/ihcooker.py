@@ -7,8 +7,7 @@ from collections import defaultdict
 from typing import Dict, List, Optional, Union
 
 import click
-
-import crc16
+import construct as c
 
 from .click_common import command, format_output
 from .device import Device
@@ -27,65 +26,53 @@ MODEL_V1 = "chunmi.ihcooker.v1"
 MODEL_VERSION1 = [MODEL_V1, MODEL_FW, MODEL_HK1, MODEL_TW1]
 MODEL_VERSION2 = [MODEL_EG1, MODEL_EXP1, MODEL_KOREA1]
 DEVICE_ID = {
-    MODEL_EG1: 2,  # TODO: TBD
+    MODEL_EG1: 4,
     MODEL_EXP1: 4,
-    MODEL_FW: 1,  # TODO: TBD
-    MODEL_HK1: 1,  # TODO: TBD
-    MODEL_KOREA1: 2,  # TODO: TBD
-    MODEL_TW1: 1,  # TODO: TBD
+    MODEL_FW: 7,
+    MODEL_HK1: 2,
+    MODEL_KOREA1: 5,
+    MODEL_TW1: 3,
     MODEL_V1: 1,
 }
-DEVICE_PREFIX = {k: "03%02d" % v for k, v in DEVICE_ID.items()}
-
-VERSION_1 = 1
-VERSION_2 = 2
-
-OFFSET_MYSTERY_BIT_V1 = 30
-OFFSET_MYSTERY_BIT_V2 = 46
-
-OFFSET_DURATION_MIN_V1 = 26
-OFFSET_DURATION_MIN_V2 = 42
-OFFSET_DURATION_MAX_V1 = 24
-OFFSET_DURATION_MAX_V2 = 40
-
-OFFSET_DURATION_V1 = 38
-OFFSET_DURATION_V2 = 22
-
-OFFSET_RECIPE_ID_V1 = 17
-OFFSET_RECIPE_ID_V2 = 33
 
 RECIPE_NAME_MAX_LEN_V1 = 13
 RECIPE_NAME_MAX_LEN_V2 = 28
-
-OFFSET_SET_START_V1 = 21
-OFFSET_SET_START_V2 = 37
-
-OFFSET_PHASE_V1 = 38
-OFFSET_PHASE_V2 = 48
-
-MAX_RECIPE_NAME_V1 = 28
-MAX_RECIPE_NAME_V2 = 58
-
-OFFSET_RECIPE_NAME = 3
-
 DEFAULT_FIRE_ON_OFF = 20
-
 DEFAULT_THRESHOLD_CELCIUS = 249
 DEFAULT_TEMP_TARGET_CELCIUS = 229
-
 DEFAULT_FIRE_LEVEL = 45
+DEFAULT_PHASE_MINUTES = 0
 
-DEFAULT_PHASE_MINUTES = 45
 
-START_REMIND_ON_BIT_STRING = 64
-START_REMIND_OFF_BIT_STRING = 190
+def crc16(data: bytes, offset=0, length=None):
+    """Computes 16bit CRC for IHCooker recipe profiles.
+
+    Based on variant by Amin Saidani posted on https://stackoverflow.com/a/55850496."""
+    if length is None:
+        length = len(data)
+    if (
+            data is None
+            or offset < 0
+            or offset > len(data) - 1
+            and offset + length > len(data)
+    ):
+        return 0
+    crc = 0x0000
+    for i in range(0, length):
+        crc ^= data[offset + i] << 8
+        for j in range(0, 8):
+            if (crc & 0x8000) > 0:
+                crc = (crc << 1) ^ 0x1021
+            else:
+                crc = crc << 1
+    return crc & 0xFFFF
 
 
 class IHCookerException(DeviceException):
     pass
 
 
-class StageMode(enum.Enum):
+class StageMode(enum.IntEnum):
     """Mode for current stage of recipe."""
 
     FireMode = 0
@@ -97,7 +84,7 @@ class StageMode(enum.Enum):
 
 
 class OperationMode(enum.Enum):
-    """Global mode the induction cooker is currently in"""
+    """Global mode the induction cooker is currently in."""
 
     Error = "error"
     Finish = "finish"
@@ -114,201 +101,212 @@ class OperationMode(enum.Enum):
     Waiting = "waiting"
 
 
-class CookProfile:
-    """Represents a recipe containing cooking time, 16 stages of temperature&timing settings and more."""
+class ArrayDefault(c.Array):
+    r"""
+    Homogenous array of elements, similar to C# generic T[].
 
-    def __init__(self, model, profile=None):
-        self.model = model
-        """Initialize a cooking profile from an existing one, or a new one."""
-        if profile is not None:
-            self.data = bytearray.fromhex(profile)
-        else:
-            self.data = bytearray([0] * 179)
-            # Initialize recipe phases.
-            if self.is_v1:
-                offset = OFFSET_PHASE_V1
-            else:
-                offset = OFFSET_PHASE_V2
+    Parses into a ListContainer (a list). Parsing and building processes an exact amount of elements. If given list has less than count elements, the array is padded with the default element. More elements raises RangeError. Size is defined as count multiplied by subcon size, but only if subcon is fixed size.
 
-            for i in range(offset, 15 * 8, 8):
-                self.data[i + 0] = 0
-                self.data[i + 1] = 0
-                self.data[i + 2] = 0
-                self.data[i + 3] = DEFAULT_THRESHOLD_CELCIUS
-                self.data[i + 4] = DEFAULT_TEMP_TARGET_CELCIUS
-                self.data[i + 5] = 0
-                self.data[i + 6] = DEFAULT_FIRE_ON_OFF
-                self.data[i + 7] = DEFAULT_FIRE_ON_OFF
-            recipe_id = random.randint(0, 2 ** 32 - 1)
-            self.set_recipe_id(recipe_id)
-            self.set_recipe_name("Custom %d" % recipe_id)
-            self.set_duration(60)
+    Operator [] can be used to make Array instances (recommended syntax).
 
-    @property
-    def is_v1(self):
-        return self.model in MODEL_VERSION1
+    :param count: integer or context lambda, strict amount of elements
+    :param subcon: Construct instance, subcon to process individual elements
+    :param default: default element to pad array with.
+    :param discard: optional, bool, if set then parsing returns empty list
 
-    @property
-    def is_v2(self):
-        return self.model in MODEL_VERSION2
+    :raises StreamError: requested reading negative amount, could not read enough bytes, requested writing different amount than actual data, or could not write all bytes
+    :raises RangeError: specified count is not valid
+    :raises RangeError: given object has different length than specified count
 
-    def set_start_remind(self, value):
-        """Prompt user to start recipe, used with set_menu function."""
-        if self.is_v1:
-            i = OFFSET_SET_START_V1
-        else:
-            i = OFFSET_SET_START_V2
-        if value:
-            self.data[i] = self.data[i] | START_REMIND_ON_BIT_STRING
-        else:
-            self.data[i] = self.data[i] & START_REMIND_OFF_BIT_STRING
+    Can propagate any exception from the lambdas, possibly non-ConstructError.
 
-    def set_sequence(self, location=9):
-        """Favorite location. set to 9 to not save, just request confirmation with set_start_remind."""
-        self.data[2] = location & 255
+    Example::
 
-    def set_recipe_name(self, name):
-        if name is None:
-            name = ""
-        name = name.replace(" ", "\n")
-        name_b = codecs.encode(name, "ascii")
-        if self.is_v1:
-            max_len = RECIPE_NAME_MAX_LEN_V1
-        else:
-            max_len = RECIPE_NAME_MAX_LEN_V2
-        for i in range(max_len):
-            if i < len(name_b):
-                print(name_b[i])
-                self.data[i + OFFSET_RECIPE_NAME] = name_b[i]
-            else:
-                self.data[i + OFFSET_RECIPE_NAME] = 0
+        >>> d = ArrayDefault(5, Byte, 0) or Byte[5]
+        >>> d.build(range(3))
+        b'\x00\x01\x02\x00\x00'
+        >>> d.parse(_)
+        [0, 1, 2, 0, 0]
+    """
 
-    def set_recipe_phases(self, phases: List[Dict[str, int]]):
-        """Set up to 16 phases of this recipe.
-        Phases are encoded using a 8 numbers:
-        mode, 128+hours, minutes, temp_threshold, temp_target, fire_power, 20 (unknown), 20 (unknown)
-        The last two numbers' purpose is unclear, but appear to be 20, 20 in almost all recipes.
+    def __init__(self, count, subcon, default, discard=False):
+        super(ArrayDefault, self).__init__(count, subcon, discard)
+        self.default = default
 
-        Args:
-        - phases is a list of up to 16 dicts representing each phase.
-            A phase is consists of the following options:
-            {
-                mode: StageMode.
-                temp: target temperature to heat to, in celsius.
-                thresh: temperature threshold for moving to next phase, in celcius.
-                mins: how long this phase lasts in minutes.
-                fire: power output between [0,99]
-                fire_on: [0,20] (untested)
-                fire_off: [0,20] (untested)
-            }
-        """
-        if self.is_v1:
-            offset = OFFSET_PHASE_V1
-        else:
-            offset = OFFSET_PHASE_V2
-        temp_target = DEFAULT_TEMP_TARGET_CELCIUS
-        for phase_i in range(15):
-            o = offset + phase_i * 8
-            if phase_i >= len(phases):
-                self.data[o + 0] = 0
-                self.data[o + 1] = 0
-                self.data[o + 2] = 0
-                self.data[o + 3] = DEFAULT_THRESHOLD_CELCIUS
-                self.data[o + 4] = temp_target
-                self.data[o + 5] = 0
-                self.data[o + 6] = DEFAULT_FIRE_ON_OFF
-                self.data[o + 7] = DEFAULT_FIRE_ON_OFF
-            else:
-                phase = phases[phase_i]
-                temp_target = phase.get("temp", 0)
-                temp_threshold = phase.get("thresh", DEFAULT_THRESHOLD_CELCIUS)
-                mode = phase.get("mode", StageMode.FireMode)
-                fire = phase.get("fire", DEFAULT_FIRE_LEVEL)
-                minutes = phase.get("mins", DEFAULT_PHASE_MINUTES)
-                hours = minutes // 60
-                minutes = minutes % 60
-                fire_on = phase.get("fire_on", DEFAULT_FIRE_ON_OFF)  # values [0-20].
-                fire_off = phase.get("fire_off", DEFAULT_FIRE_ON_OFF)  # values [0-20].
+    def _build(self, obj, stream, context, path):
+        count = self.count
+        if callable(count):
+            count = count(context)
+        if not 0 <= count:
+            raise c.RangeError("invalid count %s" % (count,), path=path)
+        if len(obj) > count:
+            raise c.RangeError(
+                "expected %d elements, found %d" % (count, len(obj)), path=path
+            )
+        retlist = c.ListContainer()
+        i = -1
+        for i, e in enumerate(obj):
+            context._index = i
+            buildret = self.subcon._build(e, stream, context, path)
+            retlist.append(buildret)
+        for i in range(len(obj), count):
+            context._index = i
+            buildret = self.subcon._build(self.default, stream, context, path)
+            retlist.append(buildret)
+        return retlist
 
-                self.data[o + 0] = mode
-                self.data[o + 1] = 128 + hours
-                self.data[o + 2] = minutes
-                self.data[o + 3] = temp_threshold
-                self.data[o + 4] = temp_target
-                self.data[o + 5] = fire
-                self.data[o + 6] = fire_off
-                self.data[o + 7] = fire_on
 
-    def set_save_recipe(self, save: bool):
-        """Flag if recipe should be stored in menu"""
-        if self.is_v1:
-            i = OFFSET_SET_START_V1
-        else:
-            i = OFFSET_SET_START_V2
-        if save:
-            self.data[i] = self.data[i] | 0
-        else:
-            self.data[i] = self.data[i] & 255
+class RebuildStream(c.Rebuild):
+    r"""
+    Field where building does not require a value, because the value gets recomputed when needed. Comes handy when building a Struct from a dict with missing keys. Useful for length and count fields when :class:`~construct.core.Prefixed` and :class:`~construct.core.PrefixedArray` cannot be used.
 
-    def set_recipe_id(self, j: int):
-        """Set recipe identifier"""
-        if self.is_v1:
-            i = OFFSET_RECIPE_ID_V1
-        else:
-            i = OFFSET_RECIPE_ID_V2
-        self.data[i + 0] = (j >> 24) & 255
-        self.data[i + 1] = (j >> 16) & 255
-        self.data[i + 2] = (j >> 8) & 255
-        self.data[i + 3] = j & 255
+    Parsing defers to subcon. Building is defered to subcon, but it builds from a value provided by the stream until now. Size is the same as subcon, unless it raises SizeofError.
 
-    def set_duration(self, minutes):
-        """Sets global timer for recipe. Runs independently from recipe phase timers."""
-        hours = minutes // 60
-        mins = minutes % 60
-        if self.is_v1:
-            i = OFFSET_DURATION_V1
-        else:
-            i = OFFSET_DURATION_V2
-        self.data[i] = hours
-        self.data[i + 1] = mins
+    Difference between Rebuild and RebuildStream, is that RebuildStream provides the current datastream to func.
 
-    def set_duration_minimum(self, minutes):
-        """Sets what appears to be the minimum time for recipe. Usage unknown."""
-        hours = minutes // 60
-        mins = minutes % 60
-        if self.is_v1:
-            i = OFFSET_DURATION_MIN_V1
-        else:
-            i = OFFSET_DURATION_MIN_V2
-        self.data[i] = hours
-        self.data[i + 1] = mins
+    :param subcon: Construct instance
+    :param func: context lambda or constant value
 
-    def set_duration_maximum(self, minutes):
-        """Sets what appears to be the maximum time for recipe. Usage unknown."""
-        hours = minutes // 60
-        mins = minutes % 60
-        if self.is_v1:
-            i = OFFSET_DURATION_MAX_V1
-        else:
-            i = OFFSET_DURATION_MAX_V2
-        self.data[i] = hours
-        self.data[i + 1] = mins
+    :raises StreamError: requested reading negative amount, could not read enough bytes, requested writing different amount than actual data, or could not write all bytes
 
-    def to_hex(self):
-        self.data[0] = 3
-        self.data[1] = DEVICE_ID[self.model]
-        if self.is_v1:
-            mystery_bit_i = OFFSET_MYSTERY_BIT_V1
-        else:
-            mystery_bit_i = OFFSET_MYSTERY_BIT_V2
-        self.data[mystery_bit_i] = 1  # This bit is always set
+    Can propagate any exception from the lambda, possibly non-ConstructError.
 
-        crc = crc16.crc16xmodem(bytes(self.data[0:-2]))
+    Example::
 
-        self.data[-2] = (crc >> 8) & 255
-        self.data[-1] = crc & 255
+        >>> d = Struct(
+        ...     "count" / Rebuild(Byte, len_(this.items)),
+        ...     "items" / Byte[this.count],
+        ... )
+        >>> d.build(dict(items=[1,2,3]))
+        b'\x03\x01\x02\x03'
+    """
 
-        return codecs.encode(self.data, "hex").decode("ascii")
+    def __init__(self, subcon, func):
+        super(RebuildStream, self).__init__(subcon, func)
+
+    def _build(self, obj, stream, context, path):
+        fallback = c.stream_tell(stream, path)
+        c.stream_seek(stream, 0, 0, path)
+        data = stream.read(fallback)
+        obj = self.func(data) if callable(self.func) else self.func
+        ret = self.subcon._build(obj, stream, context, path)
+        return ret
+
+
+profile_base = lambda is_v1, recipe_name_encoding="GBK": c.Struct(
+    c.Const(3, c.Int8un),
+    "device_version" / c.Default(c.Enum(c.Int8ub, **DEVICE_ID), 1 if is_v1 else 2),
+    # Some v2 recipes have device_version=1.
+    "menu_location" / c.Default(c.Int8ub, 9),
+    "recipe_name"
+    / c.Default(
+        c.StringEncoded(
+            c.FixedSized(
+                RECIPE_NAME_MAX_LEN_V1 if is_v1 else RECIPE_NAME_MAX_LEN_V2,
+                c.NullStripped(c.GreedyBytes),
+            ),
+            recipe_name_encoding,
+        ),
+        "Unnamed",
+    ),
+    c.Padding(1) if is_v1 else c.Padding(2),
+    "recipe_id" / c.Default(c.Int32ub, lambda _: random.randint(0, 2 ** 32 - 1)),
+    "menu_settings"
+    / c.Default(
+        c.BitStruct(  # byte 37
+            "save_recipe" / c.Default(c.Flag, 0),
+            "confirm_start" / c.Default(c.Flag, 0),
+            "menu_unknown3" / c.Default(c.Flag, 0),
+            "menu_unknown4" / c.Default(c.Flag, 0),
+            "menu_unknown5" / c.Default(c.Flag, 0),
+            "menu_unknown6" / c.Default(c.Flag, 0),
+            "menu_unknown7" / c.Default(c.Flag, 0),
+            "menu_unknown8" / c.Default(c.Flag, 0),
+        ),
+        {},
+    ),
+    "duration_hours"
+    / c.Rebuild(c.Int8ub, lambda ctx: ctx.get("duration_minutes", 0) // 60),  # byte 38
+    "duration_minutes"
+    / c.Default(
+        c.ExprAdapter(
+            c.Int8ub, lambda obj, ctx: obj + ctx.duration_hours * 60, c.obj_ % 60
+        ),
+        60,
+    ),  # byte 39
+    "duration_max_hours"
+    / c.Rebuild(
+        c.Int8ub, lambda ctx: ctx.get("duration_max_minutes", 0) // 60
+    ),  # byte 40
+    "duration_max_minutes"
+    / c.Default(
+        c.ExprAdapter(
+            c.Int8ub, lambda obj, ctx: obj + ctx.duration_max_hours * 60, c.obj_ % 60
+        ),
+        0,
+    ),  # byte 41
+    "duration_min_hours"
+    / c.Rebuild(
+        c.Int8ub, lambda ctx: ctx.get("duration_min_minutes", 0) // 60
+    ),  # byte 42
+    "duration_min_minutes"
+    / c.Default(
+        c.ExprAdapter(
+            c.Int8ub, lambda obj, ctx: obj + ctx.duration_min_hours * 60, c.obj_ % 60
+        ),
+        0,
+    ),  # byte 43
+    c.Padding(2),  # byte 44, 45
+    "always_set_to_1" / c.Default(c.Byte, 1),  # byte 46, should be set to 1
+    c.Padding(7) if is_v1 else c.Padding(1),
+    "stages"
+    / c.Default(
+        ArrayDefault(
+            15,
+            c.Struct(  # byte 48-168
+                "mode" / c.Default(c.Enum(c.Byte, StageMode), StageMode.FireMode),
+                "hours"
+                / c.Rebuild(c.Int8ub, lambda ctx: (ctx.get("minutes", 0) // 60) + 128),
+                "minutes"
+                / c.Default(
+                    c.ExprAdapter(
+                        c.Int8ub,
+                        decoder=lambda obj, ctx: obj + (ctx.hours - 128) * 60,
+                        encoder=c.obj_ % 60,
+                    ),
+                    DEFAULT_PHASE_MINUTES,
+                ),
+                "temp_threshold" / c.Default(c.Int8ub, DEFAULT_THRESHOLD_CELCIUS),
+                "temp_target" / c.Default(c.Int8ub, DEFAULT_TEMP_TARGET_CELCIUS),
+                "power" / c.Default(c.Int8ub, DEFAULT_FIRE_LEVEL),
+                "fire_off" / c.Default(c.Int8ub, DEFAULT_FIRE_ON_OFF),
+                "fire_on" / c.Default(c.Int8ub, DEFAULT_FIRE_ON_OFF),
+            ),
+            dict(
+                mode=StageMode.FireMode,
+                minutes=DEFAULT_PHASE_MINUTES,
+                temp_threshold=DEFAULT_THRESHOLD_CELCIUS,
+                temp_target=DEFAULT_TEMP_TARGET_CELCIUS,
+                power=DEFAULT_FIRE_LEVEL,
+                fire_off=DEFAULT_FIRE_ON_OFF,
+                fire_on=DEFAULT_FIRE_ON_OFF,
+            ),
+        ),
+        [],
+    ),
+    c.Padding(16) if is_v1 else c.Padding(6),  # byte 169-174
+    "unknown175" / c.Default(c.Int8ub, 0),
+    "unknown176" / c.Default(c.Int8ub, 0),
+    "unknown177" / c.Default(c.Int8ub, 0),
+    "crc"
+    / RebuildStream(
+        c.Bytes(2), crc16
+    ),  # Default profiles have invalid crc, c.Checksum() throws undesired error.
+)
+
+profile_v1 = profile_base(is_v1=True)
+profile_v2 = profile_base(is_v1=False)
+profile_korea = profile_base(is_v1=False, recipe_name_encoding="euc-kr")
 
 
 class IHCookerStatus:
@@ -415,11 +413,10 @@ class IHCookerStatus:
         0: constant power output.
         2: Temperature control.
         4: Unknown.
-        8: Temp regulation and fire hard coded for small pot , via @coolibry.
+        8: Temp regulation and fire hard coded for small pot, via @coolibry.
         16: Unknown.
         24: Temp regulation and fire hard coded for big pot, via @coolibry.
         """
-        # TODO: reverse engineer these flags in more detail.
         if not self.is_error:
             action = self.data["action"]
             if len(action) >= 8:
@@ -538,40 +535,11 @@ class IHCookerStatus:
         """Firmware version."""
         return int(self.data["version"][4:8], 16)
 
-    def __repr__(self) -> str:
-        s = (
-            "<CookerStatus mode=%s "
-            "menu=%s, "
-            "stage=%s, "
-            "temperature=%s, "
-            # "start_time=%s"
-            # "remaining=%s, "
-            # "cooking_delayed=%s, "
-            "target_temperature=%s, "
-            "wifi_led_setting=%s, "
-            "hardware_version=%s, "
-            "firmware_version=%s>"
-            % (
-                self.mode,
-                self.recipe_name,
-                self.stage,
-                self.temperature,
-                self.target_temp,
-                # self.start_time,
-                # self.remaining,
-                # self.cooking_delayed,
-                self.wifi_led_setting,
-                self.hardware_version,
-                self.firmware_version,
-            )
-        )
-        return s
-
 
 class IHCooker(Device):
     """Main class representing the induction cooker.
 
-    Custom recipes can be build with the CookProfile class."""
+    Custom recipes can be build with the profile_v1/v2 structure."""
 
     def __init__(
         self,
@@ -637,24 +605,49 @@ class IHCooker(Device):
     @command(
         click.argument("profile", type=str),
         click.argument("skip_confirmation", type=bool),
-        default_output=format_output("Cooking profile started"),
+        default_output=format_output("Cooking profile requested."),
     )
-    def start(self, profile: Union[str, CookProfile], skip_confirmation=False):
+    def start(self, profile: Union[str, c.Container, dict], skip_confirmation=False):
         """Start cooking a profile.
 
         Please do not use skip_confirmation=True, as this is potentially unsafe."""
 
         profile = self._prepare_profile(profile)
-        profile.set_save_recipe(False)
-        profile.set_sequence(9)
+        profile.menu_settings.save_recipe = False
+        profile.menu_settings.confirm_start = not skip_confirmation
         if skip_confirmation:
             warnings.warn(
                 "You're starting a profile without confirmation, which is a potentially unsafe."
             )
             self.send("set_start", [profile.to_hex()])
         else:
-            profile.set_start_remind(True)
-            self.send("set_menu1", [profile.to_hex()])
+            self.send("set_menu1", [self._profile_obj.build(profile).hex()])
+
+    @command(
+        click.argument("temperature", type=int),
+        click.argument("minutes", type=int),
+        click.argument("skip_confirmation", type=bool),
+        default_output=format_output("Cooking with temperature requested."),
+    )
+    def start_temp(self, temperature, minutes=60, skip_confirmation=False):
+        """Start cooking at a fixed temperature and duration.
+
+        Temperature in celcius.
+
+        Please do not use skip_confirmation=True, as this is potentially unsafe."""
+
+        profile = dict(
+            recipe_name="%d degrees" % temperature,
+            menu_settings=dict(save_recipe=False, confirm_start=skip_confirmation),
+            duration_minutes=minutes,
+            stages=[{"temp": temperature, "minutes": minutes}],
+        )
+        profile = self._prepare_profile(profile)
+        if skip_confirmation:
+            warnings.warn(
+                "You're starting a profile without confirmation, which is a potentially unsafe."
+            )
+        self.send("set_start", [self._profile_obj.build(profile).hex()])
 
     @command(default_output=format_output("Cooking stopped"))
     def stop(self):
@@ -687,7 +680,7 @@ class IHCooker(Device):
         default_output=format_output("Setting menu to {profile}"),
     )
     def set_menu(
-        self, profile: Union[str, CookProfile], location: int, confirm_start=False
+            self, profile: Union[str, c.Container, dict], location: int, confirm_start=False
     ):
         """Updates one of the menu options with the profile.
 
@@ -697,29 +690,52 @@ class IHCooker(Device):
         profile = self._prepare_profile(profile)
         if location >= 8 or location < 0:
             raise IHCookerException("location %d must be in [0,7]." % location)
-        profile.set_save_recipe(True)
-        profile.set_sequence(location)
-        profile.set_start_remind(confirm_start)
+        profile.device_version = DEVICE_ID[self.model]
+        profile.menu_settings.save_recipe = True
+        profile.confirm_start = confirm_start
+        profile.menu_location = location
 
-        self.send("set_menu1", [profile.to_hex()])
+        self.send("set_menu1", [self._profile_obj.build(profile).hex()])
 
-    def _prepare_profile(self, profile: Union[str, CookProfile]) -> CookProfile:
+    @property
+    def _profile_obj(self) -> c.Struct:
+        if self.model in MODEL_VERSION1:
+            return profile_v1
+        elif self.model == MODEL_KOREA1:
+            return profile_korea
+        else:
+            return profile_v2
+
+    def _prepare_profile(self, profile: Union[str, c.Container, dict]) -> c.Container:
         if isinstance(profile, str):
-            profile = CookProfile(self.model, profile)
+            profile = self._profile_obj.parse(bytes.fromhex(profile))
+        elif isinstance(profile, dict):
+            if "fields" not in profile:
+                profile = dict(fields=dict(value=profile))
+            profile["fields"]["value"]["device_version"] = DEVICE_ID[self.model]
+            profile = self._profile_obj.parse(self._profile_obj.build(profile))
+        elif isinstance(profile, c.Container):
+            pass
+        else:
+            raise ValueError("Invalid profile object")
+
+        profile.device_version = DEVICE_ID[self.model]
         return profile
 
     @property
     def model(self):
+        # TODO: read comment and adjust
         if self._model is None:
             self._model = self.info().model
         return self._model
 
     @property
     def device_prefix(self):
-        prefix = DEVICE_PREFIX.get(self.model, None)
-        if prefix is None:
+        if self.model not in DEVICE_ID:
             raise IHCookerException(
                 "Model %s currently unsupported, please report this on github."
                 % self.model
             )
+
+        prefix = "03%02d" % DEVICE_ID.get(self.model, None)
         return prefix
