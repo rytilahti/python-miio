@@ -193,10 +193,10 @@ class RebuildStream(c.Rebuild):
         return ret
 
 
+# Some public v2 recipes have device_version set to 1, so estimating the profile version is non-trivial, plus one might want to convert between versions.
 profile_base = lambda is_v1, recipe_name_encoding="GBK": c.Struct(
     c.Const(3, c.Int8un),
     "device_version" / c.Default(c.Enum(c.Int8ub, **DEVICE_ID), 1 if is_v1 else 2),
-    # Some v2 recipes have device_version=1.
     "menu_location" / c.Default(c.Int8ub, 9),
     "recipe_name"
     / c.Default(
@@ -542,12 +542,12 @@ class IHCooker(Device):
     Custom recipes can be build with the profile_v1/v2 structure."""
 
     def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
+            self,
+            ip: str = None,
+            token: str = None,
+            start_id: int = 0,
+            debug: int = 0,
+            lazy_discover: bool = True,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover)
         self._model = None
