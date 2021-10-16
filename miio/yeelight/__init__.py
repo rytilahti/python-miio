@@ -3,10 +3,10 @@ from typing import List, Optional, Tuple
 
 import click
 
-from .click_common import command, format_output
-from .device import Device, DeviceStatus
-from .exceptions import DeviceException
-from .utils import int_to_rgb, rgb_to_int
+from ..click_common import command, format_output
+from ..device import Device, DeviceStatus
+from ..exceptions import DeviceException
+from ..utils import int_to_rgb, rgb_to_int
 
 SUPPORTED_MODELS = ["yeelink.light.color1"]
 
