@@ -6,6 +6,7 @@ except ImportError:
     # python 3.8 and later
     from importlib.metadata import version  # type: ignore
 
+from integrations.yeelight import Yeelight
 from miio.airconditioner_miot import AirConditionerMiot
 from miio.airconditioningcompanion import (
     AirConditioningCompanion,
@@ -68,7 +69,6 @@ from miio.waterpurifier import WaterPurifier
 from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
-from miio.yeelight import Yeelight
 from miio.yeelight_dual_switch import YeelightDualControlModule
 
 from miio.discovery import Discovery
