@@ -8,7 +8,7 @@ from typing import Callable, Dict, Optional, Type, Union  # noqa: F401
 
 import zeroconf
 
-from integrations.yeelight import Yeelight
+from miio.integrations.yeelight import Yeelight
 
 from . import (
     AirConditionerMiot,
