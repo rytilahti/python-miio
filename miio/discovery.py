@@ -8,6 +8,8 @@ from typing import Callable, Dict, Optional, Type, Union  # noqa: F401
 
 import zeroconf
 
+from integrations.yeelight import Yeelight
+
 from . import (
     AirConditionerMiot,
     AirConditioningCompanion,
@@ -48,7 +50,6 @@ from . import (
     WaterPurifierYunmi,
     WifiRepeater,
     WifiSpeaker,
-    Yeelight,
 )
 from .airconditioningcompanion import (
     MODEL_ACPARTNER_V1,

@@ -6,7 +6,6 @@ except ImportError:
     # python 3.8 and later
     from importlib.metadata import version  # type: ignore
 
-from integrations.yeelight import Yeelight
 from miio.airconditioner_miot import AirConditionerMiot
 from miio.airconditioningcompanion import (
     AirConditioningCompanion,
