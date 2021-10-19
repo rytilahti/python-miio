@@ -2,10 +2,9 @@ from unittest import TestCase
 
 import pytest
 
-from miio import Yeelight
-from miio.yeelight import YeelightException, YeelightMode, YeelightStatus
+from miio.tests.dummies import DummyDevice
 
-from .dummies import DummyDevice
+from .. import Yeelight, YeelightException, YeelightMode, YeelightStatus
 
 
 class DummyLight(DummyDevice, Yeelight):
