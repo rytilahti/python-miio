@@ -8,7 +8,10 @@ from .click_common import EnumType, command, format_output
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
+MIJIA_VACUUM_V1 = "mijia.vacuum.v1"
 MIJIA_VACUUM_V2 = "mijia.vacuum.v2"
+
+SUPPORTED_MODELS = [MIJIA_VACUUM_V1, MIJIA_VACUUM_V2]
 
 MIOT_MAPPING = {
     MIJIA_VACUUM_V2: {
@@ -272,6 +275,8 @@ class G1CleaningSummary(DeviceStatus):
 
 class G1Vacuum(MiotDevice):
     """Support for G1 vacuum (G1, mijia.vacuum.v2)."""
+
+    _supported_models = SUPPORTED_MODELS
 
     mapping = MIOT_MAPPING[MIJIA_VACUUM_V2]
 
