@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Tuple
+from typing import NamedTuple
 
 import yaml
 
@@ -14,16 +14,23 @@ GENERIC_MODEL_SPEC_DICT = {
 }
 
 
+class YeelightColorTempRange(NamedTuple):
+    """Color temperature range."""
+
+    min: int
+    max: int
+
+
 class YeelightModelInfo:
     model: str
-    color_temp: Tuple[int, int]
+    color_temp: YeelightColorTempRange
     has_night_light: bool
     has_background_light: bool
     supports_color: bool
 
     def __init__(self, model, spec):
         self.model = model
-        self.color_temp = tuple(spec.get("color_temp", (1700, 6500)))
+        self.color_temp = YeelightColorTempRange(*spec.get("color_temp", (1700, 6500)))
         self.has_night_light = spec.get("night_light", False)
         self.has_background_light = spec.get("background_light", False)
         self.supports_color = spec.get("supports_color", False)
