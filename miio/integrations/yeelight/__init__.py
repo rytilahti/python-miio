@@ -8,7 +8,7 @@ from miio.device import Device, DeviceStatus
 from miio.exceptions import DeviceException
 from miio.utils import int_to_rgb, rgb_to_int
 
-SUPPORTED_MODELS = ["yeelink.light.color1"]
+from .spec_hellper import YeelightSpecHellper
 
 
 class YeelightException(DeviceException):
@@ -259,7 +259,7 @@ class Yeelight(Device):
     which however requires enabling the developer mode on the bulbs.
     """
 
-    _supported_models = SUPPORTED_MODELS
+    _supported_models = YeelightSpecHellper.supported_models()
 
     @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:
