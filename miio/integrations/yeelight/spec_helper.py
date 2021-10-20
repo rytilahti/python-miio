@@ -1,5 +1,6 @@
 import logging
 import os
+from dataclasses import dataclass
 from typing import NamedTuple
 
 import yaml
@@ -21,6 +22,7 @@ class YeelightColorTempRange(NamedTuple):
     max: int
 
 
+@dataclass
 class YeelightModelInfo:
     model: str
     color_temp: YeelightColorTempRange
