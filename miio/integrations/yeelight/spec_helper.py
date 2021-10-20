@@ -27,7 +27,7 @@ class YeelightModelInfo:
                 self.supports_color = spec["supports_color"]
 
 
-class YeelightSpecHellper:
+class YeelightSpecHelper:
     @staticmethod
     def specs() -> dict:
         with open(os.path.dirname(__file__) + "/specs.yaml") as filedata:
@@ -35,14 +35,14 @@ class YeelightSpecHellper:
 
     @staticmethod
     def supported_models():
-        return YeelightSpecHellper.specs().keys()
+        return YeelightSpecHelper.specs().keys()
 
     @staticmethod
     def get_model_info(model) -> YeelightModelInfo:
-        if model not in YeelightSpecHellper.specs():
+        if model not in YeelightSpecHelper.specs():
             _LOGGER.warning(
                 "Unknown model %s, please open an issue and supply features for this light. Returning generic information."
                 % model
             )
             return YeelightModelInfo(model="generic")
-        return YeelightModelInfo(model, YeelightSpecHellper.specs().get(model))
+        return YeelightModelInfo(model, YeelightSpecHelper.specs().get(model))
