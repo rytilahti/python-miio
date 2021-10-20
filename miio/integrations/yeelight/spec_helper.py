@@ -6,21 +6,27 @@ import yaml
 
 _LOGGER = logging.getLogger(__name__)
 
+GENERIC_MODEL_SPEC_DICT = {
+    "color_temp": (1700, 6500),
+    "has_night_light": False,
+    "has_background_light": False,
+    "supports_color": False,
+}
+
 
 class YeelightModelInfo:
     model: str
-    color_temp: Tuple[int, int] = (1700, 6500)
-    has_night_light: bool = False
-    has_background_light: bool = False
-    supports_color: bool = False
+    color_temp: Tuple[int, int]
+    has_night_light: bool
+    has_background_light: bool
+    supports_color: bool
 
-    def __init__(self, model, spec=None):
+    def __init__(self, model, spec):
         self.model = model
-        if spec:
-            self.color_temp = tuple(spec.get("color_temp", (1700, 6500)))
-            self.has_night_light = spec.get("night_light", False)
-            self.has_background_light = spec.get("background_light", False)
-            self.supports_color = spec.get("supports_color", False)
+        self.color_temp = tuple(spec.get("color_temp", (1700, 6500)))
+        self.has_night_light = spec.get("night_light", False)
+        self.has_background_light = spec.get("background_light", False)
+        self.supports_color = spec.get("supports_color", False)
 
 
 class YeelightSpecHelper:
@@ -40,5 +46,5 @@ class YeelightSpecHelper:
                 "Unknown model %s, please open an issue and supply features for this light. Returning generic information.",
                 model,
             )
-            return YeelightModelInfo(model="generic")
+            return YeelightModelInfo("generic", GENERIC_MODEL_SPEC_DICT)
         return YeelightModelInfo(model, YeelightSpecHelper.specs().get(model))
