@@ -18,7 +18,7 @@ class YeelightModelInfo:
         self.model = model
         if spec:
             if "color_temp" in spec:
-                self.color_temp = spec["color_temp"]
+                self.color_temp = tuple(spec["color_temp"])
             if "night_light" in spec:
                 self.has_night_light = spec["night_light"]
             if "background_light" in spec:
