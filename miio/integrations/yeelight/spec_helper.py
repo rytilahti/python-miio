@@ -1,59 +1,74 @@
 import logging
 import os
-from dataclasses import dataclass
-from typing import NamedTuple
+from typing import Dict, NamedTuple
 
+import attr
 import yaml
 
 _LOGGER = logging.getLogger(__name__)
 
 GENERIC_MODEL_SPEC_DICT = {
     "color_temp": (1700, 6500),
-    "has_night_light": False,
-    "has_background_light": False,
+    "night_light": False,
+    "background_light": False,
     "supports_color": False,
 }
 
 
-class YeelightColorTempRange(NamedTuple):
+class ColorTempRange(NamedTuple):
     """Color temperature range."""
 
     min: int
     max: int
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class YeelightModelInfo:
     model: str
-    color_temp: YeelightColorTempRange
-    has_night_light: bool
-    has_background_light: bool
+    color_temp: ColorTempRange
+    night_light: bool
+    background_light: bool
     supports_color: bool
-
-    def __init__(self, model, spec):
-        self.model = model
-        self.color_temp = YeelightColorTempRange(*spec.get("color_temp", (1700, 6500)))
-        self.has_night_light = spec.get("night_light", False)
-        self.has_background_light = spec.get("background_light", False)
-        self.supports_color = spec.get("supports_color", False)
 
 
 class YeelightSpecHelper:
-    @staticmethod
-    def specs() -> dict:
+    _models: Dict[str, YeelightModelInfo] = {}
+
+    def __init__(self):
+        if len(YeelightSpecHelper._models) == 0:
+            self._parse_specs_yaml()
+
+    def _parse_specs_yaml(self):
+        generic_info = YeelightModelInfo(
+            "generic",
+            ColorTempRange(*GENERIC_MODEL_SPEC_DICT["color_temp"]),
+            GENERIC_MODEL_SPEC_DICT["night_light"],
+            GENERIC_MODEL_SPEC_DICT["background_light"],
+            GENERIC_MODEL_SPEC_DICT["supports_color"],
+        )
+        YeelightSpecHelper._models["generic"] = generic_info
+        # read the yaml file to populate the internal model cache
         with open(os.path.dirname(__file__) + "/specs.yaml") as filedata:
-            return yaml.safe_load(filedata)
+            models = yaml.safe_load(filedata)
+            for key, value in models.items():
+                info = YeelightModelInfo(
+                    key,
+                    ColorTempRange(*value["color_temp"]),
+                    value["night_light"],
+                    value["background_light"],
+                    value["supports_color"],
+                )
+                YeelightSpecHelper._models[key] = info
 
-    @staticmethod
-    def supported_models():
-        return YeelightSpecHelper.specs().keys()
+    @property
+    def supported_models(self):
+        return self._models.keys()
 
-    @staticmethod
-    def get_model_info(model) -> YeelightModelInfo:
-        if model not in YeelightSpecHelper.specs():
+    def get_model_info(self, model) -> YeelightModelInfo:
+        if model not in self._models:
             _LOGGER.warning(
                 "Unknown model %s, please open an issue and supply features for this light. Returning generic information.",
                 model,
             )
-            return YeelightModelInfo("generic", GENERIC_MODEL_SPEC_DICT)
-        return YeelightModelInfo(model, YeelightSpecHelper.specs().get(model))
+            return self._models["generic"]
+        return self._models[model]
