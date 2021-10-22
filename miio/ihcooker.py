@@ -1,4 +1,5 @@
 import enum
+import json
 import logging
 import random
 import warnings
@@ -24,6 +25,8 @@ MODEL_V1 = "chunmi.ihcooker.v1"
 
 MODEL_VERSION1 = [MODEL_V1, MODEL_FW, MODEL_HK1, MODEL_TW1]
 MODEL_VERSION2 = [MODEL_EG1, MODEL_EXP1, MODEL_KOREA1]
+SUPPORTED_MODELS = MODEL_VERSION1 + MODEL_VERSION2
+
 DEVICE_ID = {
     MODEL_EG1: 4,
     MODEL_EXP1: 4,
@@ -40,7 +43,7 @@ DEFAULT_FIRE_ON_OFF = 20
 DEFAULT_THRESHOLD_CELCIUS = 249
 DEFAULT_TEMP_TARGET_CELCIUS = 229
 DEFAULT_FIRE_LEVEL = 45
-DEFAULT_PHASE_MINUTES = 0
+DEFAULT_PHASE_MINUTES = 50
 
 
 def crc16(data: bytes, offset=0, length=None):
@@ -51,10 +54,10 @@ def crc16(data: bytes, offset=0, length=None):
     if length is None:
         length = len(data)
     if (
-            data is None
-            or offset < 0
-            or offset > len(data) - 1
-            and offset + length > len(data)
+        data is None
+        or offset < 0
+        or offset > len(data) - 1
+        and offset + length > len(data)
     ):
         return 0
     crc = 0x0000
@@ -77,10 +80,11 @@ class StageMode(enum.IntEnum):
 
     FireMode = 0
     TemperatureMode = 2
-    Unknown1 = 4
+    Unknown4 = 4
     TempAutoSmallPot = 8  # TODO: verify this is the right behaviour.
+    Unknown10 = 10
     TempAutoBigPot = 24  # TODO: verify this is the right behaviour.
-    Unknown2 = 16
+    Unknown16 = 16
 
 
 class OperationMode(enum.Enum):
@@ -190,7 +194,7 @@ def profile_base(is_v1, recipe_name_encoding="GBK"):
         c.Const(3, c.Int8un),
         "device_version" / c.Default(c.Enum(c.Int8ub, **DEVICE_ID), 1 if is_v1 else 2),
         "menu_location"
-        / c.Default(c.ExprValidator(c.Int8ub, lambda o, _: 0 < o and o < 10), 9),
+        / c.Default(c.ExprValidator(c.Int8ub, lambda o, _: 0 <= o < 10), 9),
         "recipe_name"
         / c.Default(
             c.ExprAdapter(
@@ -551,6 +555,8 @@ class IHCooker(Device):
     Custom recipes can be build with the profile_v1/v2 structure.
     """
 
+    _supported_models = SUPPORTED_MODELS
+
     @command(
         default_output=format_output(
             "",
@@ -610,11 +616,13 @@ class IHCooker(Device):
 
     @command(
         click.argument("profile", type=str),
-        click.argument("skip_confirmation", type=bool),
+        click.argument("skip_confirmation", type=bool, default=False),
         default_output=format_output("Cooking profile requested."),
     )
     def start(self, profile: Union[str, c.Container, dict], skip_confirmation=False):
         """Start cooking a profile.
+
+        :arg
 
         Please do not use skip_confirmation=True, as this is potentially unsafe.
         """
@@ -639,12 +647,12 @@ class IHCooker(Device):
         default_output=format_output("Cooking with temperature requested."),
     )
     def start_temp(
-            self,
-            temperature,
-            minutes=60,
-            power=DEFAULT_FIRE_LEVEL,
-            skip_confirmation=False,
-            menu_location=9,
+        self,
+        temperature,
+        minutes=60,
+        power=DEFAULT_FIRE_LEVEL,
+        skip_confirmation=False,
+        menu_location=9,
     ):
         """Start cooking at a fixed temperature and duration.
 
@@ -670,7 +678,7 @@ class IHCooker(Device):
         profile = self._prepare_profile(profile)
 
         if menu_location != 9:
-            self.set_menu(profile, menu_location, False)
+            self.set_menu(profile, menu_location, True)
         else:
             self.start(profile, skip_confirmation)
 
@@ -720,7 +728,40 @@ class IHCooker(Device):
 
         self.send("set_factory_reset", [self._device_prefix])
 
-    @command(default_output=format_output("WiFi led setting changed."))
+    @command(
+        click.argument("profile", type=str),
+        default_output=format_output(""),
+    )
+    def profile_to_json(self, profile: Union[str, c.Container, dict]):
+        """Convert profile to json."""
+        profile = self._prepare_profile(profile)
+
+        res = dict(profile)
+        res["menu_settings"] = dict(res["menu_settings"])
+        del res["menu_settings"]["_io"]
+        del res["_io"]
+        del res["crc"]
+        res["stages"] = [
+            {k: v for k, v in s.items() if k != "_io"} for s in res["stages"]
+        ]
+
+        return json.dumps(res)
+
+    @command(
+        click.argument("json_str", type=str),
+        default_output=format_output(""),
+    )
+    def json_to_profile(self, json_str: str):
+        """Convert json to profile."""
+
+        profile = self._profile_obj.build(self._prepare_profile(json.loads(json_str)))
+
+        return str(profile.hex())
+
+    @command(
+        click.argument("value", type=bool),
+        default_output=format_output("WiFi led setting changed."),
+    )
     def set_wifi_led(self, value: bool):
         """Keep wifi-led on when idle."""
         return self.send(
@@ -728,14 +769,28 @@ class IHCooker(Device):
         )
 
     @command(
+        click.argument("power", type=int),
+        default_output=format_output("Fire power set."),
+    )
+    def set_power(self, power: int):
+        """Set fire power."""
+        if not 0 <= power < 100:
+            raise ValueError("Power should be in range [0,99]")
+        return self.send(
+            "set_fire", [self._device_prefix + "0005"]
+        )  # + f'{power:02x}'])
+
+    @command(
         click.argument("profile", type=str),
-        default_output=format_output("Setting menu to {profile}"),
+        click.argument("location", type=int),
+        click.argument("confirm_start", type=bool),
+        default_output=format_output("Setting menu."),
     )
     def set_menu(
-            self,
-            profile: Union[str, c.Container, dict],
-            location: int,
-            skip_confirmation=False,
+        self,
+        profile: Union[str, c.Container, dict],
+        location: int,
+        confirm_start=False,
     ):
         """Updates one of the menu options with the profile.
 
@@ -744,10 +799,11 @@ class IHCooker(Device):
         - skip_confirmation, if True, request confirmation to start recipe as well.
         """
         profile = self._prepare_profile(profile)
+        print(profile)
         if location >= 9 or location < 1:
             raise IHCookerException("location %d must be in [1,8]." % location)
         profile.menu_settings.save_recipe = True
-        profile.confirm_start = not skip_confirmation
+        profile.confirm_start = confirm_start
         profile.menu_location = location
 
         self.send("set_menu1", [self._profile_obj.build(profile).hex()])
@@ -763,8 +819,12 @@ class IHCooker(Device):
 
     def _prepare_profile(self, profile: Union[str, c.Container, dict]) -> c.Container:
         if isinstance(profile, str):
-            profile = self._profile_obj.parse(bytes.fromhex(profile))
-        elif isinstance(profile, dict):
+            if profile.strip().startswith("{"):
+                # Assuming JSON string.
+                profile = json.loads(profile)
+            else:
+                profile = self._profile_obj.parse(bytes.fromhex(profile))
+        if isinstance(profile, dict):
             for k in profile.keys():
                 if k not in profile_keys:
                     raise ValueError("Invalid key %s in profile dict." % k)

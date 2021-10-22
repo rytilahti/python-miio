@@ -89,6 +89,37 @@ class TestIHCookerV2(TestCase):
     def test_start_temp(self):
         self.device.start_temp(temperature=30, minutes=30)
 
+    def test_start_json(self):
+        json_str = """{
+  "menu_location": 5,
+  "recipe_name": "Rice Cooking",
+  "recipe_id": 42,
+  "duration_minutes": 300,
+  "stages": [
+    {
+      "mode": "Unknown10",
+      "temp_threshold": 60,
+      "temp_target": 90,
+      "power": 99
+    },
+    {
+      "mode": "Unknown10",
+      "temp_threshold": 91,
+      "temp_target": 102,
+      "power": 10
+    },
+    {
+      "mode": "TempAutoSmallPot",
+      "minutes": 300,
+      "temp_threshold": 150,
+      "temp_target": 60,
+      "power": 10
+    }
+  ]
+}
+"""
+        self.device.start(json_str)
+
     def test_construct(self):
         recipe = (
             "030405546573740a52656369706500000000000000000000000000000000000000000003ea0000000"
