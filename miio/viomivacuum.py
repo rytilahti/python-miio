@@ -51,11 +51,12 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
+from miio.integrations.roborock.vacuumcontainers import ConsumableStatus, DNDStatus
+
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
 from .utils import pretty_seconds
-from .vacuumcontainers import ConsumableStatus, DNDStatus
 
 _LOGGER = logging.getLogger(__name__)
 

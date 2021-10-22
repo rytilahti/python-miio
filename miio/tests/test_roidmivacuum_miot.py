@@ -4,6 +4,7 @@ from unittest import TestCase
 import pytest
 
 from miio import RoidmiVacuumMiot
+from miio.integrations.roborock.vacuumcontainers import DNDStatus
 from miio.roidmivacuum_miot import (
     ChargingState,
     FanSpeed,
@@ -13,7 +14,6 @@ from miio.roidmivacuum_miot import (
     SweepType,
     WaterLevel,
 )
-from miio.vacuumcontainers import DNDStatus
 
 from .dummies import DummyMiotDevice
 
