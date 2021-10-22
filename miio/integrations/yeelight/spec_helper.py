@@ -7,13 +7,6 @@ import yaml
 
 _LOGGER = logging.getLogger(__name__)
 
-GENERIC_MODEL_SPEC_DICT = {
-    "color_temp": (1700, 6500),
-    "night_light": False,
-    "background_light": False,
-    "supports_color": False,
-}
-
 
 class ColorTempRange(NamedTuple):
     """Color temperature range."""
@@ -35,30 +28,29 @@ class YeelightSpecHelper:
     _models: Dict[str, YeelightModelInfo] = {}
 
     def __init__(self):
-        if len(YeelightSpecHelper._models) == 0:
+        if not YeelightSpecHelper._models:
             self._parse_specs_yaml()
 
     def _parse_specs_yaml(self):
         generic_info = YeelightModelInfo(
-            "generic",
-            ColorTempRange(*GENERIC_MODEL_SPEC_DICT["color_temp"]),
-            GENERIC_MODEL_SPEC_DICT["night_light"],
-            GENERIC_MODEL_SPEC_DICT["background_light"],
-            GENERIC_MODEL_SPEC_DICT["supports_color"],
+            "generic", ColorTempRange(1700, 6500), False, False, False
         )
         YeelightSpecHelper._models["generic"] = generic_info
         # read the yaml file to populate the internal model cache
         with open(os.path.dirname(__file__) + "/specs.yaml") as filedata:
             models = yaml.safe_load(filedata)
             for key, value in models.items():
-                info = YeelightModelInfo(
-                    key,
-                    ColorTempRange(*value["color_temp"]),
-                    value["night_light"],
-                    value["background_light"],
-                    value["supports_color"],
-                )
-                YeelightSpecHelper._models[key] = info
+                if key in YeelightSpecHelper._models:
+                    raise Exception("Duplicate data for %s model.", key)
+                else:
+                    info = YeelightModelInfo(
+                        key,
+                        ColorTempRange(*value["color_temp"]),
+                        value["night_light"],
+                        value["background_light"],
+                        value["supports_color"],
+                    )
+                    YeelightSpecHelper._models[key] = info
 
     @property
     def supported_models(self):
