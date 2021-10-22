@@ -13,7 +13,7 @@ packages = [
 keywords = ["xiaomi", "miio", "miot", "smart home"]
 
 [tool.poetry.scripts]
-mirobo = "miio.vacuum_cli:cli"
+mirobo = "miio.integrations.roborock.vacuum_cli:cli"
 miio-extract-tokens = "miio.extract_tokens:main"
 miiocli = "miio.cli:create_cli"
 

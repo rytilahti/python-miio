@@ -42,6 +42,15 @@ from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
+from miio.integrations.roborock import Vacuum, VacuumException
+from miio.integrations.roborock.vacuumcontainers import (
+    CleaningDetails,
+    CleaningSummary,
+    ConsumableStatus,
+    DNDStatus,
+    Timer,
+    VacuumStatus,
+)
 from miio.integrations.yeelight import Yeelight
 from miio.miot_device import MiotDevice
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
@@ -54,16 +63,6 @@ from miio.pwzn_relay import PwznRelay
 from miio.roidmivacuum_miot import RoidmiVacuumMiot
 from miio.scishare_coffeemaker import ScishareCoffee
 from miio.toiletlid import Toiletlid
-from miio.vacuum import Vacuum, VacuumException
-from miio.vacuum_tui import VacuumTUI
-from miio.vacuumcontainers import (
-    CleaningDetails,
-    CleaningSummary,
-    ConsumableStatus,
-    DNDStatus,
-    Timer,
-    VacuumStatus,
-)
 from miio.viomivacuum import ViomiVacuum
 from miio.walkingpad import Walkingpad
 from miio.waterpurifier import WaterPurifier

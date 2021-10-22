@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional, Union
 
 from croniter import croniter
 
-from .device import DeviceStatus
-from .utils import pretty_seconds, pretty_time
+from miio.device import DeviceStatus
+from miio.utils import pretty_seconds, pretty_time
 
 
 def pretty_area(x: float) -> float:
