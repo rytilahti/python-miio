@@ -1,0 +1,28 @@
+{
+  "recipe_name": "Rice Cooking",
+  "recipe_id": 42,
+  "duration_minutes": 300,
+  "stages": [
+    {
+      "mode": "Unknown10",
+      "temp_threshold": 60,
+      "temp_target": 100,
+      "power": 99
+    },
+    {
+      "mode": "Unknown10",
+      "temp_threshold": 95,
+      "temp_target": 102,
+      "power": 10
+    },
+    {
+      "mode": "TempAutoSmallPot",
+      "minutes": 300,
+      "temp_threshold": 150,
+      "temp_target": 60,
+      "power": 10,
+      "fire_off": 20,
+      "fire_on": 20
+    }
+  ]
+}
