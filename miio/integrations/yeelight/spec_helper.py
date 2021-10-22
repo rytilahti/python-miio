@@ -40,17 +40,14 @@ class YeelightSpecHelper:
         with open(os.path.dirname(__file__) + "/specs.yaml") as filedata:
             models = yaml.safe_load(filedata)
             for key, value in models.items():
-                if key in YeelightSpecHelper._models:
-                    raise Exception("Duplicate data for %s model.", key)
-                else:
-                    info = YeelightModelInfo(
-                        key,
-                        ColorTempRange(*value["color_temp"]),
-                        value["night_light"],
-                        value["background_light"],
-                        value["supports_color"],
-                    )
-                    YeelightSpecHelper._models[key] = info
+                info = YeelightModelInfo(
+                    key,
+                    ColorTempRange(*value["color_temp"]),
+                    value["night_light"],
+                    value["background_light"],
+                    value["supports_color"],
+                )
+                YeelightSpecHelper._models[key] = info
 
     @property
     def supported_models(self):
