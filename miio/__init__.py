@@ -42,7 +42,7 @@ from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
-from miio.ihcooker import IHCooker
+from miio.integrations.ihcooker.ihcooker import IHCooker
 from miio.integrations.yeelight import Yeelight
 from miio.miot_device import MiotDevice
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb

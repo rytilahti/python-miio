@@ -8,6 +8,16 @@ from typing import Callable, Dict, Optional, Type, Union  # noqa: F401
 
 import zeroconf
 
+from miio import IHCooker
+from miio.integrations.ihcooker import (
+    MODEL_EG1,
+    MODEL_EXP1,
+    MODEL_FW,
+    MODEL_HK1,
+    MODEL_KOREA1,
+    MODEL_TW1,
+    MODEL_V1,
+)
 from miio.integrations.yeelight import Yeelight
 
 from . import (
@@ -101,7 +111,6 @@ from .toiletlid import MODEL_TOILETLID_V1
 
 _LOGGER = logging.getLogger(__name__)
 
-
 DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "rockrobo-vacuum-v1": Vacuum,
     "roborock-vacuum-s5": Vacuum,
@@ -174,6 +183,13 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "chunmi-cooker-normal3": Cooker,
     "chunmi-cooker-normal4": Cooker,
     "chunmi-cooker-normal5": Cooker,
+    MODEL_EXP1: IHCooker,
+    MODEL_FW: IHCooker,
+    MODEL_TW1: IHCooker,
+    MODEL_KOREA1: IHCooker,
+    MODEL_HK1: IHCooker,
+    MODEL_V1: IHCooker,
+    MODEL_EG1: IHCooker,
     "lumi-acpartner-v1": partial(AirConditioningCompanion, model=MODEL_ACPARTNER_V1),
     "lumi-acpartner-v2": partial(AirConditioningCompanion, model=MODEL_ACPARTNER_V2),
     "lumi-acpartner-v3": partial(AirConditioningCompanion, model=MODEL_ACPARTNER_V3),

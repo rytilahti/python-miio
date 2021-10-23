@@ -3,20 +3,16 @@ from unittest import TestCase
 
 import pytest
 
-from miio import IHCooker, ihcooker
+from miio import IHCooker
+from miio.tests.dummies import DummyDevice
 
-# V2 state from @aquarat
-# ['running', '01484f54504f540000000000000000000000000000000000000000000000000001', '00306300b9', '0200013b00000000', '000a1404', '0000000100000002000000030000000400000005000000000000000000000000', '01', '0000ea4a6330303400'
-from ..ihcooker import StageMode
-from .dummies import DummyDevice
-
-# V1 state from @EUA
-# ['waiting', '02537465616d2f626f696c000000000002', '0013000000', '0100010000000000', '001b0a04', '00000001000000020000000300000004000000050000a4e000000dcc00000000', '00', '0000e60a0017130f00']
+from .. import MODEL_EXP1, MODEL_V1, OperationMode, StageMode
+from ..recipe_profile import profile_v1, profile_v2
 
 
 class DummyIHCookerV2(DummyDevice, IHCooker):
     def __init__(self, *args, **kwargs):
-        self._model = ihcooker.MODEL_EXP1
+        self._model = MODEL_EXP1
 
         self.state = [
             "running",
@@ -49,7 +45,7 @@ class DummyIHCookerV2(DummyDevice, IHCooker):
 class DummyIHCookerV1(DummyIHCookerV2):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
-        self._model = ihcooker.MODEL_V1
+        self._model = MODEL_V1
 
         self.state = [
             "waiting",
@@ -129,10 +125,10 @@ class TestIHCookerV2(TestCase):
             "00f93e001414000000000000000000df87"
         )
 
-        res = ihcooker.profile_v2.parse(bytes.fromhex(recipe))
-        self.assertEqual(ihcooker.profile_v2.parse(ihcooker.profile_v2.build(res)), res)
-        self.assertEqual(len(ihcooker.profile_v2.build(res)), len(recipe) // 2)
-        self.assertEqual(str(ihcooker.profile_v2.build(res).hex()), recipe)
+        res = profile_v2.parse(bytes.fromhex(recipe))
+        self.assertEqual(profile_v2.parse(profile_v2.build(res)), res)
+        self.assertEqual(len(profile_v2.build(res)), len(recipe) // 2)
+        self.assertEqual(str(profile_v2.build(res).hex()), recipe)
 
     def test_phases(self):
         profile = dict(
@@ -183,24 +179,24 @@ class TestIHCookerV2(TestCase):
             crc=0,
         )
 
-        bytes_recipe = ihcooker.profile_v2.build(profile)
+        bytes_recipe = profile_v2.build(profile)
         hex_recipe = bytes_recipe.hex()
         self.assertEqual(
-            "030405546573740a52656369706500000000000000000000000000000000000000000003ea8001370000000000000100008137323c111113028006333d121012188007343e130f11188007343e130f11008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d14140000000000000000000a6b",
+            "030405546573740a52656369706500000000000000000000000000000000000000000003ea8001370000000000000100008137323c111113028006333d121012188007343e130f11188007343e130f11008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414000000000000000000386d",
             hex_recipe,
         )
         self.assertEqual(
             hex_recipe,
-            ihcooker.profile_v2.build(ihcooker.profile_v2.parse(bytes_recipe)).hex(),
+            profile_v2.build(profile_v2.parse(bytes_recipe)).hex(),
         )
-        self.assertEqual(115, ihcooker.profile_v2.parse(bytes_recipe).duration_minutes)
+        self.assertEqual(115, profile_v2.parse(bytes_recipe).duration_minutes)
 
     def test_crc(self):
         recipe = {}
         self.device.start(recipe)
 
     def test_mode(self):
-        self.assertEqual(ihcooker.OperationMode.Running, self.state().mode)
+        self.assertEqual(OperationMode.Running, self.state().mode)
 
     def test_temperature(self):
         self.assertEqual(60, self.state().temperature)
@@ -239,9 +235,9 @@ class TestIHCookerv1(TestCase):
 
     def test_construct(self):
         recipe = "030405546573740a52656369706500000000000000000000000000000000000000000000000000000000000000000100008005323c111113028006333d121012188007343e130f11000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e001414000000f93e000000000000000000000000000000000000000071ba"
-        res = ihcooker.profile_v1.parse(bytes.fromhex(recipe))
-        self.assertEqual(len(ihcooker.profile_v1.build(res)), len(recipe) // 2)
-        self.assertEqual(str(ihcooker.profile_v1.build(res).hex()), recipe)
+        res = profile_v1.parse(bytes.fromhex(recipe))
+        self.assertEqual(len(profile_v1.build(res)), len(recipe) // 2)
+        self.assertEqual(str(profile_v1.build(res).hex()), recipe)
 
     def test_phases(self):
         profile = dict(
@@ -292,19 +288,19 @@ class TestIHCookerv1(TestCase):
             crc=0,
         )
 
-        bytes_recipe = ihcooker.profile_v1.build(profile)
+        bytes_recipe = profile_v1.build(profile)
         hex_recipe = bytes_recipe.hex()
         self.assertEqual(
-            "030405546573740a526563697065000000000003ea8001370000000000000100000000000000008137323c111113028006333d121012188007343e130f11188007343e130f11008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d1414008000f9e52d14140000000000000000000000000000000000000005ce",
+            "030405546573740a526563697065000000000003ea8001370000000000000100000000000000008137323c111113028006333d121012188007343e130f11188007343e130f11008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414008032f9e52d1414000000000000000000000000000000000000002c57",
             hex_recipe,
         )
         self.assertEqual(
             hex_recipe,
-            ihcooker.profile_v1.build(ihcooker.profile_v1.parse(bytes_recipe)).hex(),
+            profile_v1.build(profile_v1.parse(bytes_recipe)).hex(),
         )
 
     def test_mode(self):
-        self.assertEqual(ihcooker.OperationMode.Waiting, self.state().mode)
+        self.assertEqual(OperationMode.Waiting, self.state().mode)
 
     def test_temperature(self):
         self.assertEqual(19, self.state().temperature)

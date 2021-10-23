@@ -1,7 +1,4 @@
-import enum
 import json
-import logging
-import random
 import warnings
 from collections import defaultdict
 from typing import Optional, Union
@@ -9,320 +6,30 @@ from typing import Optional, Union
 import click
 import construct as c
 
-from .click_common import command, format_output
-from .device import Device, DeviceStatus
-from .exceptions import DeviceException
+from miio import Device, DeviceStatus
+from miio.click_common import command, format_output
 
-_LOGGER = logging.getLogger(__name__)
-
-MODEL_EG1 = "chunmi.ihcooker.eg1"
-MODEL_EXP1 = "chunmi.ihcooker.exp1"
-MODEL_FW = "chunmi.ihcooker.chefnic"
-MODEL_HK1 = "chunmi.ihcooker.hk1"
-MODEL_KOREA1 = "chunmi.ihcooker.korea1"
-MODEL_TW1 = "chunmi.ihcooker.tw1"
-MODEL_V1 = "chunmi.ihcooker.v1"
-
-MODEL_VERSION1 = [MODEL_V1, MODEL_FW, MODEL_HK1, MODEL_TW1]
-MODEL_VERSION2 = [MODEL_EG1, MODEL_EXP1, MODEL_KOREA1]
-SUPPORTED_MODELS = MODEL_VERSION1 + MODEL_VERSION2
-
-DEVICE_ID = {
-    MODEL_EG1: 4,
-    MODEL_EXP1: 4,
-    MODEL_FW: 7,
-    MODEL_HK1: 2,
-    MODEL_KOREA1: 5,
-    MODEL_TW1: 3,
-    MODEL_V1: 1,
-}
-
-RECIPE_NAME_MAX_LEN_V1 = 13
-RECIPE_NAME_MAX_LEN_V2 = 28
-DEFAULT_FIRE_ON_OFF = 20
-DEFAULT_THRESHOLD_CELCIUS = 249
-DEFAULT_TEMP_TARGET_CELCIUS = 229
-DEFAULT_FIRE_LEVEL = 45
-DEFAULT_PHASE_MINUTES = 50
-
-
-def crc16(data: bytes, offset=0, length=None):
-    """Computes 16bit CRC for IHCooker recipe profiles.
-
-    Based on variant by Amin Saidani posted on https://stackoverflow.com/a/55850496.
-    """
-    if length is None:
-        length = len(data)
-    if (
-        data is None
-        or offset < 0
-        or offset > len(data) - 1
-        and offset + length > len(data)
-    ):
-        return 0
-    crc = 0x0000
-    for i in range(0, length):
-        crc ^= data[offset + i] << 8
-        for _ in range(0, 8):
-            if (crc & 0x8000) > 0:
-                crc = (crc << 1) ^ 0x1021
-            else:
-                crc = crc << 1
-    return crc & 0xFFFF
-
-
-class IHCookerException(DeviceException):
-    pass
-
-
-class StageMode(enum.IntEnum):
-    """Mode for current stage of recipe."""
-
-    FireMode = 0
-    TemperatureMode = 2
-    Unknown4 = 4
-    TempAutoSmallPot = 8  # TODO: verify this is the right behaviour.
-    Unknown10 = 10
-    TempAutoBigPot = 24  # TODO: verify this is the right behaviour.
-    Unknown16 = 16
-
-
-class OperationMode(enum.Enum):
-    """Global mode the induction cooker is currently in."""
-
-    Error = "error"
-    Finish = "finish"
-    Offline = "offline"
-    Pause = "pause"
-    TimerPaused = "pause_time"
-    Precook = "precook"
-    Running = "running"
-    SetClock = "set01"
-    SetStartTime = "set02"
-    SetCookingTime = "set03"
-    Shutdown = "shutdown"
-    Timing = "timing"
-    Waiting = "waiting"
-
-
-class ArrayDefault(c.Array):
-    r"""
-    Homogenous array of elements, similar to C# generic T[].
-
-    Parses into a ListContainer (a list). Parsing and building processes an exact amount of elements. If given list has less than count elements, the array is padded with the default element. More elements raises RangeError. Size is defined as count multiplied by subcon size, but only if subcon is fixed size.
-
-    Operator [] can be used to make Array instances (recommended syntax).
-
-    :param count: integer or context lambda, strict amount of elements
-    :param subcon: Construct instance, subcon to process individual elements
-    :param default: default element to pad array with.
-    :param discard: optional, bool, if set then parsing returns empty list
-
-    :raises StreamError: requested reading negative amount, could not read enough bytes, requested writing different amount than actual data, or could not write all bytes
-    :raises RangeError: specified count is not valid
-    :raises RangeError: given object has different length than specified count
-
-    Can propagate any exception from the lambdas, possibly non-ConstructError.
-
-    Example::
-
-        >>> d = ArrayDefault(5, Byte, 0) or Byte[5]
-        >>> d.build(range(3))
-        b'\x00\x01\x02\x00\x00'
-        >>> d.parse(_)
-        [0, 1, 2, 0, 0]
-    """
-
-    def __init__(self, count, subcon, default, discard=False):
-        super(ArrayDefault, self).__init__(count, subcon, discard)
-        self.default = default
-
-    def _build(self, obj, stream, context, path):
-        count = self.count
-        if callable(count):
-            count = count(context)
-        if not 0 <= count:
-            raise c.RangeError("invalid count %s" % (count,), path=path)
-        if len(obj) > count:
-            raise c.RangeError(
-                "expected %d elements, found %d" % (count, len(obj)), path=path
-            )
-        retlist = c.ListContainer()
-
-        for i, e in enumerate(obj):
-            context._index = i
-            buildret = self.subcon._build(e, stream, context, path)
-            retlist.append(buildret)
-        for i in range(len(obj), count):
-            context._index = i
-            buildret = self.subcon._build(self.default, stream, context, path)
-            retlist.append(buildret)
-        return retlist
-
-
-class RebuildStream(c.Rebuild):
-    r"""
-    Field where building does not require a value, because the value gets recomputed when needed. Comes handy when building a Struct from a dict with missing keys. Useful for length and count fields when :class:`~construct.core.Prefixed` and :class:`~construct.core.PrefixedArray` cannot be used.
-
-    Parsing defers to subcon. Building is defered to subcon, but it builds from a value provided by the stream until now. Size is the same as subcon, unless it raises SizeofError.
-
-    Difference between Rebuild and RebuildStream, is that RebuildStream provides the current datastream to func.
-
-    :param subcon: Construct instance
-    :param func: lambda that works with streamed bytes up to this point.
-
-    :raises StreamError: requested reading negative amount, could not read enough bytes, requested writing different amount than actual data, or could not write all bytes
-
-    Can propagate any exception from the lambda, possibly non-ConstructError.
-    """
-
-    def __init__(self, subcon, func):
-        super(RebuildStream, self).__init__(subcon, func)
-
-    def _build(self, obj, stream, context, path):
-        fallback = c.stream_tell(stream, path)
-        c.stream_seek(stream, 0, 0, path)
-        data = stream.read(fallback)
-        obj = self.func(data) if callable(self.func) else self.func
-        ret = self.subcon._build(obj, stream, context, path)
-        return ret
-
-
-# Some public v2 recipes have device_version set to 1, so estimating the profile version is non-trivial, plus one might want to convert between versions.
-def profile_base(is_v1, recipe_name_encoding="GBK"):
-    return c.Struct(
-        c.Const(3, c.Int8un),
-        "device_version" / c.Default(c.Enum(c.Int8ub, **DEVICE_ID), 1 if is_v1 else 2),
-        "menu_location"
-        / c.Default(c.ExprValidator(c.Int8ub, lambda o, _: 0 <= o < 10), 9),
-        "recipe_name"
-        / c.Default(
-            c.ExprAdapter(
-                c.StringEncoded(  # PaddedString wrapper does not support GBK encoding.
-                    c.FixedSized(
-                        RECIPE_NAME_MAX_LEN_V1 if is_v1 else RECIPE_NAME_MAX_LEN_V2,
-                        c.NullStripped(c.GreedyBytes),
-                    ),
-                    recipe_name_encoding,
-                ),
-                lambda x, _: x.replace("\n", " "),
-                lambda x, _: x.replace(" ", "\n"),
-            ),
-            "Unnamed",
-        ),
-        c.Padding(1) if is_v1 else c.Padding(2),
-        "recipe_id" / c.Default(c.Int32ub, lambda _: random.randint(0, 2 ** 32 - 1)),
-        "menu_settings"
-        / c.Default(
-            c.BitStruct(  # byte 37
-                "save_recipe" / c.Default(c.Flag, 0),
-                "confirm_start" / c.Default(c.Flag, 0),
-                "menu_unknown3" / c.Default(c.Flag, 0),
-                "menu_unknown4" / c.Default(c.Flag, 0),
-                "menu_unknown5" / c.Default(c.Flag, 0),
-                "menu_unknown6" / c.Default(c.Flag, 0),
-                "menu_unknown7" / c.Default(c.Flag, 0),
-                "menu_unknown8" / c.Default(c.Flag, 0),
-            ),
-            {},
-        ),
-        "duration_hours"
-        / c.Rebuild(
-            c.Int8ub, lambda ctx: ctx.get("duration_minutes", 0) // 60
-        ),  # byte 38
-        "duration_minutes"
-        / c.Default(
-            c.ExprAdapter(
-                c.Int8ub, lambda obj, ctx: obj + ctx.duration_hours * 60, c.obj_ % 60
-            ),
-            60,
-        ),  # byte 39
-        "duration_max_hours"
-        / c.Rebuild(
-            c.Int8ub, lambda ctx: ctx.get("duration_max_minutes", 0) // 60
-        ),  # byte 40
-        "duration_max_minutes"
-        / c.Default(
-            c.ExprAdapter(
-                c.Int8ub,
-                lambda obj, ctx: obj + ctx.duration_max_hours * 60,
-                c.obj_ % 60,
-            ),
-            0,
-        ),  # byte 41
-        "duration_min_hours"
-        / c.Rebuild(
-            c.Int8ub, lambda ctx: ctx.get("duration_min_minutes", 0) // 60
-        ),  # byte 42
-        "duration_min_minutes"
-        / c.Default(
-            c.ExprAdapter(
-                c.Int8ub,
-                lambda obj, ctx: obj + ctx.duration_min_hours * 60,
-                c.obj_ % 60,
-            ),
-            0,
-        ),  # byte 43
-        c.Padding(2),  # byte 44, 45
-        "unknown_46" / c.Default(c.Byte, 1),  # byte 46, should be set to 1
-        c.Padding(7) if is_v1 else c.Padding(1),
-        "stages"
-        / c.Default(
-            ArrayDefault(
-                15,
-                c.Struct(  # byte 48-168
-                    "mode" / c.Default(c.Enum(c.Byte, StageMode), StageMode.FireMode),
-                    "hours"
-                    / c.Rebuild(
-                        c.Int8ub, lambda ctx: (ctx.get("minutes", 0) // 60) + 128
-                    ),
-                    "minutes"
-                    / c.Default(
-                        c.ExprAdapter(
-                            c.Int8ub,
-                            decoder=lambda obj, ctx: obj + (ctx.hours - 128) * 60,
-                            encoder=c.obj_ % 60,
-                        ),
-                        DEFAULT_PHASE_MINUTES,
-                    ),
-                    "temp_threshold" / c.Default(c.Int8ub, DEFAULT_THRESHOLD_CELCIUS),
-                    "temp_target" / c.Default(c.Int8ub, DEFAULT_TEMP_TARGET_CELCIUS),
-                    "power" / c.Default(c.Int8ub, DEFAULT_FIRE_LEVEL),
-                    "fire_off" / c.Default(c.Int8ub, DEFAULT_FIRE_ON_OFF),
-                    "fire_on" / c.Default(c.Int8ub, DEFAULT_FIRE_ON_OFF),
-                ),
-                default=dict(
-                    mode=StageMode.FireMode,
-                    minutes=DEFAULT_PHASE_MINUTES,
-                    temp_threshold=DEFAULT_THRESHOLD_CELCIUS,
-                    temp_target=DEFAULT_TEMP_TARGET_CELCIUS,
-                    power=DEFAULT_FIRE_LEVEL,
-                    fire_off=DEFAULT_FIRE_ON_OFF,
-                    fire_on=DEFAULT_FIRE_ON_OFF,
-                ),
-            ),
-            [],
-        ),
-        c.Padding(16) if is_v1 else c.Padding(6),  # byte 169-174
-        "unknown175" / c.Default(c.Int8ub, 0),
-        "unknown176" / c.Default(c.Int8ub, 0),
-        "unknown177" / c.Default(c.Int8ub, 0),
-        "crc"  # byte 178-179
-        / RebuildStream(
-            c.Bytes(2), crc16
-        ),  # Default profiles have invalid crc, c.Checksum() raises undesired error when parsed.
-    )
-
-
-profile_v1 = profile_base(is_v1=True)
-profile_example = dict(profile_v1.parse(profile_v1.build(dict())))
-profile_keys = profile_example.keys()
-stage_keys = dict(profile_example["stages"][0]).keys()
-menu_keys = dict(profile_example["menu_settings"]).keys()
-
-profile_v2 = profile_base(is_v1=False)
-
-profile_korea = profile_base(is_v1=False, recipe_name_encoding="euc-kr")
+from . import (
+    DEVICE_ID,
+    MODEL_KOREA1,
+    MODEL_VERSION1,
+    MODEL_VERSION2,
+    SUPPORTED_MODELS,
+    IHCookerException,
+    OperationMode,
+    StageMode,
+)
+from .recipe_profile import (
+    DEFAULT_FIRE_LEVEL,
+    RECIPE_NAME_MAX_LEN_V1,
+    RECIPE_NAME_MAX_LEN_V2,
+    menu_keys,
+    profile_keys,
+    profile_korea,
+    profile_v1,
+    profile_v2,
+    stage_keys,
+)
 
 
 class IHCookerStatus(DeviceStatus):
@@ -643,7 +350,7 @@ class IHCooker(Device):
         click.argument("skip_confirmation", type=bool, default=False),
         click.argument("minutes", type=int, default=60),
         click.argument("power", type=int, default=DEFAULT_FIRE_LEVEL),
-        click.argument("menu_location", type=int, default=9),
+        click.argument("menu_location", type=int, default=None),
         default_output=format_output("Cooking with temperature requested."),
     )
     def start_temp(
@@ -652,7 +359,7 @@ class IHCooker(Device):
         minutes=60,
         power=DEFAULT_FIRE_LEVEL,
         skip_confirmation=False,
-        menu_location=9,
+        menu_location=None,
     ):
         """Start cooking at a fixed temperature and duration.
 
@@ -677,7 +384,7 @@ class IHCooker(Device):
         )
         profile = self._prepare_profile(profile)
 
-        if menu_location != 9:
+        if menu_location is not None:
             self.set_menu(profile, menu_location, True)
         else:
             self.start(profile, skip_confirmation)
@@ -799,9 +506,9 @@ class IHCooker(Device):
         - skip_confirmation, if True, request confirmation to start recipe as well.
         """
         profile = self._prepare_profile(profile)
-        print(profile)
-        if location >= 9 or location < 1:
-            raise IHCookerException("location %d must be in [1,8]." % location)
+
+        if location >= 9 or location < 0:
+            raise IHCookerException("location %d must be in [0,9]." % location)
         profile.menu_settings.save_recipe = True
         profile.confirm_start = confirm_start
         profile.menu_location = location
