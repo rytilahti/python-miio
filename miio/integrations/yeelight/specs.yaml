@@ -1,180 +1,202 @@
 yeelink.light.bslamp1:
-  color_temp: [1700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.bslamp2:
-  color_temp: [1700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [1700, 6500]
+    night_light: True
+    supports_color: True
 yeelink.light.bslamp3:
-  color_temp: [1700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [1700, 6500]
+    night_light: True
+    background_light: False
+    supports_color: True
 yeelink.light.ceil26:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceila:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling1:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling2:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling3:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling4:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: True
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    background_light: True
+    supports_color: False
+  background:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.ceiling5:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling6:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling10:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: True
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
+  background:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.ceiling13:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling15:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling18:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling19:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: True
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
+  background:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.ceiling20:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: True
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
+  background:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.ceiling22:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.ceiling24:
-  color_temp: [2700, 6500]
-  night_light: True
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: True
+    supports_color: False
 yeelink.light.color1:
-  color_temp: [1700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.color2:
-  color_temp: [2700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [2700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.color4:
-  color_temp: [1700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.colorc:
-  color_temp: [2700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [2700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.color:
-  color_temp: [1700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.ct_bulb:
-  color_temp: [2700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: False
+    supports_color: False
 yeelink.light.ct2:
-  color_temp: [2700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: False
+    supports_color: False
 yeelink.light.lamp1:
-  color_temp: [2700, 5000]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 5000]
+    night_light: False
+    supports_color: False
 yeelink.light.lamp4:
-  color_temp: [2600, 5000]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2600, 5000]
+    night_light: False
+    supports_color: False
 yeelink.light.lamp15:
-  color_temp: [2700, 6500]
-  night_light: False
-  background_light: True
-  supports_color: False
+  main:
+    color_temp: [2700, 6500]
+    night_light: False
+    supports_color: False
+  background:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.mono1:
-  color_temp: [2700, 2700]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 2700]
+    night_light: False
+    supports_color: False
 yeelink.light.mono5:
-  color_temp: [2700, 2700]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 2700]
+    night_light: False
+    supports_color: False
 yeelink.light.mono:
-  color_temp: [2700, 2700]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 2700]
+    night_light: False
+    supports_color: False
 yeelink.light.monob:
-  color_temp: [2700, 2700]
-  night_light: False
-  background_light: False
-  supports_color: False
+  main:
+    color_temp: [2700, 2700]
+    night_light: False
+    supports_color: False
 yeelink.light.strip1:
-  color_temp: [1700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [1700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.strip2:
-  color_temp: [2700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [2700, 6500]
+    night_light: False
+    supports_color: True
 yeelink.light.strip4:
-  color_temp: [2700, 6500]
-  night_light: False
-  background_light: False
-  supports_color: True
+  main:
+    color_temp: [2700, 6500]
+    night_light: False
+    supports_color: True

@@ -1,21 +1,25 @@
-from ..spec_helper import ColorTempRange, YeelightSpecHelper
+from ..spec_helper import ColorTempRange, YeelightSpecHelper, YeelightSubLightType
 
 
 def test_get_model_info():
     spec_helper = YeelightSpecHelper()
     model_info = spec_helper.get_model_info("yeelink.light.bslamp1")
     assert model_info.model == "yeelink.light.bslamp1"
-    assert model_info.color_temp == ColorTempRange(1700, 6500)
-    assert model_info.night_light is False
-    assert model_info.background_light is False
-    assert model_info.supports_color is True
+    assert model_info.lamps[YeelightSubLightType.Main].color_temp == ColorTempRange(
+        1700, 6500
+    )
+    assert model_info.lamps[YeelightSubLightType.Main].night_light is False
+    assert model_info.lamps[YeelightSubLightType.Main].supports_color is True
+    assert YeelightSubLightType.Background not in model_info.lamps
 
 
 def test_get_unknown_model_info():
     spec_helper = YeelightSpecHelper()
     model_info = spec_helper.get_model_info("notreal")
     assert model_info.model == "generic"
-    assert model_info.color_temp == ColorTempRange(1700, 6500)
-    assert model_info.night_light is False
-    assert model_info.background_light is False
-    assert model_info.supports_color is False
+    assert model_info.lamps[YeelightSubLightType.Main].color_temp == ColorTempRange(
+        1700, 6500
+    )
+    assert model_info.lamps[YeelightSubLightType.Main].night_light is False
+    assert model_info.lamps[YeelightSubLightType.Main].supports_color is False
+    assert YeelightSubLightType.Background not in model_info.lamps

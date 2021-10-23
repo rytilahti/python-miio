@@ -8,16 +8,11 @@ from miio.device import Device, DeviceStatus
 from miio.exceptions import DeviceException
 from miio.utils import int_to_rgb, rgb_to_int
 
-from .spec_helper import YeelightSpecHelper
+from .spec_helper import YeelightSpecHelper, YeelightSubLightType
 
 
 class YeelightException(DeviceException):
     pass
-
-
-class YeelightSubLightType(IntEnum):
-    Main = 1
-    Background = 2
 
 
 SUBLIGHT_PROP_PREFIX = {
@@ -325,7 +320,7 @@ class Yeelight(Device):
     def on(self, transition=0, mode=0):
         """Power on."""
         """
-        set_power ["on|off", "smooth", time_in_ms, mode]
+        set_power ["on|off", "sudden|smooth", time_in_ms, mode]
         where mode:
         0: last mode
         1: normal mode
