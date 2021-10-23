@@ -306,16 +306,16 @@ class IHCooker(Device):
 
         values = self.send("get_prop", ["all"])
 
-        if len(values) == len(properties_new):
-            properties = properties_new
-        elif len(values) == len(properties_old):
-            properties = properties_old
-        else:
+        if len(values) not in [len(properties_new), len(properties_old)]:
             raise IHCookerException(
                 "Count (%d or %d) of requested properties does not match the "
                 "count (%s) of received values."
                 % (len(properties_new), len(properties_old), len(values)),
             )
+        elif len(values) == len(properties_new):
+            properties = properties_new
+        elif len(values) == len(properties_old):
+            properties = properties_old
 
         return IHCookerStatus(
             self.model, defaultdict(lambda: None, zip(properties, values))
@@ -525,6 +525,9 @@ class IHCooker(Device):
             return profile_v2
 
     def _prepare_profile(self, profile: Union[str, c.Container, dict]) -> c.Container:
+        if not isinstance(profile, (dict, c.Container, str)):
+            raise ValueError("Invalid profile object")
+
         if isinstance(profile, str):
             if profile.strip().startswith("{"):
                 # Assuming JSON string.
@@ -546,8 +549,6 @@ class IHCooker(Device):
             profile = self._profile_obj.parse(self._profile_obj.build(profile))
         elif isinstance(profile, c.Container):
             pass
-        else:
-            raise ValueError("Invalid profile object")
 
         profile.device_version = DEVICE_ID[self.model]
         return profile
