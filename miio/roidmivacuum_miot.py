@@ -9,7 +9,7 @@ from enum import Enum
 
 import click
 
-from miio.integrations.roborock.vacuumcontainers import DNDStatus
+from miio.integrations.vacuum.roborock.vacuumcontainers import DNDStatus
 
 from .click_common import EnumType, command
 from .miot_device import DeviceStatus, MiotDevice, MiotMapping

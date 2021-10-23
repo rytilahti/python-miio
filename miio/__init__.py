@@ -42,8 +42,8 @@ from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
-from miio.integrations.roborock import Vacuum, VacuumException
-from miio.integrations.roborock.vacuumcontainers import (
+from miio.integrations.vacuum.roborock import Vacuum, VacuumException
+from miio.integrations.vacuum.roborock.vacuumcontainers import (
     CleaningDetails,
     CleaningSummary,
     ConsumableStatus,

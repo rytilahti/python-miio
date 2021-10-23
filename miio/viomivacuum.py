@@ -51,7 +51,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
-from miio.integrations.roborock.vacuumcontainers import ConsumableStatus, DNDStatus
+from miio.integrations.vacuum.roborock.vacuumcontainers import (
+    ConsumableStatus,
+    DNDStatus,
+)
 
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
