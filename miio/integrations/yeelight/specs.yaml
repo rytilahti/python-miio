@@ -12,7 +12,6 @@ yeelink.light.bslamp3:
   main:
     color_temp: [1700, 6500]
     night_light: True
-    background_light: False
     supports_color: True
 yeelink.light.ceil26:
   main:
@@ -43,7 +42,6 @@ yeelink.light.ceiling4:
   main:
     color_temp: [2700, 6500]
     night_light: True
-    background_light: True
     supports_color: False
   background:
     color_temp: [1700, 6500]
