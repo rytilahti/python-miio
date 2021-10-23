@@ -9,10 +9,9 @@ from enum import Enum
 
 import click
 
+from miio.click_common import EnumType, command
 from miio.integrations.vacuum.roborock.vacuumcontainers import DNDStatus
-
-from .click_common import EnumType, command
-from .miot_device import DeviceStatus, MiotDevice, MiotMapping
+from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
 

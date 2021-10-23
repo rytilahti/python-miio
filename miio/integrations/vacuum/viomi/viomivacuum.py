@@ -51,15 +51,14 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
+from miio.click_common import EnumType, command, format_output
+from miio.device import Device, DeviceStatus
+from miio.exceptions import DeviceException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
     ConsumableStatus,
     DNDStatus,
 )
-
-from .click_common import EnumType, command, format_output
-from .device import Device, DeviceStatus
-from .exceptions import DeviceException
-from .utils import pretty_seconds
+from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)
 
