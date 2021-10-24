@@ -24,13 +24,13 @@ class ColorTempRange(NamedTuple):
 @attr.s(auto_attribs=True)
 class YeelightLampInfo:
     color_temp: ColorTempRange
-    night_light: bool
     supports_color: bool
 
 
 @attr.s(auto_attribs=True)
 class YeelightModelInfo:
     model: str
+    night_light: bool
     lamps: Dict[YeelightSubLightType, YeelightLampInfo]
 
 
@@ -44,9 +44,10 @@ class YeelightSpecHelper:
     def _parse_specs_yaml(self):
         generic_info = YeelightModelInfo(
             "generic",
+            False,
             {
                 YeelightSubLightType.Main: YeelightLampInfo(
-                    ColorTempRange(1700, 6500), False, False
+                    ColorTempRange(1700, 6500), False
                 )
             },
         )
@@ -64,7 +65,6 @@ class YeelightSpecHelper:
                 lamps = {
                     YeelightSubLightType.Main: YeelightLampInfo(
                         ColorTempRange(*value["main"]["color_temp"]),
-                        value["main"]["night_light"],
                         value["main"]["supports_color"],
                     )
                 }
@@ -72,11 +72,10 @@ class YeelightSpecHelper:
                 if "background" in value:
                     lamps[YeelightSubLightType.Background] = YeelightLampInfo(
                         ColorTempRange(*value["background"]["color_temp"]),
-                        value["background"]["night_light"],
                         value["background"]["supports_color"],
                     )
 
-                info = YeelightModelInfo(key, lamps)
+                info = YeelightModelInfo(key, value["night_light"], lamps)
                 YeelightSpecHelper._models[key] = info
 
     @property
