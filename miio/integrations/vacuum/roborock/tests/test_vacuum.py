@@ -5,9 +5,9 @@ from unittest.mock import patch
 import pytest
 
 from miio import Vacuum, VacuumStatus
-from miio.vacuum import CarpetCleaningMode, MopMode
+from miio.tests.dummies import DummyDevice
 
-from .dummies import DummyDevice
+from ..vacuum import CarpetCleaningMode, MopMode
 
 
 class DummyVacuum(DummyDevice, Vacuum):

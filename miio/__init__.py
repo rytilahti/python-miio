@@ -32,16 +32,27 @@ from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
 from miio.device import Device, DeviceStatus
-from miio.dreamevacuum_miot import DreameVacuumMiot
 from miio.exceptions import DeviceError, DeviceException
 from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
 from miio.fan_leshow import FanLeshow
 from miio.fan_miot import Fan1C, FanMiot, FanP9, FanP10, FanP11, FanZA5
-from miio.g1vacuum import G1Vacuum
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
+from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuumMiot
+from miio.integrations.vacuum.mijia import G1Vacuum
+from miio.integrations.vacuum.roborock import Vacuum, VacuumException
+from miio.integrations.vacuum.roborock.vacuumcontainers import (
+    CleaningDetails,
+    CleaningSummary,
+    ConsumableStatus,
+    DNDStatus,
+    Timer,
+    VacuumStatus,
+)
+from miio.integrations.vacuum.roidmi.roidmivacuum_miot import RoidmiVacuumMiot
+from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 from miio.integrations.yeelight import Yeelight
 from miio.miot_device import MiotDevice
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
@@ -51,20 +62,8 @@ from miio.philips_rwread import PhilipsRwread
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.pwzn_relay import PwznRelay
-from miio.roidmivacuum_miot import RoidmiVacuumMiot
 from miio.scishare_coffeemaker import ScishareCoffee
 from miio.toiletlid import Toiletlid
-from miio.vacuum import Vacuum, VacuumException
-from miio.vacuum_tui import VacuumTUI
-from miio.vacuumcontainers import (
-    CleaningDetails,
-    CleaningSummary,
-    ConsumableStatus,
-    DNDStatus,
-    Timer,
-    VacuumStatus,
-)
-from miio.viomivacuum import ViomiVacuum
 from miio.walkingpad import Walkingpad
 from miio.waterpurifier import WaterPurifier
 from miio.waterpurifier_yunmi import WaterPurifierYunmi

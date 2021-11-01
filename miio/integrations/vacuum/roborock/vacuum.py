@@ -13,15 +13,16 @@ import click
 import pytz
 from appdirs import user_cache_dir
 
-from .click_common import (
+from miio.click_common import (
     DeviceGroup,
     EnumType,
     GlobalContextObject,
     LiteralParamType,
     command,
 )
-from .device import Device, DeviceInfo
-from .exceptions import DeviceException, DeviceInfoUnavailableException
+from miio.device import Device, DeviceInfo
+from miio.exceptions import DeviceException, DeviceInfoUnavailableException
+
 from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,

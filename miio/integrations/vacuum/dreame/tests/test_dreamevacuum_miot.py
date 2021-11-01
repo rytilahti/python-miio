@@ -3,15 +3,15 @@ from unittest import TestCase
 import pytest
 
 from miio import DreameVacuumMiot
-from miio.dreamevacuum_miot import (
+from miio.tests.dummies import DummyMiotDevice
+
+from ..dreamevacuum_miot import (
     ChargingState,
     CleaningMode,
     DeviceStatus,
     FaultStatus,
     OperatingMode,
 )
-
-from .dummies import DummyMiotDevice
 
 _INITIAL_STATE = {
     "battery_level": 42,

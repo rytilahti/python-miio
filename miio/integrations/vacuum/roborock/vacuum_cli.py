@@ -24,7 +24,9 @@ from miio.device import UpdateState
 from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
-from miio.vacuum import CarpetCleaningMode
+
+from .vacuum import CarpetCleaningMode
+from .vacuum_tui import VacuumTUI
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
@@ -240,7 +242,7 @@ def manual(vac: miio.Vacuum):
 @pass_dev
 def tui(vac: miio.Vacuum):
     """TUI for the manual mode."""
-    miio.VacuumTUI(vac).run()
+    VacuumTUI(vac).run()
 
 
 @manual.command(name="start")
