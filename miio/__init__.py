@@ -70,6 +70,7 @@ from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight_dual_switch import YeelightDualControlModule
+from miio.pet_water_dispenser import PetWaterDispenser
 
 from miio.discovery import Discovery
 
