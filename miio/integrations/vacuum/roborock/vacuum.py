@@ -122,6 +122,7 @@ class CarpetCleaningMode(enum.Enum):
 
 
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
+ROCKROBO_S4 = "roborock.vacuum.s4"
 ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S5_MAX = "roborock.vacuum.s5e"
 ROCKROBO_S6 = "roborock.vacuum.s6"
@@ -131,6 +132,7 @@ ROCKROBO_E2 = "roborock.vacuum.e2"
 
 SUPPORTED_MODELS = [
     ROCKROBO_V1,
+    ROCKROBO_S4,
     ROCKROBO_S5,
     ROCKROBO_S5_MAX,
     ROCKROBO_S6,
