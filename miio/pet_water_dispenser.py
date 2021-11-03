@@ -156,7 +156,7 @@ class PetWaterDispenser(MiotDevice):
             lambda power: "Turning device on" if power else "Turning device off"
         ),
     )
-    def set_power(self, power: bool) -> Dict[str, Any]:
+    def is_on(self, power: bool) -> Dict[str, Any]:
         """Toggle device power on/off."""
         if power:
             return self.set_property("on", True)
