@@ -54,7 +54,7 @@ class PetWaterDispenserStatus(DeviceStatus):
         self.data = data
 
     @property
-    def filter_left_time(self) -> int:
+    def sponge_filter_left_days(self) -> int:
         """Filter life time remaining in days."""
         return self.data["filter_left_time"]
 
@@ -69,49 +69,54 @@ class PetWaterDispenserStatus(DeviceStatus):
         return OperatingMode(self.data["mode"]).name
 
     @property
-    def indicator_light_enabled(self) -> bool:
+    def is_led_on(self) -> bool:
         """True if enabled."""
         return self.data["indicator_light"]
 
     @property
-    def cotton_left_time(self) -> int:
+    def cotton_left_days(self) -> int:
+        """Cotton filter life time remaining in days."""
         return self.data["cotton_left_time"]
 
     @property
-    def days_before_cleaning(self) -> int:
+    def before_cleaning_days(self) -> int:
+        """Days before cleaning."""
         return self.data["remain_clean_time"]
 
     @property
-    def no_water(self) -> bool:
+    def is_no_water(self) -> bool:
         """True if there is no water left."""
         if self.data["no_water_flag"]:
             return False
         return True
 
     @property
-    def minutes_without_water(self) -> int:
+    def no_water_minutes(self) -> int:
+        """Minutes without water."""
         return self.data["no_water_time"]
 
     @property
-    def pump_is_blocked(self) -> bool:
+    def is_pump_blocked(self) -> bool:
         """True if pump is blocked."""
         return self.data["pump_block_flag"]
 
     @property
-    def lid_is_up(self) -> bool:
+    def is_lid_up(self) -> bool:
         """True if lid is up."""
         return self.data["lid_up_flag"]
 
     @property
     def timezone(self) -> int:
+        """Timezone from -12 to +12."""
         return self.data["timezone"]
 
     @property
     def location(self) -> str:
+        """Device location string."""
         return self.data["location"]
 
     @property
-    def error_detected(self) -> bool:
+    def is_error_detected(self) -> bool:
         """True if fault detected."""
         return self.data["fault"] > 0
 
@@ -121,22 +126,23 @@ class PetWaterDispenser(MiotDevice):
     Dispenser."""
 
     mapping = _MAPPING
+    _supported_models = SUPPORTED_MODELS
 
     @command(
         default_output=format_output(
             "",
-            "Cotton filter live: {result.cotton_left_time} day(s) left\n"
-            "Days before cleaning: {result.days_before_cleaning} day(s)\n"
-            "Error detected: {result.error_detected}\n"
-            "Filter live: {result.filter_left_time} day(s) left\n"
-            "Indicator light enabled: {result.indicator_light_enabled}\n"
-            "Lid is up: {result.lid_is_up}\n"
-            "Location: {result.location}\n"
+            "On: {result.is_on}\n"
             "Mode: {result.mode}\n"
-            "Minutes without water: {result.minutes_without_water} minute(s)\n"
-            "No water: {result.no_water}\n"
-            "Is turned on: {result.is_on}\n"
-            "Pump is blocked: {result.pump_is_blocked}\n"
+            "LED on: {result.is_led_on}\n"
+            "Lid up: {result.is_lid_up}\n"
+            "No water: {result.is_no_water}\n"
+            "Minutes without water: {result.no_water_minutes} minute(s)\n"
+            "Pump blocked: {result.is_pump_blocked}\n"
+            "Error detected: {result.is_error_detected}\n"
+            "Days before cleaning: {result.before_cleaning_days} day(s) left\n"
+            "Cotton filter live: {result.cotton_left_days} day(s) left\n"
+            "Sponge filter live: {result.sponge_filter_left_days} day(s) left\n"
+            "Location: {result.location}\n"
             "Timezone: {result.timezone}\n",
         )
     )
@@ -149,16 +155,14 @@ class PetWaterDispenser(MiotDevice):
             }
         )
 
-    @command(
-        click.argument("power", type=bool),
-        default_output=format_output(
-            lambda power: "Turning device on" if power else "Turning device off"
-        ),
-    )
-    def is_on(self, power: bool) -> List[Dict[str, Any]]:
-        """Toggle device power on/off."""
-        if power:
-            return self.set_property("on", True)
+    @command(default_output=format_output("Turning device on"))
+    def on(self) -> List[Dict[str, Any]]:
+        """Turn device on."""
+        return self.set_property("on", True)
+
+    @command(default_output=format_output("Turning device off"))
+    def off(self) -> List[Dict[str, Any]]:
+        """Turn device off."""
         return self.set_property("on", False)
 
     @command(
@@ -181,15 +185,20 @@ class PetWaterDispenser(MiotDevice):
         """Switch operation mode."""
         return self.set_property("mode", mode.value)
 
-    @command(default_output=format_output("Resetting filter"))
-    def reset_filter(self) -> List[Dict[str, Any]]:
-        """Reset filter life counter."""
+    @command(default_output=format_output("Resetting sponge filter"))
+    def reset_sponge_filter(self) -> List[Dict[str, Any]]:
+        """Reset sponge filter."""
         return self.call_action("reset_filter_life")
 
     @command(default_output=format_output("Resetting cotton filter"))
     def reset_cotton_filter(self) -> List[Dict[str, Any]]:
-        """Reset cotton filter life counter."""
+        """Reset cotton filter."""
         return self.call_action("reset_cotton_life")
+
+    @command(default_output=format_output("Resetting all filters"))
+    def reset_all_filters(self) -> List[Dict[str, Any]]:
+        """Reset all filters."""
+        return self.reset_sponge_filter() + self.reset_cotton_filter()
 
     @command(default_output=format_output("Resetting cleaning time"))
     def reset_cleaning_time(self) -> List[Dict[str, Any]]:
