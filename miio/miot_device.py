@@ -145,10 +145,3 @@ class MiotDevice(Device):
             "set_properties",
             [{"did": property_key, **self.mapping[property_key], "value": value}],
         )
-
-    def get_property(self, property_key: str, value):
-        """Gets property value using the existing mapping."""
-        return self.send(
-            "get_properties",
-            [{"did": property_key, **self.mapping[property_key], "value": value}],
-        )

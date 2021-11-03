@@ -55,6 +55,7 @@ from miio.integrations.vacuum.roidmi.roidmivacuum_miot import RoidmiVacuumMiot
 from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 from miio.integrations.yeelight import Yeelight
 from miio.miot_device import MiotDevice
+from miio.pet_water_dispenser import PetWaterDispenser
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
 from miio.philips_eyecare import PhilipsEyecare
 from miio.philips_moonlight import PhilipsMoonlight
@@ -70,7 +71,6 @@ from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight_dual_switch import YeelightDualControlModule
-from miio.pet_water_dispenser import PetWaterDispenser
 
 from miio.discovery import Discovery
 
