@@ -34,6 +34,7 @@ jobs:
 
     - name: Publish on test pypi
       uses: pypa/gh-action-pypi-publish@master
+      continue-on-error: true
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository_url: https://test.pypi.org/legacy/

@@ -4,8 +4,8 @@ from enum import Enum
 
 import click
 
-from .click_common import EnumType, command, format_output
-from .miot_device import DeviceStatus, MiotDevice
+from miio.click_common import EnumType, command, format_output
+from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 MIJIA_VACUUM_V1 = "mijia.vacuum.v1"

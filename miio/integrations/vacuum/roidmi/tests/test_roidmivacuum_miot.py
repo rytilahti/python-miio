@@ -3,19 +3,19 @@ from unittest import TestCase
 
 import pytest
 
-from miio import RoidmiVacuumMiot
-from miio.roidmivacuum_miot import (
+from miio.integrations.vacuum.roborock.vacuumcontainers import DNDStatus
+from miio.tests.dummies import DummyMiotDevice
+
+from ..roidmivacuum_miot import (
     ChargingState,
     FanSpeed,
     PathMode,
     RoidmiState,
+    RoidmiVacuumMiot,
     SweepMode,
     SweepType,
     WaterLevel,
 )
-from miio.vacuumcontainers import DNDStatus
-
-from .dummies import DummyMiotDevice
 
 _INITIAL_STATE = {
     "auto_boost": 1,

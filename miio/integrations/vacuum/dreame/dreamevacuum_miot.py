@@ -3,9 +3,9 @@
 import logging
 from enum import Enum
 
-from .click_common import command, format_output
-from .miot_device import DeviceStatus as DeviceStatusContainer
-from .miot_device import MiotDevice, MiotMapping
+from miio.click_common import command, format_output
+from miio.miot_device import DeviceStatus as DeviceStatusContainer
+from miio.miot_device import MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
 

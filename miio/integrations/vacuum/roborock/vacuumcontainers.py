@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional, Union
 
 from croniter import croniter
 
-from .device import DeviceStatus
-from .utils import pretty_seconds, pretty_time
+from miio.device import DeviceStatus
+from miio.utils import pretty_seconds, pretty_time
 
 
 def pretty_area(x: float) -> float:
@@ -186,9 +186,11 @@ class VacuumStatus(DeviceStatus):
         )
 
     @property
-    def is_water_box_attached(self) -> bool:
+    def is_water_box_attached(self) -> Optional[bool]:
         """Return True is water box is installed."""
-        return "water_box_status" in self.data and self.data["water_box_status"] == 1
+        if "water_box_status" in self.data:
+            return self.data["water_box_status"] == 1
+        return None
 
     @property
     def is_water_box_carriage_attached(self) -> Optional[bool]:
