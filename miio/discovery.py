@@ -48,6 +48,7 @@ from . import (
     ViomiVacuum,
     WaterPurifier,
     WaterPurifierYunmi,
+    WaterHeater,
     WifiRepeater,
     WifiSpeaker,
 )
@@ -155,6 +156,7 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "yunmi-waterpuri-v2": WaterPurifier,
     "yunmi.waterpuri.lx9": WaterPurifierYunmi,
     "yunmi.waterpuri.lx11": WaterPurifierYunmi,
+    "viomi-waterheater-e1": WaterHeater,
     "philips-light-bulb": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-hbulb": PhilipsWhiteBulb,  # cannot be discovered via mdns
     "philips-light-candle": PhilipsBulb,  # cannot be discovered via mdns

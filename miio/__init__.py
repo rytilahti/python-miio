@@ -67,6 +67,7 @@ from miio.toiletlid import Toiletlid
 from miio.walkingpad import Walkingpad
 from miio.waterpurifier import WaterPurifier
 from miio.waterpurifier_yunmi import WaterPurifierYunmi
+from miio.waterheater import WaterHeater
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight_dual_switch import YeelightDualControlModule
