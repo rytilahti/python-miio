@@ -54,6 +54,7 @@ class WaterHeaterException(DeviceException):
 class WaterHeaterStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
         """Response of a Waterheater (viomi.waterheater.e1):
+
         {'washStatus': 1, 'velocity': 0, 'waterTemp': 29,
         'targetTemp': 70, 'errStatus': 0, 'hotWater': 60,
         'needClean': 0, 'modeType': 1, 'appointStart': 7
@@ -64,9 +65,11 @@ class WaterHeaterStatus(DeviceStatus):
     @property
     def status(self) -> OperationStatus:
         """Device operational status:
+
         0 - when powered off;
         1 - when heating;
-        2 - when heat preservation."""
+        2 - when heat preservation.
+        """
         return OperationStatus(self.data["washStatus"])
 
     @property
@@ -76,7 +79,10 @@ class WaterHeaterStatus(DeviceStatus):
 
     @property
     def velocity(self) -> int:
-        """The purpose is unknown. Investigation required."""
+        """The purpose is unknown.
+
+        Investigation required.
+        """
         return self.data["velocity"]
 
     @property
@@ -92,13 +98,15 @@ class WaterHeaterStatus(DeviceStatus):
     @property
     def error(self) -> int:
         """Error status during operation:
-        0 - no errors."""
+
+        0 - no errors.
+        """
         return self.data["errStatus"]
 
     @property
     def hot_water_volume(self) -> int:
-        """Empirical assessment of the hot water supply
-        (100% water heated to 75 degrees Celsius)."""
+        """Empirical assessment of the hot water supply (100% water heated to
+        75 degrees Celsius)."""
         return self.data["hotWater"]
 
     @property
@@ -109,9 +117,11 @@ class WaterHeaterStatus(DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Device operational mode:
+
         0 - Thermostatic (45 degrees Celsius);
         1 - Normal heating;
-        2 - Booking."""
+        2 - Booking.
+        """
         return OperationMode(self.data["modeType"])
 
     @property
@@ -121,8 +131,11 @@ class WaterHeaterStatus(DeviceStatus):
 
     @property
     def booking_time_end(self) -> int:
-        """End time for Booking mode [0, 23] hours. booking_time_start +
-        operational period duration = booking_time_end"""
+        """End time for Booking mode [0, 23] hours.
+
+        booking_time_start +
+        operational period duration = booking_time_end
+        """
         return self.data["appointEnd"]
 
 
