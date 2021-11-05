@@ -1,12 +1,12 @@
-import enum
 import logging
+import enum
 from typing import Any, Dict
 
 import click
 
-from .click_common import EnumType, command, format_output
-from .device import Device, DeviceStatus
-from .exceptions import DeviceException
+from miio.click_common import EnumType, command, format_output
+from miio.device import Device, DeviceStatus
+from miio.exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,13 +47,13 @@ class OperationStatus(enum.Enum):
     KeepWarm = 2
 
 
-class WaterHeaterException(DeviceException):
+class ViomiWaterHeaterException(DeviceException):
     pass
 
 
-class WaterHeaterStatus(DeviceStatus):
+class ViomiWaterHeaterStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
-        """Response of a Waterheater (viomi.waterheater.e1):
+        """Response of a ViomiWaterheater (viomi.waterheater.e1):
 
         {'washStatus': 1, 'velocity': 0, 'waterTemp': 29,
         'targetTemp': 70, 'errStatus': 0, 'hotWater': 60,
@@ -139,8 +139,10 @@ class WaterHeaterStatus(DeviceStatus):
         return self.data["appointEnd"]
 
 
-class WaterHeater(Device):
-    """Main class representing the Waterheater."""
+class ViomiWaterHeater(Device):
+    """Main class representing the ViomiWaterheater."""
+
+    _supported_models = [MODEL_WATERHEATER_E1]
 
     @command(
         default_output=format_output(
@@ -157,13 +159,13 @@ class WaterHeater(Device):
             "End time in booking mode: {result.booking_time_end}\n",
         )
     )
-    def status(self) -> WaterHeaterStatus:
+    def status(self) -> ViomiWaterHeaterStatus:
         """Retrieve properties."""
         properties = SUPPORTED_MODELS.get(
             self.model, SUPPORTED_MODELS[MODEL_WATERHEATER_E1]
         )["available_properties"]
         values = self.get_properties(properties, max_properties=1)
-        return WaterHeaterStatus(dict(zip(properties, values)))
+        return ViomiWaterHeaterStatus(dict(zip(properties, values)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -189,7 +191,7 @@ class WaterHeater(Device):
         )["temperature_range"]
 
         if not min_temp <= temperature <= max_temp:
-            raise WaterHeaterException("Invalid target temperature: %s" % temperature)
+            raise ViomiWaterHeaterException("Invalid target temperature: %s" % temperature)
         return self.send("set_temp", [temperature])
 
     @command(default_output=format_output("Setting bacteriostatic mode on"))
@@ -204,7 +206,7 @@ class WaterHeater(Device):
         )["bacteriostatic_mode"]
 
         if not bacteriostatic_mode:
-            raise WaterHeaterException("Bacteriostatic mode is not supported.")
+            raise ViomiWaterHeaterException("Bacteriostatic mode is not supported.")
 
         bacteriostatic_temp = SUPPORTED_MODELS.get(
             self.model, SUPPORTED_MODELS[MODEL_WATERHEATER_E1]
@@ -214,7 +216,7 @@ class WaterHeater(Device):
 
         # No Bacteriostatic operational mode in Thermostatic mode.
         if mode == OperationMode.Thermostatic:
-            raise WaterHeaterException(
+            raise ViomiWaterHeaterException(
                 "Bacteriostatic operational mode is "
                 "not supported in Thermostatic mode."
             )
@@ -239,7 +241,7 @@ class WaterHeater(Device):
     def set_appoint(self, booking_time_start, booking_time_end):
         """Setting up the Booking mode operational interval."""
         if not (0 <= booking_time_start <= 23) or not (0 <= booking_time_end <= 23):
-            raise WaterHeaterException(
+            raise ViomiWaterHeaterException(
                 "Booking mode operational interval parameters "
                 "must be within [0, 23]."
             )

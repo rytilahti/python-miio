@@ -53,6 +53,7 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
 )
 from miio.integrations.vacuum.roidmi.roidmivacuum_miot import RoidmiVacuumMiot
 from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
+from miio.integrations.waterheater.viomi.viomiwaterheater import ViomiWaterHeater
 from miio.integrations.yeelight import Yeelight
 from miio.miot_device import MiotDevice
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
@@ -65,7 +66,6 @@ from miio.pwzn_relay import PwznRelay
 from miio.scishare_coffeemaker import ScishareCoffee
 from miio.toiletlid import Toiletlid
 from miio.walkingpad import Walkingpad
-from miio.waterheater import WaterHeater
 from miio.waterpurifier import WaterPurifier
 from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
