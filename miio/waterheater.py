@@ -216,8 +216,8 @@ class WaterHeater(Device):
             lambda appoint_end, appoint_start:
             "Setting up the Booking mode operational interval from: %s " %
             appoint_start + "to: %s " % appoint_end + "(duration: %s)" %
-            (appoint_end-appoint_start if appoint_end-appoint_start > 0
-             else appoint_end-appoint_start+24)
+            (appoint_end - appoint_start if appoint_end - appoint_start > 0
+             else appoint_end - appoint_start + 24)
         ),
     )
     def set_appoint(self, appoint_start, appoint_end):
