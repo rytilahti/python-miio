@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -128,6 +128,14 @@ class AirHumidifierStatus(DeviceStatus):
     def lid_opened(self) -> bool:
         """True if the water tank is detached."""
         return self.data["lid_opened"] == 1
+
+    @property
+    def use_time(self) -> Optional[int]:
+        """How long the device has been active in seconds.
+
+        Not supported by the device, so we return none here.
+        """
+        return None
 
 
 class AirHumidifierJsq(Device):
