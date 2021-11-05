@@ -191,7 +191,9 @@ class ViomiWaterHeater(Device):
         )["temperature_range"]
 
         if not min_temp <= temperature <= max_temp:
-            raise ViomiWaterHeaterException("Invalid target temperature: %s" % temperature)
+            raise ViomiWaterHeaterException(
+                "Invalid target temperature: %s" % temperature
+            )
         return self.send("set_temp", [temperature])
 
     @command(default_output=format_output("Setting bacteriostatic mode on"))
