@@ -236,7 +236,7 @@ class WaterHeater(Device):
     @command(
         click.argument("mode", type=EnumType(OperationMode)),
         default_output=format_output(
-            "Setting operation mode to " "{mode.name} ({mode.value})"
+            "Setting operation mode to {mode.name} ({mode.value})"
         ),
     )
     def set_mode(self, mode: OperationMode):
