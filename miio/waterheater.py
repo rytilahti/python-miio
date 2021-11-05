@@ -72,7 +72,7 @@ class WaterHeaterStatus(DeviceStatus):
     @property
     def is_on(self) -> bool:
         """True if device is currently on."""
-        return not self.status == OperationStatus.TurnedOff
+        return self.status != OperationStatus.TurnedOff
 
     @property
     def velocity(self) -> int:
