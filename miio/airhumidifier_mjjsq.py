@@ -120,6 +120,14 @@ class AirHumidifierStatus(DeviceStatus):
 
         return None
 
+    @property
+    def use_time(self) -> Optional[int]:
+        """How long the device has been active in seconds.
+
+        Not supported by the device, so we return none here.
+        """
+        return None
+
 
 class AirHumidifierMjjsq(Device):
     """Support for deerma.humidifier.(mj)jsq."""
