@@ -1,13 +1,12 @@
 import enum
 import logging
-from typing import Any, Dict, List
 from datetime import timedelta
+from typing import Any, Dict, List
 
 import click
 
-from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
-from .miot_device import DeviceStatus, MiotDevice
+from miio.click_common import EnumType, command, format_output
+from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,10 +44,10 @@ class OperatingMode(enum.Enum):
 
 
 class PetWaterDispenserStatus(DeviceStatus):
-    """Container for status reports from the Pet Water Dispenser."""
+    """Container for status reports from Pet Water Dispenser."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """Response of a Pet Water Dispenser (mmgg.pet_waterer.s1)
+        """Response of Pet Water Dispenser (mmgg.pet_waterer.s1)
         [
             {'code': 0, 'did': 'cotton_left_time', 'piid': 1, 'siid': 5, 'value': 10},
             {'code': 0, 'did': 'fault', 'piid': 1, 'siid': 2, 'value': 0},
