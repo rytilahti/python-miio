@@ -1,6 +1,7 @@
 import enum
 import logging
 from typing import Any, Dict, List
+from datetime import timedelta
 
 import click
 
@@ -13,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_MMGG_PET_WATERER_S1 = "mmgg.pet_waterer.s1"
 MODEL_MMGG_PET_WATERER_S4 = "mmgg.pet_waterer.s4"
 
-SUPPORTED_MODELS: List[str] = [MODEL_MMGG_PET_WATERER_S1]
+SUPPORTED_MODELS: List[str] = [MODEL_MMGG_PET_WATERER_S1, MODEL_MMGG_PET_WATERER_S4]
 
 _MAPPING: Dict[str, Dict[str, int]] = {
     # https://home.miot-spec.com/spec/mmgg.pet_waterer.s1
@@ -39,24 +40,37 @@ _MAPPING: Dict[str, Dict[str, int]] = {
 
 
 class OperatingMode(enum.Enum):
-    common = 1
-    smart = 2
-
-
-class PetWaterDispenserException(DeviceException):
-    pass
+    Normal = 1
+    Smart = 2
 
 
 class PetWaterDispenserStatus(DeviceStatus):
     """Container for status reports from the Pet Water Dispenser."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """Response of a Pet Water Dispenser (mmgg.pet_waterer.s1)
+        [
+            {'code': 0, 'did': 'cotton_left_time', 'piid': 1, 'siid': 5, 'value': 10},
+            {'code': 0, 'did': 'fault', 'piid': 1, 'siid': 2, 'value': 0},
+            {'code': 0, 'did': 'filter_left_time', 'piid': 1, 'siid': 3, 'value': 10},
+            {'code': 0, 'did': 'indicator_light', 'piid': 1, 'siid': 4, 'value': True},
+            {'code': 0, 'did': 'lid_up_flag', 'piid': 4, 'siid': 7, 'value': False},
+            {'code': 0, 'did': 'location', 'piid': 2, 'siid': 9, 'value': 'ru'},
+            {'code': 0, 'did': 'mode', 'piid': 3, 'siid': 2, 'value': 1},
+            {'code': 0, 'did': 'no_water_flag', 'piid': 1, 'siid': 7, 'value': True},
+            {'code': 0, 'did': 'no_water_time', 'piid': 2, 'siid': 7, 'value': 0},
+            {'code': 0, 'did': 'on', 'piid': 2, 'siid': 2, 'value': True},
+            {'code': 0, 'did': 'pump_block_flag', 'piid': 3, 'siid': 7, 'value': False},
+            {'code': 0, 'did': 'remain_clean_time', 'piid': 1, 'siid': 6, 'value': 4},
+            {'code': 0, 'did': 'timezone', 'piid': 1, 'siid': 9, 'value': 3}
+        ]
+        """
         self.data = data
 
     @property
-    def sponge_filter_left_days(self) -> int:
+    def sponge_filter_left_days(self) -> timedelta:
         """Filter life time remaining in days."""
-        return self.data["filter_left_time"]
+        return timedelta(days=self.data["filter_left_time"])
 
     @property
     def is_on(self) -> bool:
@@ -64,9 +78,9 @@ class PetWaterDispenserStatus(DeviceStatus):
         return self.data["on"]
 
     @property
-    def mode(self) -> str:
+    def mode(self) -> OperatingMode:
         """OperatingMode."""
-        return OperatingMode(self.data["mode"]).name
+        return OperatingMode(self.data["mode"])
 
     @property
     def is_led_on(self) -> bool:
@@ -74,14 +88,14 @@ class PetWaterDispenserStatus(DeviceStatus):
         return self.data["indicator_light"]
 
     @property
-    def cotton_left_days(self) -> int:
+    def cotton_left_days(self) -> timedelta:
         """Cotton filter life time remaining in days."""
-        return self.data["cotton_left_time"]
+        return timedelta(days=self.data["cotton_left_time"])
 
     @property
-    def before_cleaning_days(self) -> int:
+    def before_cleaning_days(self) -> timedelta:
         """Days before cleaning."""
-        return self.data["remain_clean_time"]
+        return timedelta(days=self.data["remain_clean_time"])
 
     @property
     def is_no_water(self) -> bool:
@@ -91,9 +105,9 @@ class PetWaterDispenserStatus(DeviceStatus):
         return True
 
     @property
-    def no_water_minutes(self) -> int:
+    def no_water_minutes(self) -> timedelta:
         """Minutes without water."""
-        return self.data["no_water_time"]
+        return timedelta(minutes=self.data["no_water_time"])
 
     @property
     def is_pump_blocked(self) -> bool:
@@ -136,12 +150,12 @@ class PetWaterDispenser(MiotDevice):
             "LED on: {result.is_led_on}\n"
             "Lid up: {result.is_lid_up}\n"
             "No water: {result.is_no_water}\n"
-            "Minutes without water: {result.no_water_minutes} minute(s)\n"
+            "Time without water: {result.no_water_minutes}\n"
             "Pump blocked: {result.is_pump_blocked}\n"
             "Error detected: {result.is_error_detected}\n"
-            "Days before cleaning: {result.before_cleaning_days} day(s) left\n"
-            "Cotton filter live: {result.cotton_left_days} day(s) left\n"
-            "Sponge filter live: {result.sponge_filter_left_days} day(s) left\n"
+            "Days before cleaning left: {result.before_cleaning_days}\n"
+            "Cotton filter live left: {result.cotton_left_days}\n"
+            "Sponge filter live left: {result.sponge_filter_left_days}\n"
             "Location: {result.location}\n"
             "Timezone: {result.timezone}\n",
         )
@@ -172,7 +186,7 @@ class PetWaterDispenser(MiotDevice):
         ),
     )
     def set_led(self, led: bool) -> List[Dict[str, Any]]:
-        """Toggle idicator light on/off."""
+        """Toggle indicator light on/off."""
         if led:
             return self.set_property("indicator_light", True)
         return self.set_property("indicator_light", False)

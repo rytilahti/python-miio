@@ -40,6 +40,7 @@ from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
+from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuumMiot
 from miio.integrations.vacuum.mijia import G1Vacuum
 from miio.integrations.vacuum.roborock import Vacuum, VacuumException
@@ -55,7 +56,6 @@ from miio.integrations.vacuum.roidmi.roidmivacuum_miot import RoidmiVacuumMiot
 from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 from miio.integrations.yeelight import Yeelight
 from miio.miot_device import MiotDevice
-from miio.pet_water_dispenser import PetWaterDispenser
 from miio.philips_bulb import PhilipsBulb, PhilipsWhiteBulb
 from miio.philips_eyecare import PhilipsEyecare
 from miio.philips_moonlight import PhilipsMoonlight
