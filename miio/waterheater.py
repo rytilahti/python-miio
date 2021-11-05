@@ -51,8 +51,7 @@ class WaterHeaterException(DeviceException):
     pass
 
 
-class WaterHeaterStatus (DeviceStatus):
-
+class WaterHeaterStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
         """Response of a Waterheater (viomi.waterheater.e1):
         {'washStatus': 1, 'velocity': 0, 'waterTemp': 29,
@@ -65,9 +64,9 @@ class WaterHeaterStatus (DeviceStatus):
     @property
     def status(self) -> OperationStatus:
         """Device operational status:
-           0 - when powered off;
-           1 - when heating;
-           2 - when heat preservation."""
+        0 - when powered off;
+        1 - when heating;
+        2 - when heat preservation."""
         return OperationStatus(self.data["washStatus"])
 
     @property
@@ -93,13 +92,13 @@ class WaterHeaterStatus (DeviceStatus):
     @property
     def error(self) -> int:
         """Error status during operation:
-           0 - no errors."""
+        0 - no errors."""
         return self.data["errStatus"]
 
     @property
     def hot_water_volume(self) -> int:
         """Empirical assessment of the hot water supply
-           (100% water heated to 75 degrees Celsius)."""
+        (100% water heated to 75 degrees Celsius)."""
         return self.data["hotWater"]
 
     @property
@@ -110,9 +109,9 @@ class WaterHeaterStatus (DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Device operational mode:
-           0 - Thermostatic (45 degrees Celsius);
-           1 - Normal heating;
-           2 - Booking."""
+        0 - Thermostatic (45 degrees Celsius);
+        1 - Normal heating;
+        2 - Booking."""
         return OperationMode(self.data["modeType"])
 
     @property
@@ -123,7 +122,7 @@ class WaterHeaterStatus (DeviceStatus):
     @property
     def booking_time_end(self) -> int:
         """End time for Booking mode [0, 23] hours. booking_time_start +
-           operational period duration = booking_time_end """
+        operational period duration = booking_time_end"""
         return self.data["appointEnd"]
 
 
@@ -165,8 +164,7 @@ class WaterHeater(Device):
 
     @command(
         click.argument("temperature", type=int),
-        default_output=format_output(
-            "Setting target temperature to {temperature}"),
+        default_output=format_output("Setting target temperature to {temperature}"),
     )
     def set_target_temperature(self, temperature: int):
         """Set target temperature."""
@@ -178,8 +176,7 @@ class WaterHeater(Device):
         )["temperature_range"]
 
         if not min_temp <= temperature <= max_temp:
-            raise WaterHeaterException("Invalid target temperature: %s"
-                                       % temperature)
+            raise WaterHeaterException("Invalid target temperature: %s" % temperature)
         return self.send("set_temp", [temperature])
 
     @command(default_output=format_output("Setting bacteriostatic mode on"))
@@ -204,8 +201,10 @@ class WaterHeater(Device):
 
         # No Bacteriostatic operational mode in Thermostatic mode.
         if mode == OperationMode.Thermostatic:
-            raise WaterHeaterException("Bacteriostatic operational mode is "
-                                       "not supported in Thermostatic mode.")
+            raise WaterHeaterException(
+                "Bacteriostatic operational mode is "
+                "not supported in Thermostatic mode."
+            )
         else:
             return self.send("set_temp", [bacteriostatic_temp])
 
@@ -213,11 +212,15 @@ class WaterHeater(Device):
         click.argument("appoint_start", type=int),
         click.argument("appoint_end", type=int),
         default_output=format_output(
-            lambda appoint_end, appoint_start:
-            "Setting up the Booking mode operational interval from: %s " %
-            appoint_start + "to: %s " % appoint_end + "(duration: %s)" %
-            (appoint_end - appoint_start if appoint_end - appoint_start > 0
-             else appoint_end - appoint_start + 24)
+            lambda appoint_end, appoint_start: "Setting up the Booking mode operational interval from: %s "
+            % appoint_start
+            + "to: %s " % appoint_end
+            + "(duration: %s)"
+            % (
+                appoint_end - appoint_start
+                if appoint_end - appoint_start > 0
+                else appoint_end - appoint_start + 24
+            )
         ),
     )
     def set_appoint(self, appoint_start, appoint_end):
@@ -227,12 +230,14 @@ class WaterHeater(Device):
         else:
             raise WaterHeaterException(
                 "Booking mode operational interval parameters "
-                "must be within [0, 23].")
+                "must be within [0, 23]."
+            )
 
     @command(
         click.argument("mode", type=EnumType(OperationMode)),
-        default_output=format_output("Setting operation mode to "
-                                     "{mode.name} ({mode.value})"),
+        default_output=format_output(
+            "Setting operation mode to " "{mode.name} ({mode.value})"
+        ),
     )
     def set_mode(self, mode: OperationMode):
         """Set operation mode."""
