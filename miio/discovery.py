@@ -46,9 +46,9 @@ from . import (
     Toiletlid,
     Vacuum,
     ViomiVacuum,
+    WaterHeater,
     WaterPurifier,
     WaterPurifierYunmi,
-    WaterHeater,
     WifiRepeater,
     WifiSpeaker,
 )
