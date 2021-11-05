@@ -210,7 +210,6 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "viomi-vacuum-v8": ViomiVacuum,
     "zhimi.heater.za1": partial(Heater, model=MODEL_HEATER_ZA1),
     "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
-    "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
     "viomi.waterheater.e1": partial(WaterHeater, model=MODEL_WATERHEATER_E1),
 }
 
