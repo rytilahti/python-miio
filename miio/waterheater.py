@@ -209,29 +209,29 @@ class WaterHeater(Device):
             return self.send("set_temp", [bacteriostatic_temp])
 
     @command(
-        click.argument("appoint_start", type=int),
-        click.argument("appoint_end", type=int),
+        click.argument("booking_time_start", type=int),
+        click.argument("booking_time_end", type=int),
         default_output=format_output(
-            lambda appoint_end, appoint_start: "Setting up the Booking mode operational interval from: %s "
-            % appoint_start
-            + "to: %s " % appoint_end
+            lambda booking_time_start, booking_time_end: "Setting up the Booking mode operational interval from: %s "
+            % booking_time_start
+            + "to: %s " % booking_time_end
             + "(duration: %s)"
             % (
-                appoint_end - appoint_start
-                if appoint_end - appoint_start > 0
-                else appoint_end - appoint_start + 24
+                booking_time_end - booking_time_start
+                if booking_time_end - booking_time_start > 0
+                else booking_time_end - booking_time_start + 24
             )
         ),
     )
-    def set_appoint(self, appoint_start, appoint_end):
+    def set_appoint(self, booking_time_start, booking_time_end):
         """Setting up the Booking mode operational interval."""
-        if 0 <= appoint_start < 24 and 0 <= appoint_end < 24:
-            return self.send("set_appoint", [1, appoint_start, appoint_end])
-        else:
+        if not (0 <= booking_time_start <= 23) or not (0 <= booking_time_end <= 23):
             raise WaterHeaterException(
                 "Booking mode operational interval parameters "
                 "must be within [0, 23]."
             )
+        else:
+            return self.send("set_appoint", [1, booking_time_start, booking_time_end])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode)),
