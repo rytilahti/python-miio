@@ -47,8 +47,11 @@ from . import (
     Vacuum,
     ViomiVacuum,
     WaterPurifier,
+<<<<<<< 9b099b5f2abfe86e66ef54e9b42df72ad5cfbcc5
     WaterPurifierYunmi,
+=======
     WaterHeater,
+>>>>>>> Initial support for viomi.waterheater.e1 devices
     WifiRepeater,
     WifiSpeaker,
 )
@@ -99,7 +102,6 @@ from .fan_miot import (
 from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
-from .waterheater import MODEL_WATERHEATER_E1
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -155,9 +157,12 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     ),
     "deerma-humidifier-jsq1": partial(AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_JSQ1),
     "yunmi-waterpuri-v2": WaterPurifier,
+<<<<<<< 9b099b5f2abfe86e66ef54e9b42df72ad5cfbcc5
     "yunmi.waterpuri.lx9": WaterPurifierYunmi,
     "yunmi.waterpuri.lx11": WaterPurifierYunmi,
+=======
     "viomi-waterheater-e1": WaterHeater,
+>>>>>>> Initial support for viomi.waterheater.e1 devices
     "philips-light-bulb": PhilipsBulb,  # cannot be discovered via mdns
     "philips-light-hbulb": PhilipsWhiteBulb,  # cannot be discovered via mdns
     "philips-light-candle": PhilipsBulb,  # cannot be discovered via mdns
@@ -210,8 +215,6 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "viomi-vacuum-v8": ViomiVacuum,
     "zhimi.heater.za1": partial(Heater, model=MODEL_HEATER_ZA1),
     "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
-    "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
-    "viomi.waterheater.e1": partial(WaterHeater, model=MODEL_WATERHEATER_E1),
 }
 
 
