@@ -1,5 +1,5 @@
-import logging
 import enum
+import logging
 from typing import Any, Dict
 
 import click
