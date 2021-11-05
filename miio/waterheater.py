@@ -254,14 +254,14 @@ class WaterHeater(Device):
     )
     def set_mode(self, mode: OperationMode):
         """Set operation mode."""
-        appoint_start: int
-        appoint_end: int
+        booking_time_start: int
+        booking_time_end: int
 
         # The Booking mode must be activated in a special way
         if mode == OperationMode.Booking:
-            appoint_start = self.send("get_prop", ["appointStart"])[0]
-            appoint_end = self.send("get_prop", ["appointEnd"])[0]
-            return self.send("set_appoint", [1, appoint_start, appoint_end])
+            booking_time_start = self.send("get_prop", ["appointStart"])[0]
+            booking_time_end = self.send("get_prop", ["appointEnd"])[0]
+            return self.send("set_appoint", [1, booking_time_start, booking_time_end])
         # Other operational modes
         else:
             return self.send("set_mode", [mode.value])
