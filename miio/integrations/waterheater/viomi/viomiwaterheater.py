@@ -1,5 +1,7 @@
+import datetime
 import enum
 import logging
+from datetime import time
 from typing import Any, Dict
 
 import click
@@ -10,7 +12,9 @@ from miio.exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-# VIOMI Internet electric water heater 1A (60L) https://home.miot-spec.com/spec/viomi.waterheater.e1
+"""VIOMI Internet electric water heater 1A (60L)
+https://home.miot-spec.com/spec/viomi.waterheater.e1
+"""
 MODEL_WATERHEATER_E1 = "viomi.waterheater.e1"
 AVAILABLE_PROPERTIES_E1 = [
     "washStatus",
@@ -53,7 +57,8 @@ class ViomiWaterHeaterException(DeviceException):
 
 class ViomiWaterHeaterStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
-        """Response of a VIOMI Internet electric water heater 1A (60L) (viomi.waterheater.e1):
+        """Response of a VIOMI Internet electric water heater 1A (60L)
+        (viomi.waterheater.e1):
 
         {'washStatus': 1, 'velocity': 0, 'waterTemp': 29,
         'targetTemp': 70, 'errStatus': 0, 'hotWater': 60,
@@ -99,14 +104,15 @@ class ViomiWaterHeaterStatus(DeviceStatus):
     def error(self) -> int:
         """Error status during operation:
 
-        0 - no errors.
+        0 - no errors;
+        other values are not described.
         """
         return self.data["errStatus"]
 
     @property
     def hot_water_volume(self) -> int:
-        """Empirical assessment of the hot water supply (100% water heated to
-        75 degrees Celsius)."""
+        """Empirical assessment of the hot water supply (100% when water heated
+        to 75 degrees Celsius)."""
         return self.data["hotWater"]
 
     @property
@@ -125,22 +131,22 @@ class ViomiWaterHeaterStatus(DeviceStatus):
         return OperationMode(self.data["modeType"])
 
     @property
-    def booking_time_start(self) -> int:
-        """Start time for Booking mode [0, 23] hours."""
-        return self.data["appointStart"]
+    def service_time_start(self) -> time:
+        """The start time of the operational in Booking mode ([0, 23]
+        hours)."""
+        return time(self.data["appointStart"])
 
     @property
-    def booking_time_end(self) -> int:
-        """End time for Booking mode [0, 23] hours.
+    def service_time_end(self) -> time:
+        """The end time of the operational in Booking mode ([0, 23] hours).
 
-        booking_time_start +
-        operational period duration = booking_time_end
+        service_time_start + operational period duration = service_time_end
         """
-        return self.data["appointEnd"]
+        return time(self.data["appointEnd"])
 
 
 class ViomiWaterHeater(Device):
-    """Main class representing the ViomiWaterheater."""
+    """Main class representing the Viomi Waterheaters."""
 
     _supported_models = [MODEL_WATERHEATER_E1]
 
@@ -154,9 +160,9 @@ class ViomiWaterHeater(Device):
             "Error status: {result.error}\n"
             "Remaining hot water volume: {result.hot_water_volume}%\n"
             "Device cleaning is required: {result.cleaning_required}\n"
-            "Operation mode type: {result.mode.name} ({result.mode.value}) \n"
-            "Start time in booking mode: {result.booking_time_start}\n"
-            "End time in booking mode: {result.booking_time_end}\n",
+            "Operation mode type: {result.mode.name} ({result.mode.value})\n"
+            "Booking mode start time at: {result.service_time_start}\n"
+            "Booking mode end time at: {result.service_time_end}\n",
         )
     )
     def status(self) -> ViomiWaterHeaterStatus:
@@ -165,6 +171,7 @@ class ViomiWaterHeater(Device):
             self.model, SUPPORTED_MODELS[MODEL_WATERHEATER_E1]
         )["available_properties"]
         values = self.get_properties(properties, max_properties=1)
+
         return ViomiWaterHeaterStatus(dict(zip(properties, values)))
 
     @command(default_output=format_output("Powering on"))
@@ -193,6 +200,7 @@ class ViomiWaterHeater(Device):
         if not min_temp <= temperature <= max_temp:
             raise ViomiWaterHeaterException(
                 "Invalid target temperature: %s" % temperature
+                + ". Supported range: [{min_temp}, {max_temp}"
             )
 
         return self.send("set_temp", [temperature])
@@ -227,29 +235,34 @@ class ViomiWaterHeater(Device):
         return self.send("set_temp", [bacteriostatic_temp])
 
     @command(
-        click.argument("booking_time_start", type=int),
-        click.argument("booking_time_end", type=int),
+        click.argument("time_start", type=int),
+        click.argument("time_end", type=int),
         default_output=format_output(
-            lambda booking_time_start, booking_time_end: "Setting up the Booking mode operational interval from: %s "
-            % booking_time_start
-            + "to: %s " % booking_time_end
-            + "(duration: %s hours)"
+            lambda time_start, time_end: "Setting up the Booking mode operational interval from: %02d:00 "
+            % time_start
+            + "to: %02d:00 " % time_end
+            + "(duration: %s hours)."
             % (
-                booking_time_end - booking_time_start
-                if booking_time_end - booking_time_start > 0
-                else booking_time_end - booking_time_start + 24
+                time_end - time_start
+                if time_end - time_start > 0
+                else time_end - time_start + 24
             )
         ),
     )
-    def set_appoint(self, booking_time_start, booking_time_end):
+    def set_service_time(self, time_start, time_end):
         """Setting up the Booking mode operational interval."""
-        if not (0 <= booking_time_start <= 23) or not (0 <= booking_time_end <= 23):
+        if not (0 <= time_start <= 23) or not (0 <= time_end <= 23):
             raise ViomiWaterHeaterException(
                 "Booking mode operational interval parameters "
                 "must be within [0, 23]."
             )
 
-        return self.send("set_appoint", [1, booking_time_start, booking_time_end])
+        """ First parameter of set_appoint means to activate or not Booking mode:
+
+        0 - set interval only;
+        1 - set interval and change mode.
+        """
+        return self.send("set_appoint", [0, time_start, time_end])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode)),
