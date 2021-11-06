@@ -10,7 +10,7 @@ from miio.exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-# VIOMI Internet electric water heater 1A (60L)
+# VIOMI Internet electric water heater 1A (60L) https://home.miot-spec.com/spec/viomi.waterheater.e1
 MODEL_WATERHEATER_E1 = "viomi.waterheater.e1"
 AVAILABLE_PROPERTIES_E1 = [
     "washStatus",
@@ -53,7 +53,7 @@ class ViomiWaterHeaterException(DeviceException):
 
 class ViomiWaterHeaterStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
-        """Response of a ViomiWaterheater (viomi.waterheater.e1):
+        """Response of a VIOMI Internet electric water heater 1A (60L) (viomi.waterheater.e1):
 
         {'washStatus': 1, 'velocity': 0, 'waterTemp': 29,
         'targetTemp': 70, 'errStatus': 0, 'hotWater': 60,
@@ -110,9 +110,9 @@ class ViomiWaterHeaterStatus(DeviceStatus):
         return self.data["hotWater"]
 
     @property
-    def cleaning_required(self) -> int:
-        """Not 0 when cleaning the device is required."""
-        return self.data["needClean"]
+    def cleaning_required(self) -> bool:
+        """True when cleaning the device is required."""
+        return self.data["needClean"] != 0
 
     @property
     def mode(self) -> OperationMode:
@@ -194,6 +194,7 @@ class ViomiWaterHeater(Device):
             raise ViomiWaterHeaterException(
                 "Invalid target temperature: %s" % temperature
             )
+
         return self.send("set_temp", [temperature])
 
     @command(default_output=format_output("Setting bacteriostatic mode on"))
@@ -222,8 +223,8 @@ class ViomiWaterHeater(Device):
                 "Bacteriostatic operational mode is "
                 "not supported in Thermostatic mode."
             )
-        else:
-            return self.send("set_temp", [bacteriostatic_temp])
+
+        return self.send("set_temp", [bacteriostatic_temp])
 
     @command(
         click.argument("booking_time_start", type=int),
@@ -232,7 +233,7 @@ class ViomiWaterHeater(Device):
             lambda booking_time_start, booking_time_end: "Setting up the Booking mode operational interval from: %s "
             % booking_time_start
             + "to: %s " % booking_time_end
-            + "(duration: %s)"
+            + "(duration: %s hours)"
             % (
                 booking_time_end - booking_time_start
                 if booking_time_end - booking_time_start > 0
@@ -247,8 +248,8 @@ class ViomiWaterHeater(Device):
                 "Booking mode operational interval parameters "
                 "must be within [0, 23]."
             )
-        else:
-            return self.send("set_appoint", [1, booking_time_start, booking_time_end])
+
+        return self.send("set_appoint", [1, booking_time_start, booking_time_end])
 
     @command(
         click.argument("mode", type=EnumType(OperationMode)),
@@ -266,6 +267,6 @@ class ViomiWaterHeater(Device):
             booking_time_start = self.send("get_prop", ["appointStart"])[0]
             booking_time_end = self.send("get_prop", ["appointEnd"])[0]
             return self.send("set_appoint", [1, booking_time_start, booking_time_end])
+
         # Other operational modes
-        else:
-            return self.send("set_mode", [mode.value])
+        return self.send("set_mode", [mode.value])
