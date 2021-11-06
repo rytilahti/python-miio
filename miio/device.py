@@ -249,10 +249,10 @@ class Device(metaclass=DeviceGroupMeta):
         """Helper to test device properties."""
 
         def ok(x):
-            click.echo(click.style(x, fg="green", bold=True))
+            click.echo(click.style(str(x), fg="green", bold=True))
 
         def fail(x):
-            click.echo(click.style(x, fg="red", bold=True))
+            click.echo(click.style(str(x), fg="red", bold=True))
 
         try:
             model = self.info().model
@@ -293,7 +293,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         props_to_test = list(valid_properties.keys())
         max_properties = -1
-        while len(props_to_test) > 1:
+        while len(props_to_test) > 0:
             try:
                 click.echo(
                     f"Testing {len(props_to_test)} properties at once ({' '.join(props_to_test)}): ",
