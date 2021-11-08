@@ -56,16 +56,10 @@ class YeelightSpecHelper:
         with open(os.path.dirname(__file__) + "/specs.yaml") as filedata:
             models = yaml.safe_load(filedata)
             for key, value in models.items():
-                if "main" not in value:
-                    raise Exception(
-                        "Model %s has no main lamp information. Please fix this in specs.yaml "
-                        % key
-                    )
-
                 lamps = {
                     YeelightSubLightType.Main: YeelightLampInfo(
-                        ColorTempRange(*value["main"]["color_temp"]),
-                        value["main"]["supports_color"],
+                        ColorTempRange(*value["color_temp"]),
+                        value["supports_color"],
                     )
                 }
 
