@@ -1,11 +1,17 @@
 import logging
 import os
+from enum import IntEnum
 from typing import Dict, NamedTuple
 
 import attr
 import yaml
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class YeelightSubLightType(IntEnum):
+    Main = 0
+    Background = 1
 
 
 class ColorTempRange(NamedTuple):
@@ -16,12 +22,16 @@ class ColorTempRange(NamedTuple):
 
 
 @attr.s(auto_attribs=True)
+class YeelightLampInfo:
+    color_temp: ColorTempRange
+    supports_color: bool
+
+
+@attr.s(auto_attribs=True)
 class YeelightModelInfo:
     model: str
-    color_temp: ColorTempRange
     night_light: bool
-    background_light: bool
-    supports_color: bool
+    lamps: Dict[YeelightSubLightType, YeelightLampInfo]
 
 
 class YeelightSpecHelper:
@@ -33,20 +43,33 @@ class YeelightSpecHelper:
 
     def _parse_specs_yaml(self):
         generic_info = YeelightModelInfo(
-            "generic", ColorTempRange(1700, 6500), False, False, False
+            "generic",
+            False,
+            {
+                YeelightSubLightType.Main: YeelightLampInfo(
+                    ColorTempRange(1700, 6500), False
+                )
+            },
         )
         YeelightSpecHelper._models["generic"] = generic_info
         # read the yaml file to populate the internal model cache
         with open(os.path.dirname(__file__) + "/specs.yaml") as filedata:
             models = yaml.safe_load(filedata)
             for key, value in models.items():
-                info = YeelightModelInfo(
-                    key,
-                    ColorTempRange(*value["color_temp"]),
-                    value["night_light"],
-                    value["background_light"],
-                    value["supports_color"],
-                )
+                lamps = {
+                    YeelightSubLightType.Main: YeelightLampInfo(
+                        ColorTempRange(*value["color_temp"]),
+                        value["supports_color"],
+                    )
+                }
+
+                if "background" in value:
+                    lamps[YeelightSubLightType.Background] = YeelightLampInfo(
+                        ColorTempRange(*value["background"]["color_temp"]),
+                        value["background"]["supports_color"],
+                    )
+
+                info = YeelightModelInfo(key, value["night_light"], lamps)
                 YeelightSpecHelper._models[key] = info
 
     @property
