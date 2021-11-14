@@ -3,10 +3,10 @@ from typing import Any, Dict, List
 
 import click
 
-from .status import PetWaterDispenserStatus, OperatingMode
-
 from miio.click_common import EnumType, command, format_output
 from miio.miot_device import MiotDevice
+
+from .status import OperatingMode, PetWaterDispenserStatus
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -69,8 +69,6 @@ class PetWaterDispenser(MiotDevice):
             prop["did"]: prop["value"] if prop["code"] == 0 else None
             for prop in self.get_properties_for_mapping()
         }
-
-        print(data)
 
         _LOGGER.debug(data)
 
