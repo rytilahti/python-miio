@@ -105,27 +105,27 @@ class PetWaterDispenser(MiotDevice):
         return self.set_property("mode", mode.value)
 
     @command(default_output=format_output("Resetting sponge filter"))
-    def reset_sponge_filter(self) -> List[Dict[str, Any]]:
+    def reset_sponge_filter(self) -> Dict[str, Any]:
         """Reset sponge filter."""
         return self.call_action("reset_filter_life")
 
     @command(default_output=format_output("Resetting cotton filter"))
-    def reset_cotton_filter(self) -> List[Dict[str, Any]]:
+    def reset_cotton_filter(self) -> Dict[str, Any]:
         """Reset cotton filter."""
         return self.call_action("reset_cotton_life")
 
     @command(default_output=format_output("Resetting all filters"))
     def reset_all_filters(self) -> List[Dict[str, Any]]:
-        """Reset all filters."""
-        return self.reset_sponge_filter() + self.reset_cotton_filter()
+        """Reset all filters [cotton, sponge]."""
+        return [self.reset_cotton_filter(), self.reset_sponge_filter()]
 
     @command(default_output=format_output("Resetting cleaning time"))
-    def reset_cleaning_time(self) -> List[Dict[str, Any]]:
+    def reset_cleaning_time(self) -> Dict[str, Any]:
         """Reset cleaning time counter."""
         return self.call_action("reset_clean_time")
 
     @command(default_output=format_output("Resetting device"))
-    def reset(self) -> List[Dict[str, Any]]:
+    def reset(self) -> Dict[str, Any]:
         """Reset device."""
         return self.call_action("reset_device")
 
