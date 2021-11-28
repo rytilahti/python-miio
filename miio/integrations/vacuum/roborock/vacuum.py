@@ -22,6 +22,7 @@ from miio.click_common import (
 )
 from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
+from miio.utils import deprecated
 
 from .vacuumcontainers import (
     CarpetModeStatus,
@@ -140,8 +141,8 @@ SUPPORTED_MODELS = [
 ]
 
 
-class Vacuum(Device):
-    """Main class representing the vacuum."""
+class RoborockVacuum(Device):
+    """Main class for roborock vacuums (roborock.vacuum.*)."""
 
     _supported_models = SUPPORTED_MODELS
 
@@ -886,3 +887,13 @@ class Vacuum(Device):
                 json.dump(seqs, f)
 
         return dg
+
+
+class Vacuum(RoborockVacuum):
+    """Main class for roborock vacuums."""
+
+    @deprecated(
+        "This class will become the base class for all vacuum implementations. Use RoborockVacuum to control roborock vacuums."
+    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
