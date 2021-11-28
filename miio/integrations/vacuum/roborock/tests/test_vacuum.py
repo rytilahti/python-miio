@@ -316,3 +316,6 @@ class TestVacuum(TestCase):
 def test_deprecated_vacuum(caplog):
     with pytest.deprecated_call():
         Vacuum("127.1.1.1", "68ffffffffffffffffffffffffffffff")
+
+    with pytest.deprecated_call():
+        from miio.vacuum import ROCKROBO_S6  # noqa: F401
