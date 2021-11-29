@@ -8,7 +8,7 @@ except ImportError:
 import enum
 from typing import Tuple
 
-from .vacuum import Vacuum
+from .vacuum import RoborockVacuum as Vacuum
 
 
 class Control(enum.Enum):

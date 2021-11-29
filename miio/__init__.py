@@ -43,7 +43,7 @@ from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuumMiot
 from miio.integrations.vacuum.mijia import G1Vacuum
-from miio.integrations.vacuum.roborock import Vacuum, VacuumException
+from miio.integrations.vacuum.roborock import RoborockVacuum, Vacuum, VacuumException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
     CleaningDetails,
     CleaningSummary,

@@ -13,23 +13,24 @@ import click
 from appdirs import user_cache_dir
 from tqdm import tqdm
 
-import miio  # noqa: E402
 from miio.click_common import (
     ExceptionHandlerGroup,
     LiteralParamType,
     validate_ip,
     validate_token,
 )
-from miio.device import UpdateState
+from miio.device import Device, UpdateState
 from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
 
-from .vacuum import CarpetCleaningMode
+from .vacuum import CarpetCleaningMode, Consumable, RoborockVacuum, TimerState
 from .vacuum_tui import VacuumTUI
 
+from miio.discovery import Discovery
+
 _LOGGER = logging.getLogger(__name__)
-pass_dev = click.make_pass_decorator(miio.Device, ensure=True)
+pass_dev = click.make_pass_decorator(Device, ensure=True)
 
 
 @click.group(invoke_without_command=True, cls=ExceptionHandlerGroup)
@@ -60,7 +61,6 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    start_id = manual_seq = 0
     with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
         id_file, "r"
     ) as f:
@@ -69,7 +69,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         manual_seq = x.get("manual_seq", 0)
         _LOGGER.debug("Read stored sequence ids: %s", x)
 
-    vac = miio.Vacuum(ip, token, start_id, debug)
+    vac = RoborockVacuum(ip, token, start_id, debug)
 
     vac.manual_seqnum = manual_seq
     _LOGGER.debug("Connecting to %s with token %s", ip, token)
@@ -83,7 +83,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
 
 @cli.resultcallback()
 @pass_dev
-def cleanup(vac: miio.Vacuum, *args, **kwargs):
+def cleanup(vac: RoborockVacuum, *args, **kwargs):
     if vac.ip is None:  # dummy Device for discovery, skip teardown
         return
     id_file = kwargs["id_file"]
@@ -105,12 +105,12 @@ def discover(handshake):
     if handshake:
         MiIOProtocol.discover()
     else:
-        miio.Discovery.discover_mdns()
+        Discovery.discover_mdns()
 
 
 @cli.command()
 @pass_dev
-def status(vac: miio.Vacuum):
+def status(vac: RoborockVacuum):
     """Returns the state information."""
     res = vac.status()
     if not res:
@@ -125,9 +125,6 @@ def status(vac: miio.Vacuum):
     click.echo("Fanspeed: %s %%" % res.fanspeed)
     click.echo("Cleaning since: %s" % res.clean_time)
     click.echo("Cleaned area: %s m²" % res.clean_area)
-    # click.echo("DND enabled: %s" % res.dnd)
-    # click.echo("Map present: %s" % res.map)
-    # click.echo("in_cleaning: %s" % res.in_cleaning)
     click.echo("Water box attached: %s" % res.is_water_box_attached)
     if res.is_water_box_carriage_attached is not None:
         click.echo("Mop attached: %s" % res.is_water_box_carriage_attached)
@@ -135,7 +132,7 @@ def status(vac: miio.Vacuum):
 
 @cli.command()
 @pass_dev
-def consumables(vac: miio.Vacuum):
+def consumables(vac: RoborockVacuum):
     """Return consumables status."""
     res = vac.consumable_status()
     click.echo("Main brush:   %s (left %s)" % (res.main_brush, res.main_brush_left))
@@ -147,13 +144,11 @@ def consumables(vac: miio.Vacuum):
 @cli.command()
 @click.argument("name", type=str, required=True)
 @pass_dev
-def reset_consumable(vac: miio.Vacuum, name):
+def reset_consumable(vac: RoborockVacuum, name):
     """Reset consumable state.
 
     Allowed values: main_brush, side_brush, filter, sensor_dirty
     """
-    from miio.vacuum import Consumable
-
     if name == "main_brush":
         consumable = Consumable.MainBrush
     elif name == "side_brush":
@@ -173,35 +168,35 @@ def reset_consumable(vac: miio.Vacuum, name):
 
 @cli.command()
 @pass_dev
-def start(vac: miio.Vacuum):
+def start(vac: RoborockVacuum):
     """Start cleaning."""
     click.echo("Starting cleaning: %s" % vac.start())
 
 
 @cli.command()
 @pass_dev
-def spot(vac: miio.Vacuum):
+def spot(vac: RoborockVacuum):
     """Start spot cleaning."""
     click.echo("Starting spot cleaning: %s" % vac.spot())
 
 
 @cli.command()
 @pass_dev
-def pause(vac: miio.Vacuum):
+def pause(vac: RoborockVacuum):
     """Pause cleaning."""
     click.echo("Pausing: %s" % vac.pause())
 
 
 @cli.command()
 @pass_dev
-def stop(vac: miio.Vacuum):
+def stop(vac: RoborockVacuum):
     """Stop cleaning."""
     click.echo("Stop cleaning: %s" % vac.stop())
 
 
 @cli.command()
 @pass_dev
-def home(vac: miio.Vacuum):
+def home(vac: RoborockVacuum):
     """Return home."""
     click.echo("Requesting return to home: %s" % vac.home())
 
@@ -210,7 +205,7 @@ def home(vac: miio.Vacuum):
 @pass_dev
 @click.argument("x_coord", type=int)
 @click.argument("y_coord", type=int)
-def goto(vac: miio.Vacuum, x_coord: int, y_coord: int):
+def goto(vac: RoborockVacuum, x_coord: int, y_coord: int):
     """Go to specific target."""
     click.echo("Going to target : %s" % vac.goto(x_coord, y_coord))
 
@@ -218,7 +213,7 @@ def goto(vac: miio.Vacuum, x_coord: int, y_coord: int):
 @cli.command()
 @pass_dev
 @click.argument("zones", type=LiteralParamType(), required=True)
-def zoned_clean(vac: miio.Vacuum, zones: List):
+def zoned_clean(vac: RoborockVacuum, zones: List):
     """Clean zone."""
     click.echo("Cleaning zone(s) : %s" % vac.zoned_clean(zones))
 
@@ -226,7 +221,7 @@ def zoned_clean(vac: miio.Vacuum, zones: List):
 @cli.group()
 @pass_dev
 # @click.argument('command', required=False)
-def manual(vac: miio.Vacuum):
+def manual(vac: RoborockVacuum):
     """Control the robot manually."""
     command = ""
     if command == "start":
@@ -240,14 +235,14 @@ def manual(vac: miio.Vacuum):
 
 @manual.command()
 @pass_dev
-def tui(vac: miio.Vacuum):
+def tui(vac: RoborockVacuum):
     """TUI for the manual mode."""
     VacuumTUI(vac).run()
 
 
 @manual.command(name="start")
 @pass_dev
-def manual_start(vac: miio.Vacuum):  # noqa: F811  # redef of start
+def manual_start(vac: RoborockVacuum):  # noqa: F811  # redef of start
     """Activate the manual mode."""
     click.echo("Activating manual controls")
     return vac.manual_start()
@@ -255,7 +250,7 @@ def manual_start(vac: miio.Vacuum):  # noqa: F811  # redef of start
 
 @manual.command(name="stop")
 @pass_dev
-def manual_stop(vac: miio.Vacuum):  # noqa: F811  # redef of stop
+def manual_stop(vac: RoborockVacuum):  # noqa: F811  # redef of stop
     """Deactivate the manual mode."""
     click.echo("Deactivating manual controls")
     return vac.manual_stop()
@@ -264,7 +259,7 @@ def manual_stop(vac: miio.Vacuum):  # noqa: F811  # redef of stop
 @manual.command()
 @pass_dev
 @click.argument("degrees", type=int)
-def left(vac: miio.Vacuum, degrees: int):
+def left(vac: RoborockVacuum, degrees: int):
     """Turn to left."""
     click.echo("Turning %s degrees left" % degrees)
     return vac.manual_control(degrees, 0)
@@ -273,7 +268,7 @@ def left(vac: miio.Vacuum, degrees: int):
 @manual.command()
 @pass_dev
 @click.argument("degrees", type=int)
-def right(vac: miio.Vacuum, degrees: int):
+def right(vac: RoborockVacuum, degrees: int):
     """Turn to right."""
     click.echo("Turning right")
     return vac.manual_control(-degrees, 0)
@@ -282,7 +277,7 @@ def right(vac: miio.Vacuum, degrees: int):
 @manual.command()
 @click.argument("amount", type=float)
 @pass_dev
-def forward(vac: miio.Vacuum, amount: float):
+def forward(vac: RoborockVacuum, amount: float):
     """Run forwards."""
     click.echo("Moving forwards")
     return vac.manual_control(0, amount)
@@ -291,7 +286,7 @@ def forward(vac: miio.Vacuum, amount: float):
 @manual.command()
 @click.argument("amount", type=float)
 @pass_dev
-def backward(vac: miio.Vacuum, amount: float):
+def backward(vac: RoborockVacuum, amount: float):
     """Run backwards."""
     click.echo("Moving backwards")
     return vac.manual_control(0, -amount)
@@ -302,7 +297,7 @@ def backward(vac: miio.Vacuum, amount: float):
 @click.argument("rotation", type=float)
 @click.argument("velocity", type=float)
 @click.argument("duration", type=int)
-def move(vac: miio.Vacuum, rotation: int, velocity: float, duration: int):
+def move(vac: RoborockVacuum, rotation: int, velocity: float, duration: int):
     """Pass raw manual values."""
     return vac.manual_control(rotation, velocity, duration)
 
@@ -315,7 +310,12 @@ def move(vac: miio.Vacuum, rotation: int, velocity: float, duration: int):
 @click.argument("end_min", type=int, required=False)
 @pass_dev
 def dnd(
-    vac: miio.Vacuum, cmd: str, start_hr: int, start_min: int, end_hr: int, end_min: int
+    vac: RoborockVacuum,
+    cmd: str,
+    start_hr: int,
+    start_min: int,
+    end_hr: int,
+    end_min: int,
 ):
     """Query and adjust do-not-disturb mode."""
     if cmd == "off":
@@ -339,7 +339,7 @@ def dnd(
 @cli.command()
 @click.argument("speed", type=int, required=False)
 @pass_dev
-def fanspeed(vac: miio.Vacuum, speed):
+def fanspeed(vac: RoborockVacuum, speed):
     """Query and adjust the fan speed."""
     if speed:
         click.echo("Setting fan speed to %s" % speed)
@@ -351,7 +351,7 @@ def fanspeed(vac: miio.Vacuum, speed):
 @cli.group(invoke_without_command=True)
 @pass_dev
 @click.pass_context
-def timer(ctx, vac: miio.Vacuum):
+def timer(ctx, vac: RoborockVacuum):
     """List and modify existing timers."""
     if ctx.invoked_subcommand is not None:
         return
@@ -377,7 +377,7 @@ def timer(ctx, vac: miio.Vacuum):
 @click.option("--command", default="", required=False)
 @click.option("--params", default="", required=False)
 @pass_dev
-def add(vac: miio.Vacuum, cron, command, params):
+def add(vac: RoborockVacuum, cron, command, params):
     """Add a timer."""
     click.echo(vac.add_timer(cron, command, params))
 
@@ -385,7 +385,7 @@ def add(vac: miio.Vacuum, cron, command, params):
 @timer.command()
 @click.argument("timer_id", type=int, required=True)
 @pass_dev
-def delete(vac: miio.Vacuum, timer_id):
+def delete(vac: RoborockVacuum, timer_id):
     """Delete a timer."""
     click.echo(vac.delete_timer(timer_id))
 
@@ -395,10 +395,8 @@ def delete(vac: miio.Vacuum, timer_id):
 @click.option("--enable", is_flag=True)
 @click.option("--disable", is_flag=True)
 @pass_dev
-def update(vac: miio.Vacuum, timer_id, enable, disable):
+def update(vac: RoborockVacuum, timer_id, enable, disable):
     """Enable/disable a timer."""
-    from miio.vacuum import TimerState
-
     if enable and not disable:
         vac.update_timer(timer_id, TimerState.On)
     elif disable and not enable:
@@ -409,7 +407,7 @@ def update(vac: miio.Vacuum, timer_id, enable, disable):
 
 @cli.command()
 @pass_dev
-def find(vac: miio.Vacuum):
+def find(vac: RoborockVacuum):
     """Find the robot."""
     click.echo("Sending find the robot calls.")
     click.echo(vac.find())
@@ -417,14 +415,14 @@ def find(vac: miio.Vacuum):
 
 @cli.command()
 @pass_dev
-def map(vac: miio.Vacuum):
+def map(vac: RoborockVacuum):
     """Return the map token."""
     click.echo(vac.map())
 
 
 @cli.command()
 @pass_dev
-def info(vac: miio.Vacuum):
+def info(vac: RoborockVacuum):
     """Return device information."""
     try:
         res = vac.info()
@@ -440,7 +438,7 @@ def info(vac: miio.Vacuum):
 
 @cli.command()
 @pass_dev
-def cleaning_history(vac: miio.Vacuum):
+def cleaning_history(vac: RoborockVacuum):
     """Query the cleaning history."""
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
@@ -468,7 +466,7 @@ def cleaning_history(vac: miio.Vacuum):
 @click.argument("volume", type=int, required=False)
 @click.option("--test", "test_mode", is_flag=True, help="play a test tune")
 @pass_dev
-def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
+def sound(vac: RoborockVacuum, volume: int, test_mode: bool):
     """Query and change sound settings."""
     if volume is not None:
         click.echo("Setting sound volume to %s" % volume)
@@ -486,7 +484,7 @@ def sound(vac: miio.Vacuum, volume: int, test_mode: bool):
 @click.option("--sid", type=int, required=False, default=10000)
 @click.option("--ip", required=False)
 @pass_dev
-def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int, ip: str):
+def install_sound(vac: RoborockVacuum, url: str, md5sum: str, sid: int, ip: str):
     """Install a sound.
 
     When passing a local file this will create a self-hosting server
@@ -536,7 +534,7 @@ def install_sound(vac: miio.Vacuum, url: str, md5sum: str, sid: int, ip: str):
 
 @cli.command()
 @pass_dev
-def serial_number(vac: miio.Vacuum):
+def serial_number(vac: RoborockVacuum):
     """Query serial number."""
     click.echo("Serial#: %s" % vac.serial_number())
 
@@ -544,7 +542,7 @@ def serial_number(vac: miio.Vacuum):
 @cli.command()
 @click.argument("tz", required=False)
 @pass_dev
-def timezone(vac: miio.Vacuum, tz=None):
+def timezone(vac: RoborockVacuum, tz=None):
     """Query or set the timezone."""
     if tz is not None:
         click.echo("Setting timezone to: %s" % tz)
@@ -556,7 +554,7 @@ def timezone(vac: miio.Vacuum, tz=None):
 @cli.command()
 @click.argument("enabled", required=False, type=bool)
 @pass_dev
-def carpet_mode(vac: miio.Vacuum, enabled=None):
+def carpet_mode(vac: RoborockVacuum, enabled=None):
     """Query or set the carpet mode."""
     if enabled is None:
         click.echo(vac.carpet_mode())
@@ -567,7 +565,7 @@ def carpet_mode(vac: miio.Vacuum, enabled=None):
 @cli.command()
 @click.argument("mode", required=False, type=str)
 @pass_dev
-def carpet_cleaning_mode(vac: miio.Vacuum, mode=None):
+def carpet_cleaning_mode(vac: RoborockVacuum, mode=None):
     """Query or set the carpet cleaning/avoidance mode.
 
     Allowed values: Avoid, Rise, Ignore
@@ -588,7 +586,9 @@ def carpet_cleaning_mode(vac: miio.Vacuum, mode=None):
 @click.argument("uid", type=int, required=False)
 @click.option("--timezone", type=str, required=False, default=None)
 @pass_dev
-def configure_wifi(vac: miio.Vacuum, ssid: str, password: str, uid: int, timezone: str):
+def configure_wifi(
+    vac: RoborockVacuum, ssid: str, password: str, uid: int, timezone: str
+):
     """Configure the wifi settings.
 
     Note that some newer firmwares may expect you to define the timezone by using
@@ -600,7 +600,7 @@ def configure_wifi(vac: miio.Vacuum, ssid: str, password: str, uid: int, timezon
 
 @cli.command()
 @pass_dev
-def update_status(vac: miio.Vacuum):
+def update_status(vac: RoborockVacuum):
     """Return update state and progress."""
     update_state = vac.update_state()
     click.echo("Update state: %s" % update_state)
@@ -614,7 +614,7 @@ def update_status(vac: miio.Vacuum):
 @click.argument("md5", required=False, default=None)
 @click.option("--ip", required=False)
 @pass_dev
-def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
+def update_firmware(vac: RoborockVacuum, url: str, md5: str, ip: str):
     """Update device firmware.
 
     If `url` starts with http* it is expected to be an URL.
@@ -671,7 +671,7 @@ def update_firmware(vac: miio.Vacuum, url: str, md5: str, ip: str):
 @click.argument("cmd", required=True)
 @click.argument("parameters", required=False)
 @pass_dev
-def raw_command(vac: miio.Vacuum, cmd, parameters):
+def raw_command(vac: RoborockVacuum, cmd, parameters):
     """Run a raw command."""
     params = []  # type: Any
     if parameters:

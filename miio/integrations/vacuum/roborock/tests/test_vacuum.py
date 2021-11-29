@@ -4,13 +4,13 @@ from unittest.mock import patch
 
 import pytest
 
-from miio import Vacuum, VacuumStatus
+from miio import RoborockVacuum, Vacuum, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
 from ..vacuum import CarpetCleaningMode, MopMode
 
 
-class DummyVacuum(DummyDevice, Vacuum):
+class DummyVacuum(DummyDevice, RoborockVacuum):
     STATE_CHARGING = 8
     STATE_CLEANING = 5
     STATE_ZONED_CLEAN = 9
@@ -311,3 +311,11 @@ class TestVacuum(TestCase):
 
         with patch.object(self.device, "send", return_value=[32453]):
             assert self.device.mop_mode() is None
+
+
+def test_deprecated_vacuum(caplog):
+    with pytest.deprecated_call():
+        Vacuum("127.1.1.1", "68ffffffffffffffffffffffffffffff")
+
+    with pytest.deprecated_call():
+        from miio.vacuum import ROCKROBO_S6  # noqa: F401
