@@ -318,8 +318,8 @@ class Yeelight(Device):
         default_output=format_output("Powering on"),
     )
     def on(self, transition=0, mode=0):
-        """Power on."""
-        """
+        """Power on.
+
         set_power ["on|off", "sudden|smooth", time_in_ms, mode]
         where mode:
         0: last mode

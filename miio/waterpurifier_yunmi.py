@@ -299,7 +299,7 @@ class WaterPurifierYunmi(Device):
         time.
         Key "mode" (always 'purifying') and key "tds_out_avg" (always 0) are not
         included in return values.
-        """
+        """  # noqa: B018
         values = self.send("get_prop", ["all"])
 
         prop_count = len(properties)
