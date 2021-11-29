@@ -132,7 +132,9 @@ class G1MopState(Enum):
 class G1Status(DeviceStatus):
     """Container for status reports from Mijia Vacuum G1."""
 
-    """Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
+    def __init__(self, data):
+        """Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
+
         [
             {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
             {'did': 'charge_state', 'siid': 3, 'piid': 2, 'code': 0, 'value': 2},
@@ -151,8 +153,6 @@ class G1Status(DeviceStatus):
             {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0},
             {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
             ]"""
-
-    def __init__(self, data):
         self.data = data
 
     @property
@@ -245,14 +245,15 @@ class G1Status(DeviceStatus):
 
 
 class G1CleaningSummary(DeviceStatus):
-    """Container for cleaning summary from Mijia Vacuum G1."""
+    """Container for cleaning summary from Mijia Vacuum G1.
 
-    """Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
+    Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
         [
           {'did': 'total_clean_area', 'siid': 9, 'piid': 3, 'code': 0, 'value': 0},
           {'did': 'total_clean_time', 'siid': 9, 'piid': 4, 'code': 0, 'value': 0},
           {'did': 'total_clean_count', 'siid': 9, 'piid': 5, 'code': 0, 'value': 0}
-            ]"""
+            ]
+    """
 
     def __init__(self, data) -> None:
         self.data = data

@@ -186,7 +186,6 @@ class FanStatus1C(DeviceStatus):
     """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker 1C."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        self.data = data
         """Response of a Fan1C (dmaker.fan.1c):
 
         {
@@ -204,6 +203,7 @@ class FanStatus1C(DeviceStatus):
           'exe_time': 280
         }
         """
+        self.data = data
 
     @property
     def power(self) -> str:

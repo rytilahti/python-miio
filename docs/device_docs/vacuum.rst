@@ -184,7 +184,7 @@ for original firmwares.
 
 This feature works similarly to the sound updates,
 so passing a local file will create a self-hosting server
-and updating from an URL requires you to pass the md5 hash of the file.  
+and updating from an URL requires you to pass the md5 hash of the file.
 
 ::
 

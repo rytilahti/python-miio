@@ -136,7 +136,7 @@ class YeelightDualControlModule(MiotDevice):
             "flex_mode",
             "rc_list",
         ]
-        """Filter only readable properties for status"""
+        # Filter only readable properties for status
         properties = [
             {"did": k, **v}
             for k, v in filter(lambda item: item[0] in p, _MAPPING.items())
