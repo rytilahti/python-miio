@@ -1,4 +1,68 @@
 # Change Log
+## [0.5.9](https://github.com/rytilahti/python-miio/tree/0.5.9) (2021-11-30)
+
+Besides enhancements and bug fixes, this release includes plenty of janitoral work to enable common base classes in the future.
+
+For library users:
+* Integrations are slowly moving to their own packages and directories, e.g. the vacuum module is now located in `miio.integrations.vacuum.roborock`.
+* Using `Vacuum` is now deprecated and will be later used as the common interface class for all vacuum implementations. For roborock vacuums, use `RoborockVacuum` instead.
+
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.8...0.5.9)
+
+**Breaking changes:**
+
+- Move vacuums to self-contained integrations [\#1165](https://github.com/rytilahti/python-miio/pull/1165) ([rytilahti](https://github.com/rytilahti))
+- Remove unnecessary subclass constructors, deprecate subclasses only setting the model [\#1146](https://github.com/rytilahti/python-miio/pull/1146) ([rytilahti](https://github.com/rytilahti))
+- Remove deprecated cli tools \(plug,miceil,mieye\) [\#1130](https://github.com/rytilahti/python-miio/pull/1130) ([rytilahti](https://github.com/rytilahti))
+
+**Implemented enhancements:**
+
+- Upgrage install and pre-commit dependencies [\#1192](https://github.com/rytilahti/python-miio/pull/1192) ([rytilahti](https://github.com/rytilahti))
+- Add py.typed to the package [\#1184](https://github.com/rytilahti/python-miio/pull/1184) ([rytilahti](https://github.com/rytilahti))
+- airhumidifer\_\(mj\)jsq: Add use\_time for better API compatibility [\#1179](https://github.com/rytilahti/python-miio/pull/1179) ([rytilahti](https://github.com/rytilahti))
+- vacuum: return none on is\_water\_box\_attached if unsupported [\#1178](https://github.com/rytilahti/python-miio/pull/1178) ([rytilahti](https://github.com/rytilahti))
+- Add more supported vacuum models [\#1173](https://github.com/rytilahti/python-miio/pull/1173) ([OGKevin](https://github.com/OGKevin))
+- Reorganize yeelight specs file [\#1166](https://github.com/rytilahti/python-miio/pull/1166) ([Kirmas](https://github.com/Kirmas))
+- enable G1 vacuum for miiocli [\#1164](https://github.com/rytilahti/python-miio/pull/1164) ([ghoost82](https://github.com/ghoost82))
+- Add light specs for yeelight [\#1163](https://github.com/rytilahti/python-miio/pull/1163) ([Kirmas](https://github.com/Kirmas))
+- Add S5 MAX model to support models list. [\#1157](https://github.com/rytilahti/python-miio/pull/1157) ([OGKevin](https://github.com/OGKevin))
+- Use poetry-core as build-system [\#1152](https://github.com/rytilahti/python-miio/pull/1152) ([rytilahti](https://github.com/rytilahti))
+- Support for Xiaomi Mijia G1 \(mijia.vacuum.v2\)  [\#867](https://github.com/rytilahti/python-miio/pull/867) ([neturmel](https://github.com/neturmel))
+
+**Fixed bugs:**
+
+- Fix test\_properties command logic [\#1180](https://github.com/rytilahti/python-miio/pull/1180) ([Zuz666](https://github.com/Zuz666))
+- Make sure all device-derived classes accept model kwarg [\#1143](https://github.com/rytilahti/python-miio/pull/1143) ([rytilahti](https://github.com/rytilahti))
+- Make cli work again for offline gen1 vacs, fix tests [\#1141](https://github.com/rytilahti/python-miio/pull/1141) ([rytilahti](https://github.com/rytilahti))
+- Fix `water_level` calculation for humidifiers [\#1140](https://github.com/rytilahti/python-miio/pull/1140) ([bieniu](https://github.com/bieniu))
+- fix TypeError in gateway property exception handling [\#1138](https://github.com/rytilahti/python-miio/pull/1138) ([starkillerOG](https://github.com/starkillerOG))
+- Do not get battery status for mains powered devices [\#1131](https://github.com/rytilahti/python-miio/pull/1131) ([starkillerOG](https://github.com/starkillerOG))
+
+**Deprecated:**
+
+- Deprecate roborock specific miio.Vacuum [\#1191](https://github.com/rytilahti/python-miio/pull/1191) ([rytilahti](https://github.com/rytilahti))
+
+**New devices:**
+
+- add support for smart pet water dispenser mmgg.pet\_waterer.s1 [\#1174](https://github.com/rytilahti/python-miio/pull/1174) ([ofen](https://github.com/ofen))
+
+**Documentation updates:**
+
+- Docs: Add workaround for file upload failure [\#1155](https://github.com/rytilahti/python-miio/pull/1155) ([martin-kokos](https://github.com/martin-kokos))
+- Add examples how to avoid model autodetection [\#1142](https://github.com/rytilahti/python-miio/pull/1142) ([rytilahti](https://github.com/rytilahti))
+- Restructure & improve documentation [\#1139](https://github.com/rytilahti/python-miio/pull/1139) ([rytilahti](https://github.com/rytilahti))
+
+**Merged pull requests:**
+
+- Add Air Purifier Pro H support [\#1185](https://github.com/rytilahti/python-miio/pull/1185) ([pvizeli](https://github.com/pvizeli))
+- Allow publish on test pypi workflow to fail [\#1177](https://github.com/rytilahti/python-miio/pull/1177) ([rytilahti](https://github.com/rytilahti))
+- Relax pyyaml version requirement [\#1176](https://github.com/rytilahti/python-miio/pull/1176) ([rytilahti](https://github.com/rytilahti))
+- create separate directory for yeelight [\#1160](https://github.com/rytilahti/python-miio/pull/1160) ([Kirmas](https://github.com/Kirmas))
+- Add workflow to publish packages on pypi [\#1145](https://github.com/rytilahti/python-miio/pull/1145) ([rytilahti](https://github.com/rytilahti))
+- Add tests for DeviceInfo [\#1144](https://github.com/rytilahti/python-miio/pull/1144) ([rytilahti](https://github.com/rytilahti))
+- Mark device\_classes inside devicegroupmeta as private [\#1129](https://github.com/rytilahti/python-miio/pull/1129) ([rytilahti](https://github.com/rytilahti))
+
 
 ## [0.5.8](https://github.com/rytilahti/python-miio/tree/0.5.8) (2021-09-01)
 
