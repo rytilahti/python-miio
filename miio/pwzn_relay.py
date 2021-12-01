@@ -99,6 +99,8 @@ class PwznRelayStatus(DeviceStatus):
 class PwznRelay(Device):
     """Main class representing the PWZN Relay."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(default_output=format_output("", "on_count: {result.on_count}\n"))
     def status(self) -> PwznRelayStatus:
         """Retrieve properties."""

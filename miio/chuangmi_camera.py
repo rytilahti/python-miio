@@ -64,6 +64,8 @@ class NASVideoRetentionTime(enum.IntEnum):
 CONST_HIGH_SENSITIVITY = [MotionDetectionSensitivity.High] * 32
 CONST_LOW_SENSITIVITY = [MotionDetectionSensitivity.Low] * 32
 
+SUPPORTED_MODELS = ["chuangmi.camera.ipc009", "chuangmi.camera.ipc019"]
+
 
 class CameraStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Chuangmi Camera."""
@@ -147,6 +149,8 @@ class CameraStatus(DeviceStatus):
 
 class ChuangmiCamera(Device):
     """Main class representing the Xiaomi Chuangmi Camera."""
+
+    _supported_models = SUPPORTED_MODELS
 
     @command(
         default_output=format_output(

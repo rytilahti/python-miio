@@ -17,6 +17,8 @@ class GatewayDevice(Device):
     """GatewayDevice class Specifies the init method for all gateway device
     functionalities."""
 
+    _supported_models = ["dummy.device"]
+
     def __init__(
         self,
         ip: str = None,

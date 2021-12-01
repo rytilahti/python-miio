@@ -71,6 +71,10 @@ class ToiletlidStatus(DeviceStatus):
 
 
 class Toiletlid(Device):
+    """Support for tinymu.toiletlid.v1."""
+
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",

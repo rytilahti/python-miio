@@ -83,6 +83,8 @@ class PhilipsRwreadStatus(DeviceStatus):
 class PhilipsRwread(Device):
     """Main class representing Xiaomi Philips RW Read."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",

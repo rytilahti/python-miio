@@ -78,6 +78,8 @@ class PhilipsEyecareStatus(DeviceStatus):
 class PhilipsEyecare(Device):
     """Main class representing Xiaomi Philips Eyecare Smart Lamp 2."""
 
+    _supported_models = ["unknown.models"]
+
     @command(
         default_output=format_output(
             "",

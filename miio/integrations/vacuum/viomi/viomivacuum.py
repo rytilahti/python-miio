@@ -62,6 +62,7 @@ from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)
 
+SUPPORTED_MODELS = ["viomi.vacuum.v7"]
 
 ERROR_CODES = {
     0: "Sleeping and not charging",
@@ -478,6 +479,8 @@ def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
 
 class ViomiVacuum(Device):
     """Interface for Viomi vacuums (viomi.vacuum.v7)."""
+
+    _supported_models = SUPPORTED_MODELS
 
     timeout = 5
     retry_count = 10

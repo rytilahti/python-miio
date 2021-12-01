@@ -102,6 +102,8 @@ class AirConditioningCompanionStatus(DeviceStatus):
 class AirConditioningCompanionMcn02(Device):
     """Main class representing Xiaomi Air Conditioning Companion V1 and V2."""
 
+    _supported_models = [MODEL_ACPARTNER_MCN02]
+
     def __init__(
         self,
         ip: str = None,

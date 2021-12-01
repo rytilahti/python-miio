@@ -29,6 +29,8 @@ class Status(IntEnum):
 class ScishareCoffee(Device):
     """Main class for Scishare coffee maker (scishare.coffee.s1102)."""
 
+    _supported_models = ["scishare.coffee.s1102"]
+
     @command()
     def status(self) -> int:
         """Device status."""

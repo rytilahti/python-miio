@@ -276,6 +276,8 @@ class FanStatusP5(DeviceStatus):
 class Fan(Device):
     """Main class representing the Xiaomi Mi Smart Pedestal Fan."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys() - MODEL_FAN_P5)
+
     def __init__(
         self,
         ip: str = None,
@@ -524,6 +526,10 @@ class FanZA4(Fan):
 
 
 class FanP5(Device):
+    """Support for dmaker.fan.p5."""
+
+    _supported_models = [MODEL_FAN_P5]
+
     def __init__(
         self,
         ip: str = None,

@@ -578,7 +578,9 @@ class CookerStatus(DeviceStatus):
 
 
 class Cooker(Device):
-    """Main class representing the cooker."""
+    """Main class representing the chunmi.cooker.*."""
+
+    _supported_models = [*MODEL_NORMAL, *MODEL_PRESSURE]
 
     @command(
         default_output=format_output(
