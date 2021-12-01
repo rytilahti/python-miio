@@ -1,4 +1,17 @@
 # Change Log
+
+## [0.5.9.1](https://github.com/rytilahti/python-miio/tree/0.5.9.1) (2021-12-01)
+
+This minor release only adds already known models pre-emptively to the lists of supported models to avoid flooding the issue tracker on reports after the next homeassistant release.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.9...0.5.9.1)
+
+**Merged pull requests:**
+
+- Add known models to supported models [\#1202](https://github.com/rytilahti/python-miio/pull/1202) ([rytilahti](https://github.com/rytilahti))
+- Add issue template for missing model information [\#1200](https://github.com/rytilahti/python-miio/pull/1200) ([rytilahti](https://github.com/rytilahti))
+
+
 ## [0.5.9](https://github.com/rytilahti/python-miio/tree/0.5.9) (2021-11-30)
 
 Besides enhancements and bug fixes, this release includes plenty of janitoral work to enable common base classes in the future.
