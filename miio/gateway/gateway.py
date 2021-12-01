@@ -27,6 +27,17 @@ GATEWAY_MODEL_AC_V2 = "lumi.acpartner.v2"
 GATEWAY_MODEL_AC_V3 = "lumi.acpartner.v3"
 
 
+SUPPORTED_MODELS = [
+    GATEWAY_MODEL_CHINA,
+    GATEWAY_MODEL_EU,
+    GATEWAY_MODEL_ZIG3,
+    GATEWAY_MODEL_AQARA,
+    GATEWAY_MODEL_AC_V1,
+    GATEWAY_MODEL_AC_V2,
+    GATEWAY_MODEL_AC_V3,
+]
+
+
 class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
 
@@ -76,6 +87,8 @@ class Gateway(Device):
     ## scene
     * get_lumi_bind ["scene", <page number>] for rooms/devices
     """
+
+    _supported_models = SUPPORTED_MODELS
 
     def __init__(
         self,
