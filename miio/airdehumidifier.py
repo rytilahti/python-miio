@@ -158,6 +158,8 @@ class AirDehumidifierStatus(DeviceStatus):
 class AirDehumidifier(Device):
     """Implementation of Xiaomi Mi Air Dehumidifier."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",

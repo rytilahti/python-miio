@@ -101,6 +101,8 @@ class WalkingpadStatus(DeviceStatus):
 class Walkingpad(Device):
     """Main class representing Xiaomi Walkingpad."""
 
+    _supported_models = ["ksmb.walkingpad.v3"]
+
     @command(
         default_output=format_output(
             "",

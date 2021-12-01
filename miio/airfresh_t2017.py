@@ -224,6 +224,8 @@ class AirFreshStatus(DeviceStatus):
 class AirFreshA1(Device):
     """Main class representing the air fresh a1."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",

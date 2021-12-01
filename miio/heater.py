@@ -127,6 +127,8 @@ class HeaterStatus(DeviceStatus):
 class Heater(Device):
     """Main class representing the Smartmi Zhimi Heater."""
 
+    _supported_models = list(SUPPORTED_MODELS.keys())
+
     @command(
         default_output=format_output(
             "",

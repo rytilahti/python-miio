@@ -89,6 +89,8 @@ class ChuangmiPlugStatus(DeviceStatus):
 class ChuangmiPlug(Device):
     """Main class representing the Chuangmi Plug."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",

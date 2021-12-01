@@ -63,6 +63,8 @@ class AlarmClock(Device):
     seconds /tries to get an answer.
     """
 
+    _supported_models = ["zimi.clock.myk01"]
+
     @command()
     def get_config_version(self):
         """

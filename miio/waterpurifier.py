@@ -91,7 +91,9 @@ class WaterPurifierStatus(DeviceStatus):
 
 
 class WaterPurifier(Device):
-    """Main class representing the waiter purifier."""
+    """Main class representing the water purifier."""
+
+    _supported_models = ["unknown.models"]
 
     @command(
         default_output=format_output(

@@ -13,6 +13,15 @@ from .exceptions import DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 
+SUPPORTED_MODELS = [
+    "zhimi.airpurifier.v3",
+    "zhimi.airpurifier.v6",
+    "zhimi.airpurifier.v7",
+    "zhimi.airpurifier.m1",
+    "zhimi.airpurifier.m2",
+]
+
+
 class AirPurifierException(DeviceException):
     pass
 
@@ -299,6 +308,8 @@ class AirPurifierStatus(DeviceStatus):
 
 class AirPurifier(Device):
     """Main class representing the air purifier."""
+
+    _supported_models = SUPPORTED_MODELS
 
     @command(
         default_output=format_output(

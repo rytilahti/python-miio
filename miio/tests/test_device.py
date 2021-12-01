@@ -104,3 +104,12 @@ def test_device_ctor_model(cls):
     dummy_model = "dummy"
     dev = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=dummy_model)
     assert dev.model == dummy_model
+
+
+@pytest.mark.parametrize("cls", Device.__subclasses__())
+def test_device_supported_models(cls):
+    """Make sure that every device subclass has a non-empty supported models."""
+    if cls.__name__ == "MiotDevice":  # skip miotdevice
+        return
+
+    assert cls._supported_models

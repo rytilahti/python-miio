@@ -68,6 +68,8 @@ class PhilipsBulbStatus(DeviceStatus):
 class PhilipsWhiteBulb(Device):
     """Main class representing Xiaomi Philips White LED Ball Lamp."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",

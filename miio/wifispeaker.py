@@ -94,6 +94,8 @@ class WifiSpeakerStatus(DeviceStatus):
 class WifiSpeaker(Device):
     """Device class for Xiaomi Smart Wifi Speaker."""
 
+    _supported_models = ["xiaomi.wifispeaker.v2"]
+
     @command(
         default_output=format_output(
             "",

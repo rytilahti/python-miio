@@ -141,6 +141,8 @@ class AirHumidifierStatus(DeviceStatus):
 class AirHumidifierJsq(Device):
     """Implementation of Xiaomi Zero Fog Humidifier: shuii.humidifier.jsq001."""
 
+    _supported_models = [MODEL_HUMIDIFIER_JSQ001]
+
     @command(
         default_output=format_output(
             "",

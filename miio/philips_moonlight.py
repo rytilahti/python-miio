@@ -114,6 +114,8 @@ class PhilipsMoonlight(Device):
     enable_bl                       # Night light
     """
 
+    _supported_models = ["philips.light.moonlight"]
+
     @command(
         default_output=format_output(
             "",

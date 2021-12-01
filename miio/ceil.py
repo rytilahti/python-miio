@@ -73,6 +73,8 @@ class Ceil(Device):
     # TODO: - Auto On/Off Not Supported
     #       - Adjust Scenes with Wall Switch Not Supported
 
+    _supported_models = ["unknown.models"]
+
     @command(
         default_output=format_output(
             "",

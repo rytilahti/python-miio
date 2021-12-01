@@ -71,6 +71,8 @@ class WifiRepeaterConfiguration(DeviceStatus):
 class WifiRepeater(Device):
     """Device class for Xiaomi Mi WiFi Repeater 2."""
 
+    _supported_models = ["xiaomi.repeater.v2"]
+
     @command(
         default_output=format_output(
             "",

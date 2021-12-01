@@ -93,6 +93,8 @@ class FanLeshowStatus(DeviceStatus):
 class FanLeshow(Device):
     """Main class representing the Xiaomi Rosou SS4 Ventilator."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",
