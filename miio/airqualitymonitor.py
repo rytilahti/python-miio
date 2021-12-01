@@ -151,6 +151,8 @@ class AirQualityMonitorStatus(DeviceStatus):
 class AirQualityMonitor(Device):
     """Xiaomi PM2.5 Air Quality Monitor."""
 
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+
     @command(
         default_output=format_output(
             "",
