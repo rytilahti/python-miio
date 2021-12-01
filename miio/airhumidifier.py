@@ -17,6 +17,13 @@ MODEL_HUMIDIFIER_CA1 = "zhimi.humidifier.ca1"
 MODEL_HUMIDIFIER_CB1 = "zhimi.humidifier.cb1"
 MODEL_HUMIDIFIER_CB2 = "zhimi.humidifier.cb2"
 
+SUPPORTED_MODELS = [
+    MODEL_HUMIDIFIER_V1,
+    MODEL_HUMIDIFIER_CA1,
+    MODEL_HUMIDIFIER_CB1,
+    MODEL_HUMIDIFIER_CB2,
+]
+
 AVAILABLE_PROPERTIES_COMMON = [
     "power",
     "mode",
@@ -250,6 +257,8 @@ class AirHumidifierStatus(DeviceStatus):
 
 class AirHumidifier(Device):
     """Implementation of Xiaomi Mi Air Humidifier."""
+
+    _supported_models = SUPPORTED_MODELS
 
     @command(
         default_output=format_output(
