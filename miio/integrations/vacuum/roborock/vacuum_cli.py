@@ -61,13 +61,15 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
+    config = {"seq": 0, "manual_seq": 0}
     with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
         id_file, "r"
     ) as f:
-        x = json.load(f)
-        start_id = x.get("seq", 0)
-        manual_seq = x.get("manual_seq", 0)
-        _LOGGER.debug("Read stored sequence ids: %s", x)
+        config = json.load(f)
+
+    start_id = config["seq"]
+    manual_seq = config["manual_seq"]
+    _LOGGER.debug("Using config: %s", config)
 
     vac = RoborockVacuum(ip, token, start_id, debug)
 
