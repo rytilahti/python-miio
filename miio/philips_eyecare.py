@@ -88,7 +88,7 @@ class PhilipsEyecare(Device):
             "Ambient light: {result.ambient}\n"
             "Ambient light brightness: {result.ambient_brightness}\n"
             "Eyecare mode: {result.eyecare}\n"
-            "Scene: {result.scence}\n"
+            "Scene: {result.scene}\n"
             "Eye fatigue reminder: {result.reminder}\n"
             "Smart night light: {result.smart_night_light}\n"
             "Delayed turn off: {result.delay_off_countdown}\n",
