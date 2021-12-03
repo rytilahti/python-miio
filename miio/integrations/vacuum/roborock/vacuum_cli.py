@@ -33,6 +33,17 @@ _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(Device, ensure=True)
 
 
+def _read_config(file):
+    """Return sequence id information."""
+    config = {"seq": 0, "manual_seq": 0}
+    with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
+        file, "r"
+    ) as f:
+        config = json.load(f)
+
+    return config
+
+
 @click.group(invoke_without_command=True, cls=ExceptionHandlerGroup)
 @click.option("--ip", envvar="MIROBO_IP", callback=validate_ip)
 @click.option("--token", envvar="MIROBO_TOKEN", callback=validate_token)
@@ -61,11 +72,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         click.echo("You have to give ip and token!")
         sys.exit(-1)
 
-    config = {"seq": 0, "manual_seq": 0}
-    with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
-        id_file, "r"
-    ) as f:
-        config = json.load(f)
+    config = _read_config(id_file)
 
     start_id = config["seq"]
     manual_seq = config["manual_seq"]
