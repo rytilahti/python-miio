@@ -21,6 +21,7 @@ from . import (
     AirFreshT2017,
     AirHumidifier,
     AirHumidifierJsq,
+    AirHumidifierJsqs,
     AirHumidifierMjjsq,
     AirPurifier,
     AirPurifierMiot,
@@ -137,6 +138,7 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
         AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
     ),
     "deerma-humidifier-jsq1": partial(AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_JSQ1),
+    "deerma-humidifier-jsqs": AirHumidifierJsqs,
     "yunmi-waterpuri-v2": WaterPurifier,
     "yunmi.waterpuri.lx9": WaterPurifierYunmi,
     "yunmi.waterpuri.lx11": WaterPurifierYunmi,

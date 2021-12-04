@@ -20,7 +20,7 @@ _MAPPING = {
     "relative_humidity": {"siid": 3, "piid": 1},  # [0, 100] step 1
     "temperature": {"siid": 3, "piid": 7},  # [-30, 100] step 1
     # Alarm (siid=5)
-    "buzzer": {"siid": 5, "piid": 1}, # bool
+    "buzzer": {"siid": 5, "piid": 1},  # bool
     # Light (siid=6)
     "led_light": {"siid": 6, "piid": 1},  # bool
     # Other (siid=7)
@@ -30,7 +30,7 @@ _MAPPING = {
 }
 
 
-class AirHumidifierMiotException(DeviceException):
+class AirHumidifierJsqsException(DeviceException):
     pass
 
 
@@ -41,7 +41,7 @@ class OperationMode(enum.Enum):
     Auto = 4
 
 
-class AirHumidifierMiotStatus(DeviceStatus):
+class AirHumidifierJsqsStatus(DeviceStatus):
     """Container for status reports from the air humidifier.
 
     Xiaomi Mi Smart Humidifer S (deerma.humidifier.jsqs) respone (MIoT format)
@@ -149,7 +149,6 @@ class AirHumidifierMiotStatus(DeviceStatus):
             return self.data["water_shortage_fault"]
         return None
 
-
     @property
     def overwet_protect(self) -> Optional[bool]:
         """Return True if overwet mode is active."""
@@ -176,13 +175,13 @@ class AirHumidifierJsqs(MiotDevice):
             "Mode: {result.mode}\n"
             "LED light: {result.led_light}\n"
             "Buzzer: {result.buzzer}\n"
-            "Overwet protection: {result.overwet_protect}\n"
+            "Overwet protection: {result.overwet_protect}\n",
         )
     )
-    def status(self) -> AirHumidifierMiotStatus:
+    def status(self) -> AirHumidifierJsqsStatus:
         """Retrieve properties."""
 
-        return AirHumidifierMiotStatus(
+        return AirHumidifierJsqsStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping()
@@ -206,7 +205,7 @@ class AirHumidifierJsqs(MiotDevice):
     def set_target_humidity(self, humidity: int):
         """Set target humidity."""
         if humidity < 40 or humidity > 80:
-            raise AirHumidifierMiotException(
+            raise AirHumidifierJsqsException(
                 "Invalid target humidity: %s. Must be between 40 and 80" % humidity
             )
         return self.set_property("target_humidity", humidity)
@@ -245,6 +244,6 @@ class AirHumidifierJsqs(MiotDevice):
             lambda overwet: "Turning on overwet" if overwet else "Turning off overwet"
         ),
     )
-    def set_overwet(self, overwet: bool):
+    def set_overwet_protect(self, overwet: bool):
         """Set overwet mode on/off."""
         return self.set_property("overwet_protect", overwet)
