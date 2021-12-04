@@ -124,7 +124,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Indicator Light
 
     @property
-    def led_light(self) -> bool:
+    def led_light(self) -> Optional[bool]:
         """Return status of the LED."""
 
         if self.data["led_light"] is not None:
@@ -134,7 +134,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Other
 
     @property
-    def tank_filed(self) -> bool:
+    def tank_filed(self) -> Optional[bool]:
         """Return the tank filed."""
 
         if self.data["tank_filed"] is not None:

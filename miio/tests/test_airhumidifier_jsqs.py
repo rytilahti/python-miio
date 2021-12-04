@@ -1,10 +1,7 @@
 import pytest
 
 from miio import AirHumidifierJsqs
-from miio.airhumidifier_jsqs import (
-    AirHumidifierJsqsException,
-    OperationMode,
-)
+from miio.airhumidifier_jsqs import AirHumidifierJsqsException, OperationMode
 
 from .dummies import DummyMiotDevice
 
