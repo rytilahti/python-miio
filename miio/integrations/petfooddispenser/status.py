@@ -1,7 +1,7 @@
 import enum
 from typing import Any, Dict
 
-from miio.miot_device import DeviceStatus
+from miio import DeviceStatus
 
 class FoodStatus(enum.Enum):
     Normal = 0
