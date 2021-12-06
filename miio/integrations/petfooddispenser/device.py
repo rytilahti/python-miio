@@ -7,7 +7,6 @@ import click
 from miio.click_common import EnumType, command, format_output
 from miio.device import Device
 
-from miio.miioprotocol import MiIOProtocol
 
 from .status import PetFoodDispenserStatus
 
