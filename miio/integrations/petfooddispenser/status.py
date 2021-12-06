@@ -42,11 +42,6 @@ class PetFoodDispenserStatus(DeviceStatus):
         return bool(self.data["door_status"])
 
     @property
-    def feed_today(self) -> int:
-        """Units of food dispensed today."""
-        raise NotImplementedError("Device does not currently return this value correctly.")
-
-    @property
     def clean_days(self) -> int:
         """Number of days until the unit requires cleaning."""
         return self.data['clean_days']
@@ -60,11 +55,6 @@ class PetFoodDispenserStatus(DeviceStatus):
     def dryer_days(self) -> int:
         """Number of days until the desiccant disc requires replacing."""
         return self.data['dryer_days']
-
-    @property
-    def food_portion(self) -> int:
-        """Default number of units dispensed."""
-        raise NotImplementedError("Device does not currently return this value correctly.")
 
     @property
     def wifi_led(self) -> bool:
