@@ -46,7 +46,7 @@ class PetFoodDispenser(Device):
             "Food bin lid: {result.door_status}\n"
             "Dispense button lock: {result.key_lock}\n"
             "Days until clean: {result.clean_days}\n"
-            "Dessicant life: {result.dryer_days}\n"
+            "Desiccant life: {result.dryer_days}\n"
             "WiFi LED: {result.wifi_led}\n",
         )
     )
