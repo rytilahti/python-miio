@@ -5,7 +5,7 @@ from collections import defaultdict
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.device import Device
+from miio import Device
 
 
 from .status import PetFoodDispenserStatus
