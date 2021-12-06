@@ -65,10 +65,3 @@ class PetFoodDispenserStatus(DeviceStatus):
     def key_lock(self) -> bool:
         """Key lock status for manual dispense button."""
         return bool(self.data["key_lock"])
-
-    @property
-    def county_code(self) -> int:
-        """Device country code."""
-        raise NotImplementedError("Device does not currently return this value correctly.")
-
-
