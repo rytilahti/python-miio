@@ -27,7 +27,7 @@ class PetFoodDispenserStatus(DeviceStatus):
         self.data = data
 
     @property
-    def food_status(self) -> str:
+    def food_status(self) -> FoodStatus:
         """Current food status / level."""
         return FoodStatus(self.data["food_status"])
 
