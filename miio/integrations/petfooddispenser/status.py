@@ -16,6 +16,14 @@ class PetFoodDispenserStatus(DeviceStatus):
     """Container for status reports from the Pet Feeder / Smart Pet Food Dispenser."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
+        """
+        Response from pet feeder (mmgg.feeder.petfeeder):
+ 
+        {'food_status': 0, 'feed_plan': 1, 'door_status': 0,
+          'feed_today': 0, 'clean_time': 7, 'power_status': 0,
+          'dryer_days': 6, 'food_portion': 0, 'wifi_led': 1,
+          'key_lock': 1, 'country_code': 255,}
+        """
         self.data = data
 
     @property
