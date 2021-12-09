@@ -37,6 +37,7 @@ _MAPPING = {
     "clean_mode": {"siid": 7, "piid": 5},  # bool
 }
 
+
 class AirHumidifierMiotException(DeviceException):
     pass
 
