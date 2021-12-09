@@ -37,7 +37,6 @@ _MAPPING = {
     "clean_mode": {"siid": 7, "piid": 5},  # bool
 }
 
-
 class AirHumidifierMiotException(DeviceException):
     pass
 
@@ -248,8 +247,15 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return self.data["clean_mode"]
 
 
+SMARTMI_EVAPORATIVE_HUMIDIFIER_2 = "zhimi.humidfier.ca4"
+
+SUPPORTED_MODELS = [SMARTMI_EVAPORATIVE_HUMIDIFIER_2]
+
+
 class AirHumidifierMiot(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
+
+    _supported_models = SUPPORTED_MODELS
 
     mapping = _MAPPING
 
