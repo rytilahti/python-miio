@@ -12,12 +12,15 @@ _LOGGER = logging.getLogger(__name__)
 
 MODEL_PHILIPS_LIGHT_BULB = "philips.light.bulb"
 MODEL_PHILIPS_LIGHT_HBULB = "philips.light.hbulb"
+MODEL_PHILIPS_ZHIRUI_DOWNLIGHT = "philips.light.downlight"
 
 AVAILABLE_PROPERTIES_COMMON = ["power", "dv"]
+AVAILABLE_PROPERTIES_COLORTEMP = AVAILABLE_PROPERTIES_COMMON + ["bright", "cct", "snm"]
 
 AVAILABLE_PROPERTIES = {
     MODEL_PHILIPS_LIGHT_HBULB: AVAILABLE_PROPERTIES_COMMON + ["bri"],
-    MODEL_PHILIPS_LIGHT_BULB: AVAILABLE_PROPERTIES_COMMON + ["bright", "cct", "snm"],
+    MODEL_PHILIPS_LIGHT_BULB: AVAILABLE_PROPERTIES_COLORTEMP,
+    MODEL_PHILIPS_ZHIRUI_DOWNLIGHT: AVAILABLE_PROPERTIES_COLORTEMP,
 }
 
 
@@ -127,6 +130,9 @@ class PhilipsWhiteBulb(Device):
 
 
 class PhilipsBulb(PhilipsWhiteBulb):
+
+    _supported_models = [MODEL_PHILIPS_ZHIRUI_DOWNLIGHT]
+
     @command(
         click.argument("level", type=int),
         default_output=format_output("Setting color temperature to {level}"),
