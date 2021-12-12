@@ -32,4 +32,5 @@ class GatewayDevice(Device):
             )
 
         self._gateway = parent
-        super().__init__(ip, token, start_id, debug, lazy_discover)
+        self.ip = self._gateway.ip
+        self.token = self._gateway.token
