@@ -33,5 +33,7 @@ class GatewayDevice(Device):
                 "This should never be initialized without gateway object."
             )
 
+        self._info = parent.info()
+        self._model = parent.model
         self._gateway = parent
         super().__init__(ip, token, start_id, debug, lazy_discover)
