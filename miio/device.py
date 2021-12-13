@@ -149,11 +149,13 @@ class Device(metaclass=DeviceGroupMeta):
             devinfo = DeviceInfo(self.send("miIO.info"))
             self._info = devinfo
             _LOGGER.debug("Detected model %s", devinfo.model)
-            if devinfo.model not in self.supported_models:
+            cls = self.__class__.__name__
+            bases = ["Device", "MiotDevice"]
+            if devinfo.model not in self.supported_models and cls not in bases:
                 _LOGGER.warning(
                     "Found an unsupported model '%s' for class '%s'. If this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
                     self.model,
-                    self.__class__.__name__,
+                    cls,
                 )
 
             return devinfo
