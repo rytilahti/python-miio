@@ -78,6 +78,6 @@ jobs:
         run: |
           poetry run pytest --cov miio --cov-report xml
       - name: "Upload coverage to Codecov"
-        uses: "codecov/codecov-action@v1"
+        uses: "codecov/codecov-action@v2"
         with:
           fail_ci_if_error: true
