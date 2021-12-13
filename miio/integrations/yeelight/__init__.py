@@ -363,7 +363,8 @@ class Yeelight(Device):
     )
     def set_color_temp(self, level, transition=500):
         """Set color temp in kelvin."""
-        if level > 6500 or level < 1700:
+        color_temp = self._model_info.lamps[YeelightSubLightType.Main].color_temp #for now only main light support
+        if level > color_temp.max or level < color_temp.min:
             raise YeelightException("Invalid color temperature: %s" % level)
         if transition > 0:
             return self.send("set_ct_abx", [level, "smooth", transition])
