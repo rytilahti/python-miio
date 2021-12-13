@@ -91,7 +91,7 @@ class PhilipsWhiteBulb(Device):
         """Retrieve properties."""
 
         properties = AVAILABLE_PROPERTIES.get(
-            self.model, AVAILABLE_PROPERTIES[MODEL_PHILIPS_LIGHT_HBULB]
+            self.model, AVAILABLE_PROPERTIES[MODEL_PHILIPS_LIGHT_BULB]
         )
         values = self.get_properties(properties)
 
