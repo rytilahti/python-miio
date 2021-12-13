@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-from miio import Device
+from miio import Device, MiotDevice, Vacuum
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 
 
@@ -59,7 +59,7 @@ def test_unavailable_device_info_raises(mocker):
 
 def test_model_autodetection(mocker):
     """Make sure info() gets called if the model is unknown."""
-    info = mocker.patch("miio.Device.info")
+    info = mocker.patch("miio.Device._fetch_info")
     _ = mocker.patch("miio.Device.send")
 
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
@@ -83,15 +83,22 @@ def test_forced_model(mocker):
     info.assert_not_called()
 
 
-def test_missing_supported(mocker, caplog):
+@pytest.mark.parametrize(
+    "cls,hidden", [(Device, True), (MiotDevice, True), (Vacuum, False)]
+)
+def test_missing_supported(mocker, caplog, cls, hidden):
     """Make sure warning is logged if the device is unsupported for the class."""
     _ = mocker.patch("miio.Device.send")
 
-    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff")
     d._fetch_info()
 
-    assert "Found an unsupported model" in caplog.text
-    assert "for class 'Device'" in caplog.text
+    if hidden:
+        assert "Found an unsupported model" not in caplog.text
+        assert f"for class '{cls.__name__}'" not in caplog.text
+    else:
+        assert "Found an unsupported model" in caplog.text
+        assert f"for class '{cls.__name__}'" in caplog.text
 
 
 @pytest.mark.parametrize("cls", Device.__subclasses__())
