@@ -847,11 +847,17 @@ class RoborockVacuum(Device):
     @command()
     def mop_intensity(self) -> MopIntensity:
         """Get mop scrub intensity setting."""
+        if self.model != ROCKROBO_S7:
+            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+
         return MopIntensity(self.send("get_water_box_custom_mode")[0])
 
     @command(click.argument("mop_intensity", type=EnumType(MopIntensity)))
     def set_mop_intensity(self, mop_intensity: MopIntensity):
         """Set mop scrub intensity setting."""
+        if self.model != ROCKROBO_S7:
+            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+
         return self.send("set_water_box_custom_mode", [mop_intensity.value])
 
     @command()
