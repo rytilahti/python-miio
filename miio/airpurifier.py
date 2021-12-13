@@ -14,11 +14,20 @@ _LOGGER = logging.getLogger(__name__)
 
 
 SUPPORTED_MODELS = [
+    "zhimi.airpurifier.v1",
+    "zhimi.airpurifier.v2",
     "zhimi.airpurifier.v3",
+    "zhimi.airpurifier.v5",
     "zhimi.airpurifier.v6",
     "zhimi.airpurifier.v7",
     "zhimi.airpurifier.m1",
     "zhimi.airpurifier.m2",
+    "zhimi.airpurifier.ma1",
+    "zhimi.airpurifier.ma2",
+    "zhimi.airpurifier.sa1",
+    "zhimi.airpurifier.sa2",
+    "zhimi.airpurifier.mc1",
+    "zhimi.airpurifier.mc2",
 ]
 
 

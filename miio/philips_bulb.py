@@ -13,6 +13,8 @@ _LOGGER = logging.getLogger(__name__)
 MODEL_PHILIPS_LIGHT_BULB = "philips.light.bulb"
 MODEL_PHILIPS_LIGHT_HBULB = "philips.light.hbulb"
 MODEL_PHILIPS_ZHIRUI_DOWNLIGHT = "philips.light.downlight"
+MODEL_PHILIPS_CANDLE = "philips.light.candle"
+MODEL_PHILIPS_CANDLE2 = "philips.light.candle2"
 
 AVAILABLE_PROPERTIES_COMMON = ["power", "dv"]
 AVAILABLE_PROPERTIES_COLORTEMP = AVAILABLE_PROPERTIES_COMMON + ["bright", "cct", "snm"]
@@ -21,6 +23,8 @@ AVAILABLE_PROPERTIES = {
     MODEL_PHILIPS_LIGHT_HBULB: AVAILABLE_PROPERTIES_COMMON + ["bri"],
     MODEL_PHILIPS_LIGHT_BULB: AVAILABLE_PROPERTIES_COLORTEMP,
     MODEL_PHILIPS_ZHIRUI_DOWNLIGHT: AVAILABLE_PROPERTIES_COLORTEMP,
+    MODEL_PHILIPS_CANDLE: AVAILABLE_PROPERTIES_COLORTEMP,
+    MODEL_PHILIPS_CANDLE2: AVAILABLE_PROPERTIES_COLORTEMP,
 }
 
 
@@ -71,7 +75,7 @@ class PhilipsBulbStatus(DeviceStatus):
 class PhilipsWhiteBulb(Device):
     """Main class representing Xiaomi Philips White LED Ball Lamp."""
 
-    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+    _supported_models = [MODEL_PHILIPS_LIGHT_HBULB]
 
     @command(
         default_output=format_output(
@@ -87,7 +91,7 @@ class PhilipsWhiteBulb(Device):
         """Retrieve properties."""
 
         properties = AVAILABLE_PROPERTIES.get(
-            self.model, AVAILABLE_PROPERTIES[MODEL_PHILIPS_LIGHT_HBULB]
+            self.model, AVAILABLE_PROPERTIES[MODEL_PHILIPS_LIGHT_BULB]
         )
         values = self.get_properties(properties)
 
@@ -130,8 +134,9 @@ class PhilipsWhiteBulb(Device):
 
 
 class PhilipsBulb(PhilipsWhiteBulb):
+    """Support for philips bulbs that support color temperature and scenes."""
 
-    _supported_models = [MODEL_PHILIPS_ZHIRUI_DOWNLIGHT]
+    _supported_models = list(AVAILABLE_PROPERTIES.keys())
 
     @command(
         click.argument("level", type=int),

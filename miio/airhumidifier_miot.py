@@ -248,7 +248,7 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return self.data["clean_mode"]
 
 
-SMARTMI_EVAPORATIVE_HUMIDIFIER_2 = "zhimi.humidfier.ca4"
+SMARTMI_EVAPORATIVE_HUMIDIFIER_2 = "zhimi.humidifier.ca4"
 
 SUPPORTED_MODELS = [SMARTMI_EVAPORATIVE_HUMIDIFIER_2]
 

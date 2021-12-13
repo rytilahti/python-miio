@@ -9,6 +9,12 @@ from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice
 
+SUPPORTED_MODELS = [
+    "zhimi.airpurifier.ma4",  # airpurifier 3
+    "zhimi.airpurifier.mb3",  # airpurifier 3h
+    "zhimi.airpurifier.va1",  # airpurifier proh
+]
+
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
     # Air Purifier (siid=2)
@@ -364,6 +370,7 @@ class AirPurifierMiot(BasicAirPurifierMiot):
     """Main class representing the air purifier which uses MIoT protocol."""
 
     mapping = _MAPPING
+    _supported_models = SUPPORTED_MODELS
 
     @command(
         default_output=format_output(
@@ -460,6 +467,7 @@ class AirPurifierMB4(BasicAirPurifierMiot):
     """Main class representing the air purifier which uses MIoT protocol."""
 
     mapping = _MODEL_AIRPURIFIER_MB4
+    _supported_models = ["zhimi.airpurifier.mb4"]  # airpurifier 3c
 
     @command(
         default_output=format_output(
