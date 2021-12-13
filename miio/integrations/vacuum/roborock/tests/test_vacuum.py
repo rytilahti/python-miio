@@ -7,7 +7,7 @@ import pytest
 from miio import RoborockVacuum, Vacuum, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
-from ..vacuum import CarpetCleaningMode, MopMode
+from ..vacuum import CarpetCleaningMode, MopIntensity, MopMode, VacuumException
 
 
 class DummyVacuum(DummyDevice, RoborockVacuum):
@@ -311,6 +311,16 @@ class TestVacuum(TestCase):
 
         with patch.object(self.device, "send", return_value=[32453]):
             assert self.device.mop_mode() is None
+
+    def test_mop_intensity(self):
+        """Test getting mop intensity."""
+        with pytest.raises(VacuumException):
+            self.device.mop_intensity()
+
+    def test_set_mop_intensity(self):
+        """Test setting mop intensity."""
+        with pytest.raises(VacuumException):
+            self.device.set_mop_intensity(MopIntensity.Intense)
 
 
 def test_deprecated_vacuum(caplog):
