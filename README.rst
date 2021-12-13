@@ -94,7 +94,7 @@ Contributing
 ------------
 
 We welcome all sorts of contributions from patches to add improvements or fixing bugs to improving the documentation.
-To ease the process of setting up a development environment we have prepared `a short guide <https://python-miio.readthedocs.io/en/latest/new_devices.html>`__ for getting you started.
+To ease the process of setting up a development environment we have prepared `a short guide <https://python-miio.readthedocs.io/en/latest/contributing.html>`__ for getting you started.
 
 
 Supported devices
