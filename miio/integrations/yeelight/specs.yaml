@@ -165,3 +165,12 @@ yeelink.light.strip4:
   night_light: False
   color_temp: [2700, 6500]
   supports_color: True
+yeelink.bhf_light.v2:
+  night_light: False
+  color_temp: [0, 0]
+  supports_color: False
+yeelink.light.lamp22:
+  night_light: False
+  color_temp: [2700, 6500]
+  supports_color: True
+

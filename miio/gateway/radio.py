@@ -2,19 +2,16 @@
 
 import click
 
-from ..click_common import command
 from .gatewaydevice import GatewayDevice
 
 
 class Radio(GatewayDevice):
     """Radio controls for the gateway."""
 
-    @command()
     def get_radio_info(self):
         """Radio play info."""
         return self._gateway.send("get_prop_fm")
 
-    @command(click.argument("volume"))
     def set_radio_volume(self, volume):
         """Set radio volume."""
         return self._gateway.send("set_fm_volume", [volume])
@@ -68,7 +65,6 @@ class Radio(GatewayDevice):
         raise NotImplementedError()
         return self._gateway.send("get_default_music")
 
-    @command()
     def get_music_info(self):
         """Unknown."""
         info = self._gateway.send("get_music_info")
@@ -76,7 +72,6 @@ class Radio(GatewayDevice):
         free_space = self._gateway.send("get_music_free_space")
         click.echo("free space: %s" % free_space)
 
-    @command()
     def get_mute(self):
         """mute of what?"""
         return self._gateway.send("get_mute")
@@ -102,7 +97,6 @@ class Radio(GatewayDevice):
         raise NotImplementedError()
         return self._gateway.send("get_download_progress")
 
-    @command()
     def set_sound_playing(self):
         """stop playing?"""
         return self._gateway.send("set_sound_playing", ["off"])
