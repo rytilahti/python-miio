@@ -2,7 +2,10 @@ from unittest import TestCase
 
 import pytest
 
-from miio.integrations.yeelight.spec_helper import YeelightSpecHelper
+from miio.integrations.yeelight.spec_helper import (
+    YeelightSpecHelper,
+    YeelightSubLightType,
+)
 from miio.tests.dummies import DummyDevice
 
 from .. import Yeelight, YeelightException, YeelightMode, YeelightStatus
@@ -31,6 +34,9 @@ class DummyLight(DummyDevice, Yeelight):
             Yeelight._supported_models = Yeelight._spec_helper.supported_models
 
         self._model_info = Yeelight._spec_helper.get_model_info(self.model)
+        self._light_type = YeelightSubLightType.Main
+        self._light_info = self._model_info.lamps[self._light_type]
+        self._color_temp_range = self._light_info.color_temp
 
     def set_config(self, x):
         key, value = x

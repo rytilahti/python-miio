@@ -8,7 +8,7 @@ from miio.device import Device, DeviceStatus
 from miio.exceptions import DeviceException
 from miio.utils import int_to_rgb, rgb_to_int
 
-from .spec_helper import YeelightSpecHelper, YeelightSubLightType
+from .spec_helper import ColorTempRange, YeelightSpecHelper, YeelightSubLightType
 
 
 class YeelightException(DeviceException):
@@ -265,6 +265,7 @@ class Yeelight(Device):
         debug: int = 0,
         lazy_discover: bool = True,
         model: str = None,
+        light_type: YeelightSubLightType = YeelightSubLightType.Main,  # for now only Main support this is for future PR.
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
         if Yeelight._spec_helper is None:
@@ -272,6 +273,9 @@ class Yeelight(Device):
             Yeelight._supported_models = Yeelight._spec_helper.supported_models
 
         self._model_info = Yeelight._spec_helper.get_model_info(self.model)
+        self._light_type = light_type
+        self._light_info = self._model_info.lamps[self._light_type]
+        self._color_temp_range = self._light_info.color_temp
 
     @command(default_output=format_output("", "{result.cli_format}"))
     def status(self) -> YeelightStatus:
@@ -311,6 +315,10 @@ class Yeelight(Device):
         values = self.get_properties(properties)
 
         return YeelightStatus(dict(zip(properties, values)))
+
+    @property
+    def valid_temperature_range(self) -> ColorTempRange:
+        return self._color_temp_range
 
     @command(
         click.option("--transition", type=int, required=False, default=0),
@@ -363,10 +371,10 @@ class Yeelight(Device):
     )
     def set_color_temp(self, level, transition=500):
         """Set color temp in kelvin."""
-        color_temp = self._model_info.lamps[
-            YeelightSubLightType.Main
-        ].color_temp  # for now only main light support
-        if level > color_temp.max or level < color_temp.min:
+        if (
+            level > self.valid_temperature_range.max
+            or level < self.valid_temperature_range.min
+        ):
             raise YeelightException("Invalid color temperature: %s" % level)
         if transition > 0:
             return self.send("set_ct_abx", [level, "smooth", transition])
