@@ -1,5 +1,39 @@
 # Change Log
 
+## [0.5.9.2](https://github.com/rytilahti/python-miio/tree/0.5.9.2) (2021-12-14)
+
+This release fixes regressions caused by the recent refactoring related to supported models:
+* philips_bulb now defaults to a bulb that has color temperature setting
+* gateway devices do not perform an info query as that is handled by their parent
+
+Also, the list of the supported models was extended thanks to the feedback from the community!
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.9.1...0.5.9.2)
+
+**Implemented enhancements:**
+
+- Add yeelink.bhf\_light.v2 and yeelink.light.lamp22 support [\#1250](https://github.com/rytilahti/python-miio/pull/1250) ([FaintGhost](https://github.com/FaintGhost))
+- Skip warning if the unknown model is reported on a base class [\#1243](https://github.com/rytilahti/python-miio/pull/1243) ([rytilahti](https://github.com/rytilahti))
+- Add emptying bin status for roborock s7+ [\#1190](https://github.com/rytilahti/python-miio/pull/1190) ([rytilahti](https://github.com/rytilahti))
+
+**Fixed bugs:**
+
+- Fix Roborock S7 fan speed [\#1235](https://github.com/rytilahti/python-miio/pull/1235) ([shred86](https://github.com/shred86))
+- gateway: remove click support for gateway devices [\#1229](https://github.com/rytilahti/python-miio/pull/1229) ([starkillerOG](https://github.com/starkillerOG))
+- mirobo: make sure config always exists [\#1207](https://github.com/rytilahti/python-miio/pull/1207) ([rytilahti](https://github.com/rytilahti))
+- Fix typo [\#1204](https://github.com/rytilahti/python-miio/pull/1204) ([com30n](https://github.com/com30n))
+
+**Merged pull requests:**
+
+- philips\_eyecare: add philips.light.sread1 as supported [\#1246](https://github.com/rytilahti/python-miio/pull/1246) ([rytilahti](https://github.com/rytilahti))
+- Add yeelink.light.color3 support [\#1245](https://github.com/rytilahti/python-miio/pull/1245) ([Kirmas](https://github.com/Kirmas))
+- Use codecov-action@v2 for CI [\#1244](https://github.com/rytilahti/python-miio/pull/1244) ([rytilahti](https://github.com/rytilahti))
+- Add yeelink.light.color5 support [\#1242](https://github.com/rytilahti/python-miio/pull/1242) ([Kirmas](https://github.com/Kirmas))
+- Add more supported devices to their corresponding classes [\#1237](https://github.com/rytilahti/python-miio/pull/1237) ([rytilahti](https://github.com/rytilahti))
+- Add zhimi.humidfier.ca4 as supported model [\#1220](https://github.com/rytilahti/python-miio/pull/1220) ([jbouwh](https://github.com/jbouwh))
+- vacuum: Add t7s \(roborock.vacuum.a14\) [\#1214](https://github.com/rytilahti/python-miio/pull/1214) ([rytilahti](https://github.com/rytilahti))
+- philips\_bulb: add philips.light.downlight to supported devices [\#1212](https://github.com/rytilahti/python-miio/pull/1212) ([rytilahti](https://github.com/rytilahti))
+
 ## [0.5.9.1](https://github.com/rytilahti/python-miio/tree/0.5.9.1) (2021-12-01)
 
 This minor release only adds already known models pre-emptively to the lists of supported models to avoid flooding the issue tracker on reports after the next homeassistant release.
