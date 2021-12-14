@@ -265,7 +265,6 @@ class Yeelight(Device):
         debug: int = 0,
         lazy_discover: bool = True,
         model: str = None,
-        light_type: YeelightSubLightType = YeelightSubLightType.Main,  # for now only Main support this is for future PR.
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
         if Yeelight._spec_helper is None:
@@ -273,7 +272,7 @@ class Yeelight(Device):
             Yeelight._supported_models = Yeelight._spec_helper.supported_models
 
         self._model_info = Yeelight._spec_helper.get_model_info(self.model)
-        self._light_type = light_type
+        self._light_type = YeelightSubLightType.Main
         self._light_info = self._model_info.lamps[self._light_type]
         self._color_temp_range = self._light_info.color_temp
 
