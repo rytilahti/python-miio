@@ -9,7 +9,6 @@ Subpackages
 
    miio.gateway
    miio.integrations
-   miio.interfaces
 
 Submodules
 ----------
@@ -64,7 +63,6 @@ Submodules
    miio.powerstrip
    miio.protocol
    miio.pwzn_relay
-   miio.registry
    miio.scishare_coffeemaker
    miio.toiletlid
    miio.updater
