@@ -10,6 +10,14 @@ from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
+
+SUPPORTED_MODELS = [
+    "xiaomi.aircondition.mc1",
+    "xiaomi.aircondition.mc2",
+    "xiaomi.aircondition.mc4",
+    "xiaomi.aircondition.mc5",
+]
+
 _MAPPING = {
     # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-conditioner:0000A004:xiaomi-mc4:1
     # Air Conditioner (siid=2)
@@ -273,6 +281,7 @@ class AirConditionerMiotStatus(DeviceStatus):
 class AirConditionerMiot(MiotDevice):
     """Main class representing the air conditioner which uses MIoT protocol."""
 
+    _supported_models = SUPPORTED_MODELS
     mapping = _MAPPING
 
     @command(

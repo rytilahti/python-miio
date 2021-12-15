@@ -31,7 +31,10 @@ class ChuangmiIrException(DeviceException):
 class ChuangmiIr(Device):
     """Main class representing Chuangmi IR Remote Controller."""
 
-    _supported_models = ["unknown.models"]
+    _supported_models = [
+        "chuangmi.ir.v2",
+        "chuangmi-remote-h102a03",  # maybe?
+    ]
 
     PRONTO_RE = re.compile(r"^([\da-f]{4}\s?){3,}([\da-f]{4})$", re.IGNORECASE)
 
