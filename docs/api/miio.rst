@@ -8,6 +8,8 @@ Subpackages
    :maxdepth: 4
 
    miio.gateway
+   miio.integrations
+   miio.interfaces
 
 Submodules
 ----------
@@ -44,7 +46,6 @@ Submodules
    miio.device
    miio.deviceinfo
    miio.discovery
-   miio.dreamevacuum_miot
    miio.exceptions
    miio.extract_tokens
    miio.fan
@@ -63,22 +64,17 @@ Submodules
    miio.powerstrip
    miio.protocol
    miio.pwzn_relay
-   miio.roidmivacuum_miot
+   miio.registry
    miio.scishare_coffeemaker
    miio.toiletlid
    miio.updater
    miio.utils
    miio.vacuum
-   miio.vacuum_cli
-   miio.vacuum_tui
-   miio.vacuumcontainers
-   miio.viomivacuum
    miio.walkingpad
    miio.waterpurifier
    miio.waterpurifier_yunmi
    miio.wifirepeater
    miio.wifispeaker
-   miio.yeelight
    miio.yeelight_dual_switch
 
 Module contents
