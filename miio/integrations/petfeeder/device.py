@@ -75,7 +75,7 @@ class FeedPlan:
         if self.tz != self._device_tz:
             self.datetime = self.datetime.astimezone(self._device_tz)
 
-    def format(self):
+    def format(self) -> str:
         return f"{self.slot:02d}{self.datetime.strftime('%H%M')}{self.units:02d}"
 
 
@@ -115,7 +115,7 @@ class PetFeeder(Device):
         click.argument("units", type=int),
         default_output=format_output("Dispensing {units} unit(s)"),
     )
-    def dispense_food(self, units: int):
+    def dispense_food(self, units: int) -> bool:
         """Dispense food.
 
         Manually dispense food.
@@ -144,7 +144,7 @@ class PetFeeder(Device):
             lambda state: "Turning on WiFi led" if state else "Turning off WiFi led"
         ),
     )
-    def set_wifi_led(self, state: bool):
+    def set_wifi_led(self, state: bool) -> bool:
         """Set wifi led.
 
         Enable / Disable the wifi status led.
@@ -163,7 +163,7 @@ class PetFeeder(Device):
             else "Unlocking dispense button"
         ),
     )
-    def set_button_lock(self, state: bool):
+    def set_button_lock(self, state: bool) -> bool:
         """Set button lock.
 
         Lock / Unlock the manual dispense button.
@@ -182,7 +182,7 @@ class PetFeeder(Device):
             else "Disabling automatic feeding schedule"
         ),
     )
-    def set_feed_state(self, state: bool):
+    def set_feed_state(self, state: bool) -> bool:
         """Set feed state.
 
         Enable / Disable the automatic feeding schedule.
