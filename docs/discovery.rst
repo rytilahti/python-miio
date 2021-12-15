@@ -4,18 +4,40 @@ Getting started
 Installation
 ============
 
-The easiest way to install the package is to use pip:
-``pip3 install python-miio`` . `Using
-virtualenv <http://docs.python-guide.org/en/latest/dev/virtualenvs/>`__
-is recommended.
+You can install the most recent release using pip:
+
+.. code-block:: console
+
+    pip install python-miio
 
 
-Please make sure you have ``libffi`` and ``openssl`` headers installed, you can
-do this on Debian-based systems (like Rasperry Pi) with
+Alternatively, you can clone this repository and use poetry to install the current master:
 
-.. code-block:: bash
+.. code-block:: console
 
-    apt-get install libffi-dev libssl-dev
+    git clone https://github.com/rytilahti/python-miio.git
+    cd python-miio/
+    poetry install
+
+This will install python-miio into a separate virtual environment outside of your regular python installation.
+You can then execute installed programs (like ``miiocli``):
+
+.. code-block:: console
+
+    poetry run miiocli --help
+
+.. tip::
+
+    If you want to execute more commands in a row, you can activate the
+    created virtual environment to avoid typing ``poetry run`` for each
+    invocation:
+
+    .. code-block:: console
+
+        poetry shell
+        miiocli --help
+        miiocli discover
+
 
 Device discovery
 ================
