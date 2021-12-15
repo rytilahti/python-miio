@@ -93,7 +93,9 @@ class WaterPurifierStatus(DeviceStatus):
 class WaterPurifier(Device):
     """Main class representing the water purifier."""
 
-    _supported_models = ["unknown.models"]
+    _supported_models = [
+        "yunmi.waterpuri.v2",  # unknown if correct, based on mdns response
+    ]
 
     @command(
         default_output=format_output(

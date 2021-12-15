@@ -156,7 +156,7 @@ class CameraStatus(DeviceStatus):
 class AqaraCamera(Device):
     """Main class representing the Xiaomi Aqara Camera."""
 
-    _supported_models = ["lumi.camera.aq1"]
+    _supported_models = ["lumi.camera.aq1", "lumi.camera.aq2"]
 
     @command(
         default_output=format_output(

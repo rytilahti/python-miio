@@ -90,10 +90,12 @@ Development checklist
    or :class:`miio.miot_device.MiotDevice` (for MiOT) (:ref:`Minimal example`).
 2. All commands and their arguments should be decorated with `@command` decorator,
    which will make them accessible to `miiocli` (:ref:`miiocli`).
-3. Status containers is derived from `DeviceStatus` class and all properties should
+3. All implementations must define :ref:`Device._supported_models` variable in the class
+   listing the known models (as reported by `info()`).
+4. Status containers is derived from `DeviceStatus` class and all properties should
    have type annotations for their return values.
-4. Creating tests (:ref:`adding_tests`).
-5. Updating documentation is generally not needed as the API documentation
+5. Creating tests (:ref:`adding_tests`).
+6. Updating documentation is generally not needed as the API documentation
    will be generated automatically.
 
 
