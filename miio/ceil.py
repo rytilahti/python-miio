@@ -11,6 +11,9 @@ from .exceptions import DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 
+SUPPORTED_MODELS = ["philips.light.ceiling", "philips.light.zyceiling"]
+
+
 class CeilException(DeviceException):
     pass
 
@@ -73,7 +76,7 @@ class Ceil(Device):
     # TODO: - Auto On/Off Not Supported
     #       - Adjust Scenes with Wall Switch Not Supported
 
-    _supported_models = ["unknown.models"]
+    _supported_models = SUPPORTED_MODELS
 
     @command(
         default_output=format_output(
