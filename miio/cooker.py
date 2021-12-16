@@ -136,7 +136,7 @@ class TemperatureHistory(DeviceStatus):
 
     @property
     def raw(self) -> str:
-        return "".join(["{:02x}".format(value) for value in self.data])
+        return "".join([f"{value:02x}" for value in self.data])
 
     def __str__(self) -> str:
         return str(self.data)
@@ -194,7 +194,7 @@ class CookerCustomizations(DeviceStatus):
         return time(hour=self.custom[10], minute=self.custom[11])
 
     def __str__(self) -> str:
-        return "".join(["{:02x}".format(value) for value in self.custom])
+        return "".join([f"{value:02x}" for value in self.custom])
 
 
 class CookingStage(DeviceStatus):
@@ -299,7 +299,7 @@ class InteractionTimeouts(DeviceStatus):
         self.timeouts[2] = timeout
 
     def __str__(self) -> str:
-        return "".join(["{:02x}".format(value) for value in self.timeouts])
+        return "".join([f"{value:02x}" for value in self.timeouts])
 
 
 class CookerSettings(DeviceStatus):
@@ -429,7 +429,7 @@ class CookerSettings(DeviceStatus):
             self.settings[1] &= 247
 
     def __str__(self) -> str:
-        return "".join(["{:02x}".format(value) for value in self.settings])
+        return "".join([f"{value:02x}" for value in self.settings])
 
 
 class CookerStatus(DeviceStatus):
@@ -678,9 +678,9 @@ class Cooker(Device):
             "set_interaction",
             [
                 str(settings),
-                "{:x}".format(timeouts.led_off),
-                "{:x}".format(timeouts.lid_open),
-                "{:x}".format(timeouts.lid_open_warning),
+                f"{timeouts.led_off:x}",
+                f"{timeouts.lid_open:x}",
+                f"{timeouts.lid_open_warning:x}",
             ],
         )
 

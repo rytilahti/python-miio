@@ -264,7 +264,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         click.echo(f"Testing properties {properties} for {model}")
         valid_properties = {}
-        max_property_len = max([len(p) for p in properties])
+        max_property_len = max(len(p) for p in properties)
         for property in properties:
             try:
                 click.echo(f"Testing {property:{max_property_len+2}} ", nl=False)

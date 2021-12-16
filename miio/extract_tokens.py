@@ -182,7 +182,7 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
         try:
             db = tar.extractfile(DBFILE)
         except KeyError as ex:
-            click.echo("Unable to find miio database file %s: %s" % (DBFILE, ex))
+            click.echo(f"Unable to find miio database file {DBFILE}: {ex}")
             return []
         if write_to_disk:
             file = write_to_disk
@@ -200,7 +200,7 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
         try:
             db = tar.extractfile(DBFILE)
         except KeyError as ex:
-            click.echo("Unable to find yeelight database file %s: %s" % (DBFILE, ex))
+            click.echo(f"Unable to find yeelight database file {DBFILE}: {ex}")
             return []
 
         return list(read_android_yeelight(db))

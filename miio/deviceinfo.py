@@ -31,7 +31,7 @@ class DeviceInfo:
         self.data = data
 
     def __repr__(self):
-        return "%s v%s (%s) @ %s - token: %s" % (
+        return "{} v{} ({}) @ {} - token: {}".format(
             self.model,
             self.firmware_version,
             self.mac_address,

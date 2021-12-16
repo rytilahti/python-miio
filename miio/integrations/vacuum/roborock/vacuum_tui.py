@@ -67,7 +67,7 @@ class VacuumTUI:
         try:
             ctl = Control(key)
         except ValueError as e:
-            return "Ignoring %s: %s.\n" % (key, e), False
+            return f"Ignoring {key}: {e}.\n", False
 
         done = self.dispatch_control(ctl)
         return self.info(), done
@@ -100,4 +100,4 @@ class VacuumTUI:
         return False
 
     def info(self) -> str:
-        return "Rotation=%s\nVelocity=%s\n" % (self.rot, self.vel)
+        return f"Rotation={self.rot}\nVelocity={self.vel}\n"

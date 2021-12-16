@@ -46,7 +46,7 @@ class OneShotServer:
         self.server.timeout = 10
 
         _LOGGER.info(
-            "Serving on %s:%s, timeout %s" % (self.addr, self.port, self.server.timeout)
+            f"Serving on {self.addr}:{self.port}, timeout {self.server.timeout}"
         )
 
         self.file = basename(file)
@@ -54,7 +54,7 @@ class OneShotServer:
             self.payload = f.read()
             self.server.payload = self.payload
             self.md5 = hashlib.md5(self.payload).hexdigest()  # nosec
-            _LOGGER.info("Using local %s (md5: %s)" % (file, self.md5))
+            _LOGGER.info(f"Using local {file} (md5: {self.md5})")
 
     @staticmethod
     def find_local_ip():
@@ -84,7 +84,7 @@ class OneShotServer:
         if ip is None:
             ip = OneShotServer.find_local_ip()
 
-        url = "http://%s:%s/%s" % (ip, self.port, self.file)
+        url = f"http://{ip}:{self.port}/{self.file}"
         return url
 
     def serve_once(self):

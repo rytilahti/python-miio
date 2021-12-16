@@ -52,3 +52,9 @@ repos:
   hooks:
   - id: mypy
     additional_dependencies: [types-attrs, types-PyYAML, types-requests, types-pytz, types-croniter]
+
+- repo: https://github.com/asottile/pyupgrade
+  rev: v2.27.0
+  hooks:
+  - id: pyupgrade
+    args: ['--py37-plus']

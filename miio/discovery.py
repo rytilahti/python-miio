@@ -228,7 +228,7 @@ def get_addr_from_info(info):
 
 def other_package_info(info, desc):
     """Return information about another package supporting the device."""
-    return "Found %s at %s, check %s" % (info.name, get_addr_from_info(info), desc)
+    return f"Found {info.name} at {get_addr_from_info(info)}, check {desc}"
 
 
 def create_device(name: str, addr: str, device_cls: partial) -> Device:

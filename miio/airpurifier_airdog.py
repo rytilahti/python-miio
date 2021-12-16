@@ -147,9 +147,7 @@ class AirDogX3(Device):
     def set_mode_and_speed(self, mode: OperationMode, speed: int = 1):
         """Set mode and speed."""
         if mode.value not in (om.value for om in OperationMode):
-            raise AirDogException(
-                "{} is not a valid OperationMode value".format(mode.value)
-            )
+            raise AirDogException(f"{mode.value} is not a valid OperationMode value")
 
         if mode in [OperationMode.Auto, OperationMode.Idle]:
             speed = 1
