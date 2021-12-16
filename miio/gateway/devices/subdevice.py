@@ -129,7 +129,7 @@ class SubDevice:
             except Exception as ex:
                 raise GatewayException(
                     "One or more unexpected results while "
-                    "fetching properties %s: %s" % (self.get_prop_exp_dict, values)
+                    "fetching properties %s: %s on model %s" % (self.get_prop_exp_dict, values, self.model)
                 ) from ex
 
     @command()
@@ -139,7 +139,7 @@ class SubDevice:
             return self._gw.send(command, [self.sid])
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while sending command %s" % (command)
+                "Got an exception while sending command %s on model %s" % (command, self.model)
             ) from ex
 
     @command()
@@ -150,7 +150,7 @@ class SubDevice:
         except Exception as ex:
             raise GatewayException(
                 "Got an exception while sending "
-                "command '%s' with arguments '%s'" % (command, str(arguments))
+                "command '%s' with arguments '%s' on model %s" % (command, str(arguments), self.model)
             ) from ex
 
     @command(click.argument("property"))
@@ -160,12 +160,12 @@ class SubDevice:
             response = self._gw.send("get_device_prop", [self.sid, property])
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while fetching property %s" % (property)
+                "Got an exception while fetching property %s on model %s" % (property, self.model)
             ) from ex
 
         if not response:
             raise GatewayException(
-                "Empty response while fetching property '%s': %s" % (property, response)
+                "Empty response while fetching property '%s': %s on model %s" % (property, response, self.model)
             )
 
         return response
@@ -179,13 +179,13 @@ class SubDevice:
             ).pop()
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while fetching properties %s" % (properties)
+                "Got an exception while fetching properties %s on model %s" % (properties, self.model)
             ) from ex
 
         if len(list(properties)) != len(response):
             raise GatewayException(
-                "unexpected result while fetching properties %s: %s"
-                % (properties, response)
+                "unexpected result while fetching properties %s: %s on model %s"
+                % (properties, response, self.model)
             )
 
         return response
@@ -197,8 +197,8 @@ class SubDevice:
             return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while setting propertie %s to value %s"
-                % (property, str(value))
+                "Got an exception while setting propertie %s to value %s on model %s"
+                % (property, str(value), self.model)
             ) from ex
 
     @command()
