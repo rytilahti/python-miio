@@ -212,9 +212,9 @@ class PetFeeder(Device):
 
         Return all feeding plans.
 
-        return: List of FeedPlan objects
-        rtype: list
-        raises PetFeederException: if the number of elements returned is wrong
+        :return: List of FeedPlan objects
+        :rtype: list
+        :raises PetFeederException: if the number of elements returned is wrong
         """
         feed_plans = []
         for i in (1, 2):
