@@ -43,7 +43,7 @@ PyYAML = ">=5,<7"
 docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme"]
 
 [tool.poetry.dev-dependencies]
-pytest = "^5"
+pytest = ">=6.2.5"
 pytest-cov = "^2"
 pytest-mock = "^3"
 voluptuous = "^0"
