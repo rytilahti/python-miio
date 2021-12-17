@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*#
 from datetime import datetime, time, timedelta, tzinfo
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Union

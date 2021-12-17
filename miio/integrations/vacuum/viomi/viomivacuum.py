@@ -813,7 +813,7 @@ class ViomiVacuum(Device):
         """Change current map."""
         maps = self.get_maps()
         if map_id not in [m["id"] for m in maps]:
-            raise ViomiVacuumException("Map id {} doesn't exists".format(map_id))
+            raise ViomiVacuumException(f"Map id {map_id} doesn't exists")
         return self.send("set_map", [map_id])
 
     @command(click.argument("map_id", type=int))
@@ -821,7 +821,7 @@ class ViomiVacuum(Device):
         """Delete map."""
         maps = self.get_maps()
         if map_id not in [m["id"] for m in maps]:
-            raise ViomiVacuumException("Map id {} doesn't exists".format(map_id))
+            raise ViomiVacuumException(f"Map id {map_id} doesn't exists")
         return self.send("del_map", [map_id])
 
     @command(

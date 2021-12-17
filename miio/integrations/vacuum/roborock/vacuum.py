@@ -857,7 +857,7 @@ class RoborockVacuum(Device):
 
             start_id = manual_seq = 0
             with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
-                id_file, "r"
+                id_file
             ) as f:
                 x = json.load(f)
                 start_id = x.get("seq", 0)
