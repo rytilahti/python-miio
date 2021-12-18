@@ -61,7 +61,7 @@ class SubDevice:
         self.setter = model_info.get("setter")
 
     def __repr__(self):
-        return "<Subdevice %s: %s, model: %s, zigbee: %s, fw: %s, bat: %s, vol: %s, props: %s>" % (
+        return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(
             self.device_type,
             self.sid,
             self.model,
@@ -169,8 +169,7 @@ class SubDevice:
 
         if not response:
             raise GatewayException(
-                "Empty response while fetching property '%s': %s on model %s"
-                % (property, response, self.model)
+                f"Empty response while fetching property '{property}': {response} on model {self.model}"
             )
 
         return response

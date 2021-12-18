@@ -12,7 +12,7 @@ def deprecated(reason):
     From https://stackoverflow.com/a/40301488
     """
 
-    string_types = (type(b""), type(u""))
+    string_types = (bytes, str)
     if isinstance(reason, string_types):
 
         # The @deprecated is used with a 'reason'.

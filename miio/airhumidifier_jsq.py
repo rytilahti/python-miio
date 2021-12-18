@@ -208,9 +208,7 @@ class AirHumidifierJsq(Device):
         """Set mode."""
         value = mode.value
         if value not in (om.value for om in OperationMode):
-            raise AirHumidifierException(
-                "{} is not a valid OperationMode value".format(value)
-            )
+            raise AirHumidifierException(f"{value} is not a valid OperationMode value")
 
         return self.send("set_mode", [value])
 
@@ -222,9 +220,7 @@ class AirHumidifierJsq(Device):
         """Set led brightness."""
         value = brightness.value
         if value not in (lb.value for lb in LedBrightness):
-            raise AirHumidifierException(
-                "{} is not a valid LedBrightness value".format(value)
-            )
+            raise AirHumidifierException(f"{value} is not a valid LedBrightness value")
 
         return self.send("set_brightness", [value])
 

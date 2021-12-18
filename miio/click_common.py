@@ -7,7 +7,6 @@ import ipaddress
 import json
 import logging
 import re
-import sys
 from functools import partial, wraps
 from typing import Callable, Set, Type, Union
 
@@ -16,13 +15,6 @@ import click
 import miio
 
 from .exceptions import DeviceError
-
-if sys.version_info < (3, 5):
-    click.echo(
-        "To use this script you need python 3.5 or newer, got %s" % (sys.version_info,)
-    )
-    sys.exit(1)
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -205,7 +197,7 @@ class DeviceGroup(click.MultiCommand):
             elif self.default_output:
                 output = self.default_output
             else:
-                output = format_output("Running command {0}".format(self.command_name))
+                output = format_output(f"Running command {self.command_name}")
 
             # Remove skip_autodetect before constructing the click.command
             self.kwargs.pop("skip_autodetect", None)
@@ -235,7 +227,7 @@ class DeviceGroup(click.MultiCommand):
         chain=False,
         result_callback=None,
         result_callback_pass_device=True,
-        **attrs
+        **attrs,
     ):
 
         self.commands = getattr(device_class, "_device_group_commands", None)
@@ -260,7 +252,7 @@ class DeviceGroup(click.MultiCommand):
             subcommand_metavar,
             chain,
             result_callback,
-            **attrs
+            **attrs,
         )
 
     def group_callback(self, ctx, *args, **kwargs):

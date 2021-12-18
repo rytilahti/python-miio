@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # python-miio documentation build configuration file, created by
 # sphinx-quickstart on Wed Oct 18 03:50:00 2017.

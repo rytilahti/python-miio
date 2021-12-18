@@ -80,7 +80,7 @@ yeelink.light.ceiling20:
     supports_color: True
 yeelink.light.ceiling22:
   night_light: True
-  color_temp: [2700, 6500]
+  color_temp: [2600, 6100]
   supports_color: False
 yeelink.light.ceiling24:
   night_light: True
@@ -159,7 +159,7 @@ yeelink.light.strip1:
   supports_color: True
 yeelink.light.strip2:
   night_light: False
-  color_temp: [2700, 6500]
+  color_temp: [1700, 6500]
   supports_color: True
 yeelink.light.strip4:
   night_light: False
@@ -173,4 +173,3 @@ yeelink.light.lamp22:
   night_light: False
   color_temp: [2700, 6500]
   supports_color: True
-

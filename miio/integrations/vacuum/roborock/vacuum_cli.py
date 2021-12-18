@@ -36,9 +36,7 @@ pass_dev = click.make_pass_decorator(Device, ensure=True)
 def _read_config(file):
     """Return sequence id information."""
     config = {"seq": 0, "manual_seq": 0}
-    with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
-        file, "r"
-    ) as f:
+    with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(file) as f:
         config = json.load(f)
 
     return config
@@ -144,10 +142,10 @@ def status(vac: RoborockVacuum):
 def consumables(vac: RoborockVacuum):
     """Return consumables status."""
     res = vac.consumable_status()
-    click.echo("Main brush:   %s (left %s)" % (res.main_brush, res.main_brush_left))
-    click.echo("Side brush:   %s (left %s)" % (res.side_brush, res.side_brush_left))
-    click.echo("Filter:       %s (left %s)" % (res.filter, res.filter_left))
-    click.echo("Sensor dirty: %s (left %s)" % (res.sensor_dirty, res.sensor_dirty_left))
+    click.echo(f"Main brush:   {res.main_brush} (left {res.main_brush_left})")
+    click.echo(f"Side brush:   {res.side_brush} (left {res.side_brush_left})")
+    click.echo(f"Filter:       {res.filter} (left {res.filter_left})")
+    click.echo(f"Sensor dirty: {res.sensor_dirty} (left {res.sensor_dirty_left})")
 
 
 @cli.command()
@@ -170,9 +168,7 @@ def reset_consumable(vac: RoborockVacuum, name):
         click.echo("Unexpected state name: %s" % name)
         return
 
-    click.echo(
-        "Resetting consumable '%s': %s" % (name, vac.consumable_reset(consumable))
-    )
+    click.echo(f"Resetting consumable '{name}': {vac.consumable_reset(consumable)}")
 
 
 @cli.command()
@@ -331,15 +327,13 @@ def dnd(
         click.echo("Disabling DND..")
         click.echo(vac.disable_dnd())
     elif cmd == "on":
-        click.echo(
-            "Enabling DND %s:%s to %s:%s" % (start_hr, start_min, end_hr, end_min)
-        )
+        click.echo(f"Enabling DND {start_hr}:{start_min} to {end_hr}:{end_min}")
         click.echo(vac.set_dnd(start_hr, start_min, end_hr, end_min))
     else:
         x = vac.dnd_status()
         click.echo(
             click.style(
-                "Between %s and %s (enabled: %s)" % (x.start, x.end, x.enabled),
+                f"Between {x.start} and {x.end} (enabled: {x.enabled})",
                 bold=x.enabled,
             )
         )
@@ -370,14 +364,14 @@ def timer(ctx, vac: RoborockVacuum):
         color = "green" if timer.enabled else "yellow"
         click.echo(
             click.style(
-                "Timer #%s, id %s (ts: %s)" % (idx, timer.id, timer.ts),
+                f"Timer #{idx}, id {timer.id} (ts: {timer.ts})",
                 bold=True,
                 fg=color,
             )
         )
         click.echo("  %s" % timer.cron)
         min, hr, x, y, days = timer.cron.split(" ")
-        cron = "%s %s %s %s %s" % (min, hr, x, y, days)
+        cron = f"{min} {hr} {x} {y} {days}"
         click.echo("  %s" % cron)
 
 
@@ -451,7 +445,7 @@ def cleaning_history(vac: RoborockVacuum):
     """Query the cleaning history."""
     res = vac.clean_history()
     click.echo("Total clean count: %s" % res.count)
-    click.echo("Cleaned for: %s (area: %s m²)" % (res.total_duration, res.total_area))
+    click.echo(f"Cleaned for: {res.total_duration} (area: {res.total_area} m²)")
     if res.dust_collection_count is not None:
         click.echo("Emptied dust collection bin: %s times" % res.dust_collection_count)
     click.echo()
@@ -504,7 +498,7 @@ def install_sound(vac: RoborockVacuum, url: str, md5sum: str, sid: int, ip: str)
     `--ip` can be used to override automatically detected IP address for
      the device to contact for the update.
     """
-    click.echo("Installing from %s (md5: %s) for id %s" % (url, md5sum, sid))
+    click.echo(f"Installing from {url} (md5: {md5sum}) for id {sid}")
 
     local_url = None
     server = None
@@ -527,7 +521,7 @@ def install_sound(vac: RoborockVacuum, url: str, md5sum: str, sid: int, ip: str)
     progress = vac.sound_install_progress()
     while progress.is_installing:
         progress = vac.sound_install_progress()
-        click.echo("%s (%s %%)" % (progress.state.name, progress.progress))
+        click.echo(f"{progress.state.name} ({progress.progress} %)")
         time.sleep(1)
 
     progress = vac.sound_install_progress()
@@ -641,7 +635,7 @@ def update_firmware(vac: RoborockVacuum, url: str, md5: str, ip: str):
             click.echo("You need to pass md5 when using URL for updating.")
             return
 
-        click.echo("Using %s (md5: %s)" % (url, md5))
+        click.echo(f"Using {url} (md5: {md5})")
     else:
         server = OneShotServer(url)
         url = server.url(ip)
@@ -685,7 +679,7 @@ def raw_command(vac: RoborockVacuum, cmd, parameters):
     params = []  # type: Any
     if parameters:
         params = ast.literal_eval(parameters)
-    click.echo("Sending cmd %s with params %s" % (cmd, params))
+    click.echo(f"Sending cmd {cmd} with params {params}")
     click.echo(vac.raw_command(cmd, params))
 
 

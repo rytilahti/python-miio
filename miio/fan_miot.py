@@ -329,7 +329,7 @@ class FanMiot(MiotDevice):
         if angle not in SUPPORTED_ANGLES[self.model]:
             raise FanException(
                 "Unsupported angle. Supported values: "
-                + ", ".join("{0}".format(i) for i in SUPPORTED_ANGLES[self.model])
+                + ", ".join(f"{i}" for i in SUPPORTED_ANGLES[self.model])
             )
 
         return self.set_property("swing_mode_angle", angle)
@@ -754,7 +754,7 @@ class FanZA5(MiotDevice):
         if angle not in SUPPORTED_ANGLES[self.model]:
             raise FanException(
                 "Unsupported angle. Supported values: "
-                + ", ".join("{0}".format(i) for i in SUPPORTED_ANGLES[self.model])
+                + ", ".join(f"{i}" for i in SUPPORTED_ANGLES[self.model])
             )
 
         return self.set_property("swing_mode_angle", angle)
