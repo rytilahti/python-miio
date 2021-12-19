@@ -4,9 +4,9 @@ from typing import Any, Dict, Optional
 
 import click
 
-from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
-from .miot_device import DeviceStatus, MiotDevice
+from miio.click_common import EnumType, command, format_output
+from miio.exceptions import DeviceException
+from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -96,66 +96,50 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     @property
     def target_humidity(self) -> int:
         """Return target humidity."""
-        return self.data["target_humidity"]
+        return self.data.get("target_humidity")
 
     # Environment
 
     @property
     def relative_humidity(self) -> int:
         """Return current humidity."""
-        return self.data["relative_humidity"]
+        return self.data.get("relative_humidity")
 
     @property
     def temperature(self) -> Optional[float]:
         """Return current temperature, if available."""
-        if self.data["temperature"] is not None:
-            return round(self.data["temperature"], 1)
-        return None
+        return self.data.get("temperature")
 
     # Alarm
 
     @property
     def buzzer(self) -> Optional[bool]:
         """Return True if buzzer is on."""
-        if self.data["buzzer"] is not None:
-            return self.data["buzzer"]
-        return None
+        return self.data.get("buzzer")
 
     # Indicator Light
 
     @property
     def led_light(self) -> Optional[bool]:
         """Return status of the LED."""
-
-        if self.data["led_light"] is not None:
-            return self.data["led_light"]
-        return None
+        return self.data.get("led_light")
 
     # Other
 
     @property
     def tank_filed(self) -> Optional[bool]:
         """Return the tank filed."""
-
-        if self.data["tank_filed"] is not None:
-            return self.data["tank_filed"]
-        return None
+        return self.data.get("tank_filed")
 
     @property
     def water_shortage_fault(self) -> Optional[bool]:
         """Return water shortage fault."""
-
-        if self.data["water_shortage_fault"] is not None:
-            return self.data["water_shortage_fault"]
-        return None
+        return self.data.get("water_shortage_fault")
 
     @property
     def overwet_protect(self) -> Optional[bool]:
         """Return True if overwet mode is active."""
-
-        if self.data["overwet_protect"] is not None:
-            return self.data["overwet_protect"]
-        return None
+        return self.data.get("overwet_protect")
 
 
 class AirHumidifierJsqs(MiotDevice):

@@ -25,7 +25,6 @@ from miio.airfresh import AirFresh, AirFreshVA4
 from miio.airfresh_t2017 import AirFreshA1, AirFreshT2017
 from miio.airhumidifier import AirHumidifier, AirHumidifierCA1, AirHumidifierCB1
 from miio.airhumidifier_jsq import AirHumidifierJsq
-from miio.airhumidifier_jsqs import AirHumidifierJsqs
 from miio.airhumidifier_miot import AirHumidifierMiot
 from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airpurifier import AirPurifier
@@ -46,6 +45,7 @@ from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5, FanP9, FanP10, FanP11
 from miio.integrations.fan.leshow import FanLeshow
 from miio.integrations.fan.zhimi import Fan, FanZA5
+from miio.integrations.humidifier.deerma.airhumidifier_jsqs import AirHumidifierJsqs
 from miio.integrations.light.philips import (
     Ceil,
     PhilipsBulb,

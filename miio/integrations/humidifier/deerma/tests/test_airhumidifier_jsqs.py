@@ -1,9 +1,12 @@
 import pytest
 
 from miio import AirHumidifierJsqs
-from miio.airhumidifier_jsqs import AirHumidifierJsqsException, OperationMode
+from ..airhumidifier_jsqs import (
+    AirHumidifierJsqsException,
+    OperationMode,
+)
 
-from .dummies import DummyMiotDevice
+from miio.tests.dummies import DummyMiotDevice
 
 _INITIAL_STATE = {
     "power": True,
