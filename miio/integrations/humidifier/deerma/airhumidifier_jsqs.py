@@ -145,6 +145,8 @@ class AirHumidifierJsqsStatus(DeviceStatus):
 class AirHumidifierJsqs(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
 
+    _supported_models = ["deerma.humidifier.jsqs"]
+
     mapping = _MAPPING
 
     @command(
