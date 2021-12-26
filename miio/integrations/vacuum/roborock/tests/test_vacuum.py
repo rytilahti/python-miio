@@ -318,12 +318,12 @@ class TestVacuum(TestCase):
         with patch.object(self.device, "send", return_value=[32453]):
             assert self.device.mop_mode() is None
 
-    def test_mop_intensity(self):
+    def test_mop_intensity_model_check(self):
         """Test Roborock S7 check when getting mop intensity."""
         with pytest.raises(VacuumException):
             self.device.mop_intensity()
 
-    def test_set_mop_intensity(self):
+    def test_set_mop_intensity_model_check(self):
         """Test Roborock S7 check when setting mop intensity."""
         with pytest.raises(VacuumException):
             self.device.set_mop_intensity(MopIntensity.Intense)
@@ -349,7 +349,7 @@ def dummyvacuums7(request):
 
 @pytest.mark.usefixtures("dummyvacuums7")
 class TestVacuumS7(TestCase):
-    def test_get_mop_intensity(self):
+    def test_mop_intensity(self):
         """Test getting mop intensity."""
         with patch.object(self.device, "send", return_value=[203]) as mock_method:
             assert self.device.mop_intensity()
