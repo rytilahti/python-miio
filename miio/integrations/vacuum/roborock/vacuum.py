@@ -114,6 +114,15 @@ class MopMode(enum.Enum):
     Deep = 301
 
 
+class MopIntensity(enum.Enum):
+    """Mop scrub intensity on S7."""
+
+    Close = 200
+    Mild = 201
+    Moderate = 202
+    Intense = 203
+
+
 class CarpetCleaningMode(enum.Enum):
     """Type of carpet cleaning/avoidance."""
 
@@ -836,6 +845,22 @@ class RoborockVacuum(Device):
     def set_mop_mode(self, mop_mode: MopMode):
         """Set mop mode setting."""
         return self.send("set_mop_mode", [mop_mode.value])[0] == "ok"
+
+    @command()
+    def mop_intensity(self) -> MopIntensity:
+        """Get mop scrub intensity setting."""
+        if self.model != ROCKROBO_S7:
+            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+
+        return MopIntensity(self.send("get_water_box_custom_mode")[0])
+
+    @command(click.argument("mop_intensity", type=EnumType(MopIntensity)))
+    def set_mop_intensity(self, mop_intensity: MopIntensity):
+        """Set mop scrub intensity setting."""
+        if self.model != ROCKROBO_S7:
+            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+
+        return self.send("set_water_box_custom_mode", [mop_intensity.value])
 
     @command()
     def child_lock(self) -> bool:
