@@ -7,7 +7,13 @@ import pytest
 from miio import RoborockVacuum, Vacuum, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
-from ..vacuum import CarpetCleaningMode, MopIntensity, MopMode, VacuumException
+from ..vacuum import (
+    ROCKROBO_S7,
+    CarpetCleaningMode,
+    MopIntensity,
+    MopMode,
+    VacuumException,
+)
 
 
 class DummyVacuum(DummyDevice, RoborockVacuum):
@@ -313,12 +319,12 @@ class TestVacuum(TestCase):
             assert self.device.mop_mode() is None
 
     def test_mop_intensity(self):
-        """Test getting mop intensity."""
+        """Test Roborock S7 check when getting mop intensity."""
         with pytest.raises(VacuumException):
             self.device.mop_intensity()
 
     def test_set_mop_intensity(self):
-        """Test setting mop intensity."""
+        """Test Roborock S7 check when setting mop intensity."""
         with pytest.raises(VacuumException):
             self.device.set_mop_intensity(MopIntensity.Intense)
 
@@ -329,3 +335,28 @@ def test_deprecated_vacuum(caplog):
 
     with pytest.deprecated_call():
         from miio.vacuum import ROCKROBO_S6  # noqa: F401
+
+
+class DummyVacuumS7(DummyVacuum):
+    def __init__(self, *args, **kwargs):
+        self._model = ROCKROBO_S7
+
+
+@pytest.fixture(scope="class")
+def dummyvacuums7(request):
+    request.cls.device = DummyVacuumS7()
+
+
+@pytest.mark.usefixtures("dummyvacuums7")
+class TestVacuumS7(TestCase):
+    def test_get_mop_intensity(self):
+        """Test getting mop intensity."""
+        with patch.object(self.device, "send", return_value=[203]) as mock_method:
+            assert self.device.mop_intensity()
+            mock_method.assert_called_once_with("get_water_box_custom_mode")
+
+    def test_set_mop_intensity(self):
+        """Test setting mop intensity."""
+        with patch.object(self.device, "send", return_value=[203]) as mock_method:
+            assert self.device.set_mop_intensity(MopIntensity.Intense)
+            mock_method.assert_called_once_with("set_water_box_custom_mode", [203])
