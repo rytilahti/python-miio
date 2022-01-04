@@ -16,6 +16,11 @@ SUPPORTED_MODELS = [
     "zhimi.airpurifier.vb2",  # airpurifier proh
 ]
 
+SUPPORTED_MODELS_MB4 = [
+    "zhimi.airpurifier.mb4",  # airpurifier 3c
+    "zhimi.airp.mb4a",  # airpurifier 3c
+]
+
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
     # Air Purifier (siid=2)
@@ -468,7 +473,7 @@ class AirPurifierMB4(BasicAirPurifierMiot):
     """Main class representing the air purifier which uses MIoT protocol."""
 
     mapping = _MODEL_AIRPURIFIER_MB4
-    _supported_models = ["zhimi.airpurifier.mb4"]  # airpurifier 3c
+    _supported_models = SUPPORTED_MODELS_MB4
 
     @command(
         default_output=format_output(
