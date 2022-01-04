@@ -139,6 +139,7 @@ ROCKROBO_S5_MAX = "roborock.vacuum.s5e"
 ROCKROBO_S6 = "roborock.vacuum.s6"
 ROCKROBO_T6 = "roborock.vacuum.t6"  # cn s6
 ROCKROBO_S6_PURE = "roborock.vacuum.a08"
+ROCKROBO_T7 = "roborock.vacuum.a11"  # cn s7
 ROCKROBO_T7S = "roborock.vacuum.a14"
 ROCKROBO_S7 = "roborock.vacuum.a15"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
@@ -154,6 +155,7 @@ SUPPORTED_MODELS = [
     ROCKROBO_S6,
     ROCKROBO_T6,
     ROCKROBO_S6_PURE,
+    ROCKROBO_T7,
     ROCKROBO_T7S,
     ROCKROBO_S7,
     ROCKROBO_S6_MAXV,
@@ -174,7 +176,7 @@ class RoborockVacuum(Device):
         start_id: int = 0,
         debug: int = 0,
         *,
-        model=None
+        model=None,
     ):
         super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
@@ -225,12 +227,27 @@ class RoborockVacuum(Device):
             return info
         except (TypeError, DeviceInfoUnavailableException):
             # cloud-blocked gen1 vacuums will not return proper payloads
+            def create_dummy_mac(addr):
+                """Returns a dummy mac for a given IP address.
+
+                This squats the FF:FF:<first octet> OUI for a dummy mac presentation to
+                allow presenting a unique identifier for homeassistant.
+                """
+                from ipaddress import ip_address
+
+                ip_to_mac = ":".join(
+                    [f"{hex(x).replace('0x', ''):0>2}" for x in ip_address(addr).packed]
+                )
+                return f"FF:FF:{ip_to_mac}"
+
             dummy_v1 = DeviceInfo(
                 {
                     "model": ROCKROBO_V1,
                     "token": self.token,
                     "netif": {"localIp": self.ip},
-                    "fw_ver": "1.0_dummy",
+                    "mac": create_dummy_mac(self.ip),
+                    "fw_ver": "1.0_nocloud",
+                    "hw_ver": "1st gen non-cloud hw",
                 }
             )
 
