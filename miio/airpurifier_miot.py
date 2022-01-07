@@ -46,7 +46,7 @@ _MAPPING = {
     # AQI (siid=13)
     "purify_volume": {"siid": 13, "piid": 1},
     "average_aqi": {"siid": 13, "piid": 2},
-    "aqi_heartbeat": {"siid": 13, "piid": 9},
+    "aqi_realtime_update_duration": {"siid": 13, "piid": 9},  # see #1281
     # RFID (siid=14)
     "filter_rfid_tag": {"siid": 14, "piid": 1},
     "filter_rfid_product_id": {"siid": 14, "piid": 3},
@@ -403,7 +403,7 @@ class AirPurifierMiot(BasicAirPurifierMiot):
     def status(self) -> AirPurifierMiotStatus:
         """Retrieve properties."""
         if self.model == "zhimi.airpurifier.mb3":
-            self.set_property("aqi_heartbeat", 1)
+            self.set_property("aqi_realtime_update_duration", 5)
 
         return AirPurifierMiotStatus(
             {
