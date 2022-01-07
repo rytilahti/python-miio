@@ -66,7 +66,6 @@ class DreameVacuumMB1808(DreameVacuumBase):
             'map_object_name'            : {'siid': 23, 'piid': 3, 'mode': {'r': str}},
             'map_extend_data'            : {'siid': 23, 'piid': 4, 'mode': {'r': str, 'w': str}},
             'map_robot_time'             : {'siid': 23, 'piid': 5, 'mode': {'r': minutes_format}},
-            'map_frame_info'             : {'siid': 23, 'piid': 2, 'mode': {'w': str}},
             'map_req'                    : {'siid': 23, 'aiid': 1, 'mode': 'a'}, # in = [frame_info]
             'map_update'                 : {'siid': 23, 'aiid': 2, 'mode': 'a'}, # in = [map_extend_data]
             # Audio
