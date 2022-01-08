@@ -12,6 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 
 MODEL_PHILIPS_LIGHT_BULB = "philips.light.bulb"
 MODEL_PHILIPS_LIGHT_HBULB = "philips.light.hbulb"
+MODEL_PHILIPS_LIGHT_MONO1 = "philips.light.mono1"
 MODEL_PHILIPS_ZHIRUI_DOWNLIGHT = "philips.light.downlight"
 MODEL_PHILIPS_CANDLE = "philips.light.candle"
 MODEL_PHILIPS_CANDLE2 = "philips.light.candle2"
@@ -21,6 +22,13 @@ AVAILABLE_PROPERTIES_COLORTEMP = AVAILABLE_PROPERTIES_COMMON + ["bright", "cct",
 
 AVAILABLE_PROPERTIES = {
     MODEL_PHILIPS_LIGHT_HBULB: AVAILABLE_PROPERTIES_COMMON + ["bri"],
+    MODEL_PHILIPS_LIGHT_MONO1: [
+        "power",
+        "bright",
+        "notifystatus",
+        "notifytime",
+        "scene_num",
+    ],
     MODEL_PHILIPS_LIGHT_BULB: AVAILABLE_PROPERTIES_COLORTEMP,
     MODEL_PHILIPS_ZHIRUI_DOWNLIGHT: AVAILABLE_PROPERTIES_COLORTEMP,
     MODEL_PHILIPS_CANDLE: AVAILABLE_PROPERTIES_COLORTEMP,
@@ -65,11 +73,15 @@ class PhilipsBulbStatus(DeviceStatus):
     def scene(self) -> Optional[int]:
         if "snm" in self.data:
             return self.data["snm"]
+        if "scene_num" in self.data:
+            return self.data["scene_num"]
         return None
 
     @property
-    def delay_off_countdown(self) -> int:
-        return self.data["dv"]
+    def delay_off_countdown(self) -> Optional[int]:
+        if "dv" in self.data:
+            return self.data["dv"]
+        return None
 
 
 class PhilipsWhiteBulb(Device):
