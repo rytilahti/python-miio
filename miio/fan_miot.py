@@ -680,8 +680,7 @@ class FanZA5(MiotDevice):
         lazy_discover: bool = True,
         model: str = MODEL_FAN_ZA5,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover)
-        self._model = model
+        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
     @command(
         default_output=format_output(
