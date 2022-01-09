@@ -21,6 +21,8 @@ SUPPORTED_MODELS_MB4 = [
     "zhimi.airp.mb4a",  # airpurifier 3c
 ]
 
+SUPPORTED_MODELS_VA2 = ["zhimi.airp.va2"]  # airpurifier 4 pro
+
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
     # Air Purifier (siid=2)
@@ -80,6 +82,37 @@ _MODEL_AIRPURIFIER_MB4 = {
     "favorite_rpm": {"siid": 9, "piid": 3},
 }
 
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-va2:2
+_MODEL_AIRPURIFIER_VA2 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    "fan_level": {"siid": 2, "piid": 5},
+    "anion": {"siid": 2, "piid": 6},
+    # Environment
+    "humidity": {"siid": 3, "piid": 1},
+    "aqi": {"siid": 3, "piid": 4},
+    "temperature": {"siid": 3, "piid": 7},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    "favorite_rpm": {"siid": 9, "piid": 3},
+    "favorite_level": {"siid": 9, "piid": 5},
+    # aqi
+    "purify_volume": {"siid": 11, "piid": 1},
+    "average_aqi": {"siid": 11, "piid": 2},
+    "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
+    # Screen
+    "brightness": {"siid": 13, "piid": 2},
+}
+
 
 class AirPurifierMiotException(DeviceException):
     pass
@@ -97,6 +130,12 @@ class LedBrightness(enum.Enum):
     Bright = 0
     Dim = 1
     Off = 2
+
+
+class Brightness(enum.Enum):
+    Close = 0
+    Bright = 1
+    Brightest = 2
 
 
 class BasicAirPurifierMiotStatus(DeviceStatus):
@@ -317,6 +356,90 @@ class AirPurifierMB4Status(BasicAirPurifierMiotStatus):
         return self.data["led_brightness_level"]
 
 
+class AirPurifierVA2Status(BasicAirPurifierMiotStatus):
+    """Container for status reports from the air purifier.
+
+    Mi Air Purifier 4 Pro (zhimi.airp.va2) response (MIoT format)
+
+    [
+        {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
+        {'did': 'mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
+        {'did': 'fan_level', 'siid': 2, 'piid': 5, 'code': 0, 'value': 1},
+        {'did': 'anion', 'siid': 2, 'piid': 6, 'code': 0, 'value': True},
+        {'did': 'humidity', 'siid': 3, 'piid': 1, 'code': 0, 'value': 38},
+        {'did': 'aqi', 'siid': 3, 'piid': 4, 'code': 0, 'value': 3},
+        {'did': 'temperature', 'siid': 3, 'piid': 7, 'code': 0, 'value': 22.299999},
+        {'did': 'filter_life_remaining', 'siid': 4, 'piid': 1, 'code': 0, 'value': 97},
+        {'did': 'filter_hours_used', 'siid': 4, 'piid': 3, 'code': 0, 'value': 100},
+        {'did': 'filter_left_time', 'siid': 4, 'piid': 4, 'code': 0, 'value': 206},
+        {'did': 'buzzer', 'siid': 6, 'piid': 1, 'code': 0, 'value': True},
+        {'did': 'child_lock', 'siid': 8, 'piid': 1, 'code': 0, 'value': False},
+        {'did': 'motor_speed', 'siid': 9, 'piid': 1, 'code': 0, 'value': 388},
+        {'did': 'favorite_rpm', 'siid': 9, 'piid': 3, 'code': 0, 'value': 500},
+        {'did': 'favorite_level', 'siid': 9, 'piid': 5, 'code': 0, 'value': 2},
+        {'did': 'purify_volume', 'siid': 11, 'piid': 1, 'code': 0, 'value': 222564},
+        {'did': 'average_aqi', 'siid': 11, 'piid': 2, 'code': 0, 'value': 2},
+        {'did': 'brightness', 'siid': 13, 'piid': 2, 'code': 0, 'value': 8},
+    ]
+
+    """
+
+    @property
+    def average_aqi(self) -> int:
+        """Average of the air quality index."""
+        return self.data["average_aqi"]
+
+    @property
+    def humidity(self) -> int:
+        """Current humidity."""
+        return self.data["humidity"]
+
+    @property
+    def temperature(self) -> Optional[float]:
+        """Current temperature, if available."""
+        if self.data["temperature"] is not None:
+            return round(self.data["temperature"], 1)
+
+        return None
+
+    @property
+    def brightness(self) -> Optional[Brightness]:
+        """Brightness of the LED."""
+        if self.data["brightness"] is not None:
+            try:
+                return Brightness(self.data["brightness"])
+            except ValueError:
+                return None
+
+        return None
+
+    @property
+    def fan_level(self) -> int:
+        """Current fan level."""
+        return self.data["fan_level"]
+
+    @property
+    def purify_volume(self) -> int:
+        """The volume of purified air in cubic meter."""
+        return self.data["purify_volume"]
+
+    @property
+    def favorite_level(self) -> int:
+        """Return favorite level, which is used if the mode is ``favorite``."""
+        # Favorite level used when the mode is `favorite`.
+        return self.data["favorite_level"]
+
+    @property
+    def anion(self) -> bool:
+        """Return whether anion is on."""
+        return self.data["anion"]
+
+    @property
+    def filter_left_time(self) -> int:
+        """How many days can the filter still be used."""
+        return self.data["filter_left_time"]
+
+
 class BasicAirPurifierMiot(MiotDevice):
     """Main class representing the air purifier which uses MIoT protocol."""
 
@@ -516,3 +639,85 @@ class AirPurifierMB4(BasicAirPurifierMiot):
             raise AirPurifierMiotException("Invalid brightness level: %s" % level)
 
         return self.set_property("led_brightness_level", level)
+
+
+class AirPurifierVA2(BasicAirPurifierMiot):
+    """Main class representing the air purifier which uses MIoT protocol."""
+
+    mapping = _MODEL_AIRPURIFIER_VA2
+    _supported_models = SUPPORTED_MODELS_VA2
+
+    @command(
+        default_output=format_output(
+            "",
+            "Power: {result.power}\n"
+            "Anion: {result.anion}\n"
+            "AQI: {result.aqi} μg/m³\n"
+            "Average AQI: {result.average_aqi} μg/m³\n"
+            "Purify volume: {result.purify_volume} m³\n"
+            "Humidity: {result.humidity} %\n"
+            "Temperature: {result.temperature} °C\n"
+            "Fan Level: {result.fan_level}\n"
+            "Mode: {result.mode}\n"
+            "LED brightness level: {result.brightness}\n"
+            "Buzzer: {result.buzzer}\n"
+            "Child lock: {result.child_lock}\n"
+            "Filter life remaining: {result.filter_life_remaining} %\n"
+            "Filter hours used: {result.filter_hours_used}\n"
+            "Filter left time: {result.filter_left_time} days\n"
+            "Motor speed: {result.motor_speed} rpm\n"
+            "Favorite RPM: {result.favorite_rpm} rpm\n"
+            "Favorite level: {result.favorite_level}\n",
+        )
+    )
+    def status(self) -> AirPurifierVA2Status:
+        """Retrieve properties."""
+
+        return AirPurifierVA2Status(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping()
+            }
+        )
+
+    @command(
+        click.argument("level", type=int),
+        default_output=format_output("Setting fan level to '{level}'"),
+    )
+    def set_fan_level(self, level: int):
+        """Set fan level."""
+        if level < 1 or level > 3:
+            raise AirPurifierMiotException("Invalid fan level: %s" % level)
+        return self.set_property("fan_level", level)
+
+    @command(
+        click.argument("brightness", type=EnumType(Brightness)),
+        default_output=format_output("Setting LED brightness to {brightness}"),
+    )
+    def set_brightness(self, brightness: Brightness):
+        """Set led brightness."""
+        return self.set_property("brightness", brightness.value)
+
+    @command(
+        click.argument("level", type=int),
+        default_output=format_output("Setting favorite level to {level}"),
+    )
+    def set_favorite_level(self, level: int):
+        """Set the favorite level used when the mode is `favorite`.
+
+        Needs to be between 0 and 14.
+        """
+        if level < 0 or level > 14:
+            raise AirPurifierMiotException("Invalid favorite level: %s" % level)
+
+        return self.set_property("favorite_level", level)
+
+    @command(
+        click.argument("anion", type=bool),
+        default_output=format_output(
+            lambda anion: "Turning on anion" if anion else "Turing off anion",
+        ),
+    )
+    def set_anion(self, anion: bool):
+        """Set anion on/off"""
+        return self.set_property("anion", anion)
