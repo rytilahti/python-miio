@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import Dict
+from typing import Dict, List
 
 import click
 import yaml
@@ -25,7 +25,6 @@ GATEWAY_MODEL_AQARA = "lumi.gateway.aqhm01"
 GATEWAY_MODEL_AC_V1 = "lumi.acpartner.v1"
 GATEWAY_MODEL_AC_V2 = "lumi.acpartner.v2"
 GATEWAY_MODEL_AC_V3 = "lumi.acpartner.v3"
-
 
 SUPPORTED_MODELS = [
     GATEWAY_MODEL_CHINA,
@@ -94,11 +93,13 @@ class Gateway(Device):
         self,
         ip: str = None,
         token: str = None,
+        token_enc: str = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
         *,
         model: str = None,
+        push_server=None,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
@@ -110,6 +111,13 @@ class Gateway(Device):
         self._info = None
         self._subdevice_model_map = None
         self._did = None
+
+        self._token_enc = token_enc
+        self._push_server = push_server
+        self._script_ids: List[str] = []
+
+        if self._push_server:
+            self._push_server.Register_gateway(ip, token, self.push_callback)
 
     def _get_unknown_model(self):
         for model_info in self.subdevice_model_map:
@@ -387,3 +395,57 @@ class Gateway(Device):
             raise GatewayException(
                 "Got an exception while getting gateway illumination"
             ) from ex
+
+    def push_callback(self, source_device, action, params):
+        """Callback from the push server."""
+        if source_device not in self.devices:
+            _LOGGER.error(
+                "'%s' callback from device '%s' not from a known device",
+                action,
+                source_device,
+            )
+            return
+
+        device = self.devices[source_device]
+        device.push_callback(action, params)
+
+    def install_script(self, script_id, script_data):
+        """Install script such that the gateway will start pushing data for that
+        script."""
+        if self._push_server is None:
+            _LOGGER.error("Can not install script withouth a push_server")
+            return
+
+        if script_id in self._script_ids:
+            _LOGGER.error(
+                "Script_id '%s' already installed, not installing another time",
+                script_id,
+            )
+            return
+
+        self._script_ids.append(script_id)
+
+        return self.send(
+            "send_data_frame",
+            {
+                "cur": 0,
+                "data": script_data,
+                "data_tkn": 29576,
+                "total": 1,
+                "type": "scene",
+            },
+        )
+
+    def delete_script(self, script_id):
+        """Delete script by id."""
+        return self.send("miIO.xdel", [script_id])
+
+    def close(self):
+        """Cleanup all intalled scripts and registered callbacks."""
+        for script_id in self._script_ids:
+            result = self.delete_script(script_id)
+            if result != ["ok"]:
+                _LOGGER.error("Error removing script_id %s: %s", script_id, result)
+
+        self._push_server.Unregister_gateway(self.ip)
+        return

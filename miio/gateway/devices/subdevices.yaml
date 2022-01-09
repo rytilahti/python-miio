@@ -67,6 +67,20 @@
   name: Door sensor
   type: Magnet
   class: SubDevice
+  properties:
+    - property: is_open
+      default: False
+  push_properties:
+    open:
+      property: is_open
+      value: True
+      action: open
+      extra: "[1,6,1,0,[0,1],2,0]"
+    close:
+      property: is_open
+      value: False
+      action: close
+      extra: "[1,6,1,0,[0,0],2,0]"
 
 # Motion sensor
 - zigbee_id: lumi.sensor_motion.v2

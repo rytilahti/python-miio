@@ -1,6 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
+from json import dumps
 from typing import TYPE_CHECKING, Dict, Optional
 
 import attr
@@ -8,6 +9,7 @@ import click
 
 from ...click_common import command
 from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
+from ..push_server import construct_script
 
 _LOGGER = logging.getLogger(__name__)
 if TYPE_CHECKING:
@@ -59,6 +61,12 @@ class SubDevice:
                 self.get_prop_exp_dict[prop["property"]] = prop
 
         self.setter = model_info.get("setter")
+
+        self.script_i = 0
+        self.push_scripts = model_info.get("push_properties", [])
+
+        if self._gw._push_server is not None:
+            self.install_push_callbacks()
 
     def __repr__(self):
         return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(
@@ -260,3 +268,68 @@ class SubDevice:
                 ex,
             )
         return self._fw_ver
+
+    def push_callback(self, action, params):
+        if action not in self.push_scripts:
+            _LOGGER.error(
+                "Received unregistered action '%s' callback for sid '%s' model '%s'",
+                action,
+                self.sid,
+                self.model,
+            )
+
+        prop = self.push_scripts[action].get("property")
+        value = self.push_scripts[action].get("value")
+        if prop is not None and value is not None:
+            self._props[prop] = value
+
+        _LOGGER.error(action)
+        _LOGGER.error(self)
+
+    def install_push_callbacks(self):
+        """Generate and install script which captures events and sends miio package to
+        the push server."""
+        if self._gw._push_server is None:
+            _LOGGER.error("Can not install push callback withouth a push_server")
+            return False
+
+        if self._gw._push_server.device_ip is None:
+            _LOGGER.error(
+                "Can not install push callback withouth starting the push_server"
+            )
+            return False
+
+        lumi, script_id_hex = self.sid.split(".")
+        script_id_int = int.from_bytes(bytes.fromhex(script_id_hex), byteorder="big")
+        script_id_str = str(script_id_int)[-6:]
+
+        for action in self.push_scripts:
+            self.script_i = self.script_i + 1
+            script_id = f"x.scene.{self.script_i}{script_id_str}"
+
+            script = construct_script(
+                script_id=script_id,
+                action=action,
+                extra=self.push_scripts[action]["extra"],
+                source_sid=self.sid,
+                source_model=self.zigbee_model,
+                target_id=self._gw._push_server.device_id,
+                target_ip=self._gw._push_server.device_ip,
+                target_model=self._gw._push_server.device_model,
+                token_enc=self._gw._token_enc,
+                event=self.push_scripts[action].get("event", None),
+                command_extra=self.push_scripts[action].get("command_extra", ""),
+            )
+
+            script_data = dumps(script, separators=(",", ":"))
+
+            result = self._gw.install_script(script_id, script_data)
+            if result != ["ok"]:
+                _LOGGER.error(
+                    "Error installing script_id %s, response %s, script_data %s",
+                    script_id,
+                    result,
+                    script_data,
+                )
+
+        return True
