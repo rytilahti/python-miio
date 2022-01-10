@@ -193,14 +193,14 @@ class MiIOProtocol:
             data, addr = s.recvfrom(4096)
             m = Message.parse(data, token=self.token)
 
+            if self.debug > 1:
+                _LOGGER.debug("recv from %s: %s", addr[0], m)
+
             header = m.header.value
             payload = m.data.value
 
             self.__id = payload["id"]
             self._device_ts = header["ts"]  # type: ignore  # ts uses timeadapter
-
-            if self.debug > 1:
-                _LOGGER.debug("recv from %s: %s", addr[0], m)
 
             _LOGGER.debug(
                 "%s:%s (ts: %s, id: %s) << %s",
