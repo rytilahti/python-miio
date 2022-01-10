@@ -44,6 +44,7 @@ _MAPPING: MiotMapping = {
     "reset_filter_life": {"siid": 11, "aiid": 1},
     "reset_sidebrush_life": {"siid": 10, "aiid": 1},
     "move": {"siid": 21, "aiid": 1},
+    "play_sound": {"siid": 7, "aiid": 2},
 }
 
 
@@ -305,6 +306,11 @@ class DreameF9VacuumMiot(MiotDevice):
         """Reset side brush life."""
         return self.call_action("reset_sidebrush_life")
 
+    @command()
+    def play_souce(self) -> None:
+        """Play sound."""
+        return self.call_action("play_sound")
+
     @command(
         click.argument("distance", default=30, type=int),
     )
@@ -333,7 +339,7 @@ class DreameF9VacuumMiot(MiotDevice):
         click.argument("rotatation", default=90, type=int),
     )
     def rotate(self, rotatation: int) -> None:
-        """Move forward."""
+        """Rotate vacuum."""
         if (
             rotatation < self.MANUAL_ROTATION_MIN
             or rotatation > self.MANUAL_ROTATION_MAX
