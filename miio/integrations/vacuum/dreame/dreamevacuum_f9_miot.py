@@ -23,9 +23,9 @@ _MAPPING: MiotMapping = {
     "operating_mode": {"siid": 4, "piid": 1},
     "cleaning_mode": {"siid": 4, "piid": 4},
     "delete_timer": {"siid": 18, "piid": 8},
-    "timer_enable": {"siid": 20, "piid": 1},
-    "start_time": {"siid": 20, "piid": 2},
-    "stop_time": {"siid": 20, "piid": 3},
+    "timer_enable": {"siid": 5, "piid": 1},
+    "start_time": {"siid": 5, "piid": 2},
+    "stop_time": {"siid": 5, "piid": 3},
     "deg": {"siid": 21, "piid": 1, "access": ["write"]},
     "speed": {"siid": 21, "piid": 2, "access": ["write"]},
     "map_view": {"siid": 6, "piid": 1},
@@ -238,7 +238,7 @@ class DreameF9VacuumMiot(MiotDevice):
     mapping = _MAPPING
 
     _supported_models = [
-        "dreame.vacuum.p2009",
+        "dreame.vacuum.p2008",
     ]
 
     @command(
