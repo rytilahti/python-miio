@@ -170,6 +170,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
     """Qingping Air Monitor Lite."""
 
     mapping = _MAPPING_CGDN1
+    _supported_models = [MODEL_AIRQUALITYMONITOR_CGDN1]
 
     @command(
         default_output=format_output(
