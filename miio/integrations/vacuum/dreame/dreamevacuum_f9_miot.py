@@ -3,7 +3,10 @@
 import logging
 from enum import Enum
 
+import click
+
 from miio.click_common import command, format_output
+from miio.exceptions import DeviceException
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
 
@@ -26,8 +29,6 @@ _MAPPING: MiotMapping = {
     "timer_enable": {"siid": 5, "piid": 1},
     "start_time": {"siid": 5, "piid": 2},
     "stop_time": {"siid": 5, "piid": 3},
-    "deg": {"siid": 21, "piid": 1, "access": ["write"]},
-    "speed": {"siid": 21, "piid": 2, "access": ["write"]},
     "map_view": {"siid": 6, "piid": 1},
     "frame_info": {"siid": 6, "piid": 2},
     "volume": {"siid": 7, "piid": 1},
@@ -42,17 +43,7 @@ _MAPPING: MiotMapping = {
     "reset_mainbrush_life": {"siid": 9, "aiid": 1},
     "reset_filter_life": {"siid": 11, "aiid": 1},
     "reset_sidebrush_life": {"siid": 10, "aiid": 1},
-}
-
-
-_ACTION_MAPPING_1C: MiotMapping = {
-    "home": {"siid": 2, "aiid": 1},
-    "locate": {"siid": 17, "aiid": 1},
-    "start_clean": {"siid": 3, "aiid": 1},
-    "stop_clean": {"siid": 3, "aiid": 2},
-    "reset_mainbrush_life": {"siid": 26, "aiid": 1},
-    "reset_filter_life": {"siid": 27, "aiid": 1},
-    "reset_sidebrush_life": {"siid": 28, "aiid": 1},
+    "move": {"siid": 21, "aiid": 1},
 }
 
 
@@ -63,7 +54,6 @@ class ChargingState(Enum):
     GoCharging = 5
 
 
-#
 class CleaningMode(Enum):
     Unknown = -1
     Quiet = 0
@@ -72,7 +62,6 @@ class CleaningMode(Enum):
     Turbo = 3
 
 
-#
 class OperatingMode(Enum):
     Unknown = -1
     Paused = 1
@@ -90,7 +79,6 @@ class FaultStatus(Enum):
     NoFaults = 0
 
 
-#
 class DeviceStatus(Enum):
     Unknown = -1
     Sweeping = 1
@@ -101,7 +89,6 @@ class DeviceStatus(Enum):
     Charging = 6
 
 
-#
 class WaterFlow(Enum):
     Unknown = -1
     Low = 1
@@ -115,7 +102,7 @@ class WaterTankStatus(Enum):
     Attached = 1
 
 
-class DreameVacuumStatus(DeviceStatusContainer):
+class DreameF9VacuumStatus(DeviceStatusContainer):
     def __init__(self, data):
         self.data = data
 
@@ -241,6 +228,12 @@ class DreameF9VacuumMiot(MiotDevice):
         "dreame.vacuum.p2008",
     ]
 
+    # TODO: check the actual limit for this
+    MANUAL_ROTATION_MAX = 120
+    MANUAL_ROTATION_MIN = -MANUAL_ROTATION_MAX
+    MANUAL_DISTANCE_MAX = 300
+    MANUAL_DISTANCE_MIN = -300
+
     @command(
         default_output=format_output(
             "\n",
@@ -267,10 +260,10 @@ class DreameF9VacuumMiot(MiotDevice):
             "Water tank status: {result.water_tank_status.name}\n",
         )
     )
-    def status(self) -> DreameVacuumStatus:
+    def status(self) -> DreameF9VacuumStatus:
         """State of the vacuum."""
 
-        return DreameVacuumStatus(
+        return DreameF9VacuumStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping(max_properties=10)
@@ -311,3 +304,54 @@ class DreameF9VacuumMiot(MiotDevice):
     def reset_sidebrush_life(self) -> None:
         """Reset side brush life."""
         return self.call_action("reset_sidebrush_life")
+
+    @command(
+        click.argument("distance", default=30, type=int),
+    )
+    def forward(self, distance: int) -> None:
+        """Move forward."""
+        if distance < self.MANUAL_DISTANCE_MIN or distance > self.MANUAL_DISTANCE_MAX:
+            raise DeviceException(
+                "Given distance is invalid, should be [%s, %s], was: %s"
+                % (self.MANUAL_DISTANCE_MIN, self.MANUAL_DISTANCE_MAX, distance)
+            )
+        self.call_action(
+            "move",
+            [
+                {
+                    "piid": 1,
+                    "value": "0",
+                },
+                {
+                    "piid": 2,
+                    "value": f"{distance}",
+                },
+            ],
+        )
+
+    @command(
+        click.argument("rotatation", default=90, type=int),
+    )
+    def rotate(self, rotatation: int) -> None:
+        """Move forward."""
+        if (
+            rotatation < self.MANUAL_ROTATION_MIN
+            or rotatation > self.MANUAL_ROTATION_MAX
+        ):
+            raise DeviceException(
+                "Given rotation is invalid, should be [%s, %s], was %s"
+                % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotatation)
+            )
+        self.call_action(
+            "move",
+            [
+                {
+                    "piid": 1,
+                    "value": f"{rotatation}",
+                },
+                {
+                    "piid": 2,
+                    "value": "0",
+                },
+            ],
+        )
