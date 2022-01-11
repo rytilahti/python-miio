@@ -2,12 +2,12 @@ from unittest import TestCase
 
 import pytest
 
-from miio import DreameF9VacuumMiot
+from miio import DreameF9Vacuum
 from miio.tests.dummies import DummyMiotDevice
 
-from ..dreamevacuum_f9_miot import (
+from ..dreamevacuum_miot import (
     ChargingState,
-    CleaningMode,
+    CleaningModeDreameF9,
     DeviceStatus,
     FaultStatus,
     OperatingMode,
@@ -27,7 +27,7 @@ _INITIAL_STATE = {
     "brush_left_time2": 187,
     "brush_life_level2": 57,
     "operating_mode": OperatingMode.Cleaning,
-    "cleaning_mode": CleaningMode.Standart,
+    "cleaning_mode": CleaningModeDreameF9.Standart,
     "delete_timer": 12,
     "timer_enable": "false",
     "start_time": "22:00",
@@ -38,11 +38,11 @@ _INITIAL_STATE = {
     "voice_package": "DE",
     "water_flow": WaterFlow.Medium,
     "water_tank_status": WaterTankStatus.Attached,
-    "time_zone": "Europe/London",
+    "timezone": "Europe/London",
 }
 
 
-class DummyDreameF9VacuumMiot(DummyMiotDevice, DreameF9VacuumMiot):
+class DummyDreameF9VacuumMiot(DummyMiotDevice, DreameF9Vacuum):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE
         super().__init__(*args, **kwargs)
@@ -65,7 +65,7 @@ class TestDreameF9Vacuum(TestCase):
         assert status.filter_left_time == _INITIAL_STATE["filter_left_time"]
         assert status.filter_life_level == _INITIAL_STATE["filter_life_level"]
         assert status.water_flow == _INITIAL_STATE["water_flow"]
-        assert status.time_zone == _INITIAL_STATE["time_zone"]
+        assert status.timezone == _INITIAL_STATE["timezone"]
         assert status.water_tank_status == _INITIAL_STATE["water_tank_status"]
         assert status.device_fault == FaultStatus(_INITIAL_STATE["device_fault"])
         assert repr(status.device_fault) == repr(
@@ -79,9 +79,11 @@ class TestDreameF9Vacuum(TestCase):
         assert repr(status.operating_mode) == repr(
             OperatingMode(_INITIAL_STATE["operating_mode"])
         )
-        assert status.cleaning_mode == CleaningMode(_INITIAL_STATE["cleaning_mode"])
+        assert status.cleaning_mode == CleaningModeDreameF9(
+            _INITIAL_STATE["cleaning_mode"]
+        )
         assert repr(status.cleaning_mode) == repr(
-            CleaningMode(_INITIAL_STATE["cleaning_mode"])
+            CleaningModeDreameF9(_INITIAL_STATE["cleaning_mode"])
         )
         assert status.device_status == DeviceStatus(_INITIAL_STATE["device_status"])
         assert repr(status.device_status) == repr(

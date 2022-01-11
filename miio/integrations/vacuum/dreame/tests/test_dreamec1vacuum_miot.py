@@ -2,12 +2,12 @@ from unittest import TestCase
 
 import pytest
 
-from miio import DreameVacuumMiot
+from miio import DreameC1Vacuum
 from miio.tests.dummies import DummyMiotDevice
 
 from ..dreamevacuum_miot import (
     ChargingState,
-    CleaningMode,
+    CleaningModeDreameC1,
     DeviceStatus,
     FaultStatus,
     OperatingMode,
@@ -25,7 +25,7 @@ _INITIAL_STATE = {
     "brush_left_time2": 187,
     "brush_life_level2": 57,
     "operating_mode": OperatingMode.Cleaning,
-    "cleaning_mode": CleaningMode.Medium,
+    "cleaning_mode": CleaningModeDreameC1.Medium,
     "delete_timer": 12,
     "life_sieve": "9000-9000",
     "life_brush_side": "12000-12000",
@@ -39,21 +39,22 @@ _INITIAL_STATE = {
     "frame_info": 3,
     "volume": 4,
     "voice_package": "DE",
+    "timezone": "Europe/London",
 }
 
 
-class DummyDreameVacuumMiot(DummyMiotDevice, DreameVacuumMiot):
+class DummyDreameC1VacuumMiot(DummyMiotDevice, DreameC1Vacuum):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE
         super().__init__(*args, **kwargs)
 
 
 @pytest.fixture(scope="function")
-def dummydreamevacuum(request):
-    request.cls.device = DummyDreameVacuumMiot()
+def dummydreamec1vacuum(request):
+    request.cls.device = DummyDreameC1VacuumMiot()
 
 
-@pytest.mark.usefixtures("dummydreamevacuum")
+@pytest.mark.usefixtures("dummydreamec1vacuum")
 class TestDreameVacuum(TestCase):
     def test_status(self):
         status = self.device.status()
@@ -64,6 +65,7 @@ class TestDreameVacuum(TestCase):
         assert status.brush_life_level == _INITIAL_STATE["brush_life_level"]
         assert status.filter_left_time == _INITIAL_STATE["filter_left_time"]
         assert status.filter_life_level == _INITIAL_STATE["filter_life_level"]
+        assert status.timezone == _INITIAL_STATE["timezone"]
         assert status.device_fault == FaultStatus(_INITIAL_STATE["device_fault"])
         assert repr(status.device_fault) == repr(
             FaultStatus(_INITIAL_STATE["device_fault"])
@@ -76,9 +78,11 @@ class TestDreameVacuum(TestCase):
         assert repr(status.operating_mode) == repr(
             OperatingMode(_INITIAL_STATE["operating_mode"])
         )
-        assert status.cleaning_mode == CleaningMode(_INITIAL_STATE["cleaning_mode"])
+        assert status.cleaning_mode == CleaningModeDreameC1(
+            _INITIAL_STATE["cleaning_mode"]
+        )
         assert repr(status.cleaning_mode) == repr(
-            CleaningMode(_INITIAL_STATE["cleaning_mode"])
+            CleaningModeDreameC1(_INITIAL_STATE["cleaning_mode"])
         )
         assert status.device_status == DeviceStatus(_INITIAL_STATE["device_status"])
         assert repr(status.device_status) == repr(
