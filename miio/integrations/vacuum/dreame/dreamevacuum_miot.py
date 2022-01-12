@@ -34,6 +34,12 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
         "operating_mode": {"siid": 18, "piid": 1},
         "cleaning_mode": {"siid": 18, "piid": 6},
         "delete_timer": {"siid": 18, "piid": 8},
+        "cleaning_time": {"siid": 18, "piid": 2},
+        "cleaning_area": {"siid": 18, "piid": 4},
+        "first_clean_time": {"siid": 18, "piid": 12},
+        "total_clean_time": {"siid": 18, "piid": 13},
+        "total_clean_times": {"siid": 18, "piid": 14},
+        "total_clean_area": {"siid": 18, "piid": 15},
         "life_sieve": {"siid": 19, "piid": 1},
         "life_brush_side": {"siid": 19, "piid": 2},
         "life_brush_main": {"siid": 19, "piid": 3},
@@ -73,6 +79,12 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
         "cleaning_mode": {"siid": 4, "piid": 4},
         "delete_timer": {"siid": 18, "piid": 8},
         "timer_enable": {"siid": 5, "piid": 1},
+        "cleaning_time": {"siid": 4, "piid": 2},
+        "cleaning_area": {"siid": 4, "piid": 3},
+        "first_clean_time": {"siid": 12, "piid": 1},
+        "total_clean_time": {"siid": 12, "piid": 2},
+        "total_clean_times": {"siid": 12, "piid": 3},
+        "total_clean_area": {"siid": 12, "piid": 4},
         "start_time": {"siid": 5, "piid": 2},
         "stop_time": {"siid": 5, "piid": 3},
         "map_view": {"siid": 6, "piid": 1},
@@ -251,6 +263,30 @@ class DreameVacuumStatusBase(DeviceStatusContainer):
     @property
     def timezone(self) -> str:
         return self.data["timezone"]
+
+    @property
+    def cleaning_time(self) -> str:
+        return self.data["cleaning_time"]
+
+    @property
+    def cleaning_area(self) -> str:
+        return self.data["cleaning_area"]
+
+    @property
+    def first_clean_time(self) -> str:
+        return self.data["first_clean_time"]
+
+    @property
+    def total_clean_time(self) -> str:
+        return self.data["total_clean_time"]
+
+    @property
+    def total_clean_times(self) -> str:
+        return self.data["total_clean_times"]
+
+    @property
+    def total_clean_area(self) -> str:
+        return self.data["total_clean_area"]
 
 
 class DreameC1VacuumStatus(DreameVacuumStatusBase):
@@ -432,7 +468,13 @@ class DreameC1Vacuum(DreameVacuumBase):
             "Timer start time: {result.start_time}\n"
             "Timer stop time: {result.stop_time}\n"
             "Voice package: {result.voice_package}\n"
-            "Volume: {result.volume}\n",
+            "Volume: {result.volume}\n"
+            "Cleaning time: {result.cleaning_time}\n"
+            "Cleaning area: {result.cleaning_area}\n"
+            "First clean time: {result.first_clean_time}\n"
+            "Total clean time: {result.total_clean_time}\n"
+            "Total clean times: {result.total_clean_times}\n"
+            "Total clean area: {result.total_clean_area}\n",
         )
     )
     def status(self) -> DreameC1VacuumStatus:
@@ -485,7 +527,13 @@ class DreameF9Vacuum(DreameVacuumBase):
             "Voice package: {result.voice_package}\n"
             "Volume: {result.volume}\n"
             "Water flow: {result.water_flow.name}\n"
-            "Water tank status: {result.water_tank_status.name}\n",
+            "Water tank status: {result.water_tank_status.name}\n"
+            "Cleaning time: {result.cleaning_time}\n"
+            "Cleaning area: {result.cleaning_area}\n"
+            "First clean time: {result.first_clean_time}\n"
+            "Total clean time: {result.total_clean_time}\n"
+            "Total clean times: {result.total_clean_times}\n"
+            "Total clean area: {result.total_clean_area}\n",
         )
     )
     def status(self) -> DreameF9VacuumStatus:
