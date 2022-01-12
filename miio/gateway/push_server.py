@@ -240,7 +240,7 @@ class PushServer:
                     _LOGGER.debug("%s:%s=>%s", host, port, msg_value)
 
                     # Parse message
-                    action, device_call_id = msg_value["method"].split("_")
+                    action, device_call_id = msg_value["method"].rsplit("_", 1)
                     source_device_id = (
                         f"lumi.{device_call_id}"  # All known devices use lumi. prefix
                     )

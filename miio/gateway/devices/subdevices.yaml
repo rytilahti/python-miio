@@ -14,6 +14,16 @@
   type: Gateway
   class: None
 
+# Explanation push properties:
+#  push_properties:
+#    long_click_ch0:                    = action event that you receive back from the gateway (can be changed to any arbitrary string)
+#      property: last_press             = name of property to wich this event is coupled
+#      value: "long_click_ch0"          = the value to wich the coupled property schould be set upon receiving this event
+#      extra: "[1,13,1,85,[0,0],0,0]"   = "[a,b,c,d,[e,f],g,h]"
+#                                           c = part of the device that caused the event (1 = left switch, 2 = right switch, 3 = both switches)
+#                                           f = event number on which this event is fired (0 = long_click/close, 1 = click/open, 2 = double_click)
+
+
 # Weather sensor
 - zigbee_id: lumi.sensor_ht.v1
   model: WSDCGQ01LM
@@ -60,6 +70,18 @@
   name: Door sensor
   type: Magnet
   class: SubDevice
+  properties:
+    - property: is_open
+      default: False
+  push_properties:
+    open:
+      property: is_open
+      value: True
+      extra: "[1,6,1,0,[0,1],2,0]"
+    close:
+      property: is_open
+      value: False
+      extra: "[1,6,1,0,[0,0],2,0]"
 
 - zigbee_id: lumi.sensor_magnet.aq2
   model: MCCGQ11LM
@@ -74,12 +96,10 @@
     open:
       property: is_open
       value: True
-      action: open
       extra: "[1,6,1,0,[0,1],2,0]"
     close:
       property: is_open
       value: False
-      action: close
       extra: "[1,6,1,0,[0,0],2,0]"
 
 # Motion sensor
@@ -89,6 +109,18 @@
   name: Motion sensor
   type: Motion
   class: SubDevice
+  properties:
+    - property: motion
+      default: False
+  push_properties:
+    motion:
+      property: motion
+      value: True
+      extra: "[1,1030,1,0,[0,1],0,0]"
+    no_motion:
+      property: motion
+      value: False
+      extra: "[1,1030,1,8,[4,120],2,0]"
 
 - zigbee_id: lumi.sensor_motion.aq2
   model: RTCGQ11LM
@@ -96,6 +128,18 @@
   name: Motion sensor
   type: Motion
   class: SubDevice
+  properties:
+    - property: motion
+      default: False
+  push_properties:
+    motion:
+      property: motion
+      value: True
+      extra: "[1,1030,1,0,[0,1],0,0]"
+    no_motion:
+      property: motion
+      value: False
+      extra: "[1,1030,1,8,[4,120],2,0]"
 
 # Cube
 - zigbee_id: lumi.sensor_cube.v1
@@ -104,6 +148,36 @@
   name: Cube
   type: Cube
   class: SubDevice
+  properties:
+    - property: last_event
+      default: "none"
+  push_properties:
+    move:
+      property: last_event
+      value: "move"
+      extra: "[1,18,2,85,[6,256],0,0]"
+    flip90:
+      property: last_event
+      value: "flip90"
+      extra: "[1,18,2,85,[6,64],0,0]"
+    flip180:
+      property: last_event
+      value: "flip180"
+      extra: "[1,18,2,85,[6,128],0,0]"
+    taptap:
+      property: last_event
+      value: "taptap"
+      extra: "[1,18,2,85,[6,512],0,0]"
+    shakeair:
+      property: last_event
+      value: "shakeair"
+      extra: "[1,18,2,85,[0,0],0,0]"
+    rotate:
+      property: last_event
+      value: "rotate"
+      extra: "[1,12,3,85,[1,0],0,0]"
+      event: "rotate"
+      command_extra: "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]"
 
 - zigbee_id: lumi.sensor_cube.aqgl01
   model: MFKZQ01LM
@@ -111,6 +185,36 @@
   name: Cube
   type: Cube
   class: SubDevice
+  properties:
+    - property: last_event
+      default: "none"
+  push_properties:
+    move:
+      property: last_event
+      value: "move"
+      extra: "[1,18,2,85,[6,256],0,0]"
+    flip90:
+      property: last_event
+      value: "flip90"
+      extra: "[1,18,2,85,[6,64],0,0]"
+    flip180:
+      property: last_event
+      value: "flip180"
+      extra: "[1,18,2,85,[6,128],0,0]"
+    taptap:
+      property: last_event
+      value: "taptap"
+      extra: "[1,18,2,85,[6,512],0,0]"
+    shakeair:
+      property: last_event
+      value: "shakeair"
+      extra: "[1,18,2,85,[0,0],0,0]"
+    rotate:
+      property: last_event
+      value: "rotate"
+      extra: "[1,12,3,85,[1,0],0,0]"
+      event: "rotate"
+      command_extra: "[1,19,7,1006,[42,[6066005667474548,12,3,85,0]],0,0]"
 
 # Curtain
 - zigbee_id: lumi.curtain
@@ -408,6 +512,22 @@
   name: Vibration sensor
   type: VibrationSensor
   class: Vibration
+  properties:
+    - property: last_event
+      default: "none"
+  push_properties:
+    vibrate:
+      property: last_event
+      value: "vibrate"
+      extra: "[1,257,1,85,[0,1],0,0]"
+    tilt:
+      property: last_event
+      value: "tilt"
+      extra: "[1,257,1,85,[0,2],0,0]"
+    free_fall:
+      property: last_event
+      value: "free_fall"
+      extra: "[1,257,1,85,[0,3],0,0]"
 
 # Thermostats
 - zigbee_id: lumi.airrtc.tcpecn02
@@ -424,6 +544,46 @@
   name: Remote switch double
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
+    long_click_ch1:
+      property: last_press
+      value: "long_click_ch1"
+      extra: "[1,13,2,85,[0,0],0,0]"
+    click_ch1:
+      property: last_press
+      value: "click_ch1"
+      extra: "[1,13,2,85,[0,1],0,0]"
+    double_click_ch1:
+      property: last_press
+      value: "double_click_ch1"
+      extra: "[1,13,2,85,[0,2],0,0]"
+    both_long_click:
+      property: last_press
+      value: "both_long_click"
+      extra: "[1,13,3,85,[0,0],0,0]"
+    both_click:
+      property: last_press
+      value: "both_click"
+      extra: "[1,13,3,85,[0,1],0,0]"
+    both_double_click:
+      property: last_press
+      value: "both_double_click"
+      extra: "[1,13,3,85,[0,2],0,0]"
 
 - zigbee_id: lumi.sensor_86sw1.v1
   model: WXKG03LM 2016
@@ -431,6 +591,22 @@
   name: Remote switch single
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
 
 - zigbee_id: lumi.remote.b186acn01
   model: WXKG03LM 2018
@@ -438,6 +614,22 @@
   name: Remote switch single
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
 
 - zigbee_id: lumi.remote.b286acn01
   model: WXKG02LM 2018
@@ -445,6 +637,46 @@
   name: Remote switch double
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
+    long_click_ch1:
+      property: last_press
+      value: "long_click_ch1"
+      extra: "[1,13,2,85,[0,0],0,0]"
+    click_ch1:
+      property: last_press
+      value: "click_ch1"
+      extra: "[1,13,2,85,[0,1],0,0]"
+    double_click_ch1:
+      property: last_press
+      value: "double_click_ch1"
+      extra: "[1,13,2,85,[0,2],0,0]"
+    both_long_click:
+      property: last_press
+      value: "both_long_click"
+      extra: "[1,13,3,85,[0,0],0,0]"
+    both_click:
+      property: last_press
+      value: "both_click"
+      extra: "[1,13,3,85,[0,1],0,0]"
+    both_double_click:
+      property: last_press
+      value: "both_double_click"
+      extra: "[1,13,3,85,[0,2],0,0]"
 
 - zigbee_id: lumi.remote.b186acn02
   model: WXKG06LM
@@ -452,6 +684,22 @@
   name: D1 remote switch single
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
 
 - zigbee_id: lumi.remote.b286acn02
   model: WXKG07LM
@@ -459,6 +707,46 @@
   name: D1 remote switch double
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
+    long_click_ch1:
+      property: last_press
+      value: "long_click_ch1"
+      extra: "[1,13,2,85,[0,0],0,0]"
+    click_ch1:
+      property: last_press
+      value: "click_ch1"
+      extra: "[1,13,2,85,[0,1],0,0]"
+    double_click_ch1:
+      property: last_press
+      value: "double_click_ch1"
+      extra: "[1,13,2,85,[0,2],0,0]"
+    both_long_click:
+      property: last_press
+      value: "both_long_click"
+      extra: "[1,13,3,85,[0,0],0,0]"
+    both_click:
+      property: last_press
+      value: "both_click"
+      extra: "[1,13,3,85,[0,1],0,0]"
+    both_double_click:
+      property: last_press
+      value: "both_double_click"
+      extra: "[1,13,3,85,[0,2],0,0]"
 
 - zigbee_id: lumi.sensor_switch.v2
   model: WXKG01LM
@@ -466,6 +754,22 @@
   name: Button
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
 
 - zigbee_id: lumi.sensor_switch.aq2
   model: WXKG11LM 2015
@@ -473,6 +777,22 @@
   name: Button
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
 
 - zigbee_id: lumi.sensor_switch.aq3
   model: WXKG12LM
@@ -480,6 +800,30 @@
   name: Button
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "click_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
+    long_click_press:
+      property: last_press
+      value: "long_click_press"
+      extra: "[1,13,1,85,[0,16],0,0]"
+    shake:
+      property: last_press
+      value: "shake"
+      extra: "[1,13,1,85,[0,18],0,0]"
 
 - zigbee_id: lumi.remote.b1acn01
   model: WXKG11LM 2018
@@ -487,6 +831,22 @@
   name: Button
   type: RemoteSwitch
   class: SubDevice
+  properties:
+    - property: last_press
+      default: "none"
+  push_properties:
+    long_click_ch0:
+      property: last_press
+      value: "long_click_ch0"
+      extra: "[1,13,1,85,[0,0],0,0]"
+    click_ch0:
+      property: last_press
+      value: "cclick_ch0"
+      extra: "[1,13,1,85,[0,1],0,0]"
+    double_click_ch0:
+      property: last_press
+      value: "double_click_ch0"
+      extra: "[1,13,1,85,[0,2],0,0]"
 
 # Switches
 - zigbee_id: lumi.ctrl_neutral2

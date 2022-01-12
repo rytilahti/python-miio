@@ -1,6 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
+from collections.abc import Callable
 from json import dumps
 from typing import TYPE_CHECKING, Dict, Optional
 
@@ -64,6 +65,7 @@ class SubDevice:
 
         self.script_i = 0
         self.push_scripts = model_info.get("push_properties", [])
+        self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
 
         if self._gw._push_server is not None:
             self.install_push_callbacks()
@@ -269,7 +271,21 @@ class SubDevice:
             )
         return self._fw_ver
 
+    def Register_callback(self, id, callback):
+        """Register a external callback function for updates of this subdevice."""
+        if id in self._registered_callbacks:
+            _LOGGER.error(
+                "A callback with id '%s' was already registed, overwriting previous callback",
+                id,
+            )
+        self._registered_callbacks[id] = callback
+
+    def Remove_callback(self, id):
+        """Remove a external callback using its id."""
+        self._registered_callbacks.pop(id)
+
     def push_callback(self, action, params):
+        """Push callback received from the push server."""
         if action not in self.push_scripts:
             _LOGGER.error(
                 "Received unregistered action '%s' callback for sid '%s' model '%s'",
@@ -283,8 +299,8 @@ class SubDevice:
         if prop is not None and value is not None:
             self._props[prop] = value
 
-        _LOGGER.error(action)
-        _LOGGER.error(self)
+        for callback in self._registered_callbacks.values():
+            callback(action, params)
 
     def install_push_callbacks(self):
         """Generate and install script which captures events and sends miio package to
