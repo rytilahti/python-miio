@@ -42,7 +42,7 @@ from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum.dreame.dreamevacuum_miot import (
-    DreameC1Vacuum,
+    Dreame1CVacuum,
     DreameF9Vacuum,
     DreameVacuumMiot,
 )

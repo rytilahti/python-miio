@@ -32,7 +32,7 @@ from . import (
     ChuangmiPlug,
     Cooker,
     Device,
-    DreameC1Vacuum,
+    Dreame1CVacuum,
     DreameF9Vacuum,
     Fan,
     FanLeshow,
@@ -210,7 +210,7 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "viomi-vacuum-v8": ViomiVacuum,
     "zhimi.heater.za1": partial(Heater, model=MODEL_HEATER_ZA1),
     "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
-    "dreame-vacuum-mc1808": DreameC1Vacuum,
+    "dreame-vacuum-mc1808": Dreame1CVacuum,
     "dreame-vacuum-p2008": DreameF9Vacuum,
 }
 

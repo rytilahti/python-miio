@@ -15,11 +15,11 @@ from miio.utils import deprecated
 _LOGGER = logging.getLogger(__name__)
 
 
-DREAME_C1 = "dreame.vacuum.mc1808"
+DREAME_1C = "dreame.vacuum.mc1808"
 DREAME_F9 = "dreame.vacuum.p2008"
 
 MIOT_MAPPING: Dict[str, MiotMapping] = {
-    DREAME_C1: {
+    DREAME_1C: {
         # https://home.miot-spec.com/spec/dreame.vacuum.mc1808
         "battery_level": {"siid": 2, "piid": 1},
         "charging_state": {"siid": 2, "piid": 2},
@@ -115,7 +115,7 @@ class ChargingState(Enum):
     GoCharging = 5
 
 
-class CleaningModeDreameC1(Enum):
+class CleaningModeDreame1C(Enum):
     Unknown = -1
     Quiet = 0
     Default = 1
@@ -289,14 +289,14 @@ class DreameVacuumStatusBase(DeviceStatusContainer):
         return self.data["total_clean_area"]
 
 
-class DreameC1VacuumStatus(DreameVacuumStatusBase):
+class Dreame1CVacuumStatus(DreameVacuumStatusBase):
     @property
-    def cleaning_mode(self) -> CleaningModeDreameC1:
+    def cleaning_mode(self) -> CleaningModeDreame1C:
         try:
-            return CleaningModeDreameC1(self.data["cleaning_mode"])
+            return CleaningModeDreame1C(self.data["cleaning_mode"])
         except ValueError:
             _LOGGER.error("Unknown CleaningMode (%s)", self.data["cleaning_mode"])
-            return CleaningModeDreameC1.Unknown
+            return CleaningModeDreame1C.Unknown
 
     @property
     def life_sieve(self) -> str:
@@ -436,13 +436,13 @@ class DreameVacuumBase(MiotDevice):
         )
 
 
-class DreameC1Vacuum(DreameVacuumBase):
+class Dreame1CVacuum(DreameVacuumBase):
     """Interface for Vacuum 1C STYTJ01ZHM (dreame.vacuum.mc1808)"""
 
     _supported_models = [
-        DREAME_C1,
+        DREAME_1C,
     ]
-    mapping = MIOT_MAPPING[DREAME_C1]
+    mapping = MIOT_MAPPING[DREAME_1C]
 
     @command(
         default_output=format_output(
@@ -477,10 +477,10 @@ class DreameC1Vacuum(DreameVacuumBase):
             "Total clean area: {result.total_clean_area}\n",
         )
     )
-    def status(self) -> DreameC1VacuumStatus:
+    def status(self) -> Dreame1CVacuumStatus:
         """State of the vacuum."""
 
-        return DreameC1VacuumStatus(
+        return Dreame1CVacuumStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping(max_properties=10)
@@ -488,9 +488,9 @@ class DreameC1Vacuum(DreameVacuumBase):
         )
 
 
-class DreameVacuumMiot(DreameC1Vacuum):
+class DreameVacuumMiot(Dreame1CVacuum):
     @deprecated(
-        "This class is replaced with DreameC1Vacuum. Use DreameC1Vacuum to control Dreame C1 vacuums."
+        "This class is replaced with Dreame1CVacuum. Use Dreame1CVacuum to control Dreame 1C vacuums."
     )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

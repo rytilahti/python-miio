@@ -2,12 +2,12 @@ from unittest import TestCase
 
 import pytest
 
-from miio import DreameC1Vacuum
+from miio import Dreame1CVacuum
 from miio.tests.dummies import DummyMiotDevice
 
 from ..dreamevacuum_miot import (
     ChargingState,
-    CleaningModeDreameC1,
+    CleaningModeDreame1C,
     DeviceStatus,
     FaultStatus,
     OperatingMode,
@@ -25,7 +25,7 @@ _INITIAL_STATE = {
     "brush_left_time2": 187,
     "brush_life_level2": 57,
     "operating_mode": OperatingMode.Cleaning,
-    "cleaning_mode": CleaningModeDreameC1.Medium,
+    "cleaning_mode": CleaningModeDreame1C.Medium,
     "delete_timer": 12,
     "life_sieve": "9000-9000",
     "life_brush_side": "12000-12000",
@@ -43,18 +43,18 @@ _INITIAL_STATE = {
 }
 
 
-class DummyDreameC1VacuumMiot(DummyMiotDevice, DreameC1Vacuum):
+class DummyDreame1CVacuumMiot(DummyMiotDevice, Dreame1CVacuum):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE
         super().__init__(*args, **kwargs)
 
 
 @pytest.fixture(scope="function")
-def dummydreamec1vacuum(request):
-    request.cls.device = DummyDreameC1VacuumMiot()
+def dummydreame1cvacuum(request):
+    request.cls.device = DummyDreame1CVacuumMiot()
 
 
-@pytest.mark.usefixtures("dummydreamec1vacuum")
+@pytest.mark.usefixtures("dummydreame1cvacuum")
 class TestDreameVacuum(TestCase):
     def test_status(self):
         status = self.device.status()
@@ -78,11 +78,11 @@ class TestDreameVacuum(TestCase):
         assert repr(status.operating_mode) == repr(
             OperatingMode(_INITIAL_STATE["operating_mode"])
         )
-        assert status.cleaning_mode == CleaningModeDreameC1(
+        assert status.cleaning_mode == CleaningModeDreame1C(
             _INITIAL_STATE["cleaning_mode"]
         )
         assert repr(status.cleaning_mode) == repr(
-            CleaningModeDreameC1(_INITIAL_STATE["cleaning_mode"])
+            CleaningModeDreame1C(_INITIAL_STATE["cleaning_mode"])
         )
         assert status.device_status == DeviceStatus(_INITIAL_STATE["device_status"])
         assert repr(status.device_status) == repr(
