@@ -33,6 +33,7 @@ class ChuangmiIr(Device):
 
     _supported_models = [
         "chuangmi.ir.v2",
+        "chuangmi.remote.v2",
         "chuangmi-remote-h102a03",  # maybe?
     ]
 
