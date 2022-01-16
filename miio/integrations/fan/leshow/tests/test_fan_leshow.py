@@ -4,7 +4,7 @@ import pytest
 
 from miio.tests.dummies import DummyDevice
 
-from .fan_leshow import (
+from ..fan_leshow import (
     MODEL_FAN_LESHOW_SS4,
     FanLeshow,
     FanLeshowException,
