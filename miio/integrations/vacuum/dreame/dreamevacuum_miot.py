@@ -2,7 +2,8 @@
 
 import logging
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
+from unittest import result
 
 import click
 
@@ -10,13 +11,13 @@ from miio.click_common import command, format_output
 from miio.exceptions import DeviceException
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
-from miio.utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
 
 DREAME_1C = "dreame.vacuum.mc1808"
 DREAME_F9 = "dreame.vacuum.p2008"
+DREAME_D9 = "dreame.vacuum.p2009"
 
 MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_1C: {
@@ -65,6 +66,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
     },
     DREAME_F9: {
         # https://home.miot-spec.com/spec/dreame.vacuum.p2008
+        # https://home.miot-spec.com/spec/dreame.vacuum.p2009
         "battery_level": {"siid": 3, "piid": 1},
         "charging_state": {"siid": 3, "piid": 2},
         "device_fault": {"siid": 2, "piid": 2},
@@ -92,7 +94,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
         "volume": {"siid": 7, "piid": 1},
         "voice_package": {"siid": 7, "piid": 2},
         "water_flow": {"siid": 4, "piid": 5},
-        "water_tank_status": {"siid": 4, "piid": 6},
+        "water_box_carriage_status": {"siid": 4, "piid": 6},
         "timezone": {"siid": 8, "piid": 1},
         "home": {"siid": 3, "aiid": 1},
         "locate": {"siid": 7, "aiid": 1},
@@ -166,13 +168,7 @@ class WaterFlow(Enum):
     High = 3
 
 
-class WaterTankStatus(Enum):
-    Unknown = -1
-    NotAttached = 0
-    Attached = 1
-
-
-class DreameVacuumStatusBase(DeviceStatusContainer):
+class DreameVacuumStatus(DeviceStatusContainer):
     def __init__(self, data):
         self.data = data
 
@@ -288,56 +284,140 @@ class DreameVacuumStatusBase(DeviceStatusContainer):
     def total_clean_area(self) -> str:
         return self.data["total_clean_area"]
 
-
-class Dreame1CVacuumStatus(DreameVacuumStatusBase):
     @property
-    def cleaning_mode(self) -> CleaningModeDreame1C:
+    def cleaning_mode(self):
+        cleaning_mode = self.data["cleaning_mode"]
+        if self.model == DREAME_1C:
+            try:
+                return CleaningModeDreame1C(cleaning_mode)
+            except ValueError:
+                _LOGGER.error(f"Unknown CleaningMode ({cleaning_mode})")
+                return CleaningModeDreame1C.Unknown
+        elif self.model in [DREAME_D9, DREAME_F9]:
+            try:
+                return CleaningModeDreameF9(cleaning_mode)
+            except ValueError:
+                _LOGGER.error(f"Unknown CleaningMode ({cleaning_mode})")
+                return CleaningModeDreameF9.Unknown
+
+    @property
+    def life_sieve(self) -> Optional[str]:
         try:
-            return CleaningModeDreame1C(self.data["cleaning_mode"])
-        except ValueError:
-            _LOGGER.error("Unknown CleaningMode (%s)", self.data["cleaning_mode"])
-            return CleaningModeDreame1C.Unknown
+            return self.data["life_sieve"]
+        except KeyError:
+            return None
 
     @property
-    def life_sieve(self) -> str:
-        return self.data["life_sieve"]
-
-    @property
-    def life_brush_side(self) -> str:
-        return self.data["life_brush_side"]
-
-    @property
-    def life_brush_main(self) -> str:
-        return self.data["life_brush_main"]
-
-
-class DreameF9VacuumStatus(DreameVacuumStatusBase):
-    @property
-    def water_flow(self) -> WaterFlow:
+    def life_brush_side(self) -> Optional[str]:
         try:
-            return WaterFlow(self.data["water_flow"])
+            return self.data["life_brush_side"]
+        except KeyError:
+            return None
+
+    @property
+    def life_brush_main(self) -> Optional[str]:
+        try:
+            return self.data["life_brush_main"]
+        except KeyError:
+            return None
+
+    @property
+    def water_flow(self) -> Optional[WaterFlow]:
+        try:
+            water_flow = self.data["water_flow"]
+        except KeyError:
+            return None
+        try:
+            return WaterFlow(water_flow)
         except ValueError:
             _LOGGER.error("Unknown WaterFlow (%s)", self.data["water_flow"])
             return WaterFlow.Unknown
 
     @property
-    def water_tank_status(self) -> WaterTankStatus:
-        try:
-            return WaterTankStatus(self.data["water_tank_status"])
-        except ValueError:
-            _LOGGER.error("Unknown WaterFlow (%s)", self.data["water_tank_status"])
-            return WaterTankStatus.Unknown
-
-    @property
-    def cleaning_mode(self) -> CleaningModeDreameF9:
-        try:
-            return CleaningModeDreameF9(self.data["cleaning_mode"])
-        except ValueError:
-            _LOGGER.error("Unknown CleaningMode (%s)", self.data["cleaning_mode"])
-            return CleaningModeDreameF9.Unknown
+    def is_water_box_carriage_attached(self) -> Optional[bool]:
+        """Return True if water box carriage (mop) is installed, None if sensor not
+        present."""
+        if "water_box_carriage_status" in self.data:
+            return self.data["water_box_carriage_status"] == 1
+        return None
 
 
 class DreameVacuumBase(MiotDevice):
+    _supported_models = [
+        DREAME_1C,
+        DREAME_D9,
+        DREAME_F9,
+    ]
+
+    mapping = MIOT_MAPPING[DREAME_1C]
+
+    def __init__(self, *args, **kwargs) -> None:
+        model = kwargs.get("model")
+        if model:
+            mapping = MIOT_MAPPING.get(model)
+        if mapping:
+            self.mapping = mapping
+        super().__init__(*args, **kwargs)
+
+    def get_fanspeeds(self):
+        """Return fanspeeds enum for model if found or None."""
+        if self.model == DREAME_1C:
+            return CleaningModeDreame1C
+        elif self.model in [DREAME_F9, DREAME_D9]:
+            return CleaningModeDreameF9
+
+    @command(
+        default_output=format_output(
+            "\n",
+            "Battery level: {result.battery_level}\n"
+            "Brush life level: {result.brush_life_level}\n"
+            "Brush left time: {result.brush_left_time}\n"
+            "Charging state: {result.charging_state.name}\n"
+            "Cleaning mode: {result.cleaning_mode.name}\n"
+            "Device fault: {result.device_fault.name}\n"
+            "Device status: {result.device_status.name}\n"
+            "Filter left level: {result.filter_left_time}\n"
+            "Filter life level: {result.filter_life_level}\n"
+            "Life brush main: {result.life_brush_main}\n"
+            if hasattr(result, "life_brush_main")
+            else "" "Life brush side: {result.life_brush_side}\n"
+            if hasattr(result, "life_brush_side")
+            else "" "Life sieve: {result.life_sieve}\n"
+            if hasattr(result, "life_sieve")
+            else ""
+            "Map view: {result.map_view}\n"
+            "Operating mode: {result.operating_mode.name}\n"
+            "Side cleaning brush left time: {result.brush_left_time2}\n"
+            "Side cleaning brush life level: {result.brush_life_level2}\n"
+            "Time zone: {result.timezone}\n"
+            "Timer enabled: {result.timer_enable}\n"
+            "Timer start time: {result.start_time}\n"
+            "Timer stop time: {result.stop_time}\n"
+            "Voice package: {result.voice_package}\n"
+            "Volume: {result.volume}\n"
+            "Water flow: {result.water_flow.name}\n"
+            if hasattr(result, "water_flow")
+            else "" "Water box attached\n"
+            if getattr(result, "is_water_box_carriage_attached", None)
+            else ""
+            "Cleaning time: {result.cleaning_time}\n"
+            "Cleaning area: {result.cleaning_area}\n"
+            "First clean time: {result.first_clean_time}\n"
+            "Total clean time: {result.total_clean_time}\n"
+            "Total clean times: {result.total_clean_times}\n"
+            "Total clean area: {result.total_clean_area}\n",
+        )
+    )
+    def status(self) -> DreameVacuumStatus:
+        """State of the vacuum."""
+
+        return DreameVacuumStatus(
+            {
+                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                for prop in self.get_properties_for_mapping(max_properties=10)
+            }
+        )
+
     # TODO: check the actual limit for this
     MANUAL_ROTATION_MAX = 120
     MANUAL_ROTATION_MIN = -MANUAL_ROTATION_MAX
@@ -383,6 +463,18 @@ class DreameVacuumBase(MiotDevice):
     def play_sound(self) -> None:
         """Play sound."""
         return self.call_action("play_sound")
+
+    @command()
+    def fan_speed_presets(self) -> Dict[str, int]:
+        """Return dictionary containing supported fan speeds."""
+
+        def _enum_as_dict(cls):
+            return {x.name: x.value for x in list(cls)}
+
+        fanspeeds_enum = self.get_fanspeeds()
+        if not fanspeeds_enum:
+            return {}
+        return _enum_as_dict(fanspeeds_enum)
 
     @command(
         click.argument("distance", default=30, type=int),
@@ -436,112 +528,10 @@ class DreameVacuumBase(MiotDevice):
         )
 
 
-class Dreame1CVacuum(DreameVacuumBase):
+class DreameVacuum(DreameVacuumBase):
     """Interface for Vacuum 1C STYTJ01ZHM (dreame.vacuum.mc1808)"""
 
-    _supported_models = [
-        DREAME_1C,
-    ]
-    mapping = MIOT_MAPPING[DREAME_1C]
 
-    @command(
-        default_output=format_output(
-            "\n",
-            "Battery level: {result.battery_level}\n"
-            "Brush life level: {result.brush_life_level}\n"
-            "Brush left time: {result.brush_left_time}\n"
-            "Charging state: {result.charging_state.name}\n"
-            "Cleaning mode: {result.cleaning_mode.name}\n"
-            "Device fault: {result.device_fault.name}\n"
-            "Device status: {result.device_status.name}\n"
-            "Filter left level: {result.filter_left_time}\n"
-            "Filter life level: {result.filter_life_level}\n"
-            "Life brush main: {result.life_brush_main}\n"
-            "Life brush side: {result.life_brush_side}\n"
-            "Life sieve: {result.life_sieve}\n"
-            "Map view: {result.map_view}\n"
-            "Operating mode: {result.operating_mode.name}\n"
-            "Side cleaning brush left time: {result.brush_left_time2}\n"
-            "Side cleaning brush life level: {result.brush_life_level2}\n"
-            "Time zone: {result.timezone}\n"
-            "Timer enabled: {result.timer_enable}\n"
-            "Timer start time: {result.start_time}\n"
-            "Timer stop time: {result.stop_time}\n"
-            "Voice package: {result.voice_package}\n"
-            "Volume: {result.volume}\n"
-            "Cleaning time: {result.cleaning_time}\n"
-            "Cleaning area: {result.cleaning_area}\n"
-            "First clean time: {result.first_clean_time}\n"
-            "Total clean time: {result.total_clean_time}\n"
-            "Total clean times: {result.total_clean_times}\n"
-            "Total clean area: {result.total_clean_area}\n",
-        )
-    )
-    def status(self) -> Dreame1CVacuumStatus:
-        """State of the vacuum."""
-
-        return Dreame1CVacuumStatus(
-            {
-                prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping(max_properties=10)
-            }
-        )
-
-
-class DreameVacuumMiot(Dreame1CVacuum):
-    @deprecated(
-        "This class is replaced with Dreame1CVacuum. Use Dreame1CVacuum to control Dreame 1C vacuums."
-    )
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-class DreameF9Vacuum(DreameVacuumBase):
-    """Interface for Vacuum F9 (dreame.vacuum.p2008)"""
-
-    _supported_models = [
-        DREAME_F9,
-    ]
-    mapping = MIOT_MAPPING[DREAME_F9]
-
-    @command(
-        default_output=format_output(
-            "\n",
-            "Battery level: {result.battery_level}\n"
-            "Brush life level: {result.brush_life_level}\n"
-            "Brush left time: {result.brush_left_time}\n"
-            "Charging state: {result.charging_state.name}\n"
-            "Cleaning mode: {result.cleaning_mode.name}\n"
-            "Device fault: {result.device_fault.name}\n"
-            "Device status: {result.device_status.name}\n"
-            "Filter left level: {result.filter_left_time}\n"
-            "Filter life level: {result.filter_life_level}\n"
-            "Map view: {result.map_view}\n"
-            "Operating mode: {result.operating_mode.name}\n"
-            "Side cleaning brush left time: {result.brush_left_time2}\n"
-            "Side cleaning brush life level: {result.brush_life_level2}\n"
-            "Time zone: {result.timezone}\n"
-            "Timer enabled: {result.timer_enable}\n"
-            "Timer start time: {result.start_time}\n"
-            "Timer stop time: {result.stop_time}\n"
-            "Voice package: {result.voice_package}\n"
-            "Volume: {result.volume}\n"
-            "Water flow: {result.water_flow.name}\n"
-            "Water tank status: {result.water_tank_status.name}\n"
-            "Cleaning time: {result.cleaning_time}\n"
-            "Cleaning area: {result.cleaning_area}\n"
-            "First clean time: {result.first_clean_time}\n"
-            "Total clean time: {result.total_clean_time}\n"
-            "Total clean times: {result.total_clean_times}\n"
-            "Total clean area: {result.total_clean_area}\n",
-        )
-    )
-    def status(self) -> DreameF9VacuumStatus:
-        """State of the vacuum."""
-
-        return DreameF9VacuumStatus(
-            {
-                prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping(max_properties=10)
-            }
-        )
+Dreame1CVacuum = DreameVacuum
+DreameF9Vacuum = DreameVacuum
+DreameVacuumMiot = DreameVacuum
