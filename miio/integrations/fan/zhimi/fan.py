@@ -6,7 +6,6 @@ import click
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 from miio.fan_common import FanException, LedBrightness, MoveDirection
-from miio.utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -371,68 +370,3 @@ class Fan(Device):
             raise FanException("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("set_poweroff_time", [seconds])
-
-
-@deprecated('use Fan(.., model="zhimi.fan.v2")')
-class FanV2(Fan):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_V2)
-
-
-@deprecated('use Fan(.., model="zhimi.fan.sa1")')
-class FanSA1(Fan):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_SA1)
-
-
-@deprecated('use Fan(.., model="zhimi.fan.za1")')
-class FanZA1(Fan):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA1)
-
-
-@deprecated('use Fan(.., model="zhimi.fan.za3")')
-class FanZA3(Fan):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA3)
-
-
-@deprecated('use Fan(.., model="zhimi.fan.za4")')
-class FanZA4(Fan):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=MODEL_FAN_ZA4)

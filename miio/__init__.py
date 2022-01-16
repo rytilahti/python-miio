@@ -45,7 +45,7 @@ from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5, FanP9, FanP10, FanP11
-from miio.integrations.fan.zhimi import Fan, FanSA1, FanV2, FanZA1, FanZA4, FanZA5
+from miio.integrations.fan.zhimi import Fan, FanZA5
 from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuumMiot
 from miio.integrations.vacuum.mijia import G1Vacuum
