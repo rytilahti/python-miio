@@ -2,15 +2,15 @@ from unittest import TestCase
 
 import pytest
 
-from miio import FanLeshow
-from miio.fan_leshow import (
+from miio.tests.dummies import DummyDevice
+
+from ..fan_leshow import (
     MODEL_FAN_LESHOW_SS4,
+    FanLeshow,
     FanLeshowException,
     FanLeshowStatus,
     OperationMode,
 )
-
-from .dummies import DummyDevice
 
 
 class DummyFanLeshow(DummyDevice, FanLeshow):

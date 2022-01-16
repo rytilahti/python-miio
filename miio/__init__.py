@@ -38,12 +38,12 @@ from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
-from miio.fan_leshow import FanLeshow
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5, FanP9, FanP10, FanP11
+from miio.integrations.fan.leshow import FanLeshow
 from miio.integrations.fan.zhimi import Fan, FanZA5
 from miio.integrations.light.philips import (
     Ceil,
@@ -79,9 +79,6 @@ from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight_dual_switch import YeelightDualControlModule
-
-from .device import Device, DeviceStatus
-from .miot_device import MiotDevice
 
 from miio.discovery import Discovery
 
