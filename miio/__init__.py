@@ -33,7 +33,6 @@ from miio.airpurifier_miot import AirPurifierMB4, AirPurifierMiot
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.airqualitymonitor_miot import AirQualityMonitorCGDN1
 from miio.aqaracamera import AqaraCamera
-from miio.ceil import Ceil
 from miio.chuangmi_camera import ChuangmiCamera
 from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
@@ -47,6 +46,7 @@ from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5, FanP9, FanP10, FanP11
 from miio.integrations.fan.zhimi import Fan, FanZA5
 from miio.integrations.light.philips import (
+    Ceil,
     PhilipsBulb,
     PhilipsEyecare,
     PhilipsMoonlight,
