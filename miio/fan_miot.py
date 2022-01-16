@@ -6,6 +6,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .fan_common import FanException, MoveDirection, OperationMode
 from .miot_device import DeviceStatus, MiotDevice
+from .utils import deprecated
 
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
@@ -252,21 +253,7 @@ class FanStatus1C(DeviceStatus):
 
 
 class FanMiot(MiotDevice):
-    mapping = MIOT_MAPPING[MODEL_FAN_P10]
-
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_FAN_P10,
-    ) -> None:
-        if model not in MIOT_MAPPING:
-            raise FanException("Invalid FanMiot model: %s" % model)
-
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+    _mappings = MIOT_MAPPING
 
     @command(
         default_output=format_output(
@@ -406,14 +393,17 @@ class FanMiot(MiotDevice):
         return self.set_property("set_move", value)
 
 
+@deprecated("Use FanMiot")
 class FanP9(FanMiot):
     mapping = MIOT_MAPPING[MODEL_FAN_P9]
 
 
+@deprecated("Use FanMiot")
 class FanP10(FanMiot):
     mapping = MIOT_MAPPING[MODEL_FAN_P10]
 
 
+@deprecated("Use FanMiot")
 class FanP11(FanMiot):
     mapping = MIOT_MAPPING[MODEL_FAN_P11]
 
