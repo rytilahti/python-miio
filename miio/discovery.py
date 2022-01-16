@@ -32,7 +32,6 @@ from . import (
     ChuangmiPlug,
     Cooker,
     Device,
-    Fan,
     FanLeshow,
     Gateway,
     Heater,
@@ -78,18 +77,9 @@ from .chuangmi_plug import (
     MODEL_CHUANGMI_PLUG_V2,
     MODEL_CHUANGMI_PLUG_V3,
 )
-from .fan import (
-    MODEL_FAN_P5,
-    MODEL_FAN_SA1,
-    MODEL_FAN_V2,
-    MODEL_FAN_V3,
-    MODEL_FAN_ZA1,
-    MODEL_FAN_ZA3,
-    MODEL_FAN_ZA4,
-)
 from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
 from .integrations.fan.dmaker import FanMiot
-from .integrations.fan.zhimi import FanZA5
+from .integrations.fan.zhimi import Fan, FanZA5
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
 
@@ -178,14 +168,14 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "lumi-camera-aq2": AqaraCamera,
     "yeelink-light-": Yeelight,
     "leshow-fan-ss4": FanLeshow,
-    "zhimi-fan-v2": partial(Fan, model=MODEL_FAN_V2),
-    "zhimi-fan-v3": partial(Fan, model=MODEL_FAN_V3),
-    "zhimi-fan-sa1": partial(Fan, model=MODEL_FAN_SA1),
-    "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
-    "zhimi-fan-za3": partial(Fan, model=MODEL_FAN_ZA3),
-    "zhimi-fan-za4": partial(Fan, model=MODEL_FAN_ZA4),
+    "zhimi-fan-v2": Fan,
+    "zhimi-fan-v3": Fan,
+    "zhimi-fan-sa1": Fan,
+    "zhimi-fan-za1": Fan,
+    "zhimi-fan-za3": Fan,
+    "zhimi-fan-za4": Fan,
     "dmaker-fan-1c": FanMiot,
-    "dmaker-fan-p5": partial(Fan, model=MODEL_FAN_P5),
+    "dmaker-fan-p5": Fan,
     "dmaker-fan-p9": FanMiot,
     "dmaker-fan-p10": FanMiot,
     "dmaker-fan-p11": FanMiot,

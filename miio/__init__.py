@@ -39,14 +39,13 @@ from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
-from miio.fan import Fan, FanP5, FanSA1, FanV2, FanZA1, FanZA4
 from miio.fan_leshow import FanLeshow
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
-from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP9, FanP10, FanP11
-from miio.integrations.fan.zhimi import FanZA5
+from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5, FanP9, FanP10, FanP11
+from miio.integrations.fan.zhimi import Fan, FanSA1, FanV2, FanZA1, FanZA4, FanZA5
 from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuumMiot
 from miio.integrations.vacuum.mijia import G1Vacuum
@@ -77,6 +76,9 @@ from miio.waterpurifier_yunmi import WaterPurifierYunmi
 from miio.wifirepeater import WifiRepeater
 from miio.wifispeaker import WifiSpeaker
 from miio.yeelight_dual_switch import YeelightDualControlModule
+
+from .device import Device, DeviceStatus
+from .miot_device import MiotDevice
 
 from miio.discovery import Discovery
 
