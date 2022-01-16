@@ -30,7 +30,10 @@ MiotMapping = Dict[str, Dict[str, Any]]
 class MiotDevice(Device):
     """Main class representing a MIoT device.
 
-    The implementors should extend the
+    The inheriting class should use the `_mappings` to set the `MiotMapping` keyed by
+    the model names to inform which mapping is to be used for methods contained in this
+    class. Defining the mappiong using `mapping` class variable is deprecated but
+    remains in-place for backwards compatibility.
     """
 
     mapping: MiotMapping
