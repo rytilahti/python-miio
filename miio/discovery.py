@@ -34,7 +34,6 @@ from . import (
     Device,
     Fan,
     FanLeshow,
-    FanMiot,
     Gateway,
     Heater,
     PhilipsBulb,
@@ -88,14 +87,9 @@ from .fan import (
     MODEL_FAN_ZA3,
     MODEL_FAN_ZA4,
 )
-from .fan_miot import (
-    MODEL_FAN_1C,
-    MODEL_FAN_P9,
-    MODEL_FAN_P10,
-    MODEL_FAN_P11,
-    MODEL_FAN_ZA5,
-)
 from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
+from .integrations.fan.dmaker import FanMiot
+from .integrations.fan.zhimi import FanZA5
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
 
@@ -190,12 +184,12 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "zhimi-fan-za1": partial(Fan, model=MODEL_FAN_ZA1),
     "zhimi-fan-za3": partial(Fan, model=MODEL_FAN_ZA3),
     "zhimi-fan-za4": partial(Fan, model=MODEL_FAN_ZA4),
-    "dmaker-fan-1c": partial(FanMiot, model=MODEL_FAN_1C),
+    "dmaker-fan-1c": FanMiot,
     "dmaker-fan-p5": partial(Fan, model=MODEL_FAN_P5),
-    "dmaker-fan-p9": partial(FanMiot, model=MODEL_FAN_P9),
-    "dmaker-fan-p10": partial(FanMiot, model=MODEL_FAN_P10),
-    "dmaker-fan-p11": partial(FanMiot, model=MODEL_FAN_P11),
-    "zhimi-fan-za5": partial(FanMiot, model=MODEL_FAN_ZA5),
+    "dmaker-fan-p9": FanMiot,
+    "dmaker-fan-p10": FanMiot,
+    "dmaker-fan-p11": FanMiot,
+    "zhimi-fan-za5": FanZA5,
     "tinymu-toiletlid-v1": partial(Toiletlid, model=MODEL_TOILETLID_V1),
     "zhimi-airfresh-va2": partial(AirFresh, model=MODEL_AIRFRESH_VA2),
     "zhimi-airfresh-va4": partial(AirFresh, model=MODEL_AIRFRESH_VA4),

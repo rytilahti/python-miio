@@ -44,7 +44,7 @@ repos:
   rev: 1.7.1
   hooks:
   - id: bandit
-    args: [-x, 'tests']
+    args: [-x, 'tests', -x, '**/test_*.py']
 
 
 - repo: https://github.com/pre-commit/mirrors-mypy
