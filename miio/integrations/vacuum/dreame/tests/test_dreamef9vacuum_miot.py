@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from miio import DreameF9Vacuum
+from miio import DreameVacuum
 from miio.tests.dummies import DummyMiotDevice
 
 from ..dreamevacuum_miot import (
@@ -42,7 +42,7 @@ _INITIAL_STATE = {
 }
 
 
-class DummyDreameF9VacuumMiot(DummyMiotDevice, DreameF9Vacuum):
+class DummyDreameF9VacuumMiot(DummyMiotDevice, DreameVacuum):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE
         super().__init__(*args, **kwargs)
