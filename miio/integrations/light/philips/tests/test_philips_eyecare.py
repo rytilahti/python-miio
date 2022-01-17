@@ -2,10 +2,13 @@ from unittest import TestCase
 
 import pytest
 
-from miio import PhilipsEyecare
-from miio.philips_eyecare import PhilipsEyecareException, PhilipsEyecareStatus
+from miio.tests.dummies import DummyDevice
 
-from .dummies import DummyDevice
+from ..philips_eyecare import (
+    PhilipsEyecare,
+    PhilipsEyecareException,
+    PhilipsEyecareStatus,
+)
 
 
 class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):

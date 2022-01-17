@@ -4,10 +4,9 @@ from typing import Any, Dict, List, Tuple
 
 import click
 
-from .click_common import command, format_output
-from .device import Device, DeviceStatus
-from .exceptions import DeviceException
-from .utils import int_to_rgb
+from miio import Device, DeviceException, DeviceStatus
+from miio.click_common import command, format_output
+from miio.utils import int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
 

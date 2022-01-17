@@ -90,3 +90,26 @@ def test_call_action_by(dev):
             "in": params,
         },
     )
+
+
+@pytest.mark.parametrize(
+    "model,expected_mapping,expected_log",
+    [
+        ("some_model", {"x": {"y": 1}}, ""),
+        ("unknown_model", {"x": {"y": 1}}, "Unable to find mapping"),
+    ],
+)
+def test_get_mapping(dev, caplog, model, expected_mapping, expected_log):
+    """Test _get_mapping logic for fallbacks."""
+    dev._mappings["some_model"] = {"x": {"y": 1}}
+    dev._model = model
+    assert dev._get_mapping() == expected_mapping
+
+    assert expected_log in caplog.text
+
+
+def test_get_mapping_backwards_compat(dev):
+    """Test that the backwards compat works."""
+    # as dev is mocked on module level, need to empty manually
+    dev._mappings = {}
+    assert dev._get_mapping() == {}
