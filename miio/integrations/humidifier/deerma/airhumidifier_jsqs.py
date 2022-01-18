@@ -94,14 +94,14 @@ class AirHumidifierJsqsStatus(DeviceStatus):
         return mode
 
     @property
-    def target_humidity(self) -> int:
+    def target_humidity(self) -> Optional[int]:
         """Return target humidity."""
         return self.data.get("target_humidity")
 
     # Environment
 
     @property
-    def relative_humidity(self) -> int:
+    def relative_humidity(self) -> Optional[int]:
         """Return current humidity."""
         return self.data.get("relative_humidity")
 
