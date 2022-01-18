@@ -58,8 +58,17 @@ HEATER_PROPERTIES = {
 
 
 class LedBrightness(enum.Enum):
-    On = 0
-    Off = 1
+    """Xiaomi Smart Space Heater S (zhimi.heater.mc2): 
+    0 = On, 1 = Off
+
+    Xiaomi Smart Space Heater 1S (zhimi.heater.za2): 
+    0 = On (Bright), 1 = On (Dim), 2 = Off
+
+    For coverage, we use Bright/Dim/Off for both models.
+    """
+    Bright = 0
+    Dim = 1
+    Off = 2
 
 
 class HeaterMiotException(DeviceException):
