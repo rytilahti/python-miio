@@ -181,6 +181,10 @@ class WaterFlow(FormattableEnum):
     High = 3
 
 
+def _enum_as_dict(cls):
+    return {x.name: x.value for x in list(cls)}
+
+
 class DreameVacuumStatus(DeviceStatusContainer):
     def __init__(self, data, model):
         self.data = data
@@ -326,6 +330,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
     def life_brush_main(self) -> Optional[str]:
         return self.data.get("life_brush_main")
 
+    # TODO: get/set water flow for Dreame 1C
     @property
     def water_flow(self) -> Optional[WaterFlow]:
         try:
@@ -455,16 +460,76 @@ class DreameVacuum(MiotDevice):
         return self.call_action("play_sound")
 
     @command()
+    def fan_speed(self):
+        """Return fan speed."""
+        fanspeeds_enum = self.get_fanspeeds()
+        fanspeed = None
+        value = self.get_property("cleaning_mode")[0]["value"]
+        try:
+            fanspeed = fanspeeds_enum(value)
+            return {fanspeed.name: fanspeed.value}
+        except ValueError:
+            _LOGGER.warning(f"Unknown fanspeed value received #{value}")
+            return None
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed(self, speed: int):
+        """Set fan speed.
+
+        :param int speed: Fan speed to set
+        """
+        fanspeeds_enum = self.get_fanspeeds()
+        fanspeed = None
+        if not fanspeeds_enum:
+            return
+        try:
+            fanspeed = fanspeeds_enum(speed)
+        except ValueError:
+            return None
+        click.echo(f"Setting fanspeed to {fanspeed.name}")
+        return self.set_property("cleaning_mode", fanspeed.value)
+
+    @command()
     def fan_speed_presets(self) -> Dict[str, int]:
         """Return dictionary containing supported fan speeds."""
-
-        def _enum_as_dict(cls):
-            return {x.name: x.value for x in list(cls)}
-
         fanspeeds_enum = self.get_fanspeeds()
         if not fanspeeds_enum:
             return {}
         return _enum_as_dict(fanspeeds_enum)
+
+    @command()
+    def waterflow(self):
+        """Get water flow setting."""
+        mapping = self._get_mapping()
+        if "water_flow" not in mapping:
+            return None
+        waterflow = WaterFlow(self.get_property("water_flow")[0]["value"])
+        return {waterflow.name: waterflow.value}
+
+    @command(click.argument("value", type=int))
+    def set_waterflow(self, value: int):
+        """Set water flow.
+
+        :param int value: Water flow value to set
+        """
+        mapping = self._get_mapping()
+        if "water_flow" not in mapping:
+            return None
+        waterflow = None
+        try:
+            waterflow = WaterFlow(value)
+        except ValueError:
+            return None
+        click.echo(f"Setting waterflow to {waterflow.name}")
+        return self.set_property("water_flow", waterflow.value)
+
+    @command()
+    def waterflow_presets(self) -> Dict[str, int]:
+        """Return dictionary containing supported water flow."""
+        mapping = self._get_mapping()
+        if "water_flow" not in mapping:
+            return {}
+        return _enum_as_dict(WaterFlow)
 
     @command(
         click.argument("distance", default=30, type=int),

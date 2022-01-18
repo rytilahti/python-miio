@@ -119,6 +119,19 @@ class MiotDevice(Device):
         )
 
     @command(
+        click.argument("name", type=str),
+    )
+    def get_property(self, name: str):
+        mapping = self._get_mapping()
+        property_entry = mapping[name]
+        siid = property_entry.get("siid")
+        piid = property_entry.get("piid")
+        if not siid or not piid:
+            _LOGGER.error("{} doesn't set both siid and piid")
+            return
+        return self.get_property_by(siid, piid)
+
+    @command(
         click.argument("siid", type=int),
         click.argument("piid", type=int),
         click.argument("value"),
