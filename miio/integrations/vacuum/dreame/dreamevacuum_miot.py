@@ -195,6 +195,7 @@ class DreameVacuumMiot(MiotDevice):
     """Interface for Vacuum 1C STYTJ01ZHM (dreame.vacuum.mc1808)"""
 
     mapping = _MAPPING
+    _supported_models = ["dreame.vacuum.mc1808"]
 
     @command(
         default_output=format_output(
