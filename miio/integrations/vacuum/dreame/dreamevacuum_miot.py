@@ -462,15 +462,12 @@ class DreameVacuum(MiotDevice):
     @command()
     def fan_speed(self):
         """Return fan speed."""
-        fanspeeds_enum = self.get_fanspeeds()
-        fanspeed = None
-        value = self.get_property("cleaning_mode")[0]["value"]
-        try:
-            fanspeed = fanspeeds_enum(value)
-            return {fanspeed.name: fanspeed.value}
-        except ValueError:
-            _LOGGER.warning(f"Unknown fanspeed value received #{value}")
-            return None
+        dreame_vacuum_status = self.status()
+        fanspeed = dreame_vacuum_status.cleaning_mode
+        if not fanspeed or fanspeed.value == -1:
+            _LOGGER.warning("Unknown fanspeed value received")
+            return
+        return {fanspeed.name: fanspeed.value}
 
     @command(click.argument("speed", type=int))
     def set_fan_speed(self, speed: int):
@@ -500,10 +497,11 @@ class DreameVacuum(MiotDevice):
     @command()
     def waterflow(self):
         """Get water flow setting."""
-        mapping = self._get_mapping()
-        if "water_flow" not in mapping:
-            return None
-        waterflow = WaterFlow(self.get_property("water_flow")[0]["value"])
+        dreame_vacuum_status = self.status()
+        waterflow = dreame_vacuum_status.water_flow
+        if not waterflow or waterflow.value == -1:
+            _LOGGER.warning("Unknown waterflow value received")
+            return
         return {waterflow.name: waterflow.value}
 
     @command(click.argument("value", type=int))
