@@ -140,6 +140,9 @@
       property: motion
       value: False
       extra: "[1,1030,1,8,[4,120],2,0]"
+    #illumination:
+    #  extra: "[1,1024,1,0,[3,20],0,0]"
+    #  trigger_value: {"max":20, "min":0}
 
 # Cube
 - zigbee_id: lumi.sensor_cube.v1

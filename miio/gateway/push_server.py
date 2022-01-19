@@ -4,6 +4,7 @@ import datetime
 import logging
 import socket
 import struct
+from json import dumps
 from random import randint
 
 from ..protocol import Message
@@ -18,7 +19,7 @@ HELO_BYTES = bytes.fromhex(
 )
 
 
-def construct_script(
+def construct_script(  # nosec
     script_id,
     action,
     extra,
@@ -31,13 +32,18 @@ def construct_script(
     message_id=0,
     event=None,
     command_extra="",
+    trigger_value=None,
+    trigger_token="",
 ):
     if event is None:
         event = action
 
-    lumi, source_id = source_sid.split(".")
+    if source_sid.startswith("lumi."):
+        lumi, source_id = source_sid.split(".")
+    else:
+        source_id = source_sid
 
-    return [
+    script = [
         [
             script_id,
             [
@@ -52,7 +58,7 @@ def construct_script(
                         "model": source_model,
                         "src": "device",
                         "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
-                        "token": "",
+                        "token": trigger_token,
                     },
                 ],
                 [
@@ -70,6 +76,13 @@ def construct_script(
             ],
         ]
     ]
+
+    if trigger_value is not None:
+        script[0][1][2][1]["value"] = trigger_value
+
+    script_data = dumps(script, separators=(",", ":"))
+
+    return script_data
 
 
 class PushServer:

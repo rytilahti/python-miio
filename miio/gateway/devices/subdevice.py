@@ -2,7 +2,6 @@
 
 import logging
 from collections.abc import Callable
-from json import dumps
 from typing import TYPE_CHECKING, Dict, Optional
 
 import attr
@@ -66,9 +65,6 @@ class SubDevice:
         self.script_i = 0
         self.push_scripts = model_info.get("push_properties", [])
         self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
-
-        if self._gw._push_server is not None:
-            self.install_push_callbacks()
 
     def __repr__(self):
         return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(
@@ -335,17 +331,16 @@ class SubDevice:
                 token_enc=self._gw._token_enc,
                 event=self.push_scripts[action].get("event", None),
                 command_extra=self.push_scripts[action].get("command_extra", ""),
+                trigger_value=self.push_scripts[action].get("trigger_value"),
             )
 
-            script_data = dumps(script, separators=(",", ":"))
-
-            result = self._gw.install_script(script_id, script_data)
+            result = self._gw.install_script(script_id, script)
             if result != ["ok"]:
                 _LOGGER.error(
                     "Error installing script_id %s, response %s, script_data %s",
                     script_id,
                     result,
-                    script_data,
+                    script,
                 )
 
         return True

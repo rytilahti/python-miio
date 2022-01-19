@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+from collections.abc import Callable
 from typing import Dict, List
 
 import click
@@ -115,6 +116,8 @@ class Gateway(Device):
         self._token_enc = token_enc
         self._push_server = push_server
         self._script_ids: List[str] = []
+        self._gatway_script_i = 0
+        self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
 
         if self._push_server:
             self._push_server.Register_gateway(ip, token, self.push_callback)
@@ -156,6 +159,13 @@ class Gateway(Device):
         if self._info is None:
             self._info = self.info()
         return self._info.mac_address
+
+    @property
+    def did(self):
+        """Return the Device ID of the gateway."""
+        if self._protocol._device_id == b"":
+            self._info = self.info()
+        return str(int.from_bytes(self._protocol._device_id, byteorder="big"))
 
     @property
     def subdevice_model_map(self):
@@ -396,9 +406,31 @@ class Gateway(Device):
                 "Got an exception while getting gateway illumination"
             ) from ex
 
+    def Register_callback(self, id, callback):
+        """Register a external callback function for updates of this subdevice."""
+        if id in self._registered_callbacks:
+            _LOGGER.error(
+                "A callback with id '%s' was already registed, overwriting previous callback",
+                id,
+            )
+        self._registered_callbacks[id] = callback
+
+    def Remove_callback(self, id):
+        """Remove a external callback using its id."""
+        self._registered_callbacks.pop(id)
+
+    def gateway_push_callback(self, action, params):
+        """Callback from the push server regarding the gateway itself."""
+        for callback in self._registered_callbacks.values():
+            callback(action, params)
+
     def push_callback(self, source_device, action, params):
         """Callback from the push server."""
         if source_device not in self.devices:
+            if source_device == f"lumi.{self.did}":
+                self.gateway_push_callback(action, params)
+                return
+
             _LOGGER.error(
                 "'%s' callback from device '%s' not from a known device",
                 action,

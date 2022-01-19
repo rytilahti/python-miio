@@ -1,8 +1,11 @@
 """Xiaomi Gateway Alarm implementation."""
-
+import logging
 from datetime import datetime
 
 from .gatewaydevice import GatewayDevice
+from .push_server import construct_script
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Alarm(GatewayDevice):
@@ -61,3 +64,46 @@ class Alarm(GatewayDevice):
     def last_status_change_time(self) -> datetime:
         """Return the last time the alarm changed status."""
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
+
+    def install_push_callbacks(self):
+        """Generate and install script which captures events and sends miio package to
+        the push server."""
+        if self._gateway._push_server is None:
+            _LOGGER.error("Can not install push callback withouth a push_server")
+            return False
+
+        if self._gateway._push_server.device_ip is None:
+            _LOGGER.error(
+                "Can not install push callback withouth starting the push_server"
+            )
+            return False
+
+        alarm_scripts = {"alarm_triggering": {"extra": "[1,19,1,111,[0,1],2,0]"}}
+
+        for action in alarm_scripts:
+            self._gateway._gatway_script_i = self._gateway._gatway_script_i + 1
+            script_id = f"x.scene.{self._gateway._gatway_script_i}000000"
+
+            script = construct_script(
+                script_id=script_id,
+                action=action,
+                extra=alarm_scripts[action]["extra"],
+                source_sid=self._gateway.did,
+                source_model=self._gateway.model,
+                target_id=self._gateway._push_server.device_id,
+                target_ip=self._gateway._push_server.device_ip,
+                target_model=self._gateway._push_server.device_model,
+                token_enc=self._gateway._token_enc,
+                trigger_token=self._gateway.token,
+            )
+
+            result = self._gateway.install_script(script_id, script)
+            if result != ["ok"]:
+                _LOGGER.error(
+                    "Error installing script_id %s, response %s, script_data %s",
+                    script_id,
+                    result,
+                    script,
+                )
+
+        return True
