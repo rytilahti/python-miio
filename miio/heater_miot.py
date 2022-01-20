@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional
 
 import click
 
@@ -10,7 +10,7 @@ from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPINGS = {
-    'zhimi.heater.mc2': {
+    "zhimi.heater.mc2": {
         # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:zhimi-mc2:1
         # Heater (siid=2)
         "power": {"siid": 2, "piid": 1},
@@ -26,7 +26,7 @@ _MAPPINGS = {
         # Indicator light (siid=7)
         "led_brightness": {"siid": 7, "piid": 3},
     },
-    'zhimi.heater.za2': {
+    "zhimi.heater.za2": {
         # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:zhimi-za2:1
         # Heater (siid=2)
         "power": {"siid": 2, "piid": 2},
@@ -42,33 +42,27 @@ _MAPPINGS = {
         "buzzer": {"siid": 3, "piid": 1},
         # Indicator light (siid=7)
         "led_brightness": {"siid": 6, "piid": 1},
-    }
+    },
 }
 
 HEATER_PROPERTIES = {
-    'zhimi.heater.mc2': {
+    "zhimi.heater.mc2": {
         "temperature_range": (18, 28),
         "delay_off_range": (0, 12 * 3600),
     },
-    'zhimi.heater.za2': {
+    "zhimi.heater.za2": {
         "temperature_range": (16, 28),
         "delay_off_range": (0, 8 * 3600),
-    }
+    },
 }
 
 
 class LedBrightness(enum.Enum):
-    """Xiaomi Smart Space Heater S (zhimi.heater.mc2): 
-    0 = On, 1 = Off
+    """Note that only Xiaomi Smart Space Heater 1S (zhimi.heater.za2) supports `Dim`."""
 
-    Xiaomi Smart Space Heater 1S (zhimi.heater.za2): 
-    0 = On (Bright), 1 = On (Dim), 2 = Off
-
-    For coverage, we use Bright/Dim/Off for both models.
-    """
-    Bright = 0
-    Dim = 1
-    Off = 2
+    On = 0
+    Off = 1
+    Dim = 2
 
 
 class HeaterMiotException(DeviceException):
@@ -76,9 +70,9 @@ class HeaterMiotException(DeviceException):
 
 
 class HeaterMiotStatus(DeviceStatus):
-    """Container for status reports from the Xiaomi Smart Space Heater S."""
+    """Container for status reports from the Xiaomi Smart Space Heater S and 1S."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[str, Any], model: str) -> None:
         """
         Response (MIoT format) of Xiaomi Smart Space Heater S (zhimi.heater.mc2):
 
@@ -93,6 +87,7 @@ class HeaterMiotStatus(DeviceStatus):
         ]
         """
         self.data = data
+        self.model = model
 
     @property
     def power(self) -> str:
@@ -120,7 +115,7 @@ class HeaterMiotStatus(DeviceStatus):
         return self.data["temperature"]
 
     @property
-    def relative_humidity(self) -> Union[int, None]:
+    def relative_humidity(self) -> Optional[int]:
         """Current relative humidity."""
         return self.data.get("relative_humidity")
 
@@ -137,11 +132,15 @@ class HeaterMiotStatus(DeviceStatus):
     @property
     def led_brightness(self) -> LedBrightness:
         """LED indicator brightness."""
-        return LedBrightness(self.data["led_brightness"])
+        value = self.data["led_brightness"]
+        if self.model == "zhimi.heater.za2" and value:
+            value = 3 - value
+        return LedBrightness(value)
 
 
 class HeaterMiot(MiotDevice):
-    """Main class representing the Xiaomi Smart Space Heater S (zhimi.heater.mc2) & 1S (zhimi.heater.za2)."""
+    """Main class representing the Xiaomi Smart Space Heater S (zhimi.heater.mc2) & 1S
+    (zhimi.heater.za2)."""
 
     _mappings = _MAPPINGS
 
@@ -164,7 +163,8 @@ class HeaterMiot(MiotDevice):
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping()
-            }
+            },
+            self.model,
         )
 
     @command(default_output=format_output("Powering on"))
@@ -221,7 +221,12 @@ class HeaterMiot(MiotDevice):
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
-        return self.set_property("led_brightness", brightness.value)
+        value = brightness.value
+        if self.model == "zhimi.heater.za2" and value:
+            value = 3 - value  # Actually 1 means Dim, 2 means Off in za2
+        elif value == 2:
+            _LOGGER.warning("Unsupported brightness Dim for model '%s'.", self.model)
+        return self.set_property("led_brightness", value)
 
     @command(
         click.argument("seconds", type=int),
