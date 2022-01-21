@@ -237,7 +237,7 @@ class HeaterMiot(MiotDevice):
     def set_delay_off(self, seconds: int):
         """Set delay off seconds."""
         min_delay, max_delay = HEATER_PROPERTIES.get(
-            self.model, {"delay_off_range": (0, 8 * 3600)}
+            self.model, {"delay_off_range": (0, 12 * 3600)}
         )["delay_off_range"]
         if seconds < min_delay or seconds > max_delay:
             raise HeaterMiotException(
