@@ -185,7 +185,9 @@ class HeaterMiot(MiotDevice):
     )
     def set_target_temperature(self, target_temperature: int):
         """Set target_temperature ."""
-        min_temp, max_temp = HEATER_PROPERTIES[self.model]["temperature_range"]
+        min_temp, max_temp = HEATER_PROPERTIES.get(
+            self.model, {"temperature_range": (18, 28)}
+        )["temperature_range"]
         if target_temperature < min_temp or target_temperature > max_temp:
             raise HeaterMiotException(
                 "Invalid temperature: %s. Must be between %s and %s."
@@ -225,7 +227,7 @@ class HeaterMiot(MiotDevice):
         if self.model == "zhimi.heater.za2" and value:
             value = 3 - value  # Actually 1 means Dim, 2 means Off in za2
         elif value == 2:
-            _LOGGER.warning("Unsupported brightness Dim for model '%s'.", self.model)
+            raise ValueError("Unsupported brightness Dim for model '%s'.", self.model)
         return self.set_property("led_brightness", value)
 
     @command(
@@ -234,7 +236,9 @@ class HeaterMiot(MiotDevice):
     )
     def set_delay_off(self, seconds: int):
         """Set delay off seconds."""
-        min_delay, max_delay = HEATER_PROPERTIES[self.model]["delay_off_range"]
+        min_delay, max_delay = HEATER_PROPERTIES.get(
+            self.model, {"delay_off_range": (0, 8 * 3600)}
+        )["delay_off_range"]
         if seconds < min_delay or seconds > max_delay:
             raise HeaterMiotException(
                 "Invalid scheduled turn off: %s. Must be between %s and %s"
