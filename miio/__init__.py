@@ -45,7 +45,7 @@ from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
 from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5, FanP9, FanP10, FanP11
 from miio.integrations.fan.leshow import FanLeshow
 from miio.integrations.fan.zhimi import Fan, FanZA5
-from miio.integrations.humidifier.deerma.airhumidifier_jsqs import AirHumidifierJsqs
+from miio.integrations.humidifier.deerma import AirHumidifierJsqs
 from miio.integrations.light.philips import (
     Ceil,
     PhilipsBulb,
