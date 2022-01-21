@@ -44,7 +44,7 @@ class OperationMode(enum.Enum):
 class AirHumidifierJsqsStatus(DeviceStatus):
     """Container for status reports from the air humidifier.
 
-    Xiaomi Mi Smart Humidifer S (deerma.humidifier.jsqs) respone (MIoT format)
+    Xiaomi Mi Smart Humidifer S (deerma.humidifier.[jsqs, jsq5]) respone (MIoT format)
 
     [
         {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
@@ -145,7 +145,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
 class AirHumidifierJsqs(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
 
-    _supported_models = ["deerma.humidifier.jsqs"]
+    _supported_models = ["deerma.humidifier.jsqs", "deerma.humidifier.jsq5"]
 
     mapping = _MAPPING
 
