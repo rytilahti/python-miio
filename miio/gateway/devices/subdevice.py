@@ -62,6 +62,7 @@ class SubDevice:
 
         self.setter = model_info.get("setter")
 
+        self.has_push_server = gw.has_push_server
         self.script_i = 0
         self.push_scripts = model_info.get("push_properties", [])
         self._script_ids: List[str] = []

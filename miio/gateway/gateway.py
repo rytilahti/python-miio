@@ -119,7 +119,9 @@ class Gateway(Device):
         self._gatway_script_i = 0
         self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
 
-        if self._push_server:
+        self.has_push_server = push_server is not None
+
+        if self.has_push_server:
             self._push_server.Register_gateway(ip, token, self.push_callback)
 
     def _get_unknown_model(self):
