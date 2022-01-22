@@ -119,7 +119,7 @@ class Gateway(Device):
         self._gatway_script_i = 0
         self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
 
-        self.has_push_server = push_server is not None
+        self.has_push_server = push_server is not None and token_enc is not None
 
         if self.has_push_server:
             self._push_server.Register_gateway(ip, token, self.push_callback)
