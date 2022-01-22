@@ -485,5 +485,7 @@ class Gateway(Device):
         for script_id in self._script_ids:
             self.delete_script(script_id)
 
-        self._push_server.Unregister_gateway(self.ip)
+        if self.has_push_server:
+            self._push_server.Unregister_gateway(self.ip)
+
         return
