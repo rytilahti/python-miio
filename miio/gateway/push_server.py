@@ -102,14 +102,17 @@ class PushServer:
 
     def _create_udp_server(self):
         """Create the UDP socket and protocol."""
-        udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        # Gateway interacts only with port 54321
-        udp_socket.bind((self._address, SERVER_PORT))
-
-        # Connect to the gateway to get device_ip
-        udp_socket.connect((self._gateway_ip, SERVER_PORT))
-        self._device_ip = udp_socket.getsockname()[0]
+        # Connect to the gateway to get device_ip using a one time use socket
+        get_ip_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        get_ip_socket.bind((self._address, SERVER_PORT))
+        get_ip_socket.connect((self._gateway_ip, SERVER_PORT))
+        self._device_ip = get_ip_socket.getsockname()[0]
+        get_ip_socket.close()
         _LOGGER.debug("Miio push server device ip=%s", self._device_ip)
+
+        # Create a fresh socket that will be used for the push server
+        udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        udp_socket.bind((self._address, SERVER_PORT))
 
         loop = asyncio.get_event_loop()
 
