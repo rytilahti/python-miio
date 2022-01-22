@@ -844,7 +844,7 @@
       extra: "[1,13,1,85,[0,0],0,0]"
     click_ch0:
       property: last_press
-      value: "cclick_ch0"
+      value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
     double_click_ch0:
       property: last_press
