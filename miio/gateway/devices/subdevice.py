@@ -353,4 +353,5 @@ class SubDevice:
         """Uninstall scripts registered in the gateway memory."""
         for script_id in self._script_ids:
             self._gw.delete_script(script_id)
-            self._script_ids.remove(script_id)
+            if script_id in self._script_ids:
+                self._script_ids.remove(script_id)

@@ -474,7 +474,8 @@ class Gateway(Device):
         """Delete script by id."""
         result = self.send("miIO.xdel", [script_id])
         if result == ["ok"]:
-            self._script_ids.remove(script_id)
+            if script_id in self._script_ids:
+                self._script_ids.remove(script_id)
         else:
             _LOGGER.error("Error removing script_id %s: %s", script_id, result)
 
