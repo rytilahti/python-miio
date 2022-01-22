@@ -1,7 +1,7 @@
 """Xiaomi Gateway device base class."""
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from ..exceptions import DeviceException
 
@@ -28,3 +28,4 @@ class GatewayDevice:
             )
 
         self._gateway = parent
+        self._script_ids: List[str] = []

@@ -2,7 +2,7 @@
 
 import logging
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 import attr
 import click
@@ -64,6 +64,7 @@ class SubDevice:
 
         self.script_i = 0
         self.push_scripts = model_info.get("push_properties", [])
+        self._script_ids: List[str] = []
         self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
 
     def __repr__(self):
@@ -335,7 +336,9 @@ class SubDevice:
             )
 
             result = self._gw.install_script(script_id, script)
-            if result != ["ok"]:
+            if result == ["ok"]:
+                self._script_ids.append(script_id)
+            else:
                 _LOGGER.error(
                     "Error installing script_id %s, response %s, script_data %s",
                     script_id,
@@ -344,3 +347,9 @@ class SubDevice:
                 )
 
         return True
+
+    def uninstall_push_callbacks(self):
+        """Uninstall scripts registered in the gateway memory."""
+        for script_id in self._script_ids:
+            self._gw.delete_script(script_id)
+            self._script_ids.remove(script_id)

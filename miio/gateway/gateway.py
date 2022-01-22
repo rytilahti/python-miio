@@ -470,14 +470,18 @@ class Gateway(Device):
 
     def delete_script(self, script_id):
         """Delete script by id."""
-        return self.send("miIO.xdel", [script_id])
+        result = self.send("miIO.xdel", [script_id])
+        if result == ["ok"]:
+            self._script_ids.remove(script_id)
+        else:
+            _LOGGER.error("Error removing script_id %s: %s", script_id, result)
+
+        return result
 
     def close(self):
         """Cleanup all intalled scripts and registered callbacks."""
         for script_id in self._script_ids:
-            result = self.delete_script(script_id)
-            if result != ["ok"]:
-                _LOGGER.error("Error removing script_id %s: %s", script_id, result)
+            self.delete_script(script_id)
 
         self._push_server.Unregister_gateway(self.ip)
         return
