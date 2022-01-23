@@ -474,6 +474,7 @@ class DreameVacuum(MiotDevice):
         try:
             fanspeed = fanspeeds_enum(speed)
         except ValueError:
+            _LOGGER.error(f"Unknown fanspeed value passed {speed}")
             return None
         click.echo(f"Setting fanspeed to {fanspeed.name}")
         return self.set_property("cleaning_mode", fanspeed.value)
