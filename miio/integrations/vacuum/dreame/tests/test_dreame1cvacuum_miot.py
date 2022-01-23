@@ -6,6 +6,7 @@ from miio import DreameVacuum
 from miio.tests.dummies import DummyMiotDevice
 
 from ..dreamevacuum_miot import (
+    DREAME_1C,
     ChargingState,
     CleaningModeDreame1C,
     DeviceStatus,
@@ -45,6 +46,7 @@ _INITIAL_STATE = {
 
 class DummyDreame1CVacuumMiot(DummyMiotDevice, DreameVacuum):
     def __init__(self, *args, **kwargs):
+        self._model = DREAME_1C
         self.state = _INITIAL_STATE
         super().__init__(*args, **kwargs)
 

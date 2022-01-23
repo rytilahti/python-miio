@@ -6,13 +6,13 @@ from miio import DreameVacuum
 from miio.tests.dummies import DummyMiotDevice
 
 from ..dreamevacuum_miot import (
+    DREAME_F9,
     ChargingState,
     CleaningModeDreameF9,
     DeviceStatus,
     FaultStatus,
     OperatingMode,
     WaterFlow,
-    WaterTankStatus,
 )
 
 _INITIAL_STATE = {
@@ -37,13 +37,14 @@ _INITIAL_STATE = {
     "volume": 4,
     "voice_package": "DE",
     "water_flow": WaterFlow.Medium,
-    "water_tank_status": WaterTankStatus.Attached,
+    "water_box_carriage_status": 1,
     "timezone": "Europe/London",
 }
 
 
 class DummyDreameF9VacuumMiot(DummyMiotDevice, DreameVacuum):
     def __init__(self, *args, **kwargs):
+        self._model = DREAME_F9
         self.state = _INITIAL_STATE
         super().__init__(*args, **kwargs)
 
@@ -66,7 +67,7 @@ class TestDreameF9Vacuum(TestCase):
         assert status.filter_life_level == _INITIAL_STATE["filter_life_level"]
         assert status.water_flow == _INITIAL_STATE["water_flow"]
         assert status.timezone == _INITIAL_STATE["timezone"]
-        assert status.water_tank_status == _INITIAL_STATE["water_tank_status"]
+        assert status.is_water_box_carriage_attached
         assert status.device_fault == FaultStatus(_INITIAL_STATE["device_fault"])
         assert repr(status.device_fault) == repr(
             FaultStatus(_INITIAL_STATE["device_fault"])

@@ -188,6 +188,10 @@ def _get_cleaning_mode_enum_class(model):
 
 class DreameVacuumStatus(DeviceStatusContainer):
     def __init__(self, data, model):
+        """
+        data - device status dictionary
+        model - device model name
+        """
         self.data = data
         self.model = model
 
@@ -510,6 +514,7 @@ class DreameVacuum(MiotDevice):
         try:
             waterflow = WaterFlow(value)
         except ValueError:
+            _LOGGER.error(f"Unknown waterflow value passed {value}")
             return None
         click.echo(f"Setting waterflow to {waterflow.name}")
         return self.set_property("water_flow", waterflow.value)
