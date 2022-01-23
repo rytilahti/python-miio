@@ -122,7 +122,6 @@ class FormattableEnum(Enum):
 
 
 class ChargingState(FormattableEnum):
-    Unknown = -1
     Charging = 1
     Discharging = 2
     Charging2 = 4
@@ -130,7 +129,6 @@ class ChargingState(FormattableEnum):
 
 
 class CleaningModeDreame1C(FormattableEnum):
-    Unknown = -1
     Quiet = 0
     Default = 1
     Medium = 2
@@ -138,7 +136,6 @@ class CleaningModeDreame1C(FormattableEnum):
 
 
 class CleaningModeDreameF9(FormattableEnum):
-    Unknown = -1
     Quiet = 0
     Standart = 1
     Strong = 2
@@ -146,7 +143,6 @@ class CleaningModeDreameF9(FormattableEnum):
 
 
 class OperatingMode(FormattableEnum):
-    Unknown = -1
     Paused = 1
     Cleaning = 2
     GoCharging = 3
@@ -158,12 +154,10 @@ class OperatingMode(FormattableEnum):
 
 
 class FaultStatus(FormattableEnum):
-    Unknown = -1
     NoFaults = 0
 
 
 class DeviceStatus(FormattableEnum):
-    Unknown = -1
     Sweeping = 1
     Idle = 2
     Paused = 3
@@ -175,7 +169,6 @@ class DeviceStatus(FormattableEnum):
 
 
 class WaterFlow(FormattableEnum):
-    Unknown = -1
     Low = 1
     Medium = 2
     High = 3
@@ -183,6 +176,14 @@ class WaterFlow(FormattableEnum):
 
 def _enum_as_dict(cls):
     return {x.name: x.value for x in list(cls)}
+
+
+def _get_cleaning_mode_enum_class(model):
+    """Return cleaning mode enum class for model if found or None."""
+    if model == DREAME_1C:
+        return CleaningModeDreame1C
+    elif model in [DREAME_F9, DREAME_D9]:
+        return CleaningModeDreameF9
 
 
 class DreameVacuumStatus(DeviceStatusContainer):
@@ -219,36 +220,36 @@ class DreameVacuumStatus(DeviceStatusContainer):
         return self.data["filter_life_level"]
 
     @property
-    def device_fault(self) -> FaultStatus:
+    def device_fault(self) -> Optional[FaultStatus]:
         try:
             return FaultStatus(self.data["device_fault"])
         except ValueError:
             _LOGGER.error("Unknown FaultStatus (%s)", self.data["device_fault"])
-            return FaultStatus.Unknown
+            return None
 
     @property
-    def charging_state(self) -> ChargingState:
+    def charging_state(self) -> Optional[ChargingState]:
         try:
             return ChargingState(self.data["charging_state"])
         except ValueError:
             _LOGGER.error("Unknown ChargingStats (%s)", self.data["charging_state"])
-            return ChargingState.Unknown
+            return None
 
     @property
-    def operating_mode(self) -> OperatingMode:
+    def operating_mode(self) -> Optional[OperatingMode]:
         try:
             return OperatingMode(self.data["operating_mode"])
         except ValueError:
             _LOGGER.error("Unknown OperatingMode (%s)", self.data["operating_mode"])
-            return OperatingMode.Unknown
+            return None
 
     @property
-    def device_status(self) -> DeviceStatus:
+    def device_status(self) -> Optional[DeviceStatus]:
         try:
             return DeviceStatus(self.data["device_status"])
         except TypeError:
             _LOGGER.error("Unknown DeviceStatus (%s)", self.data["device_status"])
-            return DeviceStatus.Unknown
+            return None
 
     @property
     def timer_enable(self) -> str:
@@ -305,18 +306,16 @@ class DreameVacuumStatus(DeviceStatusContainer):
     @property
     def cleaning_mode(self):
         cleaning_mode = self.data["cleaning_mode"]
-        if self.model == DREAME_1C:
-            try:
-                return CleaningModeDreame1C(cleaning_mode)
-            except ValueError:
-                _LOGGER.error(f"Unknown CleaningMode ({cleaning_mode})")
-                return CleaningModeDreame1C.Unknown
-        elif self.model in [DREAME_D9, DREAME_F9]:
-            try:
-                return CleaningModeDreameF9(cleaning_mode)
-            except ValueError:
-                _LOGGER.error(f"Unknown CleaningMode ({cleaning_mode})")
-                return CleaningModeDreameF9.Unknown
+        cleaning_mode_enum_class = _get_cleaning_mode_enum_class(self.model)
+
+        if not cleaning_mode_enum_class:
+            _LOGGER.error(f"Unknown model for cleaning mode ({self.model})")
+            return None
+        try:
+            return cleaning_mode_enum_class(cleaning_mode)
+        except ValueError:
+            _LOGGER.error(f"Unknown CleaningMode ({cleaning_mode})")
+            return None
 
     @property
     def life_sieve(self) -> Optional[str]:
@@ -341,7 +340,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
             return WaterFlow(water_flow)
         except ValueError:
             _LOGGER.error("Unknown WaterFlow (%s)", self.data["water_flow"])
-            return WaterFlow.Unknown
+            return None
 
     @property
     def is_water_box_carriage_attached(self) -> Optional[bool]:
@@ -359,13 +358,6 @@ class DreameVacuum(MiotDevice):
         DREAME_F9,
     ]
     _mappings = MIOT_MAPPING
-
-    def get_fanspeeds(self):
-        """Return fanspeeds enum for model if found or None."""
-        if self.model == DREAME_1C:
-            return CleaningModeDreame1C
-        elif self.model in [DREAME_F9, DREAME_D9]:
-            return CleaningModeDreameF9
 
     @command(
         default_output=format_output(
@@ -475,7 +467,7 @@ class DreameVacuum(MiotDevice):
 
         :param int speed: Fan speed to set
         """
-        fanspeeds_enum = self.get_fanspeeds()
+        fanspeeds_enum = _get_cleaning_mode_enum_class(self.model)
         fanspeed = None
         if not fanspeeds_enum:
             return
@@ -489,7 +481,7 @@ class DreameVacuum(MiotDevice):
     @command()
     def fan_speed_presets(self) -> Dict[str, int]:
         """Return dictionary containing supported fan speeds."""
-        fanspeeds_enum = self.get_fanspeeds()
+        fanspeeds_enum = _get_cleaning_mode_enum_class(self.model)
         if not fanspeeds_enum:
             return {}
         return _enum_as_dict(fanspeeds_enum)
