@@ -7,7 +7,7 @@ import struct
 from json import dumps
 from random import randint
 
-from ..protocol import Message
+from ..protocol import Message, Utils
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,6 +17,13 @@ FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
 HELO_BYTES = bytes.fromhex(
     "21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 )
+
+
+def calculated_token_enc(token):
+    token_bytes = bytes.fromhex(token)
+    encrypted_token = Utils.encrypt(token_bytes, token_bytes)
+    encrypted_token_hex = encrypted_token.hex()
+    return encrypted_token_hex[0:32]
 
 
 def construct_script(  # nosec
