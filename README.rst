@@ -146,11 +146,13 @@ Supported devices
 -  Xiaomi Mi Smart Space Heater
 -  Xiaomiyoupin Curtain Controller (Wi-Fi) (lumi.curtain.hagl05)
 -  Xiaomi Xiaomi Mi Smart Space Heater S (zhimi.heater.mc2)
+-  Xiaomi Xiaomi Mi Smart Space Heater 1S (zhimi.heater.za2)
 -  Yeelight Dual Control Module (yeelink.switch.sw1)
 -  Scishare coffee maker (scishare.coffee.s1102)
 -  Qingping Air Monitor Lite (cgllc.airm.cgdn1)
 -  Xiaomi Walkingpad A1 (ksmb.walkingpad.v3)
 -  Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4)
+-  Xiaomi Mi Smart Humidifer S (jsqs, jsq5)
 
 
 *Feel free to create a pull request to add support for new devices as

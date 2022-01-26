@@ -131,10 +131,7 @@ class Utils:
     def is_hello(x) -> bool:
         """Return if packet is a hello packet."""
         # not very nice, but we know that hellos are 32b of length
-        if "length" in x:
-            val = x["length"]
-        else:
-            val = x.header.value["length"]
+        val = x.get("length", x.header.value["length"])
 
         return bool(val == 32)
 

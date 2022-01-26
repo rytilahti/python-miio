@@ -2,15 +2,16 @@ from unittest import TestCase
 
 import pytest
 
-from miio import PhilipsBulb, PhilipsWhiteBulb
-from miio.philips_bulb import (
+from miio.tests.dummies import DummyDevice
+
+from ..philips_bulb import (
     MODEL_PHILIPS_LIGHT_BULB,
     MODEL_PHILIPS_LIGHT_HBULB,
+    PhilipsBulb,
     PhilipsBulbException,
     PhilipsBulbStatus,
+    PhilipsWhiteBulb,
 )
-
-from .dummies import DummyDevice
 
 
 class DummyPhilipsBulb(DummyDevice, PhilipsBulb):

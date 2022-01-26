@@ -2,15 +2,15 @@ from unittest import TestCase
 
 import pytest
 
-from miio import PhilipsRwread
-from miio.philips_rwread import (
+from miio.tests.dummies import DummyDevice
+
+from ..philips_rwread import (
     MODEL_PHILIPS_LIGHT_RWREAD,
     MotionDetectionSensitivity,
+    PhilipsRwread,
     PhilipsRwreadException,
     PhilipsRwreadStatus,
 )
-
-from .dummies import DummyDevice
 
 
 class DummyPhilipsRwread(DummyDevice, PhilipsRwread):

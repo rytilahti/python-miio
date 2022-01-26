@@ -2,11 +2,14 @@ from unittest import TestCase
 
 import pytest
 
-from miio import PhilipsMoonlight
-from miio.philips_moonlight import PhilipsMoonlightException, PhilipsMoonlightStatus
+from miio.tests.dummies import DummyDevice
 from miio.utils import int_to_rgb, rgb_to_int
 
-from .dummies import DummyDevice
+from ..philips_moonlight import (
+    PhilipsMoonlight,
+    PhilipsMoonlightException,
+    PhilipsMoonlightStatus,
+)
 
 
 class DummyPhilipsMoonlight(DummyDevice, PhilipsMoonlight):
