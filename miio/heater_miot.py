@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -9,32 +9,60 @@ from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
-_MAPPING = {
-    # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:zhimi-mc2:1
-    # Heater (siid=2)
-    "power": {"siid": 2, "piid": 1},
-    "target_temperature": {"siid": 2, "piid": 5},
-    # Countdown (siid=3)
-    "countdown_time": {"siid": 3, "piid": 1},
-    # Environment (siid=4)
-    "temperature": {"siid": 4, "piid": 7},
-    # Physical Control Locked (siid=6)
-    "child_lock": {"siid": 5, "piid": 1},
-    # Alarm (siid=6)
-    "buzzer": {"siid": 6, "piid": 1},
-    # Indicator light (siid=7)
-    "led_brightness": {"siid": 7, "piid": 3},
+_MAPPINGS = {
+    "zhimi.heater.mc2": {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:zhimi-mc2:1
+        # Heater (siid=2)
+        "power": {"siid": 2, "piid": 1},
+        "target_temperature": {"siid": 2, "piid": 5},
+        # Countdown (siid=3)
+        "countdown_time": {"siid": 3, "piid": 1},
+        # Environment (siid=4)
+        "temperature": {"siid": 4, "piid": 7},
+        # Physical Control Locked (siid=5)
+        "child_lock": {"siid": 5, "piid": 1},
+        # Alarm (siid=6)
+        "buzzer": {"siid": 6, "piid": 1},
+        # Indicator light (siid=7)
+        "led_brightness": {"siid": 7, "piid": 3},
+    },
+    "zhimi.heater.za2": {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:zhimi-za2:1
+        # Heater (siid=2)
+        "power": {"siid": 2, "piid": 2},
+        "target_temperature": {"siid": 2, "piid": 6},
+        # Countdown (siid=4)
+        "countdown_time": {"siid": 4, "piid": 1},
+        # Environment (siid=5)
+        "temperature": {"siid": 5, "piid": 8},
+        "relative_humidity": {"siid": 5, "piid": 7},
+        # Physical Control Locked (siid=7)
+        "child_lock": {"siid": 7, "piid": 1},
+        # Alarm (siid=3)
+        "buzzer": {"siid": 3, "piid": 1},
+        # Indicator light (siid=7)
+        "led_brightness": {"siid": 6, "piid": 1},
+    },
 }
 
 HEATER_PROPERTIES = {
-    "temperature_range": (18, 28),
-    "delay_off_range": (0, 12 * 3600),
+    "zhimi.heater.mc2": {
+        "temperature_range": (18, 28),
+        "delay_off_range": (0, 12 * 3600),
+    },
+    "zhimi.heater.za2": {
+        "temperature_range": (16, 28),
+        "delay_off_range": (0, 8 * 3600),
+    },
 }
 
 
 class LedBrightness(enum.Enum):
+    """Note that only Xiaomi Smart Space Heater 1S (zhimi.heater.za2) supports `Dim`."""
+
     On = 0
     Off = 1
+    Dim = 2
 
 
 class HeaterMiotException(DeviceException):
@@ -42,9 +70,9 @@ class HeaterMiotException(DeviceException):
 
 
 class HeaterMiotStatus(DeviceStatus):
-    """Container for status reports from the Xiaomi Smart Space Heater S."""
+    """Container for status reports from the Xiaomi Smart Space Heater S and 1S."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[str, Any], model: str) -> None:
         """
         Response (MIoT format) of Xiaomi Smart Space Heater S (zhimi.heater.mc2):
 
@@ -59,6 +87,7 @@ class HeaterMiotStatus(DeviceStatus):
         ]
         """
         self.data = data
+        self.model = model
 
     @property
     def power(self) -> str:
@@ -86,6 +115,11 @@ class HeaterMiotStatus(DeviceStatus):
         return self.data["temperature"]
 
     @property
+    def relative_humidity(self) -> Optional[int]:
+        """Current relative humidity."""
+        return self.data.get("relative_humidity")
+
+    @property
     def child_lock(self) -> bool:
         """True if child lock is on, False otherwise."""
         return self.data["child_lock"] is True
@@ -98,13 +132,17 @@ class HeaterMiotStatus(DeviceStatus):
     @property
     def led_brightness(self) -> LedBrightness:
         """LED indicator brightness."""
-        return LedBrightness(self.data["led_brightness"])
+        value = self.data["led_brightness"]
+        if self.model == "zhimi.heater.za2" and value:
+            value = 3 - value
+        return LedBrightness(value)
 
 
 class HeaterMiot(MiotDevice):
-    """Main class representing the Xiaomi Smart Space Heater S (zhimi.heater.mc2)."""
+    """Main class representing the Xiaomi Smart Space Heater S (zhimi.heater.mc2) & 1S
+    (zhimi.heater.za2)."""
 
-    mapping = _MAPPING
+    _mappings = _MAPPINGS
 
     @command(
         default_output=format_output(
@@ -125,7 +163,8 @@ class HeaterMiot(MiotDevice):
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping()
-            }
+            },
+            self.model,
         )
 
     @command(default_output=format_output("Powering on"))
@@ -146,7 +185,9 @@ class HeaterMiot(MiotDevice):
     )
     def set_target_temperature(self, target_temperature: int):
         """Set target_temperature ."""
-        min_temp, max_temp = HEATER_PROPERTIES["temperature_range"]
+        min_temp, max_temp = HEATER_PROPERTIES.get(
+            self.model, {"temperature_range": (18, 28)}
+        )["temperature_range"]
         if target_temperature < min_temp or target_temperature > max_temp:
             raise HeaterMiotException(
                 "Invalid temperature: %s. Must be between %s and %s."
@@ -182,7 +223,12 @@ class HeaterMiot(MiotDevice):
     )
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
-        return self.set_property("led_brightness", brightness.value)
+        value = brightness.value
+        if self.model == "zhimi.heater.za2" and value:
+            value = 3 - value  # Actually 1 means Dim, 2 means Off in za2
+        elif value == 2:
+            raise ValueError("Unsupported brightness Dim for model '%s'.", self.model)
+        return self.set_property("led_brightness", value)
 
     @command(
         click.argument("seconds", type=int),
@@ -190,7 +236,9 @@ class HeaterMiot(MiotDevice):
     )
     def set_delay_off(self, seconds: int):
         """Set delay off seconds."""
-        min_delay, max_delay = HEATER_PROPERTIES["delay_off_range"]
+        min_delay, max_delay = HEATER_PROPERTIES.get(
+            self.model, {"delay_off_range": (0, 12 * 3600)}
+        )["delay_off_range"]
         if seconds < min_delay or seconds > max_delay:
             raise HeaterMiotException(
                 "Invalid scheduled turn off: %s. Must be between %s and %s"

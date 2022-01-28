@@ -133,7 +133,7 @@ class Utils:
         # not very nice, but we know that hellos are 32b of length
         val = x.get("length", x.header.value["length"])
 
-        return bool(val == 32)
+        return val == 32
 
 
 class TimeAdapter(Adapter):

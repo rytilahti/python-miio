@@ -322,7 +322,7 @@ class CleaningDetails(DeviceStatus):
 
         see also :func:`error`.
         """
-        return bool(self.data["complete"] == 1)
+        return self.data["complete"] == 1
 
 
 class ConsumableStatus(DeviceStatus):
@@ -446,7 +446,7 @@ class Timer(DeviceStatus):
     @property
     def enabled(self) -> bool:
         """True if the timer is active."""
-        return bool(self.data[1] == "on")
+        return self.data[1] == "on"
 
     @property
     def cron(self) -> str:
