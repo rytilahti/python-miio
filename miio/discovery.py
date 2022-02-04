@@ -197,6 +197,7 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "zhimi.elecheater.ma1": partial(Heater, model=MODEL_HEATER_MA1),
     "dreame-vacuum-mc1808": DreameVacuum,
     "dreame-vacuum-p2008": DreameVacuum,
+    "dreame-vacuum-p2028": DreameVacuum,
     "dreame-vacuum-p2009": DreameVacuum,
 }
 

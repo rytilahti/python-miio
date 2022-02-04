@@ -18,6 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 DREAME_1C = "dreame.vacuum.mc1808"
 DREAME_F9 = "dreame.vacuum.p2008"
 DREAME_D9 = "dreame.vacuum.p2009"
+DREAME_Z10_PRO = "dreame.vacuum.p2028"
 
 
 _DREAME_1C_MAPPING: MiotMapping = {
@@ -69,6 +70,7 @@ _DREAME_1C_MAPPING: MiotMapping = {
 _DREAME_F9_MAPPING: MiotMapping = {
     # https://home.miot-spec.com/spec/dreame.vacuum.p2008
     # https://home.miot-spec.com/spec/dreame.vacuum.p2009
+    # https://home.miot-spec.com/spec/dreame.vacuum.p2028
     "battery_level": {"siid": 3, "piid": 1},
     "charging_state": {"siid": 3, "piid": 2},
     "device_fault": {"siid": 2, "piid": 2},
@@ -113,6 +115,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_1C: _DREAME_1C_MAPPING,
     DREAME_F9: _DREAME_F9_MAPPING,
     DREAME_D9: _DREAME_F9_MAPPING,
+    DREAME_Z10_PRO: _DREAME_F9_MAPPING,
 }
 
 
@@ -182,7 +185,7 @@ def _get_cleaning_mode_enum_class(model):
     """Return cleaning mode enum class for model if found or None."""
     if model == DREAME_1C:
         return CleaningModeDreame1C
-    elif model in [DREAME_F9, DREAME_D9]:
+    elif model in [DREAME_F9, DREAME_D9, DREAME_Z10_PRO]:
         return CleaningModeDreameF9
 
 
@@ -360,6 +363,7 @@ class DreameVacuum(MiotDevice):
         DREAME_1C,
         DREAME_D9,
         DREAME_F9,
+        DREAME_Z10_PRO,
     ]
     _mappings = MIOT_MAPPING
 
