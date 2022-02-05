@@ -32,10 +32,47 @@ _INITIAL_STATE = {
     "button_pressed": "power",
 }
 
+_INITIAL_STATE_MB4 = {
+    "power": True,
+    "aqi": 10,
+    "mode": 0,
+    "led_brightness_level": 1,
+    "buzzer": False,
+    "child_lock": False,
+    "filter_life_remaining": 80,
+    "filter_hours_used": 682,
+    "motor_speed": 354,
+    "button_pressed": "power",
+}
+
+_INITIAL_STATE_VA2 = {
+    "power": True,
+    "aqi": 10,
+    "anion": True,
+    "average_aqi": 8,
+    "humidity": 62,
+    "temperature": 18.599999,
+    "fan_level": 2,
+    "mode": 0,
+    "led_brightness": 1,
+    "buzzer": False,
+    "child_lock": False,
+    "favorite_level": 10,
+    "filter_life_remaining": 80,
+    "filter_hours_used": 682,
+    "filter_left_time": 309,
+    "purify_volume": 25262,
+    "motor_speed": 354,
+    "filter_rfid_product_id": "0:0:41:30",
+    "filter_rfid_tag": "10:20:30:40:50:60:7",
+    "button_pressed": "power",
+}
+
 
 class DummyAirPurifierMiot(DummyMiotDevice, AirPurifierMiot):
     def __init__(self, *args, **kwargs):
-        self.state = _INITIAL_STATE
+        if getattr(self, "state", None) is None:
+            self.state = _INITIAL_STATE
         self.return_values = {
             "get_prop": self._get_state,
             "set_power": lambda x: self._set_state("power", x),
@@ -192,3 +229,126 @@ class TestAirPurifier(TestCase):
 
         self.device.set_child_lock(False)
         assert child_lock() is False
+
+    def test_set_anion(self):
+        with pytest.raises(AirPurifierMiotException):
+            self.device.set_anion(True)
+
+
+class DummyAirPurifierMiotMB4(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "zhimi.airpurifier.mb4"
+        self.state = _INITIAL_STATE_MB4
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="function")
+def airpurifierMB4(request):
+    request.cls.device = DummyAirPurifierMiotMB4()
+
+
+@pytest.mark.usefixtures("airpurifierMB4")
+class TestAirPurifierMB4(TestCase):
+    def test_status(self):
+        status = self.device.status()
+        assert status.is_on is _INITIAL_STATE_MB4["power"]
+        assert status.aqi == _INITIAL_STATE_MB4["aqi"]
+        assert status.average_aqi is None
+        assert status.humidity is None
+        assert status.temperature is None
+        assert status.fan_level is None
+        assert status.mode == OperationMode(_INITIAL_STATE_MB4["mode"])
+        assert status.led is None
+        assert status.led_brightness is None
+        assert status.led_brightness_level == _INITIAL_STATE_MB4["led_brightness_level"]
+        assert status.buzzer == _INITIAL_STATE_MB4["buzzer"]
+        assert status.child_lock == _INITIAL_STATE_MB4["child_lock"]
+        assert status.favorite_level is None
+        assert (
+            status.filter_life_remaining == _INITIAL_STATE_MB4["filter_life_remaining"]
+        )
+        assert status.filter_hours_used == _INITIAL_STATE_MB4["filter_hours_used"]
+        assert status.use_time is None
+        assert status.purify_volume is None
+        assert status.motor_speed == _INITIAL_STATE_MB4["motor_speed"]
+        assert status.filter_rfid_product_id is None
+        assert status.filter_type is None
+
+    def test_set_led_brightness_level(self):
+        def led_brightness_level():
+            return self.device.status().led_brightness_level
+
+        self.device.set_led_brightness_level(2)
+        assert led_brightness_level() == 2
+
+    def test_set_fan_level(self):
+        with pytest.raises(AirPurifierMiotException):
+            self.device.set_fan_level(0)
+
+    def test_set_favorite_level(self):
+        with pytest.raises(AirPurifierMiotException):
+            self.device.set_favorite_level(0)
+
+    def test_set_led_brightness(self):
+        with pytest.raises(AirPurifierMiotException):
+            self.device.set_led_brightness(LedBrightness.Bright)
+
+    def test_set_led(self):
+        with pytest.raises(AirPurifierMiotException):
+            self.device.set_led(True)
+
+
+class DummyAirPurifierMiotVA2(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "zhimi.airp.va2"
+        self.state = _INITIAL_STATE_VA2
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="function")
+def airpurifierVA2(request):
+    request.cls.device = DummyAirPurifierMiotVA2()
+
+
+@pytest.mark.usefixtures("airpurifierVA2")
+class TestAirPurifierVA2(TestCase):
+    def test_status(self):
+        status = self.device.status()
+        assert status.is_on is _INITIAL_STATE_VA2["power"]
+        assert status.anion == _INITIAL_STATE_VA2["anion"]
+        assert status.aqi == _INITIAL_STATE_VA2["aqi"]
+        assert status.average_aqi == _INITIAL_STATE_VA2["average_aqi"]
+        assert status.humidity == _INITIAL_STATE_VA2["humidity"]
+        assert status.temperature == 18.6
+        assert status.fan_level == _INITIAL_STATE_VA2["fan_level"]
+        assert status.mode == OperationMode(_INITIAL_STATE_VA2["mode"])
+        assert status.led is None
+        assert status.led_brightness == LedBrightness(
+            _INITIAL_STATE_VA2["led_brightness"]
+        )
+        assert status.buzzer == _INITIAL_STATE_VA2["buzzer"]
+        assert status.child_lock == _INITIAL_STATE_VA2["child_lock"]
+        assert status.favorite_level == _INITIAL_STATE_VA2["favorite_level"]
+        assert (
+            status.filter_life_remaining == _INITIAL_STATE_VA2["filter_life_remaining"]
+        )
+        assert status.filter_hours_used == _INITIAL_STATE_VA2["filter_hours_used"]
+        assert status.filter_left_time == _INITIAL_STATE_VA2["filter_left_time"]
+        assert status.use_time is None
+        assert status.purify_volume == _INITIAL_STATE_VA2["purify_volume"]
+        assert status.motor_speed == _INITIAL_STATE_VA2["motor_speed"]
+        assert (
+            status.filter_rfid_product_id
+            == _INITIAL_STATE_VA2["filter_rfid_product_id"]
+        )
+        assert status.filter_type == FilterType.AntiBacterial
+
+    def test_set_anion(self):
+        def anion():
+            return self.device.status().anion
+
+        self.device.set_anion(True)
+        assert anion() is True
+
+        self.device.set_anion(False)
+        assert anion() is False

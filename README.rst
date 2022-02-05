@@ -103,7 +103,7 @@ Supported devices
 -  Xiaomi Mi Robot Vacuum V1, S4, S4 MAX, S5, S5 MAX, S6 Pure, M1S, S7
 -  Xiaomi Mi Home Air Conditioner Companion
 -  Xiaomi Mi Smart Air Conditioner A (xiaomi.aircondition.mc1, mc2, mc4, mc5)
--  Xiaomi Mi Air Purifier 2, 3H, 3C, Pro, Pro H (zhimi.airpurifier.m2, mb3, mb4, v7, vb2)
+-  Xiaomi Mi Air Purifier 2, 3H, 3C, Pro, Pro H, 4 Pro (zhimi.airpurifier.m2, mb3, mb4, v7, vb2, va2)
 -  Xiaomi Mi Air (Purifier) Dog X3, X5, X7SM (airdog.airpurifier.x3, airdog.airpurifier.x5, airdog.airpurifier.x7sm)
 -  Xiaomi Mi Air Humidifier
 -  Xiaomi Aqara Camera
@@ -146,11 +146,13 @@ Supported devices
 -  Xiaomi Mi Smart Space Heater
 -  Xiaomiyoupin Curtain Controller (Wi-Fi) (lumi.curtain.hagl05)
 -  Xiaomi Xiaomi Mi Smart Space Heater S (zhimi.heater.mc2)
+-  Xiaomi Xiaomi Mi Smart Space Heater 1S (zhimi.heater.za2)
 -  Yeelight Dual Control Module (yeelink.switch.sw1)
 -  Scishare coffee maker (scishare.coffee.s1102)
 -  Qingping Air Monitor Lite (cgllc.airm.cgdn1)
 -  Xiaomi Walkingpad A1 (ksmb.walkingpad.v3)
 -  Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4)
+-  Xiaomi Mi Smart Humidifer S (jsqs, jsq5)
 
 
 *Feel free to create a pull request to add support for new devices as
