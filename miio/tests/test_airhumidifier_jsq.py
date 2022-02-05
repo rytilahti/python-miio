@@ -45,43 +45,24 @@ class DummyAirHumidifierJsq001(DummyDevice, AirHumidifierJsq):
 
         self.device_info = None
 
-        self.state = OrderedDict(
-            (
-                ("temperature", 24),
-                ("humidity", 29),
-                ("mode", 3),
-                ("buzzer", 1),
-                ("child_lock", 1),
-                ("led_brightness", 2),
-                ("power", 1),
-                ("no_water", 1),
-                ("lid_opened", 1),
-            )
-        )
-        self.start_state = self.state.copy()
+        self.start_state = [24, 29, 3, 1, 1, 2, 1, 1, 1]
+        self.state = self.start_state.copy()
+
+        # Mocks for `device.send("cmd_name", args)` commands:
+        self._available_properties = AVAILABLE_PROPERTIES[self._model]
 
         self.return_values = {
             "get_props": self._get_state,
-            "set_start": lambda x: self._set_state("power", x),
-            "set_mode": lambda x: self._set_state("mode", x),
-            "set_brightness": lambda x: self._set_state("led_brightness", x),
-            "set_buzzer": lambda x: self._set_state("buzzer", x),
-            "set_lock": lambda x: self._set_state("child_lock", x),
+            "set_start": lambda x:  self._set_state_by_key("power", x),
+            "set_mode": lambda x: self._set_state_by_key("mode", x),
+            "set_brightness": lambda x: self._set_state_by_key("led_brightness", x),
+            "set_buzzer": lambda x: self._set_state_by_key("buzzer", x),
+            "set_lock": lambda x: self._set_state_by_key("child_lock", x),
             "miIO.info": self._get_device_info,
         }
 
         super().__init__(args, kwargs)
 
-    def _get_device_info(self, _):
-        """Return dummy device info."""
-        return self.dummy_device_info
-
-    def _get_state(self, props):
-        """Return wanted properties."""
-        return list(self.state.values())
-
-
-class DummyAirHumidifierJsq002(DummyDevice, AirHumidifierJsq002):
     def _set_state_by_key(self, key, value):
         self._set_state(
             self._available_properties.index(key),
@@ -91,6 +72,16 @@ class DummyAirHumidifierJsq002(DummyDevice, AirHumidifierJsq002):
     def _get_state_by_key(self, key):
         return self.state[self._available_properties.index(key)]
 
+    def _get_device_info(self, _):
+        """Return dummy device info."""
+        return self.dummy_device_info
+
+    def _get_state(self, props):
+        """Mocks device `get_props` command """
+        return self.state
+
+
+class DummyAirHumidifierJsq002(DummyDevice, AirHumidifierJsq002):
     def __init__(self, *args, **kwargs):
         self._model = MODEL_HUMIDIFIER_JSQ002
 
@@ -121,6 +112,15 @@ class DummyAirHumidifierJsq002(DummyDevice, AirHumidifierJsq002):
         }
 
         super().__init__(args, kwargs)
+
+    def _set_state_by_key(self, key, value):
+        self._set_state(
+            self._available_properties.index(key),
+            value
+        )
+
+    def _get_state_by_key(self, key):
+        return self.state[self._available_properties.index(key)]
 
     def _get_state(self, props):
         """Mocks device `get_props` command """
@@ -204,19 +204,22 @@ class TestAirHumidifierJsq001(AirHumidifierJsqTestCase):
     def test_status(self):
         self.device._reset_state()
 
-        assert repr(self.state()) == repr(AirHumidifierStatus(self.device.start_state))
+        state: AirHumidifierStatus = self.state()
+        properties = AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_JSQ001]
+        assert repr(state) == repr(AirHumidifierStatus({
+            k: v for k, v in zip(properties, self.device.start_state)
+        }))
 
-        assert self.state().temperature == self.device.start_state["temperature"]
-        assert self.state().humidity == self.device.start_state["humidity"]
-        assert self.state().mode == OperationMode(self.device.start_state["mode"])
-        assert self.state().buzzer == (self.device.start_state["buzzer"] == 1)
-        assert self.state().child_lock == (self.device.start_state["child_lock"] == 1)
-        assert self.state().led_brightness == LedBrightness(
-            self.device.start_state["led_brightness"]
-        )
+        assert state.data['temperature'] == 24
+        assert state.data['humidity'] == 29
+        assert state.data['mode'] == 3
+        assert state.data['buzzer'] == 1
+        assert state.data['child_lock'] == 1
+        assert state.data['led_brightness'] == 2
         assert self._is_on() is True
-        assert self.state().no_water == (self.device.start_state["no_water"] == 1)
-        assert self.state().lid_opened == (self.device.start_state["lid_opened"] == 1)
+        assert state.data['power'] == 1
+        assert state.data['no_water'] == 1
+        assert state.data['lid_opened'] == 1
 
     def test_status_wrong_input(self):
         def mode():
@@ -227,16 +230,16 @@ class TestAirHumidifierJsq001(AirHumidifierJsqTestCase):
 
         self.device._reset_state()
 
-        self.device.state["mode"] = 10
+        self.device._set_state_by_key("mode", [10])
         assert mode() == OperationMode.Intelligent
 
-        self.device.state["mode"] = "smth"
+        self.device._set_state_by_key("mode", ["smt"])
         assert mode() == OperationMode.Intelligent
 
-        self.device.state["led_brightness"] = 10
+        self.device._set_state_by_key("led_brightness", [10])
         assert led_brightness() == LedBrightness.Off
 
-        self.device.state["led_brightness"] = "smth"
+        self.device._set_state_by_key("led_brightness", ["smt"])
         assert led_brightness() == LedBrightness.Off
 
     def test_set_mode(self):
@@ -324,19 +327,21 @@ class TestAirHumidifierJsq001(AirHumidifierJsqTestCase):
 
     def test_status_without_temperature(self):
         self.device._reset_state()
-        self.device.state["temperature"] = None
+        self.device._set_state_by_key("temperature", [None])
 
         assert self.state().temperature is None
 
     def test_status_without_led_brightness(self):
         self.device._reset_state()
-        self.device.state["led_brightness"] = None
+
+        self.device._set_state_by_key("led_brightness", [None])
 
         assert self.state().led_brightness is LedBrightness.Off
 
     def test_status_without_mode(self):
         self.device._reset_state()
-        self.device.state["mode"] = None
+
+        self.device._set_state_by_key("mode", [None])
 
         assert self.state().mode is OperationMode.Intelligent
 
