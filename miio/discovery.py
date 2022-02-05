@@ -21,6 +21,7 @@ from . import (
     AirFreshT2017,
     AirHumidifier,
     AirHumidifierJsq,
+    AirHumidifierJsq002,
     AirHumidifierJsqs,
     AirHumidifierMjjsq,
     AirPurifier,
@@ -62,6 +63,7 @@ from .airhumidifier import (
     MODEL_HUMIDIFIER_CB1,
     MODEL_HUMIDIFIER_V1,
 )
+from .airhumidifier_jsq import MODEL_HUMIDIFIER_JSQ001, MODEL_HUMIDIFIER_JSQ002
 from .airhumidifier_mjjsq import MODEL_HUMIDIFIER_JSQ1, MODEL_HUMIDIFIER_MJJSQ
 from .airqualitymonitor import (
     MODEL_AIRQUALITYMONITOR_B1,
@@ -133,7 +135,8 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
     "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),
-    "shuii-humidifier-jsq001": partial(AirHumidifierJsq, model=MODEL_HUMIDIFIER_MJJSQ),
+    "shuii-humidifier-jsq001": partial(AirHumidifierJsq, model=MODEL_HUMIDIFIER_JSQ001),
+    "shuii-humidifier-jsq002": partial(AirHumidifierJsq002, model=MODEL_HUMIDIFIER_JSQ002),
     "deerma-humidifier-mjjsq": partial(
         AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
     ),
