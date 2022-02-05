@@ -136,7 +136,9 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
     "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),
     "shuii-humidifier-jsq001": partial(AirHumidifierJsq, model=MODEL_HUMIDIFIER_JSQ001),
-    "shuii-humidifier-jsq002": partial(AirHumidifierJsq002, model=MODEL_HUMIDIFIER_JSQ002),
+    "shuii-humidifier-jsq002": partial(
+        AirHumidifierJsq002, model=MODEL_HUMIDIFIER_JSQ002
+    ),
     "deerma-humidifier-mjjsq": partial(
         AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
     ),

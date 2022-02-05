@@ -24,8 +24,7 @@ from miio.airdehumidifier import AirDehumidifier
 from miio.airfresh import AirFresh, AirFreshVA4
 from miio.airfresh_t2017 import AirFreshA1, AirFreshT2017
 from miio.airhumidifier import AirHumidifier, AirHumidifierCA1, AirHumidifierCB1
-from miio.airhumidifier_jsq import AirHumidifierJsq
-from miio.airhumidifier_jsq import AirHumidifierJsq002
+from miio.airhumidifier_jsq import AirHumidifierJsq, AirHumidifierJsq002
 from miio.airhumidifier_miot import AirHumidifierMiot
 from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airpurifier import AirPurifier

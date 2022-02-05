@@ -1,20 +1,19 @@
-from collections import OrderedDict
 from unittest import TestCase
 
 import pytest
 
-from miio import AirHumidifierJsq,AirHumidifierJsq002
+from miio import AirHumidifierJsq, AirHumidifierJsq002
 from miio.airhumidifier import AirHumidifierException
 from miio.airhumidifier_jsq import (
     AVAILABLE_PROPERTIES,
     MODEL_HUMIDIFIER_JSQ001,
-    AirHumidifierStatus,
-    LedBrightness,
-    OperationMode,
     MODEL_HUMIDIFIER_JSQ002,
+    AirHumidifierStatus,
     AirHumidifierStatusJsq002,
+    LedBrightness,
+    LedBrightnessJsq002,
+    OperationMode,
     OperationModeJsq002,
-    LedBrightnessJsq002
 )
 
 from .dummies import DummyDevice
@@ -53,7 +52,7 @@ class DummyAirHumidifierJsq001(DummyDevice, AirHumidifierJsq):
 
         self.return_values = {
             "get_props": self._get_state,
-            "set_start": lambda x:  self._set_state_by_key("power", x),
+            "set_start": lambda x: self._set_state_by_key("power", x),
             "set_mode": lambda x: self._set_state_by_key("mode", x),
             "set_brightness": lambda x: self._set_state_by_key("led_brightness", x),
             "set_buzzer": lambda x: self._set_state_by_key("buzzer", x),
@@ -64,10 +63,7 @@ class DummyAirHumidifierJsq001(DummyDevice, AirHumidifierJsq):
         super().__init__(args, kwargs)
 
     def _set_state_by_key(self, key, value):
-        self._set_state(
-            self._available_properties.index(key),
-            value
-        )
+        self._set_state(self._available_properties.index(key), value)
 
     def _get_state_by_key(self, key):
         return self.state[self._available_properties.index(key)]
@@ -77,7 +73,7 @@ class DummyAirHumidifierJsq001(DummyDevice, AirHumidifierJsq):
         return self.dummy_device_info
 
     def _get_state(self, props):
-        """Mocks device `get_props` command """
+        """Mocks device `get_props` command."""
         return self.state
 
 
@@ -114,16 +110,13 @@ class DummyAirHumidifierJsq002(DummyDevice, AirHumidifierJsq002):
         super().__init__(args, kwargs)
 
     def _set_state_by_key(self, key, value):
-        self._set_state(
-            self._available_properties.index(key),
-            value
-        )
+        self._set_state(self._available_properties.index(key), value)
 
     def _get_state_by_key(self, key):
         return self.state[self._available_properties.index(key)]
 
     def _get_state(self, props):
-        """Mocks device `get_props` command """
+        """Mocks device `get_props` command."""
         return self.state
 
     def _get_device_info(self, _):
@@ -206,20 +199,22 @@ class TestAirHumidifierJsq001(AirHumidifierJsqTestCase):
 
         state: AirHumidifierStatus = self.state()
         properties = AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_JSQ001]
-        assert repr(state) == repr(AirHumidifierStatus({
-            k: v for k, v in zip(properties, self.device.start_state)
-        }))
+        assert repr(state) == repr(
+            AirHumidifierStatus(
+                {k: v for k, v in zip(properties, self.device.start_state)}
+            )
+        )
 
-        assert state.data['temperature'] == 24
-        assert state.data['humidity'] == 29
-        assert state.data['mode'] == 3
-        assert state.data['buzzer'] == 1
-        assert state.data['child_lock'] == 1
-        assert state.data['led_brightness'] == 2
+        assert state.data["temperature"] == 24
+        assert state.data["humidity"] == 29
+        assert state.data["mode"] == 3
+        assert state.data["buzzer"] == 1
+        assert state.data["child_lock"] == 1
+        assert state.data["led_brightness"] == 2
         assert self._is_on() is True
-        assert state.data['power'] == 1
-        assert state.data['no_water'] == 1
-        assert state.data['lid_opened'] == 1
+        assert state.data["power"] == 1
+        assert state.data["no_water"] == 1
+        assert state.data["lid_opened"] == 1
 
     def test_status_wrong_input(self):
         def mode():
@@ -356,44 +351,46 @@ class TestAirHumidifierJsq002(AirHumidifierJsqTestCase):
 
         state: AirHumidifierStatusJsq002 = self.state()
         properties = AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_JSQ002]
-        assert repr(state) == repr(AirHumidifierStatusJsq002({
-            k: v for k, v in zip(properties, self.device.start_state)
-        }))
+        assert repr(state) == repr(
+            AirHumidifierStatusJsq002(
+                {k: v for k, v in zip(properties, self.device.start_state)}
+            )
+        )
 
-        assert state.data['power'] == 1
+        assert state.data["power"] == 1
         assert self._is_on() is True
 
-        assert state.data['mode'] == 2
+        assert state.data["mode"] == 2
         assert state.mode == OperationModeJsq002.Level2
 
-        assert state.data['humidity'] == 36
+        assert state.data["humidity"] == 36
         assert state.humidity == 36
 
-        assert state.data['led_brightness'] == 2
+        assert state.data["led_brightness"] == 2
         assert state.led_brightness == LedBrightnessJsq002.Low
 
-        assert state.data['temperature'] == 46
+        assert state.data["temperature"] == 46
         assert state.temperature == 26
 
-        assert state.data['water_level'] == 4
+        assert state.data["water_level"] == 4
         assert state.water_level == 4
 
-        assert state.data['heat'] == 1
+        assert state.data["heat"] == 1
         assert state.heater is True
 
-        assert state.data['buzzer'] == 1
+        assert state.data["buzzer"] == 1
         assert state.buzzer is True
 
-        assert state.data['child_lock'] == 1
+        assert state.data["child_lock"] == 1
         assert state.child_lock is True
 
-        assert state.data['target_temperature'] == 50
+        assert state.data["target_temperature"] == 50
         assert state.water_target_temperature == 50
 
-        assert state.data['target_humidity'] == 51
+        assert state.data["target_humidity"] == 51
         assert state.target_humidity == 51
 
-        assert state.data['reserved'] == 0
+        assert state.data["reserved"] == 0
 
     def test_on(self):
         self.device.off()  # ensure off
@@ -553,47 +550,59 @@ class TestAirHumidifierJsq002(AirHumidifierJsqTestCase):
     def test_set_child_lock(self):
         self.do_test_on_off_property("set_child_lock", "child_lock")
 
-    def test_set_target_temperature(self):
+    def test_set_target_water_temperature(self):
         def water_target_temp():
             return self.device.status().water_target_temperature
 
-        self.device.set_target_temperature(30)
+        self.device.set_target_water_temperature(30)
         assert water_target_temp() == 30
 
-        self.device.set_target_temperature(31)
+        self.device.set_target_water_temperature(31)
         assert water_target_temp() == 31
 
-        self.device.set_target_temperature(59)
+        self.device.set_target_water_temperature(59)
         assert water_target_temp() == 59
 
-        self.device.set_target_temperature(60)
+        self.device.set_target_water_temperature(60)
         assert water_target_temp() == 60
 
-    def test_set_target_temperature_wrong_input(self):
+    def test_set_target_water_temperature_wrong_input(self):
         def water_target_temp():
             return self.device.status().water_target_temperature
 
-        self.device.set_target_temperature(40)
+        self.device.set_target_water_temperature(40)
         assert water_target_temp() == 40
 
         with pytest.raises(AirHumidifierException) as excinfo:
-            self.device.set_target_temperature(29)
-        assert str(excinfo.value) == "Invalid water target temperature, should be in [30..60]. But was: 29"
+            self.device.set_target_water_temperature(29)
+        assert (
+            str(excinfo.value)
+            == "Invalid water target temperature, should be in [30..60]. But was: 29"
+        )
         assert water_target_temp() == 40
 
         with pytest.raises(AirHumidifierException) as excinfo:
-            self.device.set_target_temperature(61)
-        assert str(excinfo.value) == "Invalid water target temperature, should be in [30..60]. But was: 61"
+            self.device.set_target_water_temperature(61)
+        assert (
+            str(excinfo.value)
+            == "Invalid water target temperature, should be in [30..60]. But was: 61"
+        )
         assert water_target_temp() == 40
 
         with pytest.raises(AirHumidifierException) as excinfo:
-            self.device.set_target_temperature(-10)
-        assert str(excinfo.value) == "Invalid water target temperature, should be in [30..60]. But was: -10"
+            self.device.set_target_water_temperature(-10)
+        assert (
+            str(excinfo.value)
+            == "Invalid water target temperature, should be in [30..60]. But was: -10"
+        )
         assert water_target_temp() == 40
 
         with pytest.raises(AirHumidifierException) as excinfo:
-            self.device.set_target_temperature("smth")
-        assert str(excinfo.value) == "Invalid water target temperature, should be in [30..60]. But was: smth"
+            self.device.set_target_water_temperature("smth")
+        assert (
+            str(excinfo.value)
+            == "Invalid water target temperature, should be in [30..60]. But was: smth"
+        )
         assert water_target_temp() == 40
 
     def test_set_target_humidity(self):
@@ -621,34 +630,24 @@ class TestAirHumidifierJsq002(AirHumidifierJsqTestCase):
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_target_humidity(-10)
-        assert str(excinfo.value) == "Invalid target humidity, should be in [0..99]. But was: -10"
+        assert (
+            str(excinfo.value)
+            == "Invalid target humidity, should be in [0..99]. But was: -10"
+        )
         assert target_humidity() == 40
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_target_humidity(100)
-        assert str(excinfo.value) == "Invalid target humidity, should be in [0..99]. But was: 100"
+        assert (
+            str(excinfo.value)
+            == "Invalid target humidity, should be in [0..99]. But was: 100"
+        )
         assert target_humidity() == 40
 
         with pytest.raises(AirHumidifierException) as excinfo:
             self.device.set_target_humidity("smth")
-        assert str(excinfo.value) == "Invalid target humidity, should be in [0..99]. But was: smth"
+        assert (
+            str(excinfo.value)
+            == "Invalid target humidity, should be in [0..99]. But was: smth"
+        )
         assert target_humidity() == 40
-
-    # def test_status_without_temperature(self):
-    #     self.device._reset_state()
-    #     self.device.state["temperature"] = None
-    #
-    #     assert self.state().temperature is None
-    #
-    # def test_status_without_led_brightness(self):
-    #     self.device._reset_state()
-    #     self.device.state["led_brightness"] = None
-    #
-    #     assert self.state().led_brightness is LedBrightness.Off
-    #
-    # def test_status_without_mode(self):
-    #     self.device._reset_state()
-    #     self.device.state["mode"] = None
-    #
-    #     assert self.state().mode is OperationMode.Intelligent
-    #

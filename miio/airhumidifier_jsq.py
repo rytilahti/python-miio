@@ -17,14 +17,8 @@ MODEL_HUMIDIFIER_JSQ002 = "shuii.humidifier.jsq002"
 
 # Array of several common commands
 SHARED_COMMANDS = {
-    MODEL_HUMIDIFIER_JSQ001: dict(
-        power_on_off="set_start",
-        buzzer_on_off="set_buzzer"
-    ),
-    MODEL_HUMIDIFIER_JSQ002: dict(
-        power_on_off="on_off",
-        buzzer_on_off="buzzer_on"
-    )
+    MODEL_HUMIDIFIER_JSQ001: dict(power_on_off="set_start", buzzer_on_off="set_buzzer"),
+    MODEL_HUMIDIFIER_JSQ002: dict(power_on_off="on_off", buzzer_on_off="buzzer_on"),
 }
 
 # Array of properties in same order as in humidifier response
@@ -54,7 +48,6 @@ AVAILABLE_PROPERTIES = {
         #  Properties:
         # > dev.send("get_props","")
         #  [1, 2, 36, 2, 46, 4, 1, 1, 1, 50, 51, 0]
-
         # res[0]=1 Values (0: off/sleep, 1: on);
         "power",  # CMD: on_off [int]
         # res[1]=2 Values (1, 2, 3); fan speed in UI: {Gear: level 1, level 2, level 3};
@@ -70,16 +63,16 @@ AVAILABLE_PROPERTIES = {
         # res[6]=1, Water heater values (0: off, 1: on)
         "heat",  # CMD: warm_on [int]
         # res[7]=1 BeaPower values (0: off, 1: on)
-        'buzzer',  # CMD: buzzer_on [int]
+        "buzzer",  # CMD: buzzer_on [int]
         # res[8]=1, Values (0: off, 1: on)
-        'child_lock',  # CMD: set_lock [int]
+        "child_lock",  # CMD: set_lock [int]
         # res[9]=50 Values (water heater target temp in degrees, [int]: 30..60)
-        'target_temperature',  # CMD: set_temp [int]
+        "target_temperature",  # CMD: set_temp [int]
         # res[10]=51 Values (% [int])
-        'target_humidity',  # CMD: set_humidity [int]
+        "target_humidity",  # CMD: set_humidity [int]
         # res[11]=0 Values: <Unknown> We failed to find when it changes, is not lid opened event
-        'reserved',  # XXX: cmd rst_clean [] ?
-    ]
+        "reserved",  # XXX: cmd rst_clean [] ?
+    ],
 }
 
 
@@ -110,6 +103,10 @@ class LedBrightnessJsq002(enum.Enum):
 
 
 class AirHumidifierStatusJsqCommon(DeviceStatus):
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """Status of an Air Humidifier:"""
+        self.data = data
+
     @property
     def power(self) -> str:
         """Power state."""
@@ -144,15 +141,10 @@ class AirHumidifierStatusJsqCommon(DeviceStatus):
 class AirHumidifierStatus(AirHumidifierStatusJsqCommon):
     """Container for status reports from the air humidifier jsq."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Status of an Air Humidifier (shuii.humidifier.jsq001):
-        """
-        self.data = data
-
     @property
     def mode(self) -> OperationMode:
         """Operation mode.
+
         Can be either low, medium, high or humidity.
         """
 
@@ -200,12 +192,6 @@ class AirHumidifierStatus(AirHumidifierStatusJsqCommon):
 
 
 class AirHumidifierStatusJsq002(AirHumidifierStatusJsqCommon):
-    def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Status of Xiaomi 'Zero Fog DWZF(G)-4500Z` (shuii.humidifier.jsq002):
-        """
-        self.data = data
-
     @property
     def mode(self) -> OperationModeJsq002:
         """Operation mode.
@@ -232,11 +218,13 @@ class AirHumidifierStatusJsq002(AirHumidifierStatusJsqCommon):
 
     @property
     def water_level(self) -> int:
-        """Water level: 0,1,2,3,4,5"""
+        """Water level: 0,1,2,3,4,5."""
 
         level = self.data["water_level"]
         if level not in [0, 1, 2, 3, 4, 5]:
-            _LOGGER.exception("Water level should be 0,1,2,3,4,5. But was: %s", str(level))
+            _LOGGER.exception(
+                "Water level should be 0,1,2,3,4,5. But was: %s", str(level)
+            )
             return 5
 
         return level
@@ -252,7 +240,10 @@ class AirHumidifierStatusJsq002(AirHumidifierStatusJsqCommon):
         target_temp = self.data["target_temperature"]
         target_temp_int = int(target_temp)
         if target_temp_int not in range(30, 61):
-            _LOGGER.exception("Target water heater temp should be in [30..60]. But was: %s", str(target_temp))
+            _LOGGER.exception(
+                "Target water heater temp should be in [30..60]. But was: %s",
+                str(target_temp),
+            )
             return 30
 
         return target_temp_int
@@ -263,7 +254,10 @@ class AirHumidifierStatusJsq002(AirHumidifierStatusJsqCommon):
         target_humidity = self.data["target_humidity"]
         target_humidity_int = int(target_humidity)
         if target_humidity_int not in range(0, 100):
-            _LOGGER.exception("Target humidity should be in [0..99]. But was: %s", str(target_humidity))
+            _LOGGER.exception(
+                "Target humidity should be in [0..99]. But was: %s",
+                str(target_humidity),
+            )
             return 30
 
         return target_humidity_int
@@ -316,7 +310,7 @@ class AirHumidifierJsqCommon(Device):
         if self.model not in SHARED_COMMANDS:
             raise AirHumidifierException("Unsupported model: %s" % self.model)
 
-        return self.send(SHARED_COMMANDS[self.model]['power_on_off'], [1])
+        return self.send(SHARED_COMMANDS[self.model]["power_on_off"], [1])
 
     @command(default_output=format_output("Powering off"))
     def off(self):
@@ -324,7 +318,7 @@ class AirHumidifierJsqCommon(Device):
         if self.model not in SHARED_COMMANDS:
             raise AirHumidifierException("Unsupported model: %s" % self.model)
 
-        return self.send(SHARED_COMMANDS[self.model]['power_on_off'], [0])
+        return self.send(SHARED_COMMANDS[self.model]["power_on_off"], [0])
 
     @command(
         click.argument("buzzer", type=bool),
@@ -338,8 +332,7 @@ class AirHumidifierJsqCommon(Device):
             raise AirHumidifierException("Unsupported model: %s" % self.model)
 
         return self.send(
-            SHARED_COMMANDS[self.model]['buzzer_on_off'],
-            [int(bool(buzzer))]
+            SHARED_COMMANDS[self.model]["buzzer_on_off"], [int(bool(buzzer))]
         )
 
     @command(
@@ -423,7 +416,7 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
             "Water level: {result.water_level}\n"
             "Water heater: {result.heater}\n"
             "Water target temperature: {result.water_target_temperature} °C\n"
-            "Target humidity: {result.target_humidity} %\n"
+            "Target humidity: {result.target_humidity} %\n",
         )
     )
     def status(self) -> AirHumidifierStatusJsq002:
@@ -438,7 +431,7 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         value = mode.value
         if value not in (om.value for om in OperationModeJsq002):
             raise AirHumidifierException(
-                "{} is not a valid OperationModeJsq2 value".format(value)
+                f"{value} is not a valid OperationModeJsq2 value"
             )
 
         return self.send("set_gear", [value])
@@ -452,7 +445,7 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         value = brightness.value
         if value not in (lb.value for lb in LedBrightnessJsq002):
             raise AirHumidifierException(
-                "{} is not a valid LedBrightnessJsq2 value".format(value)
+                f"{value} is not a valid LedBrightnessJsq2 value"
             )
 
         return self.send("set_led", [value])
@@ -469,27 +462,44 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         return self.set_led_brightness(brightness)
 
     @command(
-        click.argument("lock", type=bool),
+        click.argument("heater", type=bool),
         default_output=format_output(
-            lambda lock: "Turning on child lock" if lock else "Turning off child lock"
+            lambda heater: "Turning on water heater"
+            if heater
+            else "Turning off water heater"
         ),
     )
     def set_heater(self, heater_on: bool):
         """Set water heater on/off."""
         return self.send("warm_on", [int(bool(heater_on))])
 
-    def set_target_temperature(self, temperature: int):
-        """Set the target temperature degrees C, only 30..60."""
+    @command(
+        click.argument("temperature", type=int),
+        default_output=format_output(
+            "Setting target water temperature to {temperature}"
+        ),
+    )
+    def set_target_water_temperature(self, temperature: int):
+        """Set the target water temperature degrees C, only 30..60."""
 
         if temperature not in range(30, 61):
-            raise AirHumidifierException("Invalid water target temperature, should be in [30..60]. But was: %s" % temperature)
+            raise AirHumidifierException(
+                "Invalid water target temperature, should be in [30..60]. But was: %s"
+                % temperature
+            )
 
         return self.send("set_temp", [temperature])
 
+    @command(
+        click.argument("humidity", type=int),
+        default_output=format_output("Setting target humidity to {humidity}"),
+    )
     def set_target_humidity(self, humidity: int):
         """Set the target humidity %, only 0..99."""
 
         if humidity not in range(0, 100):
-            raise AirHumidifierException("Invalid target humidity, should be in [0..99]. But was: %s" % humidity)
+            raise AirHumidifierException(
+                "Invalid target humidity, should be in [0..99]. But was: %s" % humidity
+            )
 
         return self.send("set_humidity", [humidity])
