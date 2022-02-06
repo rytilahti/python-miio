@@ -58,7 +58,7 @@ AVAILABLE_PROPERTIES = {
         "led_brightness",  # CMD: set_led [int]
         # res[4]=26 Values(is "ambient temp degrees int"+20, i.e. 46 corresponds to 26);
         "temperature",
-        # res[5]=4 (0,1,2,3,4,5)
+        # res[5]=4 (0,1,2,3,4,5). '5' is full, if pour more water, warning signal will sound
         "water_level",  # Get cmd: corrected_water []
         # res[6]=1, Water heater values (0: off, 1: on)
         "heat",  # CMD: warm_on [int]
