@@ -71,7 +71,7 @@ AVAILABLE_PROPERTIES = {
         # res[10]=51 Values (% [int])
         "target_humidity",  # CMD: set_humidity [int]
         # res[11]=0 Values: <Unknown> We failed to find when it changes, is not lid opened event
-        "reserved",  # XXX: cmd rst_clean [] ?
+        "reserved",
     ],
 }
 
@@ -531,3 +531,17 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
             )
 
         return self.send("set_humidity", [humidity])
+
+    @command(
+        default_output=format_output("Running `rst_clean` command"),
+    )
+    def rst_clean(self):
+        """Run 'rst_clean' command (unknown function)."""
+        return self.send("rst_clean", [])
+
+    @command(
+        default_output=format_output("Calibrating water level as zero"),
+    )
+    def corrected_water(self):
+        """Calibrate current water level as zero level."""
+        return self.send("corrected_water", [])
