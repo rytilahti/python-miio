@@ -385,7 +385,7 @@ class TestAirHumidifierJsq002(AirHumidifierJsqTestCase):
         assert state.child_lock is True
 
         assert state.data["target_temperature"] == 50
-        assert state.water_target_temperature == 50
+        assert state.target_water_temperature == 50
 
         assert state.data["target_humidity"] == 51
         assert state.target_humidity == 51
@@ -552,7 +552,7 @@ class TestAirHumidifierJsq002(AirHumidifierJsqTestCase):
 
     def test_set_target_water_temperature(self):
         def water_target_temp():
-            return self.device.status().water_target_temperature
+            return self.device.status().target_water_temperature
 
         self.device.set_target_water_temperature(30)
         assert water_target_temp() == 30
@@ -568,7 +568,7 @@ class TestAirHumidifierJsq002(AirHumidifierJsqTestCase):
 
     def test_set_target_water_temperature_wrong_input(self):
         def water_target_temp():
-            return self.device.status().water_target_temperature
+            return self.device.status().target_water_temperature
 
         self.device.set_target_water_temperature(40)
         assert water_target_temp() == 40

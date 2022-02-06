@@ -235,7 +235,7 @@ class AirHumidifierStatusJsq002(AirHumidifierStatusJsqCommon):
         return self.data["heat"] == 1
 
     @property
-    def water_target_temperature(self) -> int:
+    def target_water_temperature(self) -> int:
         """Return Target Water Temperature, degrees C, 30..60."""
         target_temp = self.data["target_temperature"]
         target_temp_int = int(target_temp)
@@ -418,6 +418,8 @@ class AirHumidifierJsq(AirHumidifierJsqCommon):
 
 
 class AirHumidifierJsq002(AirHumidifierJsqCommon):
+    """Implementation of Xiaomi Zero Fog DWZF(G)-4500Z: shuii.humidifier.jsq002."""
+
     @command(
         default_output=format_output(
             "",
@@ -430,7 +432,7 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
             "Child lock: {result.child_lock}\n"
             "Water level: {result.water_level}\n"
             "Water heater: {result.heater}\n"
-            "Water target temperature: {result.water_target_temperature} °C\n"
+            "Water target temperature: {result.target_water_temperature} °C\n"
             "Target humidity: {result.target_humidity} %\n",
         )
     )
