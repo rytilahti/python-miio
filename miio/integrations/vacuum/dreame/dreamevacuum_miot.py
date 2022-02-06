@@ -190,11 +190,40 @@ def _get_cleaning_mode_enum_class(model):
 
 
 class DreameVacuumStatus(DeviceStatusContainer):
+    """Container for status reports from the dreame vacuum.
+
+    Dreame vacuum respone
+    {
+        'battery_level': 100,
+        'brush_left_time': 260,
+        'brush_left_time2': 200,
+        'brush_life_level': 90,
+        'brush_life_level2': 90,
+        'charging_state': 1,
+        'cleaning_area': 22,
+        'cleaning_mode': 2,
+        'cleaning_time': 17,
+        'device_fault': 0,
+        'device_status': 6,
+        'filter_left_time': 120,
+        'filter_life_level': 40,
+        'first_clean_time': 1620154830,
+        'operating_mode': 6,
+        'start_time': '22:00',
+        'stop_time': '08:00',
+        'timer_enable': True,
+        'timezone': 'Europe/Berlin',
+        'total_clean_area': 205,
+        'total_clean_time': 186,
+        'total_clean_times': 21,
+        'voice_package': 'DR0',
+        'volume': 65,
+        'water_box_carriage_status': 0,
+        'water_flow': 3
+    }
+    """
+
     def __init__(self, data, model):
-        """
-        data - device status dictionary
-        model - device model name
-        """
         self.data = data
         self.model = model
 
