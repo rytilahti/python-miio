@@ -493,12 +493,12 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
             else "Turning off water heater"
         ),
     )
-    def set_heater(self, heater_on: bool):
+    def set_heater(self, heater: bool):
         """Set water heater on/off.
 
         Supported args one of: true, false, 0, 1
         """
-        return self.send("warm_on", [int(bool(heater_on))])
+        return self.send("warm_on", [int(bool(heater))])
 
     @command(
         click.argument("temperature", type=int),
