@@ -327,7 +327,10 @@ class AirHumidifierJsqCommon(Device):
         ),
     )
     def set_buzzer(self, buzzer: bool):
-        """Set buzzer on/off."""
+        """Set buzzer on/off.
+
+        Supported args one of: true, false, 0, 1
+        """
         if self.model not in SHARED_COMMANDS:
             raise AirHumidifierException("Unsupported model: %s" % self.model)
 
@@ -342,7 +345,10 @@ class AirHumidifierJsqCommon(Device):
         ),
     )
     def set_child_lock(self, lock: bool):
-        """Set child lock on/off."""
+        """Set child lock on/off.
+
+        Supported args one of: true, false, 0, 1
+        """
         return self.send("set_lock", [int(bool(lock))])
 
 
@@ -371,7 +377,10 @@ class AirHumidifierJsq(AirHumidifierJsqCommon):
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationMode):
-        """Set mode."""
+        """Set mode.
+
+        Supported args one of: 'intelligent', 'level1', 'level2', 'level3', 'level4'
+        """
         value = mode.value
         if value not in (om.value for om in OperationMode):
             raise AirHumidifierException(f"{value} is not a valid OperationMode value")
@@ -383,7 +392,10 @@ class AirHumidifierJsq(AirHumidifierJsqCommon):
         default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightness):
-        """Set led brightness."""
+        """Set led brightness.
+
+        Supported args one of: 'high', 'low', 'off'.
+        """
         value = brightness.value
         if value not in (lb.value for lb in LedBrightness):
             raise AirHumidifierException(f"{value} is not a valid LedBrightness value")
@@ -397,7 +409,10 @@ class AirHumidifierJsq(AirHumidifierJsqCommon):
         ),
     )
     def set_led(self, led: bool):
-        """Turn led on/off."""
+        """Turn led on/off.
+
+        Supported args one of: true, false, 0, 1
+        """
         brightness = LedBrightness.High if led else LedBrightness.Off
         return self.set_led_brightness(brightness)
 
@@ -427,7 +442,10 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
     def set_mode(self, mode: OperationModeJsq002):
-        """Set mode."""
+        """Set mode.
+
+        Supported args one of: 'level1', 'level2', 'level3'
+        """
         value = mode.value
         if value not in (om.value for om in OperationModeJsq002):
             raise AirHumidifierException(
@@ -441,7 +459,10 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         default_output=format_output("Setting LED brightness to {brightness}"),
     )
     def set_led_brightness(self, brightness: LedBrightnessJsq002):
-        """Set led brightness."""
+        """Set led brightness.
+
+        Supported args one of: 'high', 'low', 'off'.
+        """
         value = brightness.value
         if value not in (lb.value for lb in LedBrightnessJsq002):
             raise AirHumidifierException(
@@ -457,7 +478,10 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         ),
     )
     def set_led(self, led: bool):
-        """Turn led on/off."""
+        """Turn led on/off.
+
+        Supported args one of: true, false, 0, 1
+        """
         brightness = LedBrightnessJsq002.High if led else LedBrightnessJsq002.Off
         return self.set_led_brightness(brightness)
 
@@ -470,7 +494,10 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         ),
     )
     def set_heater(self, heater_on: bool):
-        """Set water heater on/off."""
+        """Set water heater on/off.
+
+        Supported args one of: true, false, 0, 1
+        """
         return self.send("warm_on", [int(bool(heater_on))])
 
     @command(
@@ -480,7 +507,8 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         ),
     )
     def set_target_water_temperature(self, temperature: int):
-        """Set the target water temperature degrees C, only 30..60."""
+        """Set the target water temperature degrees C, supported integer numbers in
+        range 30..60."""
 
         if temperature not in range(30, 61):
             raise AirHumidifierException(
@@ -495,7 +523,7 @@ class AirHumidifierJsq002(AirHumidifierJsqCommon):
         default_output=format_output("Setting target humidity to {humidity}"),
     )
     def set_target_humidity(self, humidity: int):
-        """Set the target humidity %, only 0..99."""
+        """Set the target humidity %, supported integer numbers in range 0..99."""
 
         if humidity not in range(0, 100):
             raise AirHumidifierException(
