@@ -55,7 +55,10 @@ from miio.integrations.light.philips import (
     PhilipsWhiteBulb,
 )
 from miio.integrations.petwaterdispenser import PetWaterDispenser
-from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuumMiot
+from miio.integrations.vacuum.dreame.dreamevacuum_miot import (
+    DreameVacuum,
+    DreameVacuumMiot,
+)
 from miio.integrations.vacuum.mijia import G1Vacuum
 from miio.integrations.vacuum.roborock import RoborockVacuum, Vacuum, VacuumException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
