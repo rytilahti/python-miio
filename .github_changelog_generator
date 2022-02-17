@@ -2,3 +2,4 @@ breaking_labels=breaking change
 issues=false
 add-sections={"newdevs":{"prefix":"**New devices:**","labels":["new device"]},"docs":{"prefix":"**Documentation updates:**","labels":["documentation"]}}
 release_branch=master
+usernames-as-github-logins=true
