@@ -8,7 +8,7 @@ import json
 import logging
 import re
 from functools import partial, wraps
-from typing import Callable, Set, Type, Union
+from typing import Callable, Dict, Set, Type, Union
 
 import click
 
@@ -110,6 +110,7 @@ class GlobalContextObject:
 class DeviceGroupMeta(type):
 
     _device_classes: Set[Type] = set()
+    _model_for_device_class: Dict[str, Type] = {}
 
     def __new__(mcs, name, bases, namespace):
         commands = {}
@@ -143,6 +144,14 @@ class DeviceGroupMeta(type):
 
         cls = super().__new__(mcs, name, bases, namespace)
         mcs._device_classes.add(cls)
+
+        supported_models = namespace.get("_supported_models")
+        if not supported_models:
+            _LOGGER.debug("No supported models for %s", cls)
+        else:
+            for model in supported_models:
+                mcs._model_for_device_class[model] = cls
+
         return cls
 
     @property

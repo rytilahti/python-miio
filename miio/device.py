@@ -3,13 +3,17 @@ import logging
 import warnings
 from enum import Enum
 from pprint import pformat as pf
-from typing import Any, Dict, List, Optional  # noqa: F401
+from typing import Any, Dict, List, Optional, Type  # noqa: F401
 
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
 from .deviceinfo import DeviceInfo
-from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
+from .exceptions import (
+    DeviceException,
+    DeviceInfoUnavailableException,
+    PayloadDecodeException,
+)
 from .miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
@@ -175,7 +179,7 @@ class Device(metaclass=DeviceGroupMeta):
 
     @property
     def supported_models(self) -> List[str]:
-        """Return a list of supported models."""
+        """Return a list of models supported by this class."""
         return self._supported_models
 
     @property
@@ -339,6 +343,35 @@ class Device(metaclass=DeviceGroupMeta):
         click.echo(f"Max properties: {max_properties}")
 
         return "Done"
+
+    @classmethod
+    def all_supported_models(cls) -> Dict[str, Type["Device"]]:
+        """Return a list of all models supported by the library."""
+        return Device._model_for_device_class
+
+    @classmethod
+    def class_for_model(cls, model: str):
+        """Return implementation for the given model string, if available."""
+        model_to_cls = cls.all_supported_models()
+        if model in model_to_cls:
+            return model_to_cls[model]
+
+        raise DeviceException("No implementation for %s", model)
+
+    @classmethod
+    def create(
+        cls, host: str, token: str, model: Optional[str] = None
+    ) -> Type["Device"]:
+        """Return instance for the given host and token, with optional model override.
+
+        The optional model parameter can be used to override the model detection.
+        """
+        if model is None:
+            dev: Device = cls(host, token)
+            info = dev.info()
+            model = info.model
+
+        return Device.class_for_model(model)(host, token)
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"

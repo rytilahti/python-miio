@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from miio import Discovery
+from miio import Device, Discovery
 from miio.click_common import (
     DeviceGroupMeta,
     ExceptionHandlerGroup,
@@ -57,6 +57,18 @@ def discover(mdns, handshake, network, timeout):
 
 
 cli.add_command(discover)
+
+
+@click.command()
+def supported_models():
+    """Print out the list of supported models."""
+    for model, cls in Device.all_supported_models().items():
+        click.echo(
+            f"* {model} = {cls.__name__} (command: miiocli {cls.__name__.lower()})"
+        )
+
+
+cli.add_command(supported_models)
 
 
 def create_cli():
