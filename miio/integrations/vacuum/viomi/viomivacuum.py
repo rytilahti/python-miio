@@ -62,7 +62,12 @@ from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORTED_MODELS = ["viomi.vacuum.v7", "viomi.vacuum.v8", "viomi.vacuum.v10"]
+SUPPORTED_MODELS = [
+    "viomi.vacuum.v6",
+    "viomi.vacuum.v7",
+    "viomi.vacuum.v8",
+    "viomi.vacuum.v10",
+]
 
 ERROR_CODES = {
     0: "Sleeping and not charging",
