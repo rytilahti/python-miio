@@ -15,8 +15,6 @@ from . import (
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
     AirDogX3,
-    AirDogX5,
-    AirDogX7SM,
     AirFresh,
     AirFreshT2017,
     AirHumidifier,
@@ -43,8 +41,8 @@ from . import (
     PhilipsRwread,
     PhilipsWhiteBulb,
     PowerStrip,
+    RoborockVacuum,
     Toiletlid,
-    Vacuum,
     ViomiVacuum,
     WaterPurifier,
     WaterPurifierYunmi,
@@ -89,10 +87,10 @@ _LOGGER = logging.getLogger(__name__)
 
 
 DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
-    "rockrobo-vacuum-v1": Vacuum,
-    "roborock-vacuum-s5": Vacuum,
-    "roborock-vacuum-m1s": Vacuum,
-    "roborock-vacuum-a10": Vacuum,
+    "rockrobo-vacuum-v1": RoborockVacuum,
+    "roborock-vacuum-s5": RoborockVacuum,
+    "roborock-vacuum-m1s": RoborockVacuum,
+    "roborock-vacuum-a10": RoborockVacuum,
     "chuangmi-plug-m1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M1),
     "chuangmi-plug-m3": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_M3),
     "chuangmi-plug-v1": partial(ChuangmiPlug, model=MODEL_CHUANGMI_PLUG_V1),
@@ -109,8 +107,8 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "xiaomi.aircondition.mc4": AirConditionerMiot,
     "xiaomi.aircondition.mc5": AirConditionerMiot,
     "airdog-airpurifier-x3": AirDogX3,
-    "airdog-airpurifier-x5": AirDogX5,
-    "airdog-airpurifier-x7sm": AirDogX7SM,
+    "airdog-airpurifier-x5": AirDogX3,
+    "airdog-airpurifier-x7sm": AirDogX3,
     "zhimi-airpurifier-m1": AirPurifier,  # mini model
     "zhimi-airpurifier-m2": AirPurifier,  # mini model 2
     "zhimi-airpurifier-ma1": AirPurifier,  # ms model

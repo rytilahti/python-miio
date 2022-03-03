@@ -4,8 +4,6 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio.utils import deprecated
-
 from .airfilter_util import FilterType, FilterTypeUtil
 from .click_common import EnumType, command, format_output
 from .exceptions import DeviceException
@@ -545,9 +543,3 @@ class AirPurifierMiot(MiotDevice):
             raise AirPurifierMiotException("Invalid brightness level: %s" % level)
 
         return self.set_property("led_brightness_level", level)
-
-
-class AirPurifierMB4(AirPurifierMiot):
-    @deprecated("Use AirPurifierMiot")
-    def __init__(*args, **kwargs):
-        super().__init__(*args, **kwargs)

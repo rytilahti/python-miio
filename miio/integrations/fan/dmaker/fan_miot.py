@@ -6,7 +6,6 @@ import click
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
 from miio.fan_common import FanException, MoveDirection, OperationMode
-from miio.utils import deprecated
 
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
@@ -369,21 +368,6 @@ class FanMiot(MiotDevice):
         elif direction == MoveDirection.Right:
             value = 2
         return self.set_property("set_move", value)
-
-
-@deprecated("Use FanMiot")
-class FanP9(FanMiot):
-    mapping = MIOT_MAPPING[MODEL_FAN_P9]
-
-
-@deprecated("Use FanMiot")
-class FanP10(FanMiot):
-    mapping = MIOT_MAPPING[MODEL_FAN_P10]
-
-
-@deprecated("Use FanMiot")
-class FanP11(FanMiot):
-    mapping = MIOT_MAPPING[MODEL_FAN_P11]
 
 
 class Fan1C(MiotDevice):

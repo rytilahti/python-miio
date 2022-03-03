@@ -10,7 +10,6 @@ from miio.click_common import command, format_output
 from miio.exceptions import DeviceException
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
-from miio.utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -610,9 +609,3 @@ class DreameVacuum(MiotDevice):
                 },
             ],
         )
-
-
-class DreameVacuumMiot(DreameVacuum):
-    @deprecated("DreameVacuumMiot is deprectaed. Use DreameVacuum instead.")
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
