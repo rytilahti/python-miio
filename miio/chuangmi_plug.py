@@ -78,8 +78,14 @@ class ChuangmiPlugStatus(DeviceStatus):
             return float(self.data["load_power"])
         return None
 
-    @property
+    @property  # type: ignore
+    @deprecated("Use led()")
     def wifi_led(self) -> Optional[bool]:
+        """True if the wifi led is turned on."""
+        return self.led
+
+    @property
+    def led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"
@@ -142,6 +148,7 @@ class ChuangmiPlug(Device):
         """Power off."""
         return self.send("set_usb_off")
 
+    @deprecated("Use set_led instead of set_wifi_led")
     @command(
         click.argument("wifi_led", type=bool),
         default_output=format_output(
@@ -152,6 +159,16 @@ class ChuangmiPlug(Device):
     )
     def set_wifi_led(self, wifi_led: bool):
         """Set the wifi led on/off."""
+        self.set_led(wifi_led)
+
+    @command(
+        click.argument("wifi_led", type=bool),
+        default_output=format_output(
+            lambda wifi_led: "Turning on LED" if wifi_led else "Turning off LED"
+        ),
+    )
+    def set_led(self, wifi_led: bool):
+        """Set the led on/off."""
         if wifi_led:
             return self.send("set_wifi_led", ["on"])
         else:

@@ -8,6 +8,7 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
+from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -97,8 +98,14 @@ class PowerStripStatus(DeviceStatus):
             return PowerMode(self.data["mode"])
         return None
 
-    @property
+    @property  # type: ignore
+    @deprecated("Use led instead of wifi_led")
     def wifi_led(self) -> Optional[bool]:
+        """True if the wifi led is turned on."""
+        return self.led
+
+    @property
+    def led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"
@@ -182,6 +189,7 @@ class PowerStrip(Device):
         # green, normal
         return self.send("set_power_mode", [mode.value])
 
+    @deprecated("use set_led instead of set_wifi_led")
     @command(
         click.argument("led", type=bool),
         default_output=format_output(
@@ -189,6 +197,16 @@ class PowerStrip(Device):
         ),
     )
     def set_wifi_led(self, led: bool):
+        """Set the wifi led on/off."""
+        self.set_led(led)
+
+    @command(
+        click.argument("led", type=bool),
+        default_output=format_output(
+            lambda led: "Turning on LED" if led else "Turning off LED"
+        ),
+    )
+    def set_led(self, led: bool):
         """Set the wifi led on/off."""
         if led:
             return self.send("set_wifi_led", ["on"])
