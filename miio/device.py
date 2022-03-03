@@ -1,5 +1,6 @@
 import inspect
 import logging
+import warnings
 from enum import Enum
 from pprint import pformat as pf
 from typing import Any, List, Optional  # noqa: F401
@@ -35,7 +36,9 @@ class DeviceStatus:
         for prop_tuple in props:
             name, prop = prop_tuple
             try:
-                prop_value = prop.fget(self)
+                # ignore deprecation warnings
+                with warnings.catch_warnings():
+                    prop_value = prop.fget(self)
             except Exception as ex:
                 prop_value = ex.__class__.__name__
 
