@@ -170,6 +170,7 @@ class FanStatusZA5(DeviceStatus):
 
 class FanZA5(MiotDevice):
     mapping = MIOT_MAPPING
+    _supported_models = ["zhimi.fan.za5 "]
 
     @command(
         default_output=format_output(
