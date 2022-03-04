@@ -115,6 +115,7 @@ class CurtainMiot(MiotDevice):
     """Main class representing the lumi.curtain.hagl05 curtain."""
 
     mapping = _MAPPING
+    _supported_models = ["lumi.curtain.hagl05"]
 
     @command(
         default_output=format_output(

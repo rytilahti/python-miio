@@ -108,6 +108,7 @@ class YeelightDualControlModule(MiotDevice):
     which uses MIoT protocol."""
 
     mapping = _MAPPING
+    _supported_models = ["yeelink.switch.sw1"]
 
     @command(
         default_output=format_output(

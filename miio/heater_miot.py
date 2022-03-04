@@ -143,6 +143,7 @@ class HeaterMiot(MiotDevice):
     (zhimi.heater.za2)."""
 
     _mappings = _MAPPINGS
+    _supported_models = list(_MAPPINGS.keys())
 
     @command(
         default_output=format_output(

@@ -231,6 +231,8 @@ class FanStatus1C(DeviceStatus):
 
 class FanMiot(MiotDevice):
     _mappings = MIOT_MAPPING
+    # TODO Fan1C should be merged to FanMiot
+    _supported_models = list(set(MIOT_MAPPING) - {MODEL_FAN_1C})
 
     @command(
         default_output=format_output(
@@ -372,6 +374,7 @@ class FanMiot(MiotDevice):
 
 class Fan1C(MiotDevice):
     mapping = MIOT_MAPPING[MODEL_FAN_1C]
+    _supported_models = [MODEL_FAN_1C]
 
     def __init__(
         self,
