@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from miio import AirDogX3, AirDogX5, AirDogX7SM
+from miio import AirDogX3
 from miio.airpurifier_airdog import (
     MODEL_AIRDOG_X3,
     MODEL_AIRDOG_X5,
@@ -146,7 +146,7 @@ class TestAirDogX3(TestCase):
         assert clean_filters() is False
 
 
-class DummyAirDogX5(DummyAirDogX3, AirDogX5):
+class DummyAirDogX5(DummyAirDogX3):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
         self._model = MODEL_AIRDOG_X5
@@ -167,7 +167,7 @@ def airdogx5(request):
     # TODO add ability to test on a real device
 
 
-class DummyAirDogX7SM(DummyAirDogX5, AirDogX7SM):
+class DummyAirDogX7SM(DummyAirDogX5):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
         self._model = MODEL_AIRDOG_X7SM

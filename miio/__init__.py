@@ -21,28 +21,28 @@ from miio.airconditioningcompanion import (
 )
 from miio.airconditioningcompanionMCN import AirConditioningCompanionMcn02
 from miio.airdehumidifier import AirDehumidifier
-from miio.airfresh import AirFresh, AirFreshVA4
+from miio.airfresh import AirFresh
 from miio.airfresh_t2017 import AirFreshA1, AirFreshT2017
-from miio.airhumidifier import AirHumidifier, AirHumidifierCA1, AirHumidifierCB1
+from miio.airhumidifier import AirHumidifier
 from miio.airhumidifier_jsq import AirHumidifierJsq
 from miio.airhumidifier_miot import AirHumidifierMiot
 from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airpurifier import AirPurifier
-from miio.airpurifier_airdog import AirDogX3, AirDogX5, AirDogX7SM
-from miio.airpurifier_miot import AirPurifierMB4, AirPurifierMiot
+from miio.airpurifier_airdog import AirDogX3
+from miio.airpurifier_miot import AirPurifierMiot
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.airqualitymonitor_miot import AirQualityMonitorCGDN1
 from miio.aqaracamera import AqaraCamera
 from miio.chuangmi_camera import ChuangmiCamera
 from miio.chuangmi_ir import ChuangmiIr
-from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
+from miio.chuangmi_plug import ChuangmiPlug
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
-from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5, FanP9, FanP10, FanP11
+from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5
 from miio.integrations.fan.leshow import FanLeshow
 from miio.integrations.fan.zhimi import Fan, FanZA5
 from miio.integrations.humidifier.deerma import AirHumidifierJsqs
@@ -55,12 +55,9 @@ from miio.integrations.light.philips import (
     PhilipsWhiteBulb,
 )
 from miio.integrations.petwaterdispenser import PetWaterDispenser
-from miio.integrations.vacuum.dreame.dreamevacuum_miot import (
-    DreameVacuum,
-    DreameVacuumMiot,
-)
+from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuum
 from miio.integrations.vacuum.mijia import G1Vacuum
-from miio.integrations.vacuum.roborock import RoborockVacuum, Vacuum, VacuumException
+from miio.integrations.vacuum.roborock import RoborockVacuum, VacuumException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
     CleaningDetails,
     CleaningSummary,

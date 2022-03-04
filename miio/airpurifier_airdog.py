@@ -8,7 +8,6 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
 from .exceptions import DeviceException
-from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -177,31 +176,3 @@ class AirDogX3(Device):
     def set_filters_cleaned(self):
         """Set filters cleaned."""
         return self.send("set_clean")
-
-
-class AirDogX5(AirDogX3):
-    @deprecated("Use AirDogX3(model='airdog.airpurifier.x5')")
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_AIRDOG_X5,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
-
-
-class AirDogX7SM(AirDogX3):
-    @deprecated("Use AirDogX3(model='airdog.airpurifier.x7sm')")
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-        model: str = MODEL_AIRDOG_X7SM,
-    ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)

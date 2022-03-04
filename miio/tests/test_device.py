@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-from miio import Device, MiotDevice, Vacuum
+from miio import Device, MiotDevice, RoborockVacuum
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 
 
@@ -84,7 +84,7 @@ def test_forced_model(mocker):
 
 
 @pytest.mark.parametrize(
-    "cls,hidden", [(Device, True), (MiotDevice, True), (Vacuum, False)]
+    "cls,hidden", [(Device, True), (MiotDevice, True), (RoborockVacuum, False)]
 )
 def test_missing_supported(mocker, caplog, cls, hidden):
     """Make sure warning is logged if the device is unsupported for the class."""

@@ -8,7 +8,6 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceInfo, DeviceStatus
 from .exceptions import DeviceError, DeviceException
-from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -405,48 +404,3 @@ class AirHumidifier(Device):
             return self.send("set_dry", ["on"])
         else:
             return self.send("set_dry", ["off"])
-
-
-@deprecated("Use AirHumidifer(model='zhimi.humidifier.ca1")
-class AirHumidifierCA1(AirHumidifier):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(
-            ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CA1
-        )
-
-
-@deprecated("Use AirHumidifer(model='zhimi.humidifier.cb1")
-class AirHumidifierCB1(AirHumidifier):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(
-            ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CB1
-        )
-
-
-@deprecated("Use AirHumidifier(model='zhimi.humidifier.cb2')")
-class AirHumidifierCB2(AirHumidifier):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(
-            ip, token, start_id, debug, lazy_discover, model=MODEL_HUMIDIFIER_CB2
-        )
