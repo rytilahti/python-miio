@@ -536,6 +536,7 @@ class RoidmiVacuumMiot(MiotDevice):
     """Interface for Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
     mapping = _MAPPING
+    _supported_models = ["roidmi.vacuum.v60"]
 
     @command()
     def status(self) -> RoidmiVacuumStatus:

@@ -211,6 +211,7 @@ class Huizuo(MiotDevice):
     """
 
     mapping = _MAPPING
+    _supported_models = MODELS_SUPPORTED
 
     def __init__(
         self,
