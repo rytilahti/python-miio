@@ -47,6 +47,9 @@ _MAPPING = {
     "timer": {"siid": 10, "piid": 3},
 }
 
+_MAPPINGS = {model: _MAPPING for model in SUPPORTED_MODELS}
+
+
 CLEANING_STAGES = [
     "Stopped",
     "Condensing water",
@@ -281,8 +284,7 @@ class AirConditionerMiotStatus(DeviceStatus):
 class AirConditionerMiot(MiotDevice):
     """Main class representing the air conditioner which uses MIoT protocol."""
 
-    _supported_models = SUPPORTED_MODELS
-    mapping = _MAPPING
+    _mappings = _MAPPINGS
 
     @command(
         default_output=format_output(

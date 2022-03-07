@@ -320,7 +320,6 @@ class AirPurifierMiotStatus(DeviceStatus):
 class AirPurifierMiot(MiotDevice):
     """Main class representing the air purifier which uses MIoT protocol."""
 
-    _supported_models = list(_MAPPINGS.keys())
     _mappings = _MAPPINGS
 
     @command(

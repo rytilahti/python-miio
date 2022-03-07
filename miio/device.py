@@ -3,7 +3,7 @@ import logging
 import warnings
 from enum import Enum
 from pprint import pformat as pf
-from typing import Any, List, Optional  # noqa: F401
+from typing import Any, Dict, List, Optional  # noqa: F401
 
 import click
 
@@ -57,6 +57,7 @@ class Device(metaclass=DeviceGroupMeta):
 
     retry_count = 3
     timeout = 5
+    _mappings: Dict[str, Any] = {}
     _supported_models: List[str] = []
 
     def __init__(

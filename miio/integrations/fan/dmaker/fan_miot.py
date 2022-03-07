@@ -14,17 +14,6 @@ MODEL_FAN_1C = "dmaker.fan.1c"
 
 
 MIOT_MAPPING = {
-    MODEL_FAN_1C: {
-        # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-1c:1
-        "power": {"siid": 2, "piid": 1},
-        "fan_level": {"siid": 2, "piid": 2},
-        "child_lock": {"siid": 3, "piid": 1},
-        "swing_mode": {"siid": 2, "piid": 3},
-        "power_off_time": {"siid": 2, "piid": 10},
-        "buzzer": {"siid": 2, "piid": 11},
-        "light": {"siid": 2, "piid": 12},
-        "mode": {"siid": 2, "piid": 7},
-    },
     MODEL_FAN_P9: {
         # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p9:1
         "power": {"siid": 2, "piid": 1},
@@ -68,6 +57,20 @@ MIOT_MAPPING = {
         "power_off_time": {"siid": 3, "piid": 1},
         "set_move": {"siid": 6, "piid": 1},
     },
+}
+
+FAN1C_MAPPINGS = {
+    MODEL_FAN_1C: {
+        # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-1c:1
+        "power": {"siid": 2, "piid": 1},
+        "fan_level": {"siid": 2, "piid": 2},
+        "child_lock": {"siid": 3, "piid": 1},
+        "swing_mode": {"siid": 2, "piid": 3},
+        "power_off_time": {"siid": 2, "piid": 10},
+        "buzzer": {"siid": 2, "piid": 11},
+        "light": {"siid": 2, "piid": 12},
+        "mode": {"siid": 2, "piid": 7},
+    }
 }
 
 SUPPORTED_ANGLES = {
@@ -231,8 +234,6 @@ class FanStatus1C(DeviceStatus):
 
 class FanMiot(MiotDevice):
     _mappings = MIOT_MAPPING
-    # TODO Fan1C should be merged to FanMiot
-    _supported_models = list(set(MIOT_MAPPING) - {MODEL_FAN_1C})
 
     @command(
         default_output=format_output(
@@ -373,8 +374,8 @@ class FanMiot(MiotDevice):
 
 
 class Fan1C(MiotDevice):
-    mapping = MIOT_MAPPING[MODEL_FAN_1C]
-    _supported_models = [MODEL_FAN_1C]
+    # TODO Fan1C should be merged to FanMiot, or moved into its separate file
+    _mappings = FAN1C_MAPPINGS
 
     def __init__(
         self,

@@ -36,7 +36,7 @@ class MiotDevice(Device):
     remains in-place for backwards compatibility.
     """
 
-    mapping: MiotMapping
+    mapping: MiotMapping  # Deprecated, use _mappings instead
     _mappings: Dict[str, MiotMapping] = {}
 
     def __init__(

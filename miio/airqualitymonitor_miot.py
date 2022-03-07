@@ -11,37 +11,39 @@ _LOGGER = logging.getLogger(__name__)
 
 MODEL_AIRQUALITYMONITOR_CGDN1 = "cgllc.airm.cgdn1"
 
-_MAPPING_CGDN1 = {
-    # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:cgllc-cgdn1:1
-    # Environment
-    "humidity": {"siid": 3, "piid": 1},  # [0, 100] step 1
-    "pm25": {"siid": 3, "piid": 4},  # [0, 1000] step 1
-    "pm10": {"siid": 3, "piid": 5},  # [0, 1000] step 1
-    "temperature": {"siid": 3, "piid": 7},  # [-30, 100] step 0.00001
-    "co2": {"siid": 3, "piid": 8},  # [0, 9999] step 1
-    # Battery
-    "battery": {"siid": 4, "piid": 1},  # [0, 100] step 1
-    "charging_state": {
-        "siid": 4,
-        "piid": 2,
-    },  # 1 - Charging, 2 - Not charging, 3 - Not chargeable
-    "voltage": {"siid": 4, "piid": 3},  # [0, 65535] step 1
-    # Settings
-    "start_time": {"siid": 9, "piid": 2},  # [0, 2147483647] step 1
-    "end_time": {"siid": 9, "piid": 3},  # [0, 2147483647] step 1
-    "monitoring_frequency": {
-        "siid": 9,
-        "piid": 4,
-    },  # 1, 60, 300, 600, 0; device accepts [0..600]
-    "screen_off": {
-        "siid": 9,
-        "piid": 5,
-    },  # 15, 30, 60, 300, 0; device accepts [0..300], 0 means never
-    "device_off": {
-        "siid": 9,
-        "piid": 6,
-    },  # 15, 30, 60, 0; device accepts [0..60], 0 means never
-    "temperature_unit": {"siid": 9, "piid": 7},
+_MAPPINGS = {
+    MODEL_AIRQUALITYMONITOR_CGDN1: {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-monitor:0000A008:cgllc-cgdn1:1
+        # Environment
+        "humidity": {"siid": 3, "piid": 1},  # [0, 100] step 1
+        "pm25": {"siid": 3, "piid": 4},  # [0, 1000] step 1
+        "pm10": {"siid": 3, "piid": 5},  # [0, 1000] step 1
+        "temperature": {"siid": 3, "piid": 7},  # [-30, 100] step 0.00001
+        "co2": {"siid": 3, "piid": 8},  # [0, 9999] step 1
+        # Battery
+        "battery": {"siid": 4, "piid": 1},  # [0, 100] step 1
+        "charging_state": {
+            "siid": 4,
+            "piid": 2,
+        },  # 1 - Charging, 2 - Not charging, 3 - Not chargeable
+        "voltage": {"siid": 4, "piid": 3},  # [0, 65535] step 1
+        # Settings
+        "start_time": {"siid": 9, "piid": 2},  # [0, 2147483647] step 1
+        "end_time": {"siid": 9, "piid": 3},  # [0, 2147483647] step 1
+        "monitoring_frequency": {
+            "siid": 9,
+            "piid": 4,
+        },  # 1, 60, 300, 600, 0; device accepts [0..600]
+        "screen_off": {
+            "siid": 9,
+            "piid": 5,
+        },  # 15, 30, 60, 300, 0; device accepts [0..300], 0 means never
+        "device_off": {
+            "siid": 9,
+            "piid": 6,
+        },  # 15, 30, 60, 0; device accepts [0..60], 0 means never
+        "temperature_unit": {"siid": 9, "piid": 7},
+    }
 }
 
 
@@ -169,8 +171,7 @@ class AirQualityMonitorCGDN1Status(DeviceStatus):
 class AirQualityMonitorCGDN1(MiotDevice):
     """Qingping Air Monitor Lite."""
 
-    mapping = _MAPPING_CGDN1
-    _supported_models = [MODEL_AIRQUALITYMONITOR_CGDN1]
+    _mappings = _MAPPINGS
 
     @command(
         default_output=format_output(

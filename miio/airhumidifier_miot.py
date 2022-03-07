@@ -9,32 +9,39 @@ from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
-_MAPPING = {
-    # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:humidifier:0000A00E:zhimi-ca4:2
-    # Air Humidifier (siid=2)
-    "power": {"siid": 2, "piid": 1},  # bool
-    "fault": {"siid": 2, "piid": 2},  # [0, 15] step 1
-    "mode": {"siid": 2, "piid": 5},  # 0 - Auto, 1 - lvl1, 2 - lvl2, 3 - lvl3
-    "target_humidity": {"siid": 2, "piid": 6},  # [30, 80] step 1
-    "water_level": {"siid": 2, "piid": 7},  # [0, 128] step 1
-    "dry": {"siid": 2, "piid": 8},  # bool
-    "use_time": {"siid": 2, "piid": 9},  # [0, 2147483600], step 1
-    "button_pressed": {"siid": 2, "piid": 10},  # 0 - none, 1 - led, 2 - power
-    "speed_level": {"siid": 2, "piid": 11},  # [200, 2000], step 10
-    # Environment (siid=3)
-    "temperature": {"siid": 3, "piid": 7},  # [-40, 125] step 0.1
-    "fahrenheit": {"siid": 3, "piid": 8},  # [-40, 257] step 0.1
-    "humidity": {"siid": 3, "piid": 9},  # [0, 100] step 1
-    # Alarm (siid=4)
-    "buzzer": {"siid": 4, "piid": 1},
-    # Indicator Light (siid=5)
-    "led_brightness": {"siid": 5, "piid": 2},  # 0 - Off, 1 - Dim, 2 - Brightest
-    # Physical Control Locked (siid=6)
-    "child_lock": {"siid": 6, "piid": 1},  # bool
-    # Other (siid=7)
-    "actual_speed": {"siid": 7, "piid": 1},  # [0, 2000] step 1
-    "power_time": {"siid": 7, "piid": 3},  # [0, 4294967295] step 1
-    "clean_mode": {"siid": 7, "piid": 5},  # bool
+
+
+SMARTMI_EVAPORATIVE_HUMIDIFIER_2 = "zhimi.humidifier.ca4"
+
+
+_MAPPINGS = {
+    SMARTMI_EVAPORATIVE_HUMIDIFIER_2: {
+        # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:humidifier:0000A00E:zhimi-ca4:2
+        # Air Humidifier (siid=2)
+        "power": {"siid": 2, "piid": 1},  # bool
+        "fault": {"siid": 2, "piid": 2},  # [0, 15] step 1
+        "mode": {"siid": 2, "piid": 5},  # 0 - Auto, 1 - lvl1, 2 - lvl2, 3 - lvl3
+        "target_humidity": {"siid": 2, "piid": 6},  # [30, 80] step 1
+        "water_level": {"siid": 2, "piid": 7},  # [0, 128] step 1
+        "dry": {"siid": 2, "piid": 8},  # bool
+        "use_time": {"siid": 2, "piid": 9},  # [0, 2147483600], step 1
+        "button_pressed": {"siid": 2, "piid": 10},  # 0 - none, 1 - led, 2 - power
+        "speed_level": {"siid": 2, "piid": 11},  # [200, 2000], step 10
+        # Environment (siid=3)
+        "temperature": {"siid": 3, "piid": 7},  # [-40, 125] step 0.1
+        "fahrenheit": {"siid": 3, "piid": 8},  # [-40, 257] step 0.1
+        "humidity": {"siid": 3, "piid": 9},  # [0, 100] step 1
+        # Alarm (siid=4)
+        "buzzer": {"siid": 4, "piid": 1},
+        # Indicator Light (siid=5)
+        "led_brightness": {"siid": 5, "piid": 2},  # 0 - Off, 1 - Dim, 2 - Brightest
+        # Physical Control Locked (siid=6)
+        "child_lock": {"siid": 6, "piid": 1},  # bool
+        # Other (siid=7)
+        "actual_speed": {"siid": 7, "piid": 1},  # [0, 2000] step 1
+        "power_time": {"siid": 7, "piid": 3},  # [0, 4294967295] step 1
+        "clean_mode": {"siid": 7, "piid": 5},  # bool
+    }
 }
 
 
@@ -248,17 +255,10 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return self.data["clean_mode"]
 
 
-SMARTMI_EVAPORATIVE_HUMIDIFIER_2 = "zhimi.humidifier.ca4"
-
-SUPPORTED_MODELS = [SMARTMI_EVAPORATIVE_HUMIDIFIER_2]
-
-
 class AirHumidifierMiot(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
 
-    _supported_models = SUPPORTED_MODELS
-
-    mapping = _MAPPING
+    _mappings = _MAPPINGS
 
     @command(
         default_output=format_output(
