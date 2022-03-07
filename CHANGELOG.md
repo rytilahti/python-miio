@@ -1,5 +1,46 @@
 # Change Log
 
+## [0.5.11](https://github.com/rytilahti/python-miio/tree/0.5.11) (2022-03-07)
+
+This release fixes zhimi.fan.za5 support and makes all integrations introspectable for their supported models.
+For developers, there is now a network trace parser (in devtools/parse_pcap.py) that prints the decrypted the traffic for given tokens.
+
+The following previously deprecated classes in favor of model-based discovery, if you were using these classes directly you need to adjust your code:
+* AirFreshVA4 - use AirFresh
+* AirHumidifierCA1, AirHumidifierCB1, AirHumidifierCB2 - use AirHumidifier
+* AirDogX5, AirDogX7SM - use AirDogX3
+* AirPurifierMB4 - use AirPurifierMiot
+* Plug, PlugV1, PlugV3 - use ChuangmiPlug
+* FanP9, FanP10, FanP11 - use FanMiot
+* DreameVacuumMiot - use DreameVacuum
+* Vacuum - use RoborockVacuum
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.10...0.5.11)
+
+**Breaking changes:**
+
+- Remove deprecated integration classes [\#1343](https://github.com/rytilahti/python-miio/pull/1343) (@rytilahti)
+
+**Implemented enhancements:**
+
+- Add PCAP file parser for protocol analysis [\#1331](https://github.com/rytilahti/python-miio/pull/1331) (@rytilahti)
+
+**Fixed bugs:**
+
+- Fix bug for zhimi.fan.za5 resulting in user ack timeout [\#1348](https://github.com/rytilahti/python-miio/pull/1348) (@saxel)
+
+**Deprecated:**
+
+- Deprecate wifi\_led in favor of led [\#1342](https://github.com/rytilahti/python-miio/pull/1342) (@rytilahti)
+
+**Merged pull requests:**
+
+- Make sure miotdevice implementations define supported models [\#1345](https://github.com/rytilahti/python-miio/pull/1345) (@rytilahti)
+- Add Viomi V2 \(viomi.vacuum.v6\) as supported [\#1340](https://github.com/rytilahti/python-miio/pull/1340) (@rytilahti)
+- Mark Roborock S7 MaxV \(roborock.vacuum.a27\) as supported [\#1337](https://github.com/rytilahti/python-miio/pull/1337) (@rytilahti)
+- Add pyupgrade to CI runs [\#1329](https://github.com/rytilahti/python-miio/pull/1329) (@rytilahti)
+
+
 ## [0.5.10](https://github.com/rytilahti/python-miio/tree/0.5.10) (2022-02-17)
 
 This release adds support for several new devices (see details below, thanks to @PRO-2684, @peleccom, @ymj0424, and @supar), and contains improvements to Roborock S7, yeelight and gateway integrations (thanks to @starkillerOG, @Kirmas, and @shred86). Thanks also to everyone who has reported their working model information, we can use this information to provide better discovery in the future and this release silences the warning for known working models.
