@@ -169,7 +169,7 @@ class FanStatusZA5(DeviceStatus):
 
 
 class FanZA5(MiotDevice):
-    mapping = MIOT_MAPPING
+    mapping = MIOT_MAPPING[MODEL_FAN_ZA5]
     _supported_models = list(MIOT_MAPPING.keys())
 
     @command(
