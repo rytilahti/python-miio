@@ -345,18 +345,24 @@ class Device(metaclass=DeviceGroupMeta):
         return "Done"
 
     @classmethod
-    def all_supported_models(cls) -> Dict[str, Type["Device"]]:
-        """Return a list of all models supported by the library."""
-        return Device._model_for_device_class
-
-    @classmethod
     def class_for_model(cls, model: str):
-        """Return implementation for the given model string, if available."""
-        model_to_cls = cls.all_supported_models()
+        """Return implementation class for the given model, if available.
+
+        This is provisional and may be moved into its own class later.
+        """
+        model_to_cls = cls.all_supported_models
         if model in model_to_cls:
             return model_to_cls[model]
 
-        raise DeviceException("No implementation for %s", model)
+        wildcard_models = {
+            m: impl for m, impl in model_to_cls.items() if m.endswith("*")
+        }
+        for m, impl in wildcard_models.items():
+            m = m.rstrip("*")
+            if model.startswith(m):
+                return impl
+
+        raise DeviceException("No implementation found for model %s" % model)
 
     @classmethod
     def create(
@@ -365,6 +371,8 @@ class Device(metaclass=DeviceGroupMeta):
         """Return instance for the given host and token, with optional model override.
 
         The optional model parameter can be used to override the model detection.
+
+        This is provisional and may be moved into its own class later.
         """
         if model is None:
             dev: Device = cls(host, token)

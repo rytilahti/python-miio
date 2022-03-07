@@ -14,7 +14,8 @@ MODEL_ACPARTNER_V1 = "lumi.acpartner.v1"
 MODEL_ACPARTNER_V2 = "lumi.acpartner.v2"
 MODEL_ACPARTNER_V3 = "lumi.acpartner.v3"
 
-MODELS_SUPPORTED = [MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3]
+MODELS_SUPPORTED = [MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2]
+MODELS_SUPPORTED_V3 = [MODEL_ACPARTNER_V3]  # TODO: merge v3 to the main class
 
 
 class AirConditioningCompanionException(DeviceException):
@@ -417,17 +418,7 @@ class AirConditioningCompanion(Device):
 
 
 class AirConditioningCompanionV3(AirConditioningCompanion):
-    def __init__(
-        self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = 0,
-        debug: int = 0,
-        lazy_discover: bool = True,
-    ) -> None:
-        super().__init__(
-            ip, token, start_id, debug, lazy_discover, model=MODEL_ACPARTNER_V3
-        )
+    _supported_models = MODELS_SUPPORTED_V3
 
     @command(default_output=format_output("Powering socket on"))
     def socket_on(self):

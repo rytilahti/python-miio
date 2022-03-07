@@ -3,7 +3,11 @@ import math
 import pytest
 
 from miio import Device, MiotDevice, RoborockVacuum
-from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
+from miio.exceptions import (
+    DeviceException,
+    DeviceInfoUnavailableException,
+    PayloadDecodeException,
+)
 
 DEVICE_CLASSES = Device.__subclasses__() + MiotDevice.__subclasses__()  # type: ignore
 
@@ -109,7 +113,7 @@ def test_device_ctor_model(cls):
     # TODO Huizuo implements custom model fallback, so it needs to be ignored for now
     ignore_classes = ["GatewayDevice", "CustomDevice", "Huizuo"]
     if cls.__name__ in ignore_classes:
-        return
+        pytest.skip(f"Skipping {cls.__name__} as special case")
 
     dummy_model = "dummy"
     dev = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=dummy_model)
@@ -119,7 +123,45 @@ def test_device_ctor_model(cls):
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)
 def test_device_supported_models(cls):
     """Make sure that every device subclass has a non-empty supported models."""
-    if cls.__name__ == "MiotDevice":  # skip miotdevice
-        return
+    if cls.__name__ == "MiotDevice":
+        pytest.skip("MiotDevice defines no devices as base class")
 
     assert cls.supported_models
+
+
+def test_device_all_supported_models():
+    models = Device.all_supported_models
+    for model, impl in models.items():
+        assert isinstance(model, str)
+        assert issubclass(impl, Device)
+
+
+@pytest.mark.parametrize("cls", DEVICE_CLASSES)
+def test_device_class_for_model(cls):
+    """Test that all supported models can be initialized using class_for_model."""
+
+    from miio import Gateway
+
+    if cls == Gateway:
+        pytest.skip(
+            "Skipping Gateway as AirConditioningCompanion already implements lumi.acpartner.*"
+        )
+
+    for supp in cls.supported_models:
+        dev = Device.class_for_model(supp)
+        assert dev == cls
+
+
+def test_device_class_for_wildcard():
+    """Test that wildcard matching works."""
+
+    class _DummyDevice(Device):
+        _supported_models = ["foo.bar.*"]
+
+    assert Device.class_for_model("foo.bar.xyz") == _DummyDevice
+
+
+def test_device_class_for_model_unknown():
+    """Test that unknown model raises an exception."""
+    with pytest.raises(DeviceException):
+        Device.class_for_model("foo.foo.xyz")

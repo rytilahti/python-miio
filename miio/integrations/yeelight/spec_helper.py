@@ -9,6 +9,9 @@ import yaml
 _LOGGER = logging.getLogger(__name__)
 
 
+WILDCARD_MODEL = "yeelink.light.*"
+
+
 class YeelightSubLightType(IntEnum):
     Main = 0
     Background = 1
@@ -43,7 +46,7 @@ class YeelightSpecHelper:
 
     def _parse_specs_yaml(self):
         generic_info = YeelightModelInfo(
-            "generic",
+            WILDCARD_MODEL,
             False,
             {
                 YeelightSubLightType.Main: YeelightLampInfo(
@@ -51,7 +54,7 @@ class YeelightSpecHelper:
                 )
             },
         )
-        YeelightSpecHelper._models["generic"] = generic_info
+        YeelightSpecHelper._models[WILDCARD_MODEL] = generic_info
         # read the yaml file to populate the internal model cache
         with open(os.path.dirname(__file__) + "/specs.yaml") as filedata:
             models = yaml.safe_load(filedata)
@@ -82,5 +85,5 @@ class YeelightSpecHelper:
                 "Unknown model %s, please open an issue and supply features for this light. Returning generic information.",
                 model,
             )
-            return self._models["generic"]
+            return self._models[WILDCARD_MODEL]
         return self._models[model]

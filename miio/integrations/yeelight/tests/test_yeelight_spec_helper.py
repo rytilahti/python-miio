@@ -15,8 +15,8 @@ def test_get_model_info():
 
 def test_get_unknown_model_info():
     spec_helper = YeelightSpecHelper()
-    model_info = spec_helper.get_model_info("notreal")
-    assert model_info.model == "generic"
+    model_info = spec_helper.get_model_info("yeelink.light.notreal")
+    assert model_info.model == "yeelink.light.*"
     assert model_info.night_light is False
     assert model_info.lamps[YeelightSubLightType.Main].color_temp == ColorTempRange(
         1700, 6500

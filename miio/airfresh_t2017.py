@@ -224,7 +224,7 @@ class AirFreshStatus(DeviceStatus):
 class AirFreshA1(Device):
     """Main class representing the air fresh a1."""
 
-    _supported_models = list(AVAILABLE_PROPERTIES.keys())
+    _supported_models = [MODEL_AIRFRESH_A1]
 
     @command(
         default_output=format_output(
@@ -358,6 +358,9 @@ class AirFreshA1(Device):
 
 class AirFreshT2017(AirFreshA1):
     """Main class representing the air fresh t2017."""
+
+    # TODO: merge to AirFreshA1, as this has just more features and slightly different command set
+    _supported_models = [MODEL_AIRFRESH_T2017]
 
     @command(
         default_output=format_output(

@@ -254,7 +254,7 @@ class Yeelight(Device):
     which however requires enabling the developer mode on the bulbs.
     """
 
-    _supported_models: List[str] = []
+    _supported_models: List[str] = ["yeelink.light.*", "yeelink.bhf_light.*"]
     _spec_helper = None
 
     def __init__(

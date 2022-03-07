@@ -8,7 +8,7 @@ import json
 import logging
 import re
 from functools import partial, wraps
-from typing import Callable, Dict, Set, Type, Union
+from typing import Any, Callable, ClassVar, Dict, List, Set, Type, TypeVar, Union
 
 import click
 
@@ -17,6 +17,8 @@ import miio
 from .exceptions import DeviceError
 
 _LOGGER = logging.getLogger(__name__)
+
+Device = TypeVar("Device")
 
 
 def validate_ip(ctx, param, value):
@@ -112,6 +114,9 @@ class DeviceGroupMeta(type):
     _device_classes: Set[Type] = set()
     _model_for_device_class: Dict[str, Type] = {}
 
+    _mappings: ClassVar[Dict[str, Any]]
+    _supported_models: ClassVar[List[str]]
+
     def __new__(mcs, name, bases, namespace):
         commands = {}
 
@@ -145,19 +150,36 @@ class DeviceGroupMeta(type):
         cls = super().__new__(mcs, name, bases, namespace)
         mcs._device_classes.add(cls)
 
-        supported_models = namespace.get("_supported_models")
+        supported_models = cls.supported_models
         if not supported_models:
             _LOGGER.debug("No supported models for %s", cls)
         else:
             for model in supported_models:
+                if model in mcs._model_for_device_class:
+                    _LOGGER.debug(
+                        "%s is already supported by %s, ignoring",
+                        model,
+                        mcs._model_for_device_class[model],
+                    )
+                    continue
                 mcs._model_for_device_class[model] = cls
 
         return cls
 
     @property
-    def supported_models(cls):
+    def supported_models(cls) -> List[str]:
         """Return list of supported models."""
-        return cls._mappings.keys() or cls._supported_models
+        return list(cls._mappings.keys()) or cls._supported_models
+
+    @property
+    def all_supported_models(cls) -> Dict[str, Type[Device]]:
+        """Return a dict of all models supported by the library.
+
+        This is not a property as class properties are only valid using python >= 3.9
+
+        This is provisional and may be moved into its own class later.
+        """
+        return cls._model_for_device_class
 
 
 class DeviceGroup(click.MultiCommand):
