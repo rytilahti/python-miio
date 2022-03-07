@@ -122,4 +122,4 @@ def test_device_supported_models(cls):
     if cls.__name__ == "MiotDevice":  # skip miotdevice
         return
 
-    assert cls._supported_models
+    assert cls.supported_models

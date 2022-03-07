@@ -37,13 +37,14 @@ _MAPPING: Dict[str, Dict[str, int]] = {
     "timezone": {"siid": 9, "piid": 1},
 }
 
+MIOT_MAPPING = {model: _MAPPING for model in SUPPORTED_MODELS}
+
 
 class PetWaterDispenser(MiotDevice):
     """Main class representing the Pet Waterer / Pet Drinking Fountain / Smart Pet Water
     Dispenser."""
 
-    mapping = _MAPPING
-    _supported_models = SUPPORTED_MODELS
+    _mappings = MIOT_MAPPING
 
     @command(
         default_output=format_output(

@@ -387,12 +387,6 @@ class DreameVacuumStatus(DeviceStatusContainer):
 
 
 class DreameVacuum(MiotDevice):
-    _supported_models = [
-        DREAME_1C,
-        DREAME_D9,
-        DREAME_F9,
-        DREAME_Z10_PRO,
-    ]
     _mappings = MIOT_MAPPING
 
     @command(
