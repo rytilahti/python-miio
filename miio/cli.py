@@ -62,7 +62,7 @@ cli.add_command(discover)
 @click.command()
 def supported_models():
     """Print out the list of supported models."""
-    for model, cls in Device.all_supported_models().items():
+    for model, cls in Device.all_supported_models.items():
         click.echo(
             f"* {model} = {cls.__name__} (command: miiocli {cls.__name__.lower()})"
         )
