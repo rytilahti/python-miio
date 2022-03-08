@@ -150,19 +150,15 @@ class DeviceGroupMeta(type):
         cls = super().__new__(mcs, name, bases, namespace)
         mcs._device_classes.add(cls)
 
-        supported_models = cls.supported_models
-        if not supported_models:
-            _LOGGER.debug("No supported models for %s", cls)
-        else:
-            for model in supported_models:
-                if model in mcs._model_for_device_class:
-                    _LOGGER.debug(
-                        "%s is already supported by %s, ignoring",
-                        model,
-                        mcs._model_for_device_class[model],
-                    )
-                    continue
-                mcs._model_for_device_class[model] = cls
+        for model in cls.supported_models:
+            if model in mcs._model_for_device_class:
+                _LOGGER.debug(
+                    "%s is already supported by %s, ignoring",
+                    model,
+                    mcs._model_for_device_class[model],
+                )
+                continue
+            mcs._model_for_device_class[model] = cls
 
         return cls
 
@@ -174,8 +170,6 @@ class DeviceGroupMeta(type):
     @property
     def all_supported_models(cls) -> Dict[str, Type[Device]]:
         """Return a dict of all models supported by the library.
-
-        This is not a property as class properties are only valid using python >= 3.9
 
         This is provisional and may be moved into its own class later.
         """
