@@ -8,6 +8,7 @@ from miio.tests.dummies import DummyMiotDevice
 from ..dreamevacuum_miot import (
     DREAME_1C,
     DREAME_F9,
+    MIOT_MAPPING,
     ChargingState,
     CleaningModeDreame1C,
     CleaningModeDreameF9,
@@ -15,7 +16,6 @@ from ..dreamevacuum_miot import (
     FaultStatus,
     OperatingMode,
     WaterFlow,
-    MIOT_MAPPING,
 )
 
 _INITIAL_STATE_1C = {
