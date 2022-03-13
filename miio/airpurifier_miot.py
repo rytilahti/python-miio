@@ -110,7 +110,7 @@ _MAPPINGS = {
     "zhimi.airpurifier.vb2": _MAPPING,  # airpurifier proh
     "zhimi.airpurifier.mb4": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb4a": _MAPPING_MB4,  # airpurifier 3c
-    "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4 
+    "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
 }
 
