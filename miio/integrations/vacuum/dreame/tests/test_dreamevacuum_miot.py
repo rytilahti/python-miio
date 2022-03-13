@@ -259,3 +259,9 @@ def test_dreame_models(model: str):
     # test _get_cleaning_mode_enum_class returns non-empty mapping
     fp = vac.fan_speed_presets()
     assert (fp is not None) and (len(fp) > 0)
+
+
+def test_invalid_dreame_model():
+    vac = DreameVacuum(model='model.invalid')
+    fp = vac.fan_speed_presets()
+    assert fp == {}

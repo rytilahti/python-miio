@@ -198,6 +198,7 @@ def _get_cleaning_mode_enum_class(model):
         DREAME_MOP_2_ULTRA,
     ):
         return CleaningModeDreameF9
+    return None
 
 
 class DreameVacuumStatus(DeviceStatusContainer):
