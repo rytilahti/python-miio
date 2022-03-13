@@ -190,7 +190,13 @@ def _get_cleaning_mode_enum_class(model):
     """Return cleaning mode enum class for model if found or None."""
     if model == DREAME_1C:
         return CleaningModeDreame1C
-    elif model in (DREAME_F9, DREAME_D9, DREAME_Z10_PRO, DREAME_MOP_2_PRO_PLUS, DREAME_MOP_2_ULTRA):
+    elif model in (
+        DREAME_F9,
+        DREAME_D9,
+        DREAME_Z10_PRO,
+        DREAME_MOP_2_PRO_PLUS,
+        DREAME_MOP_2_ULTRA,
+    ):
         return CleaningModeDreameF9
 
 
