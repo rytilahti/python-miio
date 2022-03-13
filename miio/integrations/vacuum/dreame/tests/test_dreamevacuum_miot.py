@@ -15,6 +15,7 @@ from ..dreamevacuum_miot import (
     FaultStatus,
     OperatingMode,
     WaterFlow,
+    MIOT_MAPPING
 )
 
 _INITIAL_STATE_1C = {
@@ -248,3 +249,13 @@ class TestDreameF9Vacuum(TestCase):
     def test_waterflow(self):
         value = self.device.waterflow()
         assert value == {"Medium": 2}
+
+
+@pytest.mark.parametrize(
+    "model", MIOT_MAPPING.keys()
+)
+def test_dreame_models(model: str):
+    vac = DreameVacuum(model=model)
+    # test _get_cleaning_mode_enum_class returns non-empty mapping
+    fp = vac.fan_speed_presets()
+    assert (fp is not None) and (len(fp) > 0)
