@@ -154,6 +154,7 @@ Supported devices
 -  Xiaomi Walkingpad A1 (ksmb.walkingpad.v3)
 -  Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4)
 -  Xiaomi Mi Smart Humidifer S (jsqs, jsq5)
+-  Xiaomi Mi Robot Vacuum Mop 2 (Pro+, Ultra)
 
 
 *Feel free to create a pull request to add support for new devices as
