@@ -158,7 +158,7 @@ class Device(metaclass=DeviceGroupMeta):
             if devinfo.model not in self.supported_models and cls not in bases:
                 _LOGGER.warning(
                     "Found an unsupported model '%s' for class '%s'. If this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
-                    self.model,
+                    devinfo.model,
                     cls,
                 )
 

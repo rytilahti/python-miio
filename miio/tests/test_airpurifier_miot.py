@@ -305,6 +305,13 @@ class DummyAirPurifierMiotVA2(DummyAirPurifierMiot):
         super().__init__(*args, **kwargs)
 
 
+class DummyAirPurifierMiotMB5(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "zhimi.airp.mb5"
+        self.state = _INITIAL_STATE_VA2
+        super().__init__(*args, **kwargs)
+
+
 @pytest.fixture(scope="function")
 def airpurifierVA2(request):
     request.cls.device = DummyAirPurifierMiotVA2()
