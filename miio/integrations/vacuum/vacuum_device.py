@@ -12,17 +12,14 @@ class VacuumDevice(Device):
     @abstractmethod
     def home(self):
         """Return to home."""
-        pass
 
     @abstractmethod
     def start(self):
         """Start cleaning."""
-        pass
 
     @abstractmethod
     def stop(self):
         """Validate that Stop cleaning."""
-        pass
 
 
 class VacuumMiotDevice(VacuumDevice, MiotDevice):
@@ -31,4 +28,3 @@ class VacuumMiotDevice(VacuumDevice, MiotDevice):
     @abstractmethod
     def start(self):
         """Start cleaning."""
-        pass
