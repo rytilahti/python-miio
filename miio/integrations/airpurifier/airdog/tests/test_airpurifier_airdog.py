@@ -3,7 +3,9 @@ from unittest import TestCase
 import pytest
 
 from miio import AirDogX3
-from miio.airpurifier_airdog import (
+from miio.tests.dummies import DummyDevice
+
+from ..airpurifier_airdog import (
     MODEL_AIRDOG_X3,
     MODEL_AIRDOG_X5,
     MODEL_AIRDOG_X7SM,
@@ -12,8 +14,6 @@ from miio.airpurifier_airdog import (
     OperationMode,
     OperationModeMapping,
 )
-
-from .dummies import DummyDevice
 
 
 class DummyAirDogX3(DummyDevice, AirDogX3):

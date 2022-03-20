@@ -190,8 +190,8 @@ class EncryptionAdapter(Adapter):
         ]
 
         for i, quirk in enumerate(decrypted_quirks):
-            decoded = quirk(decrypted).decode("utf-8")
             try:
+                decoded = quirk(decrypted).decode("utf-8")
                 return json.loads(decoded)
             except Exception as ex:
                 # log the error when decrypted bytes couldn't be loaded

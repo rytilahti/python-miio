@@ -8,21 +8,25 @@ from typing import Callable, Dict, Optional, Type, Union  # noqa: F401
 
 import zeroconf
 
-from miio.integrations.yeelight import Yeelight
+from miio.integrations.airpurifier import (
+    AirDogX3,
+    AirFresh,
+    AirFreshT2017,
+    AirPurifier,
+    AirPurifierMiot,
+)
+from miio.integrations.humidifier import (
+    AirHumidifier,
+    AirHumidifierJsq,
+    AirHumidifierJsqs,
+    AirHumidifierMjjsq,
+)
+from miio.integrations.vacuum import DreameVacuum, RoborockVacuum, ViomiVacuum
 
 from . import (
     AirConditionerMiot,
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
-    AirDogX3,
-    AirFresh,
-    AirFreshT2017,
-    AirHumidifier,
-    AirHumidifierJsq,
-    AirHumidifierJsqs,
-    AirHumidifierMjjsq,
-    AirPurifier,
-    AirPurifierMiot,
     AirQualityMonitor,
     AqaraCamera,
     Ceil,
@@ -31,19 +35,10 @@ from . import (
     ChuangmiPlug,
     Cooker,
     Device,
-    DreameVacuum,
-    FanLeshow,
     Gateway,
     Heater,
-    PhilipsBulb,
-    PhilipsEyecare,
-    PhilipsMoonlight,
-    PhilipsRwread,
-    PhilipsWhiteBulb,
     PowerStrip,
-    RoborockVacuum,
     Toiletlid,
-    ViomiVacuum,
     WaterPurifier,
     WaterPurifierYunmi,
     WifiRepeater,
@@ -55,13 +50,6 @@ from .airconditioningcompanion import (
     MODEL_ACPARTNER_V3,
 )
 from .airconditioningcompanionMCN import MODEL_ACPARTNER_MCN02
-from .airfresh import MODEL_AIRFRESH_VA2, MODEL_AIRFRESH_VA4
-from .airhumidifier import (
-    MODEL_HUMIDIFIER_CA1,
-    MODEL_HUMIDIFIER_CB1,
-    MODEL_HUMIDIFIER_V1,
-)
-from .airhumidifier_mjjsq import MODEL_HUMIDIFIER_JSQ1, MODEL_HUMIDIFIER_MJJSQ
 from .airqualitymonitor import (
     MODEL_AIRQUALITYMONITOR_B1,
     MODEL_AIRQUALITYMONITOR_S1,
@@ -78,8 +66,15 @@ from .chuangmi_plug import (
     MODEL_CHUANGMI_PLUG_V3,
 )
 from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
-from .integrations.fan.dmaker import FanMiot
-from .integrations.fan.zhimi import Fan, FanZA5
+from .integrations.fan import Fan, FanLeshow, FanMiot, FanZA5
+from .integrations.light import (
+    PhilipsBulb,
+    PhilipsEyecare,
+    PhilipsMoonlight,
+    PhilipsRwread,
+    PhilipsWhiteBulb,
+    Yeelight,
+)
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
 
@@ -129,14 +124,12 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "chuangmi-camera-ipc019": ChuangmiCamera,
     "chuangmi-ir-v2": ChuangmiIr,
     "chuangmi-remote-h102a03_": ChuangmiIr,
-    "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
-    "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
-    "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),
-    "shuii-humidifier-jsq001": partial(AirHumidifierJsq, model=MODEL_HUMIDIFIER_MJJSQ),
-    "deerma-humidifier-mjjsq": partial(
-        AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
-    ),
-    "deerma-humidifier-jsq1": partial(AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_JSQ1),
+    "zhimi-humidifier-v1": AirHumidifier,
+    "zhimi-humidifier-ca1": AirHumidifier,
+    "zhimi-humidifier-cb1": AirHumidifier,
+    "shuii-humidifier-jsq001": AirHumidifierJsq,
+    "deerma-humidifier-mjjsq": AirHumidifierMjjsq,
+    "deerma-humidifier-jsq1": AirHumidifierMjjsq,
     "deerma-humidifier-jsqs": AirHumidifierJsqs,
     "yunmi-waterpuri-v2": WaterPurifier,
     "yunmi.waterpuri.lx9": WaterPurifierYunmi,
@@ -182,8 +175,8 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "dmaker-fan-p11": FanMiot,
     "zhimi-fan-za5": FanZA5,
     "tinymu-toiletlid-v1": partial(Toiletlid, model=MODEL_TOILETLID_V1),
-    "zhimi-airfresh-va2": partial(AirFresh, model=MODEL_AIRFRESH_VA2),
-    "zhimi-airfresh-va4": partial(AirFresh, model=MODEL_AIRFRESH_VA4),
+    "zhimi-airfresh-va2": AirFresh,
+    "zhimi-airfresh-va4": AirFresh,
     "dmaker-airfresh-t2017": AirFreshT2017,
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),

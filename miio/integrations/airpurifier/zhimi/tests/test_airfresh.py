@@ -2,8 +2,10 @@ from unittest import TestCase
 
 import pytest
 
-from miio import AirFresh
-from miio.airfresh import (
+from miio.tests.dummies import DummyDevice
+
+from .. import AirFresh
+from ..airfresh import (
     MODEL_AIRFRESH_VA2,
     MODEL_AIRFRESH_VA4,
     AirFreshException,
@@ -11,8 +13,6 @@ from miio.airfresh import (
     LedBrightness,
     OperationMode,
 )
-
-from .dummies import DummyDevice
 
 
 class DummyAirFresh(DummyDevice, AirFresh):

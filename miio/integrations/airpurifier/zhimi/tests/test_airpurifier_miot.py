@@ -2,11 +2,11 @@ from unittest import TestCase
 
 import pytest
 
-from miio import AirPurifierMiot
-from miio.airfilter_util import FilterType
-from miio.airpurifier_miot import AirPurifierMiotException, LedBrightness, OperationMode
+from miio.tests.dummies import DummyMiotDevice
 
-from .dummies import DummyMiotDevice
+from .. import AirPurifierMiot
+from ..airfilter_util import FilterType
+from ..airpurifier_miot import AirPurifierMiotException, LedBrightness, OperationMode
 
 _INITIAL_STATE = {
     "power": True,
@@ -301,6 +301,13 @@ class TestAirPurifierMB4(TestCase):
 class DummyAirPurifierMiotVA2(DummyAirPurifierMiot):
     def __init__(self, *args, **kwargs):
         self._model = "zhimi.airp.va2"
+        self.state = _INITIAL_STATE_VA2
+        super().__init__(*args, **kwargs)
+
+
+class DummyAirPurifierMiotMB5(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "zhimi.airp.mb5"
         self.state = _INITIAL_STATE_VA2
         super().__init__(*args, **kwargs)
 

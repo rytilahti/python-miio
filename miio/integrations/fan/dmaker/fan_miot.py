@@ -10,6 +10,8 @@ from miio.fan_common import FanException, MoveDirection, OperationMode
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
 MODEL_FAN_P11 = "dmaker.fan.p11"
+MODEL_FAN_P15 = "dmaker.fan.p15"
+MODEL_FAN_P18 = "dmaker.fan.p18"
 MODEL_FAN_1C = "dmaker.fan.1c"
 
 
@@ -58,6 +60,12 @@ MIOT_MAPPING = {
         "set_move": {"siid": 6, "piid": 1},
     },
 }
+
+
+# These mappings are based on user reports and may not cover all features
+MIOT_MAPPING[MODEL_FAN_P15] = MIOT_MAPPING[MODEL_FAN_P11]  # see #1354
+MIOT_MAPPING[MODEL_FAN_P18] = MIOT_MAPPING[MODEL_FAN_P10]  # see #1341
+
 
 FAN1C_MAPPINGS = {
     MODEL_FAN_1C: {

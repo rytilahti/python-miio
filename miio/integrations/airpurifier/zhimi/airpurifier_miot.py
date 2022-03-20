@@ -4,10 +4,10 @@ from typing import Any, Dict, Optional
 
 import click
 
+from miio import DeviceException, DeviceStatus, MiotDevice
+from miio.click_common import EnumType, command, format_output
+
 from .airfilter_util import FilterType, FilterTypeUtil
-from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
-from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
@@ -69,6 +69,7 @@ _MAPPING_MB4 = {
 }
 
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-va2:2
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-mb5:1
 _MAPPING_VA2 = {
     # Air Purifier
     "power": {"siid": 2, "piid": 1},
@@ -109,6 +110,7 @@ _MAPPINGS = {
     "zhimi.airpurifier.vb2": _MAPPING,  # airpurifier proh
     "zhimi.airpurifier.mb4": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb4a": _MAPPING_MB4,  # airpurifier 3c
+    "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
 }
 
@@ -254,7 +256,7 @@ class AirPurifierMiotStatus(DeviceStatus):
 
         value = self.data.get("led_brightness")
         if value is not None:
-            if self.model == "zhimi.airp.va2":
+            if self.model in ("zhimi.airp.va2", "zhimi.airp.mb5"):
                 value = 2 - value
             try:
                 return LedBrightness(value)
@@ -510,7 +512,7 @@ class AirPurifierMiot(MiotDevice):
             )
 
         value = brightness.value
-        if self.model == "zhimi.airp.va2" and value:
+        if self.model in ("zhimi.airp.va2", "zhimi.airp.mb5") and value:
             value = 2 - value
         return self.set_property("led_brightness", value)
 
