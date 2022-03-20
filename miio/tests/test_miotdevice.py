@@ -1,12 +1,14 @@
 import pytest
 
 from miio import Huizuo, MiotDevice
+from miio.integrations.vacuum import VacuumMiotDevice
 from miio.miot_device import MiotValueType
 
 MIOT_DEVICES = MiotDevice.__subclasses__()
 # TODO: huizuo needs to be refactored to use _mappings,
 # until then, just disable the tests on it.
 MIOT_DEVICES.remove(Huizuo)  # type: ignore
+MIOT_DEVICES.remove(VacuumMiotDevice)  # type: ignore
 
 
 @pytest.fixture(scope="module")

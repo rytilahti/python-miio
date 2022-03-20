@@ -4,8 +4,12 @@ import pytest
 
 from miio import Device, MiotDevice, RoborockVacuum
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
+from miio.integrations.vacuum import VacuumDevice, VacuumMiotDevice
 
 DEVICE_CLASSES = Device.__subclasses__() + MiotDevice.__subclasses__()  # type: ignore
+DEVICE_CLASSES.remove(MiotDevice)
+DEVICE_CLASSES.remove(VacuumDevice)
+DEVICE_CLASSES.remove(VacuumMiotDevice)
 
 
 @pytest.mark.parametrize("max_properties", [None, 1, 15])
@@ -119,7 +123,4 @@ def test_device_ctor_model(cls):
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)
 def test_device_supported_models(cls):
     """Make sure that every device subclass has a non-empty supported models."""
-    if cls.__name__ == "MiotDevice":  # skip miotdevice
-        return
-
     assert cls.supported_models

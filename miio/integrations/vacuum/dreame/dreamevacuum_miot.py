@@ -9,7 +9,9 @@ import click
 from miio.click_common import command, format_output
 from miio.exceptions import DeviceException
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
-from miio.miot_device import MiotDevice, MiotMapping
+from miio.miot_device import MiotMapping
+
+from ..vacuum_device import VacuumMiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -399,7 +401,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         return None
 
 
-class DreameVacuum(MiotDevice):
+class DreameVacuum(VacuumMiotDevice):
     _mappings = MIOT_MAPPING
 
     @command(

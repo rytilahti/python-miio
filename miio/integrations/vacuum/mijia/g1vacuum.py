@@ -5,7 +5,9 @@ from enum import Enum
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.miot_device import DeviceStatus, MiotDevice
+from miio.miot_device import DeviceStatus
+
+from ..vacuum_device import VacuumMiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 MIJIA_VACUUM_V1 = "mijia.vacuum.v1"
@@ -274,7 +276,7 @@ class G1CleaningSummary(DeviceStatus):
         return timedelta(hours=self.data["total_clean_area"])
 
 
-class G1Vacuum(MiotDevice):
+class G1Vacuum(VacuumMiotDevice):
     """Support for G1 vacuum (G1, mijia.vacuum.v2)."""
 
     _mappings = MIOT_MAPPING
