@@ -22,7 +22,6 @@ from miio.integrations.humidifier import (
     AirHumidifierMjjsq,
 )
 from miio.integrations.vacuum import DreameVacuum, RoborockVacuum, ViomiVacuum
-from miio.integrations.yeelight import Yeelight
 
 from . import (
     AirConditionerMiot,
@@ -74,6 +73,7 @@ from .integrations.light import (
     PhilipsMoonlight,
     PhilipsRwread,
     PhilipsWhiteBulb,
+    Yeelight,
 )
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1

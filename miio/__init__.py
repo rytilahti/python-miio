@@ -57,6 +57,7 @@ from miio.integrations.light import (
     PhilipsMoonlight,
     PhilipsRwread,
     PhilipsWhiteBulb,
+    Yeelight,
 )
 from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum import (
@@ -75,7 +76,6 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     Timer,
     VacuumStatus,
 )
-from miio.integrations.yeelight import Yeelight
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.pwzn_relay import PwznRelay
