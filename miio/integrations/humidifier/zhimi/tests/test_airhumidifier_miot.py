@@ -1,14 +1,14 @@
 import pytest
 
-from miio import AirHumidifierMiot
-from miio.airhumidifier_miot import (
+from miio.tests.dummies import DummyMiotDevice
+
+from .. import AirHumidifierMiot
+from ..airhumidifier_miot import (
     AirHumidifierMiotException,
     LedBrightness,
     OperationMode,
     PressedButton,
 )
-
-from .dummies import DummyMiotDevice
 
 _INITIAL_STATE = {
     "power": True,

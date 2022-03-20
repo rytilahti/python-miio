@@ -15,16 +15,18 @@ from miio.integrations.airpurifier import (
     AirPurifier,
     AirPurifierMiot,
 )
+from miio.integrations.humidifier import (
+    AirHumidifier,
+    AirHumidifierJsq,
+    AirHumidifierJsqs,
+    AirHumidifierMjjsq,
+)
 from miio.integrations.yeelight import Yeelight
 
 from . import (
     AirConditionerMiot,
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
-    AirHumidifier,
-    AirHumidifierJsq,
-    AirHumidifierJsqs,
-    AirHumidifierMjjsq,
     AirQualityMonitor,
     AqaraCamera,
     Ceil,
@@ -57,12 +59,6 @@ from .airconditioningcompanion import (
     MODEL_ACPARTNER_V3,
 )
 from .airconditioningcompanionMCN import MODEL_ACPARTNER_MCN02
-from .airhumidifier import (
-    MODEL_HUMIDIFIER_CA1,
-    MODEL_HUMIDIFIER_CB1,
-    MODEL_HUMIDIFIER_V1,
-)
-from .airhumidifier_mjjsq import MODEL_HUMIDIFIER_JSQ1, MODEL_HUMIDIFIER_MJJSQ
 from .airqualitymonitor import (
     MODEL_AIRQUALITYMONITOR_B1,
     MODEL_AIRQUALITYMONITOR_S1,
@@ -130,14 +126,12 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "chuangmi-camera-ipc019": ChuangmiCamera,
     "chuangmi-ir-v2": ChuangmiIr,
     "chuangmi-remote-h102a03_": ChuangmiIr,
-    "zhimi-humidifier-v1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_V1),
-    "zhimi-humidifier-ca1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CA1),
-    "zhimi-humidifier-cb1": partial(AirHumidifier, model=MODEL_HUMIDIFIER_CB1),
-    "shuii-humidifier-jsq001": partial(AirHumidifierJsq, model=MODEL_HUMIDIFIER_MJJSQ),
-    "deerma-humidifier-mjjsq": partial(
-        AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_MJJSQ
-    ),
-    "deerma-humidifier-jsq1": partial(AirHumidifierMjjsq, model=MODEL_HUMIDIFIER_JSQ1),
+    "zhimi-humidifier-v1": AirHumidifier,
+    "zhimi-humidifier-ca1": AirHumidifier,
+    "zhimi-humidifier-cb1": AirHumidifier,
+    "shuii-humidifier-jsq001": AirHumidifierJsq,
+    "deerma-humidifier-mjjsq": AirHumidifierMjjsq,
+    "deerma-humidifier-jsq1": AirHumidifierMjjsq,
     "deerma-humidifier-jsqs": AirHumidifierJsqs,
     "yunmi-waterpuri-v2": WaterPurifier,
     "yunmi.waterpuri.lx9": WaterPurifierYunmi,
