@@ -34,12 +34,15 @@ from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
-from miio.integrations.airpurifier.airdog import AirDogX3
-from miio.integrations.airpurifier.dmaker import AirFreshA1, AirFreshT2017
-from miio.integrations.airpurifier.zhimi import AirFresh, AirPurifier, AirPurifierMiot
-from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5
-from miio.integrations.fan.leshow import FanLeshow
-from miio.integrations.fan.zhimi import Fan, FanZA5
+from miio.integrations.airpurifier import (
+    AirDogX3,
+    AirFresh,
+    AirFreshA1,
+    AirFreshT2017,
+    AirPurifier,
+    AirPurifierMiot,
+)
+from miio.integrations.fan import Fan, Fan1C, FanLeshow, FanMiot, FanP5, FanZA5
 from miio.integrations.humidifier import (
     AirHumidifier,
     AirHumidifierJsq,
@@ -47,7 +50,7 @@ from miio.integrations.humidifier import (
     AirHumidifierMiot,
     AirHumidifierMjjsq,
 )
-from miio.integrations.light.philips import (
+from miio.integrations.light import (
     Ceil,
     PhilipsBulb,
     PhilipsEyecare,
@@ -56,9 +59,14 @@ from miio.integrations.light.philips import (
     PhilipsWhiteBulb,
 )
 from miio.integrations.petwaterdispenser import PetWaterDispenser
-from miio.integrations.vacuum.dreame.dreamevacuum_miot import DreameVacuum
-from miio.integrations.vacuum.mijia import G1Vacuum
-from miio.integrations.vacuum.roborock import RoborockVacuum, VacuumException
+from miio.integrations.vacuum import (
+    DreameVacuum,
+    G1Vacuum,
+    RoborockVacuum,
+    RoidmiVacuumMiot,
+    VacuumException,
+    ViomiVacuum,
+)
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
     CleaningDetails,
     CleaningSummary,
@@ -67,8 +75,6 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     Timer,
     VacuumStatus,
 )
-from miio.integrations.vacuum.roidmi.roidmivacuum_miot import RoidmiVacuumMiot
-from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 from miio.integrations.yeelight import Yeelight
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils

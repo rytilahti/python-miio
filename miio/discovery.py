@@ -21,6 +21,7 @@ from miio.integrations.humidifier import (
     AirHumidifierJsqs,
     AirHumidifierMjjsq,
 )
+from miio.integrations.vacuum import DreameVacuum, RoborockVacuum, ViomiVacuum
 from miio.integrations.yeelight import Yeelight
 
 from . import (
@@ -35,19 +36,10 @@ from . import (
     ChuangmiPlug,
     Cooker,
     Device,
-    DreameVacuum,
-    FanLeshow,
     Gateway,
     Heater,
-    PhilipsBulb,
-    PhilipsEyecare,
-    PhilipsMoonlight,
-    PhilipsRwread,
-    PhilipsWhiteBulb,
     PowerStrip,
-    RoborockVacuum,
     Toiletlid,
-    ViomiVacuum,
     WaterPurifier,
     WaterPurifierYunmi,
     WifiRepeater,
@@ -75,8 +67,14 @@ from .chuangmi_plug import (
     MODEL_CHUANGMI_PLUG_V3,
 )
 from .heater import MODEL_HEATER_MA1, MODEL_HEATER_ZA1
-from .integrations.fan.dmaker import FanMiot
-from .integrations.fan.zhimi import Fan, FanZA5
+from .integrations.fan import Fan, FanLeshow, FanMiot, FanZA5
+from .integrations.light import (
+    PhilipsBulb,
+    PhilipsEyecare,
+    PhilipsMoonlight,
+    PhilipsRwread,
+    PhilipsWhiteBulb,
+)
 from .powerstrip import MODEL_POWER_STRIP_V1, MODEL_POWER_STRIP_V2
 from .toiletlid import MODEL_TOILETLID_V1
 
