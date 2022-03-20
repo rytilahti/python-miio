@@ -4,11 +4,15 @@ from typing import Any, Dict, Optional
 
 import click
 
-from .airhumidifier import AirHumidifierException
-from .click_common import EnumType, command, format_output
-from .device import Device, DeviceStatus
+from miio import Device, DeviceException, DeviceStatus
+from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class AirHumidifierException(DeviceException):
+    pass
+
 
 # Xiaomi Zero Fog Humidifier
 MODEL_HUMIDIFIER_JSQ001 = "shuii.humidifier.jsq001"

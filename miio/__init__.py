@@ -12,6 +12,7 @@ except ImportError:
 from miio.device import Device, DeviceStatus  # isort: skip
 from miio.exceptions import DeviceError, DeviceException  # isort: skip
 from miio.miot_device import MiotDevice  # isort: skip
+from miio.deviceinfo import DeviceInfo  # isort: skip
 
 # Integration imports
 from miio.airconditioner_miot import AirConditionerMiot
@@ -21,10 +22,6 @@ from miio.airconditioningcompanion import (
 )
 from miio.airconditioningcompanionMCN import AirConditioningCompanionMcn02
 from miio.airdehumidifier import AirDehumidifier
-from miio.airhumidifier import AirHumidifier
-from miio.airhumidifier_jsq import AirHumidifierJsq
-from miio.airhumidifier_miot import AirHumidifierMiot
-from miio.airhumidifier_mjjsq import AirHumidifierMjjsq
 from miio.airqualitymonitor import AirQualityMonitor
 from miio.airqualitymonitor_miot import AirQualityMonitorCGDN1
 from miio.aqaracamera import AqaraCamera
@@ -43,7 +40,13 @@ from miio.integrations.airpurifier.zhimi import AirFresh, AirPurifier, AirPurifi
 from miio.integrations.fan.dmaker import Fan1C, FanMiot, FanP5
 from miio.integrations.fan.leshow import FanLeshow
 from miio.integrations.fan.zhimi import Fan, FanZA5
-from miio.integrations.humidifier.deerma import AirHumidifierJsqs
+from miio.integrations.humidifier import (
+    AirHumidifier,
+    AirHumidifierJsq,
+    AirHumidifierJsqs,
+    AirHumidifierMiot,
+    AirHumidifierMjjsq,
+)
 from miio.integrations.light.philips import (
     Ceil,
     PhilipsBulb,

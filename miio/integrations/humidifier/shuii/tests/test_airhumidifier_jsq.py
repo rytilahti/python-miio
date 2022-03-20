@@ -3,16 +3,16 @@ from unittest import TestCase
 
 import pytest
 
-from miio import AirHumidifierJsq
-from miio.airhumidifier import AirHumidifierException
-from miio.airhumidifier_jsq import (
+from miio.tests.dummies import DummyDevice
+
+from .. import AirHumidifierJsq
+from ..airhumidifier_jsq import (
     MODEL_HUMIDIFIER_JSQ001,
+    AirHumidifierException,
     AirHumidifierStatus,
     LedBrightness,
     OperationMode,
 )
-
-from .dummies import DummyDevice
 
 
 class DummyAirHumidifierJsq(DummyDevice, AirHumidifierJsq):
