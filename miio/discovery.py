@@ -8,21 +8,23 @@ from typing import Callable, Dict, Optional, Type, Union  # noqa: F401
 
 import zeroconf
 
+from miio.integrations.airpurifier import (
+    AirDogX3,
+    AirFresh,
+    AirFreshT2017,
+    AirPurifier,
+    AirPurifierMiot,
+)
 from miio.integrations.yeelight import Yeelight
 
 from . import (
     AirConditionerMiot,
     AirConditioningCompanion,
     AirConditioningCompanionMcn02,
-    AirDogX3,
-    AirFresh,
-    AirFreshT2017,
     AirHumidifier,
     AirHumidifierJsq,
     AirHumidifierJsqs,
     AirHumidifierMjjsq,
-    AirPurifier,
-    AirPurifierMiot,
     AirQualityMonitor,
     AqaraCamera,
     Ceil,
@@ -55,7 +57,6 @@ from .airconditioningcompanion import (
     MODEL_ACPARTNER_V3,
 )
 from .airconditioningcompanionMCN import MODEL_ACPARTNER_MCN02
-from .airfresh import MODEL_AIRFRESH_VA2, MODEL_AIRFRESH_VA4
 from .airhumidifier import (
     MODEL_HUMIDIFIER_CA1,
     MODEL_HUMIDIFIER_CB1,
@@ -182,8 +183,8 @@ DEVICE_MAP: Dict[str, Union[Type[Device], partial]] = {
     "dmaker-fan-p11": FanMiot,
     "zhimi-fan-za5": FanZA5,
     "tinymu-toiletlid-v1": partial(Toiletlid, model=MODEL_TOILETLID_V1),
-    "zhimi-airfresh-va2": partial(AirFresh, model=MODEL_AIRFRESH_VA2),
-    "zhimi-airfresh-va4": partial(AirFresh, model=MODEL_AIRFRESH_VA4),
+    "zhimi-airfresh-va2": AirFresh,
+    "zhimi-airfresh-va4": AirFresh,
     "dmaker-airfresh-t2017": AirFreshT2017,
     "zhimi-airmonitor-v1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_V1),
     "cgllc-airmonitor-b1": partial(AirQualityMonitor, model=MODEL_AIRQUALITYMONITOR_B1),
