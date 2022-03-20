@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from miio.airfilter_util import FilterType, FilterTypeUtil
+from ..airfilter_util import FilterType, FilterTypeUtil
 
 
 @pytest.fixture(scope="class")

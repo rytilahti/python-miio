@@ -2,8 +2,10 @@ from unittest import TestCase
 
 import pytest
 
-from miio import AirFreshA1, AirFreshT2017
-from miio.airfresh_t2017 import (
+from miio.tests.dummies import DummyDevice
+
+from .. import AirFreshA1, AirFreshT2017
+from ..airfresh_t2017 import (
     MODEL_AIRFRESH_A1,
     MODEL_AIRFRESH_T2017,
     AirFreshException,
@@ -12,8 +14,6 @@ from miio.airfresh_t2017 import (
     OperationMode,
     PtcLevel,
 )
-
-from .dummies import DummyDevice
 
 
 class DummyAirFreshA1(DummyDevice, AirFreshA1):

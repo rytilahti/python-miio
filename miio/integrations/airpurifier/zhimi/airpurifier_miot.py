@@ -4,10 +4,10 @@ from typing import Any, Dict, Optional
 
 import click
 
+from miio import DeviceException, DeviceStatus, MiotDevice
+from miio.click_common import EnumType, command, format_output
+
 from .airfilter_util import FilterType, FilterTypeUtil
-from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
-from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPING = {
