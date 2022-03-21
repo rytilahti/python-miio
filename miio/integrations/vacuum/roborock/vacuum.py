@@ -146,6 +146,7 @@ ROCKROBO_S7 = "roborock.vacuum.a15"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 ROCKROBO_E2 = "roborock.vacuum.e2"
 ROCKROBO_1S = "roborock.vacuum.m1s"
+ROCKROBO_C1 = "roborock.vacuum.c1"
 
 SUPPORTED_MODELS = [
     ROCKROBO_V1,
@@ -164,6 +165,7 @@ SUPPORTED_MODELS = [
     ROCKROBO_S6_MAXV,
     ROCKROBO_E2,
     ROCKROBO_1S,
+    ROCKROBO_C1,
 ]
 
 
