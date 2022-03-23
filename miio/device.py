@@ -3,6 +3,7 @@ import logging
 import warnings
 from enum import Enum
 from pprint import pformat as pf
+from typing import _ProtocolMeta  # type: ignore[attr-defined]
 from typing import Any, Dict, List, Optional  # noqa: F401
 
 import click
@@ -47,7 +48,16 @@ class DeviceStatus:
         return s
 
 
-class Device(metaclass=DeviceGroupMeta):
+class _CombinedMeta(DeviceGroupMeta, _ProtocolMeta):
+    """Combine typing._ProtocolMeta and our own meta class to allow inheriting from
+    interfaces.
+
+    This is necessary as typing.Protocol defines its own metaclass causing a metaclass
+    conflict with the DeviceGroupMeta due to differing base classes.
+    """
+
+
+class Device(metaclass=_CombinedMeta):
     """Base class for all device implementations.
 
     This is the main class providing the basic protocol handling for devices using the
