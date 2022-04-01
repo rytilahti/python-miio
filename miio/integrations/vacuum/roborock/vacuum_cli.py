@@ -88,7 +88,7 @@ def cli(ctx, ip: str, token: str, debug: int, id_file: str):
         cleanup(vac, id_file=id_file)
 
 
-@cli.resultcallback()
+@cli.result_callback()
 @pass_dev
 def cleanup(vac: RoborockVacuum, *args, **kwargs):
     if vac.ip is None:  # dummy Device for discovery, skip teardown
