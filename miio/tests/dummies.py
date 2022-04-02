@@ -40,7 +40,7 @@ class DummyDevice:
         # TODO: ugly hack to check for pre-existing _model
         if getattr(self, "_model", None) is None:
             self._model = "dummy.model"
-        self.token = "ffffffffffffffffffffffffffffffff"
+        self.token = "ffffffffffffffffffffffffffffffff"  # nosec
         self.ip = "192.0.2.1"
 
     def _reset_state(self):
