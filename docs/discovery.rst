@@ -61,9 +61,9 @@ see :ref:`cloud_tokens` for information how to do this.
 Tokens from Mi Home Cloud
 ========================
 
-The fastest way to obtain tokens is to use the [cloud tokens extractor]
-(https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) by Piotr Machowski. Check out his repository
-for detailed instructions on installation and execution.
+The fastest way to obtain tokens is to use the
+[cloud tokens extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) by Piotr Machowski.
+Check out his repository for detailed instructions on installation and execution.
 
 
 .. _logged_tokens:
