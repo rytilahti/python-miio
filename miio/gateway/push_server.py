@@ -248,8 +248,8 @@ class PushServer:
                     self.send_ping_ACK(host, port)
                 else:
                     if host not in self.parent._registered_callbacks:
-                        _LOGGER.info(
-                            "Push message received from unknown Miio device with ip %s:%s",
+                        _LOGGER.warning(
+                            "Datagram received from unknown device (%s:%s)",
                             host,
                             port,
                         )
