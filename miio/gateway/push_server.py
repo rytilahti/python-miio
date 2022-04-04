@@ -145,7 +145,7 @@ class PushServer:
         if ip in self._registered_callbacks:
             self._registered_callbacks.pop(ip)
 
-    async def Start_server(self):
+    async def start(self):
         """Start Miio push server."""
         if self._listen_couroutine is not None:
             _LOGGER.error("Miio push server already started, not starting another one.")
