@@ -71,6 +71,19 @@ def test_device_id_handshake(mocker):
     handshake.assert_called()
 
 
+def test_device_id(mocker):
+    """Make sure send_handshake() does not get called if did is already known."""
+    handshake = mocker.patch("miio.Device.send_handshake")
+    _ = mocker.patch("miio.Device.send")
+
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d._protocol._device_id = b"12345678"
+
+    d.device_id
+
+    handshake.assert_not_called()
+
+
 def test_model_autodetection(mocker):
     """Make sure info() gets called if the model is unknown."""
     info = mocker.patch("miio.Device._fetch_info")
