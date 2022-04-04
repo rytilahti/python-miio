@@ -172,7 +172,7 @@ class Device(metaclass=DeviceGroupMeta):
     def device_id(self) -> int:
         """Return device id (did), if available."""
         if not self._protocol._device_id:
-            self._info = self.info()
+            self.send_handshake()
         return int.from_bytes(self._protocol._device_id, byteorder="big")
 
     @property
