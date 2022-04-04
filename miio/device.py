@@ -171,9 +171,9 @@ class Device(metaclass=DeviceGroupMeta):
     @property
     def device_id(self):
         """Return device id (did), if available."""
-        if self._protocol._device_id == b"":
+        if self._protocol.device_id == b"":
             self._info = self.info()
-        return int.from_bytes(self._protocol._device_id, byteorder="big")
+        return int.from_bytes(self._protocol.device_id, byteorder="big")
 
     @property
     def raw_id(self) -> int:
