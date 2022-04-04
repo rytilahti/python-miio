@@ -47,8 +47,8 @@ class MiIOProtocol:
 
         self._discovered = False
         # these come from the device, but we initialize them here to make mypy happy
-        self.device_id = bytes()
         self._device_ts: datetime = datetime.utcnow()
+        self._device_id = bytes()
 
     def send_handshake(self, *, retry_count=3) -> Message:
         """Send a handshake to the device.
@@ -74,7 +74,7 @@ class MiIOProtocol:
             raise DeviceException("Unable to discover the device %s" % self.ip)
 
         header = m.header.value
-        self.device_id = header.device_id
+        self._device_id = header.device_id
         self._device_ts = header.ts
         self._discovered = True
 
@@ -82,7 +82,7 @@ class MiIOProtocol:
             _LOGGER.debug(m)
         _LOGGER.debug(
             "Discovered %s with ts: %s, token: %s",
-            binascii.hexlify(self.device_id).decode(),
+            binascii.hexlify(self._device_id).decode(),
             self._device_ts,
             codecs.encode(m.checksum, "hex"),
         )
@@ -166,7 +166,7 @@ class MiIOProtocol:
         header = {
             "length": 0,
             "unknown": 0x00000000,
-            "device_id": self.device_id,
+            "device_id": self._device_id,
             "ts": send_ts,
         }
 
