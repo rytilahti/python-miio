@@ -199,15 +199,22 @@ class TestPowerStripV2(TestCase):
         self.device.set_power_mode(PowerMode.Normal)
         assert mode() == PowerMode.Normal
 
-    def test_set_wifi_led(self):
-        def wifi_led():
-            return self.device.status().wifi_led
+    def test_set_led(self):
+        def led():
+            return self.device.status().led
 
-        self.device.set_wifi_led(True)
-        assert wifi_led() is True
+        self.device.set_led(True)
+        assert led() is True
 
-        self.device.set_wifi_led(False)
-        assert wifi_led() is False
+        self.device.set_led(False)
+        assert led() is False
+
+    def test_set_wifi_led_deprecation(self):
+        with pytest.deprecated_call():
+            self.device.set_wifi_led(True)
+
+        with pytest.deprecated_call():
+            self.device.status().wifi_led
 
     def test_set_power_price(self):
         def power_price():

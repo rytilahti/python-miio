@@ -2,8 +2,10 @@ import math
 
 import pytest
 
-from miio import Device, MiotDevice, Vacuum
+from miio import Device, MiotDevice, RoborockVacuum
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
+
+DEVICE_CLASSES = Device.__subclasses__() + MiotDevice.__subclasses__()  # type: ignore
 
 
 @pytest.mark.parametrize("max_properties", [None, 1, 15])
@@ -84,7 +86,7 @@ def test_forced_model(mocker):
 
 
 @pytest.mark.parametrize(
-    "cls,hidden", [(Device, True), (MiotDevice, True), (Vacuum, False)]
+    "cls,hidden", [(Device, True), (MiotDevice, True), (RoborockVacuum, False)]
 )
 def test_missing_supported(mocker, caplog, cls, hidden):
     """Make sure warning is logged if the device is unsupported for the class."""
@@ -101,10 +103,11 @@ def test_missing_supported(mocker, caplog, cls, hidden):
         assert f"for class '{cls.__name__}'" in caplog.text
 
 
-@pytest.mark.parametrize("cls", Device.__subclasses__())
+@pytest.mark.parametrize("cls", DEVICE_CLASSES)
 def test_device_ctor_model(cls):
     """Make sure that every device subclass ctor accepts model kwarg."""
-    ignore_classes = ["GatewayDevice", "CustomDevice"]
+    # TODO Huizuo implements custom model fallback, so it needs to be ignored for now
+    ignore_classes = ["GatewayDevice", "CustomDevice", "Huizuo"]
     if cls.__name__ in ignore_classes:
         return
 
@@ -113,10 +116,10 @@ def test_device_ctor_model(cls):
     assert dev.model == dummy_model
 
 
-@pytest.mark.parametrize("cls", Device.__subclasses__())
+@pytest.mark.parametrize("cls", DEVICE_CLASSES)
 def test_device_supported_models(cls):
     """Make sure that every device subclass has a non-empty supported models."""
     if cls.__name__ == "MiotDevice":  # skip miotdevice
         return
 
-    assert cls._supported_models
+    assert cls.supported_models

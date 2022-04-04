@@ -145,6 +145,11 @@ class DeviceGroupMeta(type):
         mcs._device_classes.add(cls)
         return cls
 
+    @property
+    def supported_models(cls):
+        """Return list of supported models."""
+        return cls._mappings.keys() or cls._supported_models
+
 
 class DeviceGroup(click.MultiCommand):
     class Command:

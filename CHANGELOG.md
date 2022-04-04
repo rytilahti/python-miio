@@ -1,5 +1,88 @@
 # Change Log
 
+## [0.5.11](https://github.com/rytilahti/python-miio/tree/0.5.11) (2022-03-07)
+
+This release fixes zhimi.fan.za5 support and makes all integrations introspectable for their supported models.
+For developers, there is now a network trace parser (in devtools/parse_pcap.py) that prints the decrypted the traffic for given tokens.
+
+The following previously deprecated classes in favor of model-based discovery, if you were using these classes directly you need to adjust your code:
+* AirFreshVA4 - use AirFresh
+* AirHumidifierCA1, AirHumidifierCB1, AirHumidifierCB2 - use AirHumidifier
+* AirDogX5, AirDogX7SM - use AirDogX3
+* AirPurifierMB4 - use AirPurifierMiot
+* Plug, PlugV1, PlugV3 - use ChuangmiPlug
+* FanP9, FanP10, FanP11 - use FanMiot
+* DreameVacuumMiot - use DreameVacuum
+* Vacuum - use RoborockVacuum
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.10...0.5.11)
+
+**Breaking changes:**
+
+- Remove deprecated integration classes [\#1343](https://github.com/rytilahti/python-miio/pull/1343) (@rytilahti)
+
+**Implemented enhancements:**
+
+- Add PCAP file parser for protocol analysis [\#1331](https://github.com/rytilahti/python-miio/pull/1331) (@rytilahti)
+
+**Fixed bugs:**
+
+- Fix bug for zhimi.fan.za5 resulting in user ack timeout [\#1348](https://github.com/rytilahti/python-miio/pull/1348) (@saxel)
+
+**Deprecated:**
+
+- Deprecate wifi\_led in favor of led [\#1342](https://github.com/rytilahti/python-miio/pull/1342) (@rytilahti)
+
+**Merged pull requests:**
+
+- Make sure miotdevice implementations define supported models [\#1345](https://github.com/rytilahti/python-miio/pull/1345) (@rytilahti)
+- Add Viomi V2 \(viomi.vacuum.v6\) as supported [\#1340](https://github.com/rytilahti/python-miio/pull/1340) (@rytilahti)
+- Mark Roborock S7 MaxV \(roborock.vacuum.a27\) as supported [\#1337](https://github.com/rytilahti/python-miio/pull/1337) (@rytilahti)
+- Add pyupgrade to CI runs [\#1329](https://github.com/rytilahti/python-miio/pull/1329) (@rytilahti)
+
+
+## [0.5.10](https://github.com/rytilahti/python-miio/tree/0.5.10) (2022-02-17)
+
+This release adds support for several new devices (see details below, thanks to @PRO-2684, @peleccom, @ymj0424, and @supar), and contains improvements to Roborock S7, yeelight and gateway integrations (thanks to @starkillerOG, @Kirmas, and @shred86). Thanks also to everyone who has reported their working model information, we can use this information to provide better discovery in the future and this release silences the warning for known working models.
+
+Python 3.6 is no longer supported, and Fan{V2,SA1,ZA1,ZA3,ZA4} utility classes are now removed in favor of using Fan class.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.9.2...0.5.10)
+
+**Breaking changes:**
+
+- Split fan.py to vendor-specific fan integrations [\#1304](https://github.com/rytilahti/python-miio/pull/1304) (@rytilahti)
+- Drop python 3.6 support [\#1263](https://github.com/rytilahti/python-miio/pull/1263) (@rytilahti)
+
+**Implemented enhancements:**
+
+- Improve miotdevice mappings handling [\#1302](https://github.com/rytilahti/python-miio/pull/1302) (@rytilahti)
+- airpurifier\_miot: force aqi update prior fetching data [\#1282](https://github.com/rytilahti/python-miio/pull/1282) (@rytilahti)
+- improve gateway error messages [\#1261](https://github.com/rytilahti/python-miio/pull/1261) (@starkillerOG)
+- yeelight: use and expose the color temp range from specs [\#1247](https://github.com/rytilahti/python-miio/pull/1247) (@Kirmas)
+- Add Roborock S7 mop scrub intensity [\#1236](https://github.com/rytilahti/python-miio/pull/1236) (@shred86)
+
+**New devices:**
+
+- Add support for zhimi.heater.za2 [\#1301](https://github.com/rytilahti/python-miio/pull/1301) (@PRO-2684)
+- Dreame F9 Vacuum \(dreame.vacuum.p2008\) support [\#1290](https://github.com/rytilahti/python-miio/pull/1290) (@peleccom)
+- Add support for Air Purifier 4 Pro \(zhimi.airp.va2\) [\#1287](https://github.com/rytilahti/python-miio/pull/1287) (@ymj0424)
+- Add support for deerma.humidifier.jsq{s,5} [\#1193](https://github.com/rytilahti/python-miio/pull/1193) (@supar)
+
+**Merged pull requests:**
+
+- Add roborock.vacuum.a23 to supported models [\#1314](https://github.com/rytilahti/python-miio/pull/1314) (@rytilahti)
+- Move philips light implementations to integrations/light/philips [\#1306](https://github.com/rytilahti/python-miio/pull/1306) (@rytilahti)
+- Move leshow fan implementation to integrations/fan/leshow/ [\#1305](https://github.com/rytilahti/python-miio/pull/1305) (@rytilahti)
+- Split fan\_miot.py to vendor-specific fan integrations [\#1303](https://github.com/rytilahti/python-miio/pull/1303) (@rytilahti)
+- Add chuangmi.remote.v2 to chuangmiir [\#1299](https://github.com/rytilahti/python-miio/pull/1299) (@rytilahti)
+- Perform pypi release on github release [\#1298](https://github.com/rytilahti/python-miio/pull/1298) (@rytilahti)
+- Print debug recv contents prior accessing its contents [\#1293](https://github.com/rytilahti/python-miio/pull/1293) (@rytilahti)
+- Add more supported models [\#1292](https://github.com/rytilahti/python-miio/pull/1292) (@rytilahti)
+- Add more supported models [\#1275](https://github.com/rytilahti/python-miio/pull/1275) (@rytilahti)
+- Update installation instructions to use poetry [\#1259](https://github.com/rytilahti/python-miio/pull/1259) (@rytilahti)
+- Add more supported models based on discovery.py's mdns records [\#1258](https://github.com/rytilahti/python-miio/pull/1258) (@rytilahti)
+
 ## [0.5.9.2](https://github.com/rytilahti/python-miio/tree/0.5.9.2) (2021-12-14)
 
 This release fixes regressions caused by the recent refactoring related to supported models:

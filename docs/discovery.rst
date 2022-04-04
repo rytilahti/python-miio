@@ -53,14 +53,25 @@ encryption token must be known.
 If the returned a token is with characters other than ``0``\ s or ``f``\ s,
 it is likely a valid token which can be used directly for communication.
 If not, the token needs to be extracted from the Mi Home Application,
-see :ref:`logged_tokens` for information how to do this.
+see :ref:`cloud_tokens` for information how to do this.
+
+
+.. _cloud_tokens:
+
+Tokens from Mi Home Cloud
+========================
+
+The fastest way to obtain tokens is to use the
+[cloud tokens extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) by Piotr Machowski.
+Check out his repository for detailed instructions on installation and execution.
+
 
 .. _logged_tokens:
 
 Tokens from Mi Home logs
 ========================
 
-The easiest way to obtain tokens is to browse through log files of the Mi Home
+The easiest way to obtain tokens yourself is to browse through log files of the Mi Home
 app version 5.4.49 for Android. It seems that version was released with debug
 messages turned on by mistake. An APK file with the old version can be easily
 found using one of the popular web search engines. After downgrading use a file

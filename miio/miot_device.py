@@ -36,7 +36,7 @@ class MiotDevice(Device):
     remains in-place for backwards compatibility.
     """
 
-    mapping: MiotMapping
+    mapping: MiotMapping  # Deprecated, use _mappings instead
     _mappings: Dict[str, MiotMapping] = {}
 
     def __init__(
@@ -79,10 +79,11 @@ class MiotDevice(Device):
     )
     def call_action(self, name: str, params=None):
         """Call an action by a name in the mapping."""
-        if name not in self.mapping:
+        mapping = self._get_mapping()
+        if name not in mapping:
             raise DeviceException(f"Unable to find {name} in the mapping")
 
-        action = self.mapping[name]
+        action = mapping[name]
 
         if "siid" not in action or "aiid" not in action:
             raise DeviceException(f"{name} is not an action (missing siid or aiid)")
@@ -163,7 +164,6 @@ class MiotDevice(Device):
         """
         if not self._mappings:
             return self.mapping
-
         mapping = self._mappings.get(self.model)
         if mapping is not None:
             return mapping
