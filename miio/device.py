@@ -169,7 +169,7 @@ class Device(metaclass=DeviceGroupMeta):
             ) from ex
 
     @property
-    def device_id(self):
+    def device_id(self) -> int:
         """Return device id (did), if available."""
         if not self._protocol._device_id:
             self._info = self.info()
