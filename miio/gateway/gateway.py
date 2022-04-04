@@ -14,7 +14,6 @@ from ..device import Device
 from ..exceptions import DeviceError, DeviceException
 from .alarm import Alarm
 from .light import Light
-from .push_server import calculated_token_enc
 from .radio import Radio
 from .zigbee import Zigbee
 
@@ -113,7 +112,6 @@ class Gateway(Device):
         self._subdevice_model_map = None
         self._did = None
 
-        self._token_enc = calculated_token_enc(token)
         self._push_server = push_server
         self._script_ids: List[str] = []
         self._gatway_script_i = 0

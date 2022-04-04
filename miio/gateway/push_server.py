@@ -26,72 +26,6 @@ def calculated_token_enc(token):
     return encrypted_token_hex[0:32]
 
 
-def construct_script(  # nosec
-    script_id,
-    action,
-    extra,
-    source_sid,
-    source_model,
-    target_id,
-    target_ip,
-    target_model,
-    token_enc,
-    message_id=0,
-    event=None,
-    command_extra="",
-    trigger_value=None,
-    trigger_token="",
-):
-    if event is None:
-        event = action
-
-    if source_sid.startswith("lumi."):
-        lumi, source_id = source_sid.split(".")
-    else:
-        source_id = source_sid
-
-    script = [
-        [
-            script_id,
-            [
-                "1.0",
-                randint(1590161094, 1590162094),  # nosec
-                [
-                    "0",
-                    {
-                        "did": source_sid,
-                        "extra": extra,
-                        "key": "event." + source_model + "." + event,
-                        "model": source_model,
-                        "src": "device",
-                        "timespan": ["0 0 * * 0,1,2,3,4,5,6", "0 0 * * 0,1,2,3,4,5,6"],
-                        "token": trigger_token,
-                    },
-                ],
-                [
-                    {
-                        "command": target_model + "." + action + "_" + source_id,
-                        "did": str(target_id),
-                        "extra": command_extra,
-                        "id": message_id,
-                        "ip": target_ip,
-                        "model": target_model,
-                        "token": token_enc,
-                        "value": "",
-                    }
-                ],
-            ],
-        ]
-    ]
-
-    if trigger_value is not None:
-        script[0][1][2][1]["value"] = trigger_value
-
-    script_data = dumps(script, separators=(",", ":"))
-
-    return script_data
-
-
 class PushServer:
     """Async UDP push server using a fake miio device registered to a real gateway."""
 
@@ -161,6 +95,79 @@ class PushServer:
 
         self._listen_couroutine.close()
         self._listen_couroutine = None
+
+    def construct_script(  # nosec
+        self,
+        script_id,
+        action,
+        extra,
+        source_sid,
+        source_model,
+        source_token,
+        message_id=0,
+        event=None,
+        command_extra="",
+        trigger_value=None,
+        trigger_token="",
+    ):
+        """Construct the script data payload needed to subscripe to an event."""
+        if event is None:
+            event = action
+
+        if source_sid.startswith("lumi."):
+            lumi, source_id = source_sid.split(".")
+        else:
+            source_id = source_sid
+
+        token_enc = calculated_token_enc(source_token)
+
+        script = [
+            [
+                script_id,
+                [
+                    "1.0",
+                    randint(1590161094, 1590162094),  # nosec
+                    [
+                        "0",
+                        {
+                            "did": source_sid,
+                            "extra": extra,
+                            "key": "event." + source_model + "." + event,
+                            "model": source_model,
+                            "src": "device",
+                            "timespan": [
+                                "0 0 * * 0,1,2,3,4,5,6",
+                                "0 0 * * 0,1,2,3,4,5,6",
+                            ],
+                            "token": trigger_token,
+                        },
+                    ],
+                    [
+                        {
+                            "command": self.device_model
+                            + "."
+                            + action
+                            + "_"
+                            + source_id,
+                            "did": str(self.device_id),
+                            "extra": command_extra,
+                            "id": message_id,
+                            "ip": self.device_ip,
+                            "model": self.device_model,
+                            "token": token_enc,
+                            "value": "",
+                        }
+                    ],
+                ],
+            ]
+        ]
+
+        if trigger_value is not None:
+            script[0][1][2][1]["value"] = trigger_value
+
+        script_data = dumps(script, separators=(",", ":"))
+
+        return script_data
 
     @property
     def device_ip(self):

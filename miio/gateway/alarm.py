@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 
 from .gatewaydevice import GatewayDevice
-from .push_server import construct_script
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -84,16 +83,13 @@ class Alarm(GatewayDevice):
             self._gateway._gatway_script_i = self._gateway._gatway_script_i + 1
             script_id = f"x.scene.{self._gateway._gatway_script_i}000000"
 
-            script = construct_script(
+            script = self._gateway._push_server.construct_script(
                 script_id=script_id,
                 action=action,
                 extra=alarm_scripts[action]["extra"],
                 source_sid=self._gateway.did,
                 source_model=self._gateway.model,
-                target_id=self._gateway._push_server.device_id,
-                target_ip=self._gateway._push_server.device_ip,
-                target_model=self._gateway._push_server.device_model,
-                token_enc=self._gateway._token_enc,
+                source_token=self._gateway.token,
                 trigger_token=self._gateway.token,
             )
 

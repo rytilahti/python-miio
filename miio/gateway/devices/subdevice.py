@@ -9,7 +9,6 @@ import click
 
 from ...click_common import command
 from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
-from ..push_server import construct_script
 
 _LOGGER = logging.getLogger(__name__)
 if TYPE_CHECKING:
@@ -321,16 +320,13 @@ class SubDevice:
             self.script_i = self.script_i + 1
             script_id = f"x.scene.{self.script_i}{script_id_str}"
 
-            script = construct_script(
+            script = self._gw._push_server.construct_script(
                 script_id=script_id,
                 action=action,
                 extra=self.push_scripts[action]["extra"],
                 source_sid=self.sid,
                 source_model=self.zigbee_model,
-                target_id=self._gw._push_server.device_id,
-                target_ip=self._gw._push_server.device_ip,
-                target_model=self._gw._push_server.device_model,
-                token_enc=self._gw._token_enc,
+                source_token=self._gw.token,
                 event=self.push_scripts[action].get("event", None),
                 command_extra=self.push_scripts[action].get("command_extra", ""),
                 trigger_value=self.push_scripts[action].get("trigger_value"),
