@@ -7,7 +7,7 @@ import struct
 from json import dumps
 from random import randint
 
-from ..protocol import Message, Utils
+from .protocol import Message, Utils
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,29 +27,30 @@ def calculated_token_enc(token):
 
 
 class PushServer:
-    """Async UDP push server using a fake miio device registered to a real gateway."""
+    """Async UDP push server using a fake miio device registered to a real miio
+    device."""
 
-    def __init__(self, gateway_ip):
+    def __init__(self, device_ip):
         """Initialize the class."""
-        self._gateway_ip = gateway_ip
+        self._device_ip = device_ip
 
         self._address = "0.0.0.0"  # nosec
-        self._device_ip = None
-        self._device_id = int(FAKE_DEVICE_ID)
-        self._device_model = FAKE_DEVICE_MODEL
+        self._server_ip = None
+        self._server_id = int(FAKE_DEVICE_ID)
+        self._server_model = FAKE_DEVICE_MODEL
 
         self._listen_couroutine = None
         self._registered_callbacks = {}
 
     def _create_udp_server(self):
         """Create the UDP socket and protocol."""
-        # Connect to the gateway to get device_ip using a one time use socket
+        # Connect to the miio device to get server_ip using a one time use socket
         get_ip_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         get_ip_socket.bind((self._address, SERVER_PORT))
-        get_ip_socket.connect((self._gateway_ip, SERVER_PORT))
-        self._device_ip = get_ip_socket.getsockname()[0]
+        get_ip_socket.connect((self._device_ip, SERVER_PORT))
+        self._server_ip = get_ip_socket.getsockname()[0]
         get_ip_socket.close()
-        _LOGGER.debug("Miio push server device ip=%s", self._device_ip)
+        _LOGGER.debug("Miio push server device ip=%s", self._server_ip)
 
         # Create a fresh socket that will be used for the push server
         udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -62,8 +63,8 @@ class PushServer:
             sock=udp_socket,
         )
 
-    def Register_gateway(self, ip, token, callback):
-        """Register a gateway to this push server."""
+    def Register_miio_device(self, ip, token, callback):
+        """Register a miio device to this push server."""
         if ip in self._registered_callbacks:
             _LOGGER.error(
                 "A callback for ip '%s' was already registed, overwriting previous callback",
@@ -74,8 +75,8 @@ class PushServer:
             "token": bytes.fromhex(token),
         }
 
-    def Unregister_gateway(self, ip):
-        """Unregister a gateway from this push server."""
+    def Unregister_miio_device(self, ip):
+        """Unregister a miio device from this push server."""
         if ip in self._registered_callbacks:
             self._registered_callbacks.pop(ip)
 
@@ -144,7 +145,7 @@ class PushServer:
                     ],
                     [
                         {
-                            "command": self.device_model
+                            "command": self.server_model
                             + "."
                             + action
                             + "_"
@@ -152,8 +153,8 @@ class PushServer:
                             "did": str(self.device_id),
                             "extra": command_extra,
                             "id": message_id,
-                            "ip": self.device_ip,
-                            "model": self.device_model,
+                            "ip": self.server_ip,
+                            "model": self.server_model,
                             "token": token_enc,
                             "value": "",
                         }
@@ -170,19 +171,19 @@ class PushServer:
         return script_data
 
     @property
-    def device_ip(self):
+    def server_ip(self):
         """Return the IP of the device running this server."""
-        return self._device_ip
+        return self._server_ip
 
     @property
-    def device_id(self):
+    def server_id(self):
         """Return the ID of the fake device beeing emulated."""
-        return self._device_id
+        return self._server_id
 
     @property
-    def device_model(self):
+    def server_model(self):
         """Return the model of the fake device beeing emulated."""
-        return self._device_model
+        return self._server_model
 
     class ServerProtocol:
         """Handle responding to UDP packets."""
@@ -200,7 +201,7 @@ class PushServer:
             timestamp = calendar.timegm(datetime.datetime.now().timetuple())
             # ACK packet not signed, 16 bytes header + 16 bytes of zeroes
             return struct.pack(
-                ">HHIII16s", 0x2131, 32, 0, self.parent._device_id, timestamp, bytes(16)
+                ">HHIII16s", 0x2131, 32, 0, self.parent.server_id, timestamp, bytes(16)
             )
 
         def connection_made(self, transport):
@@ -210,7 +211,7 @@ class PushServer:
             _LOGGER.info(
                 "Miio push server started with address=%s device_id=%s",
                 self.parent._address,
-                self.parent._device_id,
+                self.parent.server_id,
             )
 
         def connection_lost(self, exc):
@@ -224,9 +225,7 @@ class PushServer:
             _LOGGER.debug("%s:%s=>PING", host, port)
             m = self._build_ack()
             self.transport.sendto(m, (host, port))
-            _LOGGER.debug(
-                "%s:%s<=ACK(device_id=%s)", host, port, self.parent._device_id
-            )
+            _LOGGER.debug("%s:%s<=ACK(device_id=%s)", host, port, self.parent.server_id)
 
         def send_msg_OK(self, host, port, msg_id, token):
             # This result means OK, but some methods return ['ok'] instead of 0
@@ -235,7 +234,7 @@ class PushServer:
             header = {
                 "length": 0,
                 "unknown": 0,
-                "device_id": self.parent._device_id,
+                "device_id": self.parent.server_id,
                 "ts": datetime.datetime.now(),
             }
             msg = {

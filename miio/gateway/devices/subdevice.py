@@ -306,7 +306,7 @@ class SubDevice:
             _LOGGER.error("Can not install push callback withouth a push_server")
             return False
 
-        if self._gw._push_server.device_ip is None:
+        if self._gw._push_server.server_ip is None:
             _LOGGER.error(
                 "Can not install push callback withouth starting the push_server"
             )

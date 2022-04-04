@@ -120,7 +120,7 @@ class Gateway(Device):
         self.has_push_server = push_server is not None
 
         if self.has_push_server:
-            self._push_server.Register_gateway(ip, token, self.push_callback)
+            self._push_server.Register_miio_device(ip, token, self.push_callback)
 
     def _get_unknown_model(self):
         for model_info in self.subdevice_model_map:
@@ -485,6 +485,6 @@ class Gateway(Device):
             self.delete_script(script_id)
 
         if self.has_push_server:
-            self._push_server.Unregister_gateway(self.ip)
+            self._push_server.Unregister_miio_device(self.ip)
 
         return

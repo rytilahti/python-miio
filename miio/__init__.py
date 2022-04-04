@@ -38,7 +38,7 @@ from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug, Plug, PlugV1, PlugV3
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
-from miio.gateway import Gateway, PushServer
+from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
 from miio.huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, HuizuoLampScene
@@ -71,6 +71,7 @@ from miio.integrations.vacuum.viomi.viomivacuum import ViomiVacuum
 from miio.integrations.yeelight import Yeelight
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
+from miio.push_server import PushServer
 from miio.pwzn_relay import PwznRelay
 from miio.scishare_coffeemaker import ScishareCoffee
 from miio.toiletlid import Toiletlid
