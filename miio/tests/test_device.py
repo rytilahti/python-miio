@@ -59,6 +59,18 @@ def test_unavailable_device_info_raises(mocker):
     assert send.call_count == 1
 
 
+def test_device_id_handshake(mocker):
+    """Make sure send_handshake() gets called if did is unknown."""
+    handshake = mocker.patch("miio.Device.send_handshake")
+    _ = mocker.patch("miio.Device.send")
+
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+
+    d.device_id
+
+    handshake.assert_called()
+
+
 def test_model_autodetection(mocker):
     """Make sure info() gets called if the model is unknown."""
     info = mocker.patch("miio.Device._fetch_info")
