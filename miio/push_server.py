@@ -150,7 +150,7 @@ class PushServer:
                             + action
                             + "_"
                             + source_id,
-                            "did": str(self.device_id),
+                            "did": str(self.server_id),
                             "extra": command_extra,
                             "id": message_id,
                             "ip": self.server_ip,
@@ -209,7 +209,7 @@ class PushServer:
             self.transport = transport
             self._connected = True
             _LOGGER.info(
-                "Miio push server started with address=%s device_id=%s",
+                "Miio push server started with address=%s server_id=%s",
                 self.parent._address,
                 self.parent.server_id,
             )
@@ -225,7 +225,7 @@ class PushServer:
             _LOGGER.debug("%s:%s=>PING", host, port)
             m = self._build_ack()
             self.transport.sendto(m, (host, port))
-            _LOGGER.debug("%s:%s<=ACK(device_id=%s)", host, port, self.parent.server_id)
+            _LOGGER.debug("%s:%s<=ACK(server_id=%s)", host, port, self.parent.server_id)
 
         def send_msg_OK(self, host, port, msg_id, token):
             # This result means OK, but some methods return ['ok'] instead of 0
