@@ -169,6 +169,13 @@ class Device(metaclass=DeviceGroupMeta):
             ) from ex
 
     @property
+    def device_id(self) -> int:
+        """Return device id (did), if available."""
+        if not self._protocol._device_id:
+            self.send_handshake()
+        return int.from_bytes(self._protocol._device_id, byteorder="big")
+
+    @property
     def raw_id(self) -> int:
         """Return the last used protocol sequence id."""
         return self._protocol.raw_id
