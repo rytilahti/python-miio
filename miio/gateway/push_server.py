@@ -247,31 +247,33 @@ class PushServer:
                 if data == HELO_BYTES:
                     self.send_ping_ACK(host, port)
                     return
-                    if host not in self.parent._registered_callbacks:
-                        _LOGGER.warning(
-                            "Datagram received from unknown device (%s:%s)",
-                            host,
-                            port,
-                        )
-                        return
-                    token = self.parent._registered_callbacks[host]["token"]
-                    callback = self.parent._registered_callbacks[host]["callback"]
 
-                    msg = Message.parse(data, token=token)
-                    msg_value = msg.data.value
-                    msg_id = msg_value["id"]
-                    _LOGGER.debug("%s:%s=>%s", host, port, msg_value)
-
-                    # Parse message
-                    action, device_call_id = msg_value["method"].rsplit("_", 1)
-                    source_device_id = (
-                        f"lumi.{device_call_id}"  # All known devices use lumi. prefix
+                if host not in self.parent._registered_callbacks:
+                    _LOGGER.warning(
+                        "Datagram received from unknown device (%s:%s)",
+                        host,
+                        port,
                     )
+                    return
 
-                    callback(source_device_id, action, msg_value.get("params"))
+                token = self.parent._registered_callbacks[host]["token"]
+                callback = self.parent._registered_callbacks[host]["callback"]
 
-                    # Send OK
-                    self.send_msg_OK(host, port, msg_id, token)
+                msg = Message.parse(data, token=token)
+                msg_value = msg.data.value
+                msg_id = msg_value["id"]
+                _LOGGER.debug("%s:%s=>%s", host, port, msg_value)
+
+                # Parse message
+                action, device_call_id = msg_value["method"].rsplit("_", 1)
+                source_device_id = (
+                    f"lumi.{device_call_id}"  # All known devices use lumi. prefix
+                )
+
+                callback(source_device_id, action, msg_value.get("params"))
+
+                # Send OK
+                self.send_msg_OK(host, port, msg_id, token)
 
             except Exception:
                 _LOGGER.exception(
