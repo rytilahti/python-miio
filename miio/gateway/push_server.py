@@ -246,7 +246,7 @@ class PushServer:
                 (host, port) = addr
                 if data == HELO_BYTES:
                     self.send_ping_ACK(host, port)
-                else:
+                    return
                     if host not in self.parent._registered_callbacks:
                         _LOGGER.warning(
                             "Datagram received from unknown device (%s:%s)",
