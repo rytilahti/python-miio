@@ -154,7 +154,7 @@ class PushServer:
         listen_task = self._create_udp_server()
         _, self._listen_couroutine = await listen_task
 
-    def Stop_server(self):
+    def stop(self):
         """Stop Miio push server."""
         if self._listen_couroutine is None:
             return
