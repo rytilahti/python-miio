@@ -1,8 +1,9 @@
 import inspect
 import logging
+import warnings
 from enum import Enum
 from pprint import pformat as pf
-from typing import Any, List, Optional  # noqa: F401
+from typing import Any, Dict, List, Optional  # noqa: F401
 
 import click
 
@@ -35,7 +36,9 @@ class DeviceStatus:
         for prop_tuple in props:
             name, prop = prop_tuple
             try:
-                prop_value = prop.fget(self)
+                # ignore deprecation warnings
+                with warnings.catch_warnings():
+                    prop_value = prop.fget(self)
             except Exception as ex:
                 prop_value = ex.__class__.__name__
 
@@ -54,6 +57,7 @@ class Device(metaclass=DeviceGroupMeta):
 
     retry_count = 3
     timeout = 5
+    _mappings: Dict[str, Any] = {}
     _supported_models: List[str] = []
 
     def __init__(
@@ -154,7 +158,7 @@ class Device(metaclass=DeviceGroupMeta):
             if devinfo.model not in self.supported_models and cls not in bases:
                 _LOGGER.warning(
                     "Found an unsupported model '%s' for class '%s'. If this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
-                    self.model,
+                    devinfo.model,
                     cls,
                 )
 

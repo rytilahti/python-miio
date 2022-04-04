@@ -8,25 +8,32 @@ from .click_common import EnumType, command, format_output
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
-_MAPPING = {
-    # # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:lumi-hagl05:1
-    # Curtain
-    "motor_control": {"siid": 2, "piid": 2},  # 0 - Pause, 1 - Open, 2 - Close, 3 - auto
-    "current_position": {"siid": 2, "piid": 3},  # Range: [0, 100, 1]
-    "status": {"siid": 2, "piid": 6},  # 0 - Stopped, 1 - Opening, 2 - Closing
-    "target_position": {"siid": 2, "piid": 7},  # Range: [0, 100, 1]
-    # curtain_cfg
-    "is_manual_enabled": {"siid": 4, "piid": 1},  #
-    "polarity": {"siid": 4, "piid": 2},
-    "is_position_limited": {"siid": 4, "piid": 3},
-    "night_tip_light": {"siid": 4, "piid": 4},
-    "run_time": {"siid": 4, "piid": 5},  # Range: [0, 255, 1]
-    # motor_controller
-    "adjust_value": {"siid": 5, "piid": 1},  # Range: [-100, 100, 1]
-}
+
 
 # Model: ZNCLDJ21LM (also known as "Xiaomiyoupin Curtain Controller (Wi-Fi)"
 MODEL_CURTAIN_HAGL05 = "lumi.curtain.hagl05"
+
+_MAPPINGS = {
+    MODEL_CURTAIN_HAGL05: {
+        # # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:curtain:0000A00C:lumi-hagl05:1
+        # Curtain
+        "motor_control": {
+            "siid": 2,
+            "piid": 2,
+        },  # 0 - Pause, 1 - Open, 2 - Close, 3 - auto
+        "current_position": {"siid": 2, "piid": 3},  # Range: [0, 100, 1]
+        "status": {"siid": 2, "piid": 6},  # 0 - Stopped, 1 - Opening, 2 - Closing
+        "target_position": {"siid": 2, "piid": 7},  # Range: [0, 100, 1]
+        # curtain_cfg
+        "is_manual_enabled": {"siid": 4, "piid": 1},  #
+        "polarity": {"siid": 4, "piid": 2},
+        "is_position_limited": {"siid": 4, "piid": 3},
+        "night_tip_light": {"siid": 4, "piid": 4},
+        "run_time": {"siid": 4, "piid": 5},  # Range: [0, 255, 1]
+        # motor_controller
+        "adjust_value": {"siid": 5, "piid": 1},  # Range: [-100, 100, 1]
+    }
+}
 
 
 class MotorControl(enum.Enum):
@@ -114,7 +121,7 @@ class CurtainStatus(DeviceStatus):
 class CurtainMiot(MiotDevice):
     """Main class representing the lumi.curtain.hagl05 curtain."""
 
-    mapping = _MAPPING
+    _mappings = _MAPPINGS
 
     @command(
         default_output=format_output(

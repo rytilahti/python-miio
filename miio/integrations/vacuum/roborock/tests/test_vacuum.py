@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from miio import RoborockVacuum, Vacuum, VacuumStatus
+from miio import RoborockVacuum, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
 from ..vacuum import (
@@ -327,14 +327,6 @@ class TestVacuum(TestCase):
         """Test Roborock S7 check when setting mop intensity."""
         with pytest.raises(VacuumException):
             self.device.set_mop_intensity(MopIntensity.Intense)
-
-
-def test_deprecated_vacuum(caplog):
-    with pytest.deprecated_call():
-        Vacuum("127.1.1.1", "68ffffffffffffffffffffffffffffff")
-
-    with pytest.deprecated_call():
-        from miio.vacuum import ROCKROBO_S6  # noqa: F401
 
 
 class DummyVacuumS7(DummyVacuum):

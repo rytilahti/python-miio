@@ -269,7 +269,8 @@ class MiIOProtocol:
 
     def _handle_error(self, error):
         """Raise exception based on the given error code."""
-        if "code" in error and error["code"] == -30001:
+        RECOVERABLE_ERRORS = [-30001, -9999]
+        if "code" in error and error["code"] in RECOVERABLE_ERRORS:
             raise RecoverableError(error)
         raise DeviceError(error)
 

@@ -6,26 +6,16 @@ import click
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
 from miio.fan_common import FanException, MoveDirection, OperationMode
-from miio.utils import deprecated
 
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
 MODEL_FAN_P11 = "dmaker.fan.p11"
+MODEL_FAN_P15 = "dmaker.fan.p15"
+MODEL_FAN_P18 = "dmaker.fan.p18"
 MODEL_FAN_1C = "dmaker.fan.1c"
 
 
 MIOT_MAPPING = {
-    MODEL_FAN_1C: {
-        # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-1c:1
-        "power": {"siid": 2, "piid": 1},
-        "fan_level": {"siid": 2, "piid": 2},
-        "child_lock": {"siid": 3, "piid": 1},
-        "swing_mode": {"siid": 2, "piid": 3},
-        "power_off_time": {"siid": 2, "piid": 10},
-        "buzzer": {"siid": 2, "piid": 11},
-        "light": {"siid": 2, "piid": 12},
-        "mode": {"siid": 2, "piid": 7},
-    },
     MODEL_FAN_P9: {
         # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p9:1
         "power": {"siid": 2, "piid": 1},
@@ -69,6 +59,26 @@ MIOT_MAPPING = {
         "power_off_time": {"siid": 3, "piid": 1},
         "set_move": {"siid": 6, "piid": 1},
     },
+}
+
+
+# These mappings are based on user reports and may not cover all features
+MIOT_MAPPING[MODEL_FAN_P15] = MIOT_MAPPING[MODEL_FAN_P11]  # see #1354
+MIOT_MAPPING[MODEL_FAN_P18] = MIOT_MAPPING[MODEL_FAN_P10]  # see #1341
+
+
+FAN1C_MAPPINGS = {
+    MODEL_FAN_1C: {
+        # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-1c:1
+        "power": {"siid": 2, "piid": 1},
+        "fan_level": {"siid": 2, "piid": 2},
+        "child_lock": {"siid": 3, "piid": 1},
+        "swing_mode": {"siid": 2, "piid": 3},
+        "power_off_time": {"siid": 2, "piid": 10},
+        "buzzer": {"siid": 2, "piid": 11},
+        "light": {"siid": 2, "piid": 12},
+        "mode": {"siid": 2, "piid": 7},
+    }
 }
 
 SUPPORTED_ANGLES = {
@@ -371,23 +381,9 @@ class FanMiot(MiotDevice):
         return self.set_property("set_move", value)
 
 
-@deprecated("Use FanMiot")
-class FanP9(FanMiot):
-    mapping = MIOT_MAPPING[MODEL_FAN_P9]
-
-
-@deprecated("Use FanMiot")
-class FanP10(FanMiot):
-    mapping = MIOT_MAPPING[MODEL_FAN_P10]
-
-
-@deprecated("Use FanMiot")
-class FanP11(FanMiot):
-    mapping = MIOT_MAPPING[MODEL_FAN_P11]
-
-
 class Fan1C(MiotDevice):
-    mapping = MIOT_MAPPING[MODEL_FAN_1C]
+    # TODO Fan1C should be merged to FanMiot, or moved into its separate file
+    _mappings = FAN1C_MAPPINGS
 
     def __init__(
         self,

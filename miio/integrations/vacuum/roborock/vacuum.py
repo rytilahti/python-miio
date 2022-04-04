@@ -22,7 +22,6 @@ from miio.click_common import (
 )
 from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
-from miio.utils import deprecated
 
 from .vacuumcontainers import (
     CarpetModeStatus,
@@ -142,10 +141,12 @@ ROCKROBO_S6_PURE = "roborock.vacuum.a08"
 ROCKROBO_T7 = "roborock.vacuum.a11"  # cn s7
 ROCKROBO_T7S = "roborock.vacuum.a14"
 ROCKROBO_T7SPLUS = "roborock.vacuum.a23"
+ROCKROBO_S7_MAXV = "roborock.vacuum.a27"
 ROCKROBO_S7 = "roborock.vacuum.a15"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 ROCKROBO_E2 = "roborock.vacuum.e2"
 ROCKROBO_1S = "roborock.vacuum.m1s"
+ROCKROBO_C1 = "roborock.vacuum.c1"
 
 SUPPORTED_MODELS = [
     ROCKROBO_V1,
@@ -160,9 +161,11 @@ SUPPORTED_MODELS = [
     ROCKROBO_T7S,
     ROCKROBO_T7SPLUS,
     ROCKROBO_S7,
+    ROCKROBO_S7_MAXV,
     ROCKROBO_S6_MAXV,
     ROCKROBO_E2,
     ROCKROBO_1S,
+    ROCKROBO_C1,
 ]
 
 
@@ -930,7 +933,7 @@ class RoborockVacuum(Device):
 
         @dg.resultcallback()
         @dg.device_pass
-        def cleanup(vac: Vacuum, *args, **kwargs):
+        def cleanup(vac: RoborockVacuum, *args, **kwargs):
             if vac.ip is None:  # dummy Device for discovery, skip teardown
                 return
             id_file = kwargs["id_file"]
@@ -943,13 +946,3 @@ class RoborockVacuum(Device):
                 json.dump(seqs, f)
 
         return dg
-
-
-class Vacuum(RoborockVacuum):
-    """Main class for roborock vacuums."""
-
-    @deprecated(
-        "This class will become the base class for all vacuum implementations. Use RoborockVacuum to control roborock vacuums."
-    )
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)

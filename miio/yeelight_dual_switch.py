@@ -17,22 +17,30 @@ class Switch(enum.Enum):
     Second = 1
 
 
-_MAPPING: MiotMapping = {
-    # http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:yeelink-sw1:1:0000C809
-    # First Switch (siid=2)
-    "switch_1_state": {"siid": 2, "piid": 1},  # bool
-    "switch_1_default_state": {"siid": 2, "piid": 2},  # 0 - Off, 1 - On
-    "switch_1_off_delay": {"siid": 2, "piid": 3},  # -1 - Off, [1, 43200] - delay in sec
-    # Second Switch (siid=3)
-    "switch_2_state": {"siid": 3, "piid": 1},  # bool
-    "switch_2_default_state": {"siid": 3, "piid": 2},  # 0 - Off, 1 - On
-    "switch_2_off_delay": {"siid": 3, "piid": 3},  # -1 - Off, [1, 43200] - delay in sec
-    # Extensions (siid=4)
-    "interlock": {"siid": 4, "piid": 1},  # bool
-    "flex_mode": {"siid": 4, "piid": 2},  # 0 - Off, 1 - On
-    "rc_list": {"siid": 4, "piid": 3},  # string
-    "rc_list_for_del": {"siid": 4, "piid": 4},  # string
-    "toggle": {"siid": 4, "piid": 5},  # 0 - First switch, 1 - Second switch
+_MAPPINGS: MiotMapping = {
+    "yeelink.switch.sw1": {
+        # http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:switch:0000A003:yeelink-sw1:1:0000C809
+        # First Switch (siid=2)
+        "switch_1_state": {"siid": 2, "piid": 1},  # bool
+        "switch_1_default_state": {"siid": 2, "piid": 2},  # 0 - Off, 1 - On
+        "switch_1_off_delay": {
+            "siid": 2,
+            "piid": 3,
+        },  # -1 - Off, [1, 43200] - delay in sec
+        # Second Switch (siid=3)
+        "switch_2_state": {"siid": 3, "piid": 1},  # bool
+        "switch_2_default_state": {"siid": 3, "piid": 2},  # 0 - Off, 1 - On
+        "switch_2_off_delay": {
+            "siid": 3,
+            "piid": 3,
+        },  # -1 - Off, [1, 43200] - delay in sec
+        # Extensions (siid=4)
+        "interlock": {"siid": 4, "piid": 1},  # bool
+        "flex_mode": {"siid": 4, "piid": 2},  # 0 - Off, 1 - On
+        "rc_list": {"siid": 4, "piid": 3},  # string
+        "rc_list_for_del": {"siid": 4, "piid": 4},  # string
+        "toggle": {"siid": 4, "piid": 5},  # 0 - First switch, 1 - Second switch
+    }
 }
 
 
@@ -107,7 +115,7 @@ class YeelightDualControlModule(MiotDevice):
     """Main class representing the Yeelight Dual Control Module (yeelink.switch.sw1)
     which uses MIoT protocol."""
 
-    mapping = _MAPPING
+    _mappings = _MAPPINGS
 
     @command(
         default_output=format_output(
@@ -139,7 +147,7 @@ class YeelightDualControlModule(MiotDevice):
         # Filter only readable properties for status
         properties = [
             {"did": k, **v}
-            for k, v in filter(lambda item: item[0] in p, _MAPPING.items())
+            for k, v in filter(lambda item: item[0] in p, self._get_mapping().items())
         ]
         values = self.get_properties(properties)
         return DualControlModuleStatus(

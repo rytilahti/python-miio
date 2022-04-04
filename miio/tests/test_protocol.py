@@ -75,8 +75,8 @@ def test_request_extra_params(proto):
     assert req["sid"] == 1234
 
 
-def test_device_error_handling(proto: MiIOProtocol):
-    retry_error = -30001
+@pytest.mark.parametrize("retry_error", [-30001, -9999])
+def test_device_error_handling(proto: MiIOProtocol, retry_error):
     with pytest.raises(RecoverableError):
         proto._handle_error({"code": retry_error})
 

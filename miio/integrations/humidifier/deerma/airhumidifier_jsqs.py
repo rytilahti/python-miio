@@ -29,6 +29,9 @@ _MAPPING = {
     "overwet_protect": {"siid": 7, "piid": 3},  # bool
 }
 
+SUPPORTED_MODELS = ["deerma.humidifier.jsqs", "deerma.humidifier.jsq5"]
+MIOT_MAPPING = {model: _MAPPING for model in SUPPORTED_MODELS}
+
 
 class AirHumidifierJsqsException(DeviceException):
     pass
@@ -145,9 +148,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
 class AirHumidifierJsqs(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
 
-    _supported_models = ["deerma.humidifier.jsqs", "deerma.humidifier.jsq5"]
-
-    mapping = _MAPPING
+    _mappings = MIOT_MAPPING
 
     @command(
         default_output=format_output(

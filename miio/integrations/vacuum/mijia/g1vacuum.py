@@ -13,38 +13,38 @@ MIJIA_VACUUM_V2 = "mijia.vacuum.v2"
 
 SUPPORTED_MODELS = [MIJIA_VACUUM_V1, MIJIA_VACUUM_V2]
 
-MIOT_MAPPING = {
-    MIJIA_VACUUM_V2: {
-        # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:vacuum:0000A006:mijia-v1:1
-        "battery": {"siid": 3, "piid": 1},
-        "charge_state": {"siid": 3, "piid": 2},
-        "error_code": {"siid": 2, "piid": 2},
-        "state": {"siid": 2, "piid": 1},
-        "fan_speed": {"siid": 2, "piid": 6},
-        "operating_mode": {"siid": 2, "piid": 4},
-        "mop_state": {"siid": 16, "piid": 1},
-        "water_level": {"siid": 2, "piid": 5},
-        "main_brush_life_level": {"siid": 14, "piid": 1},
-        "main_brush_time_left": {"siid": 14, "piid": 2},
-        "side_brush_life_level": {"siid": 15, "piid": 1},
-        "side_brush_time_left": {"siid": 15, "piid": 2},
-        "filter_life_level": {"siid": 11, "piid": 1},
-        "filter_time_left": {"siid": 11, "piid": 2},
-        "clean_area": {"siid": 9, "piid": 1},
-        "clean_time": {"siid": 9, "piid": 2},
-        # totals always return 0
-        "total_clean_area": {"siid": 9, "piid": 3},
-        "total_clean_time": {"siid": 9, "piid": 4},
-        "total_clean_count": {"siid": 9, "piid": 5},
-        "home": {"siid": 2, "aiid": 3},
-        "find": {"siid": 6, "aiid": 1},
-        "start": {"siid": 2, "aiid": 1},
-        "stop": {"siid": 2, "aiid": 2},
-        "reset_main_brush_life_level": {"siid": 14, "aiid": 1},
-        "reset_side_brush_life_level": {"siid": 15, "aiid": 1},
-        "reset_filter_life_level": {"siid": 11, "aiid": 1},
-    }
+MAPPING = {
+    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:vacuum:0000A006:mijia-v1:1
+    "battery": {"siid": 3, "piid": 1},
+    "charge_state": {"siid": 3, "piid": 2},
+    "error_code": {"siid": 2, "piid": 2},
+    "state": {"siid": 2, "piid": 1},
+    "fan_speed": {"siid": 2, "piid": 6},
+    "operating_mode": {"siid": 2, "piid": 4},
+    "mop_state": {"siid": 16, "piid": 1},
+    "water_level": {"siid": 2, "piid": 5},
+    "main_brush_life_level": {"siid": 14, "piid": 1},
+    "main_brush_time_left": {"siid": 14, "piid": 2},
+    "side_brush_life_level": {"siid": 15, "piid": 1},
+    "side_brush_time_left": {"siid": 15, "piid": 2},
+    "filter_life_level": {"siid": 11, "piid": 1},
+    "filter_time_left": {"siid": 11, "piid": 2},
+    "clean_area": {"siid": 9, "piid": 1},
+    "clean_time": {"siid": 9, "piid": 2},
+    # totals always return 0
+    "total_clean_area": {"siid": 9, "piid": 3},
+    "total_clean_time": {"siid": 9, "piid": 4},
+    "total_clean_count": {"siid": 9, "piid": 5},
+    "home": {"siid": 2, "aiid": 3},
+    "find": {"siid": 6, "aiid": 1},
+    "start": {"siid": 2, "aiid": 1},
+    "stop": {"siid": 2, "aiid": 2},
+    "reset_main_brush_life_level": {"siid": 14, "aiid": 1},
+    "reset_side_brush_life_level": {"siid": 15, "aiid": 1},
+    "reset_filter_life_level": {"siid": 11, "aiid": 1},
 }
+
+MIOT_MAPPING = {model: MAPPING for model in SUPPORTED_MODELS}
 
 ERROR_CODES = {
     0: "No error",
@@ -277,9 +277,7 @@ class G1CleaningSummary(DeviceStatus):
 class G1Vacuum(MiotDevice):
     """Support for G1 vacuum (G1, mijia.vacuum.v2)."""
 
-    _supported_models = SUPPORTED_MODELS
-
-    mapping = MIOT_MAPPING[MIJIA_VACUUM_V2]
+    _mappings = MIOT_MAPPING
 
     @command(
         default_output=format_output(

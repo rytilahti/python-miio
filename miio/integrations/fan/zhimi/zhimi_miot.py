@@ -169,7 +169,7 @@ class FanStatusZA5(DeviceStatus):
 
 
 class FanZA5(MiotDevice):
-    mapping = MIOT_MAPPING
+    _mappings = MIOT_MAPPING
 
     @command(
         default_output=format_output(

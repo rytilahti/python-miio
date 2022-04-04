@@ -15,63 +15,65 @@ from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
 
-_MAPPING: MiotMapping = {
-    "battery_level": {"siid": 3, "piid": 1},
-    "charging_state": {"siid": 3, "piid": 2},
-    "error_code": {"siid": 2, "piid": 2},
-    "state": {"siid": 2, "piid": 1},
-    "filter_life_level": {"siid": 10, "piid": 1},
-    "filter_left_minutes": {"siid": 10, "piid": 2},
-    "main_brush_left_minutes": {"siid": 11, "piid": 1},
-    "main_brush_life_level": {"siid": 11, "piid": 2},
-    "side_brushes_left_minutes": {"siid": 12, "piid": 1},
-    "side_brushes_life_level": {"siid": 12, "piid": 2},
-    "sensor_dirty_time_left_minutes": {
-        "siid": 15,
-        "piid": 1,
-    },  # named brush_left_time in the spec
-    "sensor_dirty_remaning_level": {"siid": 15, "piid": 2},
-    "sweep_mode": {"siid": 14, "piid": 1},
-    "fanspeed_mode": {"siid": 2, "piid": 4},
-    "sweep_type": {"siid": 2, "piid": 8},
-    "path_mode": {"siid": 13, "piid": 8},
-    "mop_present": {"siid": 8, "piid": 1},
-    "work_station_freq": {"siid": 8, "piid": 2},  # Range: [0, 3, 1]
-    "timing": {"siid": 8, "piid": 6},
-    "clean_area": {"siid": 8, "piid": 7},  # uint32
-    # "uid": {"siid": 8, "piid": 8},  # str - This UID is unknown
-    "auto_boost": {"siid": 8, "piid": 9},
-    "forbid_mode": {"siid": 8, "piid": 10},  # str
-    "water_level": {"siid": 8, "piid": 11},
-    "total_clean_time_sec": {"siid": 8, "piid": 13},
-    "total_clean_areas": {"siid": 8, "piid": 14},
-    "clean_counts": {"siid": 8, "piid": 18},
-    "clean_time_sec": {"siid": 8, "piid": 19},
-    "double_clean": {"siid": 8, "piid": 20},
-    # "edge_sweep": {"siid": 8, "piid": 21}, # 2021-07-11: Roidmi Eve is not changing behavior when this bool is changed
-    "led_switch": {"siid": 8, "piid": 22},
-    "lidar_collision": {"siid": 8, "piid": 23},
-    "station_key": {"siid": 8, "piid": 24},
-    "station_led": {"siid": 8, "piid": 25},
-    "current_audio": {"siid": 8, "piid": 26},
-    # "progress": {"siid": 8, "piid": 28}, # 2021-07-11: this is part of the spec, but not implemented in Roidme Eve
-    "station_type": {"siid": 8, "piid": 29},  # uint32
-    # "voice_conf": {"siid": 8, "piid": 30}, # Always return file not exist !!!
-    # "switch_status": {"siid": 2, "piid": 10}, # Enum with only one value: Open
-    "volume": {"siid": 9, "piid": 1},
-    "mute": {"siid": 9, "piid": 2},
-    "start": {"siid": 2, "aiid": 1},
-    "stop": {"siid": 2, "aiid": 2},
-    "start_room_sweep": {"siid": 2, "aiid": 3},
-    "start_sweep": {"siid": 14, "aiid": 1},
-    "home": {"siid": 3, "aiid": 1},
-    "identify": {"siid": 8, "aiid": 1},
-    "start_station_dust_collection": {"siid": 8, "aiid": 6},
-    "set_voice": {"siid": 8, "aiid": 12},
-    "reset_filter_life": {"siid": 10, "aiid": 1},
-    "reset_main_brush_life": {"siid": 11, "aiid": 1},
-    "reset_side_brushes_life": {"siid": 12, "aiid": 1},
-    "reset_sensor_dirty_life": {"siid": 15, "aiid": 1},
+_MAPPINGS: MiotMapping = {
+    "roidmi.vacuum.v60": {
+        "battery_level": {"siid": 3, "piid": 1},
+        "charging_state": {"siid": 3, "piid": 2},
+        "error_code": {"siid": 2, "piid": 2},
+        "state": {"siid": 2, "piid": 1},
+        "filter_life_level": {"siid": 10, "piid": 1},
+        "filter_left_minutes": {"siid": 10, "piid": 2},
+        "main_brush_left_minutes": {"siid": 11, "piid": 1},
+        "main_brush_life_level": {"siid": 11, "piid": 2},
+        "side_brushes_left_minutes": {"siid": 12, "piid": 1},
+        "side_brushes_life_level": {"siid": 12, "piid": 2},
+        "sensor_dirty_time_left_minutes": {
+            "siid": 15,
+            "piid": 1,
+        },  # named brush_left_time in the spec
+        "sensor_dirty_remaning_level": {"siid": 15, "piid": 2},
+        "sweep_mode": {"siid": 14, "piid": 1},
+        "fanspeed_mode": {"siid": 2, "piid": 4},
+        "sweep_type": {"siid": 2, "piid": 8},
+        "path_mode": {"siid": 13, "piid": 8},
+        "mop_present": {"siid": 8, "piid": 1},
+        "work_station_freq": {"siid": 8, "piid": 2},  # Range: [0, 3, 1]
+        "timing": {"siid": 8, "piid": 6},
+        "clean_area": {"siid": 8, "piid": 7},  # uint32
+        # "uid": {"siid": 8, "piid": 8},  # str - This UID is unknown
+        "auto_boost": {"siid": 8, "piid": 9},
+        "forbid_mode": {"siid": 8, "piid": 10},  # str
+        "water_level": {"siid": 8, "piid": 11},
+        "total_clean_time_sec": {"siid": 8, "piid": 13},
+        "total_clean_areas": {"siid": 8, "piid": 14},
+        "clean_counts": {"siid": 8, "piid": 18},
+        "clean_time_sec": {"siid": 8, "piid": 19},
+        "double_clean": {"siid": 8, "piid": 20},
+        # "edge_sweep": {"siid": 8, "piid": 21}, # 2021-07-11: Roidmi Eve is not changing behavior when this bool is changed
+        "led_switch": {"siid": 8, "piid": 22},
+        "lidar_collision": {"siid": 8, "piid": 23},
+        "station_key": {"siid": 8, "piid": 24},
+        "station_led": {"siid": 8, "piid": 25},
+        "current_audio": {"siid": 8, "piid": 26},
+        # "progress": {"siid": 8, "piid": 28}, # 2021-07-11: this is part of the spec, but not implemented in Roidme Eve
+        "station_type": {"siid": 8, "piid": 29},  # uint32
+        # "voice_conf": {"siid": 8, "piid": 30}, # Always return file not exist !!!
+        # "switch_status": {"siid": 2, "piid": 10}, # Enum with only one value: Open
+        "volume": {"siid": 9, "piid": 1},
+        "mute": {"siid": 9, "piid": 2},
+        "start": {"siid": 2, "aiid": 1},
+        "stop": {"siid": 2, "aiid": 2},
+        "start_room_sweep": {"siid": 2, "aiid": 3},
+        "start_sweep": {"siid": 14, "aiid": 1},
+        "home": {"siid": 3, "aiid": 1},
+        "identify": {"siid": 8, "aiid": 1},
+        "start_station_dust_collection": {"siid": 8, "aiid": 6},
+        "set_voice": {"siid": 8, "aiid": 12},
+        "reset_filter_life": {"siid": 10, "aiid": 1},
+        "reset_main_brush_life": {"siid": 11, "aiid": 1},
+        "reset_side_brushes_life": {"siid": 12, "aiid": 1},
+        "reset_sensor_dirty_life": {"siid": 15, "aiid": 1},
+    }
 }
 
 
@@ -535,7 +537,7 @@ class RoidmiConsumableStatus(DeviceStatus):
 class RoidmiVacuumMiot(MiotDevice):
     """Interface for Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
-    mapping = _MAPPING
+    _mappings = _MAPPINGS
 
     @command()
     def status(self) -> RoidmiVacuumStatus:
@@ -697,9 +699,9 @@ class RoidmiVacuumMiot(MiotDevice):
         # The current do not disturb is read back for a better user expierence,
         # as start/end time must be set together with enabled=False
         try:
-            current_dnd_str = self.get_property_by(**_MAPPING["forbid_mode"])[0][
-                "value"
-            ]
+            current_dnd_str = self.get_property_by(
+                **self._get_mapping()["forbid_mode"]
+            )[0]["value"]
             current_dnd_dict = json.loads(current_dnd_str)
         except Exception:
             # In case reading current DND back fails, DND is disabled anyway

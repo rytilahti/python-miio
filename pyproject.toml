@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-miio"
-version = "0.5.9.2"
+version = "0.5.11"
 description = "Python library for interfacing with Xiaomi smart appliances"
 authors = ["Teemu R <tpr@iki.fi>"]
 repository = "https://github.com/rytilahti/python-miio"
