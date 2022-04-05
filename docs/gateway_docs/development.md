@@ -3,9 +3,10 @@
 ## Supporting new push actions
 
 To support new push actions or properties a packet capture of the Xiaomi Home app needs to be made to figure out the required data.
-To do this you will need 3 programs running on a PC:
+To do this you will need 4 programs running on a PC:
  - [BlueStacks](https://www.bluestacks.com) to emulate the Xiaomi Home app on windows
  - [WireShark](https://www.wireshark.org) to capture the network packets send by the Xiaomi Home app in BlueStacks
+ - [Python](https://www.python.org/downloads/) at least version 3.9 is required
  - [Python-miio devtools](https://github.com/rytilahti/python-miio/tree/master/devtools) to decode the captured packets of WireShark
 
 1. Install BlueStacks and WireShark and [download the latest python-miio](https://github.com/rytilahti/python-miio) (green Code button --> download ZIP, then unzip on your computer).
