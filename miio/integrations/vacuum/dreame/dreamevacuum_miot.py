@@ -198,7 +198,7 @@ def _get_cleaning_mode_enum_class(model):
         DREAME_Z10_PRO,
         DREAME_MOP_2_PRO_PLUS,
         DREAME_MOP_2_ULTRA,
-        DREAME_MOP_2
+        DREAME_MOP_2,
     ):
         return CleaningModeDreameF9
     return None
