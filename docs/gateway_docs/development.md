@@ -1,7 +1,6 @@
-Gateway and zigbee devices
-====
+# Gateway and zigbee devices
 
-### Supporting new push actions
+## Supporting new push actions
 
 To support new push actions or properties a packet capture of the Xiaomi Home app needs to be made to figure out the required data.
 To do this you will need 3 programs running on a PC:
@@ -19,9 +18,10 @@ To do this you will need 3 programs running on a PC:
 8. Get the regular token of your gateway from the Home Assistant `core.config_entries` file located in your `config\.storage` folder of Home Assistant (search for `"domain": "xiaomi_miio"`)
 9. open a command line --> `python3 C:\path\to\python-miio\folder\step1\devtools\parse_pcap.py C:\path\to\the\file\you\just\saved\filename.pcap --token TokenTokenToken` in which you will need to fill in the paths and the token, optionally multiple tokens can be added by repeating `--token Token2Token2Token2`.
 10. You schould now see the decoded communication of the Xiaomi Home app to your gateway and back during the packet capture.
-11. One of the packets schould look something like this: {"id":1234,"method":"send_data_frame","params":{"cur":0,"data":"[[\"x.scene.1234567890\",[\"1.0\",1234567890,[\"0\",{\"src\":\"device\",\"key\":\"event.lumi.sensor_magnet.aq2.open\",\"did\":\"lumi.123456789abcde\",\"model\":\"lumi.sensor_magnet.aq2\",\"token\":\"\",\"extra\":\"[1,6,1,0,[0,1],2,0]\",\"timespan\":[\"0 0 * * 0,1,2,3,4,5,6\",\"0 0 * * 0,1,2,3,4,5,6\"]}],[{\"command\":\"lumi.gateway.v3.set_rgb\",\"did\":\"12345678\",\"extra\":\"[1,19,7,85,[40,123456],0,0]\",\"id\":1,\"ip\":\"192.168.1.IP\",\"model\":\"lumi.gateway.v3\",\"token\":\"encrypted0token0we0need000000000\",\"value\":123456}]]]]","data_tkn":12345,"total":1,"type":"scene"}}
-12. go to the miio\gateway\devices\subdevices.YAML file of this python module and search for the device you want to implement the action for.
-13. Add the action you just discoved like this:
+11. One of the packets schould look something like this:
+```{"id":1234,"method":"send_data_frame","params":{"cur":0,"data":"[[\"x.scene.1234567890\",[\"1.0\",1234567890,[\"0\",{\"src\":\"device\",\"key\":\"event.lumi.sensor_magnet.aq2.open\",\"did\":\"lumi.123456789abcde\",\"model\":\"lumi.sensor_magnet.aq2\",\"token\":\"\",\"extra\":\"[1,6,1,0,[0,1],2,0]\",\"timespan\":[\"0 0 * * 0,1,2,3,4,5,6\",\"0 0 * * 0,1,2,3,4,5,6\"]}],[{\"command\":\"lumi.gateway.v3.set_rgb\",\"did\":\"12345678\",\"extra\":\"[1,19,7,85,[40,123456],0,0]\",\"id\":1,\"ip\":\"192.168.1.IP\",\"model\":\"lumi.gateway.v3\",\"token\":\"encrypted0token0we0need000000000\",\"value\":123456}]]]]","data_tkn":12345,"total":1,"type":"scene"}}```
+13. go to the miio\gateway\devices\subdevices.YAML file of this python module and search for the device you want to implement the action for.
+14. Add the action you just discoved like this:
 ```
   properties:
     - property: is_open # the new property of this device (optional)
