@@ -87,7 +87,7 @@ class Alarm(GatewayDevice):
                 script_id=script_id,
                 action=action,
                 extra=alarm_scripts[action]["extra"],
-                source_sid=self._gateway.did,
+                source_sid=str(self._gateway.device_id),
                 source_model=self._gateway.model,
                 source_token=self._gateway.token,
                 trigger_token=self._gateway.token,

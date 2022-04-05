@@ -110,7 +110,6 @@ class Gateway(Device):
         self._devices: Dict[str, SubDevice] = {}
         self._info = None
         self._subdevice_model_map = None
-        self._did = None
 
         self._push_server = push_server
         self._script_ids: List[str] = []
@@ -159,13 +158,6 @@ class Gateway(Device):
         if self._info is None:
             self._info = self.info()
         return self._info.mac_address
-
-    @property
-    def did(self):
-        """Return the Device ID of the gateway."""
-        if self._protocol._device_id == b"":
-            self._info = self.info()
-        return str(int.from_bytes(self._protocol._device_id, byteorder="big"))
 
     @property
     def subdevice_model_map(self):
@@ -240,24 +232,34 @@ class Gateway(Device):
         self._devices = {}
 
         # find the gateway
+        found_gateway = False
         for device in device_dict:
-            if device["mac"] == self.mac:
-                self._did = device["did"]
-                break
+            if device["did"] == str(self.device_id):
+                if device["mac"] == self.mac:
+                    found_gateway = True
+                    break
+                _LOGGER.error(
+                    "Mac and device id of gateway with ip '%s', mac '%s', did '%i', model '%s' did not match in the cloud device list response",
+                    self.ip,
+                    self.mac,
+                    self.device_id,
+                    self.model,
+                )
 
         # check if the gateway is found
-        if self._did is None:
+        if not found_gateway:
             _LOGGER.error(
-                "Could not find gateway with ip '%s', mac '%s', model '%s' in the cloud device list response",
+                "Could not find gateway with ip '%s', mac '%s', did '%i', model '%s' in the cloud device list response",
                 self.ip,
                 self.mac,
+                self.device_id,
                 self.model,
             )
             return self._devices
 
         # find the subdevices belonging to this gateway
         for device in device_dict:
-            if device.get("parent_id") == self._did:
+            if device.get("parent_id") == str(self.device_id):
                 # Match 'model' to get the type_id
                 model_info = self.match_zigbee_model(device["model"], device["did"])
 
@@ -427,7 +429,7 @@ class Gateway(Device):
     def push_callback(self, source_device, action, params):
         """Callback from the push server."""
         if source_device not in self.devices:
-            if source_device == f"lumi.{self.did}":
+            if source_device == f"lumi.{str(self.device_id)}":
                 self.gateway_push_callback(action, params)
                 return
 
