@@ -400,7 +400,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         return None
 
 
-class DreameVacuum(VacuumInterface, MiotDevice):
+class DreameVacuum(MiotDevice, VacuumInterface):
     _mappings = MIOT_MAPPING
 
     @command(

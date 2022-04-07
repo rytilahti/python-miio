@@ -2,10 +2,8 @@
 devices."""
 from abc import abstractmethod
 
-from miio import Device
 
-
-class VacuumInterface(Device):
+class VacuumInterface:
     """Vacuum API interface."""
 
     @abstractmethod

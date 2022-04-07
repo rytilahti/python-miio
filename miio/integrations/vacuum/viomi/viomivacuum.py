@@ -52,7 +52,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.device import DeviceStatus
+from miio.device import Device, DeviceStatus
 from miio.exceptions import DeviceException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
     ConsumableStatus,
@@ -483,7 +483,7 @@ def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
     return scheduled_found, rooms
 
 
-class ViomiVacuum(VacuumInterface):
+class ViomiVacuum(Device, VacuumInterface):
     """Interface for Viomi vacuums (viomi.vacuum.v7)."""
 
     _supported_models = SUPPORTED_MODELS

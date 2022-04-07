@@ -20,7 +20,7 @@ from miio.click_common import (
     LiteralParamType,
     command,
 )
-from miio.device import DeviceInfo
+from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
 from miio.interfaces.vacuuminterface import VacuumInterface
 
@@ -168,7 +168,7 @@ SUPPORTED_MODELS = [
 ]
 
 
-class RoborockVacuum(VacuumInterface):
+class RoborockVacuum(Device, VacuumInterface):
     """Main class for roborock vacuums (roborock.vacuum.*)."""
 
     _supported_models = SUPPORTED_MODELS
