@@ -4,12 +4,11 @@ import pytest
 
 from miio import Device, MiotDevice, RoborockVacuum
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
-from miio.integrations.vacuum import VacuumDevice, VacuumMiotDevice
+from miio.interfaces.vacuuminterface import VacuumInterface
 
 DEVICE_CLASSES = Device.__subclasses__() + MiotDevice.__subclasses__()  # type: ignore
 DEVICE_CLASSES.remove(MiotDevice)
-DEVICE_CLASSES.remove(VacuumDevice)
-DEVICE_CLASSES.remove(VacuumMiotDevice)
+DEVICE_CLASSES.remove(VacuumInterface)
 
 
 @pytest.mark.parametrize("max_properties", [None, 1, 15])

@@ -58,9 +58,8 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     ConsumableStatus,
     DNDStatus,
 )
+from miio.interfaces.vacuuminterface import VacuumInterface
 from miio.utils import pretty_seconds
-
-from ..vacuum_device import VacuumDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -484,7 +483,7 @@ def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
     return scheduled_found, rooms
 
 
-class ViomiVacuum(VacuumDevice):
+class ViomiVacuum(VacuumInterface):
     """Interface for Viomi vacuums (viomi.vacuum.v7)."""
 
     _supported_models = SUPPORTED_MODELS

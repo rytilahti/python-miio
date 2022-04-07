@@ -11,9 +11,8 @@ import click
 
 from miio.click_common import EnumType, command
 from miio.integrations.vacuum.roborock.vacuumcontainers import DNDStatus
-from miio.miot_device import DeviceStatus, MiotMapping
-
-from ..vacuum_device import VacuumMiotDevice
+from miio.interfaces.vacuuminterface import VacuumInterface
+from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -536,7 +535,7 @@ class RoidmiConsumableStatus(DeviceStatus):
         return timedelta(minutes=self.data["sensor_dirty_time_left_minutes"])
 
 
-class RoidmiVacuumMiot(VacuumMiotDevice):
+class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     """Interface for Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
     _mappings = _MAPPINGS
