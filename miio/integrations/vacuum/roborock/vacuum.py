@@ -240,9 +240,7 @@ class RoborockVacuum(Device):
                 """
                 from ipaddress import ip_address
 
-                ip_to_mac = ":".join(
-                    [f"{hex(x).replace('0x', ''):0>2}" for x in ip_address(addr).packed]
-                )
+                ip_to_mac = ":".join([f"{hex(x).replace('0x', ''):0>2}" for x in ip_address(addr).packed])
                 return f"FF:FF:{ip_to_mac}"
 
             dummy_v1 = DeviceInfo(
@@ -257,9 +255,7 @@ class RoborockVacuum(Device):
             )
 
             self._info = dummy_v1
-            _LOGGER.debug(
-                "Unable to query info, falling back to dummy %s", dummy_v1.model
-            )
+            _LOGGER.debug("Unable to query info, falling back to dummy %s", dummy_v1.model)
             return self._info
 
     @command()
@@ -318,13 +314,9 @@ class RoborockVacuum(Device):
     @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
-        click.argument(
-            "duration", type=int, required=False, default=MANUAL_DURATION_DEFAULT
-        ),
+        click.argument("duration", type=int, required=False, default=MANUAL_DURATION_DEFAULT),
     )
-    def manual_control_once(
-        self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT
-    ):
+    def manual_control_once(self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT):
         """Starts the remote control mode and executes the action once before
         deactivating the mode."""
         number_of_tries = 3
@@ -342,13 +334,9 @@ class RoborockVacuum(Device):
     @command(
         click.argument("rotation", type=int),
         click.argument("velocity", type=float),
-        click.argument(
-            "duration", type=int, required=False, default=MANUAL_DURATION_DEFAULT
-        ),
+        click.argument("duration", type=int, required=False, default=MANUAL_DURATION_DEFAULT),
     )
-    def manual_control(
-        self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT
-    ):
+    def manual_control(self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT):
         """Give a command over manual control interface."""
         if rotation < self.MANUAL_ROTATION_MIN or rotation > self.MANUAL_ROTATION_MAX:
             raise DeviceException(
@@ -502,9 +490,7 @@ class RoborockVacuum(Device):
     @command(
         click.argument("id_", type=int, metavar="ID"),
     )
-    def clean_details(
-        self, id_: int
-    ) -> Union[List[CleaningDetails], Optional[CleaningDetails]]:
+    def clean_details(self, id_: int) -> Union[List[CleaningDetails], Optional[CleaningDetails]]:
         """Return details about specific cleaning."""
         details = self.send("get_clean_record", [id_])
 
@@ -562,9 +548,7 @@ class RoborockVacuum(Device):
         """
         return self.send("del_timer", [str(timer_id)])
 
-    @command(
-        click.argument("timer_id", type=int), click.argument("mode", type=TimerState)
-    )
+    @command(click.argument("timer_id", type=int), click.argument("mode", type=TimerState))
     def update_timer(self, timer_id: int, mode: TimerState):
         """Update a timer with given ID.
 
@@ -706,9 +690,7 @@ class RoborockVacuum(Device):
 
         def _fallback_timezone(data):
             fallback = "UTC"
-            _LOGGER.error(
-                "Unsupported timezone format (%s), falling back to %s", data, fallback
-            )
+            _LOGGER.error("Unsupported timezone format (%s), falling back to %s", data, fallback)
             return fallback
 
         if isinstance(res, int):
@@ -775,9 +757,7 @@ class RoborockVacuum(Device):
     def carpet_cleaning_mode(self) -> Optional[CarpetCleaningMode]:
         """Get carpet cleaning mode/avoidance setting."""
         try:
-            return CarpetCleaningMode(
-                self.send("get_carpet_clean_mode")[0]["carpet_clean_mode"]
-            )
+            return CarpetCleaningMode(self.send("get_carpet_clean_mode")[0]["carpet_clean_mode"])
         except Exception as err:
             _LOGGER.warning("Error while requesting carpet clean mode: %s", err)
             return None
@@ -785,10 +765,7 @@ class RoborockVacuum(Device):
     @command(click.argument("mode", type=EnumType(CarpetCleaningMode)))
     def set_carpet_cleaning_mode(self, mode: CarpetCleaningMode):
         """Set carpet cleaning mode/avoidance setting."""
-        return (
-            self.send("set_carpet_clean_mode", {"carpet_clean_mode": mode.value})[0]
-            == "ok"
-        )
+        return self.send("set_carpet_clean_mode", {"carpet_clean_mode": mode.value})[0] == "ok"
 
     @command()
     def stop_zoned_clean(self):
@@ -905,9 +882,7 @@ class RoborockVacuum(Device):
                 kwargs["debug"] = gco.debug
 
             start_id = manual_seq = 0
-            with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
-                id_file
-            ) as f:
+            with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(id_file) as f:
                 x = json.load(f)
                 start_id = x.get("seq", 0)
                 manual_seq = x.get("manual_seq", 0)
@@ -923,15 +898,13 @@ class RoborockVacuum(Device):
                 click.Option(
                     ["--id-file"],
                     type=click.Path(dir_okay=False, writable=True),
-                    default=os.path.join(
-                        user_cache_dir("python-miio"), "python-mirobo.seq"
-                    ),
+                    default=os.path.join(user_cache_dir("python-miio"), "python-mirobo.seq"),
                 )
             ],
             callback=callback,
         )
 
-        @dg.resultcallback()
+        @dg.result_callback()
         @dg.device_pass
         def cleanup(vac: RoborockVacuum, *args, **kwargs):
             if vac.ip is None:  # dummy Device for discovery, skip teardown
