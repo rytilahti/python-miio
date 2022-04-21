@@ -137,7 +137,7 @@ _MAPPING_VB4 = {
     # Screen
     "led_brightness": {"siid": 13, "piid": 2},
     # Device Display Unit
-    "device-display-unit": {"siid": 14, "piid": 1}, 
+    "device-display-unit": {"siid": 14, "piid": 1},
 }
 
 _MAPPINGS = {
@@ -559,7 +559,10 @@ class AirPurifierMiot(MiotDevice):
             )
 
         value = brightness.value
-        if self.model in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4") and value:
+        if (
+            self.model in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4")
+            and value
+        ):
             value = 2 - value
         return self.set_property("led_brightness", value)
 
