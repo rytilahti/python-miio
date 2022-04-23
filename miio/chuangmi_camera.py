@@ -64,7 +64,11 @@ class NASVideoRetentionTime(enum.IntEnum):
 CONST_HIGH_SENSITIVITY = [MotionDetectionSensitivity.High] * 32
 CONST_LOW_SENSITIVITY = [MotionDetectionSensitivity.Low] * 32
 
-SUPPORTED_MODELS = ["chuangmi.camera.ipc009", "chuangmi.camera.ipc019"]
+SUPPORTED_MODELS = [
+    "chuangmi.camera.ipc009",
+    "chuangmi.camera.ipc019",
+    "chuangmi.camera.038a2",
+]
 
 
 class CameraStatus(DeviceStatus):
