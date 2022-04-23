@@ -141,7 +141,7 @@ _MAPPINGS = {
     "zhimi.airp.mb4a": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
-    "zhimi.airp.rmb1": _MAPPING_RMB1 # airpurifier 4 lite
+    "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
 }
 
 
@@ -542,7 +542,10 @@ class AirPurifierMiot(MiotDevice):
             )
 
         value = brightness.value
-        if self.model in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.rmb1") and value:
+        if (
+            self.model in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.rmb1")
+            and value
+        ):
             value = 2 - value
         return self.set_property("led_brightness", value)
 
