@@ -540,7 +540,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
 
         :param speed: integer value from fan_speed_presets() method
         """
-        if speed not in self.fan_speed_presets().values:
+        if speed not in self.fan_speed_presets().values():
             raise ValueError("Invalid argument, given value not in predefined values")
         self.set_fan_speed(speed)
 
