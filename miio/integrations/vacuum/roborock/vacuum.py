@@ -22,7 +22,7 @@ from miio.click_common import (
 )
 from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
-from miio.interfaces.vacuuminterface import VacuumInterface
+from miio.interfaces import VacuumInterface
 
 from .vacuumcontainers import (
     CarpetModeStatus,

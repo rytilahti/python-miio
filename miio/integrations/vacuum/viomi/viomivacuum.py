@@ -58,7 +58,7 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     ConsumableStatus,
     DNDStatus,
 )
-from miio.interfaces.vacuuminterface import VacuumInterface
+from miio.interfaces import VacuumInterface
 from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)

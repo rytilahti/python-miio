@@ -11,7 +11,7 @@ import click
 
 from miio.click_common import EnumType, command
 from miio.integrations.vacuum.roborock.vacuumcontainers import DNDStatus
-from miio.interfaces.vacuuminterface import VacuumInterface
+from miio.interfaces import VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)

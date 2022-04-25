@@ -5,7 +5,7 @@ from enum import Enum
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.interfaces.vacuuminterface import VacuumInterface
+from miio.interfaces import VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
