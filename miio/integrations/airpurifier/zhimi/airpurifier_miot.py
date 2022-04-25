@@ -330,7 +330,12 @@ class AirPurifierMiotStatus(DeviceStatus):
 
         value = self.data.get("led_brightness")
         if value is not None:
-            if self.model in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4", "zhimi.airp.rmb1"):
+            if self.model in (
+                "zhimi.airp.va2",
+                "zhimi.airp.mb5",
+                "zhimi.airp.vb4",
+                "zhimi.airp.rmb1",
+            ):
                 value = 2 - value
             try:
                 return LedBrightness(value)
@@ -588,7 +593,8 @@ class AirPurifierMiot(MiotDevice):
 
         value = brightness.value
         if (
-            self.model in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4", "zhimi.airp.rmb1")
+            self.model
+            in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4", "zhimi.airp.rmb1")
             and value
         ):
             value = 2 - value
