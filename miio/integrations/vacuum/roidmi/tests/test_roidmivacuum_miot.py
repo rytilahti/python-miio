@@ -182,6 +182,10 @@ class TestRoidmiVacuum(TestCase):
         )
         assert str(status._parse_forbid_mode(value)) == str(expected_value)
 
+    def test_set_fan_speed_preset(self):
+        for speed in self.device.fan_speed_presets().values():
+            self.device.set_fan_speed_preset(speed)
+
 
 class DummyRoidmiVacuumMiot2(DummyMiotDevice, RoidmiVacuumMiot):
     def __init__(self, *args, **kwargs):
