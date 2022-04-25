@@ -1,6 +1,7 @@
 import logging
 from datetime import timedelta
 from enum import Enum
+from typing import Dict
 
 import click
 
@@ -373,3 +374,22 @@ class G1Vacuum(MiotDevice, VacuumInterface):
     def set_fan_speed(self, fan_speed: G1FanSpeed):
         """Set fan speed."""
         return self.set_property("fan_speed", fan_speed.value)
+
+    @command()
+    def fan_speed_presets(self) -> Dict[str, int]:
+        """Retrieve predefined fan speeds, dictionary where.
+
+        - key is name (identifier)
+        - value is integer representation usable as argument for set_fan_speed_preset() method
+        """
+        return {x.name: x.value for x in G1FanSpeed}
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed: int) -> None:
+        """Sets fan speed preset value.
+
+        :param speed: integer value from fan_speed_presets() method
+        """
+        if speed not in self.fan_speed_presets().values:
+            raise ValueError("Invalid argument, given value not in predefined values")
+        return self.set_property("fan_speed", speed)

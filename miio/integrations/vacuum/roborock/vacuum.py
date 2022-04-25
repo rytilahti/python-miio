@@ -620,7 +620,11 @@ class RoborockVacuum(Device, VacuumInterface):
 
     @command()
     def fan_speed_presets(self) -> Dict[str, int]:
-        """Return dictionary containing supported fan speeds."""
+        """Retrieve predefined fan speeds, dictionary where.
+
+        - key is name (identifier)
+        - value is integer representation usable as argument for set_fan_speed_preset() method
+        """
 
         def _enum_as_dict(cls):
             return {x.name: x.value for x in list(cls)}
@@ -651,6 +655,16 @@ class RoborockVacuum(Device, VacuumInterface):
         _LOGGER.debug("Using fanspeeds %s for %s", fanspeeds, self.model)
 
         return _enum_as_dict(fanspeeds)
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed: int) -> None:
+        """Sets fan speed preset value.
+
+        :param speed: integer value from fan_speed_presets() method
+        """
+        if speed not in self.fan_speed_presets().values:
+            raise ValueError("Invalid argument, given value not in predefined values")
+        return self.send("set_custom_mode", [speed])
 
     @command()
     def sound_info(self):

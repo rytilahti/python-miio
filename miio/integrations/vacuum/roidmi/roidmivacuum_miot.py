@@ -6,6 +6,7 @@ import logging
 import math
 from datetime import timedelta
 from enum import Enum
+from typing import Dict
 
 import click
 
@@ -636,6 +637,25 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     def set_fanspeed(self, fanspeed_mode: FanSpeed):
         """Set fan speed."""
         return self.set_property("fanspeed_mode", fanspeed_mode.value)
+
+    @command()
+    def fan_speed_presets(self) -> Dict[str, int]:
+        """Retrieve predefined fan speeds, dictionary where.
+
+        - key is name (identifier)
+        - value is integer representation usable as argument for set_fan_speed_preset() method
+        """
+        return {"Sweep": 0, "Silent": 1, "Basic": 2, "Strong": 3, "FullSpeed": 4}
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed: int) -> None:
+        """Sets fan speed preset value.
+
+        :param speed: integer value from fan_speed_presets() method
+        """
+        if speed not in self.fan_speed_presets().values:
+            raise ValueError("Invalid argument, given value not in predefined values")
+        return self.set_property("fanspeed_mode", speed)
 
     @command(click.argument("sweep_type", type=EnumType(SweepType)))
     def set_sweep_type(self, sweep_type: SweepType):

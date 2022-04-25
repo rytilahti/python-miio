@@ -340,7 +340,11 @@ class ViomiVacuumStatus(DeviceStatus):
 
     @command()
     def fan_speed_presets(self) -> Dict[str, int]:
-        """Return dictionary containing supported fanspeeds."""
+        """Retrieve predefined fan speeds, dictionary where.
+
+        - key is name (identifier)
+        - value is integer representation usable as argument for set_fan_speed_preset() method
+        """
         return {x.name: x.value for x in list(ViomiVacuumSpeed)}
 
     @property
@@ -676,6 +680,25 @@ class ViomiVacuum(Device, VacuumInterface):
     def set_fan_speed(self, speed: ViomiVacuumSpeed):
         """Set fanspeed [silent, standard, medium, turbo]."""
         self.send("set_suction", [speed.value])
+
+    @command()
+    def fan_speed_presets(self) -> Dict[str, int]:
+        """Retrieve predefined fan speeds, dictionary where.
+
+        - key is name (identifier)
+        - value is integer representation usable as argument for set_fan_speed_preset() method
+        """
+        return {x.name: x.value for x in list(ViomiVacuumSpeed)}
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed: int) -> None:
+        """Sets fan speed preset value.
+
+        :param speed: integer value from fan_speed_presets() method
+        """
+        if speed not in self.fan_speed_presets().values:
+            raise ValueError("Invalid argument, given value not in predefined values")
+        self.send("set_suction", [speed])
 
     @command(click.argument("watergrade", type=EnumType(ViomiWaterGrade)))
     def set_water_grade(self, watergrade: ViomiWaterGrade):
