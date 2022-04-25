@@ -50,3 +50,15 @@ def test_vacuum_fan_speed_presets(cls: Type[Device], model: str) -> None:
         assert name, "presets key cannot be empty"
         assert isinstance(value, int), "presets value must be integer"
         assert value >= 0, "presets value must be >= 0"
+
+
+@pytest.mark.parametrize("cls, model", _all_vacuum_models())
+def test_vacuum_set_fan_speed_presets_fails(cls: Type[Device], model: str) -> None:
+    """Test method VacuumInterface.fan_speed_presets()"""
+    if model == ROCKROBO_V1:
+        return  # this model cannot be tested because presets depends on firmware
+    assert issubclass(cls, Device)
+    dev = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=model)
+    assert isinstance(dev, VacuumInterface)
+    with pytest.raises(ValueError):
+        dev.set_fan_speed_preset(-1)
