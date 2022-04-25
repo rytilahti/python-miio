@@ -38,7 +38,6 @@ def test_vacuum_fan_speed_presets(cls: Type[Device], model: str) -> None:
     """Test method VacuumInterface.fan_speed_presets()"""
     if model == ROCKROBO_V1:
         return  # this model cannot be tested because presets depends on firmware
-    assert issubclass(cls, Device)
     dev = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=model)
     assert isinstance(dev, VacuumInterface)
     presets = dev.fan_speed_presets()
@@ -57,7 +56,6 @@ def test_vacuum_set_fan_speed_presets_fails(cls: Type[Device], model: str) -> No
     """Test method VacuumInterface.fan_speed_presets()"""
     if model == ROCKROBO_V1:
         return  # this model cannot be tested because presets depends on firmware
-    assert issubclass(cls, Device)
     dev = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff", model=model)
     assert isinstance(dev, VacuumInterface)
     with pytest.raises(ValueError):
