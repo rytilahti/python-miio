@@ -1,6 +1,7 @@
 # Copyright 2022
 # Author: 2pirko
 import collections
+import sys
 from typing import List, Sequence, Tuple, Type
 
 import pytest
@@ -23,7 +24,10 @@ def _all_vacuum_models() -> Sequence[Tuple[Type[Device], str]]:
     for cls in VACUUM_CLASSES:
         assert issubclass(cls, Device)
         vacuum_models = cls.supported_models
-        assert isinstance(vacuum_models, collections.Iterable)
+        if sys.version_info >= (3, 10):
+            assert isinstance(vacuum_models, collections.abc.Iterable)
+        else:
+            assert isinstance(vacuum_models, collections.Iterable)
         for model in vacuum_models:
             result.append((cls, model))
     return result  # type: ignore
