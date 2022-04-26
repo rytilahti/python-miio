@@ -56,7 +56,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "python-miio"
-copyright = "2017, Teemu Rytilahti"
+copyright = "2017-2022, Teemu Rytilahti"
 author = "Teemu Rytilahti"
 
 # The version info for the project you're documenting, acts as replacement for
