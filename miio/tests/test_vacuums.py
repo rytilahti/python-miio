@@ -1,7 +1,5 @@
-# Copyright 2022
-# Author: 2pirko
-import collections
-import sys
+"""Test of vacuum devices."""
+from collections.abc import Iterable
 from typing import List, Sequence, Tuple, Type
 
 import pytest
@@ -10,11 +8,9 @@ from miio.device import Device
 from miio.integrations.vacuum.roborock.vacuum import ROCKROBO_V1
 from miio.interfaces import VacuumInterface
 
-from .test_device import DEVICE_CLASSES
-
 # list of all supported vacuum classes
 VACUUM_CLASSES: Tuple[Type[VacuumInterface], ...] = tuple(
-    cl for cl in DEVICE_CLASSES if issubclass(cl, VacuumInterface)  # type: ignore
+    cl for cl in VacuumInterface.__subclasses__()  # type: ignore
 )
 
 
@@ -24,10 +20,7 @@ def _all_vacuum_models() -> Sequence[Tuple[Type[Device], str]]:
     for cls in VACUUM_CLASSES:
         assert issubclass(cls, Device)
         vacuum_models = cls.supported_models
-        if sys.version_info >= (3, 10):
-            assert isinstance(vacuum_models, collections.abc.Iterable)
-        else:
-            assert isinstance(vacuum_models, collections.Iterable)
+        assert isinstance(vacuum_models, Iterable)
         for model in vacuum_models:
             result.append((cls, model))
     return result  # type: ignore

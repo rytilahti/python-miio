@@ -1,5 +1,5 @@
 """Interfaces API."""
 
-from .vacuuminterface import VacuumInterface
+from .vacuuminterface import FanspeedPresets, VacuumInterface
 
-__all__ = ["VacuumInterface"]
+__all__ = ["FanspeedPresets", "VacuumInterface"]

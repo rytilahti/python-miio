@@ -1,12 +1,11 @@
 import logging
 from datetime import timedelta
 from enum import Enum
-from typing import Dict
 
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.interfaces import VacuumInterface
+from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -376,12 +375,8 @@ class G1Vacuum(MiotDevice, VacuumInterface):
         return self.set_property("fan_speed", fan_speed.value)
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
-        """Retrieve predefined fan speeds, dictionary where.
-
-        - key is name (identifier)
-        - value is integer representation usable as argument for set_fan_speed_preset() method
-        """
+    def fan_speed_presets(self) -> FanspeedPresets:
+        """Retrieve predefined fan speeds, see VacuumInterface for details."""
         return {x.name: x.value for x in G1FanSpeed}
 
     @command(click.argument("speed", type=int))

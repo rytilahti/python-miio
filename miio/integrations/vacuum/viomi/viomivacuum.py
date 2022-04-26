@@ -58,7 +58,7 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     ConsumableStatus,
     DNDStatus,
 )
-from miio.interfaces import VacuumInterface
+from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)
@@ -339,12 +339,8 @@ class ViomiVacuumStatus(DeviceStatus):
         return ViomiVacuumSpeed(self.data["suction_grade"])
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
-        """Retrieve predefined fan speeds, dictionary where.
-
-        - key is name (identifier)
-        - value is integer representation usable as argument for set_fan_speed_preset() method
-        """
+    def fan_speed_presets(self) -> FanspeedPresets:
+        """Retrieve predefined fan speeds, see VacuumInterface for details."""
         return {x.name: x.value for x in list(ViomiVacuumSpeed)}
 
     @property
@@ -682,12 +678,8 @@ class ViomiVacuum(Device, VacuumInterface):
         self.send("set_suction", [speed.value])
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
-        """Retrieve predefined fan speeds, dictionary where.
-
-        - key is name (identifier)
-        - value is integer representation usable as argument for set_fan_speed_preset() method
-        """
+    def fan_speed_presets(self) -> FanspeedPresets:
+        """Retrieve predefined fan speeds, see VacuumInterface for details."""
         return {x.name: x.value for x in list(ViomiVacuumSpeed)}
 
     @command(click.argument("speed", type=int))
