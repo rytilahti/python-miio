@@ -12,7 +12,7 @@ class VacuumInterface:
 
     @abstractmethod
     def home(self):
-        """Return to home."""
+        """Return vacuum robot to home station/dock."""
 
     @abstractmethod
     def start(self):
@@ -20,7 +20,7 @@ class VacuumInterface:
 
     @abstractmethod
     def stop(self):
-        """Validate that Stop cleaning."""
+        """Stop cleaning."""
 
     def pause(self):
         """Pause cleaning.
@@ -33,7 +33,7 @@ class VacuumInterface:
     def fan_speed_presets(self) -> FanspeedPresets:
         """Return dictionary containing supported fan speeds.
 
-        Dictionary where:
+        :returns: Dictionary where:
         - key is name (identifier)
         - value is integer representation; usable as argument for set_fan_speed_preset() method
         """
