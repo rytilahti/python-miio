@@ -31,7 +31,7 @@ class VacuumInterface:
 
     @abstractmethod
     def fan_speed_presets(self) -> FanspeedPresets:
-        """Return dictionary containing supported fan speeds.
+        """Return available fan speed presets.
 
         :returns: Dictionary where:
         - key is name (identifier)
@@ -39,9 +39,9 @@ class VacuumInterface:
         """
 
     @abstractmethod
-    def set_fan_speed_preset(self, speed: int) -> None:
-        """Sets fan speed preset value.
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed.
 
-        :param speed: integer value from fan_speed_presets() method
-        :raise RuntimeError: if argument is not recognized preset speed for the device
+        :param speed_preset: integer value from fan_speed_presets() method
+        :raise ValueError: if argument is not recognized preset speed for the device
         """

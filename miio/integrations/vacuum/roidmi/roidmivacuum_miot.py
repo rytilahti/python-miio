@@ -639,18 +639,17 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
 
     @command()
     def fan_speed_presets(self) -> FanspeedPresets:
-        """Retrieve predefined fan speeds, see VacuumInterface for details."""
+        """Return available fan speed presets, see VacuumInterface for details."""
         return {"Sweep": 0, "Silent": 1, "Basic": 2, "Strong": 3, "FullSpeed": 4}
 
     @command(click.argument("speed", type=int))
-    def set_fan_speed_preset(self, speed: int) -> None:
-        """Sets fan speed preset value.
-
-        :param speed: integer value from fan_speed_presets() method
-        """
-        if speed not in self.fan_speed_presets().values():
-            raise ValueError("Invalid argument, given value not in predefined values")
-        return self.set_property("fanspeed_mode", speed)
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed, see VacuumInterface for detailed description."""
+        if speed_preset not in self.fan_speed_presets().values():
+            raise ValueError(
+                f"Invalid preset speed {speed_preset}, not in: {self.fan_speed_presets().values()}"
+            )
+        return self.set_property("fanspeed_mode", speed_preset)
 
     @command(click.argument("sweep_type", type=EnumType(SweepType)))
     def set_sweep_type(self, sweep_type: SweepType):

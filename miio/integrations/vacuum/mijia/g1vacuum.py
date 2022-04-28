@@ -376,15 +376,14 @@ class G1Vacuum(MiotDevice, VacuumInterface):
 
     @command()
     def fan_speed_presets(self) -> FanspeedPresets:
-        """Retrieve predefined fan speeds, see VacuumInterface for details."""
+        """Return available fan speed presets, see VacuumInterface for details."""
         return {x.name: x.value for x in G1FanSpeed}
 
     @command(click.argument("speed", type=int))
-    def set_fan_speed_preset(self, speed: int) -> None:
-        """Sets fan speed preset value.
-
-        :param speed: integer value from fan_speed_presets() method
-        """
-        if speed not in self.fan_speed_presets().values():
-            raise ValueError("Invalid argument, given value not in predefined values")
-        return self.set_property("fan_speed", speed)
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed, see VacuumInterface for detailed description."""
+        if speed_preset not in self.fan_speed_presets().values():
+            raise ValueError(
+                f"Invalid preset speed {speed_preset}, not in: {self.fan_speed_presets().values()}"
+            )
+        return self.set_property("fan_speed", speed_preset)

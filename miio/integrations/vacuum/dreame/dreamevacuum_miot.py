@@ -528,21 +528,20 @@ class DreameVacuum(MiotDevice, VacuumInterface):
 
     @command()
     def fan_speed_presets(self) -> FanspeedPresets:
-        """Retrieve predefined fan speeds, see VacuumInterface for details."""
+        """Return available fan speed presets, see VacuumInterface for details."""
         fanspeeds_enum = _get_cleaning_mode_enum_class(self.model)
         if not fanspeeds_enum:
             return {}
         return _enum_as_dict(fanspeeds_enum)
 
     @command(click.argument("speed", type=int))
-    def set_fan_speed_preset(self, speed: int) -> None:
-        """Sets fan speed preset value.
-
-        :param speed: integer value from fan_speed_presets() method
-        """
-        if speed not in self.fan_speed_presets().values():
-            raise ValueError("Invalid argument, given value not in predefined values")
-        self.set_fan_speed(speed)
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed, see VacuumInterface for detailed description."""
+        if speed_preset not in self.fan_speed_presets().values():
+            raise ValueError(
+                f"Invalid preset speed {speed_preset}, not in: {self.fan_speed_presets().values()}"
+            )
+        self.set_fan_speed(speed_preset)
 
     @command()
     def waterflow(self):
