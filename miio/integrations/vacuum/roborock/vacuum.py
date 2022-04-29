@@ -22,6 +22,7 @@ from miio.click_common import (
 )
 from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
+from miio.interfaces import VacuumInterface
 
 from .vacuumcontainers import (
     CarpetModeStatus,
@@ -169,7 +170,7 @@ SUPPORTED_MODELS = [
 ]
 
 
-class RoborockVacuum(Device):
+class RoborockVacuum(Device, VacuumInterface):
     """Main class for roborock vacuums (roborock.vacuum.*)."""
 
     _supported_models = SUPPORTED_MODELS
@@ -931,7 +932,7 @@ class RoborockVacuum(Device):
             callback=callback,
         )
 
-        @dg.resultcallback()
+        @dg.result_callback()
         @dg.device_pass
         def cleanup(vac: RoborockVacuum, *args, **kwargs):
             if vac.ip is None:  # dummy Device for discovery, skip teardown

@@ -103,6 +103,72 @@ _MAPPING_VA2 = {
     "led_brightness": {"siid": 13, "piid": 2},
 }
 
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-vb4:1
+_MAPPING_VB4 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    "fan_level": {"siid": 2, "piid": 5},
+    "anion": {"siid": 2, "piid": 6},
+    # Environment
+    "humidity": {"siid": 3, "piid": 1},
+    "aqi": {"siid": 3, "piid": 4},
+    "temperature": {"siid": 3, "piid": 7},
+    "pm10_density": {"siid": 3, "piid": 8},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    "favorite_rpm": {"siid": 9, "piid": 3},
+    "favorite_level": {"siid": 9, "piid": 5},
+    # aqi
+    "purify_volume": {"siid": 11, "piid": 1},
+    "average_aqi": {"siid": 11, "piid": 2},
+    "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
+    # RFID
+    "filter_rfid_tag": {"siid": 12, "piid": 1},
+    "filter_rfid_product_id": {"siid": 12, "piid": 3},
+    # Screen
+    "led_brightness": {"siid": 13, "piid": 2},
+    # Device Display Unit
+    "device-display-unit": {"siid": 14, "piid": 1},
+}
+
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-rmb1:1
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-rmb1:2
+_MAPPING_RMB1 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    # Environment
+    "humidity": {"siid": 3, "piid": 1},
+    "aqi": {"siid": 3, "piid": 4},
+    "temperature": {"siid": 3, "piid": 7},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    "favorite_level": {"siid": 9, "piid": 5},
+    # aqi
+    "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
+    # Screen
+    "led_brightness": {"siid": 13, "piid": 2},
+    # Device Display Unit
+    "device-display-unit": {"siid": 14, "piid": 1},
+}
+
 _MAPPINGS = {
     "zhimi.airpurifier.ma4": _MAPPING,  # airpurifier 3
     "zhimi.airpurifier.mb3": _MAPPING,  # airpurifier 3h
@@ -112,6 +178,8 @@ _MAPPINGS = {
     "zhimi.airp.mb4a": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
+    "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
+    "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
 }
 
 
@@ -241,6 +309,12 @@ class AirPurifierMiotStatus(DeviceStatus):
         return round(temperate, 1) if temperate is not None else None
 
     @property
+    def pm10_density(self) -> Optional[float]:
+        """Current temperature, if available."""
+        pm10_density = self.data.get("pm10_density")
+        return round(pm10_density, 1) if pm10_density is not None else None
+
+    @property
     def fan_level(self) -> Optional[int]:
         """Current fan level."""
         return self.data.get("fan_level")
@@ -256,7 +330,12 @@ class AirPurifierMiotStatus(DeviceStatus):
 
         value = self.data.get("led_brightness")
         if value is not None:
-            if self.model in ("zhimi.airp.va2", "zhimi.airp.mb5"):
+            if self.model in (
+                "zhimi.airp.va2",
+                "zhimi.airp.mb5",
+                "zhimi.airp.vb4",
+                "zhimi.airp.rmb1",
+            ):
                 value = 2 - value
             try:
                 return LedBrightness(value)
@@ -333,6 +412,7 @@ class AirPurifierMiot(MiotDevice):
             "Average AQI: {result.average_aqi} μg/m³\n"
             "Humidity: {result.humidity} %\n"
             "Temperature: {result.temperature} °C\n"
+            "PM10 Density: {result.pm10_density} μg/m³\n"
             "Fan Level: {result.fan_level}\n"
             "Mode: {result.mode}\n"
             "LED: {result.led}\n"
@@ -512,7 +592,11 @@ class AirPurifierMiot(MiotDevice):
             )
 
         value = brightness.value
-        if self.model in ("zhimi.airp.va2", "zhimi.airp.mb5") and value:
+        if (
+            self.model
+            in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4", "zhimi.airp.rmb1")
+            and value
+        ):
             value = 2 - value
         return self.set_property("led_brightness", value)
 
