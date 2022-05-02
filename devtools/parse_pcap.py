@@ -68,7 +68,7 @@ def read_payloads_from_file(file, tokens: list[str]):
 
         yield src_addr, dst_addr, payload
 
-    print(stats)  # noqa: T001
+    print(stats)  # noqa: T201
 
 
 @app.command()
@@ -77,7 +77,7 @@ def read_file(
 ):
     """Read PCAP file and output decrypted miio communication."""
     for src_addr, dst_addr, payload in read_payloads_from_file(file, token):
-        print(f"{src_addr:<15} -> {dst_addr:<15} {payload}")  # noqa: T001
+        print(f"{src_addr:<15} -> {dst_addr:<15} {payload}")  # noqa: T201
 
 
 if __name__ == "__main__":
