@@ -169,6 +169,43 @@ _MAPPING_RMB1 = {
     "device-display-unit": {"siid": 14, "piid": 1},
 }
 
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-za1:2
+_MAPPING_ZA1 = {
+    # Air Purifier (siid=2)
+    "power": {"siid": 2, "piid": 1},
+    "fan_level": {"siid": 2, "piid": 4},
+    "mode": {"siid": 2, "piid": 5},
+    # Environment (siid=3)
+    "humidity": {"siid": 3, "piid": 7},
+    "temperature": {"siid": 3, "piid": 8},
+    "aqi": {"siid": 3, "piid": 6},
+    "tvoc": {"siid": 3, "piid": 1},
+    # Filter (siid=4)
+    "filter_life_remaining": {"siid": 4, "piid": 3},
+    "filter_hours_used": {"siid": 4, "piid": 5},
+    # Alarm (siid=5)
+    "buzzer": {"siid": 5, "piid": 1},
+    # Indicator Light (siid=6)
+    "led_brightness": {"siid": 6, "piid": 1},
+    # Physical Control Locked (siid=7)
+    "child_lock": {"siid": 7, "piid": 1},
+    # Motor Speed (siid=10)
+    "favorite_level": {"siid": 10, "piid": 10},
+    "motor_speed": {"siid": 10, "piid": 11},
+    # Use time (siid=12)
+    "use_time": {"siid": 12, "piid": 1},
+    # AQI (siid=13)
+    "purify_volume": {"siid": 13, "piid": 1},
+    "average_aqi": {"siid": 13, "piid": 2},
+    "aqi_realtime_update_duration": {"siid": 13, "piid": 9},
+    # RFID (siid=14)
+    "filter_rfid_tag": {"siid": 14, "piid": 1},
+    "filter_rfid_product_id": {"siid": 14, "piid": 3},
+    # Device Display Unit
+    "device-display-unit": {"siid": 16, "piid": 1},
+}
+
+
 _MAPPINGS = {
     "zhimi.airpurifier.ma4": _MAPPING,  # airpurifier 3
     "zhimi.airpurifier.mb3": _MAPPING,  # airpurifier 3h
@@ -180,6 +217,7 @@ _MAPPINGS = {
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
+    "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
 }
 
 
@@ -303,6 +341,11 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("humidity")
 
     @property
+    def tvoc(self) -> Optional[int]:
+        """Current TVOC."""
+        return self.data.get("tvoc")
+
+    @property
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         temperate = self.data.get("temperature")
@@ -409,6 +452,7 @@ class AirPurifierMiot(MiotDevice):
             "Power: {result.power}\n"
             "Anion: {result.anion}\n"
             "AQI: {result.aqi} μg/m³\n"
+            "TVOC: {result.tvoc}\n"
             "Average AQI: {result.average_aqi} μg/m³\n"
             "Humidity: {result.humidity} %\n"
             "Temperature: {result.temperature} °C\n"

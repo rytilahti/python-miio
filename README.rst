@@ -106,6 +106,7 @@ Supported devices
 -  Xiaomi Mi Air Purifier 2, 3H, 3C, 4, Pro, Pro H, 4 Pro (zhimi.airpurifier.m2, mb3, mb4, mb5, v7, vb2, va2), 4 Lite
 -  Xiaomi Mi Air (Purifier) Dog X3, X5, X7SM (airdog.airpurifier.x3, airdog.airpurifier.x5, airdog.airpurifier.x7sm)
 -  Xiaomi Mi Air Humidifier
+-  Smartmi Air Purifier
 -  Xiaomi Aqara Camera
 -  Xiaomi Aqara Gateway (basic implementation, alarm, lights)
 -  Xiaomi Mijia 360 1080p
