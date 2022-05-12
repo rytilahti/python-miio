@@ -203,6 +203,8 @@ _MAPPING_ZA1 = {
     "filter_rfid_product_id": {"siid": 14, "piid": 3},
     # Device Display Unit
     "device-display-unit": {"siid": 16, "piid": 1},
+    # Other
+    "gestures": {"siid": 15, "piid": 13},
 }
 
 
@@ -440,6 +442,11 @@ class AirPurifierMiotStatus(DeviceStatus):
         """How many days can the filter still be used."""
         return self.data.get("filter_left_time")
 
+    @property
+    def gestures(self) -> Optional[bool]:
+        """Return True if gesture control is on."""
+        return self.data.get("gestures")
+
 
 class AirPurifierMiot(MiotDevice):
     """Main class representing the air purifier which uses MIoT protocol."""
@@ -462,6 +469,7 @@ class AirPurifierMiot(MiotDevice):
             "LED: {result.led}\n"
             "LED brightness: {result.led_brightness}\n"
             "LED brightness level: {result.led_brightness_level}\n"
+            "Gestures: {result.gestures}\n"
             "Buzzer: {result.buzzer}\n"
             "Buzzer vol.: {result.buzzer_volume}\n"
             "Child lock: {result.child_lock}\n"
@@ -558,6 +566,23 @@ class AirPurifierMiot(MiotDevice):
             )
 
         return self.set_property("buzzer", buzzer)
+
+    @command(
+        click.argument("gestures", type=bool),
+        default_output=format_output(
+            lambda gestures: "Turning on gestures"
+            if gestures
+            else "Turning off gestures"
+        ),
+    )
+    def set_gestures(self, gestures: bool):
+        """Set gestures on/off."""
+        if "gestures" not in self._get_mapping():
+            raise AirPurifierMiotException(
+                "Unsupported buzzer for model '%s'" % self.model
+            )
+
+        return self.set_property("gestures", gestures)
 
     @command(
         click.argument("lock", type=bool),
