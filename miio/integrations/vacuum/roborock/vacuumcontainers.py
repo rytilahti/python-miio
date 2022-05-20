@@ -434,14 +434,22 @@ class Timer(DeviceStatus):
         self.croniter = croniter(self.cron, start_time=localized_ts)
 
     @property
-    def id(self) -> int:
-        """ID which can be used to point to this timer."""
-        return int(self.data[0])
+    def id(self) -> str:
+        """Unique identifier for timer.
+
+        Usually a unix timestamp of when the timer was created, but it is not
+        guaranteed. For example, valetudo apparently allows using arbitrary strings for
+        this.
+        """
+        return self.data[0]
 
     @property
-    def ts(self) -> datetime:
-        """Pretty-printed ID (timestamp) presentation as time."""
-        return pretty_time(int(self.data[0]) / 1000)
+    def ts(self) -> Optional[datetime]:
+        """Timer creation time, if the id is a unix timestamp."""
+        try:
+            return pretty_time(int(self.data[0]) / 1000)
+        except ValueError:
+            return None
 
     @property
     def enabled(self) -> bool:
