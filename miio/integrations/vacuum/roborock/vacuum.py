@@ -542,39 +542,39 @@ class RoborockVacuum(Device, VacuumInterface):
         click.argument("cron"),
         click.argument("command", required=False, default=""),
         click.argument("parameters", required=False, default=""),
+        click.argument("timer_id", required=False, default=None),
     )
-    def add_timer(self, cron: str, command: str, parameters: str):
+    def add_timer(self, cron: str, command: str, parameters: str, timer_id: str):
         """Add a timer.
 
         :param cron: schedule in cron format
         :param command: ignored by the vacuum.
         :param parameters: ignored by the vacuum.
         """
-        import time
+        if not timer_id:
+            timer_id = str(int(round(time.time() * 1000)))
+        return self.send("set_timer", [[timer_id, [cron, [command, parameters]]]])
 
-        ts = int(round(time.time() * 1000))
-        return self.send("set_timer", [[str(ts), [cron, [command, parameters]]]])
-
-    @command(click.argument("timer_id", type=int))
-    def delete_timer(self, timer_id: int):
+    @command(click.argument("timer_id", type=str))
+    def delete_timer(self, timer_id: str):
         """Delete a timer with given ID.
 
-        :param int timer_id: Timer ID
+        :param str timer_id: Timer ID
         """
-        return self.send("del_timer", [str(timer_id)])
+        return self.send("del_timer", [timer_id])
 
     @command(
-        click.argument("timer_id", type=int), click.argument("mode", type=TimerState)
+        click.argument("timer_id", type=str), click.argument("mode", type=TimerState)
     )
-    def update_timer(self, timer_id: int, mode: TimerState):
+    def update_timer(self, timer_id: str, mode: TimerState):
         """Update a timer with given ID.
 
-        :param int timer_id: Timer ID
-        :param TimerStae mode: either On or Off
+        :param str timer_id: Timer ID
+        :param TimerState mode: either On or Off
         """
         if mode != TimerState.On and mode != TimerState.Off:
             raise DeviceException("Only 'On' or 'Off' are  allowed")
-        return self.send("upd_timer", [str(timer_id), mode.value])
+        return self.send("upd_timer", [timer_id, mode.value])
 
     @command()
     def dnd_status(self):
