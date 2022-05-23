@@ -3,7 +3,7 @@ devices."""
 from abc import abstractmethod
 from typing import Dict
 
-# dictionary of predefined fan speed;  see corresponding method for detailed description
+# Dictionary of predefined fan speeds
 FanspeedPresets = Dict[str, int]
 
 
@@ -25,7 +25,7 @@ class VacuumInterface:
     def pause(self):
         """Pause cleaning.
 
-        :raise RuntimeError: if the method is not supported for the device
+        :raises RuntimeError: if the method is not supported by the device
         """
         raise RuntimeError("`pause` not supported")
 
@@ -33,15 +33,14 @@ class VacuumInterface:
     def fan_speed_presets(self) -> FanspeedPresets:
         """Return available fan speed presets.
 
-        :returns: Dictionary where:
-        - key is name (identifier)
-        - value is integer representation; usable as argument for set_fan_speed_preset() method
+        The returned object is a dictionary where the key is user-readable name and the
+        value is input for :func:`set_fan_speed_preset()`.
         """
 
     @abstractmethod
     def set_fan_speed_preset(self, speed_preset: int) -> None:
         """Set fan speed preset speed.
 
-        :param speed_preset: integer value from fan_speed_presets() method
-        :raise ValueError: if argument is not recognized preset speed for the device
+        :param speed_preset: a value from :func:`fan_speed_presets()`
+        :raises ValueError: for invalid preset value
         """
