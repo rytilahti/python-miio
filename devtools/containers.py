@@ -42,7 +42,7 @@ class ModelMapping(DataClassJsonMixin):
     def urn_for_model(self, model: str):
         matches = [inst for inst in self.instances if inst.model == model]
         if len(matches) > 1:
-            print(  # noqa: T001
+            print(  # noqa: T201
                 "WARNING more than a single match for model %s, using the first one: %s"
                 % (model, matches)
             )

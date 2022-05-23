@@ -8,7 +8,7 @@ import click
 
 from miio.click_common import command, format_output
 from miio.exceptions import DeviceException
-from miio.interfaces import VacuumInterface
+from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
 
@@ -527,12 +527,21 @@ class DreameVacuum(MiotDevice, VacuumInterface):
         return self.set_property("cleaning_mode", fanspeed.value)
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
-        """Return dictionary containing supported fan speeds."""
+    def fan_speed_presets(self) -> FanspeedPresets:
+        """Return available fan speed presets."""
         fanspeeds_enum = _get_cleaning_mode_enum_class(self.model)
         if not fanspeeds_enum:
             return {}
         return _enum_as_dict(fanspeeds_enum)
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed."""
+        if speed_preset not in self.fan_speed_presets().values():
+            raise ValueError(
+                f"Invalid preset speed {speed_preset}, not in: {self.fan_speed_presets().values()}"
+            )
+        self.set_fan_speed(speed_preset)
 
     @command()
     def waterflow(self):

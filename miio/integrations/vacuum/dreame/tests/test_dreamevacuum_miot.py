@@ -176,6 +176,10 @@ class TestDreame1CVacuum(TestCase):
         value = self.device.fan_speed()
         assert value == {"Medium": 2}
 
+    def test_set_fan_speed_preset(self):
+        for speed in self.device.fan_speed_presets().values():
+            self.device.set_fan_speed_preset(speed)
+
 
 @pytest.mark.usefixtures("dummydreamef9vacuum")
 class TestDreameF9Vacuum(TestCase):
@@ -253,10 +257,7 @@ class TestDreameF9Vacuum(TestCase):
 
 @pytest.mark.parametrize("model", MIOT_MAPPING.keys())
 def test_dreame_models(model: str):
-    vac = DreameVacuum(model=model)
-    # test _get_cleaning_mode_enum_class returns non-empty mapping
-    fp = vac.fan_speed_presets()
-    assert (fp is not None) and (len(fp) > 0)
+    DreameVacuum(model=model)
 
 
 def test_invalid_dreame_model():

@@ -5,7 +5,7 @@ from enum import Enum
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.interfaces import VacuumInterface
+from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -373,3 +373,17 @@ class G1Vacuum(MiotDevice, VacuumInterface):
     def set_fan_speed(self, fan_speed: G1FanSpeed):
         """Set fan speed."""
         return self.set_property("fan_speed", fan_speed.value)
+
+    @command()
+    def fan_speed_presets(self) -> FanspeedPresets:
+        """Return available fan speed presets."""
+        return {x.name: x.value for x in G1FanSpeed}
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed."""
+        if speed_preset not in self.fan_speed_presets().values():
+            raise ValueError(
+                f"Invalid preset speed {speed_preset}, not in: {self.fan_speed_presets().values()}"
+            )
+        return self.set_property("fan_speed", speed_preset)

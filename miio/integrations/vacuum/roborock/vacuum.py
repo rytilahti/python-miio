@@ -7,7 +7,7 @@ import math
 import os
 import pathlib
 import time
-from typing import Dict, List, Optional, Type, Union
+from typing import List, Optional, Type, Union
 
 import click
 import pytz
@@ -22,7 +22,7 @@ from miio.click_common import (
 )
 from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
-from miio.interfaces import VacuumInterface
+from miio.interfaces import FanspeedPresets, VacuumInterface
 
 from .vacuumcontainers import (
     CarpetModeStatus,
@@ -619,8 +619,8 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("get_custom_mode")[0]
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
-        """Return dictionary containing supported fan speeds."""
+    def fan_speed_presets(self) -> FanspeedPresets:
+        """Return available fan speed presets."""
 
         def _enum_as_dict(cls):
             return {x.name: x.value for x in list(cls)}
@@ -651,6 +651,15 @@ class RoborockVacuum(Device, VacuumInterface):
         _LOGGER.debug("Using fanspeeds %s for %s", fanspeeds, self.model)
 
         return _enum_as_dict(fanspeeds)
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed."""
+        if speed_preset not in self.fan_speed_presets().values():
+            raise ValueError(
+                f"Invalid preset speed {speed_preset}, not in: {self.fan_speed_presets().values()}"
+            )
+        return self.send("set_custom_mode", [speed_preset])
 
     @command()
     def sound_info(self):

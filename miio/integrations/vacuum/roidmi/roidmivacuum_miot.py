@@ -11,7 +11,7 @@ import click
 
 from miio.click_common import EnumType, command
 from miio.integrations.vacuum.roborock.vacuumcontainers import DNDStatus
-from miio.interfaces import VacuumInterface
+from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
@@ -636,6 +636,20 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     def set_fanspeed(self, fanspeed_mode: FanSpeed):
         """Set fan speed."""
         return self.set_property("fanspeed_mode", fanspeed_mode.value)
+
+    @command()
+    def fan_speed_presets(self) -> FanspeedPresets:
+        """Return available fan speed presets."""
+        return {"Sweep": 0, "Silent": 1, "Basic": 2, "Strong": 3, "FullSpeed": 4}
+
+    @command(click.argument("speed", type=int))
+    def set_fan_speed_preset(self, speed_preset: int) -> None:
+        """Set fan speed preset speed."""
+        if speed_preset not in self.fan_speed_presets().values():
+            raise ValueError(
+                f"Invalid preset speed {speed_preset}, not in: {self.fan_speed_presets().values()}"
+            )
+        return self.set_property("fanspeed_mode", speed_preset)
 
     @command(click.argument("sweep_type", type=EnumType(SweepType)))
     def set_sweep_type(self, sweep_type: SweepType):
