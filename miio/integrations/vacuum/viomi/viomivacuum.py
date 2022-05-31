@@ -68,6 +68,7 @@ SUPPORTED_MODELS = [
     "viomi.vacuum.v7",
     "viomi.vacuum.v8",
     "viomi.vacuum.v10",
+    "viomi.vacuum.v13",
 ]
 
 ERROR_CODES = {
