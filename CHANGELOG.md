@@ -2,7 +2,7 @@
 
 ## [0.5.12](https://github.com/rytilahti/python-miio/tree/0.5.12) (2022-06-14)
 
-TBD.
+This release adds support for several new devices (see details below, thanks to @jedziemyjedziemy, @rperrell, @icepie, @MPThLee and @2pirko) and contains improvements to Roborock and Yeelight integration.
 
 [Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.11...0.5.12)
 
@@ -24,8 +24,7 @@ TBD.
 - Use result\_callback \(click8+\) in roborock integration [\#1390](https://github.com/rytilahti/python-miio/pull/1390) (@DoganM95)
 - Retry on error code -9999 [\#1363](https://github.com/rytilahti/python-miio/pull/1363) (@rytilahti)
 - Catch exceptions during quirk handling [\#1360](https://github.com/rytilahti/python-miio/pull/1360) (@rytilahti)
-- Use devinfo.model for unsupported model warning
- [\#1359](https://github.com/rytilahti/python-miio/pull/1359) (@MPThLee)
+- Use devinfo.model for unsupported model warning [\#1359](https://github.com/rytilahti/python-miio/pull/1359) (@MPThLee)
 
 **New devices:**
 
