@@ -1,5 +1,58 @@
 # Change Log
 
+## [0.5.12](https://github.com/rytilahti/python-miio/tree/0.5.12) (2022-06-14)
+
+TBD.
+
+[Full Changelog](https://github.com/rytilahti/python-miio/compare/0.5.11...0.5.12)
+
+**Breaking changes:**
+
+- Require click8+ \(API incompatibility on result\_callback\) [\#1378](https://github.com/rytilahti/python-miio/pull/1378) (@Sir-Photch)
+- Move humidifier implementations to miio.integrations.humidifier package [\#1365](https://github.com/rytilahti/python-miio/pull/1365) (@rytilahti)
+- Move airpurifier impls to miio.integrations.airpurifier package [\#1364](https://github.com/rytilahti/python-miio/pull/1364) (@rytilahti)
+
+**Implemented enhancements:**
+
+- Add yeelink.light.color7 for yeelight [\#1426](https://github.com/rytilahti/python-miio/pull/1426) (@rytilahti)
+- vacuum/roborock: Allow custom timer ids [\#1423](https://github.com/rytilahti/python-miio/pull/1423) (@rytilahti)
+- Add fan speed presets to VacuumInterface [\#1405](https://github.com/rytilahti/python-miio/pull/1405) (@2pirko)
+- Add device\_id property to Device class [\#1384](https://github.com/rytilahti/python-miio/pull/1384) (@starkillerOG)
+
+**Fixed bugs:**
+
+- Use result\_callback \(click8+\) in roborock integration [\#1390](https://github.com/rytilahti/python-miio/pull/1390) (@DoganM95)
+- Retry on error code -9999 [\#1363](https://github.com/rytilahti/python-miio/pull/1363) (@rytilahti)
+- Catch exceptions during quirk handling [\#1360](https://github.com/rytilahti/python-miio/pull/1360) (@rytilahti)
+- Use devinfo.model for unsupported model warning
+ [\#1359](https://github.com/rytilahti/python-miio/pull/1359) (@MPThLee)
+
+**New devices:**
+
+- Add zhimi.airp.rmb1 support [\#1402](https://github.com/rytilahti/python-miio/pull/1402) (@jedziemyjedziemy)
+- Add zhimi.airp.vb4 support \(air purifier 4 pro\) [\#1399](https://github.com/rytilahti/python-miio/pull/1399) (@rperrell)
+- Add support for dreame.vacuum.p2150o [\#1382](https://github.com/rytilahti/python-miio/pull/1382) (@icepie)
+- Add support for Air Purifier 4 \(zhimi.airp.mb5\) [\#1357](https://github.com/rytilahti/python-miio/pull/1357) (@MPThLee)
+- Support for Xiaomi Vaccum Mop 2 Ultra and Pro+ \(dreame\) [\#1356](https://github.com/rytilahti/python-miio/pull/1356) (@2pirko)
+
+**Documentation updates:**
+
+- Add cloud extractor for token extraction to documentation [\#1383](https://github.com/rytilahti/python-miio/pull/1383) (@NiRi0004)
+
+**Merged pull requests:**
+
+- Add python 3.11-dev to CI [\#1427](https://github.com/rytilahti/python-miio/pull/1427) (@rytilahti)
+- Add codeql checks [\#1403](https://github.com/rytilahti/python-miio/pull/1403) (@rytilahti)
+- Update pre-commit hooks to fix black in CI [\#1380](https://github.com/rytilahti/python-miio/pull/1380) (@rytilahti)
+- Mark chuangmi.camera.038a2 as supported [\#1371](https://github.com/rytilahti/python-miio/pull/1371) (@rockyzhang)
+- Mark roborock.vacuum.c1 as supported [\#1370](https://github.com/rytilahti/python-miio/pull/1370) (@rytilahti)
+- Add common interface for vacuums [\#1368](https://github.com/rytilahti/python-miio/pull/1368) (@2pirko)
+- Move yeelight to integrations.light package [\#1367](https://github.com/rytilahti/python-miio/pull/1367) (@rytilahti)
+- Use integration type specific imports [\#1366](https://github.com/rytilahti/python-miio/pull/1366) (@rytilahti)
+- Mark dmaker.fan.p{15,18} as supported [\#1362](https://github.com/rytilahti/python-miio/pull/1362) (@rytilahti)
+- Mark philips.light.sread2 as supported for philips\_eyecare [\#1355](https://github.com/rytilahti/python-miio/pull/1355) (@rytilahti)
+- Use \_mappings for all miot integrations [\#1349](https://github.com/rytilahti/python-miio/pull/1349) (@rytilahti)
+
 ## [0.5.11](https://github.com/rytilahti/python-miio/tree/0.5.11) (2022-03-07)
 
 This release fixes zhimi.fan.za5 support and makes all integrations introspectable for their supported models.
