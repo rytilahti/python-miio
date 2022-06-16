@@ -113,6 +113,8 @@ class VacuumStatus(DeviceStatus):
             17: "Zoned cleaning",
             18: "Segment cleaning",
             22: "Emptying the bin",  # on s7+, see #1189
+            23: "Washing the mop",  # on a46, #1435
+            26: "Going to wash the mop",  # on a46, #1435
             100: "Charging complete",
             101: "Device offline",
         }
