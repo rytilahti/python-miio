@@ -187,6 +187,10 @@ class EncryptionAdapter(Adapter):
             lambda decrypted_bytes: decrypted_bytes[: decrypted_bytes.rfind(b"\x00")]
             if b"\x00" in decrypted_bytes
             else decrypted_bytes,
+            # fix double-oh values for 090615.curtain.jldj03, ##1411
+            lambda decrypted_bytes: decrypted_bytes.replace(
+                b'"value":00', b'"value":0'
+            ),
         ]
 
         for i, quirk in enumerate(decrypted_quirks):
