@@ -89,6 +89,10 @@ class TestFanZA5(TestCase):
             with pytest.raises(FanException):
                 self.device.set_speed(s)
 
+    def test_fan_speed_deprecation(self):
+        with pytest.deprecated_call():
+            self.device.status().fan_speed
+
     def test_set_angle(self):
         def angle():
             return self.device.status().angle
