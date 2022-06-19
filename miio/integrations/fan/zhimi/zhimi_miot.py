@@ -6,8 +6,7 @@ import click
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
 from miio.fan_common import FanException, MoveDirection, OperationMode
-
-from .utils import deprecated
+from miio.utils import deprecated
 
 MODEL_FAN_ZA5 = "zhimi.fan.za5"
 
