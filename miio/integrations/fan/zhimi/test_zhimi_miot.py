@@ -79,7 +79,7 @@ class TestFanZA5(TestCase):
 
     def test_set_speed(self):
         def speed():
-            return self.device.status().fan_speed
+            return self.device.status().speed
 
         for s in range(1, 101):
             self.device.set_speed(s)
