@@ -6,6 +6,7 @@ import click
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
 from miio.fan_common import FanException, MoveDirection, OperationMode
+from miio.utils import deprecated
 
 MODEL_FAN_ZA5 = "zhimi.fan.za5"
 
@@ -107,8 +108,14 @@ class FanStatusZA5(DeviceStatus):
         """Fan level (1-4)."""
         return self.data["fan_level"]
 
-    @property
+    @property  # type: ignore
+    @deprecated("Use speed()")
     def fan_speed(self) -> int:
+        """Fan speed (1-100)."""
+        return self.speed
+
+    @property
+    def speed(self) -> int:
         """Fan speed (1-100)."""
         return self.data["fan_speed"]
 
