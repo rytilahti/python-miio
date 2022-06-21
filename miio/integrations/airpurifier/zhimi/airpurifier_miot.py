@@ -579,7 +579,7 @@ class AirPurifierMiot(MiotDevice):
         """Set gestures on/off."""
         if "gestures" not in self._get_mapping():
             raise AirPurifierMiotException(
-                "Unsupported buzzer for model '%s'" % self.model
+                "Gestures not support for model '%s'" % self.model
             )
 
         return self.set_property("gestures", gestures)
