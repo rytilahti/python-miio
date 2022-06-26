@@ -38,12 +38,12 @@ You can get some information from any miIO/MIoT device, including its device mod
     Network: {'localIp': '<ip>', 'mask': '255.255.255.0', 'gw': '<ip>'}
     AP: {'rssi': -73, 'ssid': '<nnetwork>', 'primary': 11, 'bssid': '<bssid>'}
 
-Each different device type is supported by their corresponding module (e.g., `vacuum` or `fan`).
+Different devices are supported by their corresponding modules (e.g., `roborockvacuum` or `fan`).
 You can get the list of available commands for any given module by passing `--help` argument to it::
 
-    $ miiocli vacuum --help
+    $ miiocli roborockvacuum --help
 
-    Usage: miiocli vacuum [OPTIONS] COMMAND [ARGS]...
+    Usage: miiocli roborockvacuum [OPTIONS] COMMAND [ARGS]...
 
     Options:
       --ip TEXT       [required]
@@ -58,16 +58,16 @@ You can get the list of available commands for any given module by passing `--he
 Each command invocation will automatically detect the device model necessary for some actions by querying the device.
 You can avoid this by specifying the model manually::
 
-    miiocli vacuum --model roborock.vacuum.s5 --ip <ip> --token <token> start
+    miiocli roborockvacuum --model roborock.vacuum.s5 --ip <ip> --token <token> start
 
 
 API usage
 ---------
 All functionality is accessible through the `miio` module::
 
-    from miio import Vacuum
+    from miio import RoborockVacuum
 
-    vac = Vacuum("<ip address>", "<token>")
+    vac = RoborockVacuum("<ip address>", "<token>")
     vac.start()
 
 Each separate device type inherits from `miio.Device`
@@ -77,9 +77,9 @@ Each command invocation will automatically detect (and cache) the device model n
 by querying the device.
 You can avoid this by specifying the model manually::
 
-    from miio import Vacuum
+    from miio import RoborockVacuum
 
-    vac = Vacuum("<ip address>", "<token>", model="roborock.vacuum.s5")
+    vac = RoborockVacuum("<ip address>", "<token>", model="roborock.vacuum.s5")
 
 Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/api/miio.html>`__ for more information.
 
