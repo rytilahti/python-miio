@@ -1,8 +1,8 @@
 import logging
+from enum import Enum
 from typing import Dict
 
 import click
-from Enum import Enum
 
 from miio.click_common import EnumType, command, format_output
 from miio.interfaces import FanspeedPresets, VacuumInterface
@@ -183,6 +183,8 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
     """Support for Mi Robot Vacuum-Mop 2 Pro (ijai.vacuum.v3)."""
 
     _mappings = MIOT_MAPPING
+
+    supported_models = SUPPORTED_MODELS
 
     @command(
         default_output=format_output(
