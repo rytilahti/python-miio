@@ -773,7 +773,7 @@ class Vacuum(Device):
 
     @command(click.argument("enabled", required=True, type=bool))
     def set_dust_collection(self, enabled: bool) -> bool:
-        """Turn automatic dust collection on or off"""
+        """Turn automatic dust collection on or off."""
         self._verify_auto_empty_support()
         return (
             self.send("set_dust_collection_switch_status", {"status": int(enabled)})[0]
@@ -784,10 +784,7 @@ class Vacuum(Device):
     def set_dust_collection_mode(self, mode: DustCollectionMode) -> bool:
         """Set dust collection mode setting."""
         self._verify_auto_empty_support()
-        return (
-            self.send("set_dust_collection_mode", {"mode": mode.value})[0]
-            == "ok"
-        )
+        return self.send("set_dust_collection_mode", {"mode": mode.value})[0] == "ok"
 
     @command()
     def start_dust_collection(self):
@@ -803,9 +800,7 @@ class Vacuum(Device):
 
     def _verify_auto_empty_support(self) -> None:
         if self.model not in self._auto_empty_models:
-            raise VacuumException(
-                "Device does not support auto emptying"
-            )
+            raise VacuumException("Device does not support auto emptying")
 
     @command()
     def stop_zoned_clean(self):
