@@ -224,7 +224,8 @@ class PushServer:
 
         if len(command) > 49:
             _LOGGER.error(
-                "push server event command can be max 49 chars long, '%s' is %i chars",
+                "push server event command can be max 49 chars long,"
+                " '%s' is %i chars, received callback command will be truncated",
                 command,
                 len(command),
             )
@@ -241,6 +242,9 @@ class PushServer:
             ],
             "token": info.trigger_token,
         }
+
+        if info.trigger_value is not None:
+            trigger_data["value"] = info.trigger_value
 
         target_data = {
             "command": command,
@@ -267,9 +271,6 @@ class PushServer:
                 ],
             ]
         ]
-
-        if info.trigger_value is not None:
-            event_data[0][1][2][1]["value"] = info.trigger_value
 
         event_payload = dumps(event_data, separators=(",", ":"))
 
