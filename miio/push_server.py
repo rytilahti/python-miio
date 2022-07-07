@@ -103,7 +103,7 @@ class PushServer:
                 "A device for ip '%s' was already registed, overwriting previous callback",
                 device.ip,
             )
-            script_ids = self._registered_devices["script_ids"]
+            script_ids = self._registered_devices[device.ip]["script_ids"]
 
         self._registered_devices[device.ip] = {
             "callback": callback,
