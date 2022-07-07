@@ -113,13 +113,12 @@ class Gateway(Device):
 
         self._push_server = push_server
         self._script_ids: List[str] = []
-        self._gatway_script_i = 0
         self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
 
         self.has_push_server = push_server is not None
 
         if self.has_push_server:
-            self._push_server.Register_miio_device(ip, token, self.push_callback)
+            self._push_server.register_miio_device(self, self.push_callback)
 
     def _get_unknown_model(self):
         for model_info in self.subdevice_model_map:
@@ -443,50 +442,9 @@ class Gateway(Device):
         device = self.devices[source_device]
         device.push_callback(action, params)
 
-    def install_script(self, script_id, script_data):
-        """Install script such that the gateway will start pushing data for that
-        script."""
-        if self._push_server is None:
-            _LOGGER.error("Can not install script withouth a push_server")
-            return
-
-        if script_id in self._script_ids:
-            _LOGGER.error(
-                "Script_id '%s' already installed, not installing another time",
-                script_id,
-            )
-            return
-
-        self._script_ids.append(script_id)
-
-        return self.send(
-            "send_data_frame",
-            {
-                "cur": 0,
-                "data": script_data,
-                "data_tkn": 29576,
-                "total": 1,
-                "type": "scene",
-            },
-        )
-
-    def delete_script(self, script_id):
-        """Delete script by id."""
-        result = self.send("miIO.xdel", [script_id])
-        if result == ["ok"]:
-            if script_id in self._script_ids:
-                self._script_ids.remove(script_id)
-        else:
-            _LOGGER.error("Error removing script_id %s: %s", script_id, result)
-
-        return result
-
     def close(self):
         """Cleanup all intalled scripts and registered callbacks."""
-        for script_id in self._script_ids:
-            self.delete_script(script_id)
-
         if self.has_push_server:
-            self._push_server.Unregister_miio_device(self.ip)
+            self._push_server.unregister_miio_device(self)
 
         return

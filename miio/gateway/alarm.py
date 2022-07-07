@@ -2,6 +2,7 @@
 import logging
 from datetime import datetime
 
+from ..push_server import ScriptInfo
 from .gatewaydevice import GatewayDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -71,44 +72,23 @@ class Alarm(GatewayDevice):
             _LOGGER.error("Can not install push callback withouth a push_server")
             return False
 
-        if self._gateway._push_server.server_ip is None:
-            _LOGGER.error(
-                "Can not install push callback withouth starting the push_server"
-            )
+        script_info = ScriptInfo(
+            action="alarm_triggering",
+            extra="[1,19,1,111,[0,1],2,0]",
+            trigger_token=self._gateway.token,
+        )
+
+        script_id = self._gateway._push_server.install_script(
+            self._gateway, script_info
+        )
+        if script_id is None:
             return False
 
-        alarm_scripts = {"alarm_triggering": {"extra": "[1,19,1,111,[0,1],2,0]"}}
-
-        for action in alarm_scripts:
-            self._gateway._gatway_script_i = self._gateway._gatway_script_i + 1
-            script_id = f"x.scene.{self._gateway._gatway_script_i}000000"
-
-            script = self._gateway._push_server.construct_script(
-                script_id=script_id,
-                action=action,
-                extra=alarm_scripts[action]["extra"],
-                source_sid=str(self._gateway.device_id),
-                source_model=self._gateway.model,
-                source_token=self._gateway.token,
-                trigger_token=self._gateway.token,
-            )
-
-            result = self._gateway.install_script(script_id, script)
-            if result == ["ok"]:
-                self._script_ids.append(script_id)
-            else:
-                _LOGGER.error(
-                    "Error installing script_id %s, response %s, script_data %s",
-                    script_id,
-                    result,
-                    script,
-                )
-
+        self._script_ids.append(script_id)
         return True
 
     def uninstall_push_callbacks(self):
         """uninstall scripts registered in the gateway memory."""
         for script_id in self._script_ids:
-            self._gateway.delete_script(script_id)
-            if script_id in self._script_ids:
-                self._script_ids.remove(script_id)
+            self._gateway._push_server.delete_script(self._gateway, script_id)
+            self._script_ids.remove(script_id)

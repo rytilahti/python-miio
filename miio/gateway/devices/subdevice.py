@@ -8,6 +8,7 @@ import attr
 import click
 
 from ...click_common import command
+from ...push_server import ScriptInfo
 from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,7 +63,6 @@ class SubDevice:
         self.setter = model_info.get("setter")
 
         self.has_push_server = gw.has_push_server
-        self.script_i = 0
         self.push_scripts = model_info.get("push_properties", [])
         self._script_ids: List[str] = []
         self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
@@ -306,22 +306,9 @@ class SubDevice:
             _LOGGER.error("Can not install push callback withouth a push_server")
             return False
 
-        if self._gw._push_server.server_ip is None:
-            _LOGGER.error(
-                "Can not install push callback withouth starting the push_server"
-            )
-            return False
-
-        lumi, script_id_hex = self.sid.split(".")
-        script_id_int = int.from_bytes(bytes.fromhex(script_id_hex), byteorder="big")
-        script_id_str = str(script_id_int)[-6:]
-
+        result = True
         for action in self.push_scripts:
-            self.script_i = self.script_i + 1
-            script_id = f"x.scene.{self.script_i}{script_id_str}"
-
-            script = self._gw._push_server.construct_script(
-                script_id=script_id,
+            script_info = ScriptInfo(
                 action=action,
                 extra=self.push_scripts[action]["extra"],
                 source_sid=self.sid,
@@ -332,22 +319,17 @@ class SubDevice:
                 trigger_value=self.push_scripts[action].get("trigger_value"),
             )
 
-            result = self._gw.install_script(script_id, script)
-            if result == ["ok"]:
-                self._script_ids.append(script_id)
-            else:
-                _LOGGER.error(
-                    "Error installing script_id %s, response %s, script_data %s",
-                    script_id,
-                    result,
-                    script,
-                )
+            script_id = self._gw._push_server.install_script(self._gw, script_info)
+            if script_id is None:
+                result = False
+                continue
 
-        return True
+            self._script_ids.append(script_id)
+
+        return result
 
     def uninstall_push_callbacks(self):
         """Uninstall scripts registered in the gateway memory."""
         for script_id in self._script_ids:
-            self._gw.delete_script(script_id)
-            if script_id in self._script_ids:
-                self._script_ids.remove(script_id)
+            self._gw._push_server.delete_script(self._gw, script_id)
+            self._script_ids.remove(script_id)

@@ -6,7 +6,11 @@ import socket
 import struct
 from json import dumps
 from random import randint
+from typing import Optional
 
+import attr
+
+from .device import Device
 from .protocol import Message, Utils
 
 _LOGGER = logging.getLogger(__name__)
@@ -17,6 +21,21 @@ FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
 HELO_BYTES = bytes.fromhex(
     "21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 )
+
+
+@attr.s(auto_attribs=True)
+class ScriptInfo:
+    """Script info to register to the push server."""
+
+    action: str
+    extra: str
+    event: Optional[str] = None  # defaults to the action
+    command_extra: str = ""
+    trigger_value = None
+    trigger_token: str = ""
+    source_sid: Optional[str] = None  # Normally not needed and obtained from device
+    source_model: Optional[str] = None  # Normally not needed and obtained from device
+    source_token: Optional[str] = None  # Normally not needed and obtained from device
 
 
 def calculated_token_enc(token):
@@ -40,7 +59,9 @@ class PushServer:
         self._server_model = FAKE_DEVICE_MODEL
 
         self._listen_couroutine = None
-        self._registered_callbacks = {}
+        self._registered_devices = {}
+
+        self._script_id = 1000000
 
     def _create_udp_server(self):
         """Create the UDP socket and protocol."""
@@ -63,22 +84,42 @@ class PushServer:
             sock=udp_socket,
         )
 
-    def Register_miio_device(self, ip, token, callback):
+    def register_miio_device(self, device: Device, callback):
         """Register a miio device to this push server."""
-        if ip in self._registered_callbacks:
+        if device.ip is None:
             _LOGGER.error(
-                "A callback for ip '%s' was already registed, overwriting previous callback",
-                ip,
+                "Can not register miio device to push server since it has no ip"
             )
-        self._registered_callbacks[ip] = {
+            return
+        if device.token is None:
+            _LOGGER.error(
+                "Can not register miio device to push server since it has no token"
+            )
+            return
+
+        script_ids = []
+        if device.ip in self._registered_devices:
+            _LOGGER.error(
+                "A device for ip '%s' was already registed, overwriting previous callback",
+                device.ip,
+            )
+            script_ids = self._registered_devices["script_ids"]
+
+        self._registered_devices[device.ip] = {
             "callback": callback,
-            "token": bytes.fromhex(token),
+            "token": bytes.fromhex(device.token),
+            "script_ids": script_ids,
         }
 
-    def Unregister_miio_device(self, ip):
+    def unregister_miio_device(self, device: Device):
         """Unregister a miio device from this push server."""
-        if ip in self._registered_callbacks:
-            self._registered_callbacks.pop(ip)
+        if device.ip is None:
+            return
+
+        if device.ip in self._registered_devices:
+            for script_id in self._registered_devices[device.ip]["script_ids"]:
+                self.delete_script(device, script_id)
+            self._registered_devices.pop(device.ip)
 
     async def start(self):
         """Start Miio push server."""
@@ -97,30 +138,79 @@ class PushServer:
         self._listen_couroutine.close()
         self._listen_couroutine = None
 
-    def construct_script(  # nosec
+    def install_script(self, device: Device, script_info: ScriptInfo):
+        """Install script such that the device will start pushing data for that
+        script."""
+        if device.ip not in self._registered_devices:
+            _LOGGER.error("Can not install script, miio device not yet registered")
+            return None
+
+        if self.server_ip is None:
+            _LOGGER.error("Can not install script withouth starting the push server")
+            return None
+
+        self._script_id = self._script_id + 1
+        script_id = f"x.scene.{self._script_id}"
+
+        script_data = self._construct_script(script_id, script_info, device)
+
+        response = device.send(
+            "send_data_frame",
+            {
+                "cur": 0,
+                "data": script_data,
+                "data_tkn": 29576,
+                "total": 1,
+                "type": "scene",
+            },
+        )
+
+        if response != ["ok"]:
+            _LOGGER.error(
+                "Error installing script, response %s, script_data %s",
+                response,
+                script_data,
+            )
+            return None
+
+        script_ids = self._registered_devices[device.ip]["script_ids"]
+        script_ids.append(script_id)
+
+        return script_id
+
+    def delete_script(self, device: Device, script_id):
+        """Delete script by id."""
+        result = device.send("miIO.xdel", [script_id])
+        if result == ["ok"]:
+            script_ids = self._registered_devices[device.ip]["script_ids"]
+            if script_id in script_ids:
+                script_ids.remove(script_id)
+        else:
+            _LOGGER.error("Error removing script_id %s: %s", script_id, result)
+
+        return result
+
+    def _construct_script(  # nosec
         self,
         script_id,
-        action,
-        extra,
-        source_sid,
-        source_model,
-        source_token,
-        message_id=0,
-        event=None,
-        command_extra="",
-        trigger_value=None,
-        trigger_token="",
+        info: ScriptInfo,
+        device: Device,
     ):
         """Construct the script data payload needed to subscripe to an event."""
-        if event is None:
-            event = action
+        if info.event is None:
+            info.event = info.action
+        if info.source_sid is None:
+            info.source_sid = str(device.device_id)
+        if info.source_model is None:
+            info.source_model = device.model
+        if info.source_token is None:
+            info.source_token = device.token
 
-        if source_sid.startswith("lumi."):
-            lumi, source_id = source_sid.split(".")
-        else:
-            source_id = source_sid
-
-        token_enc = calculated_token_enc(source_token)
+        token_enc = calculated_token_enc(info.source_token)
+        source_id = info.source_sid.replace(".", "_")
+        command = f"{self.server_model}.{info.action}__{source_id}"
+        key = f"event.{info.source_model}.{info.event}"
+        message_id = 0
 
         script = [
             [
@@ -131,27 +221,23 @@ class PushServer:
                     [
                         "0",
                         {
-                            "did": source_sid,
-                            "extra": extra,
-                            "key": "event." + source_model + "." + event,
-                            "model": source_model,
+                            "did": info.source_sid,
+                            "extra": info.extra,
+                            "key": key,
+                            "model": info.source_model,
                             "src": "device",
                             "timespan": [
                                 "0 0 * * 0,1,2,3,4,5,6",
                                 "0 0 * * 0,1,2,3,4,5,6",
                             ],
-                            "token": trigger_token,
+                            "token": info.trigger_token,
                         },
                     ],
                     [
                         {
-                            "command": self.server_model
-                            + "."
-                            + action
-                            + "_"
-                            + source_id,
+                            "command": command,
                             "did": str(self.server_id),
-                            "extra": command_extra,
+                            "extra": info.command_extra,
                             "id": message_id,
                             "ip": self.server_ip,
                             "model": self.server_model,
@@ -163,8 +249,8 @@ class PushServer:
             ]
         ]
 
-        if trigger_value is not None:
-            script[0][1][2][1]["value"] = trigger_value
+        if info.trigger_value is not None:
+            script[0][1][2][1]["value"] = info.trigger_value
 
         script_data = dumps(script, separators=(",", ":"))
 
@@ -254,7 +340,7 @@ class PushServer:
                     self.send_ping_ACK(host, port)
                     return
 
-                if host not in self.parent._registered_callbacks:
+                if host not in self.parent._registered_devices:
                     _LOGGER.warning(
                         "Datagram received from unknown device (%s:%s)",
                         host,
@@ -262,8 +348,8 @@ class PushServer:
                     )
                     return
 
-                token = self.parent._registered_callbacks[host]["token"]
-                callback = self.parent._registered_callbacks[host]["callback"]
+                token = self.parent._registered_devices[host]["token"]
+                callback = self.parent._registered_devices[host]["callback"]
 
                 msg = Message.parse(data, token=token)
                 msg_value = msg.data.value
@@ -271,10 +357,8 @@ class PushServer:
                 _LOGGER.debug("%s:%s=>%s", host, port, msg_value)
 
                 # Parse message
-                action, device_call_id = msg_value["method"].rsplit("_", 1)
-                source_device_id = (
-                    f"lumi.{device_call_id}"  # All known devices use lumi. prefix
-                )
+                action, device_call_id = msg_value["method"].rsplit("__", 1)
+                source_device_id = device_call_id.replace("_", ".")
 
                 callback(source_device_id, action, msg_value.get("params"))
 
