@@ -349,7 +349,7 @@ class PushServer:
             }
             response = Message.build(msg, token=token)
             self.transport.sendto(response, (host, port))
-            _LOGGER.debug("%s:%s<=%s", host, port, result)
+            _LOGGER.debug(">> %s:%s: %s", host, port, result)
 
         def datagram_received(self, data, addr):
             """Handle received messages."""
@@ -373,7 +373,7 @@ class PushServer:
                 msg = Message.parse(data, token=token)
                 msg_value = msg.data.value
                 msg_id = msg_value["id"]
-                _LOGGER.debug("%s:%s=>%s", host, port, msg_value)
+                _LOGGER.debug("<< %s:%s: %s", host, port, msg_value)
 
                 # Parse message
                 action, device_call_id = msg_value["method"].rsplit(":", 1)
