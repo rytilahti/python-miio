@@ -27,8 +27,8 @@ HELO_BYTES = bytes.fromhex(
 class ScriptInfo:
     """Script info to register to the push server."""
 
-    action: str
-    extra: str
+    action: str  # user friendly name of the event, can be set arbitrarily and will be received by the server as the name of the event
+    extra: str  # the identification of this event, this determines on what event the callback is triggered
     event: Optional[str] = None  # defaults to the action
     command_extra: str = ""
     trigger_value: Optional[Any] = None
