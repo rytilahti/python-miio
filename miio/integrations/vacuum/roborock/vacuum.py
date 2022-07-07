@@ -131,6 +131,16 @@ class CarpetCleaningMode(enum.Enum):
     Ignore = 2
 
 
+class DustCollectionMode(enum.Enum):
+    """Auto emptying mode (S7 only)"""
+
+    Smart = 0
+    Quick = 1
+    Daily = 2
+    Strong = 3
+    Max = 4
+
+
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S4 = "roborock.vacuum.s4"
 ROCKROBO_S4_MAX = "roborock.vacuum.a19"
@@ -171,11 +181,16 @@ SUPPORTED_MODELS = [
     ROCKROBO_C1,
 ]
 
+AUTO_EMPTY_MODELS = [
+    ROCKROBO_S7,
+]
+
 
 class RoborockVacuum(Device, VacuumInterface):
     """Main class for roborock vacuums (roborock.vacuum.*)."""
 
     _supported_models = SUPPORTED_MODELS
+    _auto_empty_models = AUTO_EMPTY_MODELS
 
     def __init__(
         self,
@@ -801,6 +816,47 @@ class RoborockVacuum(Device, VacuumInterface):
             self.send("set_carpet_clean_mode", {"carpet_clean_mode": mode.value})[0]
             == "ok"
         )
+
+    @command()
+    def dust_collection_mode(self) -> Optional[DustCollectionMode]:
+        """Get the dust collection mode setting."""
+        self._verify_auto_empty_support()
+        try:
+            return DustCollectionMode(self.send("get_dust_collection_mode")["mode"])
+        except Exception as err:
+            _LOGGER.warning("Error while requesting dust collection mode: %s", err)
+            return None
+
+    @command(click.argument("enabled", required=True, type=bool))
+    def set_dust_collection(self, enabled: bool) -> bool:
+        """Turn automatic dust collection on or off."""
+        self._verify_auto_empty_support()
+        return (
+            self.send("set_dust_collection_switch_status", {"status": int(enabled)})[0]
+            == "ok"
+        )
+
+    @command(click.argument("mode", required=True, type=EnumType(DustCollectionMode)))
+    def set_dust_collection_mode(self, mode: DustCollectionMode) -> bool:
+        """Set dust collection mode setting."""
+        self._verify_auto_empty_support()
+        return self.send("set_dust_collection_mode", {"mode": mode.value})[0] == "ok"
+
+    @command()
+    def start_dust_collection(self):
+        """Activate automatic dust collection."""
+        self._verify_auto_empty_support()
+        return self.send("app_start_collect_dust")
+
+    @command()
+    def stop_dust_collection(self):
+        """Abort in progress dust collection."""
+        self._verify_auto_empty_support()
+        return self.send("app_stop_collect_dust")
+
+    def _verify_auto_empty_support(self) -> None:
+        if self.model not in self._auto_empty_models:
+            raise VacuumException("Device does not support auto emptying")
 
     @command()
     def stop_zoned_clean(self):
