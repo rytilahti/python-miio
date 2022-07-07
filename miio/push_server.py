@@ -6,7 +6,7 @@ import socket
 import struct
 from json import dumps
 from random import randint
-from typing import Optional
+from typing import Any, Optional
 
 import attr
 
@@ -31,7 +31,7 @@ class ScriptInfo:
     extra: str
     event: Optional[str] = None  # defaults to the action
     command_extra: str = ""
-    trigger_value = None
+    trigger_value: Optional[Any] = None
     trigger_token: str = ""
     source_sid: Optional[str] = None  # Normally not needed and obtained from device
     source_model: Optional[str] = None  # Normally not needed and obtained from device
@@ -109,6 +109,7 @@ class PushServer:
             "callback": callback,
             "token": bytes.fromhex(device.token),
             "script_ids": script_ids,
+            "device": device,
         }
 
     def unregister_miio_device(self, device: Device):
@@ -134,6 +135,9 @@ class PushServer:
         """Stop Miio push server."""
         if self._listen_couroutine is None:
             return
+
+        for device_info in self._registered_devices:
+            self.unregister_miio_device(device_info["device"])
 
         self._listen_couroutine.close()
         self._listen_couroutine = None
@@ -383,7 +387,5 @@ class PushServer:
             self._connected = False
             if self.transport:
                 self.transport.close()
-            self._loop.remove_writer(self._sock.fileno())
-            self._loop.remove_reader(self._sock.fileno())
             self._sock.close()
             _LOGGER.info("Miio push server stopped")
