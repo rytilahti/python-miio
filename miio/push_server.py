@@ -63,26 +63,25 @@ class PushServer:
 
         self._event_id = 1000000
 
-    def _create_udp_server(self):
-        """Create the UDP socket and protocol."""
-        # Connect to the miio device to get server_ip using a one time use socket
-        get_ip_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        get_ip_socket.bind((self._address, SERVER_PORT))
-        get_ip_socket.connect((self._device_ip, SERVER_PORT))
-        self._server_ip = get_ip_socket.getsockname()[0]
-        get_ip_socket.close()
-        _LOGGER.debug("Miio push server device ip=%s", self._server_ip)
+    async def start(self):
+        """Start Miio push server."""
+        if self._listen_couroutine is not None:
+            _LOGGER.error("Miio push server already started, not starting another one.")
+            return
 
-        # Create a fresh socket that will be used for the push server
-        udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        udp_socket.bind((self._address, SERVER_PORT))
+        listen_task = self._create_udp_server()
+        _, self._listen_couroutine = await listen_task
 
-        loop = asyncio.get_event_loop()
+    def stop(self):
+        """Stop Miio push server."""
+        if self._listen_couroutine is None:
+            return
 
-        return loop.create_datagram_endpoint(
-            lambda: self.ServerProtocol(loop, udp_socket, self),
-            sock=udp_socket,
-        )
+        for ip in list(self._registered_devices):
+            self.unregister_miio_device(self._registered_devices[ip]["device"])
+
+        self._listen_couroutine.close()
+        self._listen_couroutine = None
 
     def register_miio_device(self, device: Device, callback):
         """Register a miio device to this push server."""
@@ -122,26 +121,6 @@ class PushServer:
                 self.unsubscribe_event(device, event_id)
             self._registered_devices.pop(device.ip)
             _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
-
-    async def start(self):
-        """Start Miio push server."""
-        if self._listen_couroutine is not None:
-            _LOGGER.error("Miio push server already started, not starting another one.")
-            return
-
-        listen_task = self._create_udp_server()
-        _, self._listen_couroutine = await listen_task
-
-    def stop(self):
-        """Stop Miio push server."""
-        if self._listen_couroutine is None:
-            return
-
-        for ip in list(self._registered_devices):
-            self.unregister_miio_device(self._registered_devices[ip]["device"])
-
-        self._listen_couroutine.close()
-        self._listen_couroutine = None
 
     def subscribe_event(self, device: Device, event_info: EventInfo):
         """Subscribe to a event such that the device will start pushing data for that
@@ -194,6 +173,31 @@ class PushServer:
             _LOGGER.error("Error removing event_id %s: %s", event_id, result)
 
         return result
+
+    def _get_server_ip(self):
+        """Connect to the miio device to get server_ip using a one time use socket."""
+        get_ip_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        get_ip_socket.bind((self._address, SERVER_PORT))
+        get_ip_socket.connect((self._device_ip, SERVER_PORT))
+        server_ip = get_ip_socket.getsockname()[0]
+        get_ip_socket.close()
+        _LOGGER.debug("Miio push server device ip=%s", server_ip)
+        return server_ip
+
+    def _create_udp_server(self):
+        """Create the UDP socket and protocol."""
+        self._server_ip = self._get_server_ip()
+
+        # Create a fresh socket that will be used for the push server
+        udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        udp_socket.bind((self._address, SERVER_PORT))
+
+        loop = asyncio.get_event_loop()
+
+        return loop.create_datagram_endpoint(
+            lambda: self.ServerProtocol(loop, udp_socket, self),
+            sock=udp_socket,
+        )
 
     def _construct_event(  # nosec
         self,
