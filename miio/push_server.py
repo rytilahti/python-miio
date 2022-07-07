@@ -27,8 +27,8 @@ HELO_BYTES = bytes.fromhex(
 class ScriptInfo:
     """Script info to register to the push server."""
 
-    action: str
-    extra: str
+    action: str  # user friendly name of the event, can be set arbitrarily and will be received by the server as the name of the event
+    extra: str  # the identification of this event, this determines on what event the callback is triggered
     event: Optional[str] = None  # defaults to the action
     command_extra: str = ""
     trigger_value: Optional[Any] = None
@@ -224,6 +224,30 @@ class PushServer:
                 len(command),
             )
 
+        event_data = {
+            "did": info.source_sid,
+            "extra": info.extra,
+            "key": key,
+            "model": info.source_model,
+            "src": "device",
+            "timespan": [
+                "0 0 * * 0,1,2,3,4,5,6",
+                "0 0 * * 0,1,2,3,4,5,6",
+            ],
+            "token": info.trigger_token,
+        }
+
+        target_data = {
+            "command": command,
+            "did": str(self.server_id),
+            "extra": info.command_extra,
+            "id": message_id,
+            "ip": self.server_ip,
+            "model": self.server_model,
+            "token": token_enc,
+            "value": "",
+        }
+
         script = [
             [
                 script_id,
@@ -232,31 +256,9 @@ class PushServer:
                     randint(1590161094, 1590162094),  # nosec
                     [
                         "0",
-                        {
-                            "did": info.source_sid,
-                            "extra": info.extra,
-                            "key": key,
-                            "model": info.source_model,
-                            "src": "device",
-                            "timespan": [
-                                "0 0 * * 0,1,2,3,4,5,6",
-                                "0 0 * * 0,1,2,3,4,5,6",
-                            ],
-                            "token": info.trigger_token,
-                        },
+                        event_data,
                     ],
-                    [
-                        {
-                            "command": command,
-                            "did": str(self.server_id),
-                            "extra": info.command_extra,
-                            "id": message_id,
-                            "ip": self.server_ip,
-                            "model": self.server_model,
-                            "token": token_enc,
-                            "value": "",
-                        }
-                    ],
+                    [target_data],
                 ],
             ]
         ]
