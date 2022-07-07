@@ -113,14 +113,15 @@ class PushServer:
 
     def unregister_miio_device(self, device: Device):
         """Unregister a miio device from this push server."""
-        if device.ip is None:
+        device_info = self._registered_devices.get(device.ip)
+        if device_info is None:
+            _LOGGER.debug("Device with ip %s not registered, bailing out", device.ip)
             return
 
-        if device.ip in self._registered_devices:
-            for event_id in self._registered_devices[device.ip]["event_ids"]:
-                self.unsubscribe_event(device, event_id)
-            self._registered_devices.pop(device.ip)
-            _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
+        for event_id in device_info["event_ids"]:
+            self.unsubscribe_event(device, event_id)
+        self._registered_devices.pop(device.ip)
+        _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
 
     def subscribe_event(self, device: Device, event_info: EventInfo):
         """Subscribe to a event such that the device will start pushing data for that
