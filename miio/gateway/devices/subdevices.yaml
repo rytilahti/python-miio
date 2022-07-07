@@ -645,7 +645,7 @@
   setter: toggle_plug
   battery_powered: false
   properties:
-    - property: neutral_0 # 'on' / 'off'
+    - property: channel_0 # 'on' / 'off'
       name: status_ch0
       get: get_property_exp
     - property: load_power
