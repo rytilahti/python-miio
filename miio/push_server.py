@@ -24,8 +24,8 @@ HELO_BYTES = bytes.fromhex(
 
 
 @attr.s(auto_attribs=True)
-class ScriptInfo:
-    """Script info to register to the push server."""
+class EventInfo:
+    """Event info to register to the push server."""
 
     action: str  # user friendly name of the event, can be set arbitrarily and will be received by the server as the name of the event
     extra: str  # the identification of this event, this determines on what event the callback is triggered
@@ -61,7 +61,7 @@ class PushServer:
         self._listen_couroutine = None
         self._registered_devices = {}
 
-        self._script_id = 1000000
+        self._event_id = 1000000
 
     def _create_udp_server(self):
         """Create the UDP socket and protocol."""
@@ -97,18 +97,18 @@ class PushServer:
             )
             return
 
-        script_ids = []
+        event_ids = []
         if device.ip in self._registered_devices:
             _LOGGER.error(
                 "A device for ip '%s' was already registed, overwriting previous callback",
                 device.ip,
             )
-            script_ids = self._registered_devices[device.ip]["script_ids"]
+            event_ids = self._registered_devices[device.ip]["event_ids"]
 
         self._registered_devices[device.ip] = {
             "callback": callback,
             "token": bytes.fromhex(device.token),
-            "script_ids": script_ids,
+            "event_ids": event_ids,
             "device": device,
         }
 
@@ -118,8 +118,8 @@ class PushServer:
             return
 
         if device.ip in self._registered_devices:
-            for script_id in self._registered_devices[device.ip]["script_ids"]:
-                self.delete_script(device, script_id)
+            for event_id in self._registered_devices[device.ip]["event_ids"]:
+                self.unsubscribe_event(device, event_id)
             self._registered_devices.pop(device.ip)
             _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
 
@@ -143,27 +143,27 @@ class PushServer:
         self._listen_couroutine.close()
         self._listen_couroutine = None
 
-    def install_script(self, device: Device, script_info: ScriptInfo):
-        """Install script such that the device will start pushing data for that
-        script."""
+    def subscribe_event(self, device: Device, event_info: EventInfo):
+        """Subscribe to a event such that the device will start pushing data for that
+        event."""
         if device.ip not in self._registered_devices:
-            _LOGGER.error("Can not install script, miio device not yet registered")
+            _LOGGER.error("Can not subscribe event, miio device not yet registered")
             return None
 
         if self.server_ip is None:
-            _LOGGER.error("Can not install script withouth starting the push server")
+            _LOGGER.error("Can not subscribe event withouth starting the push server")
             return None
 
-        self._script_id = self._script_id + 1
-        script_id = f"x.scene.{self._script_id}"
+        self._event_id = self._event_id + 1
+        event_id = f"x.scene.{self._event_id}"
 
-        script_data = self._construct_script(script_id, script_info, device)
+        event_payload = self._construct_event(event_id, event_info, device)
 
         response = device.send(
             "send_data_frame",
             {
                 "cur": 0,
-                "data": script_data,
+                "data": event_payload,
                 "data_tkn": 29576,
                 "total": 1,
                 "type": "scene",
@@ -172,36 +172,36 @@ class PushServer:
 
         if response != ["ok"]:
             _LOGGER.error(
-                "Error installing script, response %s, script_data %s",
+                "Error subscribing event, response %s, event_payload %s",
                 response,
-                script_data,
+                event_payload,
             )
             return None
 
-        script_ids = self._registered_devices[device.ip]["script_ids"]
-        script_ids.append(script_id)
+        event_ids = self._registered_devices[device.ip]["event_ids"]
+        event_ids.append(event_id)
 
-        return script_id
+        return event_id
 
-    def delete_script(self, device: Device, script_id):
-        """Delete script by id."""
-        result = device.send("miIO.xdel", [script_id])
+    def unsubscribe_event(self, device: Device, event_id):
+        """Unsubscribe from a event by id."""
+        result = device.send("miIO.xdel", [event_id])
         if result == ["ok"]:
-            script_ids = self._registered_devices[device.ip]["script_ids"]
-            if script_id in script_ids:
-                script_ids.remove(script_id)
+            event_ids = self._registered_devices[device.ip]["event_ids"]
+            if event_id in event_ids:
+                event_ids.remove(event_id)
         else:
-            _LOGGER.error("Error removing script_id %s: %s", script_id, result)
+            _LOGGER.error("Error removing event_id %s: %s", event_id, result)
 
         return result
 
-    def _construct_script(  # nosec
+    def _construct_event(  # nosec
         self,
-        script_id,
-        info: ScriptInfo,
+        event_id,
+        info: EventInfo,
         device: Device,
     ):
-        """Construct the script data payload needed to subscripe to an event."""
+        """Construct the event data payload needed to subscribe to an event."""
         if info.event is None:
             info.event = info.action
         if info.source_sid is None:
@@ -219,12 +219,12 @@ class PushServer:
 
         if len(command) > 49:
             _LOGGER.error(
-                "push server script command can be max 49 chars long, '%s' is %i chars",
+                "push server event command can be max 49 chars long, '%s' is %i chars",
                 command,
                 len(command),
             )
 
-        event_data = {
+        trigger_data = {
             "did": info.source_sid,
             "extra": info.extra,
             "key": key,
@@ -248,15 +248,15 @@ class PushServer:
             "value": "",
         }
 
-        script = [
+        event_data = [
             [
-                script_id,
+                event_id,
                 [
                     "1.0",
                     randint(1590161094, 1590162094),  # nosec
                     [
                         "0",
-                        event_data,
+                        trigger_data,
                     ],
                     [target_data],
                 ],
@@ -264,11 +264,11 @@ class PushServer:
         ]
 
         if info.trigger_value is not None:
-            script[0][1][2][1]["value"] = info.trigger_value
+            event_data[0][1][2][1]["value"] = info.trigger_value
 
-        script_data = dumps(script, separators=(",", ":"))
+        event_payload = dumps(event_data, separators=(",", ":"))
 
-        return script_data
+        return event_payload
 
     @property
     def server_ip(self):
