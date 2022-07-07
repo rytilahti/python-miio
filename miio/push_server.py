@@ -221,7 +221,7 @@ class PushServer:
         command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"
         message_id = 0
-        random_number = randint(
+        magic_number = randint(
             1590161094, 1642025774
         )  # nosec, min/max taken from packet captures, unknown use
 
@@ -265,7 +265,7 @@ class PushServer:
                 event_id,
                 [
                     "1.0",
-                    random_number,
+                    magic_number,
                     [
                         "0",
                         trigger_data,
