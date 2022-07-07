@@ -121,6 +121,7 @@ class PushServer:
             for script_id in self._registered_devices[device.ip]["script_ids"]:
                 self.delete_script(device, script_id)
             self._registered_devices.pop(device.ip)
+            _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
 
     async def start(self):
         """Start Miio push server."""
@@ -136,8 +137,8 @@ class PushServer:
         if self._listen_couroutine is None:
             return
 
-        for device_info in self._registered_devices:
-            self.unregister_miio_device(device_info["device"])
+        for ip in list(self._registered_devices):
+            self.unregister_miio_device(self._registered_devices[ip]["device"])
 
         self._listen_couroutine.close()
         self._listen_couroutine = None
