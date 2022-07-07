@@ -78,6 +78,7 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
 )
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
+from miio.push_server import PushServer
 from miio.pwzn_relay import PwznRelay
 from miio.scishare_coffeemaker import ScishareCoffee
 from miio.toiletlid import Toiletlid
