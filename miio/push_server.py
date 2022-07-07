@@ -212,9 +212,16 @@ class PushServer:
 
         token_enc = calculated_token_enc(info.source_token)
         source_id = info.source_sid.replace(".", "_")
-        command = f"{self.server_model}.{info.action}__{source_id}"
+        command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"
         message_id = 0
+
+        if len(command) > 49:
+            _LOGGER.error(
+                "push server script command can be max 49 chars long, '%s' is %i chars",
+                command,
+                len(command),
+            )
 
         script = [
             [
@@ -361,7 +368,7 @@ class PushServer:
                 _LOGGER.debug("%s:%s=>%s", host, port, msg_value)
 
                 # Parse message
-                action, device_call_id = msg_value["method"].rsplit("__", 1)
+                action, device_call_id = msg_value["method"].rsplit(":", 1)
                 source_device_id = device_call_id.replace("_", ".")
 
                 callback(source_device_id, action, msg_value.get("params"))

@@ -16,7 +16,7 @@
 
 # Explanation push properties:
 #  push_properties:
-#    long_click_ch0:                    = action event that you receive back from the gateway (can be changed to any arbitrary string)
+#    l_click_ch0:                    = action event that you receive back from the gateway (can be changed to any arbitrary string)
 #      property: last_press             = name of property to wich this event is coupled
 #      value: "long_click_ch0"          = the value to wich the coupled property schould be set upon receiving this event
 #      extra: "[1,13,1,85,[0,0],0,0]"   = "[a,b,c,d,[e,f],g,h]"
@@ -551,7 +551,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -559,11 +559,11 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
-    long_click_ch1:
+    l_click_ch1:
       property: last_press
       value: "long_click_ch1"
       extra: "[1,13,2,85,[0,0],0,0]"
@@ -571,11 +571,11 @@
       property: last_press
       value: "click_ch1"
       extra: "[1,13,2,85,[0,1],0,0]"
-    double_click_ch1:
+    d_click_ch1:
       property: last_press
       value: "double_click_ch1"
       extra: "[1,13,2,85,[0,2],0,0]"
-    both_long_click:
+    both_l_click:
       property: last_press
       value: "both_long_click"
       extra: "[1,13,3,85,[0,0],0,0]"
@@ -583,7 +583,7 @@
       property: last_press
       value: "both_click"
       extra: "[1,13,3,85,[0,1],0,0]"
-    both_double_click:
+    both_d_click:
       property: last_press
       value: "both_double_click"
       extra: "[1,13,3,85,[0,2],0,0]"
@@ -598,7 +598,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -606,7 +606,7 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
@@ -621,7 +621,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -629,7 +629,7 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
@@ -644,7 +644,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -652,11 +652,11 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
-    long_click_ch1:
+    l_click_ch1:
       property: last_press
       value: "long_click_ch1"
       extra: "[1,13,2,85,[0,0],0,0]"
@@ -664,11 +664,11 @@
       property: last_press
       value: "click_ch1"
       extra: "[1,13,2,85,[0,1],0,0]"
-    double_click_ch1:
+    d_click_ch1:
       property: last_press
       value: "double_click_ch1"
       extra: "[1,13,2,85,[0,2],0,0]"
-    both_long_click:
+    both_l_click:
       property: last_press
       value: "both_long_click"
       extra: "[1,13,3,85,[0,0],0,0]"
@@ -676,7 +676,7 @@
       property: last_press
       value: "both_click"
       extra: "[1,13,3,85,[0,1],0,0]"
-    both_double_click:
+    both_d_click:
       property: last_press
       value: "both_double_click"
       extra: "[1,13,3,85,[0,2],0,0]"
@@ -691,7 +691,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -699,7 +699,7 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
@@ -714,7 +714,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -722,11 +722,11 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
-    long_click_ch1:
+    l_click_ch1:
       property: last_press
       value: "long_click_ch1"
       extra: "[1,13,2,85,[0,0],0,0]"
@@ -734,11 +734,11 @@
       property: last_press
       value: "click_ch1"
       extra: "[1,13,2,85,[0,1],0,0]"
-    double_click_ch1:
+    d_click_ch1:
       property: last_press
       value: "double_click_ch1"
       extra: "[1,13,2,85,[0,2],0,0]"
-    both_long_click:
+    both_l_click:
       property: last_press
       value: "both_long_click"
       extra: "[1,13,3,85,[0,0],0,0]"
@@ -746,7 +746,7 @@
       property: last_press
       value: "both_click"
       extra: "[1,13,3,85,[0,1],0,0]"
-    both_double_click:
+    both_d_click:
       property: last_press
       value: "both_double_click"
       extra: "[1,13,3,85,[0,2],0,0]"
@@ -761,7 +761,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -769,7 +769,7 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
@@ -784,7 +784,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -792,7 +792,7 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
@@ -807,7 +807,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -815,11 +815,11 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
-    long_click_press:
+    l_click_pres:
       property: last_press
       value: "long_click_press"
       extra: "[1,13,1,85,[0,16],0,0]"
@@ -838,7 +838,7 @@
     - property: last_press
       default: "none"
   push_properties:
-    long_click_ch0:
+    l_click_ch0:
       property: last_press
       value: "long_click_ch0"
       extra: "[1,13,1,85,[0,0],0,0]"
@@ -846,7 +846,7 @@
       property: last_press
       value: "click_ch0"
       extra: "[1,13,1,85,[0,1],0,0]"
-    double_click_ch0:
+    d_click_ch0:
       property: last_press
       value: "double_click_ch0"
       extra: "[1,13,1,85,[0,2],0,0]"
