@@ -13,112 +13,189 @@ and calling the registered callbacks accordingly.
     how to check if your target device supports this functionality.
 
 
-1. The push server is started and listens for incommming messages (server.start)
-2. A miio device is registed to the push server where a callback is specified such that the push server will recognize the device (server.register_miio_device).
-3. A message is sent to the miio device to subscribe a specific event to the push server, basically a local scene is made with as target the push server (server.subscribe_event).
-4. The miio device will start keep alive communication with the push server (pings)
-5. When the device triggers an event (eg. a button is pressed), the push server gets notified by the miio device and executes the registered callback
+1. The push server is started and listens for incoming messages (:meth:`PushServer.start`)
+2. A miio device and its callback needs to be registered to the push server (:meth:`PushServer.register_miio_device`).
+3. A message is sent to the miio device to subscribe a specific event to the push server,
+   basically a local scene is made with as target the push server (:meth:`PushServer.subscribe_event`).
+4. The device will start keep alive communication with the push server (pings).
+5. When the device triggers an event (e.g., a button is pressed),
+   the push server gets notified by the device and executes the registered callback.
 
 
 Events
 ------
 
-Events are the triggers of a scene in the mobile app.
+Events are the triggers for a scene in the mobile app.
 Most triggers that can be used in the mobile app can be converted to a event that can be registered to the push server.
-For example: pressing a button, opening a door-sensor, motion beeing detected, vibrating a sensor or flipping a cube.
-When such a event happens the miio device will imediatly send a message to to push server that will identify the sending device and execute its callback function.
-The callback function can be used to act on the event, for instance when motion is detected turn on the light.
+For example: pressing a button, opening a door-sensor, motion being detected, vibrating a sensor or flipping a cube.
+When such a event happens,
+the miio device will immediately send a message to to push server,
+which will identify the sender and execute its callback function.
+The callback function can be used to act on the event,
+for instance when motion is detected turn on the light.
 
 Callbacks
-------
+---------
+
+Gateway-like devices will have a single callback for all connected Zigbee devices.
+The `source_device` argument is set to the device that caused the event.
+
 Multiple events of the same device can be subscribed to, for instance both opening and closing a door-sensor.
-Therefore the callback function has a 'action' parameter that will specify which event triggered the callback: 'open' or 'close'.
-Gateway like devices will have a single callback for all there connected zigbee devices.
-Therfore the callback function has a 'source_device' paramter specifying the source of the event which indicates the zigbee device that sent the message.
-At last the callback also has a 'params' parameter providing aditional information about the event in case that is supported.
-Callback functions therefore need to have the following form:
+The `action` argument (e.g., "open" or "close") is set to the action,
+that was defined in the :class:`PushServer.EventInfo` used for subscribing to the event.
+
+Lastly, the `params` argument provides additional information about the event, if available.
+
+Therefore, the callback functions need to have the following signature:
+
 .. code-block::
+
     def callback(source_device, action, params):
+
+
+.. todo::
+
+    Add an example how the arguments look like?
+
 
 .. _events_subscribe:
 
 Subscribing to Events
 ~~~~~~~~~~~~~~~~~~~~~
-In order to subscribe to a event a few steps need to be taken, we assume a miio_device class has already been intialized to which the events belong:
-1. Create the push server
-server = PushServer(miio_device.ip)  # A ip of a real working miio_device needs to be specified, it does not matter which device.
-2. Start the server
-await push_server.start()
-3. Define a callback function
-def callback_func(source_device, action, params):
-    _LOGGER.info("callback '%s' from '%s', params: '%s'", action, source_device, params)
-4. Register the miio device to the server and its callback function to receive events for this device
-push_server.register_miio_device(miio_device, callback_func)
-5. Create a EventInfo object with the information about the event you which to subscribe to (:ref:`Obtain event info<obtain_event_info>`)
-event_info = EventInfo(
-    action="alarm_triggering",
-    extra="[1,19,1,111,[0,1],2,0]",
-    trigger_token=miio_device.token,
-)
-6. Send a message to the miio_device to subscribe for the event to receive messages on the push_server
-push_server.subscribe_event(miio_device, event_info)
-7. Now you will see the callback function beeing called whenever the event occurs
-await asyncio.sleep(30)
-8. When done stop the push_server, this will send messages to all subscribed miio_devices to unsubscribe all events
-push_server.stop()
+In order to subscribe to a event a few steps need to be taken,
+we assume that a device class has already been initialized to which the events belong:
+
+1. Create a push server instance:
+
+::
+
+    server = PushServer(miio_device.ip)
+
+.. note::
+
+    The server needs an IP address of a real, working miio device as it connects to it to find the IP address to bind on.
+
+2. Start the server:
+
+::
+
+    await push_server.start()
+
+3. Define a callback function:
+
+::
+
+    def callback_func(source_device, action, params):
+        _LOGGER.info("callback '%s' from '%s', params: '%s'", action, source_device, params)
+
+4. Register the miio device to the server and its callback function to receive events from this device:
+
+::
+
+    push_server.register_miio_device(miio_device, callback_func)
+
+5. Create an :class:`PushServer.EventInfo` (:ref:`how to obtain event info<obtain_event_info>`)
+    object with the event to subscribe to:
+
+::
+
+    event_info = EventInfo(
+        action="alarm_triggering",
+        extra="[1,19,1,111,[0,1],2,0]",
+        trigger_token=miio_device.token,
+    )
+
+6. Send a message to the device to subscribe for the event to receive messages on the push_server:
+
+::
+
+    push_server.subscribe_event(miio_device, event_info)
+
+7. The callback function should now be called whenever a matching event occurs.
+
+8. You should stop the server when you are done with it.
+   This will automatically inform all devices with event subscriptions
+   to stop sending more events to the server.
+
+::
+
+    push_server.stop()
+
 
 .. _obtain_event_info:
 
 Obtaining Event Information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you want to support a new type of event in python-miio, a packet capture of the mobile Xiaomi Home app of that event is needed to retrieve the necessary information.
-To do this you will need 4 programs running on a PC:
- - [BlueStacks](https://www.bluestacks.com) to emulate the Xiaomi Home app on windows
- - [WireShark](https://www.wireshark.org) to capture the network packets send by the Xiaomi Home app in BlueStacks
- - [Python](https://www.python.org/downloads/) at least version 3.9 is required
- - [Python-miio devtools](https://github.com/rytilahti/python-miio/tree/master/devtools) to decode the captured packets of WireShark
+When you want to support a new type of event in python-miio,
+you need to first perform a packet capture of the mobile Xiaomi Home app
+to retrieve the necessary information for that event.
 
-1. Install BlueStacks and WireShark and [download the latest python-miio](https://github.com/rytilahti/python-miio) (green Code button --> download ZIP, then unzip on your computer).
-2. Set up Xiaomi Home app in BlueStacks and login to synchronize devices.
-3. Open WireShark, select all your interfaces, apply a filter "ip.src==192.168.1.GATEWAY_IP or ip.dst==192.168.1.GATEWAY_IP" in which GATEWAY_IP is the Ip-address of your gateway, and start capturing packets
-4. In the Xiaomi Home app go to `scene` --> `+` --> for "If" select the device for which you want to make the new Event --> select the event you want to support --> for "Then" select the same gateway as the zigbee device is connected to (or the gateway itself) --> select "Control nightlight" --> select "Switch gateway light color" --> click the finish checkmark and accept the default name.
-5. Repeat step 4 for all new Events you want to implement.
-6. Stop capturing packets in WireShark, you can now delete the `scenes` again you just created in the Xiaomi Home app.
-7. In WireShark go to `file` --> `Save as` --> select `pcap` instead of `pcapng` under `save as type` --> save the file on your computer
-8. Get the regular token of your gateway from the Home Assistant `core.config_entries` file located in your `config\.storage` folder of Home Assistant (search for `"domain": "xiaomi_miio"`)
-9. open a command line --> `python3 C:\path\to\python-miio\folder\step1\devtools\parse_pcap.py C:\path\to\the\file\you\just\saved\filename.pcap --token TokenTokenToken` in which you will need to fill in the paths and the token, optionally multiple tokens can be added by repeating `--token Token2Token2Token2`.
-10. You schould now see the decoded communication of the Xiaomi Home app to your gateway and back during the packet capture.
-11. One of the packets schould look something like this:
-```{"id":1234,"method":"send_data_frame","params":{"cur":0,"data":"[[\"x.scene.1234567890\",[\"1.0\",1234567890,[\"0\",{\"src\":\"device\",\"key\":\"event.lumi.sensor_magnet.aq2.open\",\"did\":\"lumi.123456789abcde\",\"model\":\"lumi.sensor_magnet.aq2\",\"token\":\"\",\"extra\":\"[1,6,1,0,[0,1],2,0]\",\"timespan\":[\"0 0 * * 0,1,2,3,4,5,6\",\"0 0 * * 0,1,2,3,4,5,6\"]}],[{\"command\":\"lumi.gateway.v3.set_rgb\",\"did\":\"12345678\",\"extra\":\"[1,19,7,85,[40,123456],0,0]\",\"id\":1,\"ip\":\"192.168.1.IP\",\"model\":\"lumi.gateway.v3\",\"token\":\"encrypted0token0we0need000000000\",\"value\":123456}]]]]","data_tkn":12345,"total":1,"type":"scene"}}```
-12. Now extract the necessary information form the packet capture:
-```
+1. Prepare your system to capture traffic between the gateway device and your mobile phone. You can, for example, use `BlueStacks emulator <https://www.bluestacks.com>`_ to run the Xiaomi Home app, and `WireShark <https://www.wireshark.org>`_ to capture the network traffic.
+2. In the Xiaomi Home app go to `Scene` --> `+` --> for "If" select the device for which you want to make the new event
+3. Select the event you want to add
+4. For "Then" select the same gateway as the Zigbee device is connected to (or the gateway itself).
+5. Select the any action, e.g., "Control nightlight" --> "Switch gateway light color",
+   and click the finish checkmark and accept the default name.
+6. Repeat the steps 3-5 for all new events you want to implement.
+7. After you are done, you can remove the created scenes from the app and stop the traffic capture.
+8. You can use `devtools/parse_pcap.py` script to parse the captured PCAP files.
+
+::
+
+    python devtools/parse_pcap.py <pcap file> --token <token of your gateway>
+
+
+.. note::
+
+    Note, you can repeat `--token` parameter to list all tokens you know to decrypt traffic from all devices:
+
+10. You should now see the decoded communication of between the Xiaomi Home app and your gateway.
+11. You should see packets like the following in the output,
+    the most important information is stored under the `data` key:
+
+::
+
+    {
+        "id" : 1234,
+        "method" : "send_data_frame",
+        "params" : {
+            "cur" : 0,
+            "data" : "[[\"x.scene.1234567890\",[\"1.0\",1234567890,[\"0\",{\"src\":\"device\",\"key\":\"event.lumi.sensor_magnet.aq2.open\",\"did\":\"lumi.123456789abcde\",\"model\":\"lumi.sensor_magnet.aq2\",\"token\":\"\",\"extra\":\"[1,6,1,0,[0,1],2,0]\",\"timespan\":[\"0 0 * * 0,1,2,3,4,5,6\",\"0 0 * * 0,1,2,3,4,5,6\"]}],[{\"command\":\"lumi.gateway.v3.set_rgb\",\"did\":\"12345678\",\"extra\":\"[1,19,7,85,[40,123456],0,0]\",\"id\":1,\"ip\":\"192.168.1.IP\",\"model\":\"lumi.gateway.v3\",\"token\":\"encrypted0token0we0need000000000\",\"value\":123456}]]]]",
+            "data_tkn" : 12345,
+            "total" : 1,
+            "type" : "scene"
+        }
+    }
+
+
+12. Now, extract the necessary information form the packet capture to create :class:`PushServer.EventInfo` objects.
+
+13. Locate the element containing `"key": "event.*"` in the trace,
+    this is the event triggering the command (`"command"`, `lumi.gateway.v3.set_rgb` in the example above) in the trace.
+
+14. The `extra` parameter is the most important piece containing the event details,
+    which you can directly copy from the packet capture.
+    The `action` is normally the last part of the `key` value, e.g.,
+    `open` (from `event.lumi.sensor_magnet.aq2.open`) in the example above.
+
+::
+
     event_info = EventInfo(
-        action="open",  # user friendly name of the event, can be set arbitrarily and will be received by the server as the name of the event
-        extra="[1,6,1,0,[0,1],2,0]",  # the identification of this event, this determines on what event the callback is triggered
+        action="open",
+        extra="[1,6,1,0,[0,1],2,0]",
     )
-```
-The 'action' is normally taken equal to the last part of the "key" in the packet capture.
-So `\"key\":\"event.lumi.sensor_magnet.aq2.open\"` becomes 'open'
-The 'extra' paramter is the most importatant and is directly coppied from the packet caputure.
-Note that you need to take the first 'extra' parameter in the capture that represents the trigger/event.
-The second 'extra' parameter in the capture represents the action, in this case turning on the gateway light, however this will be replaced by a action to notify the push server automatically and is therefore not needed.
 
-Most times this information will be enough, however the EventInfo class allows for aditional information:
-```
-    event_info = EventInfo(
-        action="open",  # user friendly name of the event, can be set arbitrarily and will be received by the server as the name of the event
-        extra="[1,6,1,0,[0,1],2,0]",  # the identification of this event, this determines on what event the callback is triggered
-        event: "open"  # defaults to the action
-        command_extra="[1,19,7,85,[40,123456],0,0]"  # will be received by the push server, hopefully this will allow us to obtain extra information about the event for instance the vibration intesisty or light level that triggered the event (still experimental)
-        trigger_value: # defautls to None, only needed if the trigger has a certain threshold value (like a temperature for a wheather sensor), a "value" key will be present in the first part of the capture.
-        trigger_token: ""   # defaults to "", only needed for protected events like the alarm feature of a gateway, equal to the "token" of the first part of the caputure.
-        source_sid: Optional[str] = None  # Normally automatically obtained from the device, only needed for zigbee devices: the "did" key
-        source_model: Optional[str] = None  # Normally not needed and obtained from device, only needed for zigbee devices: the "model" key
-    )
-```
 
-You might need to repeat the packet capture again if it did not show up the first time, if it still does not show up, make sure you do not have a VPN enabled while executing steps 3 to 6 and make sure you use the correct token for decoding the packets (each gateway has its own token).
+.. note::
+
+    The `action` is an user friendly name of the event, can be set arbitrarily and will be received by the server as the name of the event.
+    The `extra` is the identification of the event.
+
+Most times this information will be enough, however the :class:`miio.EventInfo` class allows for additional information.
+For example, on Zigbee sub-devices you also need to define `source_sid` and `source_model`,
+see :ref:`button press <_button_press_example>` for an example.
+See the :class:`PushServer.EventInfo` for more detailed documentation.
 
 
 Examples
@@ -128,7 +205,7 @@ Gateway alarm trigger
 ~~~~~~~~~~~~~~~~~~~~~
 
 The following example shows how to create a push server and make it to listen for alarm triggers from a gateway device.
-This is proper async python code that can be executed as a script. 
+This is proper async python code that can be executed as a script.
 
 
 .. literalinclude:: examples/push_server/gateway_alarm_trigger.py
@@ -136,13 +213,17 @@ This is proper async python code that can be executed as a script.
 
 
 
+.. _button_press_example:
+
 Button press
 ~~~~~~~~~~~~
 
 The following examples shows a more complex use case of acting on button presses of Aqara Zigbee button.
-Since the source device (the button) differs from the communicating device (the gateway) some aditional EventInfo is needed: source_sid and source_model.
+Since the source device (the button) differs from the communicating device (the gateway),
+some additional parameters are needed for the :class:`PushServer.EventInfo`: `source_sid` and `source_model`.
 
 .. literalinclude:: examples/push_server/gateway_button_press.py
    :language: python
+
 
 :py:class:`API <miio.push_server>`
