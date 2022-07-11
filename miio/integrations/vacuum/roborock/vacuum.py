@@ -98,6 +98,14 @@ class FanspeedS7(FanspeedEnum):
     Turbo = 104
 
 
+class FanspeedS7_Maxv(FanspeedEnum):
+    Silent = 101
+    Standard = 102
+    Medium = 103
+    Turbo = 104
+    Max = 108
+
+
 class WaterFlow(enum.Enum):
     """Water flow strength on s5 max."""
 
@@ -115,7 +123,7 @@ class MopMode(enum.Enum):
 
 
 class MopIntensity(enum.Enum):
-    """Mop scrub intensity on S7."""
+    """Mop scrub intensity on S7 + S7MAXV."""
 
     Close = 200
     Mild = 201
@@ -132,7 +140,7 @@ class CarpetCleaningMode(enum.Enum):
 
 
 class DustCollectionMode(enum.Enum):
-    """Auto emptying mode (S7 only)"""
+    """Auto emptying mode (S7 + S7MAXV only)"""
 
     Smart = 0
     Quick = 1
@@ -185,6 +193,7 @@ SUPPORTED_MODELS = [
 
 AUTO_EMPTY_MODELS = [
     ROCKROBO_S7,
+    ROCKROBO_S7_MAXV,
 ]
 
 
@@ -664,6 +673,8 @@ class RoborockVacuum(Device, VacuumInterface):
             fanspeeds = FanspeedE2
         elif self.model == ROCKROBO_S7:
             fanspeeds = FanspeedS7
+        elif self.model == ROCKROBO_S7_MAXV:
+            fanspeeds = FanspeedS7_Maxv
         else:
             fanspeeds = FanspeedV2
 
