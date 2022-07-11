@@ -35,7 +35,6 @@ class EventInfo:
     trigger_token: str = ""
     source_sid: Optional[str] = None  # Normally not needed and obtained from device
     source_model: Optional[str] = None  # Normally not needed and obtained from device
-    source_token: Optional[str] = None  # Normally not needed and obtained from device
 
 
 def calculated_token_enc(token):
@@ -236,10 +235,8 @@ class PushServer:
             info.source_sid = str(device.device_id)
         if info.source_model is None:
             info.source_model = device.model
-        if info.source_token is None:
-            info.source_token = device.token
 
-        token_enc = calculated_token_enc(info.source_token)
+        token_enc = calculated_token_enc(device.token)
         source_id = info.source_sid.replace(".", "_")
         command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"

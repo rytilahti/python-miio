@@ -34,7 +34,6 @@ async def asyncio_demo(loop):
         extra="[1,13,1,85,[0,1],0,0]",
         source_sid=button.sid,
         source_model=button.zigbee_model,
-        source_token=gateway.token,
     )
 
     await loop.run_in_executor(None, push_server.subscribe_event, gateway, event_info)
