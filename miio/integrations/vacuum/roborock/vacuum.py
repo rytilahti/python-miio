@@ -97,14 +97,14 @@ class FanspeedS7(FanspeedEnum):
     Medium = 103
     Turbo = 104
 
-    
+
 class FanspeedS7_Maxv(FanspeedEnum):
     Silent = 101
     Standard = 102
     Medium = 103
     Turbo = 104
     Max = 108
-    
+
 
 class WaterFlow(enum.Enum):
     """Water flow strength on s5 max."""
