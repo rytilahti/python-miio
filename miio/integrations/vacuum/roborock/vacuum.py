@@ -674,7 +674,7 @@ class RoborockVacuum(Device, VacuumInterface):
         elif self.model == ROCKROBO_S7:
             fanspeeds = FanspeedS7
         elif self.model == ROCKROBO_S7MAXV:
-            fanspeeds = FanspeedS7_Maxv           
+            fanspeeds = FanspeedS7_Maxv
         else:
             fanspeeds = FanspeedV2
 
