@@ -97,6 +97,7 @@ class FanspeedS7(FanspeedEnum):
     Medium = 103
     Turbo = 104
 
+    
 class FanspeedS7_Maxv(FanspeedEnum):
     Silent = 101
     Standard = 102
