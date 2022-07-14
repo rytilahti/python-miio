@@ -223,23 +223,32 @@ class Gateway(Device):
 
         # find the gateway
         for device in device_dict:
-            if device["mac"] == self.mac:
-                self._did = device["did"]
-                break
+            if device["did"] == str(self.device_id):
+                if device["mac"] == self.mac:
+                    found_gateway = True
+                    break
+                _LOGGER.error(
+                    "Mac and device id of gateway with ip '%s', mac '%s', did '%i', model '%s' did not match in the cloud device list response",
+                    self.ip,
+                    self.mac,
+                    self.device_id,
+                    self.model,
+                )
 
         # check if the gateway is found
-        if self._did is None:
+        if not found_gateway:
             _LOGGER.error(
-                "Could not find gateway with ip '%s', mac '%s', model '%s' in the cloud device list response",
+                "Could not find gateway with ip '%s', mac '%s', did '%i', model '%s' in the cloud device list response",
                 self.ip,
                 self.mac,
+                self.device_id,
                 self.model,
             )
             return self._devices
 
         # find the subdevices belonging to this gateway
         for device in device_dict:
-            if device.get("parent_id") == self._did:
+            if device.get("parent_id") == str(self.device_id):
                 # Match 'model' to get the type_id
                 model_info = self.match_zigbee_model(device["model"], device["did"])
 
