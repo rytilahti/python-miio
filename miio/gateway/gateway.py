@@ -109,7 +109,6 @@ class Gateway(Device):
         self._devices: Dict[str, SubDevice] = {}
         self._info = None
         self._subdevice_model_map = None
-        self._did = None
 
     def _get_unknown_model(self):
         for model_info in self.subdevice_model_map:
