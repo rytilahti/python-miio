@@ -209,6 +209,14 @@ class Gateway(Device):
 
         return self._devices
 
+    def _get_device_by_did(self, device_dict, device_did):
+        """Get a device by its did from a device dict."""
+        for device in device_dict:
+            if device["did"] == device_did:
+                return device
+
+        return None
+
     @command()
     def get_devices_from_dict(self, device_dict):
         """Get SubDevices from a dict containing at least "mac", "did", "parent_id" and
@@ -221,22 +229,8 @@ class Gateway(Device):
         self._devices = {}
 
         # find the gateway
-        found_gateway = False
-        for device in device_dict:
-            if device["did"] == str(self.device_id):
-                if device["mac"] == self.mac:
-                    found_gateway = True
-                    break
-                _LOGGER.error(
-                    "Mac and device id of gateway with ip '%s', mac '%s', did '%i', model '%s' did not match in the cloud device list response",
-                    self.ip,
-                    self.mac,
-                    self.device_id,
-                    self.model,
-                )
-
-        # check if the gateway is found
-        if not found_gateway:
+        gateway = self._get_device_by_did(device_dict, str(self.device_id))
+        if gateway is None:
             _LOGGER.error(
                 "Could not find gateway with ip '%s', mac '%s', did '%i', model '%s' in the cloud device list response",
                 self.ip,
@@ -246,19 +240,29 @@ class Gateway(Device):
             )
             return self._devices
 
+        if gateway["mac"] != self.mac:
+            _LOGGER.error(
+                "Mac and device id of gateway with ip '%s', mac '%s', did '%i', model '%s' did not match in the cloud device list response",
+                self.ip,
+                self.mac,
+                self.device_id,
+                self.model,
+            )
+            return self._devices
+
         # find the subdevices belonging to this gateway
         for device in device_dict:
-            if device.get("parent_id") == str(self.device_id):
-                # Match 'model' to get the type_id
-                model_info = self.match_zigbee_model(device["model"], device["did"])
+            if device.get("parent_id") != str(self.device_id):
+                continue
 
-                # Extract discovered information
-                dev_info = SubDeviceInfo(
-                    device["did"], model_info["type_id"], -1, -1, -1
-                )
+            # Match 'model' to get the type_id
+            model_info = self.match_zigbee_model(device["model"], device["did"])
 
-                # Setup the device
-                self.setup_device(dev_info, model_info)
+            # Extract discovered information
+            dev_info = SubDeviceInfo(device["did"], model_info["type_id"], -1, -1, -1)
+
+            # Setup the device
+            self.setup_device(dev_info, model_info)
 
         return self._devices
 
