@@ -192,6 +192,29 @@ For example, on Zigbee sub-devices you also need to define `source_sid` and `sou
 see :ref:`button press <_button_press_example>` for an example.
 See the :class:`PushServer.EventInfo` for more detailed documentation.
 
+Implement a gateway zigbee device
+--------
+
+Once the event information is obtained as discribed above a new event for a zigbee device connected to a gateway can be implemented as follows:
+
+1. go to the miio\gateway\devices\subdevices.YAML file of this python module and search for the device you want to implement the event for.
+2. Add the event you just discoved like this:
+::
+
+    properties:
+      - property: is_open # the new property of this device (optional)
+        default: False    # default value of the property when the device is initialized (optional)
+    push_properties:
+      open:               # the event you added, see the decoded packet capture `\"key\":\"event.lumi.sensor_magnet.aq2.open\"` take this equal to everything after the model
+        property: is_open # the property as listed above that this event will link to (optional)
+        value: True       # the value the property as listed above will be set to if this event is received (optional)
+        extra: "[1,6,1,0,[0,1],2,0]"  # the identification of this event, see the decoded packet capture `\"extra\":\"[1,6,1,0,[0,1],2,0]\"`
+      close:
+        property: is_open
+        value: False
+        extra: "[1,6,1,0,[0,0],2,0]"
+
+3. Make a Pull Request to include the new event to this python module.
 
 Examples
 --------
