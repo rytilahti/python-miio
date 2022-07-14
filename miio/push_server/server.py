@@ -1,50 +1,19 @@
 import asyncio
-import calendar
-import datetime
 import logging
 import socket
-import struct
 from json import dumps
 from random import randint
-from typing import Any, Optional
 
-import attr
-
-from .device import Device
-from .protocol import Message, Utils
+from ..device import Device
+from ..protocol import Utils
+from .eventinfo import EventInfo
+from .serverprotocol import ServerProtocol
 
 _LOGGER = logging.getLogger(__name__)
 
 SERVER_PORT = 54321
 FAKE_DEVICE_ID = "120009025"
 FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
-HELO_BYTES = bytes.fromhex(
-    "21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-)
-
-
-@attr.s(auto_attribs=True)
-class EventInfo:
-    """Event info to register to the push server.
-
-    action: user friendly name of the event, can be set arbitrarily and will be received by the server as the name of the event.
-    extra: the identification of this event, this determines on what event the callback is triggered.
-    event: defaults to the action.
-    command_extra: will be received by the push server, hopefully this will allow us to obtain extra information about the event for instance the vibration intesisty or light level that triggered the event (still experimental).
-    trigger_value: Only needed if the trigger has a certain threshold value (like a temperature for a wheather sensor), a "value" key will be present in the first part of a scene packet capture.
-    trigger_token: Only needed for protected events like the alarm feature of a gateway, equal to the "token" of the first part of of a scene packet caputure.
-    source_sid: Normally not needed and obtained from device, only needed for zigbee devices: the "did" key.
-    source_model: Normally not needed and obtained from device, only needed for zigbee devices: the "model" key.
-    """
-
-    action: str
-    extra: str
-    event: Optional[str] = None
-    command_extra: str = ""
-    trigger_value: Optional[Any] = None
-    trigger_token: str = ""
-    source_sid: Optional[str] = None
-    source_model: Optional[str] = None
 
 
 def calculated_token_enc(token):
@@ -228,7 +197,7 @@ class PushServer:
         loop = asyncio.get_event_loop()
 
         return loop.create_datagram_endpoint(
-            lambda: self.ServerProtocol(loop, udp_socket, self),
+            lambda: ServerProtocol(loop, udp_socket, self),
             sock=udp_socket,
         )
 
@@ -323,118 +292,3 @@ class PushServer:
     def server_model(self):
         """Return the model of the fake device beeing emulated."""
         return self._server_model
-
-    class ServerProtocol:
-        """Handle responding to UDP packets."""
-
-        def __init__(self, loop, udp_socket, parent):
-            """Initialize the class."""
-            self.transport = None
-            self._loop = loop
-            self._sock = udp_socket
-            self.parent = parent
-            self._connected = False
-
-        def _build_ack(self):
-            # Original devices are using year 1970, but it seems current datetime is fine
-            timestamp = calendar.timegm(datetime.datetime.now().timetuple())
-            # ACK packet not signed, 16 bytes header + 16 bytes of zeroes
-            return struct.pack(
-                ">HHIII16s", 0x2131, 32, 0, self.parent.server_id, timestamp, bytes(16)
-            )
-
-        def connection_made(self, transport):
-            """Set the transport."""
-            self.transport = transport
-            self._connected = True
-            _LOGGER.info(
-                "Miio push server started with address=%s server_id=%s",
-                self.parent._address,
-                self.parent.server_id,
-            )
-
-        def connection_lost(self, exc):
-            """Handle connection lost."""
-            if self._connected:
-                _LOGGER.error(
-                    "Connection unexpectedly lost in Miio push server: %s", exc
-                )
-
-        def send_ping_ACK(self, host, port):
-            _LOGGER.debug("%s:%s=>PING", host, port)
-            m = self._build_ack()
-            self.transport.sendto(m, (host, port))
-            _LOGGER.debug("%s:%s<=ACK(server_id=%s)", host, port, self.parent.server_id)
-
-        def send_msg_OK(self, host, port, msg_id, token):
-            # This result means OK, but some methods return ['ok'] instead of 0
-            # might be necessary to use different results for different methods
-            result = {"result": 0, "id": msg_id}
-            header = {
-                "length": 0,
-                "unknown": 0,
-                "device_id": self.parent.server_id,
-                "ts": datetime.datetime.now(),
-            }
-            msg = {
-                "data": {"value": result},
-                "header": {"value": header},
-                "checksum": 0,
-            }
-            response = Message.build(msg, token=token)
-            self.transport.sendto(response, (host, port))
-            _LOGGER.debug(">> %s:%s: %s", host, port, result)
-
-        def datagram_received(self, data, addr):
-            """Handle received messages."""
-            try:
-                (host, port) = addr
-                if data == HELO_BYTES:
-                    self.send_ping_ACK(host, port)
-                    return
-
-                if host not in self.parent._registered_devices:
-                    _LOGGER.warning(
-                        "Datagram received from unknown device (%s:%s)",
-                        host,
-                        port,
-                    )
-                    return
-
-                token = self.parent._registered_devices[host]["token"]
-                callback = self.parent._registered_devices[host]["callback"]
-
-                msg = Message.parse(data, token=token)
-                msg_value = msg.data.value
-                msg_id = msg_value["id"]
-                _LOGGER.debug("<< %s:%s: %s", host, port, msg_value)
-
-                # Parse message
-                action, device_call_id = msg_value["method"].rsplit(":", 1)
-                source_device_id = device_call_id.replace("_", ".")
-
-                callback(source_device_id, action, msg_value.get("params"))
-
-                # Send OK
-                self.send_msg_OK(host, port, msg_id, token)
-
-            except Exception:
-                _LOGGER.exception(
-                    "Cannot process Miio push server packet: '%s' from %s:%s",
-                    data,
-                    host,
-                    port,
-                )
-
-        def error_received(self, exc):
-            """Log UDP errors."""
-            _LOGGER.error("UDP error received in Miio push server: %s", exc)
-
-        def close(self):
-            """Stop the server."""
-            _LOGGER.debug("Miio push server shutting down")
-            self._connected = False
-            if self.transport:
-                self.transport.close()
-            self._sock.close()
-            _LOGGER.info("Miio push server stopped")
