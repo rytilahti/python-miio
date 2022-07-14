@@ -1,8 +1,8 @@
 """Dreame Vacuum."""
 
 import logging
-from enum import Enum
 import threading
+from enum import Enum
 from typing import Dict, Optional
 
 import click
@@ -612,8 +612,8 @@ class DreameVacuum(MiotDevice, VacuumInterface):
     def rotate(self, rotatation: int) -> None:
         """Rotate vacuum."""
         if (
-            rotatation < self.MANUAL_ROTATION_MIN or
-            rotatation > self.MANUAL_ROTATION_MAX
+            rotatation < self.MANUAL_ROTATION_MIN
+            or rotatation > self.MANUAL_ROTATION_MAX
         ):
             raise DeviceException(
                 "Given rotation is invalid, should be [%s, %s], was %s"
@@ -639,19 +639,21 @@ class DreameVacuum(MiotDevice, VacuumInterface):
         click.argument("size", type=int, default=0),
     )
     def set_voice(self, url: str, md5sum: str, size: int):
-        """Upload voice package
+        """Upload voice package.
 
         :param str url: URL or path to languaeg pack
 
         :param str md5sum: MD5 hash for file if URL used
 
-        :param int size: File size in bytes if URL used"""
+        :param int size: File size in bytes if URL used
+        """
         local_url = None
         server = None
         if url.startswith("http"):
             if md5sum is None or size == 0:
                 click.echo(
-                    "You need to pass md5 and file size when using URL for updating.")
+                    "You need to pass md5 and file size when using URL for updating."
+                )
                 return
             local_url = url
         else:
@@ -665,11 +667,11 @@ class DreameVacuum(MiotDevice, VacuumInterface):
             click.echo(f"Hosting file at {local_url}")
 
         params = [
-            {'piid': 3, 'value': 'MA'},
-            {'piid': 4, 'value': local_url},
-            {'piid': 5, 'value': md5sum},
-            {'piid': 6, 'value': size},
+            {"piid": 3, "value": "MA"},
+            {"piid": 4, "value": local_url},
+            {"piid": 5, "value": md5sum},
+            {"piid": 6, "value": size},
         ]
-        result_status = self.call_action('set_voice', params=params)
-        if result_status['code'] == 0:
+        result_status = self.call_action("set_voice", params=params)
+        if result_status["code"] == 0:
             click.echo("Installation complete!")
