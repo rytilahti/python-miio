@@ -30,5 +30,6 @@ who have helped to extend this to cover not only the vacuum cleaner.
     troubleshooting
     contributing
     device_docs/index
+    push_server
 
     API <api/miio>
