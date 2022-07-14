@@ -38,10 +38,10 @@ Callbacks
 ---------
 
 Gateway-like devices will have a single callback for all connected Zigbee devices.
-The `source_device` argument is set to the device that caused the event.
+The `source_device` argument is set to the device that caused the event e.g. "lumi.123456789abcdef".
 
 Multiple events of the same device can be subscribed to, for instance both opening and closing a door-sensor.
-The `action` argument (e.g., "open" or "close") is set to the action,
+The `action` argument is set to the action e.g., "open" or "close" ,
 that was defined in the :class:`PushServer.EventInfo` used for subscribing to the event.
 
 Lastly, the `params` argument provides additional information about the event, if available.
@@ -51,11 +51,6 @@ Therefore, the callback functions need to have the following signature:
 .. code-block::
 
     def callback(source_device, action, params):
-
-
-.. todo::
-
-    Add an example how the arguments look like?
 
 
 .. _events_subscribe:
@@ -172,12 +167,12 @@ to retrieve the necessary information for that event.
 12. Now, extract the necessary information form the packet capture to create :class:`PushServer.EventInfo` objects.
 
 13. Locate the element containing `"key": "event.*"` in the trace,
-    this is the event triggering the command (`"command"`, `lumi.gateway.v3.set_rgb` in the example above) in the trace.
+    this is the event triggering the command in the trace.
+    The `action` of the `EventInfo` is normally the last part of the `key` value, e.g.,
+    `open` (from `event.lumi.sensor_magnet.aq2.open`) in the example above.
 
 14. The `extra` parameter is the most important piece containing the event details,
     which you can directly copy from the packet capture.
-    The `action` is normally the last part of the `key` value, e.g.,
-    `open` (from `event.lumi.sensor_magnet.aq2.open`) in the example above.
 
 ::
 
