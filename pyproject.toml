@@ -29,6 +29,7 @@ appdirs = "^1"
 tqdm = "^4"
 netifaces = { version = "^0", optional = true }
 android_backup = { version = "^0", optional = true }
+micloud = { version = "*", optional = true }
 importlib_metadata = { version = "^1", markers = "python_version <= '3.7'" }
 croniter = ">=1"
 defusedxml = "^0"

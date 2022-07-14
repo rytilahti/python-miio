@@ -11,6 +11,8 @@ from miio.click_common import (
 )
 from miio.miioprotocol import MiIOProtocol
 
+from .cloud import cloud
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -57,6 +59,7 @@ def discover(mdns, handshake, network, timeout):
 
 
 cli.add_command(discover)
+cli.add_command(cloud)
 
 
 def create_cli():
