@@ -1,12 +1,14 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
-from typing import TYPE_CHECKING, Dict, Optional
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 import attr
 import click
 
 from ...click_common import command
+from ...push_server import EventInfo
 from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
 
 _LOGGER = logging.getLogger(__name__)
@@ -59,6 +61,10 @@ class SubDevice:
                 self.get_prop_exp_dict[prop["property"]] = prop
 
         self.setter = model_info.get("setter")
+
+        self.push_events = model_info.get("push_properties", [])
+        self._event_ids: List[str] = []
+        self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
 
     def __repr__(self):
         return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(
@@ -260,3 +266,67 @@ class SubDevice:
                 ex,
             )
         return self._fw_ver
+
+    def Register_callback(self, id, callback):
+        """Register a external callback function for updates of this subdevice."""
+        if id in self._registered_callbacks:
+            _LOGGER.error(
+                "A callback with id '%s' was already registed, overwriting previous callback",
+                id,
+            )
+        self._registered_callbacks[id] = callback
+
+    def Remove_callback(self, id):
+        """Remove a external callback using its id."""
+        self._registered_callbacks.pop(id)
+
+    def push_callback(self, action, params):
+        """Push callback received from the push server."""
+        if action not in self.push_events:
+            _LOGGER.error(
+                "Received unregistered action '%s' callback for sid '%s' model '%s'",
+                action,
+                self.sid,
+                self.model,
+            )
+
+        prop = self.push_events[action].get("property")
+        value = self.push_events[action].get("value")
+        if prop is not None and value is not None:
+            self._props[prop] = value
+
+        for callback in self._registered_callbacks.values():
+            callback(action, params)
+
+    def subscribe_events(self):
+        """subscribe to all subdevice events using the push server."""
+        if self._gw._push_server is None:
+            _LOGGER.error("Can not install push callback withouth a push_server")
+            return False
+
+        result = True
+        for action in self.push_events:
+            event_info = EventInfo(
+                action=action,
+                extra=self.push_events[action]["extra"],
+                source_sid=self.sid,
+                source_model=self.zigbee_model,
+                event=self.push_events[action].get("event", None),
+                command_extra=self.push_events[action].get("command_extra", ""),
+                trigger_value=self.push_events[action].get("trigger_value"),
+            )
+
+            event_id = self._gw._push_server.subscribe_event(self._gw, event_info)
+            if event_id is None:
+                result = False
+                continue
+
+            self._event_ids.append(event_id)
+
+        return result
+
+    def unsubscribe_events(self):
+        """Unsubscibe from events registered in the gateway memory."""
+        for event_id in self._event_ids:
+            self._gw._push_server.unsubscribe_event(self._gw, event_id)
+            self._event_ids.remove(event_id)

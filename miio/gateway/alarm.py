@@ -1,8 +1,12 @@
 """Xiaomi Gateway Alarm implementation."""
 
+import logging
 from datetime import datetime
 
+from ..push_server import EventInfo
 from .gatewaydevice import GatewayDevice
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Alarm(GatewayDevice):
@@ -61,3 +65,28 @@ class Alarm(GatewayDevice):
     def last_status_change_time(self) -> datetime:
         """Return the last time the alarm changed status."""
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
+
+    def subscribe_events(self):
+        """subscribe to the alarm events using the push server."""
+        if self._gateway._push_server is None:
+            _LOGGER.error("Can not install push callback withouth a push_server")
+            return False
+
+        event_info = EventInfo(
+            action="alarm_triggering",
+            extra="[1,19,1,111,[0,1],2,0]",
+            trigger_token=self._gateway.token,
+        )
+
+        event_id = self._gateway._push_server.subscribe_event(self._gateway, event_info)
+        if event_id is None:
+            return False
+
+        self._event_ids.append(event_id)
+        return True
+
+    def unsubscribe_events(self):
+        """Unsubscibe from events registered in the gateway memory."""
+        for event_id in self._event_ids:
+            self._gateway._push_server.unsubscribe_event(self._gateway, event_id)
+            self._event_ids.remove(event_id)
