@@ -637,15 +637,16 @@ class DreameVacuum(MiotDevice, VacuumInterface):
         click.argument("url", type=str),
         click.argument("md5sum", type=str, required=False),
         click.argument("size", type=int, default=0),
+        click.argument("voice_id", type=str, default="CP"),
     )
-    def set_voice(self, url: str, md5sum: str, size: int):
+    def set_voice(self, url: str, md5sum: str, size: int, voice_id: str):
         """Upload voice package.
 
-        :param str url: URL or path to languaeg pack
-
+        :param str url: URL or path to language pack
         :param str md5sum: MD5 hash for file if URL used
-
         :param int size: File size in bytes if URL used
+        :param str voice_id: In original it is country code for the selected
+        voice pack. You can put here what you like, I guess it doesn't matter (default: CP - Custom Packet)
         """
         local_url = None
         server = None
@@ -667,7 +668,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
             click.echo(f"Hosting file at {local_url}")
 
         params = [
-            {"piid": 3, "value": "MA"},
+            {"piid": 3, "value": voice_id},
             {"piid": 4, "value": local_url},
             {"piid": 5, "value": md5sum},
             {"piid": 6, "value": size},
@@ -675,3 +676,5 @@ class DreameVacuum(MiotDevice, VacuumInterface):
         result_status = self.call_action("set_voice", params=params)
         if result_status["code"] == 0:
             click.echo("Installation complete!")
+
+        return result_status
