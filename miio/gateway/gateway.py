@@ -222,6 +222,7 @@ class Gateway(Device):
         self._devices = {}
 
         # find the gateway
+        found_gateway = False
         for device in device_dict:
             if device["did"] == str(self.device_id):
                 if device["mac"] == self.mac:
