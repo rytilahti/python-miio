@@ -1,6 +1,7 @@
 """Dreame Vacuum."""
 
 import logging
+import threading
 from enum import Enum
 from typing import Dict, Optional
 
@@ -11,6 +12,7 @@ from miio.exceptions import DeviceException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
+from miio.updater import OneShotServer
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,6 +68,7 @@ _DREAME_1C_MAPPING: MiotMapping = {
     "reset_sidebrush_life": {"siid": 28, "aiid": 1},
     "move": {"siid": 21, "aiid": 1},
     "play_sound": {"siid": 24, "aiid": 3},
+    "set_voice": {"siid": 24, "aiid": 2},
 }
 
 
@@ -629,3 +632,49 @@ class DreameVacuum(MiotDevice, VacuumInterface):
                 },
             ],
         )
+
+    @command(
+        click.argument("url", type=str),
+        click.argument("md5sum", type=str, required=False),
+        click.argument("size", type=int, default=0),
+        click.argument("voice_id", type=str, default="CP"),
+    )
+    def set_voice(self, url: str, md5sum: str, size: int, voice_id: str):
+        """Upload voice package.
+
+        :param str url: URL or path to language pack
+        :param str md5sum: MD5 hash for file if URL used
+        :param int size: File size in bytes if URL used
+        :param str voice_id: In original it is country code for the selected
+        voice pack. You can put here what you like, I guess it doesn't matter (default: CP - Custom Packet)
+        """
+        local_url = None
+        server = None
+        if url.startswith("http"):
+            if md5sum is None or size == 0:
+                click.echo(
+                    "You need to pass md5 and file size when using URL for updating."
+                )
+                return
+            local_url = url
+        else:
+            server = OneShotServer(file=url)
+            local_url = server.url()
+            md5sum = server.md5
+            size = len(server.payload)
+
+            t = threading.Thread(target=server.serve_once)
+            t.start()
+            click.echo(f"Hosting file at {local_url}")
+
+        params = [
+            {"piid": 3, "value": voice_id},
+            {"piid": 4, "value": local_url},
+            {"piid": 5, "value": md5sum},
+            {"piid": 6, "value": size},
+        ]
+        result_status = self.call_action("set_voice", params=params)
+        if result_status["code"] == 0:
+            click.echo("Installation complete!")
+
+        return result_status
