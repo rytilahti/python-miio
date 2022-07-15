@@ -271,7 +271,7 @@ class SubDevice:
             )
         return self._fw_ver
 
-    def register_callback(self, id, callback: GatewayCallback):
+    def register_callback(self, id: str, callback: GatewayCallback):
         """Register a external callback function for updates of this subdevice."""
         if id in self._registered_callbacks:
             _LOGGER.error(
@@ -280,11 +280,11 @@ class SubDevice:
             )
         self._registered_callbacks[id] = callback
 
-    def remove_callback(self, id):
+    def remove_callback(self, id: str):
         """Remove a external callback using its id."""
         self._registered_callbacks.pop(id)
 
-    def push_callback(self, action, params):
+    def push_callback(self, action: str, params: str):
         """Push callback received from the push server."""
         if action not in self.push_events:
             _LOGGER.error(

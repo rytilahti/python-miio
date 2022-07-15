@@ -398,7 +398,7 @@ class Gateway(Device):
                 "Got an exception while getting gateway illumination"
             ) from ex
 
-    def register_callback(self, id, callback: GatewayCallback):
+    def register_callback(self, id: str, callback: GatewayCallback):
         """Register a external callback function for updates of this subdevice."""
         if id in self._registered_callbacks:
             _LOGGER.error(
@@ -407,16 +407,16 @@ class Gateway(Device):
             )
         self._registered_callbacks[id] = callback
 
-    def remove_callback(self, id):
+    def remove_callback(self, id: str):
         """Remove a external callback using its id."""
         self._registered_callbacks.pop(id)
 
-    def gateway_push_callback(self, action, params):
+    def gateway_push_callback(self, action: str, params: str):
         """Callback from the push server regarding the gateway itself."""
         for callback in self._registered_callbacks.values():
             callback(action, params)
 
-    def push_callback(self, source_device, action, params):
+    def push_callback(self, source_device: str, action: str, params: str):
         """Callback from the push server."""
         if source_device == str(self.device_id):
             self.gateway_push_callback(action, params)
