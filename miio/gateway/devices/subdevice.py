@@ -290,9 +290,10 @@ class SubDevice:
                 self.model,
             )
 
-        prop = self.push_events[action].get("property")
-        value = self.push_events[action].get("value")
-        if prop is not None and value is not None:
+        event = self.push_events[action]
+        prop = event.get("property")
+        value = event.get("value")
+        if prop is not None:
             self._props[prop] = value
 
         for callback in self._registered_callbacks.values():
