@@ -183,7 +183,7 @@ class Device(metaclass=DeviceGroupMeta):
     @property
     def supported_models(self) -> List[str]:
         """Return a list of supported models."""
-        return self._supported_models
+        return list(self._mappings.keys()) or self._supported_models
 
     @property
     def model(self) -> str:
