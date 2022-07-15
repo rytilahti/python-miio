@@ -192,6 +192,7 @@ For example, on Zigbee sub-devices you also need to define `source_sid` and `sou
 see :ref:`button press <_button_press_example>` for an example.
 See the :class:`PushServer.EventInfo` for more detailed documentation.
 
+
 Examples
 --------
 
