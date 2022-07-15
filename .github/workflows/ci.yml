@@ -68,6 +68,10 @@ jobs:
             os: macos-latest
           - python-version: pypy3
             os: windows-latest
+          - python-version: 3.11-dev
+            os: macos-latest
+          - python-version: 3.11-dev
+            os: windows-latest
 
     steps:
       - uses: "actions/checkout@v2"
