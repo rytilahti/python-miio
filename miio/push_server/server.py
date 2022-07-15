@@ -3,7 +3,7 @@ import logging
 import socket
 from json import dumps
 from random import randint
-from typing import Callable, Union
+from typing import Callable, Optional
 
 from ..device import Device
 from ..protocol import Utils
@@ -127,9 +127,7 @@ class PushServer:
         self._registered_devices.pop(device.ip)
         _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
 
-    def subscribe_event(
-        self, device: Device, event_info: EventInfo
-    ) -> Union[str, None]:
+    def subscribe_event(self, device: Device, event_info: EventInfo) -> Optional[str]:
         """Subscribe to a event such that the device will start pushing data for that
         event."""
         if device.ip not in self._registered_devices:
