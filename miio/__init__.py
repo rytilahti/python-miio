@@ -28,6 +28,7 @@ from miio.aqaracamera import AqaraCamera
 from miio.chuangmi_camera import ChuangmiCamera
 from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug
+from miio.cloud import CloudInterface
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
 from miio.gateway import Gateway
