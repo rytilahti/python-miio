@@ -197,7 +197,7 @@ Implement a gateway zigbee device
 
 Once the event information is obtained as discribed above a new event for a zigbee device connected to a gateway can be implemented as follows:
 
-1. go to the miio\gateway\devices\subdevices.YAML file of this python module and search for the device you want to implement the event for.
+1. Open `miio/gateway/devices/subdevices.yaml` file and search for the target device for the new event.
 2. Add the event you just discoved like this:
 ::
 
