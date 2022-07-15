@@ -3,8 +3,7 @@
 import logging
 import os
 import sys
-from collections.abc import Callable
-from typing import Dict, List
+from typing import Callable, Dict, List
 
 import click
 import yaml

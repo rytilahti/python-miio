@@ -1,9 +1,9 @@
 import asyncio
 import logging
 import socket
-from collections.abc import Callable
 from json import dumps
 from random import randint
+from typing import Callable
 
 from ..device import Device
 from ..protocol import Utils
