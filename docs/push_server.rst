@@ -214,7 +214,7 @@ Once the event information is obtained as discribed above a new event for a zigb
         value: False
         extra: "[1,6,1,0,[0,0],2,0]"
 
-3. Make a Pull Request to include the new event to this python module.
+3. Create a pull request to get the event added to this library.
 
 Examples
 --------
