@@ -69,7 +69,7 @@ class Alarm(GatewayDevice):
     def subscribe_events(self):
         """subscribe to the alarm events using the push server."""
         if self._gateway._push_server is None:
-            _LOGGER.error("Can not install push callback withouth a push_server")
+            _LOGGER.error("Can not install push callback without a PushServer instance")
             return False
 
         event_info = EventInfo(
