@@ -7,6 +7,7 @@ import attr
 import click
 
 from ...click_common import command
+from ...exceptions import DeviceException
 from ...push_server import EventInfo
 from ..gateway import (
     GATEWAY_MODEL_EU,
@@ -306,8 +307,9 @@ class SubDevice:
     def subscribe_events(self):
         """subscribe to all subdevice events using the push server."""
         if self._gw._push_server is None:
-            _LOGGER.error("Can not install push callback withouth a push_server")
-            return False
+            raise DeviceException(
+                "Can not install push callback without a PushServer instance"
+            )
 
         result = True
         for action in self.push_events:

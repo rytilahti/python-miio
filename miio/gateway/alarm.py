@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime
 
+from ..exceptions import DeviceException
 from ..push_server import EventInfo
 from .gatewaydevice import GatewayDevice
 
@@ -69,8 +70,9 @@ class Alarm(GatewayDevice):
     def subscribe_events(self):
         """subscribe to the alarm events using the push server."""
         if self._gateway._push_server is None:
-            _LOGGER.error("Can not install push callback without a PushServer instance")
-            return False
+            raise DeviceException(
+                "Can not install push callback without a PushServer instance"
+            )
 
         event_info = EventInfo(
             action="alarm_triggering",
