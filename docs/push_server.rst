@@ -198,7 +198,7 @@ Implement a gateway zigbee device
 Once the event information is obtained as discribed above a new event for a zigbee device connected to a gateway can be implemented as follows:
 
 1. Open `miio/gateway/devices/subdevices.yaml` file and search for the target device for the new event.
-2. Add the event you just discoved like this:
+2. Add an entry for the :ref:`newly discovered event<obtain_event_info>`_:
 ::
 
     properties:
