@@ -406,7 +406,7 @@ class Gateway(Device):
             )
         self._registered_callbacks[id] = callback
 
-    def Remove_callback(self, id):
+    def remove_callback(self, id):
         """Remove a external callback using its id."""
         self._registered_callbacks.pop(id)
 
