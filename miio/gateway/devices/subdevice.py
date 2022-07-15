@@ -1,7 +1,6 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 import attr
@@ -9,7 +8,12 @@ import click
 
 from ...click_common import command
 from ...push_server import EventInfo
-from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayException
+from ..gateway import (
+    GATEWAY_MODEL_EU,
+    GATEWAY_MODEL_ZIG3,
+    GatewayCallback,
+    GatewayException,
+)
 
 _LOGGER = logging.getLogger(__name__)
 if TYPE_CHECKING:
@@ -64,7 +68,7 @@ class SubDevice:
 
         self.push_events = model_info.get("push_properties", [])
         self._event_ids: List[str] = []
-        self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
+        self._registered_callbacks: Dict[str, GatewayCallback] = {}
 
     def __repr__(self):
         return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(
@@ -267,7 +271,7 @@ class SubDevice:
             )
         return self._fw_ver
 
-    def register_callback(self, id, callback):
+    def register_callback(self, id, callback: GatewayCallback):
         """Register a external callback function for updates of this subdevice."""
         if id in self._registered_callbacks:
             _LOGGER.error(
@@ -293,7 +297,7 @@ class SubDevice:
         event = self.push_events[action]
         prop = event.get("property")
         value = event.get("value")
-        if prop is not None:
+        if prop is not None and value is not None:
             self._props[prop] = value
 
         for callback in self._registered_callbacks.values():

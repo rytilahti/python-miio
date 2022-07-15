@@ -38,6 +38,8 @@ SUPPORTED_MODELS = [
     GATEWAY_MODEL_AC_V3,
 ]
 
+GatewayCallback = Callable[[str, str], None]
+
 
 class GatewayException(DeviceException):
     """Exception for the Xioami Gateway communication."""
@@ -115,7 +117,7 @@ class Gateway(Device):
 
         self._push_server = push_server
         self._event_ids: List[str] = []
-        self._registered_callbacks: Dict[str, Callable[[str, str], None]] = {}
+        self._registered_callbacks: Dict[str, GatewayCallback] = {}
 
         if self._push_server is not None:
             self._push_server.register_miio_device(self, self.push_callback)
@@ -397,7 +399,7 @@ class Gateway(Device):
                 "Got an exception while getting gateway illumination"
             ) from ex
 
-    def register_callback(self, id, callback):
+    def register_callback(self, id, callback: GatewayCallback):
         """Register a external callback function for updates of this subdevice."""
         if id in self._registered_callbacks:
             _LOGGER.error(
@@ -417,11 +419,11 @@ class Gateway(Device):
 
     def push_callback(self, source_device, action, params):
         """Callback from the push server."""
-        if source_device not in self.devices:
-            if source_device == f"lumi.{str(self.device_id)}":
-                self.gateway_push_callback(action, params)
-                return
+        if source_device == str(self.device_id):
+            self.gateway_push_callback(action, params)
+            return
 
+        if source_device not in self.devices:
             _LOGGER.error(
                 "'%s' callback from device '%s' not from a known device",
                 action,

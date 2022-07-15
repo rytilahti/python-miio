@@ -3,4 +3,4 @@ other devices."""
 
 # flake8: noqa
 from .eventinfo import EventInfo
-from .server import PushServer
+from .server import PushServer, PushServerCallback

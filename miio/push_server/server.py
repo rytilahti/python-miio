@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import socket
+from collections.abc import Callable
 from json import dumps
 from random import randint
 
@@ -14,6 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 SERVER_PORT = 54321
 FAKE_DEVICE_ID = "120009025"
 FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
+
+PushServerCallback = Callable[[str, str, str], None]
 
 
 def calculated_token_enc(token):
@@ -84,7 +87,7 @@ class PushServer:
         self._listen_couroutine.close()
         self._listen_couroutine = None
 
-    def register_miio_device(self, device: Device, callback):
+    def register_miio_device(self, device: Device, callback: PushServerCallback):
         """Register a miio device to this push server."""
         if device.ip is None:
             _LOGGER.error(
