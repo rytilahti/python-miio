@@ -267,7 +267,7 @@ class SubDevice:
             )
         return self._fw_ver
 
-    def Register_callback(self, id, callback):
+    def register_callback(self, id, callback):
         """Register a external callback function for updates of this subdevice."""
         if id in self._registered_callbacks:
             _LOGGER.error(
