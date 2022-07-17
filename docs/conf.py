@@ -186,7 +186,7 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3.8", None)}
 
 apidoc_module_dir = "../miio"
 apidoc_output_dir = "api"
-apidoc_excluded_paths = ["tests"]
+apidoc_excluded_paths = ["tests", "**/test_*", "**/tests"]
 apidoc_separate_modules = True
 autodoc_member_order = "groupwise"
 autodoc_inherit_docstrings = True
