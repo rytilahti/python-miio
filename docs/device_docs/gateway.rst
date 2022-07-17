@@ -1,11 +1,16 @@
-Implement a gateway zigbee device
---------
+Gateway
+=======
 
-Once the event information is obtained as  :ref:`discribed in the push server docs<obtain_event_info>`_ a new event for a zigbee device connected to a gateway can be implemented as follows:
+Adding support for new Zigbee devices
+-------------------------------------
+
+Once the event information is obtained as :ref:`described in the push server docs<obtain_event_info>`,
+a new event for a Zigbee device connected to a gateway can be implemented as follows:
 
 1. Open `miio/gateway/devices/subdevices.yaml` file and search for the target device for the new event.
-2. Add an entry for the :ref:`newly discovered event<obtain_event_info>`_:
-::
+2. Add an entry for the new event:
+
+.. code-block:: yaml
 
     properties:
       - property: is_open # the new property of this device (optional)
