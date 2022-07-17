@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import Dict
+from typing import Callable, Dict, List
 
 import click
 import yaml
@@ -36,6 +36,8 @@ SUPPORTED_MODELS = [
     GATEWAY_MODEL_AC_V2,
     GATEWAY_MODEL_AC_V3,
 ]
+
+GatewayCallback = Callable[[str, str], None]
 
 
 class GatewayException(DeviceException):
@@ -99,6 +101,7 @@ class Gateway(Device):
         lazy_discover: bool = True,
         *,
         model: str = None,
+        push_server=None,
     ) -> None:
         super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
 
@@ -109,6 +112,13 @@ class Gateway(Device):
         self._devices: Dict[str, SubDevice] = {}
         self._info = None
         self._subdevice_model_map = None
+
+        self._push_server = push_server
+        self._event_ids: List[str] = []
+        self._registered_callbacks: Dict[str, GatewayCallback] = {}
+
+        if self._push_server is not None:
+            self._push_server.register_miio_device(self, self.push_callback)
 
     def _get_unknown_model(self):
         for model_info in self.subdevice_model_map:
@@ -400,3 +410,43 @@ class Gateway(Device):
             raise GatewayException(
                 "Got an exception while getting gateway illumination"
             ) from ex
+
+    def register_callback(self, id: str, callback: GatewayCallback):
+        """Register a external callback function for updates of this subdevice."""
+        if id in self._registered_callbacks:
+            _LOGGER.error(
+                "A callback with id '%s' was already registed, overwriting previous callback",
+                id,
+            )
+        self._registered_callbacks[id] = callback
+
+    def remove_callback(self, id: str):
+        """Remove a external callback using its id."""
+        self._registered_callbacks.pop(id)
+
+    def gateway_push_callback(self, action: str, params: str):
+        """Callback from the push server regarding the gateway itself."""
+        for callback in self._registered_callbacks.values():
+            callback(action, params)
+
+    def push_callback(self, source_device: str, action: str, params: str):
+        """Callback from the push server."""
+        if source_device == str(self.device_id):
+            self.gateway_push_callback(action, params)
+            return
+
+        if source_device not in self.devices:
+            _LOGGER.error(
+                "'%s' callback from device '%s' not from a known device",
+                action,
+                source_device,
+            )
+            return
+
+        device = self.devices[source_device]
+        device.push_callback(action, params)
+
+    def close(self):
+        """Cleanup all subscribed events and registered callbacks."""
+        if self._push_server is not None:
+            self._push_server.unregister_miio_device(self)

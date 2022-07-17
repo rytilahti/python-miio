@@ -3,6 +3,7 @@ import logging
 import socket
 from json import dumps
 from random import randint
+from typing import Callable, Optional
 
 from ..device import Device
 from ..protocol import Utils
@@ -14,6 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 SERVER_PORT = 54321
 FAKE_DEVICE_ID = "120009025"
 FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
+
+PushServerCallback = Callable[[str, str, str], None]
 
 
 def calculated_token_enc(token):
@@ -84,7 +87,7 @@ class PushServer:
         self._listen_couroutine.close()
         self._listen_couroutine = None
 
-    def register_miio_device(self, device: Device, callback):
+    def register_miio_device(self, device: Device, callback: PushServerCallback):
         """Register a miio device to this push server."""
         if device.ip is None:
             _LOGGER.error(
@@ -124,7 +127,7 @@ class PushServer:
         self._registered_devices.pop(device.ip)
         _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
 
-    def subscribe_event(self, device: Device, event_info: EventInfo):
+    def subscribe_event(self, device: Device, event_info: EventInfo) -> Optional[str]:
         """Subscribe to a event such that the device will start pushing data for that
         event."""
         if device.ip not in self._registered_devices:
@@ -164,7 +167,7 @@ class PushServer:
 
         return event_id
 
-    def unsubscribe_event(self, device: Device, event_id):
+    def unsubscribe_event(self, device: Device, event_id: str):
         """Unsubscribe from a event by id."""
         result = device.send("miIO.xdel", [event_id])
         if result == ["ok"]:
@@ -203,7 +206,7 @@ class PushServer:
 
     def _construct_event(  # nosec
         self,
-        event_id,
+        event_id: str,
         info: EventInfo,
         device: Device,
     ):
