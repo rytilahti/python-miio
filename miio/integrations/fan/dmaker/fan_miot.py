@@ -12,6 +12,7 @@ MODEL_FAN_P10 = "dmaker.fan.p10"
 MODEL_FAN_P11 = "dmaker.fan.p11"
 MODEL_FAN_P15 = "dmaker.fan.p15"
 MODEL_FAN_P18 = "dmaker.fan.p18"
+MODEL_FAN_P33 = "dmaker.fan.p33"
 MODEL_FAN_1C = "dmaker.fan.1c"
 
 
@@ -59,6 +60,21 @@ MIOT_MAPPING = {
         "power_off_time": {"siid": 3, "piid": 1},
         "set_move": {"siid": 6, "piid": 1},
     },
+    MODEL_FAN_P33: {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p33:1
+        "power": {"siid": 2, "piid": 1},
+        "fan_level": {"siid": 2, "piid": 2},
+        "mode": {"siid": 2, "piid": 3},
+        "swing_mode": {"siid": 2, "piid": 4},
+        "swing_mode_angle": {"siid": 2, "piid": 5},
+        "fan_speed": {"siid": 2, "piid": 6},
+        "light": {"siid": 4, "piid": 1},
+        "buzzer": {"siid": 5, "piid": 1},
+        # "device_fault": {"siid": 6, "piid": 2},
+        "child_lock": {"siid": 7, "piid": 1},
+        "power_off_time": {"siid": 3, "piid": 1},
+        "set_move": {"siid": 6, "piid": 1},
+    },
 }
 
 
@@ -85,6 +101,7 @@ SUPPORTED_ANGLES = {
     MODEL_FAN_P9: [30, 60, 90, 120, 150],
     MODEL_FAN_P10: [30, 60, 90, 120, 140],
     MODEL_FAN_P11: [30, 60, 90, 120, 140],
+    MODEL_FAN_P33: [30, 60, 90, 120, 140],
 }
 
 
