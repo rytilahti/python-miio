@@ -48,7 +48,7 @@ class MiIOProtocol:
         self._discovered = False
         # these come from the device, but we initialize them here to make mypy happy
         self._device_ts: datetime = datetime.utcnow()
-        self._device_id = bytes()
+        self._device_id = b""
 
     def send_handshake(self, *, retry_count=3) -> Message:
         """Send a handshake to the device.
