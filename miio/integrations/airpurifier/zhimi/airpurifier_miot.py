@@ -237,6 +237,7 @@ _MAPPING_ZA1 = {
 _MAPPINGS = {
     "zhimi.airpurifier.ma4": _MAPPING,  # airpurifier 3
     "zhimi.airpurifier.mb3": _MAPPING,  # airpurifier 3h
+    "zhimi.airpurifier.mb3a": _MAPPING,  # airpurifier 3h
     "zhimi.airpurifier.va1": _MAPPING,  # airpurifier proh
     "zhimi.airpurifier.vb2": _MAPPING,  # airpurifier proh
     "zhimi.airpurifier.mb4": _MAPPING_MB4,  # airpurifier 3c
