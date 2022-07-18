@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-miio"
-version = "0.5.11"
+version = "0.5.12"
 description = "Python library for interfacing with Xiaomi smart appliances"
 authors = ["Teemu R <tpr@iki.fi>"]
 repository = "https://github.com/rytilahti/python-miio"
@@ -11,6 +11,15 @@ packages = [
   { include = "miio" }
 ]
 keywords = ["xiaomi", "miio", "miot", "smart home"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: OS Independent",
+  "Topic :: System :: Hardware",
+  "Topic :: Home Automation"
+]
 
 [tool.poetry.scripts]
 mirobo = "miio.integrations.vacuum.roborock.vacuum_cli:cli"
