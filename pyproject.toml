@@ -11,6 +11,15 @@ packages = [
   { include = "miio" }
 ]
 keywords = ["xiaomi", "miio", "miot", "smart home"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: OS Independent",
+  "Topic :: System :: Hardware",
+  "Topic :: Home Automation"
+]
 
 [tool.poetry.scripts]
 mirobo = "miio.integrations.vacuum.roborock.vacuum_cli:cli"
