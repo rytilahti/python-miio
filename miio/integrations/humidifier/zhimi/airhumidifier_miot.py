@@ -70,28 +70,28 @@ class PressedButton(enum.Enum):
 class AirHumidifierMiotStatus(DeviceStatus):
     """Container for status reports from the air humidifier.
 
-    Xiaomi Smartmi Evaporation Air Humidifier 2 (zhimi.humidifier.ca4) respone (MIoT format)
+    Xiaomi Smartmi Evaporation Air Humidifier 2 (zhimi.humidifier.ca4) respone (MIoT format)::
 
-    [
-        {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
-        {'did': 'fault', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
-        {'did': 'mode', 'siid': 2, 'piid': 5, 'code': 0, 'value': 0},
-        {'did': 'target_humidity', 'siid': 2, 'piid': 6, 'code': 0, 'value': 50},
-        {'did': 'water_level', 'siid': 2, 'piid': 7, 'code': 0, 'value': 127},
-        {'did': 'dry', 'siid': 2, 'piid': 8, 'code': 0, 'value': False},
-        {'did': 'use_time', 'siid': 2, 'piid': 9, 'code': 0, 'value': 5140816},
-        {'did': 'button_pressed', 'siid': 2, 'piid': 10, 'code': 0, 'value': 2},
-        {'did': 'speed_level', 'siid': 2, 'piid': 11, 'code': 0, 'value': 790},
-        {'did': 'temperature', 'siid': 3, 'piid': 7, 'code': 0, 'value': 22.7},
-        {'did': 'fahrenheit', 'siid': 3, 'piid': 8, 'code': 0, 'value': 72.8},
-        {'did': 'humidity', 'siid': 3, 'piid': 9, 'code': 0, 'value': 39},
-        {'did': 'buzzer', 'siid': 4, 'piid': 1, 'code': 0, 'value': False},
-        {'did': 'led_brightness', 'siid': 5, 'piid': 2, 'code': 0, 'value': 2},
-        {'did': 'child_lock', 'siid': 6, 'piid': 1, 'code': 0, 'value': False},
-        {'did': 'actual_speed', 'siid': 7, 'piid': 1, 'code': 0, 'value': 0},
-        {'did': 'power_time', 'siid': 7, 'piid': 3, 'code': 0, 'value': 18520},
-        {'did': 'clean_mode', 'siid': 7, 'piid': 5, 'code': 0, 'value': True}
-    ]
+        [
+            {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
+            {'did': 'fault', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
+            {'did': 'mode', 'siid': 2, 'piid': 5, 'code': 0, 'value': 0},
+            {'did': 'target_humidity', 'siid': 2, 'piid': 6, 'code': 0, 'value': 50},
+            {'did': 'water_level', 'siid': 2, 'piid': 7, 'code': 0, 'value': 127},
+            {'did': 'dry', 'siid': 2, 'piid': 8, 'code': 0, 'value': False},
+            {'did': 'use_time', 'siid': 2, 'piid': 9, 'code': 0, 'value': 5140816},
+            {'did': 'button_pressed', 'siid': 2, 'piid': 10, 'code': 0, 'value': 2},
+            {'did': 'speed_level', 'siid': 2, 'piid': 11, 'code': 0, 'value': 790},
+            {'did': 'temperature', 'siid': 3, 'piid': 7, 'code': 0, 'value': 22.7},
+            {'did': 'fahrenheit', 'siid': 3, 'piid': 8, 'code': 0, 'value': 72.8},
+            {'did': 'humidity', 'siid': 3, 'piid': 9, 'code': 0, 'value': 39},
+            {'did': 'buzzer', 'siid': 4, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'led_brightness', 'siid': 5, 'piid': 2, 'code': 0, 'value': 2},
+            {'did': 'child_lock', 'siid': 6, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'actual_speed', 'siid': 7, 'piid': 1, 'code': 0, 'value': 0},
+            {'did': 'power_time', 'siid': 7, 'piid': 3, 'code': 0, 'value': 18520},
+            {'did': 'clean_mode', 'siid': 7, 'piid': 5, 'code': 0, 'value': True}
+        ]
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:

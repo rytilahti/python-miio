@@ -9,7 +9,7 @@ and calling the registered callbacks accordingly.
 .. note::
 
     While the eventing has been so far tested only on gateway devices, other devices that allow scene definitions on the
-    mobile app may potentially support this functionality. See :ref:`how to obtain event information<events_obtain>` for details
+    mobile app may potentially support this functionality. See :ref:`how to obtain event information<obtain_event_info>` for details
     how to check if your target device supports this functionality.
 
 
@@ -189,7 +189,7 @@ to retrieve the necessary information for that event.
 
 Most times this information will be enough, however the :class:`miio.EventInfo` class allows for additional information.
 For example, on Zigbee sub-devices you also need to define `source_sid` and `source_model`,
-see :ref:`button press <_button_press_example>` for an example.
+see :ref:`button press <button_press_example>` for an example.
 See the :class:`PushServer.EventInfo` for more detailed documentation.
 
 

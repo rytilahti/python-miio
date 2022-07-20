@@ -136,24 +136,27 @@ class G1Status(DeviceStatus):
     def __init__(self, data):
         """Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
 
-        [
-            {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
-            {'did': 'charge_state', 'siid': 3, 'piid': 2, 'code': 0, 'value': 2},
-            {'did': 'error_code', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
-            {'did': 'state', 'siid': 2, 'piid': 1, 'code': 0, 'value': 5},
-            {'did': 'fan_speed', 'siid': 2, 'piid': 6, 'code': 0, 'value': 1},
-            {'did': 'operating_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
-            {'did': 'mop_state', 'siid': 16, 'piid': 1, 'code': 0, 'value': 0},
-            {'did': 'water_level', 'siid': 2, 'piid': 5, 'code': 0, 'value': 2},
-            {'did': 'main_brush_life_level', 'siid': 14, 'piid': 1, 'code': 0, 'value': 99},
-            {'did': 'main_brush_time_left', 'siid': 14, 'piid': 2, 'code': 0, 'value': 17959}
-            {'did': 'side_brush_life_level', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0 },
-            {'did': 'side_brush_time_left', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
-            {'did': 'filter_life_level', 'siid': 11, 'piid': 1, 'code': 0, 'value': 99},
-            {'did': 'filter_time_left', 'siid': 11, 'piid': 2, 'code': 0, 'value': 8959},
-            {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0},
-            {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
-            ]"""
+        Example::
+
+            [
+                 {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
+                 {'did': 'charge_state', 'siid': 3, 'piid': 2, 'code': 0, 'value': 2},
+                 {'did': 'error_code', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
+                 {'did': 'state', 'siid': 2, 'piid': 1, 'code': 0, 'value': 5},
+                 {'did': 'fan_speed', 'siid': 2, 'piid': 6, 'code': 0, 'value': 1},
+                 {'did': 'operating_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
+                 {'did': 'mop_state', 'siid': 16, 'piid': 1, 'code': 0, 'value': 0},
+                 {'did': 'water_level', 'siid': 2, 'piid': 5, 'code': 0, 'value': 2},
+                 {'did': 'main_brush_life_level', 'siid': 14, 'piid': 1, 'code': 0, 'value': 99},
+                 {'did': 'main_brush_time_left', 'siid': 14, 'piid': 2, 'code': 0, 'value': 17959}
+                 {'did': 'side_brush_life_level', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0 },
+                 {'did': 'side_brush_time_left', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
+                 {'did': 'filter_life_level', 'siid': 11, 'piid': 1, 'code': 0, 'value': 99},
+                 {'did': 'filter_time_left', 'siid': 11, 'piid': 2, 'code': 0, 'value': 8959},
+                 {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0},
+                 {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
+            ]
+        """
         self.data = data
 
     @property
@@ -248,12 +251,13 @@ class G1Status(DeviceStatus):
 class G1CleaningSummary(DeviceStatus):
     """Container for cleaning summary from Mijia Vacuum G1.
 
-    Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)
+    Response (MIoT format) of a Mijia Vacuum G1 (mijia.vacuum.v2)::
+
         [
-          {'did': 'total_clean_area', 'siid': 9, 'piid': 3, 'code': 0, 'value': 0},
-          {'did': 'total_clean_time', 'siid': 9, 'piid': 4, 'code': 0, 'value': 0},
-          {'did': 'total_clean_count', 'siid': 9, 'piid': 5, 'code': 0, 'value': 0}
-            ]
+            {'did': 'total_clean_area', 'siid': 9, 'piid': 3, 'code': 0, 'value': 0},
+            {'did': 'total_clean_time', 'siid': 9, 'piid': 4, 'code': 0, 'value': 0},
+            {'did': 'total_clean_count', 'siid': 9, 'piid': 5, 'code': 0, 'value': 0}
+        ]
     """
 
     def __init__(self, data) -> None:

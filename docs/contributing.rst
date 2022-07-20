@@ -115,10 +115,11 @@ Development checklist
 ---------------------
 
 1. All device classes are derived from either :class:`miio.device.Device` (for MiIO)
-   or :class:`miio.miot_device.MiotDevice` (for MiOT) (:ref:`Minimal example`).
+   or :class:`miio.miot_device.MiotDevice` (for MiOT) (:ref:`minimal_example`).
 2. All commands and their arguments should be decorated with `@command` decorator,
    which will make them accessible to `miiocli` (:ref:`miiocli`).
-3. All implementations must define :ref:`Device._supported_models` variable in the class
+3. All implementations must either include a model-keyed ``_mappings`` list (for MiOT),
+   or define ``Device._supported_models`` variable in the class (for MiIO).
    listing the known models (as reported by `info()`).
 4. Status containers is derived from `DeviceStatus` class and all properties should
    have type annotations for their return values.
@@ -127,12 +128,16 @@ Development checklist
    will be generated automatically.
 
 
+.. _minimal_example:
+
 Minimal example
 ~~~~~~~~~~~~~~~
 
 .. TODO::
     Add or link to an example.
 
+
+.. _miiocli:
 
 miiocli integration
 ~~~~~~~~~~~~~~~~~~~
