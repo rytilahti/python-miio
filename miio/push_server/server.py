@@ -30,27 +30,27 @@ class PushServer:
     """Async UDP push server acting as a fake miio device to handle event notifications
     from other devices.
 
-    Assuming you already have a miio_device class initialized:
+    Assuming you already have a miio_device class initialized::
 
-    # First create the push server
-    push_server = PushServer(miio_device.ip)
-    # Then start the server
-    await push_server.start()
-    # Register the miio device to the server and specify a callback function to receive events for this device
-    # The callback function schould have the form of "def callback_func(source_device, action, params):"
-    push_server.register_miio_device(miio_device, callback_func)
-    # create a EventInfo object with the information about the event you which to subscribe to (information taken from packet captures of automations in the mi home app)
-    event_info = EventInfo(
-        action="alarm_triggering",
-        extra="[1,19,1,111,[0,1],2,0]",
-        trigger_token=miio_device.token,
-    )
-    # Send a message to the miio_device to subscribe for the event to receive messages on the push_server
-    await loop.run_in_executor(None, push_server.subscribe_event, miio_device, event_info)
-    # Now you will see the callback function beeing called whenever the event occurs
-    await asyncio.sleep(30)
-    # When done stop the push_server, this will send messages to all subscribed miio_devices to unsubscribe all events
-    push_server.stop()
+        # First create the push server
+        push_server = PushServer(miio_device.ip)
+        # Then start the server
+        await push_server.start()
+        # Register the miio device to the server and specify a callback function to receive events for this device
+        # The callback function schould have the form of "def callback_func(source_device, action, params):"
+        push_server.register_miio_device(miio_device, callback_func)
+        # create a EventInfo object with the information about the event you which to subscribe to (information taken from packet captures of automations in the mi home app)
+        event_info = EventInfo(
+            action="alarm_triggering",
+            extra="[1,19,1,111,[0,1],2,0]",
+            trigger_token=miio_device.token,
+        )
+        # Send a message to the miio_device to subscribe for the event to receive messages on the push_server
+        await loop.run_in_executor(None, push_server.subscribe_event, miio_device, event_info)
+        # Now you will see the callback function beeing called whenever the event occurs
+        await asyncio.sleep(30)
+        # When done stop the push_server, this will send messages to all subscribed miio_devices to unsubscribe all events
+        push_server.stop()
     """
 
     def __init__(self, device_ip):

@@ -180,46 +180,46 @@ class RoidmiVacuumStatus(DeviceStatus):
 
     def __init__(self, data):
         """
-        Response (MIoT format) of a Roidme Eve Plus (roidmi.vacuum.v60)
-        [
-            {'did': 'battery_level', 'siid': 3, 'piid': 1},
-            {'did': 'charging_state', 'siid': 3, 'piid': 2},
-            {'did': 'error_code', 'siid': 2, 'piid': 2},
-            {'did': 'state', 'siid': 2, 'piid': 1},
-            {'did': 'filter_life_level', 'siid': 10, 'piid': 1},
-            {'did': 'filter_left_minutes', 'siid': 10, 'piid': 2},
-            {'did': 'main_brush_left_minutes', 'siid': 11, 'piid': 1},
-            {'did': 'main_brush_life_level', 'siid': 11, 'piid': 2},
-            {'did': 'side_brushes_left_minutes', 'siid': 12, 'piid': 1},
-            {'did': 'side_brushes_life_level', 'siid': 12, 'piid': 2},
-            {'did': 'sensor_dirty_time_left_minutes', 'siid': 15, 'piid': 1},
-            {'did': 'sensor_dirty_remaning_level', 'siid': 15, 'piid': 2},
-            {'did': 'sweep_mode', 'siid': 14, 'piid': 1},
-            {'did': 'fanspeed_mode', 'siid': 2, 'piid': 4},
-            {'did': 'sweep_type', 'siid': 2, 'piid': 8}
-            {'did': 'path_mode', 'siid': 13, 'piid': 8},
-            {'did': 'mop_present', 'siid': 8, 'piid': 1},
-            {'did': 'work_station_freq', 'siid': 8, 'piid': 2},
-            {'did': 'timing', 'siid': 8, 'piid': 6},
-            {'did': 'clean_area', 'siid': 8, 'piid': 7},
-            {'did': 'auto_boost', 'siid': 8, 'piid': 9},
-            {'did': 'forbid_mode', 'siid': 8, 'piid': 10},
-            {'did': 'water_level', 'siid': 8, 'piid': 11},
-            {'did': 'total_clean_time_sec', 'siid': 8, 'piid': 13},
-            {'did': 'total_clean_areas', 'siid': 8, 'piid': 14},
-            {'did': 'clean_counts', 'siid': 8, 'piid': 18},
-            {'did': 'clean_time_sec', 'siid': 8, 'piid': 19},
-            {'did': 'double_clean', 'siid': 8, 'piid': 20},
-            {'did': 'led_switch', 'siid': 8, 'piid': 22}
-            {'did': 'lidar_collision', 'siid': 8, 'piid': 23},
-            {'did': 'station_key', 'siid': 8, 'piid': 24},
-            {'did': 'station_led', 'siid': 8, 'piid': 25},
-            {'did': 'current_audio', 'siid': 8, 'piid': 26},
-            {'did': 'station_type', 'siid': 8, 'piid': 29},
-            {'did': 'volume', 'siid': 9, 'piid': 1},
-            {'did': 'mute', 'siid': 9, 'piid': 2}
-        ]
+        Response (MIoT format) of a Roidme Eve Plus (roidmi.vacuum.v60)::
 
+            [
+                 {'did': 'battery_level', 'siid': 3, 'piid': 1},
+                 {'did': 'charging_state', 'siid': 3, 'piid': 2},
+                 {'did': 'error_code', 'siid': 2, 'piid': 2},
+                 {'did': 'state', 'siid': 2, 'piid': 1},
+                 {'did': 'filter_life_level', 'siid': 10, 'piid': 1},
+                 {'did': 'filter_left_minutes', 'siid': 10, 'piid': 2},
+                 {'did': 'main_brush_left_minutes', 'siid': 11, 'piid': 1},
+                 {'did': 'main_brush_life_level', 'siid': 11, 'piid': 2},
+                 {'did': 'side_brushes_left_minutes', 'siid': 12, 'piid': 1},
+                 {'did': 'side_brushes_life_level', 'siid': 12, 'piid': 2},
+                 {'did': 'sensor_dirty_time_left_minutes', 'siid': 15, 'piid': 1},
+                 {'did': 'sensor_dirty_remaning_level', 'siid': 15, 'piid': 2},
+                 {'did': 'sweep_mode', 'siid': 14, 'piid': 1},
+                 {'did': 'fanspeed_mode', 'siid': 2, 'piid': 4},
+                 {'did': 'sweep_type', 'siid': 2, 'piid': 8}
+                 {'did': 'path_mode', 'siid': 13, 'piid': 8},
+                 {'did': 'mop_present', 'siid': 8, 'piid': 1},
+                 {'did': 'work_station_freq', 'siid': 8, 'piid': 2},
+                 {'did': 'timing', 'siid': 8, 'piid': 6},
+                 {'did': 'clean_area', 'siid': 8, 'piid': 7},
+                 {'did': 'auto_boost', 'siid': 8, 'piid': 9},
+                 {'did': 'forbid_mode', 'siid': 8, 'piid': 10},
+                 {'did': 'water_level', 'siid': 8, 'piid': 11},
+                 {'did': 'total_clean_time_sec', 'siid': 8, 'piid': 13},
+                 {'did': 'total_clean_areas', 'siid': 8, 'piid': 14},
+                 {'did': 'clean_counts', 'siid': 8, 'piid': 18},
+                 {'did': 'clean_time_sec', 'siid': 8, 'piid': 19},
+                 {'did': 'double_clean', 'siid': 8, 'piid': 20},
+                 {'did': 'led_switch', 'siid': 8, 'piid': 22}
+                 {'did': 'lidar_collision', 'siid': 8, 'piid': 23},
+                 {'did': 'station_key', 'siid': 8, 'piid': 24},
+                 {'did': 'station_led', 'siid': 8, 'piid': 25},
+                 {'did': 'current_audio', 'siid': 8, 'piid': 26},
+                 {'did': 'station_type', 'siid': 8, 'piid': 29},
+                 {'did': 'volume', 'siid': 9, 'piid': 1},
+                 {'did': 'mute', 'siid': 9, 'piid': 2}
+            ]
         """
         self.data = data
 
@@ -301,9 +301,18 @@ class RoidmiVacuumStatus(DeviceStatus):
 
     @property
     def timing(self) -> str:
-        """Repeated cleaning
-        Example: {"time":[[32400,1,3,0,[1,2,3,4,5],0,[12,10],null],[57600,0,1,2,[1,2,3,4,5,6,0],2,[],null]],"tz":2,"tzs":7200}
-        Cleaning 1:
+        """Repeated cleaning.
+
+        Example::
+
+            {"time":[
+                [32400,1,3,0,[1,2,3,4,5],0,[12,10],null],
+                [57600,0,1,2,[1,2,3,4,5,6,0],2,[],null]
+             ],
+             "tz":2,"tzs":7200
+            }
+
+        Cleaning 1::
             32400 = startTime(9:00)
             1=Enabled
             3=FanSpeed.Strong
@@ -312,7 +321,8 @@ class RoidmiVacuumStatus(DeviceStatus):
             0=WaterLevel
             [12,10]=List of rooms
             null: ?Might be related to "Customize"?
-        Cleaning 2:
+
+        Cleaning 2::
             57600 = startTime(16:00)
             0=Disabled
             1=FanSpeed.Silent
@@ -321,6 +331,7 @@ class RoidmiVacuumStatus(DeviceStatus):
             2=WaterLevel.Second
             []=All rooms
             null: ?Might be related to "Customize"?
+
         tz/tzs= time-zone
         """
         return self.data["timing"]

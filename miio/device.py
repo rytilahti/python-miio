@@ -232,7 +232,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         :param list properties: List of properties to query from the device.
         :param int max_properties: Number of properties that can be requested at once.
-        :return List of property values.
+        :return: List of property values.
         """
         _props = properties.copy()
         values = []

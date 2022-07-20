@@ -1,3 +1,5 @@
+:orphan:
+
 .. _legacy_token_extraction:
 
 Legacy methods for obtaining tokens

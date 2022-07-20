@@ -47,21 +47,21 @@ class OperationMode(enum.Enum):
 class AirHumidifierJsqsStatus(DeviceStatus):
     """Container for status reports from the air humidifier.
 
-    Xiaomi Mi Smart Humidifer S (deerma.humidifier.[jsqs, jsq5]) respone (MIoT format)
+    Xiaomi Mi Smart Humidifer S (deerma.humidifier.[jsqs, jsq5]) response (MIoT format)::
 
-    [
-        {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
-        {'did': 'fault', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
-        {'did': 'mode', 'siid': 2, 'piid': 5, 'code': 0, 'value': 1},
-        {'did': 'target_humidity', 'siid': 2, 'piid': 6, 'code': 0, 'value': 50},
-        {'did': 'relative_humidity', 'siid': 3, 'piid': 1, 'code': 0, 'value': 40},
-        {'did': 'temperature', 'siid': 3, 'piid': 7, 'code': 0, 'value': 22.7},
-        {'did': 'buzzer', 'siid': 5, 'piid': 1, 'code': 0, 'value': False},
-        {'did': 'led_light', 'siid': 6, 'piid': 1, 'code': 0, 'value': True},
-        {'did': 'water_shortage_fault', 'siid': 7, 'piid': 1, 'code': 0, 'value': False},
-        {'did': 'tank_filed', 'siid': 7, 'piid': 2, 'code': 0, 'value': False},
-        {'did': 'overwet_protect', 'siid': 7, 'piid': 3, 'code': 0, 'value': False}
-    ]
+        [
+            {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},
+            {'did': 'fault', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
+            {'did': 'mode', 'siid': 2, 'piid': 5, 'code': 0, 'value': 1},
+            {'did': 'target_humidity', 'siid': 2, 'piid': 6, 'code': 0, 'value': 50},
+            {'did': 'relative_humidity', 'siid': 3, 'piid': 1, 'code': 0, 'value': 40},
+            {'did': 'temperature', 'siid': 3, 'piid': 7, 'code': 0, 'value': 22.7},
+            {'did': 'buzzer', 'siid': 5, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'led_light', 'siid': 6, 'piid': 1, 'code': 0, 'value': True},
+            {'did': 'water_shortage_fault', 'siid': 7, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'tank_filed', 'siid': 7, 'piid': 2, 'code': 0, 'value': False},
+            {'did': 'overwet_protect', 'siid': 7, 'piid': 3, 'code': 0, 'value': False}
+        ]
     """
 
     def __init__(self, data: Dict[str, Any]) -> None:

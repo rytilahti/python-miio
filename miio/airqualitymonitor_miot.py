@@ -87,26 +87,25 @@ class DisplayTemperatureUnitCGDN1(enum.Enum):
 
 
 class AirQualityMonitorCGDN1Status(DeviceStatus):
-    """
-    Container of air quality monitor CGDN1 status.
+    """Container of air quality monitor CGDN1 status.
 
-    {
-      'humidity': 34,
-      'pm25': 18,
-      'pm10': 21,
-      'temperature': 22.8,
-      'co2': 468,
-      'battery': 37,
-      'charging_state': 0,
-      'voltage': 3564,
-      'start_time': 0,
-      'end_time': 0,
-      'monitoring_frequency': 1,
-      'screen_off': 300,
-      'device_off': 60,
-      'temperature_unit': 'c'
-    }
-
+    Example::
+        {
+        'humidity': 34,
+        'pm25': 18,
+        'pm10': 21,
+        'temperature': 22.8,
+        'co2': 468,
+        'battery': 37,
+        'charging_state': 0,
+        'voltage': 3564,
+        'start_time': 0,
+        'end_time': 0,
+        'monitoring_frequency': 1,
+        'screen_off': 300,
+        'device_off': 60,
+        'temperature_unit': 'c'
+        }
     """
 
     def __init__(self, data):

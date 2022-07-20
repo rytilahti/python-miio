@@ -192,7 +192,8 @@ class HuizuoStatus(DeviceStatus):
 class Huizuo(MiotDevice):
     """A basic support for Huizuo Lamps.
 
-    Example: response of a Huizuo Pisces For Bedroom (huayi.light.pis123)
+    Example response of a Huizuo Pisces For Bedroom (huayi.light.pis123)::
+
         {'id': 1, 'result': [
           {'did': '', 'siid': 2, 'piid': 1, 'code': 0, 'value': False},
           {'did': '', 'siid': 2, 'piid': 2, 'code': 0, 'value': 94},
@@ -200,14 +201,15 @@ class Huizuo(MiotDevice):
           ]
         }
 
-    Explanation (line-by-line):
+    Explanation (line-by-line)::
+
         power = '{"siid":2,"piid":1}' values = true,false
         brightless(%) = '{"siid":2,"piid":2}' values = 1-100
         color temperature(Kelvin) = '{"siid":2,"piid":3}' values = 3000-6400
 
-    This is basic response for all HUIZUO lamps
+    This is basic response for all HUIZUO lamps.
     Also some models supports additional properties, like for Fan or Heating management.
-    If your device does't support some properties, the 'None' will be returned
+    If your device does't support some properties, the 'None' will be returned.
     """
 
     mapping = _MAPPING

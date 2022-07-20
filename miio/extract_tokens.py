@@ -54,13 +54,13 @@ def read_android_yeelight(db) -> Iterator[DeviceConfig]:
 class BackupDatabaseReader:
     """Main class for reading backup files.
 
-    Example:
-    .. code-block:: python
+    Example::
+        .. code-block:: python
 
-        r = BackupDatabaseReader()
-        devices = r.read_tokens("/tmp/database.sqlite")
-        for dev in devices:
-            print("Got %s with token %s" % (dev.ip, dev.token)
+            r = BackupDatabaseReader()
+            devices = r.read_tokens("/tmp/database.sqlite")
+            for dev in devices:
+                print("Got %s with token %s" % (dev.ip, dev.token)
     """
 
     def __init__(self, dump_raw=False):
