@@ -1,8 +1,9 @@
-build:
-  image: latest
+version: 2
 
 python:
-  version: 3.7
-  pip_install: true
-  extra_requirements:
-    - docs
+  version: "3.9"
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
