@@ -15,6 +15,11 @@ class SingleFileHandler(BaseHTTPRequestHandler):
 
         super().__init__(request, client_address, server)
 
+    def send_error(self, *args, **kwargs):
+        """Dummy override to avoid crashing sphinx builds on invalid upstream
+        docstring."""
+        return super().send_error(*args, **kwargs)
+
     def handle_one_request(self):
         self.server.got_request = True
         self.raw_requestline = self.rfile.readline()
@@ -33,7 +38,7 @@ class SingleFileHandler(BaseHTTPRequestHandler):
 class OneShotServer:
     """A simple HTTP server for serving an update file.
 
-    The server will be started in an emphemeral port, and will only accept a single
+    The server will be started in an ephemeral port, and will only accept a single
     request to keep it simple.
     """
 
