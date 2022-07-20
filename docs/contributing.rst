@@ -78,13 +78,41 @@ Replace `$BROWSER` with your preferred browser, if the environment variable is n
 
 .. _new_devices:
 
-Adding support for new devices
-------------------------------
+Improving device support
+------------------------
+
+Whether adding support for a new device or improving an existing one,
+the journey begins by finding out the commands used to control the device.
+This usually involves capturing packet traces between the device and the official app,
+and analyzing those packet traces afterwards.
+The process is as follows:
+
+1. Install Android emulator (`BlueStacks emulator <https://www.bluestacks.com>`_ has been reported to work on Windows).
+2. Install the official Mi Home app in the emulator and set it up to use your device.
+3. Install `WireShark <https://www.wireshark.org>`_ (or use ``tcpdump`` on Linux) to capture the device traffic.
+4. Use the app to control the device and save the resulting PCAP file for later analyses.
+5. :ref:`Obtain the device token<obtaining_tokens>` in order to decrypt the traffic.
+6. Use ``devtools/parse_pcap.py`` script to parse the captured PCAP files.
+
+::
+
+    python devtools/parse_pcap.py <pcap file> --token <token>
+
+
+.. _miot:
+
+MiOT devices
+~~~~~~~~~~~~
+
+For MiOT devices it is possible to obtain the available commands from the cloud.
+The git repository contains a script, ``devtools/miottemplate.py``, that allows both
+downloading the description files and parsing them into more understandable form.
+
 
 .. _checklist:
 
 Development checklist
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 1. All device classes are derived from either :class:`miio.device.Device` (for MiIO)
    or :class:`miio.miot_device.MiotDevice` (for MiOT) (:ref:`Minimal example`).
@@ -135,16 +163,6 @@ is the main way for library users to access properties exposed by the device.
 The status container should inherit :class:`miio.device.DeviceStatus` to ensure a generic :meth:`__repr__`.
 
 
-
-MiIO devices
-~~~~~~~~~~~~
-
-.. TODO::
-    Add instructions how to extract protocol from network captures
-
-
-MiOT devices
-~~~~~~~~~~~~
 
 .. _adding_tests:
 

@@ -55,6 +55,8 @@ If the returned a token is with characters other than ``0``\ s or ``f``\ s,
 it is likely a valid token which can be used directly for communication.
 
 
+.. _obtaining_tokens:
+
 Obtaining tokens
 ================
 
