@@ -1,18 +1,18 @@
 # flake8: noqa
-try:
-    # python 3.7 and earlier
-    from importlib_metadata import version  # type: ignore
-except ImportError:
-    # python 3.8 and later
-    from importlib.metadata import version  # type: ignore
+from importlib.metadata import version  # type: ignore
 
 # Library imports need to be on top to avoid problems with
 # circular dependencies. As these do not change that often
 # they can be marked to be skipped for isort runs.
-from miio.device import Device, DeviceStatus  # isort: skip
-from miio.exceptions import DeviceError, DeviceException  # isort: skip
-from miio.miot_device import MiotDevice  # isort: skip
-from miio.deviceinfo import DeviceInfo  # isort: skip
+
+# isort: off
+
+from miio.device import Device, DeviceStatus
+from miio.exceptions import DeviceError, DeviceException
+from miio.miot_device import MiotDevice
+from miio.deviceinfo import DeviceInfo
+
+# isort: on
 
 # Integration imports
 from miio.airconditioner_miot import AirConditionerMiot
