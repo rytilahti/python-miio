@@ -39,6 +39,14 @@ class Device(metaclass=DeviceGroupMeta):
     _mappings: Dict[str, Any] = {}
     _supported_models: List[str] = []
 
+    def __init_subclass__(cls, **kwargs):
+        """Overridden to register all integrations to the factory."""
+        super().__init_subclass__(**kwargs)
+
+        from .devicefactory import DeviceFactory
+
+        DeviceFactory.register(cls)
+
     def __init__(
         self,
         ip: str = None,

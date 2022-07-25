@@ -8,7 +8,7 @@ import json
 import logging
 import re
 from functools import partial, wraps
-from typing import Callable, Set, Type, Union
+from typing import Any, Callable, ClassVar, Dict, List, Set, Type, Union
 
 import click
 
@@ -110,6 +110,8 @@ class GlobalContextObject:
 class DeviceGroupMeta(type):
 
     _device_classes: Set[Type] = set()
+    _supported_models: ClassVar[List[str]]
+    _mappings: ClassVar[Dict[str, Any]]
 
     def __new__(mcs, name, bases, namespace):
         commands = {}
@@ -146,9 +148,9 @@ class DeviceGroupMeta(type):
         return cls
 
     @property
-    def supported_models(cls):
+    def supported_models(cls) -> List[str]:
         """Return list of supported models."""
-        return cls._mappings.keys() or cls._supported_models
+        return list(cls._mappings.keys()) or cls._supported_models
 
 
 class DeviceGroup(click.MultiCommand):
