@@ -350,6 +350,19 @@ class TestAirPurifierVA2(TestCase):
         )
         assert status.filter_type == FilterType.AntiBacterial
 
+    def test_set_led_brightness(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led_brightness(LedBrightness.Bright)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led_brightness(LedBrightness.Dim)
+        assert led_brightness() == LedBrightness.Dim
+
+        self.device.set_led_brightness(LedBrightness.Off)
+        assert led_brightness() == LedBrightness.Off
+
     def test_set_anion(self):
         def anion():
             return self.device.status().anion
