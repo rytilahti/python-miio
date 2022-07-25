@@ -34,7 +34,7 @@ class ChuangmiIr(Device):
     _supported_models = [
         "chuangmi.ir.v2",
         "chuangmi.remote.v2",
-        "chuangmi-remote-h102a03",  # maybe?
+        "chuangmi.remote.h102a03",
     ]
 
     PRONTO_RE = re.compile(r"^([\da-f]{4}\s?){3,}([\da-f]{4})$", re.IGNORECASE)
