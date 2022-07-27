@@ -167,6 +167,7 @@ class DeviceGroup(click.MultiCommand):
             self.kwargs.setdefault("help", self.func.__doc__)
 
             def _autodetect_model_if_needed(func):
+                @wraps(func)
                 def _wrap(self, *args, **kwargs):
                     skip_autodetect = func._device_group_command.kwargs.pop(
                         "skip_autodetect", False
