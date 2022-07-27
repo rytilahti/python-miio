@@ -1,4 +1,4 @@
-"""Xiaomi Chuangmi camera (chuangmi.camera.ipc009, ipc019) support."""
+"""Xiaomi Chuangmi camera (chuangmi.camera.ipc009, ipc013, ipc019, 038a2) support."""
 
 import enum
 import logging
@@ -66,6 +66,7 @@ CONST_LOW_SENSITIVITY = [MotionDetectionSensitivity.Low] * 32
 
 SUPPORTED_MODELS = [
     "chuangmi.camera.ipc009",
+    "chuangmi.camera.ipc013",
     "chuangmi.camera.ipc019",
     "chuangmi.camera.038a2",
 ]
