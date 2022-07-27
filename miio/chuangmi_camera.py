@@ -4,6 +4,10 @@ import enum
 import logging
 from typing import Any, Dict
 
+import ipaddress
+import socket
+from urllib.parse import urlparse
+
 import click
 
 from .click_common import EnumType, command, format_output
@@ -362,7 +366,7 @@ class ChuangmiCamera(Device):
 
     @command(
         click.argument("state", type=EnumType(NASState)),
-        click.argument("share"),
+        click.argument("share", type=click.STRING),
         click.argument("sync-interval", type=EnumType(NASSyncInterval)),
         click.argument("video-retention-time", type=EnumType(NASVideoRetentionTime)),
         default_output=format_output("Setting NAS config to '{state.name}'"),
@@ -375,13 +379,29 @@ class ChuangmiCamera(Device):
         video_retention_time: NASVideoRetentionTime = NASVideoRetentionTime.Week,
     ):
         """Set NAS configuration."""
-        if share is None:
-            share = {}
-        return self.send(
-            "nas_set_config",
-            {
-                "state": state,
-                "sync_interval": sync_interval,
-                "video_retention_time": video_retention_time,
-            },
-        )
+        share_obj = None
+        share = urlparse(share)
+        if share.scheme == "smb":
+            ip = socket.gethostbyname(share.hostname)
+            reversed_ip = ".".join(reversed(ip.split(".")))
+            addr = int(ipaddress.ip_address(reversed_ip))
+
+            share_obj = {
+                "type": 1,
+                "name": share.hostname,
+                "addr": addr,
+                "dir": share.path.lstrip('/'),
+                "group": "WORKGROUP",
+                "user": share.username,
+                "pass": share.password,
+            }
+        
+        params = {
+            "state": state,
+            "sync_interval": sync_interval,
+            "video_retention_time": video_retention_time,
+        }
+        if share_obj != None:
+            params["share"] = share_obj
+        
+        return self.send("nas_set_config", params)
