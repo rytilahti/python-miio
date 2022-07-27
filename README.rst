@@ -116,6 +116,7 @@ Supported devices
 -  Xiaomi Mi Home (Mijia) G1 Robot Vacuum Mop MJSTG1
 -  Xiaomi Roidmi Eve
 -  Xiaomi Mi Smart WiFi Socket
+-  Xiaomi Chuangmi camera (chuangmi.camera.ipc009, ipc013, ipc019, 038a2)
 -  Xiaomi Chuangmi Plug V1 (1 Socket, 1 USB Port)
 -  Xiaomi Chuangmi Plug V3 (1 Socket, 2 USB Ports)
 -  Xiaomi Smart Power Strip V1 and V2 (WiFi, 6 Ports)
