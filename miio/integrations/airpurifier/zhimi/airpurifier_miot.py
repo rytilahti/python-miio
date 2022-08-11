@@ -186,7 +186,7 @@ _MAPPING_RMB1 = {
     "child_lock": {"siid": 8, "piid": 1},
     # custom-service
     "motor_speed": {"siid": 9, "piid": 1},
-    "favorite_level": {"siid": 9, "piid": 5},
+    "favorite_level": {"siid": 9, "piid": 11},
     # aqi
     "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
     # Screen
