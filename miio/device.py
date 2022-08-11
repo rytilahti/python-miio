@@ -37,7 +37,7 @@ class DeviceStatus:
             name, prop = prop_tuple
             try:
                 # ignore deprecation warnings
-                with warnings.catch_warnings():
+                with warnings.catch_warnings(record=True):
                     prop_value = prop.fget(self)
             except Exception as ex:
                 prop_value = ex.__class__.__name__
