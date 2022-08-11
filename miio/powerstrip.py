@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceStatus
+from .device import Device, DeviceStatus, sensor
 from .exceptions import DeviceException
 from .utils import deprecated
 
@@ -65,16 +65,19 @@ class PowerStripStatus(DeviceStatus):
         return self.data["power"]
 
     @property
+    @sensor(name="Power")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @sensor(name="Temperature", unit="C", icon="mdi:thermometer")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
 
     @property
+    @sensor(name="Current", unit="A", icon="mdi:current-ac")
     def current(self) -> Optional[float]:
         """Current, if available.
 
@@ -85,6 +88,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Load power", unit="W")
     def load_power(self) -> Optional[float]:
         """Current power load, if available."""
         if self.data["power_consume_rate"] is not None:
@@ -105,6 +109,7 @@ class PowerStripStatus(DeviceStatus):
         return self.led
 
     @property
+    @sensor(name="LED", icon="mdi:led-outline")
     def led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
@@ -119,6 +124,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Leakage current", unit="A")
     def leakage_current(self) -> Optional[int]:
         """The leakage current, if available."""
         if "elec_leakage" in self.data and self.data["elec_leakage"] is not None:
@@ -126,6 +132,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Voltage", unit="V")
     def voltage(self) -> Optional[float]:
         """The voltage, if available."""
         if "voltage" in self.data and self.data["voltage"] is not None:
@@ -133,6 +140,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Power Factor", unit="%")
     def power_factor(self) -> Optional[float]:
         """The power factor, if available."""
         if "power_factor" in self.data and self.data["power_factor"] is not None:
