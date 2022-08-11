@@ -3,11 +3,26 @@ import logging
 import warnings
 from enum import Enum
 from pprint import pformat as pf
-from typing import Any, Dict, List, Optional  # noqa: F401
+from typing import (  # noqa: F401
+    Any,
+    Dict,
+    List,
+    Optional,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
+from .descriptors import (
+    ButtonDescriptor,
+    SensorDescriptor,
+    SettingDescriptor,
+    SwitchDescriptor,
+)
 from .deviceinfo import DeviceInfo
 from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 from .miioprotocol import MiIOProtocol
@@ -22,11 +37,68 @@ class UpdateState(Enum):
     Idle = "idle"
 
 
-class DeviceStatus:
+def sensor(*, name: str, icon: str = "mdi:sensor", unit: str = "", **kwargs):
+    """Decorator helper to create sensordescriptors for status classes.
+
+    The information can be used by users of the library to programatically find out what
+    types of sensors are available for the device.
+    """
+
+    def decorator_sensor(func):
+        property_name = func.__name__
+
+        def _sensor_type_for_return_type(func):
+            rtype = get_type_hints(func).get("return")
+            if get_origin(rtype) is Union:  # Unwrap Optional[]
+                rtype, _ = get_args(rtype)
+
+            if rtype == bool:
+                return "binary"
+            else:
+                return "sensor"
+
+        sensor_type = _sensor_type_for_return_type(func)
+        descriptor = SensorDescriptor(
+            id=str(property_name),
+            property=str(property_name),
+            name=name,
+            icon=icon,
+            unit=unit,
+            type=sensor_type,
+            **kwargs,
+        )
+        func._sensor = descriptor
+
+        return func
+
+    return decorator_sensor
+
+
+class _StatusMeta(type):
+    """Meta class to provide introspectable properties."""
+
+    def __new__(metacls, name, bases, namespace, **kwargs):
+        cls = super().__new__(metacls, name, bases, namespace)
+        cls._sensors = []
+        for n in namespace:
+            prop = getattr(namespace[n], "fget", None)
+            if prop:
+                sensor = getattr(prop, "_sensor", None)
+                if sensor:
+                    _LOGGER.debug(f"Found sensor: {sensor} for {name}")
+                    cls._sensors.append(sensor)
+
+        return cls
+
+
+class DeviceStatus(metaclass=_StatusMeta):
     """Base class for status containers.
 
-    All status container classes should inherit from this class. The __repr__
-    implementation returns all defined properties and their values.
+    All status container classes should inherit from this class:
+
+    * This class allows downstream users to access the available information in an
+      introspectable way.
+    * The __repr__ implementation returns all defined properties and their values.
     """
 
     def __repr__(self):
@@ -45,6 +117,13 @@ class DeviceStatus:
             s += f" {name}={prop_value}"
         s += ">"
         return s
+
+    def sensors(self):
+        """Return the list of sensors exposed by the status container.
+
+        You can use @sensor decorator to define sensors inside your status class.
+        """
+        return self._sensors
 
 
 class Device(metaclass=DeviceGroupMeta):
@@ -346,6 +425,28 @@ class Device(metaclass=DeviceGroupMeta):
         click.echo(f"Max properties: {max_properties}")
 
         return "Done"
+
+    def status(self) -> DeviceStatus:
+        """Return device status."""
+        raise NotImplementedError()
+
+    def buttons(self) -> List[ButtonDescriptor]:
+        """Return a list of button-like, clickable actions of the device."""
+        return []
+
+    def settings(self) -> List[SettingDescriptor]:
+        """Return list of settings."""
+        return []
+
+    def sensors(self) -> List[SensorDescriptor]:
+        """Return list of sensors."""
+        # TODO: the latest status should be cached and re-used by all meta information getters
+        sensors = self.status().sensors()
+        return sensors
+
+    def switches(self) -> List[SwitchDescriptor]:
+        """Return list of toggleable switches."""
+        return []
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
