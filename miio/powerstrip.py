@@ -6,7 +6,8 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceStatus, sensor
+from .device import Device
+from .devicestatus import DeviceStatus, sensor
 from .exceptions import DeviceException
 from .utils import deprecated
 
