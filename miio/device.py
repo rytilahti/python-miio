@@ -1,14 +1,19 @@
-import inspect
 import logging
-import warnings
 from enum import Enum
 from pprint import pformat as pf
-from typing import Any, Dict, List, Optional  # noqa: F401
+from typing import Any, Dict, List, Optional, Union  # noqa: F401
 
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
+from .descriptors import (
+    ButtonDescriptor,
+    SensorDescriptor,
+    SettingDescriptor,
+    SwitchDescriptor,
+)
 from .deviceinfo import DeviceInfo
+from .devicestatus import DeviceStatus
 from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 from .miioprotocol import MiIOProtocol
 
@@ -20,31 +25,6 @@ class UpdateState(Enum):
     Installing = "installing"
     Failed = "failed"
     Idle = "idle"
-
-
-class DeviceStatus:
-    """Base class for status containers.
-
-    All status container classes should inherit from this class. The __repr__
-    implementation returns all defined properties and their values.
-    """
-
-    def __repr__(self):
-        props = inspect.getmembers(self.__class__, lambda o: isinstance(o, property))
-
-        s = f"<{self.__class__.__name__}"
-        for prop_tuple in props:
-            name, prop = prop_tuple
-            try:
-                # ignore deprecation warnings
-                with warnings.catch_warnings(record=True):
-                    prop_value = prop.fget(self)
-            except Exception as ex:
-                prop_value = ex.__class__.__name__
-
-            s += f" {name}={prop_value}"
-        s += ">"
-        return s
 
 
 class Device(metaclass=DeviceGroupMeta):
@@ -346,6 +326,28 @@ class Device(metaclass=DeviceGroupMeta):
         click.echo(f"Max properties: {max_properties}")
 
         return "Done"
+
+    def status(self) -> DeviceStatus:
+        """Return device status."""
+        raise NotImplementedError()
+
+    def buttons(self) -> List[ButtonDescriptor]:
+        """Return a list of button-like, clickable actions of the device."""
+        return []
+
+    def settings(self) -> List[SettingDescriptor]:
+        """Return list of settings."""
+        return []
+
+    def sensors(self) -> Dict[str, SensorDescriptor]:
+        """Return list of sensors."""
+        # TODO: the latest status should be cached and re-used by all meta information getters
+        sensors = self.status().sensors()
+        return sensors
+
+    def switches(self) -> List[SwitchDescriptor]:
+        """Return list of toggleable switches."""
+        return []
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"

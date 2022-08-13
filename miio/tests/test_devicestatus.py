@@ -1,4 +1,5 @@
 from miio import DeviceStatus
+from miio.devicestatus import sensor
 
 
 def test_multiple():
@@ -64,3 +65,33 @@ def test_none():
             return None
 
     assert repr(NoneStatus()) == "<NoneStatus return_none=None>"
+
+
+def test_sensor_decorator():
+    class DecoratedProps(DeviceStatus):
+        @property
+        @sensor(name="Voltage", unit="V")
+        def all_kwargs(self):
+            pass
+
+        @property
+        @sensor(name="Only name")
+        def only_name(self):
+            pass
+
+        @property
+        @sensor(name="", unknown_kwarg="123")
+        def unknown(self):
+            pass
+
+    status = DecoratedProps()
+    sensors = status.sensors()
+    assert len(sensors) == 3
+
+    all_kwargs = sensors["all_kwargs"]
+    assert all_kwargs.name == "Voltage"
+    assert all_kwargs.unit == "V"
+
+    assert sensors["only_name"].name == "Only name"
+
+    assert "unknown_kwarg" in sensors["unknown"].extras

@@ -114,16 +114,17 @@ downloading the description files and parsing them into more understandable form
 Development checklist
 ---------------------
 
-1. All device classes are derived from either :class:`miio.device.Device` (for MiIO)
-   or :class:`miio.miot_device.MiotDevice` (for MiOT) (:ref:`minimal_example`).
-2. All commands and their arguments should be decorated with `@command` decorator,
+1. All device classes are derived from either :class:`~miio.device.Device` (for MiIO)
+   or :class:`~miio.miot_device.MiotDevice` (for MiOT) (:ref:`minimal_example`).
+2. All commands and their arguments should be decorated with :meth:`@command <miio.click_common.command>` decorator,
    which will make them accessible to `miiocli` (:ref:`miiocli`).
-3. All implementations must either include a model-keyed ``_mappings`` list (for MiOT),
-   or define ``Device._supported_models`` variable in the class (for MiIO).
-   listing the known models (as reported by `info()`).
-4. Status containers is derived from `DeviceStatus` class and all properties should
-   have type annotations for their return values.
-5. Creating tests (:ref:`adding_tests`).
+3. All implementations must either include a model-keyed :obj:`~miio.device.Device._mappings` list (for MiOT),
+   or define :obj:`~miio.device.Device._supported_models` variable in the class (for MiIO).
+   listing the known models (as reported by :meth:`~miio.device.Device.info()`).
+4. Status containers is derived from :class:`~miio.devicestatus.DeviceStatus` class and all properties should
+   have type annotations for their return values. The information that can be displayed
+   directly to users should be decorated using `@sensor` to make them discoverable (:ref:`status_containers`).
+5. Add tests at least for the status container handling (:ref:`adding_tests`).
 6. Updating documentation is generally not needed as the API documentation
    will be generated automatically.
 
@@ -160,14 +161,36 @@ Produces a command ``miiocli example`` command requiring an argument
 that is passed to the method as string, and an optional integer argument.
 
 
+.. _status_containers:
+
 Status containers
 ~~~~~~~~~~~~~~~~~
 
 The status container (returned by `status()` method of the device class)
 is the main way for library users to access properties exposed by the device.
-The status container should inherit :class:`miio.device.DeviceStatus` to ensure a generic :meth:`__repr__`.
+The status container should inherit :class:`~miio.devicestatus.DeviceStatus`.
+This ensures a generic :meth:`__repr__` that is helpful for debugging,
+and allows defining properties that are especially interesting for end users.
+
+The properties can be decorated with :meth:`@sensor <miio.devicestatus.sensor>` decorator to
+define meta information that enables introspection and programatic creation of user interface elements.
+This will create :class:`~miio.descriptors.SensorDescriptor` objects that are accessible
+using :meth:`~miio.device.Device.sensors`.
+
+.. code-block:: python
+
+    @property
+    @sensor(name="Voltage", unit="V")
+    def voltage(self) -> Optional[float]:
+        """Return the voltage, if available."""
+        pass
 
 
+Note, that all keywords not defined in the descriptor class will be contained
+inside :attr:`~miio.descriptors.SensorDescriptor.extras` variable.
+This information can be used to pass information to the downstream users,
+see the source of :class:`miio.powerstrip.PowerStripStatus` for example of how to pass
+device class information to Home Assistant.
 
 .. _adding_tests:
 
