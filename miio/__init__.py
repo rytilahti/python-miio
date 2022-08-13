@@ -7,7 +7,8 @@ from importlib.metadata import version  # type: ignore
 
 # isort: off
 
-from miio.device import Device, DeviceStatus
+from miio.device import Device
+from miio.devicestatus import DeviceStatus
 from miio.exceptions import DeviceError, DeviceException
 from miio.miot_device import MiotDevice
 from miio.deviceinfo import DeviceInfo

@@ -88,7 +88,7 @@ def sensor(*, name: str, icon: str = "mdi:sensor", unit: str = "", **kwargs):
             icon=icon,
             unit=unit,
             type=sensor_type,
-            **kwargs,
+            extras=kwargs,
         )
         func._sensor = descriptor
 

@@ -8,7 +8,7 @@ but developers can override :func:buttons(), :func:sensors(), .. to expose more 
 """
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional
 
 
 @dataclass
@@ -27,6 +27,7 @@ class SensorDescriptor:
     property: str
     icon: Optional[str] = None
     unit: Optional[str] = None
+    extras: Optional[Dict] = None
 
 
 @dataclass
