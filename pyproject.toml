@@ -105,8 +105,9 @@ exclude_lines = [
   "def __repr__"
 ]
 
-[tool.check-manifest]
-ignore = ["devtools/*"]
+[tool.mypy]
+# disables "Decorated property not supported", see https://github.com/python/mypy/issues/1362
+disable_error_code = "misc"
 
 [build-system]
 requires = ["poetry-core"]
