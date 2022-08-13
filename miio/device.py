@@ -339,7 +339,7 @@ class Device(metaclass=DeviceGroupMeta):
         """Return list of settings."""
         return []
 
-    def sensors(self) -> List[SensorDescriptor]:
+    def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return list of sensors."""
         # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.status().sensors()

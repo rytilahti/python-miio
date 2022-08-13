@@ -1,7 +1,7 @@
 import inspect
 import logging
 import warnings
-from typing import Union, get_args, get_origin, get_type_hints
+from typing import Dict, Union, get_args, get_origin, get_type_hints
 
 from .descriptors import SensorDescriptor
 
@@ -13,14 +13,14 @@ class _StatusMeta(type):
 
     def __new__(metacls, name, bases, namespace, **kwargs):
         cls = super().__new__(metacls, name, bases, namespace)
-        cls._sensors = []
+        cls._sensors: Dict[str, SensorDescriptor] = {}
         for n in namespace:
             prop = getattr(namespace[n], "fget", None)
             if prop:
                 sensor = getattr(prop, "_sensor", None)
                 if sensor:
                     _LOGGER.debug(f"Found sensor: {sensor} for {name}")
-                    cls._sensors.append(sensor)
+                    cls._sensors[n] = sensor
 
         return cls
 
@@ -52,12 +52,12 @@ class DeviceStatus(metaclass=_StatusMeta):
         s += ">"
         return s
 
-    def sensors(self):
-        """Return the list of sensors exposed by the status container.
+    def sensors(self) -> Dict[str, SensorDescriptor]:
+        """Return the dict of sensors exposed by the status container.
 
         You can use @sensor decorator to define sensors inside your status class.
         """
-        return self._sensors
+        return self._sensors  # type: ignore[attr-defined]
 
 
 def sensor(*, name: str, icon: str = "mdi:sensor", unit: str = "", **kwargs):
