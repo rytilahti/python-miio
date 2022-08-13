@@ -44,7 +44,9 @@ class SwitchDescriptor:
     id: str
     name: str
     property: str
-    setter: Callable
+    setter_name: str
+    setter: Optional[Callable] = None
+    extras: Optional[Dict] = None
 
 
 @dataclass
