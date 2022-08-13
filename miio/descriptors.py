@@ -16,7 +16,7 @@ class ButtonDescriptor:
     id: str
     name: str
     method: Callable
-    icon: Optional[str] = None
+    extras: Optional[Dict] = None
 
 
 @dataclass
@@ -25,7 +25,6 @@ class SensorDescriptor:
     type: str
     name: str
     property: str
-    icon: Optional[str] = None
     unit: Optional[str] = None
     extras: Optional[Dict] = None
 
@@ -38,7 +37,6 @@ class SwitchDescriptor:
     name: str
     property: str
     setter: Callable
-    icon: Optional[str] = None
 
 
 @dataclass
@@ -50,7 +48,6 @@ class SettingDescriptor:
     property: str
     setter: Callable
     unit: str
-    icon: str
 
 
 class SettingType(Enum):
@@ -65,6 +62,7 @@ class EnumSettingDescriptor(SettingDescriptor):
 
     choices: List
     type: SettingType = SettingType.Enum
+    extras: Optional[Dict] = None
 
 
 @dataclass
@@ -75,3 +73,4 @@ class NumberSettingDescriptor(SettingDescriptor):
     max_value: int
     step: int
     type: SettingType = SettingType.Number
+    extras: Optional[Dict] = None

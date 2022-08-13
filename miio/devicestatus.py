@@ -85,7 +85,6 @@ def sensor(*, name: str, icon: str = "mdi:sensor", unit: str = "", **kwargs):
             id=str(property_name),
             property=str(property_name),
             name=name,
-            icon=icon,
             unit=unit,
             type=sensor_type,
             extras=kwargs,

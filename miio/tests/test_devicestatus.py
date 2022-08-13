@@ -70,7 +70,7 @@ def test_none():
 def test_sensor_decorator():
     class DecoratedProps(DeviceStatus):
         @property
-        @sensor(name="Voltage", unit="V", icon="foo")
+        @sensor(name="Voltage", unit="V")
         def all_kwargs(self):
             pass
 
@@ -91,7 +91,6 @@ def test_sensor_decorator():
     all_kwargs = sensors["all_kwargs"]
     assert all_kwargs.name == "Voltage"
     assert all_kwargs.unit == "V"
-    assert all_kwargs.icon == "foo"
 
     assert sensors["only_name"].name == "Only name"
 
