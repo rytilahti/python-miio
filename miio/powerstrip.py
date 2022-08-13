@@ -72,13 +72,13 @@ class PowerStripStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    @sensor(name="Temperature", unit="C", icon="mdi:thermometer")
+    @sensor(name="Temperature", unit="C", device_class="temperature")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
 
     @property
-    @sensor(name="Current", unit="A", icon="mdi:current-ac")
+    @sensor(name="Current", unit="A", device_class="current")
     def current(self) -> Optional[float]:
         """Current, if available.
 
@@ -89,7 +89,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
-    @sensor(name="Load power", unit="W")
+    @sensor(name="Load power", unit="W", device_class="power")
     def load_power(self) -> Optional[float]:
         """Current power load, if available."""
         if self.data["power_consume_rate"] is not None:
@@ -125,7 +125,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
-    @sensor(name="Leakage current", unit="A")
+    @sensor(name="Leakage current", unit="A", device_class="current")
     def leakage_current(self) -> Optional[int]:
         """The leakage current, if available."""
         if "elec_leakage" in self.data and self.data["elec_leakage"] is not None:
@@ -133,7 +133,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
-    @sensor(name="Voltage", unit="V")
+    @sensor(name="Voltage", unit="V", device_class="voltage")
     def voltage(self) -> Optional[float]:
         """The voltage, if available."""
         if "voltage" in self.data and self.data["voltage"] is not None:
@@ -141,7 +141,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
-    @sensor(name="Power Factor", unit="%")
+    @sensor(name="Power Factor", unit="%", device_class="power_factor")
     def power_factor(self) -> Optional[float]:
         """The power factor, if available."""
         if "power_factor" in self.data and self.data["power_factor"] is not None:
