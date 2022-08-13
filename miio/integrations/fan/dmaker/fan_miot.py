@@ -101,8 +101,8 @@ SUPPORTED_ANGLES = {
     MODEL_FAN_P9: [30, 60, 90, 120, 150],
     MODEL_FAN_P10: [30, 60, 90, 120, 140],
     MODEL_FAN_P11: [30, 60, 90, 120, 140],
-    MODEL_FAN_P15: [30, 60, 90, 120, 140], # mapped to P11
-    MODEL_FAN_P18: [30, 60, 90, 120, 140], # mapped to P10
+    MODEL_FAN_P15: [30, 60, 90, 120, 140],  # mapped to P11
+    MODEL_FAN_P18: [30, 60, 90, 120, 140],  # mapped to P10
     MODEL_FAN_P33: [30, 60, 90, 120, 140],
 }
 
