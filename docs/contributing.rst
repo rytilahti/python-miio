@@ -186,6 +186,11 @@ using :meth:`~miio.device.Device.sensors`.
         pass
 
 
+Note, that all keywords not defined in the descriptor class will be contained
+inside :attr:`~miio.descriptors.SensorDescriptor.extras` variable.
+This information can be used to pass information to the downstream users,
+see the source of :class:`miio.powerstrip.PowerStripStatus` for example of how to pass
+device class information to Home Assistant.
 
 .. _adding_tests:
 

@@ -21,6 +21,14 @@ class ButtonDescriptor:
 
 @dataclass
 class SensorDescriptor:
+    """Describes a sensor exposed by the device.
+
+    This information can be used by library users to programatically
+    access information what types of data is available to display to users.
+
+    Prefer :meth:`@sensor <miio.devicestatus.sensor>` for constructing these.
+    """
+
     id: str
     type: str
     name: str

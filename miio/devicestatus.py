@@ -60,11 +60,15 @@ class DeviceStatus(metaclass=_StatusMeta):
         return self._sensors  # type: ignore[attr-defined]
 
 
-def sensor(*, name: str, icon: str = "mdi:sensor", unit: str = "", **kwargs):
-    """Decorator helper to create sensordescriptors for status classes.
+def sensor(*, name: str, unit: str = "", **kwargs):
+    """Syntactic sugar to create SensorDescriptor objects.
 
     The information can be used by users of the library to programatically find out what
     types of sensors are available for the device.
+
+    The interface is kept minimal, but you can pass any extra keyword arguments.
+    These extras are made accessible over :attr:`~miio.descriptors.SensorDescriptor.extras`,
+    and can be interpreted downstream users as they wish.
     """
 
     def decorator_sensor(func):
