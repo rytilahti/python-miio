@@ -73,7 +73,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         return self._switches  # type: ignore[attr-defined]
 
 
-def sensor(*, name: str, unit: str = "", **kwargs):
+def sensor(name: str, *, unit: str = "", **kwargs):
     """Syntactic sugar to create SensorDescriptor objects.
 
     The information can be used by users of the library to programatically find out what
@@ -113,7 +113,7 @@ def sensor(*, name: str, unit: str = "", **kwargs):
     return decorator_sensor
 
 
-def switch(*, name: str, setter_name: str, **kwargs):
+def switch(name: str, *, setter_name: str, **kwargs):
     """Syntactic sugar to create SwitchDescriptor objects.
 
     The information can be used by users of the library to programatically find out what
