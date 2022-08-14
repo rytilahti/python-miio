@@ -340,14 +340,19 @@ class Device(metaclass=DeviceGroupMeta):
         return []
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
-        """Return list of sensors."""
+        """Return sensors."""
         # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.status().sensors()
         return sensors
 
-    def switches(self) -> List[SwitchDescriptor]:
-        """Return list of toggleable switches."""
-        return []
+    def switches(self) -> Dict[str, SwitchDescriptor]:
+        """Return toggleable switches."""
+        switches = self.status().switches()
+        for switch in switches.values():
+            # TODO: Bind setter methods, this should probably done only once during init.
+            switch.setter = getattr(self, switch.setter_name)
+
+        return switches
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"

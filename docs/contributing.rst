@@ -122,8 +122,9 @@ Development checklist
    or define :obj:`~miio.device.Device._supported_models` variable in the class (for MiIO).
    listing the known models (as reported by :meth:`~miio.device.Device.info()`).
 4. Status containers is derived from :class:`~miio.devicestatus.DeviceStatus` class and all properties should
-   have type annotations for their return values. The information that can be displayed
-   directly to users should be decorated using `@sensor` to make them discoverable (:ref:`status_containers`).
+   have type annotations for their return values. The information that should be exposed directly
+   to end users should be decorated using appropriate decorators (e.g., `@sensor` or `@switch`) to make
+   them discoverable (:ref:`status_containers`).
 5. Add tests at least for the status container handling (:ref:`adding_tests`).
 6. Updating documentation is generally not needed as the API documentation
    will be generated automatically.
@@ -172,25 +173,54 @@ The status container should inherit :class:`~miio.devicestatus.DeviceStatus`.
 This ensures a generic :meth:`__repr__` that is helpful for debugging,
 and allows defining properties that are especially interesting for end users.
 
-The properties can be decorated with :meth:`@sensor <miio.devicestatus.sensor>` decorator to
-define meta information that enables introspection and programatic creation of user interface elements.
-This will create :class:`~miio.descriptors.SensorDescriptor` objects that are accessible
-using :meth:`~miio.device.Device.sensors`.
+The properties can be decorated using special decorators to define meta information
+that enables introspection and programatic creation of user interface elements.
+
+.. note::
+
+    The helper decorators are just syntactic sugar to create the corresponding descriptor classes
+    and binding them to the status class.
+
+
+Sensors
+"""""""
+
+Use :meth:`@sensor <miio.devicestatus.sensor>` to create :class:`~miio.descriptors.SensorDescriptor`
+objects for the status container.
+This will make all decorated sensors accessible through :meth:`~miio.device.Device.sensors` for downstream users.
 
 .. code-block:: python
 
     @property
-    @sensor(name="Voltage", unit="V")
+    @sensor(name="Voltage", unit="V", some_kwarg_for_downstream="hi there")
     def voltage(self) -> Optional[float]:
         """Return the voltage, if available."""
-        pass
+
+.. note::
+
+    All keywords arguments not defined in the decorator signature will be available
+    through the :attr:`~miio.descriptors.SensorDescriptor.extras` variable.
+
+    This information can be used to pass information to the downstream users,
+    see the source of :class:`miio.powerstrip.PowerStripStatus` for example of how to pass
+    device class information to Home Assistant.
 
 
-Note, that all keywords not defined in the descriptor class will be contained
-inside :attr:`~miio.descriptors.SensorDescriptor.extras` variable.
-This information can be used to pass information to the downstream users,
-see the source of :class:`miio.powerstrip.PowerStripStatus` for example of how to pass
-device class information to Home Assistant.
+Switches
+""""""""
+
+Use :meth:`@switch <miio.devicestatus.switch>` to create :class:`~miio.descriptors.SwitchDescriptor` objects.
+This will make all decorated sensors accessible through :meth:`~miio.device.Device.switches` for downstream users.
+
+.. code-block::
+
+    @property
+    @switch(name="Power", setter_name="set_power")
+    def power(self) -> bool:
+        """Return if device is turned on."""
+
+The mandatory *setter_name* will be used to bind the method to be accessible using
+the :meth:`~miio.descriptors.SwitchDescriptor.setter` callable.
 
 .. _adding_tests:
 
