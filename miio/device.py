@@ -335,9 +335,20 @@ class Device(metaclass=DeviceGroupMeta):
         """Return a list of button-like, clickable actions of the device."""
         return []
 
-    def settings(self) -> List[SettingDescriptor]:
+    def settings(self) -> Dict[str, SettingDescriptor]:
         """Return list of settings."""
-        return []
+        settings = self.status().settings()
+        for setting in settings.values():
+            # TODO: Bind setter methods, this should probably done only once during init.
+            if setting.setter is None and setting.setter_name is not None:
+                setting.setter = getattr(self, setting.setter_name)
+            else:
+                # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
+                raise Exception(
+                    f"Neither setter or setter_name was defined for {setting}"
+                )
+
+        return settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return sensors."""
@@ -350,7 +361,13 @@ class Device(metaclass=DeviceGroupMeta):
         switches = self.status().switches()
         for switch in switches.values():
             # TODO: Bind setter methods, this should probably done only once during init.
-            switch.setter = getattr(self, switch.setter_name)
+            if switch.setter is None and switch.setter_name is not None:
+                switch.setter = getattr(self, switch.setter_name)
+            else:
+                # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
+                raise Exception(
+                    f"Neither setter or setter_name was defined for {switch}"
+                )
 
         return switches
 

@@ -8,14 +8,19 @@ but developers can override :func:buttons(), :func:sensors(), .. to expose more 
 """
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, Optional
+
+from attrs import define
 
 
 @dataclass
 class ButtonDescriptor:
+    """Describes a button exposed by the device."""
+
     id: str
     name: str
-    method: Callable
+    method_name: str
+    method: Optional[Callable] = None
     extras: Optional[Dict] = None
 
 
@@ -44,20 +49,21 @@ class SwitchDescriptor:
     id: str
     name: str
     property: str
-    setter_name: str
+    setter_name: Optional[str] = None
     setter: Optional[Callable] = None
     extras: Optional[Dict] = None
 
 
-@dataclass
+@define(kw_only=True)
 class SettingDescriptor:
     """Presents a settable value."""
 
     id: str
     name: str
     property: str
-    setter: Callable
     unit: str
+    setter: Optional[Callable] = None
+    setter_name: Optional[str] = None
 
 
 class SettingType(Enum):
@@ -66,16 +72,17 @@ class SettingType(Enum):
     Enum = auto()
 
 
-@dataclass
+@define(kw_only=True)
 class EnumSettingDescriptor(SettingDescriptor):
     """Presents a settable, enum-based value."""
 
-    choices: List
     type: SettingType = SettingType.Enum
+    choices_attribute: Optional[str] = None
+    choices: Optional[Enum] = None
     extras: Optional[Dict] = None
 
 
-@dataclass
+@define(kw_only=True)
 class NumberSettingDescriptor(SettingDescriptor):
     """Presents a settable, numerical value."""
 
