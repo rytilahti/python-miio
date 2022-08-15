@@ -1,19 +1,22 @@
-"""This module contains integration descriptors.
+"""This module contains descriptors.
 
-These can be used to make specifically interesting pieces of functionality
-visible to downstream users.
+The descriptors contain information that can be used to provide generic, dynamic user-interfaces.
 
-TBD: Some descriptors are created automatically based on the status container classes,
-but developers can override :func:buttons(), :func:sensors(), .. to expose more features.
+If you are a downstream developer, use :func:`~miio.device.Device.sensors()`,
+:func:`~miio.device.Device.settings()`, :func:`~miio.device.Device.switches()`, and
+:func:`~miio.device.Device.buttons()` to access the functionality exposed by the integration developer.
+
+If you are developing an integration, prefer :func:`~miio.devicestatus.sensor`, :func:`~miio.devicestatus.sensor`, and
+:func:`~miio.devicestatus.sensor` decorators over creating the descriptors manually.
+If needed, you can override the methods listed to add more descriptors to your integration.
 """
-from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable, Dict, Optional
 
-from attrs import define
+import attr
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class ButtonDescriptor:
     """Describes a button exposed by the device."""
 
@@ -24,7 +27,7 @@ class ButtonDescriptor:
     extras: Optional[Dict] = None
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class SensorDescriptor:
     """Describes a sensor exposed by the device.
 
@@ -42,7 +45,7 @@ class SensorDescriptor:
     extras: Optional[Dict] = None
 
 
-@dataclass
+@attr.s(auto_attribs=True)
 class SwitchDescriptor:
     """Presents toggleable switch."""
 
@@ -54,7 +57,7 @@ class SwitchDescriptor:
     extras: Optional[Dict] = None
 
 
-@define(kw_only=True)
+@attr.s(auto_attribs=True, kw_only=True)
 class SettingDescriptor:
     """Presents a settable value."""
 
@@ -72,7 +75,7 @@ class SettingType(Enum):
     Enum = auto()
 
 
-@define(kw_only=True)
+@attr.s(auto_attribs=True, kw_only=True)
 class EnumSettingDescriptor(SettingDescriptor):
     """Presents a settable, enum-based value."""
 
@@ -82,7 +85,7 @@ class EnumSettingDescriptor(SettingDescriptor):
     extras: Optional[Dict] = None
 
 
-@define(kw_only=True)
+@attr.s(auto_attribs=True, kw_only=True)
 class NumberSettingDescriptor(SettingDescriptor):
     """Presents a settable, numerical value."""
 
