@@ -85,6 +85,10 @@ Whether adding support for a new device or improving an existing one,
 the journey begins by finding out the commands used to control the device.
 This usually involves capturing packet traces between the device and the official app,
 and analyzing those packet traces afterwards.
+
+Traffic Capturing
+~~~~~~~~~~~~~~~~~
+
 The process is as follows:
 
 1. Install Android emulator (`BlueStacks emulator <https://www.bluestacks.com>`_ has been reported to work on Windows).
@@ -97,6 +101,44 @@ The process is as follows:
 ::
 
     python devtools/parse_pcap.py <pcap file> --token <token>
+
+Testing Properties
+~~~~~~~~~~~~~~~~~~
+
+Another option for MiIO devices is to try to test which property accesses return a response.
+Some ideas about the naming of properties can be located from the existing integrations.
+
+The ``miiocli devtools test-properties`` command can be used to perform this testing:
+
+.. code-block::
+
+    $ miiocli devtools test-properties power temperature current mode power_consume_rate voltage power_factor elec_leakage
+
+    Testing properties ('power', 'temperature', 'current', 'mode', 'power_consume_rate', 'voltage', 'power_factor', 'elec_leakage') for zimi.powerstrip.v2
+    Testing power                'on' <class 'str'>
+    Testing temperature          49.13 <class 'float'>
+    Testing current              0.07 <class 'float'>
+    Testing mode                 None
+    Testing power_consume_rate   7.8 <class 'float'>
+    Testing voltage              None
+    Testing power_factor         0.0 <class 'float'>
+    Testing elec_leakage         None
+    Found 5 valid properties, testing max_properties..
+    Testing 5 properties at once (power temperature current power_consume_rate power_factor): OK for 5 properties
+
+    Please copy the results below to your report
+    ### Results ###
+    Model: zimi.powerstrip.v2
+    Total responsives: 5
+    Total non-empty: 5
+    All non-empty properties:
+    {'current': 0.07,
+     'power': 'on',
+     'power_consume_rate': 7.8,
+     'power_factor': 0.0,
+     'temperature': 49.13}
+    Max properties: 5
+
 
 
 .. _miot:
