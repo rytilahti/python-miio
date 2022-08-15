@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 from croniter import croniter
 
 from miio.device import DeviceStatus
-from miio.devicestatus import sensor
+from miio.devicestatus import sensor, setting
 from miio.utils import pretty_seconds, pretty_time
 
 
@@ -148,6 +148,15 @@ class VacuumStatus(DeviceStatus):
         return int(self.data["battery"])
 
     @property
+    @setting(
+        "Fanspeed",
+        unit="%",
+        setter_name="set_fan_speed",
+        min_value=0,
+        max_value=100,
+        step=1,
+        icon="mdi:fan",
+    )
     def fanspeed(self) -> int:
         """Current fan speed."""
         return int(self.data["fan_power"])

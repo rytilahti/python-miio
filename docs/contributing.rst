@@ -167,19 +167,23 @@ that is passed to the method as string, and an optional integer argument.
 Status containers
 ~~~~~~~~~~~~~~~~~
 
-The status container (returned by `status()` method of the device class)
+The status container (returned by the :meth:`~miio.device.Device.status` method of the device class)
 is the main way for library users to access properties exposed by the device.
 The status container should inherit :class:`~miio.devicestatus.DeviceStatus`.
-This ensures a generic :meth:`__repr__` that is helpful for debugging,
-and allows defining properties that are especially interesting for end users.
-
-The properties can be decorated using special decorators to define meta information
-that enables introspection and programatic creation of user interface elements.
+Doing so ensures that a developer-friendly :meth:`~miio.devicestatus.DeviceStatus.__repr__` based on the defined
+properties is there to help with debugging.
+Furthermore, it allows defining meta information about properties that are especially interesting for end users.
 
 .. note::
 
     The helper decorators are just syntactic sugar to create the corresponding descriptor classes
     and binding them to the status class.
+
+.. note::
+
+    The descriptors are merely hints to downstream users about the device capabilities.
+    In practice this means that neither the input nor the output values of functions decorated with
+    the descriptors are enforced automatically by this library.
 
 
 Sensors
@@ -210,7 +214,7 @@ Switches
 """"""""
 
 Use :meth:`@switch <miio.devicestatus.switch>` to create :class:`~miio.descriptors.SwitchDescriptor` objects.
-This will make all decorated sensors accessible through :meth:`~miio.device.Device.switches` for downstream users.
+This will make all decorated switches accessible through :meth:`~miio.device.Device.switches` for downstream users.
 
 .. code-block::
 
@@ -219,8 +223,60 @@ This will make all decorated sensors accessible through :meth:`~miio.device.Devi
     def power(self) -> bool:
         """Return if device is turned on."""
 
-The mandatory *setter_name* will be used to bind the method to be accessible using
-the :meth:`~miio.descriptors.SwitchDescriptor.setter` callable.
+You can either use *setter* to define a callable that can be used to adjust the value of the property,
+or alternatively define *setter_name* which will be used to bind the method during the initialization
+to the the :meth:`~miio.descriptors.SwitchDescriptor.setter` callable.
+
+
+Settings
+""""""""
+
+Use :meth:`@switch <miio.devicestatus.setting>` to create :meth:`~miio.descriptors.SettingDescriptor` objects.
+This will make all decorated settings accessible through :meth:`~miio.device.Device.settings` for downstream users.
+
+The type of the descriptor depends on the input parameters:
+
+    * Passing *min_value* or *max_value* will create a :class:`~miio.descriptors.NumberSettingDescriptor`,
+      which is useful for presenting ranges of values.
+    * Passing an Enum object using *choices* will create a :class:`~miio.descriptors.EnumSettingDescriptor`,
+      which is useful for presenting a fixed set of options.
+
+
+You can either use *setter* to define a callable that can be used to adjust the value of the property,
+or alternatively define *setter_name* which will be used to bind the method during the initialization
+to the the :meth:`~miio.descriptors.SettingDescriptor.setter` callable.
+
+Numerical Settings
+^^^^^^^^^^^^^^^^^^
+
+The number descriptor allows defining a range of values and information about the steps.
+The *max_value* is the only mandatory parameter. If not given, *min_value* defaults to ``0`` and *steps* to ``1``.
+
+.. code-block::
+
+    @property
+    @switch(name="Fan Speed", min_value=0, max_value=100, steps=5, setter_name="set_fan_speed")
+    def fan_speed(self) -> int:
+        """Return the current fan speed."""
+
+
+Enum-based Settings
+^^^^^^^^^^^^^^^^^^^
+
+If the device has a setting with some pre-defined values, you want to use this.
+
+.. code-block::
+
+    class LedBrightness(Enum):
+        Dim = 0
+        Bright = 1
+        Off = 2
+
+    @property
+    @switch(name="LED Brightness", choices=SomeEnum, setter_name="set_led_brightness")
+    def led_brightness(self) -> LedBrightness:
+        """Return the LED brightness."""
+
 
 .. _adding_tests:
 
