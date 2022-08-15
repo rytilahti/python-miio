@@ -98,11 +98,7 @@ class AlarmClock(Device):
 
     @command()
     def volume(self) -> int:
-        """Return the volume.
-
-        ->  192.168.0.128 data= {"id":251,"method":"set_volume","params":[17]}
-        <-  192.168.0.57 data= {"result":["OK"],"id":251}
-        """
+        """Return the volume."""
         return int(self.send("get_volume")[0])
 
     @command(click.argument("volume", type=int))
@@ -124,37 +120,36 @@ class AlarmClock(Device):
         click.argument("tone", type=EnumType(Tone)),
     )
     def set_ring(self, alarm_type: AlarmType, ring: RingTone):
-        """Set alarm tone.
+        """Set alarm tone (not implemented).
 
-        ->  192.168.0.128 data= {"id":236,"method":"set_ring",
-           "params":[{"ringtone":"a1.mp3","smart_clock":"","type":"alarm"}]}
-        <-  192.168.0.57 data= {"result":["OK"],"id":236}
+        Raw payload example::
+
+            ->  192.168.0.128 data= {"id":236,"method":"set_ring",
+               "params":[{"ringtone":"a1.mp3","smart_clock":"","type":"alarm"}]}
+            <-  192.168.0.57 data= {"result":["OK"],"id":236}
         """
         raise NotImplementedError()
-        # return self.send("set_ring", ) == ["OK"]
 
     @command()
     def night_mode(self):
-        """Get night mode status.
-
-        ->  192.168.0.128 data= {"id":234,"method":"get_night_mode","params":[]}
-        <-  192.168.0.57 data= {"result":[0],"id":234}
-        """
+        """Get night mode status."""
         return Nightmode(self.send("get_night_mode"))
 
     @command()
     def set_night_mode(self):
-        """Set the night mode.
+        """Set the night mode (not implemented).
 
-        # enable
-        ->  192.168.0.128 data= {"id":248,"method":"set_night_mode",
-            "params":[1,"21:00","6:00"]}
-        <-  192.168.0.57 data= {"result":["OK"],"id":248}
+        Enable night mode::
 
-        # disable
-        ->  192.168.0.128 data= {"id":249,"method":"set_night_mode",
-            "params":[0,"21:00","6:00"]}
-        <-  192.168.0.57 data= {"result":["OK"],"id":249}
+            ->  192.168.0.128 data= {"id":248,"method":"set_night_mode",
+                "params":[1,"21:00","6:00"]}
+            <-  192.168.0.57 data= {"result":["OK"],"id":248}
+
+        Disable night mode::
+
+            ->  192.168.0.128 data= {"id":249,"method":"set_night_mode",
+                "params":[0,"21:00","6:00"]}
+            <-  192.168.0.57 data= {"result":["OK"],"id":249}
         """
         raise NotImplementedError()
 
@@ -162,18 +157,21 @@ class AlarmClock(Device):
     def near_wakeup(self):
         """Status for near wakeup.
 
-        ->  192.168.0.128 data= {"id":235,"method":"get_near_wakeup_status",
-            "params":[]}
-        <-  192.168.0.57 data= {"result":["disable"],"id":235}
+        Get the status::
 
-        # setters
-        ->  192.168.0.128 data= {"id":254,"method":"set_near_wakeup_status",
-            "params":["enable"]}
-        <-  192.168.0.57 data= {"result":["OK"],"id":254}
+            ->  192.168.0.128 data= {"id":235,"method":"get_near_wakeup_status",
+                "params":[]}
+            <-  192.168.0.57 data= {"result":["disable"],"id":235}
 
-        ->  192.168.0.128 data= {"id":255,"method":"set_near_wakeup_status",
-            "params":["disable"]}
-        <-  192.168.0.57 data= {"result":["OK"],"id":255}
+        Set the status::
+
+            ->  192.168.0.128 data= {"id":254,"method":"set_near_wakeup_status",
+                "params":["enable"]}
+            <-  192.168.0.57 data= {"result":["OK"],"id":254}
+
+            ->  192.168.0.128 data= {"id":255,"method":"set_near_wakeup_status",
+                "params":["disable"]}
+            <-  192.168.0.57 data= {"result":["OK"],"id":255}
         """
         return self.send("get_near_wakeup_status")
 
@@ -184,54 +182,44 @@ class AlarmClock(Device):
         """
         return self.send("get_count_down_v2")
 
-    @command()
     def alarmops(self):
-        """
-        NOTE: the alarm_ops method is the one used to create, query and delete
-        all types of alarms (reminders, alarms, countdowns).
-        ->  192.168.0.128 data= {"id":263,"method":"alarm_ops",
-            "params":{"operation":"create","data":[
-                {"type":"alarm","event":"testlabel","reminder":"","smart_clock":0,
-                "ringtone":"a2.mp3","volume":100,"circle":"once","status":"on",
-                "repeat_ringing":0,"delete_datetime":1564291980000,
-                "disable_datetime":"","circle_extra":"",
-                "datetime":1564291980000}
-                ],"update_datetime":1564205639326}}
-        <-  192.168.0.57 data= {"result":[{"id":1,"ack":"OK"}],"id":263}
+        """Method to create, query, and delete alarms (not implemented).
 
-        # query per index, starts from 0 instead of 1 as the ids it seems
-        ->  192.168.0.128 data= {"id":264,"method":"alarm_ops",
-            "params":{"operation":"query","req_type":"alarm",
-                "update_datetime":1564205639593,"index":0}}
-        <-  192.168.0.57 data= {"result":
-            [0,[
-                {"i":"1","c":"once","d":"2019-07-28T13:33:00+0800","s":"on",
-                "n":"testlabel","a":"a2.mp3","dd":1}
-               ], "America/New_York"
-            ],"id":264}
+        The alarm_ops method is the one used to create, query and delete
+        all types of alarms (reminders, alarms, countdowns)::
 
-        # result [code, list of alarms, timezone]
-        ->  192.168.0.128 data= {"id":265,"method":"alarm_ops",
-            "params":{"operation":"query","index":0,"update_datetime":1564205639596,
-                "req_type":"reminder"}}
-        <-  192.168.0.57 data= {"result":[0,[],"America/New_York"],"id":265}
+            ->  192.168.0.128 data= {"id":263,"method":"alarm_ops",
+                "params":{"operation":"create","data":[
+                    {"type":"alarm","event":"testlabel","reminder":"","smart_clock":0,
+                    "ringtone":"a2.mp3","volume":100,"circle":"once","status":"on",
+                    "repeat_ringing":0,"delete_datetime":1564291980000,
+                    "disable_datetime":"","circle_extra":"",
+                    "datetime":1564291980000}
+                    ],"update_datetime":1564205639326}}
+            <-  192.168.0.57 data= {"result":[{"id":1,"ack":"OK"}],"id":263}
+
+            # query per index, starts from 0 instead of 1 as the ids it seems
+            ->  192.168.0.128 data= {"id":264,"method":"alarm_ops",
+                "params":{"operation":"query","req_type":"alarm",
+                    "update_datetime":1564205639593,"index":0}}
+            <-  192.168.0.57 data= {"result":
+                [0,[
+                    {"i":"1","c":"once","d":"2019-07-28T13:33:00+0800","s":"on",
+                    "n":"testlabel","a":"a2.mp3","dd":1}
+                   ], "America/New_York"
+                ],"id":264}
+
+            # result [code, list of alarms, timezone]
+            ->  192.168.0.128 data= {"id":265,"method":"alarm_ops",
+                "params":{"operation":"query","index":0,"update_datetime":1564205639596,
+                    "req_type":"reminder"}}
+            <-  192.168.0.57 data= {"result":[0,[],"America/New_York"],"id":265}
         """
         raise NotImplementedError()
 
     @command(click.argument("url"))
     def start_countdown(self, url):
-        """Start countdown timer playing the given media.
-
-        {"id":354,"method":"alarm_ops",
-        "params":{"operation":"create","update_datetime":1564206432733,
-        "data":[{"type":"timer",
-          "background":"http://host.invalid/testfile.mp3",
-          "offset":1800,
-          "circle":"once",
-          "volume":100,
-          "datetime":1564208232733}]}}
-        """
-
+        """Start countdown timer playing the given media."""
         current_ts = int(time.time() * 1000)
         payload = {
             "operation": "create",
@@ -252,12 +240,7 @@ class AlarmClock(Device):
 
     @command()
     def query(self):
-        """
-        ->  192.168.0.128 data= {"id":227,"method":"alarm_ops","params":
-        {"operation":"query","index":0,"update_datetime":1564205198413,"req_type":"reminder"}}
-
-        """
-
+        """Query timer alarm."""
         payload = {
             "operation": "query",
             "index": 0,
@@ -268,12 +251,7 @@ class AlarmClock(Device):
 
     @command()
     def cancel(self):
-        """Cancel alarm of the defined type.
-
-        "params":{"operation":"cancel","update_datetime":1564206332603,"data":[{"type":"timer"}]}}
-        """
-        import time
-
+        """Cancel timer alarm."""
         payload = {
             "operation": "pause",
             "update_datetime": int(time.time() * 1000),
