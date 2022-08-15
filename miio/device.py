@@ -340,13 +340,14 @@ class Device(metaclass=DeviceGroupMeta):
         settings = self.status().settings()
         for setting in settings.values():
             # TODO: Bind setter methods, this should probably done only once during init.
-            if setting.setter is None and setting.setter_name is not None:
-                setting.setter = getattr(self, setting.setter_name)
-            else:
+            if setting.setter is None:
                 # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
-                raise Exception(
-                    f"Neither setter or setter_name was defined for {setting}"
-                )
+                if setting.setter_name is None:
+                    raise Exception(
+                        f"Neither setter or setter_name was defined for {setting}"
+                    )
+
+                setting.setter = getattr(self, setting.setter_name)
 
         return settings
 
@@ -361,13 +362,13 @@ class Device(metaclass=DeviceGroupMeta):
         switches = self.status().switches()
         for switch in switches.values():
             # TODO: Bind setter methods, this should probably done only once during init.
-            if switch.setter is None and switch.setter_name is not None:
+            if switch.setter is None:
+                if switch.setter_name is None:
+                    # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
+                    raise Exception(
+                        f"Neither setter or setter_name was defined for {switch}"
+                    )
                 switch.setter = getattr(self, switch.setter_name)
-            else:
-                # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
-                raise Exception(
-                    f"Neither setter or setter_name was defined for {switch}"
-                )
 
         return switches
 

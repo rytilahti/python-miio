@@ -330,14 +330,17 @@ class AirFreshA1(Device):
 
     @command()
     def set_ptc_timer(self):
-        """
-        value = time.index + '-' +
-            time.hexSum + '-' +
-            time.startTime + '-' +
-            time.ptcTimer.endTime + '-' +
-            time.level + '-' +
-            time.status;
-        return self.send("set_ptc_timer", [value])
+        """Set PTC timer (not implemented)
+
+        Value construction::
+
+            value = time.index + '-' +
+                time.hexSum + '-' +
+                time.startTime + '-' +
+                time.ptcTimer.endTime + '-' +
+                time.level + '-' +
+                time.status;
+            return self.send("set_ptc_timer", [value])
         """
         raise NotImplementedError()
 

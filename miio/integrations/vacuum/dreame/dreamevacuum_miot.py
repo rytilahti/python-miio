@@ -646,8 +646,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
         :param str url: URL or path to language pack
         :param str md5sum: MD5 hash for file if URL used
         :param int size: File size in bytes if URL used
-        :param str voice_id: In original it is country code for the selected
-        voice pack. You can put here what you like, I guess it doesn't matter (default: CP - Custom Packet)
+        :param str voice_id: Country code for the selected voice pack. CP=Custom Packet
         """
         local_url = None
         server = None
