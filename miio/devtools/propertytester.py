@@ -1,21 +1,14 @@
-"""Command-line interface for devtools."""
 import logging
 from pprint import pformat as pf
 
 import click
 
-from .device import Device
+from miio import Device
 
 _LOGGER = logging.getLogger(__name__)
 
 
-@click.group(invoke_without_command=False)
-@click.pass_context
-def devtools(ctx: click.Context):
-    """Tools for developers and troubleshooting."""
-
-
-@devtools.command()
+@click.command()
 @click.option("--host", required=True, prompt=True)
 @click.option("--token", required=True, prompt=True)
 @click.argument("properties", type=str, nargs=-1, required=True)

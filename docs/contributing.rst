@@ -96,11 +96,40 @@ The process is as follows:
 3. Install `WireShark <https://www.wireshark.org>`_ (or use ``tcpdump`` on Linux) to capture the device traffic.
 4. Use the app to control the device and save the resulting PCAP file for later analyses.
 5. :ref:`Obtain the device token<obtaining_tokens>` in order to decrypt the traffic.
-6. Use ``devtools/parse_pcap.py`` script to parse the captured PCAP files.
+6. Use ``miiocli devtools parse-pcap`` script to parse the captured PCAP files.
+
+.. note::
+
+    You can pass as many tokens you want to ``parse-pcap``, they will be tested sequentially until decryption succeeds,
+    or the input list is exhausted.
 
 ::
 
-    python devtools/parse_pcap.py <pcap file> --token <token>
+    $ miiocli devtools parse-pcap captured_traffic.pcap <token> <another_token>
+
+    host   -> strip {'id': 6489, 'method': 'get_prop', 'params': ['power', 'temperature', 'current', 'mode', 'power_consume_rate', 'wifi_led', 'power_price']}
+    strip  -> host   {'result': ['on', 48.91, 0.07, None, 7.69, 'off', 999], 'id': 6489}
+    host   -> vacuum {'id': 8606, 'method': 'get_status', 'params': []}
+    vacuum -> host   {'result': [{'msg_ver': 8, 'msg_seq': 10146, 'state': 8, 'battery': 100, 'clean_time': 966, 'clean_area': 19342500, 'error_code': 0, 'map_present': 1, 'in_cleaning': 0, 'fan_power': 60, 'dnd_enabled': 1}], 'id': 8606}
+
+    ...
+
+    == stats ==
+            miio_packets: 24
+            results: 12
+
+    == dst_addr ==
+        ...
+    == src_addr ==
+        ...
+
+    == commands ==
+            get_prop: 3
+            get_status: 3
+            set_custom_mode: 2
+            set_wifi_led: 2
+            set_power: 2
+
 
 Testing Properties
 ~~~~~~~~~~~~~~~~~~
