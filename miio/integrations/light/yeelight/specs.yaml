@@ -149,6 +149,10 @@ yeelink.light.mono5:
   night_light: False
   color_temp: [2700, 2700]
   supports_color: False
+yeelink.light.mono6:
+  night_light: False
+  color_temp: [2700, 2700]
+  supports_color: False
 yeelink.light.mono:
   night_light: False
   color_temp: [2700, 2700]
