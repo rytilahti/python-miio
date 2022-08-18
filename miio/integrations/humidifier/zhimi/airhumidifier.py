@@ -131,7 +131,6 @@ class AirHumidifierStatus(DeviceStatus):
     @setting(
         name="Led Brightness",
         icon="mdi:brightness-6",
-        unit="something",
         setter_name="set_led_brightness",
         choices=LedBrightness,
         entity_category="config",
