@@ -83,17 +83,16 @@ class TestAirQualityMonitorV1(TestCase):
         )
 
 
+class DummyDeviceInfo:
+    def __init__(self, version) -> None:
+        self.firmware_version = version
+
+
 class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, version, state, *args, **kwargs):
         self._model = MODEL_AIRQUALITYMONITOR_S1
-        self.state = {
-            "battery": 100,
-            "co2": 695,
-            "humidity": 62.1,
-            "pm25": 19.4,
-            "temperature": 27.4,
-            "tvoc": 254,
-        }
+        self.version = version
+        self.state = state
         self.return_values = {"get_prop": self._get_state}
         super().__init__(args, kwargs)
 
@@ -101,11 +100,38 @@ class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
         """Return wanted properties."""
         return self.state
 
+    def info(self):
+        return DummyDeviceInfo(version=self.version)
+
 
 @pytest.fixture(scope="class")
 def airqualitymonitors1(request):
-    request.cls.device = DummyAirQualityMonitorS1()
+    request.cls.device = DummyAirQualityMonitorS1(
+        version="3.1.8_9999",
+        state={
+            "battery": 100,
+            "co2": 695,
+            "humidity": 62.1,
+            "pm25": 19.4,
+            "temperature": 27.4,
+            "tvoc": 254,
+        },
+    )
     # TODO add ability to test on a real device
+
+
+@pytest.fixture(scope="class")
+def airqualitymonitors1_v4(request):
+    request.cls.device = DummyAirQualityMonitorS1(
+        version="4.1.8_9999",
+        state={
+            "co2": 695,
+            "humidity": 62.1,
+            "pm25": 19.4,
+            "temperature": 27.4,
+            "tvoc": 254,
+        },
+    )
 
 
 @pytest.mark.usefixtures("airqualitymonitors1")
@@ -127,6 +153,30 @@ class TestAirQualityMonitorS1(TestCase):
         assert self.state().temperature == self.device.start_state["temperature"]
         assert self.state().tvoc == self.device.start_state["tvoc"]
         assert self.state().aqi is None
+        assert self.state().usb_power is None
+        assert self.state().display_clock is None
+        assert self.state().night_mode is None
+
+
+@pytest.mark.usefixtures("airqualitymonitors1_v4")
+class TestAirQualityMonitorS1_V4(TestCase):
+    def state(self):
+        return self.device.status()
+
+    def test_status(self):
+        self.device._reset_state()
+
+        assert repr(self.state()) == repr(
+            AirQualityMonitorStatus(self.device.start_state)
+        )
+
+        assert self.state().co2 == self.device.start_state["co2"]
+        assert self.state().humidity == self.device.start_state["humidity"]
+        assert self.state().pm25 == self.device.start_state["pm25"]
+        assert self.state().temperature == self.device.start_state["temperature"]
+        assert self.state().tvoc == self.device.start_state["tvoc"]
+        assert self.state().aqi is None
+        assert self.state().battery is None
         assert self.state().usb_power is None
         assert self.state().display_clock is None
         assert self.state().night_mode is None

@@ -175,6 +175,13 @@ class AirQualityMonitor(Device):
             self.model, AVAILABLE_PROPERTIES[MODEL_AIRQUALITYMONITOR_V1]
         )
 
+        is_s1_firmware_version_4 = (
+            self.model == MODEL_AIRQUALITYMONITOR_S1
+            and self.info().firmware_version.startswith("4")
+        )
+        if is_s1_firmware_version_4 and "battery" in properties:
+            properties.remove("battery")
+
         if self.model == MODEL_AIRQUALITYMONITOR_B1:
             values = self.send("get_air_data")
         else:
