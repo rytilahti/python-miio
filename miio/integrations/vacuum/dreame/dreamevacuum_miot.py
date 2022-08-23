@@ -132,10 +132,10 @@ _DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
     "brush_life_level2": {"siid": 10, "piid": 2},
     "filter_life_level": {"siid": 11, "piid": 1},
     "filter_left_time": {"siid": 11, "piid": 2},
-    "operating_mode": {"siid": 4, "piid": 1}, # work-mode
+    "operating_mode": {"siid": 4, "piid": 1},  # work-mode
     "cleaning_mode": {"siid": 4, "piid": 4},
     "delete_timer": {"siid": 8, "aiid": 1},
-    "timer_enable": {"siid": 5, "piid": 1}, # do-not-disturb -> enable
+    "timer_enable": {"siid": 5, "piid": 1},  # do-not-disturb -> enable
     "cleaning_time": {"siid": 4, "piid": 2},
     "cleaning_area": {"siid": 4, "piid": 3},
     "first_clean_time": {"siid": 12, "piid": 1},
@@ -143,22 +143,22 @@ _DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
     "total_clean_times": {"siid": 12, "piid": 3},
     "total_clean_area": {"siid": 12, "piid": 4},
     "start_time": {"siid": 5, "piid": 2},
-    "stop_time": {"siid": 5, "piid": 3}, # end-time
-    "map_view": {"siid": 6, "piid": 1}, # map-data
+    "stop_time": {"siid": 5, "piid": 3},  # end-time
+    "map_view": {"siid": 6, "piid": 1},  # map-data
     "frame_info": {"siid": 6, "piid": 2},
     "volume": {"siid": 7, "piid": 1},
-    "voice_package": {"siid": 7, "piid": 2}, # voice-packet-id
-    "water_flow": {"siid": 4, "piid": 5}, # mop-mode
-    "water_box_carriage_status": {"siid": 4, "piid": 6}, #waterbox-status
-    "timezone": {"siid": 8, "piid": 1}, # time-zone
-    "home": {"siid": 3, "aiid": 1}, # start-charge
-    "locate": {"siid": 7, "aiid": 1}, # audio -> position
-    "start_clean": {"siid": 4, "aiid": 1}, 
+    "voice_package": {"siid": 7, "piid": 2},  # voice-packet-id
+    "water_flow": {"siid": 4, "piid": 5},  # mop-mode
+    "water_box_carriage_status": {"siid": 4, "piid": 6},  # waterbox-status
+    "timezone": {"siid": 8, "piid": 1},  # time-zone
+    "home": {"siid": 3, "aiid": 1},  # start-charge
+    "locate": {"siid": 7, "aiid": 1},  # audio -> position
+    "start_clean": {"siid": 4, "aiid": 1},
     "stop_clean": {"siid": 4, "aiid": 2},
     "reset_mainbrush_life": {"siid": 9, "aiid": 1},
     "reset_filter_life": {"siid": 11, "aiid": 1},
     "reset_sidebrush_life": {"siid": 10, "aiid": 1},
-    "move": {"siid": 21, "aiid": 1}, # not in documentation?
+    "move": {"siid": 21, "aiid": 1},  # not in documentation
     "play_sound": {"siid": 7, "aiid": 2},
 }
 
