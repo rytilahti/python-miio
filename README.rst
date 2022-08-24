@@ -113,6 +113,7 @@ Supported devices
 -  Xiaomi Mijia STYJ02YM (Viomi)
 -  Xiaomi Mijia 1C STYTJ01ZHM (Dreame)
 -  Dreame F9, D9, Z10 Pro
+-  Dreame Trouver Finder
 -  Xiaomi Mi Home (Mijia) G1 Robot Vacuum Mop MJSTG1
 -  Xiaomi Roidmi Eve
 -  Xiaomi Mi Smart WiFi Socket
