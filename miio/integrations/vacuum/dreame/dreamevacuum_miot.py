@@ -24,6 +24,7 @@ DREAME_Z10_PRO = "dreame.vacuum.p2028"
 DREAME_MOP_2_PRO_PLUS = "dreame.vacuum.p2041o"
 DREAME_MOP_2_ULTRA = "dreame.vacuum.p2150a"
 DREAME_MOP_2 = "dreame.vacuum.p2150o"
+DREAME_TROUVER_FINDER = "dreame.vacuum.p2036"
 
 _DREAME_1C_MAPPING: MiotMapping = {
     # https://home.miot-spec.com/spec/dreame.vacuum.mc1808
@@ -119,6 +120,48 @@ _DREAME_F9_MAPPING: MiotMapping = {
     "play_sound": {"siid": 7, "aiid": 2},
 }
 
+_DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
+    # https://home.miot-spec.com/spec/dreame.vacuum.p2036
+    "battery_level": {"siid": 3, "piid": 1},
+    "charging_state": {"siid": 3, "piid": 2},
+    "device_fault": {"siid": 2, "piid": 2},
+    "device_status": {"siid": 2, "piid": 1},
+    "brush_left_time": {"siid": 9, "piid": 1},
+    "brush_life_level": {"siid": 9, "piid": 2},
+    "brush_left_time2": {"siid": 10, "piid": 1},
+    "brush_life_level2": {"siid": 10, "piid": 2},
+    "filter_life_level": {"siid": 11, "piid": 1},
+    "filter_left_time": {"siid": 11, "piid": 2},
+    "operating_mode": {"siid": 4, "piid": 1},  # work-mode
+    "cleaning_mode": {"siid": 4, "piid": 4},
+    "delete_timer": {"siid": 8, "aiid": 1},
+    "timer_enable": {"siid": 5, "piid": 1},  # do-not-disturb -> enable
+    "cleaning_time": {"siid": 4, "piid": 2},
+    "cleaning_area": {"siid": 4, "piid": 3},
+    "first_clean_time": {"siid": 12, "piid": 1},
+    "total_clean_time": {"siid": 12, "piid": 2},
+    "total_clean_times": {"siid": 12, "piid": 3},
+    "total_clean_area": {"siid": 12, "piid": 4},
+    "start_time": {"siid": 5, "piid": 2},
+    "stop_time": {"siid": 5, "piid": 3},  # end-time
+    "map_view": {"siid": 6, "piid": 1},  # map-data
+    "frame_info": {"siid": 6, "piid": 2},
+    "volume": {"siid": 7, "piid": 1},
+    "voice_package": {"siid": 7, "piid": 2},  # voice-packet-id
+    "water_flow": {"siid": 4, "piid": 5},  # mop-mode
+    "water_box_carriage_status": {"siid": 4, "piid": 6},  # waterbox-status
+    "timezone": {"siid": 8, "piid": 1},  # time-zone
+    "home": {"siid": 3, "aiid": 1},  # start-charge
+    "locate": {"siid": 7, "aiid": 1},  # audio -> position
+    "start_clean": {"siid": 4, "aiid": 1},
+    "stop_clean": {"siid": 4, "aiid": 2},
+    "reset_mainbrush_life": {"siid": 9, "aiid": 1},
+    "reset_filter_life": {"siid": 11, "aiid": 1},
+    "reset_sidebrush_life": {"siid": 10, "aiid": 1},
+    "move": {"siid": 21, "aiid": 1},  # not in documentation
+    "play_sound": {"siid": 7, "aiid": 2},
+}
+
 MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_1C: _DREAME_1C_MAPPING,
     DREAME_F9: _DREAME_F9_MAPPING,
@@ -127,6 +170,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_MOP_2_PRO_PLUS: _DREAME_F9_MAPPING,
     DREAME_MOP_2_ULTRA: _DREAME_F9_MAPPING,
     DREAME_MOP_2: _DREAME_F9_MAPPING,
+    DREAME_TROUVER_FINDER: _DREAME_TROUVER_FINDER_MAPPING,
 }
 
 
@@ -203,6 +247,7 @@ def _get_cleaning_mode_enum_class(model):
         DREAME_MOP_2_PRO_PLUS,
         DREAME_MOP_2_ULTRA,
         DREAME_MOP_2,
+        DREAME_TROUVER_FINDER,
     ):
         return CleaningModeDreameF9
     return None
