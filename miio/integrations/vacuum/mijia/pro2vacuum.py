@@ -26,11 +26,14 @@ MAPPING = {
     "main_brush_time_left": {"siid": 7, "piid": 11},
     "side_brush_life_level": {"siid": 7, "piid": 8},
     "side_brush_time_left": {"siid": 7, "piid": 9},
+    "filter_life_level": {"siid": 7, "piid": 12},
+    "filter_time_left": {"siid": 7, "piid": 13},
     "clean_area": {"siid": 7, "piid": 23},
     "clean_time": {"siid": 7, "piid": 22},
     "home": {"siid": 3, "aiid": 1},
     "start": {"siid": 2, "aiid": 1},
     "stop": {"siid": 2, "aiid": 2},
+    "current_language": {"siid": 7, "piid": 21},
 }
 
 ERROR_CODES: Dict[int, str] = {}
@@ -130,8 +133,11 @@ class Pro2Status(DeviceStatus):
             {'did': 'main_brush_time_left', 'siid': 14, 'piid': 2, 'code': 0, 'value': 17959}
             {'did': 'side_brush_life_level', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0 },
             {'did': 'side_brush_time_left', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
+            {'did': 'filter_life_level', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
+            {'did': 'filter_time_left', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
             {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0},
             {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
+            {'did': 'current_language', 'siid': 7, 'piid': 21, 'code': 0, 'value': 0}
             ]"""
         self.data = data
 
@@ -178,6 +184,51 @@ class Pro2Status(DeviceStatus):
         """Water Level."""
         return WaterState(self.data["water_level"])
 
+    @property
+    def main_brush_life_level(self) -> int:
+        """Main Brush Life Level(%)."""
+        return self.data["main_brush_life_level"]
+
+    @property
+    def main_brush_time_left(self) -> int:
+        """Main Brush Life Time Left(hours)."""
+        return self.data["main_brush_time_left"]
+
+    @property
+    def side_brush_life_level(self) -> int:
+        """Side Brush Life Level(%)."""
+        return self.data["side_brush_life_level"]
+
+    @property
+    def side_brush_time_left(self) -> int:
+        """Side Brush Life Time Left(hours)."""
+        return self.data["side_brush_time_left"]
+
+    @property
+    def filter_life_level(self) -> int:
+        """Filter Life Level(%)."""
+        return self.data["filter_life_level"]
+
+    @property
+    def filter_time_left(self) -> int:
+        """Filter Life Time Left(hours)."""
+        return self.data["filter_time_left"]
+
+    @property
+    def clean_area(self) -> int:
+        """Last time clean area(m^2)."""
+        return self.data["clean_area"]
+
+    @property
+    def clean_time(self) -> int:
+        """Last time clean time(mins)."""
+        return self.data["clean_time"]
+
+    @property
+    def current_language(self) -> str:
+        """Current Language."""
+        return self.data["current_language"]
+
 
 class Pro2Vacuum(MiotDevice, VacuumInterface):
     """Support for Mi Robot Vacuum-Mop 2 Pro (ijai.vacuum.v3)."""
@@ -194,17 +245,17 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
             "Battery: {result.battery}%\n"
             "Mode: {result.operating_mode}\n"
             "Mop State: {result.mop_state}\n"
-            "Charge Status: {result.charge_state}\n"
             "Fan speed: {result.fan_speed}\n"
             "Water level: {result.water_level}\n"
             "Main Brush Life Level: {result.main_brush_life_level}%\n"
-            "Main Brush Life Time: {result.main_brush_time_left}\n"
+            "Main Brush Life Time: {result.main_brush_time_left}h\n"
             "Side Brush Life Level: {result.side_brush_life_level}%\n"
-            "Side Brush Life Time: {result.side_brush_time_left}\n"
+            "Side Brush Life Time: {result.side_brush_time_left}h\n"
             "Filter Life Level: {result.filter_life_level}%\n"
-            "Filter Life Time: {result.filter_time_left}\n"
-            "Clean Area: {result.clean_area}\n"
-            "Clean Time: {result.clean_time}\n",
+            "Filter Life Time: {result.filter_time_left}h\n"
+            "Clean Area: {result.clean_area} m^2\n"
+            "Clean Time: {result.clean_time} mins\n"
+            "Current Language: {result.current_language}\n",
         )
     )
     def status(self) -> Pro2Status:
@@ -221,7 +272,7 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
 
     @command()
     def home(self):
-        """Home."""
+        """Go Home."""
         return self.call_action("home")
 
     @command()
@@ -233,11 +284,6 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
     def stop(self):
         """Stop Cleaning."""
         return self.call_action("stop")
-
-    @command()
-    def find(self) -> None:
-        """Find the robot."""
-        return self.call_action("find")
 
     @command(
         click.argument("fan_speed", type=EnumType(SuctionState)),
