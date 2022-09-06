@@ -2,7 +2,16 @@ import inspect
 import logging
 import warnings
 from enum import Enum
-from typing import Callable, Dict, Optional, Union, get_args, get_origin, get_type_hints
+from typing import (
+    Callable,
+    Dict,
+    Optional,
+    Type,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 from .descriptors import (
     EnumSettingDescriptor,
@@ -165,11 +174,11 @@ def setting(
     *,
     setter: Optional[Callable] = None,
     setter_name: Optional[str] = None,
-    unit: str,
+    unit: Optional[str] = None,
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
     step: Optional[int] = None,
-    choices: Optional[Enum] = None,
+    choices: Optional[Type[Enum]] = None,
     choices_attribute: Optional[str] = None,
     **kwargs,
 ):
