@@ -1,8 +1,9 @@
-from datetime import datetime, time, timedelta, tzinfo
+from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Union
 
 from croniter import croniter
+from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
@@ -449,7 +450,7 @@ class Timer(DeviceStatus):
     the creation time.
     """
 
-    def __init__(self, data: List[Any], timezone: tzinfo) -> None:
+    def __init__(self, data: List[Any], timezone: BaseTzInfo) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
         #  ['1488667777661', 'off', ['49 21 * * 3,4,5,6', ['start_clean', '']]
@@ -457,8 +458,7 @@ class Timer(DeviceStatus):
         self.data = data
         self.timezone = timezone
 
-        # ignoring the type here, as the localize is not provided directly by datetime.tzinfo
-        localized_ts = timezone.localize(datetime.now())  # type: ignore
+        localized_ts = timezone.localize(self._now())
 
         # Initialize croniter to cause an exception on invalid entries (#847)
         self.croniter = croniter(self.cron, start_time=localized_ts)
@@ -506,6 +506,10 @@ class Timer(DeviceStatus):
         if self._next_schedule is None:
             self._next_schedule = self.croniter.get_next(ret_type=datetime)
         return self._next_schedule
+
+    @staticmethod
+    def _now() -> datetime:
+        return datetime.now()
 
 
 class SoundStatus(DeviceStatus):
