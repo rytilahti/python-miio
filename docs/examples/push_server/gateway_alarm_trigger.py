@@ -30,13 +30,13 @@ async def asyncio_demo(loop):
         trigger_token=gateway.token,
     )
 
-    await loop.run_in_executor(None, push_server.subscribe_event, gateway, event_info)
+    await push_server.subscribe_event(gateway, event_info)
 
     _LOGGER.info("Listening")
 
     await asyncio.sleep(30)
 
-    push_server.stop()
+    await push_server.stop()
 
 
 if __name__ == "__main__":

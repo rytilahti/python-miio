@@ -304,7 +304,7 @@ class SubDevice:
         for callback in self._registered_callbacks.values():
             callback(action, params)
 
-    def subscribe_events(self):
+    async def subscribe_events(self):
         """subscribe to all subdevice events using the push server."""
         if self._gw._push_server is None:
             raise DeviceException(
@@ -323,7 +323,7 @@ class SubDevice:
                 trigger_value=self.push_events[action].get("trigger_value"),
             )
 
-            event_id = self._gw._push_server.subscribe_event(self._gw, event_info)
+            event_id = await self._gw._push_server.subscribe_event(self._gw, event_info)
             if event_id is None:
                 result = False
                 continue
@@ -332,8 +332,8 @@ class SubDevice:
 
         return result
 
-    def unsubscribe_events(self):
+    async def unsubscribe_events(self):
         """Unsubscibe from events registered in the gateway memory."""
         for event_id in self._event_ids:
-            self._gw._push_server.unsubscribe_event(self._gw, event_id)
+            await self._gw._push_server.unsubscribe_event(self._gw, event_id)
             self._event_ids.remove(event_id)
