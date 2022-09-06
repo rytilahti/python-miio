@@ -462,6 +462,7 @@ class Timer(DeviceStatus):
 
         # Initialize croniter to cause an exception on invalid entries (#847)
         self.croniter = croniter(self.cron, start_time=localized_ts)
+        self._next_schedule: Optional[datetime] = None
 
     @property
     def id(self) -> str:
@@ -502,7 +503,9 @@ class Timer(DeviceStatus):
     @property
     def next_schedule(self) -> datetime:
         """Next schedule for the timer."""
-        return self.croniter.get_next(ret_type=datetime)
+        if self._next_schedule is None:
+            self._next_schedule = self.croniter.get_next(ret_type=datetime)
+        return self._next_schedule
 
 
 class SoundStatus(DeviceStatus):
