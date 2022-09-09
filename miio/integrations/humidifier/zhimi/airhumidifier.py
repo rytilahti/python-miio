@@ -143,7 +143,7 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @switch(
-        name="Child lock",
+        name="Child Lock",
         icon="mdi:lock",
         setter_name="set_child_lock",
         device_class="switch",
@@ -208,14 +208,14 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @sensor(
-        "Motor speed",
+        "Motor Speed",
         unit="rpm",
         device_class="measurement",
         icon="mdi:fast-forward",
         entity_category="diagnostic",
     )
     def motor_speed(self) -> Optional[int]:
-        """Current fan speed."""
+        """Current motor speed."""
         if "speed" in self.data and self.data["speed"] is not None:
             return self.data["speed"]
         return None
@@ -232,7 +232,7 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @sensor(
-        "Water level",
+        "Water Level",
         unit="%",
         device_class="measurement",
         icon="mdi:water-check",
@@ -254,7 +254,7 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @sensor(
-        "Water tank",
+        "Water Tank Attached",
         device_class="connectivity",
         icon="mdi:car-coolant-level",
         entity_category="diagnostic",
@@ -284,7 +284,7 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @switch(
-        name="Dry mode",
+        name="Dry Mode",
         icon="mdi:hair-dryer",
         setter_name="set_dry",
         device_class="switch",
@@ -302,7 +302,7 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @sensor(
-        "Use time",
+        "Use Time",
         unit="s",
         device_class="total_increasing",
         icon="mdi:progress-clock",
