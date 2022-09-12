@@ -446,7 +446,7 @@ class Gateway(Device):
         device = self.devices[source_device]
         device.push_callback(action, params)
 
-    def close(self):
+    async def close(self):
         """Cleanup all subscribed events and registered callbacks."""
         if self._push_server is not None:
-            self._push_server.unregister_miio_device(self)
+            await self._push_server.unregister_miio_device(self)

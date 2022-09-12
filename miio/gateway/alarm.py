@@ -67,7 +67,7 @@ class Alarm(GatewayDevice):
         """Return the last time the alarm changed status."""
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
-    def subscribe_events(self):
+    async def subscribe_events(self):
         """subscribe to the alarm events using the push server."""
         if self._gateway._push_server is None:
             raise DeviceException(
@@ -80,15 +80,17 @@ class Alarm(GatewayDevice):
             trigger_token=self._gateway.token,
         )
 
-        event_id = self._gateway._push_server.subscribe_event(self._gateway, event_info)
+        event_id = await self._gateway._push_server.subscribe_event(
+            self._gateway, event_info
+        )
         if event_id is None:
             return False
 
         self._event_ids.append(event_id)
         return True
 
-    def unsubscribe_events(self):
+    async def unsubscribe_events(self):
         """Unsubscibe from events registered in the gateway memory."""
         for event_id in self._event_ids:
-            self._gateway._push_server.unsubscribe_event(self._gateway, event_id)
+            await self._gateway._push_server.unsubscribe_event(self._gateway, event_id)
             self._event_ids.remove(event_id)

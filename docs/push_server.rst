@@ -104,7 +104,7 @@ we assume that a device class has already been initialized to which the events b
 
 ::
 
-    push_server.subscribe_event(miio_device, event_info)
+    await push_server.subscribe_event(miio_device, event_info)
 
 7. The callback function should now be called whenever a matching event occurs.
 
@@ -114,7 +114,7 @@ we assume that a device class has already been initialized to which the events b
 
 ::
 
-    push_server.stop()
+    await push_server.stop()
 
 
 .. _obtain_event_info:
