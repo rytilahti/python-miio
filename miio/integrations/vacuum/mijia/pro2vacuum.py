@@ -45,16 +45,11 @@ _MAPPINGS = {
 ERROR_CODES: Dict[int, str] = {}
 
 
-class FormattableEnum(Enum):
-    def __str__(self):
-        return f"{self.name}"
-
-
 def _enum_as_dict(cls):
     return {x.name: x.value for x in list(cls)}
 
 
-class DeviceState(FormattableEnum):
+class DeviceState(Enum):
     Sleep = 0
     Idle = 1
     Paused = 2
@@ -66,13 +61,13 @@ class DeviceState(FormattableEnum):
     Upgrading = 8
 
 
-class SweepMode(FormattableEnum):
+class SweepMode(Enum):
     Sweep = 0
     SweepAndMop = 1
     Mop = 2
 
 
-class SweepType(FormattableEnum):
+class SweepType(Enum):
     Global = 0
     Mop = 1
     Edge = 2
@@ -84,37 +79,37 @@ class SweepType(FormattableEnum):
     Floor = 8
 
 
-class RepeatState(FormattableEnum):
-    Off = 0
-    On = 1
+class RepeatState(Enum):
+    Off = False
+    On = True
 
 
-class DoorState(FormattableEnum):
+class DoorState(Enum):
     Off = 0
     DustBox = 1
     WaterVolume = 2
     TwoInOneWaterVolume = 3
 
 
-class ClothState(FormattableEnum):
-    Off = 0
-    On = 1
+class ClothState(Enum):
+    Off = False
+    On = True
 
 
-class SuctionState(FormattableEnum):
+class FadSpeedMode(Enum):
     Off = 0
     EnergySaving = 1
     Standard = 2
     Turbo = 3
 
 
-class WaterState(FormattableEnum):
-    LowLevel = 0
-    MediumLevel = 1
-    HighLevel = 2
+class WaterLevel(Enum):
+    Low = 0
+    Medium = 1
+    High = 2
 
 
-class MopRoute(FormattableEnum):
+class MopRoute(Enum):
     BowStyle = 0
     YStyle = 1
 
@@ -169,9 +164,9 @@ class Pro2Status(DeviceStatus):
         return DeviceState(self.data["state"])
 
     @property
-    def fan_speed(self) -> SuctionState:
+    def fan_speed(self) -> FadSpeedMode:
         """Fan Speed."""
-        return SuctionState(self.data["fan_speed"])
+        return FadSpeedMode(self.data["fan_speed"])
 
     @property
     def operating_mode(self) -> SweepType:
@@ -184,9 +179,9 @@ class Pro2Status(DeviceStatus):
         return ClothState(self.data["mop_state"])
 
     @property
-    def water_level(self) -> WaterState:
+    def water_level(self) -> WaterLevel:
         """Water Level."""
-        return WaterState(self.data["water_level"])
+        return WaterLevel(self.data["water_level"])
 
     @property
     def main_brush_life_level(self) -> int:
@@ -288,17 +283,17 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
         return self.call_action("stop")
 
     @command(
-        click.argument("fan_speed", type=EnumType(SuctionState)),
+        click.argument("fan_speed", type=EnumType(FadSpeedMode)),
         default_output=format_output("Setting fan speed to {fan_speed}"),
     )
-    def set_fan_speed(self, fan_speed: SuctionState):
+    def set_fan_speed(self, fan_speed: FadSpeedMode):
         """Set fan speed."""
         return self.set_property("fan_speed", fan_speed.value)
 
     @command()
     def fan_speed_presets(self) -> FanspeedPresets:
         """Return available fan speed presets."""
-        return _enum_as_dict(SuctionState)
+        return _enum_as_dict(FadSpeedMode)
 
     @command(click.argument("speed", type=int))
     def set_fan_speed_preset(self, speed_preset: int) -> None:
