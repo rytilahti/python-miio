@@ -11,34 +11,38 @@ from miio.miot_device import DeviceStatus, MiotDevice
 _LOGGER = logging.getLogger(__name__)
 MI_ROBOT_VACUUM_MOP_PRO_2 = "ijai.vacuum.v3"
 
-SUPPORTED_MODELS = [MI_ROBOT_VACUUM_MOP_PRO_2]
-
-MAPPING = {
-    # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:vacuum:0000A006:ijai-v3:1
-    "battery": {"siid": 3, "piid": 1},
-    "error_code": {"siid": 2, "piid": 2},
-    "state": {"siid": 2, "piid": 1},
-    "fan_speed": {"siid": 7, "piid": 5},
-    "operating_mode": {"siid": 2, "piid": 4},
-    "mop_state": {"siid": 7, "piid": 4},
-    "water_level": {"siid": 7, "piid": 6},
-    "main_brush_life_level": {"siid": 7, "piid": 10},
-    "main_brush_time_left": {"siid": 7, "piid": 11},
-    "side_brush_life_level": {"siid": 7, "piid": 8},
-    "side_brush_time_left": {"siid": 7, "piid": 9},
-    "filter_life_level": {"siid": 7, "piid": 12},
-    "filter_time_left": {"siid": 7, "piid": 13},
-    "clean_area": {"siid": 7, "piid": 23},
-    "clean_time": {"siid": 7, "piid": 22},
-    "home": {"siid": 3, "aiid": 1},
-    "start": {"siid": 2, "aiid": 1},
-    "stop": {"siid": 2, "aiid": 2},
-    "current_language": {"siid": 7, "piid": 21},
+_MAPPINGS = {
+    MI_ROBOT_VACUUM_MOP_PRO_2: {
+        # Source  https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:vacuum:0000A006:ijai-v3:1
+        # Robot Cleaner (siid=2)
+        "state": {"siid": 2, "piid": 1},
+        "error_code": {"siid": 2, "piid": 2},  # [0, 3000] step 1
+        "operating_mode": {
+            "siid": 2,
+            "piid": 4,
+        },  # 0 - Sweep, 1 - Sweep And Mop, 2 - Mop
+        "start": {"siid": 2, "aiid": 1},
+        "stop": {"siid": 2, "aiid": 2},
+        # Battery (siid=3)
+        "battery": {"siid": 3, "piid": 1},  # [0, 100] step 1
+        "home": {"siid": 3, "aiid": 1},  # Start Charge
+        # sweep (siid=7)
+        "mop_state": {"siid": 7, "piid": 4},  # 0 - none, 1 - set
+        "fan_speed": {
+            "siid": 7,
+            "piid": 5,
+        },  # 0 - off, 1 - power save, 2 - standard, 3 - turbo
+        "water_level": {"siid": 7, "piid": 6},  # 0 - low, 1 - medium, 2 - high
+        "side_brush_life_level": {"siid": 7, "piid": 8},  # [0, 100] step 1
+        "side_brush_time_left": {"siid": 7, "piid": 9},  # [0, 180] step 1
+        "main_brush_life_level": {"siid": 7, "piid": 10},  # [0, 100] step 1
+        "main_brush_time_left": {"siid": 7, "piid": 11},  # [0, 360] step 1
+        "clean_time": {"siid": 7, "piid": 22},  # [0, 120] step 1
+        "clean_area": {"siid": 7, "piid": 23},  # [0, 1200] step 1
+    }
 }
 
 ERROR_CODES: Dict[int, str] = {}
-
-MIOT_MAPPING = {MI_ROBOT_VACUUM_MOP_PRO_2: MAPPING}
 
 
 class FormattableEnum(Enum):
@@ -233,9 +237,7 @@ class Pro2Status(DeviceStatus):
 class Pro2Vacuum(MiotDevice, VacuumInterface):
     """Support for Mi Robot Vacuum-Mop 2 Pro (ijai.vacuum.v3)."""
 
-    _mappings = MIOT_MAPPING
-
-    supported_models = SUPPORTED_MODELS
+    _mappings = _MAPPINGS
 
     @command(
         default_output=format_output(
