@@ -1,11 +1,13 @@
 """Test of vacuum devices."""
 from collections.abc import Iterable
+from datetime import datetime
 from typing import List, Sequence, Tuple, Type
 
 import pytest
+from pytz import UTC
 
 from miio.device import Device
-from miio.integrations.vacuum.roborock.vacuum import ROCKROBO_V1
+from miio.integrations.vacuum.roborock.vacuum import ROCKROBO_V1, Timer
 from miio.interfaces import VacuumInterface
 
 # list of all supported vacuum classes
@@ -53,3 +55,25 @@ def test_vacuum_set_fan_speed_presets_fails(cls: Type[Device], model: str) -> No
     assert isinstance(dev, VacuumInterface)
     with pytest.raises(ValueError):
         dev.set_fan_speed_preset(-1)
+
+
+def test_vacuum_timer(mocker):
+    """Test Timer class."""
+
+    mock = mocker.patch.object(Timer, attribute="_now")
+    mock.return_value = datetime(2000, 1, 1)
+
+    t = Timer(
+        data=["1488667794112", "off", ["49 22 * * 6", ["start_clean", ""]]],
+        timezone=UTC,
+    )
+
+    assert t.id == "1488667794112"
+    assert t.enabled is False
+    assert t.cron == "49 22 * * 6"
+    assert t.next_schedule == datetime(
+        2000, 1, 1, 22, 49, tzinfo=UTC
+    ), "should figure out the next run"
+    assert t.next_schedule == datetime(
+        2000, 1, 1, 22, 49, tzinfo=UTC
+    ), "should return the same value twice"
