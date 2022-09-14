@@ -1,7 +1,9 @@
+from unittest.mock import ANY
+
 import pytest
 
 from miio import Huizuo, MiotDevice
-from miio.miot_device import MiotValueType
+from miio.miot_device import MiotValueType, _filter_request_fields
 
 MIOT_DEVICES = MiotDevice.__subclasses__()
 # TODO: huizuo needs to be refactored to use _mappings,
@@ -15,6 +17,7 @@ def dev(module_mocker):
     device = MiotDevice(
         "127.0.0.1", "68ffffffffffffffffffffffffffffff", mapping=DUMMY_MAPPING
     )
+    device._model = "testmodel"
     module_mocker.patch.object(device, "send")
     return device
 
@@ -151,3 +154,51 @@ def test_supported_models(cls):
 
     # make sure that that _supported_models is not defined
     assert not cls._supported_models
+
+
+def test_call_action(dev):
+    dev._mappings["testmodel"] = {"test_action": {"siid": 1, "aiid": 1}}
+
+    dev.call_action("test_action")
+
+
+@pytest.mark.parametrize(
+    "props,included_in_request",
+    [
+        ({"access": ["read"]}, True),  # read only
+        ({"access": ["read", "write"]}, True),  # read-write
+        ({}, True),  # not defined
+        ({"access": ["write"]}, False),  # write-only
+        ({"aiid": "1"}, False),  # action
+    ],
+    ids=["read-only", "read-write", "access-not-defined", "write-only", "action"],
+)
+def test_get_properties_for_mapping_readables(mocker, dev, props, included_in_request):
+    base_props = {"readable_property": {"siid": 1, "piid": 1}}
+    base_request = [{"did": k, **v} for k, v in base_props.items()]
+    dev._mappings["testmodel"] = mapping = {
+        **base_props,
+        "property_under_test": {"siid": 1, "piid": 2, **props},
+    }
+    expected_request = [
+        {"did": k, **_filter_request_fields(v)} for k, v in mapping.items()
+    ]
+
+    req = mocker.patch.object(dev, "get_properties")
+    dev.get_properties_for_mapping()
+
+    try:
+
+        req.assert_called_with(
+            expected_request, property_getter=ANY, max_properties=ANY
+        )
+    except AssertionError:
+        if included_in_request:
+            raise AssertionError("Required property was not requested")
+        else:
+            try:
+                req.assert_called_with(
+                    base_request, property_getter=ANY, max_properties=ANY
+                )
+            except AssertionError as ex:
+                raise AssertionError("Tried to read unreadable property") from ex
