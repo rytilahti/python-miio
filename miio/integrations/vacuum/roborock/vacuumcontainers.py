@@ -502,7 +502,10 @@ class Timer(DeviceStatus):
 
     @property
     def next_schedule(self) -> datetime:
-        """Next schedule for the timer."""
+        """Next schedule for the timer.
+
+        Note, this value will not be updated after the Timer object has been created.
+        """
         if self._next_schedule is None:
             self._next_schedule = self.croniter.get_next(ret_type=datetime)
         return self._next_schedule
