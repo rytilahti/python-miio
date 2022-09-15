@@ -244,12 +244,22 @@ _MAPPINGS = {
     "zhimi.airpurifier.mb4": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb4a": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
+    "zhimi.airp.mb5a": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
     "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
 }
+
+# Models requiring reversed led brightness value
+REVERSED_LED_BRIGHTNESS = [
+    "zhimi.airp.va2",
+    "zhimi.airp.mb5",
+    "zhimi.airp.mb5a",
+    "zhimi.airp.vb4",
+    "zhimi.airp.rmb1",
+]
 
 
 class AirPurifierMiotException(DeviceException):
@@ -401,15 +411,9 @@ class AirPurifierMiotStatus(DeviceStatus):
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
         """Brightness of the LED."""
-
         value = self.data.get("led_brightness")
         if value is not None:
-            if self.model in (
-                "zhimi.airp.va2",
-                "zhimi.airp.mb5",
-                "zhimi.airp.vb4",
-                "zhimi.airp.rmb1",
-            ):
+            if self.model in REVERSED_LED_BRIGHTNESS:
                 value = 2 - value
             try:
                 return LedBrightness(value)
@@ -690,11 +694,7 @@ class AirPurifierMiot(MiotDevice):
             )
 
         value = brightness.value
-        if (
-            self.model
-            in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4", "zhimi.airp.rmb1")
-            and value is not None
-        ):
+        if self.model in REVERSED_LED_BRIGHTNESS and value is not None:
             value = 2 - value
         return self.set_property("led_brightness", value)
 
