@@ -1,5 +1,7 @@
 from enum import Enum
 
+import pytest
+
 from miio import Device, DeviceStatus
 from miio.descriptors import EnumSettingDescriptor, NumberSettingDescriptor
 from miio.devicestatus import sensor, setting, switch
@@ -198,3 +200,36 @@ def test_setting_decorator_enum(mocker):
 
     settings["level"].setter(TestEnum.Second)
     setter.assert_called_with(TestEnum.Second)
+
+
+def test_embed():
+    class MainStatus(DeviceStatus):
+        @property
+        @sensor("main_sensor")
+        def main_sensor(self):
+            return "main"
+
+    class SubStatus(DeviceStatus):
+        @property
+        @sensor("sub_sensor")
+        def sub_sensor(self):
+            return "sub"
+
+    main = MainStatus()
+    assert len(main.sensors()) == 1
+
+    sub = SubStatus()
+    main.embed(sub)
+    sensors = main.sensors()
+    assert len(sensors) == 2
+
+    assert getattr(main, sensors["main_sensor"].property) == "main"
+    assert getattr(main, sensors["SubStatus:sub_sensor"].property) == "sub"
+
+    with pytest.raises(KeyError):
+        main.sensors()["nonexisting_sensor"]
+
+    assert (
+        repr(main)
+        == "<MainStatus main_sensor=main SubStatus=<SubStatus sub_sensor=sub>>"
+    )

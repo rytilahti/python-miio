@@ -35,6 +35,8 @@ class _StatusMeta(type):
         cls._switches: Dict[str, SwitchDescriptor] = {}
         cls._settings: Dict[str, SettingDescriptor] = {}
 
+        cls._embedded: Dict[str, "DeviceStatus"] = {}
+
         descriptor_map = {
             "sensor": cls._sensors,
             "switch": cls._switches,
@@ -58,7 +60,8 @@ class DeviceStatus(metaclass=_StatusMeta):
     All status container classes should inherit from this class:
 
     * This class allows downstream users to access the available information in an
-      introspectable way.
+      introspectable way. See :func:`@property`, :func:`switch`, and :func:`@setting`.
+    * :func:`embed` allows embedding other status containers.
     * The __repr__ implementation returns all defined properties and their values.
     """
 
@@ -76,6 +79,10 @@ class DeviceStatus(metaclass=_StatusMeta):
                 prop_value = ex.__class__.__name__
 
             s += f" {name}={prop_value}"
+
+        for name, embedded in self._embedded.items():
+            s += f" {name}={repr(embedded)}"
+
         s += ">"
         return s
 
@@ -100,11 +107,46 @@ class DeviceStatus(metaclass=_StatusMeta):
         """
         return self._settings  # type: ignore[attr-defined]
 
+    def embed(self, other: "DeviceStatus"):
+        """Embed another status container to current one.
+
+        This makes it easy to provide a single status response for cases where responses
+        from multiple I/O calls is wanted to provide a simple interface for downstreams.
+
+        Internally, this will prepend the name of the other class to the property names,
+        and override the __getattribute__ to lookup attributes in the embedded containers.
+        """
+        other_name = str(other.__class__.__name__)
+
+        self._embedded[other_name] = other
+
+        for name, sensor in other.sensors().items():
+            final_name = f"{other_name}:{name}"
+            import attr
+
+            self._sensors[final_name] = attr.evolve(sensor, property=final_name)
+
+        for name, switch in other.switches().items():
+            final_name = f"{other_name}:{name}"
+            self._switches[final_name] = attr.evolve(switch, property=final_name)
+
+        for name, setting in other.settings().items():
+            final_name = f"{other_name}:{name}"
+            self._settings[final_name] = attr.evolve(setting, property=final_name)
+
+    def __getattribute__(self, item):
+        """Overridden to lookup properties from embedded containers."""
+        if ":" not in item:
+            return super().__getattribute__(item)
+
+        embed, prop = item.split(":")
+        return getattr(self._embedded[embed], prop)
+
 
 def sensor(name: str, *, unit: str = "", **kwargs):
     """Syntactic sugar to create SensorDescriptor objects.
 
-    The information can be used by users of the library to programatically find out what
+    The information can be used by users of the library to programmatically find out what
     types of sensors are available for the device.
 
     The interface is kept minimal, but you can pass any extra keyword arguments.
@@ -144,7 +186,7 @@ def sensor(name: str, *, unit: str = "", **kwargs):
 def switch(name: str, *, setter_name: str, **kwargs):
     """Syntactic sugar to create SwitchDescriptor objects.
 
-    The information can be used by users of the library to programatically find out what
+    The information can be used by users of the library to programmatically find out what
     types of sensors are available for the device.
 
     The interface is kept minimal, but you can pass any extra keyword arguments.
@@ -184,7 +226,7 @@ def setting(
 ):
     """Syntactic sugar to create SettingDescriptor objects.
 
-    The information can be used by users of the library to programatically find out what
+    The information can be used by users of the library to programmatically find out what
     types of sensors are available for the device.
 
     The interface is kept minimal, but you can pass any extra keyword arguments.
