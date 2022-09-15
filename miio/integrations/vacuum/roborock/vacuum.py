@@ -403,7 +403,10 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def status(self) -> VacuumStatus:
         """Return status of the vacuum."""
-        return VacuumStatus(self.send("get_status")[0])
+        status = VacuumStatus(self.send("get_status")[0])
+        status.embed(self.consumable_status())
+        status.embed(self.clean_history())
+        return status
 
     def enable_log_upload(self):
         raise NotImplementedError("unknown parameters")
