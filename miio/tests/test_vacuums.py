@@ -71,9 +71,15 @@ def test_vacuum_timer(mocker):
     assert t.id == "1488667794112"
     assert t.enabled is False
     assert t.cron == "49 22 * * 6"
-    assert t.next_schedule == datetime(
-        2000, 1, 1, 22, 49, tzinfo=UTC
+    with pytest.deprecated_call():
+        assert t.next_schedule == datetime(
+            2000, 1, 1, 22, 49, tzinfo=UTC
+        ), "should figure out the next run"
+    with pytest.deprecated_call():
+        assert t.next_schedule == datetime(
+            2000, 1, 1, 22, 49, tzinfo=UTC
+        ), "should return the same value twice"
+
+    assert t.find_next_schedule(after=datetime(2000, 2, 2)) == datetime(
+        2000, 2, 5, 22, 49, tzinfo=UTC
     ), "should figure out the next run"
-    assert t.next_schedule == datetime(
-        2000, 1, 1, 22, 49, tzinfo=UTC
-    ), "should return the same value twice"

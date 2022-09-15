@@ -7,7 +7,7 @@ from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
-from miio.utils import pretty_seconds, pretty_time
+from miio.utils import deprecated, pretty_seconds, pretty_time
 
 
 def pretty_area(x: float) -> float:
@@ -458,12 +458,6 @@ class Timer(DeviceStatus):
         self.data = data
         self.timezone = timezone
 
-        localized_ts = timezone.localize(self._now())
-
-        # Initialize croniter to cause an exception on invalid entries (#847)
-        self.croniter = croniter(self.cron, start_time=localized_ts)
-        self._next_schedule: Optional[datetime] = None
-
     @property
     def id(self) -> str:
         """Unique identifier for timer.
@@ -501,14 +495,27 @@ class Timer(DeviceStatus):
         return str(self.data[2][1])
 
     @property
+    @deprecated("Use find_next_schedule()")
     def next_schedule(self) -> datetime:
         """Next schedule for the timer.
 
         Note, this value will not be updated after the Timer object has been created.
         """
-        if self._next_schedule is None:
-            self._next_schedule = self.croniter.get_next(ret_type=datetime)
-        return self._next_schedule
+        return self.find_next_schedule()
+
+    def find_next_schedule(self, after: Optional[datetime] = None) -> datetime:
+        """Find next schedule for the timer.
+
+        :param datetime after: reference timestamp for the search (default current time)
+        :return: the next schedule of the timer relative to the "after" parameter.
+        """
+        after = after or self._now()
+        localized_after = self.timezone.localize(after)
+
+        # Initialize croniter to cause an exception on invalid entries (#847)
+        return croniter(self.cron, start_time=localized_after).get_next(
+            ret_type=datetime
+        )
 
     @staticmethod
     def _now() -> datetime:
