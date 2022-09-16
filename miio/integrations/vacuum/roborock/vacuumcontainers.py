@@ -35,7 +35,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     17: "Side brushes problem, reboot me",
     18: "Suction fan problem",
     19: "Unpowered charging station",
-    21: "Laser disance sensor blocked",
+    21: "Laser distance sensor blocked",
     22: "Clean the dock charging contacts",
     23: "Docking station not reachable",
     24: "No-go zone or invisible wall detected",
@@ -233,7 +233,7 @@ class VacuumStatus(DeviceStatus):
     @property
     @sensor("Error", icon="mdi:alert")
     def got_error(self) -> bool:
-        """True if an error has occured."""
+        """True if an error has occurred."""
         return self.error_code != 0
 
 
