@@ -1,13 +1,14 @@
 """Parse PCAP files for miio traffic."""
 from collections import Counter, defaultdict
 from ipaddress import ip_address
+from typing import List
 
 import click
 
 from miio import Message
 
 
-def read_payloads_from_file(file, tokens: list[str]):
+def read_payloads_from_file(file, tokens: List[str]):
     """Read the given pcap file and yield src, dst, and result."""
     try:
         import dpkt
@@ -77,7 +78,7 @@ def read_payloads_from_file(file, tokens: list[str]):
 @click.command()
 @click.argument("file", type=click.File("rb"))
 @click.argument("token", nargs=-1)
-def parse_pcap(file, token: list[str]):
+def parse_pcap(file, token: List[str]):
     """Read PCAP file and output decrypted miio communication."""
     for src_addr, dst_addr, payload in read_payloads_from_file(file, token):
         print(f"{src_addr:<15} -> {dst_addr:<15} {payload}")  # noqa: T201
