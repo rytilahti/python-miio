@@ -5,6 +5,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting, switch
 from miio.fan_common import FanException, LedBrightness, MoveDirection
 
 _LOGGER = logging.getLogger(__name__)
@@ -81,11 +82,13 @@ class FanStatus(DeviceStatus):
         return self.data["power"]
 
     @property
+    @switch("Power", setter_name="set_power")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.power == "on"
 
     @property
+    @sensor("Humidity")
     def humidity(self) -> Optional[int]:
         """Current humidity."""
         if "humidity" in self.data and self.data["humidity"] is not None:
@@ -93,6 +96,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Temperature", unit="C")
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         if "temp_dec" in self.data and self.data["temp_dec"] is not None:
@@ -100,6 +104,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @switch("LED", setter_name="set_led")
     def led(self) -> Optional[bool]:
         """True if LED is turned on, if available."""
         if "led" in self.data and self.data["led"] is not None:
@@ -107,6 +112,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @setting("LED Brightness", choices=LedBrightness, setter_name="set_led_brightness")
     def led_brightness(self) -> Optional[LedBrightness]:
         """LED brightness, if available."""
         if self.data["led_b"] is not None:
@@ -114,16 +120,19 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @switch("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] in ["on", 1, 2]
 
     @property
+    @switch("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
+    @setting("Natural Speed Level", setter_name="set_natural_speed", max_value=100)
     def natural_speed(self) -> Optional[int]:
         """Speed level in natural mode."""
         if "natural_level" in self.data and self.data["natural_level"] is not None:
@@ -131,6 +140,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @setting("Direct Speed", setter_name="set_direct_speed", max_value=100)
     def direct_speed(self) -> Optional[int]:
         """Speed level in direct mode."""
         if "speed_level" in self.data and self.data["speed_level"] is not None:
@@ -138,11 +148,13 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @switch("Oscillate", setter_name="set_oscillate")
     def oscillate(self) -> bool:
         """True if oscillation is enabled."""
         return self.data["angle_enable"] == "on"
 
     @property
+    @sensor("Battery", unit="%")
     def battery(self) -> Optional[int]:
         """Current battery level."""
         if "battery" in self.data and self.data["battery"] is not None:
@@ -150,6 +162,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Battery Charge State")
     def battery_charge(self) -> Optional[str]:
         """State of the battery charger, if available."""
         if "bat_charge" in self.data and self.data["bat_charge"] is not None:
@@ -157,6 +170,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Battery State")
     def battery_state(self) -> Optional[str]:
         """State of the battery, if available."""
         if "bat_state" in self.data and self.data["bat_state"] is not None:
@@ -164,6 +178,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("AC Powered")
     def ac_power(self) -> bool:
         """True if powered by AC."""
         return self.data["ac_power"] == "on"
@@ -174,11 +189,13 @@ class FanStatus(DeviceStatus):
         return self.data["poweroff_time"]
 
     @property
+    @sensor("Motor Speed", unit="RPM")
     def speed(self) -> int:
         """Speed of the motor."""
         return self.data["speed"]
 
     @property
+    @setting("Oscillation Angle", setter_name="set_angle", max_value=120)
     def angle(self) -> int:
         """Current angle."""
         return self.data["angle"]
@@ -189,6 +206,7 @@ class FanStatus(DeviceStatus):
         return self.data["use_time"]
 
     @property
+    @sensor("Last Pressed Button")
     def button_pressed(self) -> Optional[str]:
         """Last pressed button."""
         if "button_pressed" in self.data and self.data["button_pressed"] is not None:
@@ -246,6 +264,16 @@ class Fan(Device):
     def off(self):
         """Power off."""
         return self.send("set_power", ["off"])
+
+    @command(
+        click.argument("power", type=bool),
+    )
+    def set_power(self, power: bool):
+        """Turn device on or off."""
+        if power:
+            self.on()
+        else:
+            self.off()
 
     @command(
         click.argument("speed", type=int),
