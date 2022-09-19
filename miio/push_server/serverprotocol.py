@@ -52,10 +52,10 @@ class ServerProtocol:
         self.transport.sendto(m, (host, port))
         _LOGGER.debug("%s:%s<=ACK(server_id=%s)", host, port, self.server.server_id)
 
-    def send_msg_OK(self, host, port, msg_id, token):
-        # This result means OK, but some methods return ['ok'] instead of 0
-        # might be necessary to use different results for different methods
-        result = {"result": 0, "id": msg_id}
+    def send_response(self, host, port, msg_id, token, payload=None):
+        if payload is None:
+            payload = {}
+        result = {**payload, "id": msg_id}
         header = {
             "length": 0,
             "unknown": 0,
@@ -71,38 +71,74 @@ class ServerProtocol:
         self.transport.sendto(response, (host, port))
         _LOGGER.debug(">> %s:%s: %s", host, port, result)
 
+    def send_error(self, host, port, msg_id, token, code, message):
+        """Send error message with given code and message to the client."""
+        return self.send_response(
+            host, port, msg_id, token, {"error": {"code": code, "error": message}}
+        )
+
+    def _handle_datagram_from_registered_device(self, host, port, data):
+        """Handle requests from registered eventing devices."""
+        token = self.server._registered_devices[host]["token"]
+        callback = self.server._registered_devices[host]["callback"]
+
+        msg = Message.parse(data, token=token)
+        msg_value = msg.data.value
+        msg_id = msg_value["id"]
+        _LOGGER.debug("<< %s:%s: %s", host, port, msg_value)
+
+        # Send OK
+        # This result means OK, but some methods return ['ok'] instead of 0
+        # might be necessary to use different results for different methods
+        payload = {"result": 0}
+        self.send_response(host, port, msg_id, token, payload=payload)
+
+        # Parse message
+        action, device_call_id = msg_value["method"].rsplit(":", 1)
+        source_device_id = device_call_id.replace("_", ".")
+
+        callback(source_device_id, action, msg_value.get("params"))
+
+    def _handle_datagram_from_client(self, host: str, port: int, data):
+        """Handle datagram from a regular client."""
+        token = bytes.fromhex(32 * "0")  # TODO: make token configurable?
+        msg = Message.parse(data, token=token)
+        msg_value = msg.data.value
+        msg_id = msg_value["id"]
+
+        _LOGGER.debug(
+            "Received datagram #%s from regular client: %s: %s",
+            msg_id,
+            host,
+            msg_value,
+        )
+
+        methods = self.server.methods
+        if msg_value["method"] not in methods:
+            return self.send_error(host, port, msg_id, token, -1, "unsupported method")
+
+        method = methods[msg_value["method"]]
+        if callable(method):
+            try:
+                response = method(msg_value)
+            except Exception as ex:
+                return self.send_error(host, port, msg_id, token, -1, str(ex))
+        else:
+            response = method
+
+        return self.send_response(host, port, msg_id, token, payload=response)
+
     def datagram_received(self, data, addr):
         """Handle received messages."""
         try:
             (host, port) = addr
             if data == HELO_BYTES:
-                self.send_ping_ACK(host, port)
-                return
+                return self.send_ping_ACK(host, port)
 
-            if host not in self.server._registered_devices:
-                _LOGGER.warning(
-                    "Datagram received from unknown device (%s:%s)",
-                    host,
-                    port,
-                )
-                return
-
-            token = self.server._registered_devices[host]["token"]
-            callback = self.server._registered_devices[host]["callback"]
-
-            msg = Message.parse(data, token=token)
-            msg_value = msg.data.value
-            msg_id = msg_value["id"]
-            _LOGGER.debug("<< %s:%s: %s", host, port, msg_value)
-
-            # Send OK
-            self.send_msg_OK(host, port, msg_id, token)
-
-            # Parse message
-            action, device_call_id = msg_value["method"].rsplit(":", 1)
-            source_device_id = device_call_id.replace("_", ".")
-
-            callback(source_device_id, action, msg_value.get("params"))
+            if host in self.server._registered_devices:
+                return self._handle_datagram_from_registered_device(host, port, data)
+            else:
+                return self._handle_datagram_from_client(host, port, data)
 
         except Exception:
             _LOGGER.exception(

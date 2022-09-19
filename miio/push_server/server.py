@@ -3,7 +3,7 @@ import logging
 import socket
 from json import dumps
 from random import randint
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional, Union
 
 from ..device import Device
 from ..protocol import Utils
@@ -53,7 +53,7 @@ class PushServer:
         await push_server.stop()
     """
 
-    def __init__(self, device_ip):
+    def __init__(self, device_ip=None):
         """Initialize the class."""
         self._device_ip = device_ip
 
@@ -66,6 +66,8 @@ class PushServer:
         self._listen_couroutine = None
         self._registered_devices = {}
 
+        self._methods = {}
+
         self._event_id = 1000000
 
     async def start(self):
@@ -76,7 +78,9 @@ class PushServer:
 
         self._loop = asyncio.get_event_loop()
 
-        _, self._listen_couroutine = await self._create_udp_server()
+        transport, self._listen_couroutine = await self._create_udp_server()
+
+        return transport, self._listen_couroutine
 
     async def stop(self):
         """Stop Miio push server."""
@@ -89,6 +93,13 @@ class PushServer:
         self._listen_couroutine.close()
         self._listen_couroutine = None
         self._loop = None
+
+    def add_method(self, name: str, response: Union[Dict, Callable]):
+        """Add a method to server.
+
+        The response can be either a callable or a dictionary to send back as response.
+        """
+        self._methods[name] = response
 
     def register_miio_device(self, device: Device, callback: PushServerCallback):
         """Register a miio device to this push server."""
@@ -208,7 +219,8 @@ class PushServer:
 
     async def _create_udp_server(self):
         """Create the UDP socket and protocol."""
-        self._server_ip = await self._get_server_ip()
+        if self._device_ip is not None:
+            self._server_ip = await self._get_server_ip()
 
         # Create a fresh socket that will be used for the push server
         udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -311,3 +323,8 @@ class PushServer:
     def server_model(self):
         """Return the model of the fake device beeing emulated."""
         return self._server_model
+
+    @property
+    def methods(self):
+        """Return a dict of implemented methods."""
+        return self._methods
