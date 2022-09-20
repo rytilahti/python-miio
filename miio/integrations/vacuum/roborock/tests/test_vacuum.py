@@ -45,8 +45,34 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "water_box_status": 1,
         }
 
+        self.dummies = {}
+        self.dummies["consumables"] = [
+            {
+                "filter_work_time": 32454,
+                "sensor_dirty_time": 3798,
+                "side_brush_work_time": 32454,
+                "main_brush_work_time": 32454,
+            }
+        ]
+        self.dummies["clean_summary"] = [
+            174145,
+            2410150000,
+            82,
+            [
+                1488240000,
+                1488153600,
+                1488067200,
+                1487980800,
+                1487894400,
+                1487808000,
+                1487548800,
+            ],
+        ]
+
         self.return_values = {
-            "get_status": self.vacuum_state,
+            "get_status": lambda x: [self.state],
+            "get_consumable": lambda x: self.dummies["consumables"],
+            "get_clean_summary": lambda x: self.dummies["clean_summary"],
             "app_start": lambda x: self.change_mode("start"),
             "app_stop": lambda x: self.change_mode("stop"),
             "app_pause": lambda x: self.change_mode("pause"),
@@ -76,9 +102,6 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             self.state["state"] = DummyVacuum.STATE_ZONED_CLEAN
         elif new_mode == "charge":
             self.state["state"] = DummyVacuum.STATE_CHARGING
-
-    def vacuum_state(self, _):
-        return [self.state]
 
 
 @pytest.fixture(scope="class")

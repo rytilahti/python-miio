@@ -256,6 +256,18 @@ Furthermore, it allows defining meta information about properties that are espec
     In practice this means that neither the input nor the output values of functions decorated with
     the descriptors are enforced automatically by this library.
 
+Embedding Containers
+""""""""""""""""""""
+
+Sometimes your device requires multiple I/O requests to gather information you want to expose
+to downstream users. One example of such is Roborock vacuum integration, where the status request
+does not report on information about consumables.
+
+To make it easy for downstream users, you can *embed* other status container classes into a single
+one using :meth:`miio.devicestatus.DeviceStatus.embed`.
+This will create a copy of the exposed descriptors to the main container and act as a proxy to give
+access to the properties of embedded containers.
+
 
 Sensors
 """""""
