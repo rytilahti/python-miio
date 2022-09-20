@@ -7,6 +7,7 @@ import click
 
 from miio import Device, DeviceError, DeviceException, DeviceInfo, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting, switch
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -99,6 +100,7 @@ class AirHumidifierStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
+    @sensor("Temperature", unit="°C", device_class="temperature")
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         if "temp_dec" in self.data and self.data["temp_dec"] is not None:
@@ -108,16 +110,31 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Humidity", unit="%", device_class="humidity")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
 
     @property
+    @switch(
+        name="Buzzer",
+        icon="mdi:volume-high",
+        setter_name="set_buzzer",
+        device_class="switch",
+        entity_category="config",
+    )
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] == "on"
 
     @property
+    @setting(
+        name="Led Brightness",
+        icon="mdi:brightness-6",
+        setter_name="set_led_brightness",
+        choices=LedBrightness,
+        entity_category="config",
+    )
     def led_brightness(self) -> Optional[LedBrightness]:
         """LED brightness if available."""
         if self.data["led_b"] is not None:
@@ -125,6 +142,13 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
+    @switch(
+        name="Child Lock",
+        icon="mdi:lock",
+        setter_name="set_child_lock",
+        device_class="switch",
+        entity_category="config",
+    )
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
@@ -183,8 +207,15 @@ class AirHumidifierStatus(DeviceStatus):
             return 0
 
     @property
+    @sensor(
+        "Motor Speed",
+        unit="rpm",
+        device_class="measurement",
+        icon="mdi:fast-forward",
+        entity_category="diagnostic",
+    )
     def motor_speed(self) -> Optional[int]:
-        """Current fan speed."""
+        """Current motor speed."""
         if "speed" in self.data and self.data["speed"] is not None:
             return self.data["speed"]
         return None
@@ -193,13 +224,20 @@ class AirHumidifierStatus(DeviceStatus):
     def depth(self) -> Optional[int]:
         """Return raw value of depth."""
         _LOGGER.warning(
-            "The 'depth' property is deprecated and will be removed in the future. Use 'water_level' and 'water_tank_detached' properties instead."
+            "The 'depth' property is deprecated and will be removed in the future. Use 'water_level' and 'water_tank_attached' properties instead."
         )
         if "depth" in self.data:
             return self.data["depth"]
         return None
 
     @property
+    @sensor(
+        "Water Level",
+        unit="%",
+        device_class="measurement",
+        icon="mdi:water-check",
+        entity_category="diagnostic",
+    )
     def water_level(self) -> Optional[int]:
         """Return current water level in percent.
 
@@ -215,16 +253,43 @@ class AirHumidifierStatus(DeviceStatus):
         return int(min(depth / 1.2, 100))
 
     @property
+    @sensor(
+        "Water Tank Attached",
+        device_class="connectivity",
+        icon="mdi:car-coolant-level",
+        entity_category="diagnostic",
+    )
+    def water_tank_attached(self) -> Optional[bool]:
+        """True if the water tank is attached.
+
+        If water tank is detached, depth is 127.
+        """
+        if self.data.get("depth") is not None:
+            return self.data["depth"] != 127
+        return None
+
+    @property
     def water_tank_detached(self) -> Optional[bool]:
         """True if the water tank is detached.
 
         If water tank is detached, depth is 127.
         """
+
+        _LOGGER.warning(
+            "The 'water_tank_detached' property is deprecated and will be removed in the future. Use 'water_tank_attached' properties instead."
+        )
         if self.data.get("depth") is not None:
             return self.data["depth"] == 127
         return None
 
     @property
+    @switch(
+        name="Dry Mode",
+        icon="mdi:hair-dryer",
+        setter_name="set_dry",
+        device_class="switch",
+        entity_category="config",
+    )
     def dry(self) -> Optional[bool]:
         """Dry mode: The amount of water is not enough to continue to work for about 8
         hours.
@@ -236,6 +301,13 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(
+        "Use Time",
+        unit="s",
+        device_class="total_increasing",
+        icon="mdi:progress-clock",
+        entity_category="diagnostic",
+    )
     def use_time(self) -> Optional[int]:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
@@ -273,7 +345,7 @@ class AirHumidifier(Device):
             "Speed: {result.motor_speed}\n"
             "Depth: {result.depth}\n"
             "Water Level: {result.water_level} %\n"
-            "Water tank detached: {result.water_tank_detached}\n"
+            "Water tank attached: {result.water_tank_attached}\n"
             "Dry: {result.dry}\n"
             "Use time: {result.use_time}\n"
             "Hardware version: {result.hardware_version}\n"
