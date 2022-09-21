@@ -55,6 +55,7 @@ docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme"]
 pytest = ">=6.2.5"
 pytest-cov = "^2"
 pytest-mock = "^3"
+pytest-asyncio = "*"
 voluptuous = "^0"
 pre-commit = "^2"
 doc8 = "^0"
