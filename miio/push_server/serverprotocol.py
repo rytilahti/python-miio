@@ -52,23 +52,31 @@ class ServerProtocol:
         self.transport.sendto(m, (host, port))
         _LOGGER.debug("%s:%s<=ACK(server_id=%s)", host, port, self.server.server_id)
 
-    def send_response(self, host, port, msg_id, token, payload=None):
-        if payload is None:
-            payload = {}
-        result = {**payload, "id": msg_id}
+    def _create_message(self, data, token, device_id):
+        """Create a message to be sent to the client."""
         header = {
             "length": 0,
             "unknown": 0,
-            "device_id": self.server.server_id,
+            "device_id": device_id,
             "ts": datetime.datetime.now(),
         }
         msg = {
-            "data": {"value": result},
+            "data": {"value": data},
             "header": {"value": header},
             "checksum": 0,
         }
         response = Message.build(msg, token=token)
-        self.transport.sendto(response, (host, port))
+
+        return response
+
+    def send_response(self, host, port, msg_id, token, payload=None):
+        if payload is None:
+            payload = {}
+
+        result = {**payload, "id": msg_id}
+        msg = self._create_message(result, token, device_id=self.server.server_id)
+
+        self.transport.sendto(msg, (host, port))
         _LOGGER.debug(">> %s:%s: %s", host, port, result)
 
     def send_error(self, host, port, msg_id, token, code, message):
