@@ -66,7 +66,7 @@ class SimulatedMiio(BaseModel):
     properties: List[MiioProperty]
     name: Optional[str] = Field(default="Unnamed integration")
     actions: Optional[List[MiioAction]] = Field(default=[])
-    _model: Optional[str] = PrivateAttr()
+    _model: Optional[str] = PrivateAttr(default=None)
 
     class Config:
         extra = "forbid"
