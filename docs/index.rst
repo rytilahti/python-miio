@@ -29,6 +29,7 @@ who have helped to extend this to cover not only the vacuum cleaner.
     discovery
     troubleshooting
     contributing
+    simulator
     device_docs/index
     push_server
 

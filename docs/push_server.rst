@@ -6,6 +6,9 @@ such as those from Zigbee devices connected to a gateway device.
 The server itself acts as a miio device receiving the events it has :ref:`subscribed to receive<events_subscribe>`,
 and calling the registered callbacks accordingly.
 
+.. contents:: Contents
+   :local:
+
 .. note::
 
     While the eventing has been so far tested only on gateway devices, other devices that allow scene definitions on the
