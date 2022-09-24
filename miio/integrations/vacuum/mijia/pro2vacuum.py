@@ -102,7 +102,7 @@ class DoorState(Enum):
     TwoInOneWaterVolume = 3
 
 
-class FadSpeedMode(Enum):
+class FanSpeedMode(Enum):
     Off = 0
     EnergySaving = 1
     Standard = 2
@@ -126,27 +126,29 @@ class Pro2Status(DeviceStatus):
     def __init__(self, data):
         """Response (MIoT format) of a Mi Robot Vacuum-Mop 2 Pro (ijai.vacuum.v3)
 
-        [
-            {'did': 'state', 'siid': 2, 'piid': 1, 'code': 0, 'value': 5},
-            {'did': 'error_code', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
-            {'did': 'sweep_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
-            {'did': 'sweep_type', 'siid': 2, 'piid': 8, 'code': 0, 'value': 1},
-            {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
-            {'did': 'mop_state', 'siid': 7, 'piid': 4, 'code': 0, 'value': 0},
-            {'did': 'fan_speed', 'siid': 7, 'piid': 5, 'code': 0, 'value': 1},
-            {'did': 'water_level', 'siid': 7, 'piid': 6, 'code': 0, 'value': 2},
-            {'did': 'side_brush_life_level', 'siid': 7, 'piid': 8, 'code': 0, 'value': 0 },
-            {'did': 'side_brush_time_left', 'siid': 7, 'piid': 9', 'code': 0, 'value': 0},
-            {'did': 'main_brush_life_level', 'siid': 7, 'piid': 10, 'code': 0, 'value': 99},
-            {'did': 'main_brush_time_left', 'siid': 7, 'piid': 11, 'code': 0, 'value': 17959}
-            {'did': 'filter_life_level', 'siid': 7, 'piid': 12, 'code': 0, 'value': 0},
-            {'did': 'filter_time_left', 'siid': 7, 'piid': 13, 'code': 0, 'value': 0},
-            {'did': 'mop_life_level', 'siid': 7, 'piid': 14, 'code': 0, 'value': 0},
-            {'did': 'mop_time_left', 'siid': 7, 'piid': 15, 'code': 0, 'value': 0},
-            {'did': 'current_language', 'siid': 7, 'piid': 21, 'code': 0, 'value': 0}
-            {'did': 'clean_area', 'siid': 7, 'piid': 22, 'code': 0, 'value': 0},
-            {'did': 'clean_time', 'siid': 7, 'piid': 23, 'code': 0, 'value': 0}
-            ]"""
+        Example::
+            [
+                {'did': 'state', 'siid': 2, 'piid': 1, 'code': 0, 'value': 5},
+                {'did': 'error_code', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
+                {'did': 'sweep_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
+                {'did': 'sweep_type', 'siid': 2, 'piid': 8, 'code': 0, 'value': 1},
+                {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
+                {'did': 'mop_state', 'siid': 7, 'piid': 4, 'code': 0, 'value': 0},
+                {'did': 'fan_speed', 'siid': 7, 'piid': 5, 'code': 0, 'value': 1},
+                {'did': 'water_level', 'siid': 7, 'piid': 6, 'code': 0, 'value': 2},
+                {'did': 'side_brush_life_level', 'siid': 7, 'piid': 8, 'code': 0, 'value': 0 },
+                {'did': 'side_brush_time_left', 'siid': 7, 'piid': 9', 'code': 0, 'value': 0},
+                {'did': 'main_brush_life_level', 'siid': 7, 'piid': 10, 'code': 0, 'value': 99},
+                {'did': 'main_brush_time_left', 'siid': 7, 'piid': 11, 'code': 0, 'value': 17959},
+                {'did': 'filter_life_level', 'siid': 7, 'piid': 12, 'code': 0, 'value': 0},
+                {'did': 'filter_time_left', 'siid': 7, 'piid': 13, 'code': 0, 'value': 0},
+                {'did': 'mop_life_level', 'siid': 7, 'piid': 14, 'code': 0, 'value': 0},
+                {'did': 'mop_time_left', 'siid': 7, 'piid': 15, 'code': 0, 'value': 0},
+                {'did': 'current_language', 'siid': 7, 'piid': 21, 'code': 0, 'value': 0},
+                {'did': 'clean_area', 'siid': 7, 'piid': 22, 'code': 0, 'value': 0},
+                {'did': 'clean_time', 'siid': 7, 'piid': 23, 'code': 0, 'value': 0},
+            ]
+        """
         self.data = data
 
     @property
@@ -175,10 +177,10 @@ class Pro2Status(DeviceStatus):
         return DeviceState(self.data["state"])
 
     @property
-    @switch(name="Fan Speed", choices=FadSpeedMode, setter_name="set_fan_speed")
-    def fan_speed(self) -> FadSpeedMode:
+    @switch(name="Fan Speed", choices=FanSpeedMode, setter_name="set_fan_speed")
+    def fan_speed(self) -> FanSpeedMode:
         """Fan Speed."""
-        return FadSpeedMode(self.data["fan_speed"])
+        return FanSpeedMode(self.data["fan_speed"])
 
     @property
     @switch(name="Sweep Type", choices=SweepType, setter_name="set_sweep_type")
@@ -259,7 +261,7 @@ class Pro2Status(DeviceStatus):
         return self.data["clean_area"]
 
     @property
-    @sensor("Last Clean Time", unit="s", icon="mdi:timer-sand")
+    @sensor("Last Clean Time", unit="mins", icon="mdi:timer-sand")
     def clean_time(self) -> timedelta:
         """Last time clean time(mins)."""
         return timedelta(minutes=self.data["clean_time"])
@@ -301,7 +303,6 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
     )
     def status(self) -> Pro2Status:
         """Retrieve properties."""
-
         return Pro2Status(
             {
                 # max_properties limited to 10 to avoid "Checksum error"
@@ -327,17 +328,17 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
         return self.call_action("stop")
 
     @command(
-        click.argument("fan_speed", type=EnumType(FadSpeedMode)),
+        click.argument("fan_speed", type=EnumType(FanSpeedMode)),
         default_output=format_output("Setting fan speed to {fan_speed}"),
     )
-    def set_fan_speed(self, fan_speed: FadSpeedMode):
+    def set_fan_speed(self, fan_speed: FanSpeedMode):
         """Set fan speed."""
         return self.set_property("fan_speed", fan_speed.value)
 
     @command()
     def fan_speed_presets(self) -> FanspeedPresets:
         """Return available fan speed presets."""
-        return _enum_as_dict(FadSpeedMode)
+        return _enum_as_dict(FanSpeedMode)
 
     @command(click.argument("speed", type=int))
     def set_fan_speed_preset(self, speed_preset: int) -> None:
