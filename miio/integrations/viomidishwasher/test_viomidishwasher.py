@@ -5,7 +5,9 @@ import pytest
 
 from miio import ViomiDishwasher
 from miio.exceptions import DeviceException
-from miio.viomidishwasher import (
+from miio.tests.dummies import DummyDevice
+
+from .viomidishwasher import (
     MODEL_DISWAHSER_M02,
     ChildLockStatus,
     MachineStatus,
@@ -15,12 +17,10 @@ from miio.viomidishwasher import (
     ViomiDishwasherStatus,
 )
 
-from .dummies import DummyDevice
-
 
 class DummyViomiDishwasher(DummyDevice, ViomiDishwasher):
     def __init__(self, *args, **kwargs):
-        self.model = MODEL_DISWAHSER_M02
+        self._model = MODEL_DISWAHSER_M02
         self.dummy_device_info = {
             "ap": {
                 "bssid": "18:E8:FF:FF:F:FF",

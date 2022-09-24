@@ -6,9 +6,9 @@ from typing import Any, Dict, List, Optional
 
 import click
 
-from .click_common import EnumType, command, format_output
-from .device import Device
-from .exceptions import DeviceException
+from miio.click_common import EnumType, command, format_output
+from miio.device import Device, DeviceStatus
+from miio.exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,7 +22,9 @@ class MachineStatus(enum.IntEnum):
     On = 1
     Running = 2
     Paused = 3
+    Done = 4
     Scheduled = 5
+    AutoDry = 6
 
 
 class ProgramStatus(enum.IntEnum):
@@ -78,39 +80,31 @@ class SystemStatus(enum.IntEnum):
     HeatingElementError = 2048
 
 
-class ViomiDishwasherStatus:
-    def __init__(self, data: Dict[str, int]) -> None:
-        """A ViomiDishwasherStatus representing the most important values for the device.
+class ViomiDishwasherStatus(DeviceStatus):
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """A ViomiDishwasherStatus representing the most important values for the
+        device.
 
         Example:
-            Example payload
-                {
-                    "child_lock": 0,
-                    "program": 2,
-                    "run_status": 512,
-                    "wash_status": 0,
-                    "wash_temp": 86,
-                    "power": 0,
-                    "left_time": 0,
-                    "wash_done_appointment": 0,
-                    "freshdry_interval": 0,
-                    "wash_process": 0
-                }
-
+            {
+                "child_lock": 0,
+                "program": 2,
+                "run_status": 512,
+                "wash_status": 0,
+                "wash_temp": 86,
+                "power": 0,
+                "left_time": 0,
+                "wash_done_appointment": 0,
+                "freshdry_interval": 0,
+                "wash_process": 0
+            }
         """
 
         self.data = data
 
     @property
     def child_lock(self) -> bool:
-        """Returns the child lock status of the device.
-
-        Returns:
-            bool: The return value. True for enabled, False for disabled.
-
-        Raises:
-            DeviceException: When the returned value by the device is not 1 or 0.
-        """
+        """Returns the child lock status of the device."""
         value = self.data["child_lock"]
         if value in [0, 1]:
             return bool(value)
@@ -119,11 +113,7 @@ class ViomiDishwasherStatus:
 
     @property
     def program(self) -> Program:
-        """Returns the current selected program of the device.
-
-        Returns:
-            Program: The current program or Program.Unknown if an Unknown program was detected.
-        """
+        """Returns the current selected program of the device."""
         program = self.data["program"]
         try:
             return Program(program)
@@ -133,11 +123,7 @@ class ViomiDishwasherStatus:
 
     @property
     def door_open(self) -> bool:
-        """Returns the door status of the device.
-
-        Returns:
-            Bool: True if open False if closed.
-        """
+        """Returns True if the door is open."""
 
         return bool(self.data["run_status"] & (1 << 7))
 
@@ -148,45 +134,26 @@ class ViomiDishwasherStatus:
         This is in general used to detected:
             - Errors in the system.
             - If the door is open or not.
-
-        Returns:
-            int: Raw value.
         """
 
         return self.data["run_status"]
 
     @property
     def status(self) -> MachineStatus:
-        """Returns the machine status of the device.
-
-        This is in general used to determine what the device is doing.
-
-        Returns:
-            MachineStatus: The machine status Enum.
-        """
+        """Returns the machine status of the device."""
 
         return MachineStatus(self.data["wash_status"])
 
     @property
     def temperature(self) -> int:
-        """Returns the temperature in degree Celsius as determined by the NTC thermistor.
-
-        Returns:
-            int: degree Celsius.
-        """
+        """Returns the temperature in degree Celsius as determined by the NTC
+        thermistor."""
 
         return self.data["wash_temp"]
 
     @property
     def power(self) -> bool:
-        """Returns the power status of the device.
-
-        Returns:
-            bool: The return value. True for power on, False for power off.
-
-        Raises:
-            DeviceException: When the returned value by the device is not 1 or 0.
-        """
+        """Returns the power status of the device."""
 
         value = self.data["power"]
         if value in [0, 1]:
@@ -199,12 +166,6 @@ class ViomiDishwasherStatus:
         """Returns the timedelta in seconds of time left of the current program.
 
         Will always be 0 if no program is running.
-
-        Returns:
-            timedelta: A timedelta with seconds left of the current program.
-
-        Raises:
-            DeviceException: When the returned value by the device is not a valid integer.
         """
         value = self.data["left_time"]
         if isinstance(value, int):
@@ -214,15 +175,9 @@ class ViomiDishwasherStatus:
 
     @property
     def schedule(self) -> Optional[datetime]:
-        """Returns a datetime when the scheduled program should be finished..
+        """Returns a datetime when the scheduled program should be finished.
 
         Will always be 0 if nothing is scheduled.
-
-        Returns:
-            datetime: A datetime when the selected program should be finished.
-
-        Raises:
-            DeviceException: When the returned value by the device is not a valid integer.
         """
 
         value = self.data["wash_done_appointment"]
@@ -237,14 +192,6 @@ class ViomiDishwasherStatus:
     def air_refresh_interval(self) -> int:
         """Returns an integer on how often the air in the device should be refreshed.
 
-        Returns 0 if disabled.
-
-        Returns:
-            int: ?
-
-        Raises:
-            DeviceException: When the returned value by the device is not a valid integer.
-
         Todo:
             * It's unknown what the value means. It seems not to be minutes. The default set by the Xiaomi Home app is 8.
         """
@@ -257,11 +204,7 @@ class ViomiDishwasherStatus:
 
     @property
     def program_progress(self) -> ProgramStatus:
-        """Returns the program status of the running program.
-
-        Returns:
-            ProgramStatus: The program status Enum or ProgramStatus.Unknown if it's unknown status.
-        """
+        """Returns the program status of the running program."""
         value = self.data["wash_process"]
         try:
             return ProgramStatus(value)
@@ -271,11 +214,7 @@ class ViomiDishwasherStatus:
 
     @property
     def errors(self) -> List[SystemStatus]:
-        """Returns list of errors if detected in the system.
-
-        Returns:
-            List[Optional[SystemStatus]]: A list of SystemStatus Enums when errors are detected.
-        """
+        """Returns list of errors if detected in the system."""
 
         errors = []
         if self.data["run_status"] & (1 << 0):
@@ -293,36 +232,11 @@ class ViomiDishwasherStatus:
 
         return errors
 
-    def __repr__(self) -> str:
-        return (
-            f"<ViomiDishwasherStatus "
-            f"child_lock={self.child_lock}, "
-            f"program={self.program}, "
-            f"door_open={self.door_open}, "
-            f"system_status_raw={self.system_status_raw}, "
-            f"status={self.status}, "
-            f"temperature={self.temperature}, "
-            f"power={self.power}, "
-            f"time_left={self.time_left}, "
-            f"schedule={self.schedule}, "
-            f"air_refresh_interval={self.air_refresh_interval}, "
-            f"program_progress={self.program_progress}, "
-            f"errors={self.errors}>"
-        )
-
 
 class ViomiDishwasher(Device):
     """Main class representing the dishwasher."""
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        model = self.info().model
-        if model not in MODELS_SUPPORTED:
-            _LOGGER.warning(
-                "Dishwasher model '%s' has not been tested. "
-                "Please continue with caution and open a GitHub issue to get this model supported.",
-                model,
-            )
+    _supported_models = MODELS_SUPPORTED
 
     @command(
         default_output=format_output(
@@ -357,12 +271,7 @@ class ViomiDishwasher(Device):
             "wash_process",
         ]
 
-        import inspect
-
-        if "flatten_request" in inspect.getfullargspec(self.get_properties).args:
-            values = self.get_properties(properties, flatten_request=True)
-        else:
-            values = self.get_properties(properties, max_properties=1)
+        values = self.get_properties(properties, max_properties=1)
 
         return ViomiDishwasherStatus(defaultdict(lambda: None, zip(properties, values)))
 
@@ -370,12 +279,9 @@ class ViomiDishwasher(Device):
     def _is_on(self) -> bool:
         return bool(self.get_properties(["power"])[0])
 
-    def _is_valid_program(self, program: Program) -> bool:
-        return True if not program == Program.Unknown else False
-
     def _is_running(self) -> bool:
         current_status = ProgramStatus(self.get_properties(["wash_process"])[0])
-        return True if current_status > 0 else False
+        return current_status > 0
 
     def _set_wash_status(self, status: MachineStatus) -> Any:
         return self.send("set_wash_status", [status.value])
@@ -417,10 +323,9 @@ class ViomiDishwasher(Device):
             time (datetime): A datetime object of when the program should finish.
             program (:obj:Program, optional): An optional program to run with this schedule. If not defined the current
                 selected program will be used.
-
         """
 
-        if not self._is_valid_program(program):
+        if program == Program.Unknown:
             DeviceException(f"Program {program.name} is not valid for this function.")
 
         scheduled_finish_date = datetime.now().replace(
@@ -430,7 +335,6 @@ class ViomiDishwasher(Device):
             seconds=program.run_time
         )
         if scheduled_start_date < datetime.now():
-            print(f"{scheduled_start_date} : {datetime.now()}")
             raise DeviceException(
                 "Proposed time is in the past (the proposed time is the finishing time, not the start time)."
             )
