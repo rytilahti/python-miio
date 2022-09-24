@@ -91,11 +91,6 @@ class DoorState(Enum):
     TwoInOneWaterVolume = 3
 
 
-class ClothState(Enum):
-    Off = False
-    On = True
-
-
 class FadSpeedMode(Enum):
     Off = 0
     EnergySaving = 1
@@ -174,9 +169,9 @@ class Pro2Status(DeviceStatus):
         return SweepType(self.data["operating_mode"])
 
     @property
-    def mop_state(self) -> ClothState:
+    def mop_state(self) -> bool:
         """Mop State."""
-        return ClothState(self.data["mop_state"])
+        return bool(self.data["mop_state"])
 
     @property
     def water_level(self) -> WaterLevel:
