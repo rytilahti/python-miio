@@ -78,6 +78,7 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     Timer,
     VacuumStatus,
 )
+from miio.integrations.viomidishwasher import ViomiDishwasher
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.push_server import EventInfo, PushServer
