@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from enum import Enum
 from typing import Dict
 
@@ -17,10 +18,14 @@ _MAPPINGS = {
         # Robot Cleaner (siid=2)
         "state": {"siid": 2, "piid": 1},
         "error_code": {"siid": 2, "piid": 2},  # [0, 3000] step 1
-        "operating_mode": {
+        "sweep_mode": {
             "siid": 2,
             "piid": 4,
         },  # 0 - Sweep, 1 - Sweep And Mop, 2 - Mop
+        "sweep_type": {
+            "siid": 2,
+            "piid": 8,
+        },  # 0 - Global, 1 - Mop, 2 - Edge, 3 - Area, 4 - Point, 5 - Remote, 6 - Explore, 7 - Room, 8 - Floor
         "start": {"siid": 2, "aiid": 1},
         "stop": {"siid": 2, "aiid": 2},
         # Battery (siid=3)
@@ -37,6 +42,11 @@ _MAPPINGS = {
         "side_brush_time_left": {"siid": 7, "piid": 9},  # [0, 180] step 1
         "main_brush_life_level": {"siid": 7, "piid": 10},  # [0, 100] step 1
         "main_brush_time_left": {"siid": 7, "piid": 11},  # [0, 360] step 1
+        "filter_life_level": {"siid": 7, "piid": 12},  # [0, 100] step 1
+        "filter_time_left": {"siid": 7, "piid": 13},  # [0, 180] step 1
+        "mop_life_level": {"siid": 7, "piid": 14},  # [0, 100] step 1
+        "mop_time_left": {"siid": 7, "piid": 15},  # [0, 180] step 1
+        "current_language": {"siid": 7, "piid": 21},  # string
         "clean_time": {"siid": 7, "piid": 22},  # [0, 120] step 1
         "clean_area": {"siid": 7, "piid": 23},  # [0, 1200] step 1
     }
@@ -121,6 +131,7 @@ class Pro2Status(DeviceStatus):
             {'did': 'state', 'siid': 2, 'piid': 1, 'code': 0, 'value': 5},
             {'did': 'fan_speed', 'siid': 2, 'piid': 6, 'code': 0, 'value': 1},
             {'did': 'operating_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
+            {'did': 'sweep_type', 'siid': 2, 'piid': 8, 'code': 0, 'value': 1},
             {'did': 'mop_state', 'siid': 16, 'piid': 1, 'code': 0, 'value': 0},
             {'did': 'water_level', 'siid': 2, 'piid': 5, 'code': 0, 'value': 2},
             {'did': 'main_brush_life_level', 'siid': 14, 'piid': 1, 'code': 0, 'value': 99},
@@ -148,10 +159,9 @@ class Pro2Status(DeviceStatus):
     @property
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
-        try:
-            return ERROR_CODES[self.error_code]
-        except KeyError:
-            return "Definition missing for error %s" % self.error_code
+        return ERROR_CODES.get(
+            self.error_code, f"Unknown error code: {self.error_code}"
+        )
 
     @property
     def state(self) -> DeviceState:
@@ -164,9 +174,14 @@ class Pro2Status(DeviceStatus):
         return FadSpeedMode(self.data["fan_speed"])
 
     @property
-    def operating_mode(self) -> SweepType:
+    def sweep_type(self) -> SweepType:
         """Operating Mode."""
-        return SweepType(self.data["operating_mode"])
+        return SweepType(self.data["sweep_type"])
+
+    @property
+    def sweep_mode(self) -> SweepMode:
+        """Sweep Mode."""
+        return SweepMode(self.data["sweep_mode"])
 
     @property
     def mop_state(self) -> bool:
@@ -184,9 +199,9 @@ class Pro2Status(DeviceStatus):
         return self.data["main_brush_life_level"]
 
     @property
-    def main_brush_time_left(self) -> int:
+    def main_brush_time_left(self) -> timedelta:
         """Main Brush Life Time Left(hours)."""
-        return self.data["main_brush_time_left"]
+        return timedelta(hours=self.data["main_brush_time_left"])
 
     @property
     def side_brush_life_level(self) -> int:
@@ -194,9 +209,9 @@ class Pro2Status(DeviceStatus):
         return self.data["side_brush_life_level"]
 
     @property
-    def side_brush_time_left(self) -> int:
+    def side_brush_time_left(self) -> timedelta:
         """Side Brush Life Time Left(hours)."""
-        return self.data["side_brush_time_left"]
+        return timedelta(hours=self.data["side_brush_time_left"])
 
     @property
     def filter_life_level(self) -> int:
@@ -204,9 +219,19 @@ class Pro2Status(DeviceStatus):
         return self.data["filter_life_level"]
 
     @property
-    def filter_time_left(self) -> int:
+    def filter_time_left(self) -> timedelta:
         """Filter Life Time Left(hours)."""
-        return self.data["filter_time_left"]
+        return timedelta(hours=self.data["filter_time_left"])
+
+    @property
+    def mop_life_level(self) -> int:
+        """Mop Life Level(%)."""
+        return self.data["mop_life_level"]
+
+    @property
+    def mop_time_left(self) -> timedelta:
+        """Mop Life Time Left(hours)."""
+        return timedelta(hours=self.data["mop_time_left"])
 
     @property
     def clean_area(self) -> int:
@@ -214,9 +239,9 @@ class Pro2Status(DeviceStatus):
         return self.data["clean_area"]
 
     @property
-    def clean_time(self) -> int:
+    def clean_time(self) -> timedelta:
         """Last time clean time(mins)."""
-        return self.data["clean_time"]
+        return timedelta(minutes=self.data["clean_time"])
 
     @property
     def current_language(self) -> str:
@@ -235,7 +260,8 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
             "State: {result.state}\n"
             "Error: {result.error}\n"
             "Battery: {result.battery}%\n"
-            "Mode: {result.operating_mode}\n"
+            "Sweep Mode: {result.sweep_mode}\n"
+            "Sweep Type: {result.sweep_type}\n"
             "Mop State: {result.mop_state}\n"
             "Fan speed: {result.fan_speed}\n"
             "Water level: {result.water_level}\n"
@@ -245,6 +271,8 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
             "Side Brush Life Time: {result.side_brush_time_left}h\n"
             "Filter Life Level: {result.filter_life_level}%\n"
             "Filter Life Time: {result.filter_time_left}h\n"
+            "Mop Life Level: {result.mop_life_level}%\n"
+            "Mop Life Time: {result.mop_time_left}h\n"
             "Clean Area: {result.clean_area} m^2\n"
             "Clean Time: {result.clean_time} mins\n"
             "Current Language: {result.current_language}\n",
