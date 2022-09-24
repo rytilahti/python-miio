@@ -319,10 +319,7 @@ class ViomiDishwasher(Device):
     def schedule(self, time: datetime, program: Program) -> str:
         """Schedule a program run.
 
-        Args:
-            time (datetime): A datetime object of when the program should finish.
-            program (:obj:Program, optional): An optional program to run with this schedule. If not defined the current
-                selected program will be used.
+        *time* defines the time when the program should finish.
         """
 
         if program == Program.Unknown:
