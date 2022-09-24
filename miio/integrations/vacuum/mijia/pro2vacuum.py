@@ -6,6 +6,7 @@ from typing import Dict
 import click
 
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, switch
 from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice
 
@@ -126,37 +127,42 @@ class Pro2Status(DeviceStatus):
         """Response (MIoT format) of a Mi Robot Vacuum-Mop 2 Pro (ijai.vacuum.v3)
 
         [
-            {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
-            {'did': 'error_code', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
             {'did': 'state', 'siid': 2, 'piid': 1, 'code': 0, 'value': 5},
-            {'did': 'fan_speed', 'siid': 2, 'piid': 6, 'code': 0, 'value': 1},
-            {'did': 'operating_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
+            {'did': 'error_code', 'siid': 2, 'piid': 2, 'code': 0, 'value': 0},
+            {'did': 'sweep_mode', 'siid': 2, 'piid': 4, 'code': 0, 'value': 1},
             {'did': 'sweep_type', 'siid': 2, 'piid': 8, 'code': 0, 'value': 1},
-            {'did': 'mop_state', 'siid': 16, 'piid': 1, 'code': 0, 'value': 0},
-            {'did': 'water_level', 'siid': 2, 'piid': 5, 'code': 0, 'value': 2},
-            {'did': 'main_brush_life_level', 'siid': 14, 'piid': 1, 'code': 0, 'value': 99},
-            {'did': 'main_brush_time_left', 'siid': 14, 'piid': 2, 'code': 0, 'value': 17959}
-            {'did': 'side_brush_life_level', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0 },
-            {'did': 'side_brush_time_left', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
-            {'did': 'filter_life_level', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
-            {'did': 'filter_time_left', 'siid': 15, 'piid': 2', 'code': 0, 'value': 0},
-            {'did': 'clean_area', 'siid': 9, 'piid': 1, 'code': 0, 'value': 0},
-            {'did': 'clean_time', 'siid': 9, 'piid': 2, 'code': 0, 'value': 0}
+            {'did': 'battery', 'siid': 3, 'piid': 1, 'code': 0, 'value': 100},
+            {'did': 'mop_state', 'siid': 7, 'piid': 4, 'code': 0, 'value': 0},
+            {'did': 'fan_speed', 'siid': 7, 'piid': 5, 'code': 0, 'value': 1},
+            {'did': 'water_level', 'siid': 7, 'piid': 6, 'code': 0, 'value': 2},
+            {'did': 'side_brush_life_level', 'siid': 7, 'piid': 8, 'code': 0, 'value': 0 },
+            {'did': 'side_brush_time_left', 'siid': 7, 'piid': 9', 'code': 0, 'value': 0},
+            {'did': 'main_brush_life_level', 'siid': 7, 'piid': 10, 'code': 0, 'value': 99},
+            {'did': 'main_brush_time_left', 'siid': 7, 'piid': 11, 'code': 0, 'value': 17959}
+            {'did': 'filter_life_level', 'siid': 7, 'piid': 12, 'code': 0, 'value': 0},
+            {'did': 'filter_time_left', 'siid': 7, 'piid': 13, 'code': 0, 'value': 0},
+            {'did': 'mop_life_level', 'siid': 7, 'piid': 14, 'code': 0, 'value': 0},
+            {'did': 'mop_time_left', 'siid': 7, 'piid': 15, 'code': 0, 'value': 0},
             {'did': 'current_language', 'siid': 7, 'piid': 21, 'code': 0, 'value': 0}
+            {'did': 'clean_area', 'siid': 7, 'piid': 22, 'code': 0, 'value': 0},
+            {'did': 'clean_time', 'siid': 7, 'piid': 23, 'code': 0, 'value': 0}
             ]"""
         self.data = data
 
     @property
+    @sensor(name="Battery", unit="%", device_class="battery")
     def battery(self) -> int:
         """Battery Level."""
         return self.data["battery"]
 
     @property
+    @sensor("Error", icon="mdi:alert")
     def error_code(self) -> int:
         """Error code as returned by the device."""
         return int(self.data["error_code"])
 
     @property
+    @sensor("Error", icon="mdi:alert")
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
         return ERROR_CODES.get(
@@ -169,76 +175,91 @@ class Pro2Status(DeviceStatus):
         return DeviceState(self.data["state"])
 
     @property
+    @switch(name="Fan Speed", choices=FadSpeedMode, setter_name="set_fan_speed")
     def fan_speed(self) -> FadSpeedMode:
         """Fan Speed."""
         return FadSpeedMode(self.data["fan_speed"])
 
     @property
+    @switch(name="Sweep Type", choices=SweepType, setter_name="set_sweep_type")
     def sweep_type(self) -> SweepType:
         """Operating Mode."""
         return SweepType(self.data["sweep_type"])
 
     @property
+    @switch(name="Sweep Mode", choices=SweepMode, setter_name="set_sweep_mode")
     def sweep_mode(self) -> SweepMode:
         """Sweep Mode."""
         return SweepMode(self.data["sweep_mode"])
 
     @property
+    @sensor("Mop Attached")
     def mop_state(self) -> bool:
         """Mop State."""
         return bool(self.data["mop_state"])
 
     @property
+    @sensor("Water Level")
     def water_level(self) -> WaterLevel:
         """Water Level."""
         return WaterLevel(self.data["water_level"])
 
     @property
+    @sensor("Main Brush Life Level", unit="%")
     def main_brush_life_level(self) -> int:
         """Main Brush Life Level(%)."""
         return self.data["main_brush_life_level"]
 
     @property
+    @sensor("Main Brush Life Time Left", unit="hr")
     def main_brush_time_left(self) -> timedelta:
         """Main Brush Life Time Left(hours)."""
         return timedelta(hours=self.data["main_brush_time_left"])
 
     @property
+    @sensor("Side Brush Life Level", unit="%")
     def side_brush_life_level(self) -> int:
         """Side Brush Life Level(%)."""
         return self.data["side_brush_life_level"]
 
     @property
+    @sensor("Side Brush Life Time Left", unit="hr")
     def side_brush_time_left(self) -> timedelta:
         """Side Brush Life Time Left(hours)."""
         return timedelta(hours=self.data["side_brush_time_left"])
 
     @property
+    @sensor("Filter Life Level", unit="%")
     def filter_life_level(self) -> int:
         """Filter Life Level(%)."""
         return self.data["filter_life_level"]
 
     @property
+    @sensor("Filter Life Time Left", unit="hr")
     def filter_time_left(self) -> timedelta:
         """Filter Life Time Left(hours)."""
         return timedelta(hours=self.data["filter_time_left"])
 
     @property
+    @sensor("Mop Life Level", unit="%")
     def mop_life_level(self) -> int:
         """Mop Life Level(%)."""
         return self.data["mop_life_level"]
 
     @property
+    @sensor("Mop Life Time Left", unit="hr")
     def mop_time_left(self) -> timedelta:
         """Mop Life Time Left(hours)."""
         return timedelta(hours=self.data["mop_time_left"])
 
     @property
+    @sensor("Last Clean Area", unit="m2", icon="mdi:texture-box")
     def clean_area(self) -> int:
         """Last time clean area(m^2)."""
         return self.data["clean_area"]
 
     @property
+    @sensor("Last Clean Time", unit="s", icon="mdi:timer-sand")
     def clean_time(self) -> timedelta:
         """Last time clean time(mins)."""
         return timedelta(minutes=self.data["clean_time"])
