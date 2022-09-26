@@ -111,7 +111,7 @@ The name is not required, but recommended.
 This information is currently used to set the model information for the simulated
 device when not overridden using the ``--model`` option.
 
-The description file needs to define a list of properties the device supports.
+The description file can define a list of *properties* the device supports for ``get_prop`` queries.
 You need to define several mappings for each property:
 
     * ``name`` defines the name used for fetching using the ``get_prop`` request
@@ -126,10 +126,30 @@ You need to define several mappings for each property:
     definition of new files using pure YAML without a need for Python implementation.
     Refer :ref:`example_desc` for a complete, working example.
 
+Alternatively, you can define *methods* with their responses by defining ``methods``, which is necessary to simulate
+devices that use other ways to obtain the status information (e.g., on Roborock vacuums).
+You can either use ``result`` or ``result_json`` to define the response for the given method:
+
+.. code-block:: yaml
+
+    methods:
+      - name: get_status
+        result:
+          - some_variable: 1
+            another_variable: "foo"
+      - name: get_timezone
+        result_json: '["UTC"]'
+
+Calling method ``get_status`` will return ``[{"some_variable": 1, "another_variable": "foo"}]``,
+the ``result_json`` will be parsed and serialized to ``["UTC"]`` when sent to the client.
+A full working example can be found in :ref:`example_desc_methods`.
+
+
 Minimal Working Example
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The following defining a very minimal device description having a single model with two properties:
+The following YAML file defines a very minimal device having a single model with two properties,
+and exposing also a custom method (``reboot``):
 
 .. code-block:: yaml
 
@@ -144,6 +164,9 @@ The following defining a very minimal device description having a single model w
       - name: is_on
         type: bool
         value: false
+    methods:
+      - name: reboot
+        result_json: '["ok"]'
 
 In this case, the ``get_prop`` method call with parameters ``['speed', 'is_on']`` will return ``[33, 0]``.
 The ``speed`` property can be changed by calling the ``set_speed`` method.
@@ -154,9 +177,21 @@ See :ref:`example_desc` for a more complete example.
 Example Description File
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following description file shows a complete, concrete example of a description file (``zhimi_fan.yaml``):
+The following description file shows a complete,
+concrete example for a device using ``get_prop`` for accessing the properties (``zhimi_fan.yaml``):
 
 .. literalinclude:: ../miio/integrations/fan/zhimi/zhimi_fan.yaml
+   :language: yaml
+
+.. _example_desc_methods:
+
+Example Description File Using Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following description file (``simulated_roborock.yaml``) shows a complete,
+concrete example for a device using custom method names for obtaining the status.
+
+.. literalinclude:: ../miio/integrations/vacuum/roborock/simulated_roborock.yaml
    :language: yaml
 
 
