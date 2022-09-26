@@ -5,9 +5,7 @@ import click
 
 from .pcapparser import parse_pcap
 from .propertytester import test_properties
-from .simulators import miio_simulator
-
-# from .simulators import miot_simulator
+from .simulators import miio_simulator, miot_simulator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,4 +19,4 @@ def devtools(ctx: click.Context):
 devtools.add_command(parse_pcap)
 devtools.add_command(test_properties)
 devtools.add_command(miio_simulator)
-# devtools.add_command(miot_simulator)
+devtools.add_command(miot_simulator)
