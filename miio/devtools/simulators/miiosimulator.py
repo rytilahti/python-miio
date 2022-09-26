@@ -1,5 +1,6 @@
 """Implementation of miio simulator."""
 import asyncio
+import json
 import logging
 from typing import List, Optional, Union
 
@@ -51,6 +52,14 @@ class MiioAction(BaseModel):
     """Simulated miio action."""
 
 
+class MiioMethod(BaseModel):
+    """Simulated method."""
+
+    name: str
+    result: Optional[List] = None
+    result_json: Optional[str] = None
+
+
 class MiioModel(BaseModel):
     """Model information."""
 
@@ -61,11 +70,12 @@ class MiioModel(BaseModel):
 class SimulatedMiio(BaseModel):
     """Simulated device model for miio devices."""
 
+    name: Optional[str] = Field(default="Unnamed integration")
     models: List[MiioModel]
     type: str
-    properties: List[MiioProperty]
-    name: Optional[str] = Field(default="Unnamed integration")
-    actions: Optional[List[MiioAction]] = Field(default=[])
+    properties: List[MiioProperty] = Field(default=[])
+    actions: List[MiioAction] = Field(default=[])
+    methods: List[MiioMethod] = Field(default=[])
     _model: Optional[str] = PrivateAttr(default=None)
 
     class Config:
@@ -84,7 +94,9 @@ class MiioSimulator:
         if self._dev._model is None:
             self._dev._model = next(iter(self._dev.models)).model
 
-        server.add_method("get_prop", self.get_prop)
+        # Add get_prop if device has properties defined
+        if self._dev.properties:
+            server.add_method("get_prop", self.get_prop)
         # initialize setters
         for prop in self._dev.properties:
             if prop.models and self._dev._model not in prop.models:
@@ -92,6 +104,15 @@ class MiioSimulator:
             if prop.setter is not None:
                 self._setters[prop.setter] = prop
                 server.add_method(prop.setter, self.handle_set)
+
+        # Add static methods
+        for method in self._dev.methods:
+            if method.result_json:
+                server.add_method(
+                    method.name, {"result": json.loads(method.result_json)}
+                )
+            else:
+                server.add_method(method.name, {"result": method.result})
 
     def get_prop(self, payload):
         """Handle get_prop."""

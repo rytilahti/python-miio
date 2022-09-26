@@ -1,0 +1,65 @@
+models:
+  - model: roborock.vacuum.a15
+type: vacuum
+methods:
+  - name: get_status
+    result:
+      - _model: roborock.vacuum.a15  # internal note where this status came from
+        adbumper_status:
+          - 0
+          - 0
+          - 0
+        auto_dust_collection: 1
+        battery: 87
+        clean_area: 35545000
+        clean_time: 2311
+        debug_mode: 0
+        dnd_enabled: 0
+        dock_type: 0
+        dust_collection_status: 0
+        error_code: 0
+        fan_power: 102
+        in_cleaning: 0
+        in_fresh_state: 1
+        in_returning: 0
+        is_locating: 0
+        lab_status: 3
+        lock_status: 0
+        map_present: 1
+        map_status: 3
+        mop_forbidden_enable: 0
+        mop_mode: 300
+        msg_seq: 1839
+        msg_ver: 2
+        state: 8
+        water_box_carriage_status: 0
+        water_box_mode: 202
+        water_box_status: 1
+        water_shortage_status: 0
+  - name: get_consumable
+    result:
+      - filter_work_time: 32454
+        sensor_dirty_time: 3798
+        side_brush_work_time: 32454
+        main_brush_work_time: 32454
+  - name: get_clean_summary
+    result_json: '[ 174145, 2410150000, 82, [ 1488240000, 1488153600, 1488067200, 1487980800, 1487894400, 1487808000, 1487548800 ] ]'
+  - name: get_timer
+    result_json: '[["1488667794112", "off", ["49 22 * * 6", ["start_clean", ""]], ["1488667777661", "off", ["49 21 * * 3,4,5,6", ["start_clean", ""]]]]]'
+  - name: get_timezone
+    result_json: '["UTC"]'
+  - name: get_dnd_timer
+    result:
+      - enabled: 1
+        start_minute: 0
+        end_minute: 0
+        start_hour: 22
+        end_hour: 8
+  - name: get_clean_record
+    result:
+      - begin: 1488347071
+        end: 1488347123
+        duration: 16
+        area: 0
+        error: 0
+        complete: 0
