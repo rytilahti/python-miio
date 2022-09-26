@@ -138,11 +138,12 @@ def download(ctx, urn, model):
             ctx.invoke(download_mapping)
 
         mapping = get_mapping()
-        urn = mapping.urn_for_model(model)
+        model = mapping.info_for_model(model)
 
-    url = f"https://miot-spec.org/miot-spec-v2/instance?type={urn}"
+    url = f"https://miot-spec.org/miot-spec-v2/instance?type={model.type}"
+    click.echo("Going to download %s" % url)
     content = requests.get(url)
-    save_to = f"{urn}.json"
+    save_to = model.filename
     click.echo(f"Saving data to {save_to}")
     with open(save_to, "w") as f:
         f.write(content.text)
