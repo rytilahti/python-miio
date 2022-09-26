@@ -120,6 +120,12 @@ You need to define several mappings for each property:
     * ``setter`` defines the method that allows changing the ``value``
     * ``models`` list, if the property is only available on some of the supported models
 
+.. note::
+
+    The schema might change in the future to accommodate other potential uses, e.g., allowing
+    definition of new files using pure YAML without a need for Python implementation.
+    Refer :ref:`example_desc` for a complete, working example.
+
 Alternatively, you can define *methods* with their responses by defining ``methods``, which is necessary to simulate
 devices that use other ways to obtain the status information (e.g., on Roborock vacuums).
 You can either use ``result`` or ``result_json`` to define the response for the given method:
@@ -134,18 +140,16 @@ You can either use ``result`` or ``result_json`` to define the response for the 
       - name: get_timezone
         result_json: '["UTC"]'
 
+Calling method ``get_status`` will return ``[{"some_variable": 1, "another_variable": "foo"}]``,
+the ``result_json`` will be parsed and serialized to ``["UTC"]`` when sent to the client.
 A full working example can be found in :ref:`example_desc_methods`.
 
-.. note::
-
-    The schema might change in the future to accommodate other potential uses, e.g., allowing
-    definition of new files using pure YAML without a need for Python implementation.
-    Refer :ref:`example_desc` for a complete, working example.
 
 Minimal Working Example
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The following defining a very minimal device description having a single model with two properties:
+The following YAML file defines a very minimal device having a single model with two properties,
+and exposing also a custom method (``reboot``):
 
 .. code-block:: yaml
 
@@ -184,7 +188,7 @@ concrete example for a device using ``get_prop`` for accessing the properties (`
 Example Description File Using Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following description file shows a complete,
+The following description file (``simulated_roborock.yaml``) shows a complete,
 concrete example for a device using custom method names for obtaining the status.
 
 .. literalinclude:: ../miio/integrations/vacuum/roborock/simulated_roborock.yaml
