@@ -155,7 +155,8 @@ def sensor(name: str, *, unit: str = "", **kwargs):
     """
 
     def decorator_sensor(func):
-        property_name = func.__name__
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
 
         def _sensor_type_for_return_type(func):
             rtype = get_type_hints(func).get("return")
@@ -169,8 +170,8 @@ def sensor(name: str, *, unit: str = "", **kwargs):
 
         sensor_type = _sensor_type_for_return_type(func)
         descriptor = SensorDescriptor(
-            id=str(property_name),
-            property=str(property_name),
+            id=qualified_name,
+            property=property_name,
             name=name,
             unit=unit,
             type=sensor_type,

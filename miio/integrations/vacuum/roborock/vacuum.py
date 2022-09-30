@@ -408,6 +408,7 @@ class RoborockVacuum(Device, VacuumInterface):
         clean_history = self.clean_history()
         status.embed(clean_history)
         status.embed(self.last_clean_details(history=clean_history))
+        status.embed(self.dnd_status())
         return status
 
     def enable_log_upload(self):
