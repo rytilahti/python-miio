@@ -336,6 +336,12 @@ class CleaningDetails(DeviceStatus):
         return pretty_area(self.data["area"])
 
     @property
+    @sensor("Last clean map id", icon="mdi:floor-plan")
+    def multi_map_id(self) -> int:
+        """Map id used (multi map feature) during the cleaning run."""
+        return self.data["map_flag"]
+
+    @property
     def error_code(self) -> int:
         """Error code."""
         return int(self.data["error"])
