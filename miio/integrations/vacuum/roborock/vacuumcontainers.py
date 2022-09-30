@@ -440,13 +440,13 @@ class DNDStatus(DeviceStatus):
         return bool(self.data["enabled"])
 
     @property
-    @sensor("Do not disturb start", icon="mdi:minus-circle-off")
+    @sensor("Do not disturb start", icon="mdi:minus-circle-off", enabled_default=False)
     def start(self) -> time:
         """Start time of DnD."""
         return time(hour=self.data["start_hour"], minute=self.data["start_minute"])
 
     @property
-    @sensor("Do not disturb end", icon="mdi:minus-circle-off")
+    @sensor("Do not disturb end", icon="mdi:minus-circle-off", enabled_default=False)
     def end(self) -> time:
         """End time of DnD."""
         return time(hour=self.data["end_hour"], minute=self.data["end_minute"])
