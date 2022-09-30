@@ -135,6 +135,13 @@ class DeviceStatus(metaclass=_StatusMeta):
             final_name = f"{other_name}:{name}"
             self._settings[final_name] = attr.evolve(setting, property=final_name)
 
+    def __getattribute__(self, item):
+        """Overridden to lookup properties from embedded containers."""
+        if ":" not in item:
+            return super().__getattribute__(item)
+
+        embed, prop = item.split(":")
+        return getattr(self._embedded[embed], prop)
 
 def sensor(name: str, *, unit: str = "", **kwargs):
     """Syntactic sugar to create SensorDescriptor objects.
