@@ -88,7 +88,7 @@ class VacuumStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("State code")
+    @sensor("State code", enabled_default=False)
     def state_code(self) -> int:
         """State code as returned by the device."""
         return int(self.data["state"])
@@ -197,7 +197,7 @@ class VacuumStatus(DeviceStatus):
         )
 
     @property
-    @sensor("Water box attached")
+    @sensor("Water box attached", icon="mdi:cup-water")
     def is_water_box_attached(self) -> Optional[bool]:
         """Return True is water box is installed."""
         if "water_box_status" in self.data:
@@ -214,7 +214,7 @@ class VacuumStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Water level low", icon="mdi:alert")
+    @sensor("Water level low", icon="mdi:water-alert-outline")
     def is_water_shortage(self) -> Optional[bool]:
         """Returns True if water is low in the tank, None if sensor not present."""
         if "water_shortage_status" in self.data:
