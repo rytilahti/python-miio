@@ -154,13 +154,13 @@ class VacuumStatus(DeviceStatus):
         return int(self.data["fan_power"])
 
     @property
-    @sensor("Clean duration", unit="s", icon="mdi:timer-sand")
+    @sensor("Current clean duration", unit="s", icon="mdi:timer-sand")
     def clean_time(self) -> timedelta:
         """Time used for cleaning (if finished, shows how long it took)."""
         return pretty_seconds(self.data["clean_time"])
 
     @property
-    @sensor("Cleaned area", unit="m²", icon="mdi:texture-box")
+    @sensor("Current clean area", unit="m²", icon="mdi:texture-box")
     def clean_area(self) -> float:
         """Cleaned area in m2."""
         return pretty_area(self.data["clean_area"])
@@ -368,43 +368,49 @@ class ConsumableStatus(DeviceStatus):
         self.sensor_dirty_total = timedelta(hours=30)
 
     @property
-    @sensor("Main brush usage", unit="s")
+    @sensor("Main brush used", unit="s", icon="mdi:brush", enabled_default=False)
     def main_brush(self) -> timedelta:
         """Main brush usage time."""
         return pretty_seconds(self.data["main_brush_work_time"])
 
     @property
-    @sensor("Main brush remaining", unit="s")
+    @sensor("Main brush left", unit="s", icon="mdi:brush")
     def main_brush_left(self) -> timedelta:
         """How long until the main brush should be changed."""
         return self.main_brush_total - self.main_brush
 
     @property
+    @sensor("Side brush used", unit="s", icon="mdi:brush", enabled_default=False)
     def side_brush(self) -> timedelta:
         """Side brush usage time."""
         return pretty_seconds(self.data["side_brush_work_time"])
 
     @property
+    @sensor("Side brush left", unit="s", icon="mdi:brush")
     def side_brush_left(self) -> timedelta:
         """How long until the side brush should be changed."""
         return self.side_brush_total - self.side_brush
 
     @property
+    @sensor("Filter used", unit="s", icon="mdi:air-filter", enabled_default=False)
     def filter(self) -> timedelta:
         """Filter usage time."""
         return pretty_seconds(self.data["filter_work_time"])
 
     @property
+    @sensor("Filter left", unit="s", icon="mdi:air-filter")
     def filter_left(self) -> timedelta:
         """How long until the filter should be changed."""
         return self.filter_total - self.filter
 
     @property
+    @sensor("Sensor dirty used", unit="s", icon="mdi:eye-outline", enabled_default=False)
     def sensor_dirty(self) -> timedelta:
         """Return ``sensor_dirty_time``"""
         return pretty_seconds(self.data["sensor_dirty_time"])
 
     @property
+    @sensor("Sensor dirty left", unit="s", icon="mdi:eye-outline")
     def sensor_dirty_left(self) -> timedelta:
         return self.sensor_dirty_total - self.sensor_dirty
 
