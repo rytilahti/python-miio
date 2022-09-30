@@ -195,12 +195,13 @@ def switch(name: str, *, setter_name: str, **kwargs):
     and can be interpreted downstream users as they wish.
     """
 
-    def decorator_sensor(func):
-        property_name = func.__name__
+    def decorator_switch(func):
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
 
         descriptor = SwitchDescriptor(
-            id=str(property_name),
-            property=str(property_name),
+            id=qualified_name,
+            property=property_name,
             name=name,
             setter_name=setter_name,
             extras=kwargs,
@@ -209,7 +210,7 @@ def switch(name: str, *, setter_name: str, **kwargs):
 
         return func
 
-    return decorator_sensor
+    return decorator_switch
 
 
 def setting(
@@ -236,15 +237,16 @@ def setting(
     """
 
     def decorator_setting(func):
-        property_name = func.__name__
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
 
         if setter is None and setter_name is None:
             raise Exception("Either setter or setter_name needs to be defined")
 
         if min_value or max_value:
             descriptor = NumberSettingDescriptor(
-                id=str(property_name),
-                property=str(property_name),
+                id=qualified_name,
+                property=property_name,
                 name=name,
                 unit=unit,
                 setter=setter,
@@ -260,8 +262,8 @@ def setting(
                 # construct enums pointed by the attribute
                 raise NotImplementedError("choices_attribute is not yet implemented")
             descriptor = EnumSettingDescriptor(
-                id=str(property_name),
-                property=str(property_name),
+                id=qualified_name,
+                property=property_name,
                 name=name,
                 unit=unit,
                 setter=setter,
