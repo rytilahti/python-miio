@@ -134,7 +134,7 @@ class VacuumStatus(DeviceStatus):
         return int(self.data["error_code"])
 
     @property
-    @sensor("Error", icon="mdi:alert")
+    @sensor("Error String", icon="mdi:alert")
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
         try:
@@ -160,7 +160,7 @@ class VacuumStatus(DeviceStatus):
         return pretty_seconds(self.data["clean_time"])
 
     @property
-    @sensor("Cleaned Area", unit="m2", icon="mdi:texture-box")
+    @sensor("Cleaned Area", unit="m²", icon="mdi:texture-box")
     def clean_area(self) -> float:
         """Cleaned area in m2."""
         return pretty_area(self.data["clean_area"])
