@@ -405,7 +405,9 @@ class RoborockVacuum(Device, VacuumInterface):
         """Return status of the vacuum."""
         status = VacuumStatus(self.send("get_status")[0])
         status.embed(self.consumable_status())
-        status.embed(self.clean_history())
+        clean_history = self.clean_history()
+        status.embed(clean_history)
+        status.embed(self.last_clean_details(history=clean_history))
         return status
 
     def enable_log_upload(self):
@@ -519,16 +521,17 @@ class RoborockVacuum(Device, VacuumInterface):
         return CleaningSummary(self.send("get_clean_summary"))
 
     @command()
-    def last_clean_details(self) -> Optional[CleaningDetails]:
+    def last_clean_details(self, history: Optional[CleaningSummary] = None) -> Optional[CleaningDetails]:
         """Return details from the last cleaning.
 
         Returns None if there has been no cleanups.
         """
-        history = self.clean_history()
+        if history is None:
+            history = self.clean_history()
         if not history.ids:
             return None
 
-        last_clean_id = history.ids.pop(0)
+        last_clean_id = history.ids[0]
         return self.clean_details(last_clean_id)
 
     @command(

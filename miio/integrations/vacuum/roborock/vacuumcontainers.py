@@ -254,7 +254,7 @@ class CleaningSummary(DeviceStatus):
             self.data["records"] = []
 
     @property
-    @sensor("Total clean duration", icon="mdi:timer-sand")
+    @sensor("Total clean duration", unit="s", icon="mdi:timer-sand")
     def total_duration(self) -> timedelta:
         """Total cleaning duration."""
         return pretty_seconds(self.data["clean_time"])
@@ -306,21 +306,25 @@ class CleaningDetails(DeviceStatus):
             self.data = data
 
     @property
+    @sensor("Last clean start", icon="mdi:clock-time-twelve")
     def start(self) -> datetime:
         """When cleaning was started."""
         return pretty_time(self.data["begin"])
 
     @property
+    @sensor("Last clean end", icon="mdi:clock-time-twelve")
     def end(self) -> datetime:
         """When cleaning was finished."""
         return pretty_time(self.data["end"])
 
     @property
+    @sensor("Last clean duration", unit="s", icon="mdi:timer-sand")
     def duration(self) -> timedelta:
         """Total duration of the cleaning run."""
         return pretty_seconds(self.data["duration"])
 
     @property
+    @sensor("Last clean area", unit="m²", icon="mdi:texture-box")
     def area(self) -> float:
         """Total cleaned area."""
         return pretty_area(self.data["area"])
