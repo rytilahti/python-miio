@@ -128,13 +128,13 @@ class VacuumStatus(DeviceStatus):
             return "Definition missing for state %s" % self.state_code
 
     @property
-    @sensor("Error code", icon="mdi:alert")
+    @sensor("Error code", icon="mdi:alert", enabled_default=False)
     def error_code(self) -> int:
         """Error code as returned by the device."""
         return int(self.data["error_code"])
 
     @property
-    @sensor("Error string", icon="mdi:alert")
+    @sensor("Error string", icon="mdi:alert", enabled_default=False)
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
         try:
@@ -222,7 +222,7 @@ class VacuumStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Error", icon="mdi:alert")
+    @sensor("Error", icon="mdi:alert", enabled_default=False)
     def got_error(self) -> bool:
         """True if an error has occurred."""
         return self.error_code != 0
@@ -254,19 +254,19 @@ class CleaningSummary(DeviceStatus):
             self.data["records"] = []
 
     @property
-    @sensor("Total cleaning time", icon="mdi:timer-sand")
+    @sensor("Total clean duration", icon="mdi:timer-sand")
     def total_duration(self) -> timedelta:
         """Total cleaning duration."""
         return pretty_seconds(self.data["clean_time"])
 
     @property
-    @sensor("Total cleaning area", unit="m²", icon="mdi:texture-box")
+    @sensor("Total clean area", unit="m²", icon="mdi:texture-box")
     def total_area(self) -> float:
         """Total cleaned area."""
         return pretty_area(self.data["clean_area"])
 
     @property
-    @sensor("Total clean count")
+    @sensor("Total clean count", icon="mdi:counter")
     def count(self) -> int:
         """Number of cleaning runs."""
         return int(self.data["clean_count"])
@@ -277,7 +277,7 @@ class CleaningSummary(DeviceStatus):
         return list(self.data["records"])
 
     @property
-    @sensor("Dust collection count")
+    @sensor("Total_dust collection count", icon="mdi:counter")
     def dust_collection_count(self) -> Optional[int]:
         """Total number of dust collections."""
         if "dust_collection_count" in self.data:
