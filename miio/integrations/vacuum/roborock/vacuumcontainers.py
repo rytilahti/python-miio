@@ -143,7 +143,7 @@ class VacuumStatus(DeviceStatus):
             return "Definition missing for error %s" % self.error_code
 
     @property
-    @sensor("Battery", unit="%", device_class="battery", enabled_default=False})
+    @sensor("Battery", unit="%", device_class="battery", enabled_default=False)
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return int(self.data["battery"])
