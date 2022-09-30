@@ -149,15 +149,6 @@ class VacuumStatus(DeviceStatus):
         return int(self.data["battery"])
 
     @property
-    @setting(
-        "Fanspeed",
-        unit="%",
-        setter_name="set_fan_speed",
-        min_value=0,
-        max_value=100,
-        step=1,
-        icon="mdi:fan",
-    )
     def fanspeed(self) -> int:
         """Current fan speed."""
         return int(self.data["fan_power"])
