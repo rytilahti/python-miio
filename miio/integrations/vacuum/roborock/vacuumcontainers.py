@@ -174,7 +174,7 @@ class VacuumStatus(DeviceStatus):
     @sensor("Multi map id", icon="mdi:floor-plan")
     def multi_map_id(self) -> int:
         """The id of the current map with regards to the multi map feature, [3,7,11,15] -> [0,1,2,3]."""
-        return (self.data["map_status"]+1)/4 - 1
+        return int((self.data["map_status"]+1)/4 - 1)
 
     @property
     def in_zone_cleaning(self) -> bool:
