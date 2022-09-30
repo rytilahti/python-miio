@@ -143,6 +143,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         embed, prop = item.split(":")
         return getattr(self._embedded[embed], prop)
 
+
 def sensor(name: str, *, unit: str = "", **kwargs):
     """Syntactic sugar to create SensorDescriptor objects.
 
