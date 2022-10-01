@@ -9,7 +9,7 @@ from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
 from miio.utils import pretty_seconds, pretty_time
 
-from .vacuum import MopIntensity, MopMode
+from .vacuum_enums import MopIntensity, MopMode
 
 def pretty_area(x: float) -> float:
     return int(x) / 1000000
