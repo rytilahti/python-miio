@@ -215,6 +215,7 @@ class RoborockVacuum(Device, VacuumInterface):
         super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
         self._multi_maps = None
+        self._multi_map_enum = None
 
     @command()
     def start(self):
@@ -448,32 +449,32 @@ class RoborockVacuum(Device, VacuumInterface):
         if self._multi_maps is not None and not skip_cache:
             return self._multi_maps
 
-        multi_maps = self.send("get_multi_maps_list")[0]
-        multi_maps['map_names'] = []
-        for map in multi_maps["map_info"]:
-            multi_maps['map_names'].append(map["name"])
-
-        self._multi_maps = multi_maps
+        self._multi_maps = self.send("get_multi_maps_list")[0]
         return self._multi_maps
+
+    @command()
+    def multi_map_enum(self, skip_cache=False) -> enum.Enum:
+        """Enum of the available map names."""
+        if self._multi_map_enum is not None and not skip_cache:
+            return self._multi_map_enum
+
+        multi_maps = self.get_multi_maps()
+        maps_dict = {}
+        for map in multi_maps["map_info"]:
+            maps_dict[map["name"]] = map["mapFlag"]
+
+        self._multi_map_enum = enum.Enum("multi_map_enum", maps_dict)
+        return self._multi_map_enum
 
     @command(click.argument("multi_map_id", type=int))
     def load_multi_map(self, multi_map_id: int):
         """Change the current map used."""
         return self.send("load_multi_map", [multi_map_id])[0] == "ok"
 
-    @command(click.argument("multi_map_name", type=str))
-    def load_multi_map_by_name(self, multi_map_name: str):
-        """Change the current map used by name."""
-        multi_map_id = None
-        for map in self.get_multi_maps()["map_info"]:
-            if map["name"] == multi_map_name:
-                multi_map_id = map["mapFlag"]
-                break
-
-        if multi_map_id is None:
-            return False
-
-        return self.load_multi_map(multi_map_id)
+    @command()
+    def load_multi_map_by_enum(self, multi_map_enum):
+        """Change the current map used by enum."""
+        return self.load_multi_map(multi_map_enum.value)
 
     @command(click.argument("start", type=bool))
     def edit_map(self, start):

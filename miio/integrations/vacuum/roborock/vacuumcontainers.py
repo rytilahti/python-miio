@@ -87,9 +87,6 @@ class VacuumStatus(DeviceStatus):
         # 'auto_dust_collection': 1,  'mop_mode': 300, 'debug_mode': 0}]
         self.data = data
         self._multi_maps = multi_maps
-        self._map_names = []
-        if multi_maps is not None:
-            self._map_names = multi_maps["map_names"]
 
     @property
     @sensor("State code", enabled_default=False)
@@ -175,12 +172,12 @@ class VacuumStatus(DeviceStatus):
         return bool(self.data["map_present"])
 
     @property
+    @setting("Multi map", choices_attribute="multi_map_enum", setter_name="load_multi_map_by_enum", icon="mdi:floor-plan")
     def multi_map_id(self) -> int:
         """The id of the current map with regards to the multi map feature, [3,7,11,15] -> [0,1,2,3]."""
         return int((self.data["map_status"]+1)/4 - 1)
 
     @property
-    @setting("Multi map name", choices=self._map_names, setter_name="load_multi_map_by_name", icon="mdi:floor-plan")
     def multi_map_name(self) -> str:
         """The name of the current map with regards to the multi map feature."""
         if self._multi_maps is None:

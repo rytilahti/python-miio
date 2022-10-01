@@ -257,10 +257,10 @@ def setting(
                 extras=kwargs,
             )
         elif choices or choices_attribute:
-            if choices_attribute is not None:
+            #if choices_attribute is not None:
                 # TODO: adding choices from attribute is a bit more complex, as it requires a way to
                 # construct enums pointed by the attribute
-                raise NotImplementedError("choices_attribute is not yet implemented")
+                #raise NotImplementedError("choices_attribute is not yet implemented")
             descriptor = EnumSettingDescriptor(
                 id=qualified_name,
                 property=property_name,
