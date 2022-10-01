@@ -450,7 +450,7 @@ class RoborockVacuum(Device, VacuumInterface):
 
         multi_maps = self.send("get_multi_maps_list")[0]
         multi_maps['map_names'] = []
-        for map in multi_maps["map_info"]
+        for map in multi_maps["map_info"]:
             multi_maps['map_names'].append(map["name"])
 
         self._multi_maps = multi_maps
