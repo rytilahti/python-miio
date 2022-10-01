@@ -156,13 +156,13 @@ class VacuumStatus(DeviceStatus):
         return int(self.data["fan_power"])
 
     @property
-    @setting("Mop scrub intensity", choices=MopIntensity, setter_name="set_mop_intensity", icon="mdi:floor-plan")
+    @setting("Mop scrub intensity", choices=MopIntensity, setter_name="set_mop_intensity", icon="mdi:checkbox-multiple-blank-circle-outline")
     def mop_intensity(self) -> int:
         """Current mop intensity."""
         return int(self.data["water_box_mode"])
 
     @property
-    @setting("Mop route", choices=MopMode, setter_name="set_mop_mode", icon="mdi:floor-plan")
+    @setting("Mop route", choices=MopMode, setter_name="set_mop_mode", icon="mdi:swap-horizontal-variant")
     def mop_route(self) -> int:
         """Current mop route."""
         return int(self.data["mop_mode"])
