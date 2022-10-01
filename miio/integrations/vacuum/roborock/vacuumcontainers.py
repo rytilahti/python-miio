@@ -6,7 +6,7 @@ from croniter import croniter
 from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
-from miio.devicestatus import sensor, setting
+from miio.devicestatus import sensor, setting, switch
 from miio.utils import pretty_seconds, pretty_time
 
 from .vacuum_enums import MopIntensity, MopMode
@@ -247,6 +247,14 @@ class VacuumStatus(DeviceStatus):
         """Returns True if water is low in the tank, None if sensor not present."""
         if "water_shortage_status" in self.data:
             return self.data["water_shortage_status"] == 1
+        return None
+
+    @property
+    @switch("Auto dust collection", setter_name="set_dust_collection", icon="mdi:turbine")
+    def auto_dust_collection(self) -> Optional[bool]:
+        """Returns True if auto dust collection is enabled, None if sensor not present."""
+        if "auto_dust_collection" in self.data:
+            return self.data["auto_dust_collection"] == 1
         return None
 
     @property
