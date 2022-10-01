@@ -448,13 +448,32 @@ class RoborockVacuum(Device, VacuumInterface):
         if self._multi_maps is not None and not skip_cache:
             return self._multi_maps
 
-        self._multi_maps = self.send("get_multi_maps_list")[0]
+        multi_maps = self.send("get_multi_maps_list")[0]
+        multi_maps['map_names'] = []
+        for map in multi_maps["map_info"]
+            multi_maps['map_names'].append(map["name"])
+
+        self._multi_maps = multi_maps
         return self._multi_maps
 
     @command(click.argument("multi_map_id", type=int))
     def load_multi_map(self, multi_map_id: int):
         """Change the current map used."""
         return self.send("load_multi_map", [multi_map_id])[0] == "ok"
+
+    @command(click.argument("multi_map_name", type=str))
+    def load_multi_map_by_name(self, multi_map_name: str):
+        """Change the current map used by name."""
+        multi_map_id = None
+        for map in self.get_multi_maps()["map_info"]:
+            if map["name"] == multi_map_name:
+                multi_map_id = map["mapFlag"]
+                break
+
+        if multi_map_id is None:
+            return False
+
+        return self.load_multi_map(multi_map_id)
 
     @command(click.argument("start", type=bool))
     def edit_map(self, start):
