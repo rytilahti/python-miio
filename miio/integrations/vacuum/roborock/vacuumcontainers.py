@@ -448,6 +448,12 @@ class ConsumableStatus(DeviceStatus):
     def sensor_dirty_left(self) -> timedelta:
         return self.sensor_dirty_total - self.sensor_dirty
 
+    @property
+    @sensor("Dustbin times auto-empty used", icon="mdi:delete", enabled_default=False)
+    def dustbin_auto_empty_used(self) -> int:
+        """Return ``dust_collection_work_times``"""
+        return self.data["dust_collection_work_times"]
+
 
 class DNDStatus(DeviceStatus):
     """A container for the do-not-disturb status."""
