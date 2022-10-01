@@ -451,6 +451,11 @@ class RoborockVacuum(Device, VacuumInterface):
         self._multi_maps = self.send("get_multi_maps_list")[0]
         return self._multi_maps
 
+    @command(click.argument("multi_map_id", type=int))
+    def load_multi_map(self, multi_map_id: int):
+        """Change the current map used."""
+        return self.send("load_multi_map", [multi_map_id])[0] == "ok"
+
     @command(click.argument("start", type=bool))
     def edit_map(self, start):
         """Start map editing?"""
