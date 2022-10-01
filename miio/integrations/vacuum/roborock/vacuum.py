@@ -214,6 +214,7 @@ class RoborockVacuum(Device, VacuumInterface):
     ):
         super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
+        self._multi_maps = None
 
     @command()
     def start(self):
@@ -403,7 +404,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def status(self) -> VacuumStatus:
         """Return status of the vacuum."""
-        status = VacuumStatus(self.send("get_status")[0])
+        status = VacuumStatus(self.send("get_status")[0], self.get_multi_maps())
         status.embed(self.consumable_status())
         clean_history = self.clean_history()
         status.embed(clean_history)
@@ -435,6 +436,20 @@ class RoborockVacuum(Device, VacuumInterface):
         """Return map token."""
         # returns ['retry'] without internet
         return self.send("get_map_v1")
+
+    @command()
+    def get_multi_maps(self, skip_cache=False):
+        """Return list of multi maps."""
+        # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
+        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]}, 
+        #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
+        #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
+        #  ]}
+        if self._multi_maps is not None and not skip_cache:
+            return self._multi_maps
+
+        self._multi_maps = self.send("get_multi_maps_list")[0]
+        return self._multi_maps
 
     @command(click.argument("start", type=bool))
     def edit_map(self, start):
@@ -548,7 +563,7 @@ class RoborockVacuum(Device, VacuumInterface):
             _LOGGER.warning("No cleaning record found for id %s", id_)
             return None
 
-        res = CleaningDetails(details.pop())
+        res = CleaningDetails(details.pop(), self.get_multi_maps())
         return res
 
     @command()

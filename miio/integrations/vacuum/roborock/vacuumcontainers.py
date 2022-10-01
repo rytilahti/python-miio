@@ -45,7 +45,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[str, Any], multi_maps=None) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
@@ -86,6 +86,7 @@ class VacuumStatus(DeviceStatus):
         # 'water_shortage_status': 0, 'dock_type': 0, 'dust_collection_status': 0,
         # 'auto_dust_collection': 1,  'mop_mode': 300, 'debug_mode': 0}]
         self.data = data
+        self._multi_maps = multi_maps
 
     @property
     @sensor("State code", enabled_default=False)
@@ -171,10 +172,18 @@ class VacuumStatus(DeviceStatus):
         return bool(self.data["map_present"])
 
     @property
-    @sensor("Multi map id", icon="mdi:floor-plan")
     def multi_map_id(self) -> int:
         """The id of the current map with regards to the multi map feature, [3,7,11,15] -> [0,1,2,3]."""
         return int((self.data["map_status"]+1)/4 - 1)
+
+    @property
+    @sensor("Multi map name", icon="mdi:floor-plan")
+    def multi_map_name(self) -> str:
+        """The name of the current map with regards to the multi map feature."""
+        if self._multi_maps is None:
+            return str(self.multi_map_id)
+
+        return self._multi_maps["map_info"][self.multi_map_id]["name"]
 
     @property
     def in_zone_cleaning(self) -> bool:
@@ -295,10 +304,11 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
+    def __init__(self, data: Union[List[Any], Dict[str, Any]], multi_maps=None) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
+        self._multi_maps = multi_maps
         if isinstance(data, list):
             self.data = {
                 "begin": data[0],
@@ -336,10 +346,18 @@ class CleaningDetails(DeviceStatus):
         return pretty_area(self.data["area"])
 
     @property
-    @sensor("Last clean map id", icon="mdi:floor-plan")
     def multi_map_id(self) -> int:
         """Map id used (multi map feature) during the cleaning run."""
         return self.data["map_flag"]
+
+    @property
+    @sensor("Last clean map name", icon="mdi:floor-plan")
+    def multi_map_name(self) -> str:
+        """The name of the map used (multi map feature) during the cleaning run."""
+        if self._multi_maps is None:
+            return str(self.multi_map_id)
+
+        return self._multi_maps["map_info"][self.multi_map_id]["name"]
 
     @property
     def error_code(self) -> int:
