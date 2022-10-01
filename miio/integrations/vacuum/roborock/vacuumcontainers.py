@@ -9,6 +9,7 @@ from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
 from miio.utils import pretty_seconds, pretty_time
 
+from .vacuum import MopIntensity, MopMode
 
 def pretty_area(x: float) -> float:
     return int(x) / 1000000
@@ -153,6 +154,18 @@ class VacuumStatus(DeviceStatus):
     def fanspeed(self) -> int:
         """Current fan speed."""
         return int(self.data["fan_power"])
+
+    @property
+    @setting("Mop scrub intensity", choices=MopIntensity, setter_name="set_mop_intensity", icon="mdi:floor-plan")
+    def mop_intensity(self) -> int:
+        """Current mop intensity."""
+        return int(self.data["water_box_mode"])
+
+    @property
+    @setting("Mop route", choices=MopMode, setter_name="set_mop_mode", icon="mdi:floor-plan")
+    def mop_route(self) -> int:
+        """Current mop route."""
+        return int(self.data["mop_mode"])
 
     @property
     @sensor("Current clean duration", unit="s", icon="mdi:timer-sand")

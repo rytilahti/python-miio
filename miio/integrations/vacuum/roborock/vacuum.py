@@ -99,6 +99,7 @@ class FanspeedS7(FanspeedEnum):
 
 
 class FanspeedS7_Maxv(FanspeedEnum):
+    # Original names from the app: Quiet, Balanced, Turbo, Max, Max+
     Silent = 101
     Standard = 102
     Medium = 103
@@ -116,16 +117,17 @@ class WaterFlow(enum.Enum):
 
 
 class MopMode(enum.Enum):
-    """Mop routing on S7."""
+    """Mop routing on S7 + S7MAXV."""
 
     Standard = 300
     Deep = 301
+    DeepPlus = 303
 
 
 class MopIntensity(enum.Enum):
     """Mop scrub intensity on S7 + S7MAXV."""
 
-    Close = 200
+    Off = 200
     Mild = 201
     Moderate = 202
     Intense = 203
@@ -1001,7 +1003,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def mop_intensity(self) -> MopIntensity:
         """Get mop scrub intensity setting."""
-        if self.model != ROCKROBO_S7:
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
             raise VacuumException("Mop scrub intensity not supported by %s", self.model)
 
         return MopIntensity(self.send("get_water_box_custom_mode")[0])
@@ -1009,7 +1011,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command(click.argument("mop_intensity", type=EnumType(MopIntensity)))
     def set_mop_intensity(self, mop_intensity: MopIntensity):
         """Set mop scrub intensity setting."""
-        if self.model != ROCKROBO_S7:
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
             raise VacuumException("Mop scrub intensity not supported by %s", self.model)
 
         return self.send("set_water_box_custom_mode", [mop_intensity.value])
