@@ -302,7 +302,7 @@ class CleaningSummary(DeviceStatus):
         return pretty_area(self.data["clean_area"])
 
     @property
-    @sensor("Total clean count", icon="mdi:counter", entity_category="diagnostic")
+    @sensor("Total clean count", icon="mdi:counter", state_class="total_increasing", entity_category="diagnostic")
     def count(self) -> int:
         """Number of cleaning runs."""
         return int(self.data["clean_count"])
@@ -313,7 +313,7 @@ class CleaningSummary(DeviceStatus):
         return list(self.data["records"])
 
     @property
-    @sensor("Total dust collection count", icon="mdi:counter", entity_category="diagnostic")
+    @sensor("Total dust collection count", icon="mdi:counter", state_class="total_increasing", entity_category="diagnostic")
     def dust_collection_count(self) -> Optional[int]:
         """Total number of dust collections."""
         if "dust_collection_count" in self.data:
