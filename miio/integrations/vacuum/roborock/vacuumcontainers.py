@@ -90,13 +90,13 @@ class VacuumStatus(DeviceStatus):
         self._multi_maps = multi_maps
 
     @property
-    @sensor("State code", enabled_default=False)
+    @sensor("State code", entity_category="diagnostic", enabled_default=False)
     def state_code(self) -> int:
         """State code as returned by the device."""
         return int(self.data["state"])
 
     @property
-    @sensor("State")
+    @sensor("State", entity_category="diagnostic")
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
         states = {
@@ -130,13 +130,13 @@ class VacuumStatus(DeviceStatus):
             return "Definition missing for state %s" % self.state_code
 
     @property
-    @sensor("Error code", icon="mdi:alert", enabled_default=False)
+    @sensor("Error code", icon="mdi:alert", entity_category="diagnostic", enabled_default=False)
     def error_code(self) -> int:
         """Error code as returned by the device."""
         return int(self.data["error_code"])
 
     @property
-    @sensor("Error string", icon="mdi:alert", enabled_default=False)
+    @sensor("Error string", icon="mdi:alert", entity_category="diagnostic", enabled_default=False)
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
         try:
@@ -250,7 +250,7 @@ class VacuumStatus(DeviceStatus):
         return None
 
     @property
-    @switch("Auto dust collection", setter_name="set_dust_collection", icon="mdi:turbine")
+    @switch("Auto dust collection", setter_name="set_dust_collection", icon="mdi:turbine", entity_category="config")
     def auto_dust_collection(self) -> Optional[bool]:
         """Returns True if auto dust collection is enabled, None if sensor not present."""
         if "auto_dust_collection" in self.data:
@@ -258,7 +258,7 @@ class VacuumStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Error", icon="mdi:alert", enabled_default=False)
+    @sensor("Error", icon="mdi:alert", entity_category="diagnostic", enabled_default=False)
     def got_error(self) -> bool:
         """True if an error has occurred."""
         return self.error_code != 0
@@ -290,19 +290,19 @@ class CleaningSummary(DeviceStatus):
             self.data["records"] = []
 
     @property
-    @sensor("Total clean duration", unit="s", icon="mdi:timer-sand")
+    @sensor("Total clean duration", unit="s", icon="mdi:timer-sand", entity_category="diagnostic")
     def total_duration(self) -> timedelta:
         """Total cleaning duration."""
         return pretty_seconds(self.data["clean_time"])
 
     @property
-    @sensor("Total clean area", unit="m²", icon="mdi:texture-box")
+    @sensor("Total clean area", unit="m²", icon="mdi:texture-box", entity_category="diagnostic")
     def total_area(self) -> float:
         """Total cleaned area."""
         return pretty_area(self.data["clean_area"])
 
     @property
-    @sensor("Total clean count", icon="mdi:counter")
+    @sensor("Total clean count", icon="mdi:counter", entity_category="diagnostic")
     def count(self) -> int:
         """Number of cleaning runs."""
         return int(self.data["clean_count"])
@@ -313,7 +313,7 @@ class CleaningSummary(DeviceStatus):
         return list(self.data["records"])
 
     @property
-    @sensor("Total_dust collection count", icon="mdi:counter")
+    @sensor("Total dust collection count", icon="mdi:counter", entity_category="diagnostic")
     def dust_collection_count(self) -> Optional[int]:
         """Total number of dust collections."""
         if "dust_collection_count" in self.data:
@@ -343,25 +343,25 @@ class CleaningDetails(DeviceStatus):
             self.data = data
 
     @property
-    @sensor("Last clean start", icon="mdi:clock-time-twelve")
+    @sensor("Last clean start", icon="mdi:clock-time-twelve", entity_category="diagnostic")
     def start(self) -> datetime:
         """When cleaning was started."""
         return pretty_time(self.data["begin"])
 
     @property
-    @sensor("Last clean end", icon="mdi:clock-time-twelve")
+    @sensor("Last clean end", icon="mdi:clock-time-twelve", entity_category="diagnostic")
     def end(self) -> datetime:
         """When cleaning was finished."""
         return pretty_time(self.data["end"])
 
     @property
-    @sensor("Last clean duration", unit="s", icon="mdi:timer-sand")
+    @sensor("Last clean duration", unit="s", icon="mdi:timer-sand", entity_category="diagnostic")
     def duration(self) -> timedelta:
         """Total duration of the cleaning run."""
         return pretty_seconds(self.data["duration"])
 
     @property
-    @sensor("Last clean area", unit="m²", icon="mdi:texture-box")
+    @sensor("Last clean area", unit="m²", icon="mdi:texture-box", entity_category="diagnostic")
     def area(self) -> float:
         """Total cleaned area."""
         return pretty_area(self.data["area"])
@@ -372,7 +372,7 @@ class CleaningDetails(DeviceStatus):
         return self.data["map_flag"]
 
     @property
-    @sensor("Last clean map name", icon="mdi:floor-plan")
+    @sensor("Last clean map name", icon="mdi:floor-plan", entity_category="diagnostic")
     def multi_map_name(self) -> str:
         """The name of the map used (multi map feature) during the cleaning run."""
         if self._multi_maps is None:
@@ -406,7 +406,7 @@ class FloorCleanDetails(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Floor 0 clean start", icon="mdi:clock-time-twelve")
+    @sensor("Floor 0 clean start", icon="mdi:clock-time-twelve", entity_category="diagnostic")
     def start_0(self) -> datetime:
         """When cleaning was started."""
         if "0" not in self.data:
@@ -417,7 +417,7 @@ class FloorCleanDetails(DeviceStatus):
         return self.data["0"].start
 
     @property
-    @sensor("Floor 1 clean start", icon="mdi:clock-time-twelve")
+    @sensor("Floor 1 clean start", icon="mdi:clock-time-twelve", entity_category="diagnostic")
     def start_1(self) -> datetime:
         """When cleaning was started."""
         if "1" not in self.data:
@@ -428,7 +428,7 @@ class FloorCleanDetails(DeviceStatus):
         return self.data["1"].start
 
     @property
-    @sensor("Floor 2 clean start", icon="mdi:clock-time-twelve")
+    @sensor("Floor 2 clean start", icon="mdi:clock-time-twelve", entity_category="diagnostic")
     def start_2(self) -> datetime:
         """When cleaning was started."""
         if "2" not in self.data:
@@ -439,7 +439,7 @@ class FloorCleanDetails(DeviceStatus):
         return self.data["2"].start
 
     @property
-    @sensor("Floor 3 clean start", icon="mdi:clock-time-twelve")
+    @sensor("Floor 3 clean start", icon="mdi:clock-time-twelve", entity_category="diagnostic")
     def start_3(self) -> datetime:
         """When cleaning was started."""
         if "3" not in self.data:
@@ -474,54 +474,54 @@ class ConsumableStatus(DeviceStatus):
         self.sensor_dirty_total = timedelta(hours=30)
 
     @property
-    @sensor("Main brush used", unit="s", icon="mdi:brush", enabled_default=False)
+    @sensor("Main brush used", unit="s", icon="mdi:brush", entity_category="diagnostic", enabled_default=False)
     def main_brush(self) -> timedelta:
         """Main brush usage time."""
         return pretty_seconds(self.data["main_brush_work_time"])
 
     @property
-    @sensor("Main brush left", unit="s", icon="mdi:brush")
+    @sensor("Main brush left", unit="s", icon="mdi:brush", entity_category="diagnostic")
     def main_brush_left(self) -> timedelta:
         """How long until the main brush should be changed."""
         return self.main_brush_total - self.main_brush
 
     @property
-    @sensor("Side brush used", unit="s", icon="mdi:brush", enabled_default=False)
+    @sensor("Side brush used", unit="s", icon="mdi:brush", entity_category="diagnostic", enabled_default=False)
     def side_brush(self) -> timedelta:
         """Side brush usage time."""
         return pretty_seconds(self.data["side_brush_work_time"])
 
     @property
-    @sensor("Side brush left", unit="s", icon="mdi:brush")
+    @sensor("Side brush left", unit="s", icon="mdi:brush", entity_category="diagnostic")
     def side_brush_left(self) -> timedelta:
         """How long until the side brush should be changed."""
         return self.side_brush_total - self.side_brush
 
     @property
-    @sensor("Filter used", unit="s", icon="mdi:air-filter", enabled_default=False)
+    @sensor("Filter used", unit="s", icon="mdi:air-filter", entity_category="diagnostic", enabled_default=False)
     def filter(self) -> timedelta:
         """Filter usage time."""
         return pretty_seconds(self.data["filter_work_time"])
 
     @property
-    @sensor("Filter left", unit="s", icon="mdi:air-filter")
+    @sensor("Filter left", unit="s", icon="mdi:air-filter", entity_category="diagnostic")
     def filter_left(self) -> timedelta:
         """How long until the filter should be changed."""
         return self.filter_total - self.filter
 
     @property
-    @sensor("Sensor dirty used", unit="s", icon="mdi:eye-outline", enabled_default=False)
+    @sensor("Sensor dirty used", unit="s", icon="mdi:eye-outline", entity_category="diagnostic", enabled_default=False)
     def sensor_dirty(self) -> timedelta:
         """Return ``sensor_dirty_time``"""
         return pretty_seconds(self.data["sensor_dirty_time"])
 
     @property
-    @sensor("Sensor dirty left", unit="s", icon="mdi:eye-outline")
+    @sensor("Sensor dirty left", unit="s", icon="mdi:eye-outline", entity_category="diagnostic")
     def sensor_dirty_left(self) -> timedelta:
         return self.sensor_dirty_total - self.sensor_dirty
 
     @property
-    @sensor("Dustbin times auto-empty used", icon="mdi:delete", enabled_default=False)
+    @sensor("Dustbin times auto-empty used", icon="mdi:delete", entity_category="diagnostic", enabled_default=False)
     def dustbin_auto_empty_used(self) -> int:
         """Return ``dust_collection_work_times``"""
         return self.data["dust_collection_work_times"]
@@ -536,19 +536,19 @@ class DNDStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Do not disturb", icon="mdi:minus-circle-off")
+    @sensor("Do not disturb", icon="mdi:minus-circle-off", entity_category="diagnostic")
     def enabled(self) -> bool:
         """True if DnD is enabled."""
         return bool(self.data["enabled"])
 
     @property
-    @sensor("Do not disturb start", icon="mdi:minus-circle-off", enabled_default=False)
+    @sensor("Do not disturb start", icon="mdi:minus-circle-off", entity_category="diagnostic", enabled_default=False)
     def start(self) -> time:
         """Start time of DnD."""
         return time(hour=self.data["start_hour"], minute=self.data["start_minute"])
 
     @property
-    @sensor("Do not disturb end", icon="mdi:minus-circle-off", enabled_default=False)
+    @sensor("Do not disturb end", icon="mdi:minus-circle-off", entity_category="diagnostic", enabled_default=False)
     def end(self) -> time:
         """End time of DnD."""
         return time(hour=self.data["end_hour"], minute=self.data["end_minute"])
