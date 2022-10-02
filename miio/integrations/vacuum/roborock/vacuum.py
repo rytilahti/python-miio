@@ -29,6 +29,7 @@ from .vacuumcontainers import (
     CleaningDetails,
     CleaningSummary,
     ConsumableStatus,
+    FloorCleanDetails,
     DNDStatus,
     SoundInstallStatus,
     SoundStatus,
@@ -126,6 +127,8 @@ class RoborockVacuum(Device, VacuumInterface):
         self.manual_seqnum = -1
         self._multi_maps = None
         self._multi_map_enum = None
+        self._floor_clean_details = {}
+        self._searched_clean_id = None
 
     @command()
     def start(self):
@@ -319,7 +322,9 @@ class RoborockVacuum(Device, VacuumInterface):
         status.embed(self.consumable_status())
         clean_history = self.clean_history()
         status.embed(clean_history)
-        status.embed(self.last_clean_details(history=clean_history))
+        clean_details = self.last_clean_all_floor(history=clean_history)
+        status.embed(clean_details["last"])
+        status.embed(FloorCleanDetails(clean_details))
         status.embed(self.dnd_status())
         return status
 
@@ -484,6 +489,48 @@ class RoborockVacuum(Device, VacuumInterface):
 
         last_clean_id = history.ids[0]
         return self.clean_details(last_clean_id)
+
+    @command()
+    def last_clean_all_floor(self, history: Optional[CleaningSummary] = None) -> dict[str, Optional[CleaningDetails]]:
+        """Return details from the last cleaning and for each floor.
+
+        Returns None if there has been no cleanups for that floor.
+        """
+        if history is None:
+            history = self.clean_history()
+
+        N_maps = self.get_multi_maps()["multi_map_count"]
+        map_ids = list(range(0,N_maps))
+
+        # if cache empty, fill with None
+        if not self._floor_clean_details:
+            self._floor_clean_details["last"] = None
+            for id in map_ids:
+                self._floor_clean_details[str(id)] = None
+
+        if not history.ids:
+            return self._floor_clean_details
+
+        last_clean_id = history.ids[0]
+        for id in history.ids:
+            # already searched this record
+            if id == self._searched_clean_id:
+                break
+
+            clean_detail = self.clean_details(id)
+            if clean_detail.multi_map_id in map_ids:
+                self._floor_clean_details[str(clean_detail.multi_map_id)] = clean_detail
+                map_ids.remove(clean_detail.multi_map_id)
+
+            if id == last_clean_id:
+                self._floor_clean_details["last"] = clean_detail
+
+            # all floors found
+            if not map_ids:
+                break
+
+        self._searched_clean_id = last_clean_id
+        return self._floor_clean_details
 
     @command(
         click.argument("id_", type=int, metavar="ID"),

@@ -399,6 +399,57 @@ class CleaningDetails(DeviceStatus):
         return self.data["complete"] == 1
 
 
+class FloorCleanDetails(DeviceStatus):
+    """Contains details about a last cleaning run per floor."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.data = data
+
+    @property
+    @sensor("Floor 0 clean start", icon="mdi:clock-time-twelve")
+    def start_0(self) -> datetime:
+        """When cleaning was started."""
+        if "0" not in self.data:
+            return None
+        if self.data["0"] is None:
+            return None
+
+        return pretty_time(self.data["0"].start)
+
+    @property
+    @sensor("Floor 1 clean start", icon="mdi:clock-time-twelve")
+    def start_1(self) -> datetime:
+        """When cleaning was started."""
+        if "1" not in self.data:
+            return None
+        if self.data["1"] is None:
+            return None
+
+        return pretty_time(self.data["1"].start)
+
+    @property
+    @sensor("Floor 2 clean start", icon="mdi:clock-time-twelve")
+    def start_2(self) -> datetime:
+        """When cleaning was started."""
+        if "1" not in self.data:
+            return None
+        if self.data["1"] is None:
+            return None
+
+        return pretty_time(self.data["1"].start)
+
+    @property
+    @sensor("Floor 3 clean start", icon="mdi:clock-time-twelve")
+    def start_3(self) -> datetime:
+        """When cleaning was started."""
+        if "1" not in self.data:
+            return None
+        if self.data["1"] is None:
+            return None
+
+        return pretty_time(self.data["1"].start)
+
+
 class ConsumableStatus(DeviceStatus):
     """Container for consumable status information, including information about brushes
     and duration until they should be changed. The methods returning time left are based
