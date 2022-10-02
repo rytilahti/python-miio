@@ -414,7 +414,7 @@ class FloorCleanDetails(DeviceStatus):
         if self.data["0"] is None:
             return None
 
-        return pretty_time(self.data["0"].start)
+        return self.data["0"].start
 
     @property
     @sensor("Floor 1 clean start", icon="mdi:clock-time-twelve")
@@ -425,29 +425,29 @@ class FloorCleanDetails(DeviceStatus):
         if self.data["1"] is None:
             return None
 
-        return pretty_time(self.data["1"].start)
+        return self.data["1"].start
 
     @property
     @sensor("Floor 2 clean start", icon="mdi:clock-time-twelve")
     def start_2(self) -> datetime:
         """When cleaning was started."""
-        if "1" not in self.data:
+        if "2" not in self.data:
             return None
-        if self.data["1"] is None:
+        if self.data["2"] is None:
             return None
 
-        return pretty_time(self.data["1"].start)
+        return self.data["2"].start
 
     @property
     @sensor("Floor 3 clean start", icon="mdi:clock-time-twelve")
     def start_3(self) -> datetime:
         """When cleaning was started."""
-        if "1" not in self.data:
+        if "3" not in self.data:
             return None
-        if self.data["1"] is None:
+        if self.data["3"] is None:
             return None
 
-        return pretty_time(self.data["1"].start)
+        return self.data["3"].start
 
 
 class ConsumableStatus(DeviceStatus):
