@@ -7,7 +7,7 @@ import math
 import os
 import pathlib
 import time
-from typing import List, Optional, Type, Union
+from typing import Dict, List, Optional, Type, Union
 
 import click
 import pytz
@@ -127,7 +127,7 @@ class RoborockVacuum(Device, VacuumInterface):
         self.manual_seqnum = -1
         self._multi_maps = None
         self._multi_map_enum = None
-        self._floor_clean_details: dict[str, Optional[CleaningDetails]] = {}
+        self._floor_clean_details: Dict[str, Optional[CleaningDetails]] = {}
         self._searched_clean_id: Optional[int] = None
 
     @command()
@@ -495,7 +495,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def last_clean_all_floor(
         self, history: Optional[CleaningSummary] = None
-    ) -> dict[str, Optional[CleaningDetails]]:
+    ) -> Dict[str, Optional[CleaningDetails]]:
         """Return details from the last cleaning and for each floor.
 
         Returns None if there has been no cleanups for that floor.
