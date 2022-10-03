@@ -24,34 +24,33 @@ from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
+from .vacuum_enums import (
+    CarpetCleaningMode,
+    Consumable,
+    DustCollectionMode,
+    FanspeedE2,
+    FanspeedEnum,
+    FanspeedS7,
+    FanspeedS7_Maxv,
+    FanspeedV1,
+    FanspeedV2,
+    FanspeedV3,
+    MopIntensity,
+    MopMode,
+    TimerState,
+    WaterFlow,
+)
 from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,
     CleaningSummary,
     ConsumableStatus,
-    FloorCleanDetails,
     DNDStatus,
+    FloorCleanDetails,
     SoundInstallStatus,
     SoundStatus,
     Timer,
     VacuumStatus,
-)
-
-from .vacuum_enums import (
-    TimerState,
-    Consumable,
-    FanspeedEnum,
-    FanspeedV1,
-    FanspeedV2,
-    FanspeedV3,
-    FanspeedE2,
-    FanspeedS7,
-    FanspeedS7_Maxv,
-    WaterFlow,
-    MopMode,
-    MopIntensity,
-    CarpetCleaningMode,
-    DustCollectionMode,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -59,6 +58,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class VacuumException(DeviceException):
     pass
+
 
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S4 = "roborock.vacuum.s4"
@@ -357,7 +357,7 @@ class RoborockVacuum(Device, VacuumInterface):
     def get_multi_maps(self, skip_cache=False):
         """Return list of multi maps."""
         # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
-        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]}, 
+        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
         #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
         #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
         #  ]}
@@ -477,7 +477,9 @@ class RoborockVacuum(Device, VacuumInterface):
         return CleaningSummary(self.send("get_clean_summary"))
 
     @command()
-    def last_clean_details(self, history: Optional[CleaningSummary] = None) -> Optional[CleaningDetails]:
+    def last_clean_details(
+        self, history: Optional[CleaningSummary] = None
+    ) -> Optional[CleaningDetails]:
         """Return details from the last cleaning.
 
         Returns None if there has been no cleanups.
@@ -491,7 +493,9 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.clean_details(last_clean_id)
 
     @command()
-    def last_clean_all_floor(self, history: Optional[CleaningSummary] = None) -> dict[str, Optional[CleaningDetails]]:
+    def last_clean_all_floor(
+        self, history: Optional[CleaningSummary] = None
+    ) -> dict[str, Optional[CleaningDetails]]:
         """Return details from the last cleaning and for each floor.
 
         Returns None if there has been no cleanups for that floor.
@@ -500,7 +504,7 @@ class RoborockVacuum(Device, VacuumInterface):
             history = self.clean_history()
 
         N_maps = self.get_multi_maps()["multi_map_count"]
-        map_ids = list(range(0,N_maps))
+        map_ids = list(range(0, N_maps))
 
         # if cache empty, fill with None
         if not self._floor_clean_details:

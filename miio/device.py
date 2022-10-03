@@ -244,7 +244,9 @@ class Device(metaclass=DeviceGroupMeta):
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return list of settings."""
-        settings = self.status().settings()     #NOTE that this already does IO so schould be run in executer job in HA
+        settings = (
+            self.status().settings()
+        )  # NOTE that this already does IO so schould be run in executer job in HA
         for setting in settings.values():
             # TODO: Bind setter methods, this should probably done only once during init.
             if setting.setter is None:
