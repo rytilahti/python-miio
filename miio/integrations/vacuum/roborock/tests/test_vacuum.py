@@ -83,6 +83,35 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "miIO.info": "dummy info",
         }
 
+        self._multi_maps = {
+            "max_multi_map": 4,
+            "max_bak_map": 1,
+            "multi_map_count": 3,
+            "map_info": [
+                {
+                    "mapFlag": 0,
+                    "add_time": 1664448893,
+                    "length": 10,
+                    "name": "Downstairs",
+                    "bak_maps": [{"mapFlag": 4, "add_time": 1663577737}],
+                },
+                {
+                    "mapFlag": 1,
+                    "add_time": 1663580330,
+                    "length": 8,
+                    "name": "Upstairs",
+                    "bak_maps": [{"mapFlag": 5, "add_time": 1663577752}],
+                },
+                {
+                    "mapFlag": 2,
+                    "add_time": 1663580384,
+                    "length": 5,
+                    "name": "Attic",
+                    "bak_maps": [{"mapFlag": 6, "add_time": 1663577765}],
+                },
+            ],
+        }
+
         super().__init__(args, kwargs)
 
     def change_mode(self, new_mode):
