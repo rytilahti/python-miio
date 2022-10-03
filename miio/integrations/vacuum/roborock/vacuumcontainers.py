@@ -454,7 +454,7 @@ class CleaningDetails(DeviceStatus):
     @property
     def multi_map_id(self) -> int:
         """Map id used (multi map feature) during the cleaning run."""
-        return self.data["map_flag"]
+        return self.data.get("map_flag", 0)
 
     @property
     @sensor("Last clean map name", icon="mdi:floor-plan", entity_category="diagnostic")
