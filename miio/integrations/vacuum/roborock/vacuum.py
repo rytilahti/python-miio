@@ -139,8 +139,8 @@ class RoborockVacuum(Device, VacuumInterface):
     def stop(self):
         """Stop cleaning.
 
-        Note, prefer 'pause' instead of this for wider support. Some
-        newer vacuum models do not support this command.
+        Note, prefer 'pause' instead of this for wider support. Some newer vacuum models
+        do not support this command.
         """
         return self.send("app_stop")
 
@@ -168,9 +168,8 @@ class RoborockVacuum(Device, VacuumInterface):
     def _fetch_info(self) -> DeviceInfo:
         """Return info about the device.
 
-        This is overrides the base class info to account for gen1
-        devices that do not respond to info query properly when not
-        connected to the cloud.
+        This is overrides the base class info to account for gen1 devices that do not
+        respond to info query properly when not connected to the cloud.
         """
         try:
             info = super()._fetch_info()
@@ -180,9 +179,8 @@ class RoborockVacuum(Device, VacuumInterface):
             def create_dummy_mac(addr):
                 """Returns a dummy mac for a given IP address.
 
-                This squats the FF:FF:<first octet> OUI for a dummy mac
-                presentation to allow presenting a unique identifier for
-                homeassistant.
+                This squats the FF:FF:<first octet> OUI for a dummy mac presentation to
+                allow presenting a unique identifier for homeassistant.
                 """
                 from ipaddress import ip_address
 
@@ -469,8 +467,7 @@ class RoborockVacuum(Device, VacuumInterface):
     def enable_lab_mode(self, enable):
         """Enable persistent maps and software barriers.
 
-        This is required to use create_nogo_zone and
-        create_software_barrier commands.
+        This is required to use create_nogo_zone and create_software_barrier commands.
         """
         return self.send("set_lab_status", int(enable))["ok"]
 

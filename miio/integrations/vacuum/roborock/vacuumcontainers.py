@@ -219,13 +219,14 @@ class VacuumStatus(DeviceStatus):
     )
     def multi_map_id(self) -> int:
         """The id of the current map with regards to the multi map feature,
-        [3,7,11,15] -> [0,1,2,3]."""
+
+        [3,7,11,15] -> [0,1,2,3].
+        """
         return int((self.data["map_status"] + 1) / 4 - 1)
 
     @property
     def multi_map_name(self) -> str:
-        """The name of the current map with regards to the multi map
-        feature."""
+        """The name of the current map with regards to the multi map feature."""
         if self._multi_maps is None:
             return str(self.multi_map_id)
 
@@ -268,8 +269,8 @@ class VacuumStatus(DeviceStatus):
     @property
     @sensor("Mop attached")
     def is_water_box_carriage_attached(self) -> Optional[bool]:
-        """Return True if water box carriage (mop) is installed, None if sensor
-        not present."""
+        """Return True if water box carriage (mop) is installed, None if sensor not
+        present."""
         if "water_box_carriage_status" in self.data:
             return self.data["water_box_carriage_status"] == 1
         return None
@@ -277,8 +278,7 @@ class VacuumStatus(DeviceStatus):
     @property
     @sensor("Water level low", icon="mdi:water-alert-outline")
     def is_water_shortage(self) -> Optional[bool]:
-        """Returns True if water is low in the tank, None if sensor not
-        present."""
+        """Returns True if water is low in the tank, None if sensor not present."""
         if "water_shortage_status" in self.data:
             return self.data["water_shortage_status"] == 1
         return None
@@ -459,8 +459,7 @@ class CleaningDetails(DeviceStatus):
     @property
     @sensor("Last clean map name", icon="mdi:floor-plan", entity_category="diagnostic")
     def multi_map_name(self) -> str:
-        """The name of the map used (multi map feature) during the cleaning
-        run."""
+        """The name of the map used (multi map feature) during the cleaning run."""
         if self._multi_maps is None:
             return str(self.multi_map_id)
 
@@ -557,9 +556,9 @@ class FloorCleanDetails(DeviceStatus):
 
 
 class ConsumableStatus(DeviceStatus):
-    """Container for consumable status information, including information about
-    brushes and duration until they should be changed. The methods returning
-    time left are based on the following lifetimes:
+    """Container for consumable status information, including information about brushes
+    and duration until they should be changed. The methods returning time left are based
+    on the following lifetimes:
 
     - Sensor cleanup time: XXX FIXME
     - Main brush: 300 hours
@@ -732,8 +731,8 @@ class DNDStatus(DeviceStatus):
 class Timer(DeviceStatus):
     """A container for scheduling.
 
-    The timers are accessed using an integer ID, which is based on the
-    unix timestamp of the creation time.
+    The timers are accessed using an integer ID, which is based on the unix timestamp of
+    the creation time.
     """
 
     def __init__(self, data: List[Any], timezone: BaseTzInfo) -> None:
@@ -754,9 +753,9 @@ class Timer(DeviceStatus):
     def id(self) -> str:
         """Unique identifier for timer.
 
-        Usually a unix timestamp of when the timer was created, but it
-        is not guaranteed. For example, valetudo apparently allows using
-        arbitrary strings for this.
+        Usually a unix timestamp of when the timer was created, but it is not
+        guaranteed. For example, valetudo apparently allows using arbitrary strings for
+        this.
         """
         return self.data[0]
 
@@ -790,8 +789,7 @@ class Timer(DeviceStatus):
     def next_schedule(self) -> datetime:
         """Next schedule for the timer.
 
-        Note, this value will not be updated after the Timer object has
-        been created.
+        Note, this value will not be updated after the Timer object has been created.
         """
         if self._next_schedule is None:
             self._next_schedule = self.croniter.get_next(ret_type=datetime)
