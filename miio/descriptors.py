@@ -65,7 +65,6 @@ class SettingDescriptor:
     name: str
     property: str
     unit: str
-    type: SettingType
     setter: Optional[Callable] = None
     setter_name: Optional[str] = None
 

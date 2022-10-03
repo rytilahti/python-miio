@@ -10,8 +10,6 @@ from .descriptors import (
     EnumSettingDescriptor,
     NumberSettingDescriptor,
     SensorDescriptor,
-    SettingDescriptor,
-    SettingType,
     SwitchDescriptor,
 )
 from .deviceinfo import DeviceInfo
@@ -262,10 +260,12 @@ class Device(metaclass=DeviceGroupMeta):
                     )
 
                 setting.setter = getattr(self, setting.setter_name)
-            if isinstance(setting, EnumSettingDescriptor):
-                if setting.choices_attribute is not None:
-                    retrieve_choices_function = getattr(self, setting.choices_attribute)
-                    setting.choices = retrieve_choices_function()
+            if (
+                isinstance(setting, EnumSettingDescriptor)
+                and setting.choices_attribute is not None
+            ):
+                retrieve_choices_function = getattr(self, setting.choices_attribute)
+                setting.choices = retrieve_choices_function()
 
         return settings
 
