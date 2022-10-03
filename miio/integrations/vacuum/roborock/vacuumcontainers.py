@@ -497,7 +497,7 @@ class FloorCleanDetails(DeviceStatus):
         device_class="timestamp",
         entity_category="diagnostic",
     )
-    def start_0(self) -> datetime:
+    def start_0(self) -> Optional[datetime]:
         """When cleaning was started."""
         if "0" not in self.data:
             return None
@@ -513,7 +513,7 @@ class FloorCleanDetails(DeviceStatus):
         device_class="timestamp",
         entity_category="diagnostic",
     )
-    def start_1(self) -> datetime:
+    def start_1(self) -> Optional[datetime]:
         """When cleaning was started."""
         if "1" not in self.data:
             return None
@@ -529,7 +529,7 @@ class FloorCleanDetails(DeviceStatus):
         device_class="timestamp",
         entity_category="diagnostic",
     )
-    def start_2(self) -> datetime:
+    def start_2(self) -> Optional[datetime]:
         """When cleaning was started."""
         if "2" not in self.data:
             return None
@@ -545,7 +545,7 @@ class FloorCleanDetails(DeviceStatus):
         device_class="timestamp",
         entity_category="diagnostic",
     )
-    def start_3(self) -> datetime:
+    def start_3(self) -> Optional[datetime]:
         """When cleaning was started."""
         if "3" not in self.data:
             return None

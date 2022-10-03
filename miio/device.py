@@ -7,8 +7,11 @@ import click
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
 from .descriptors import (
     ButtonDescriptor,
+    EnumSettingDescriptor,
+    NumberSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
+    SettingType,
     SwitchDescriptor,
 )
 from .deviceinfo import DeviceInfo
@@ -242,7 +245,9 @@ class Device(metaclass=DeviceGroupMeta):
         """Return a list of button-like, clickable actions of the device."""
         return []
 
-    def settings(self) -> Dict[str, SettingDescriptor]:
+    def settings(
+        self,
+    ) -> Dict[str, Union[EnumSettingDescriptor, NumberSettingDescriptor]]:
         """Return list of settings."""
         settings = (
             self.status().settings()
@@ -257,9 +262,10 @@ class Device(metaclass=DeviceGroupMeta):
                     )
 
                 setting.setter = getattr(self, setting.setter_name)
-            if setting.choices_attribute is not None:
-                retrieve_choices_function = getattr(self, setting.choices_attribute)
-                setting.choices = retrieve_choices_function()
+            if isinstance(setting, EnumSettingDescriptor):
+                if setting.choices_attribute is not None:
+                    retrieve_choices_function = getattr(self, setting.choices_attribute)
+                    setting.choices = retrieve_choices_function()
 
         return settings
 

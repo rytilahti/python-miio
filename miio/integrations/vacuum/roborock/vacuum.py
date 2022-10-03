@@ -127,8 +127,8 @@ class RoborockVacuum(Device, VacuumInterface):
         self.manual_seqnum = -1
         self._multi_maps = None
         self._multi_map_enum = None
-        self._floor_clean_details = {}
-        self._searched_clean_id = None
+        self._floor_clean_details: dict[str, Optional[CleaningDetails]] = {}
+        self._searched_clean_id: Optional[int] = None
 
     @command()
     def start(self):
@@ -368,7 +368,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self._multi_maps
 
     @command()
-    def multi_map_enum(self, skip_cache=False) -> enum.Enum:
+    def multi_map_enum(self, skip_cache=False) -> Optional[enum.Enum]:
         """Enum of the available map names."""
         if self._multi_map_enum is not None and not skip_cache:
             return self._multi_map_enum
