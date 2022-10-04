@@ -90,11 +90,6 @@ class SweepType(Enum):
     Floor = 8
 
 
-class RepeatState(Enum):
-    Off = False
-    On = True
-
-
 class DoorState(Enum):
     Off = 0
     DustBox = 1
