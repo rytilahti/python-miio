@@ -24,7 +24,7 @@ _INITIAL_STATE_PRO2 = {
     "battery": 42,
     "mop_state": False,
     "fan_speed": FanSpeedMode.EnergySaving,
-    "water_level": WaterLevel.Medium,
+    "water_level": WaterLevel.High,
     "side_brush_life_level": 93,
     "side_brush_time_left": 14,
     "main_brush_life_level": 87,
@@ -46,7 +46,7 @@ class DummyPRO2Vacuum(DummyMiotDevice, Pro2Vacuum):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="function")
 def dummypro2vacuum(request):
     request.cls.device = DummyPRO2Vacuum()
 
@@ -92,3 +92,21 @@ class TestPro2Vacuum(TestCase):
             minutes=_INITIAL_STATE_PRO2["clean_time"]
         )
         assert status.current_language == _INITIAL_STATE_PRO2["current_language"]
+
+    def test_fanspeed_presets(self):
+        presets = self.device.fan_speed_presets()
+        for item in FanSpeedMode:
+            assert item.name in presets
+            assert presets[item.name] == item.value
+
+    def test_set_fan_speed_preset(self):
+        for speed in self.device.fan_speed_presets().values():
+            self.device.set_fan_speed_preset(speed)
+            status = self.device.status()
+            assert status.fan_speed == FanSpeedMode(speed)
+
+    def test_set_fan_speed(self):
+        for speed in self.device.fan_speed_presets().values():
+            self.device.set_fan_speed(speed)
+            status = self.device.status()
+            assert status.fan_speed == FanSpeedMode(speed)

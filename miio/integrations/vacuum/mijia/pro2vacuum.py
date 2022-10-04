@@ -178,13 +178,13 @@ class Pro2Status(DeviceStatus):
         return FanSpeedMode(self.data["fan_speed"])
 
     @property
-    @switch(name="Sweep Type", choices=SweepType, setter_name="set_sweep_type")
+    @sensor(name="Sweep Type")
     def sweep_type(self) -> SweepType:
         """Operating Mode."""
         return SweepType(self.data["sweep_type"])
 
     @property
-    @switch(name="Sweep Mode", choices=SweepMode, setter_name="set_sweep_mode")
+    @sensor(name="Sweep Mode")
     def sweep_mode(self) -> SweepMode:
         """Sweep Mode."""
         return SweepMode(self.data["sweep_mode"])
@@ -328,7 +328,7 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
     )
     def set_fan_speed(self, fan_speed: FanSpeedMode):
         """Set fan speed."""
-        return self.set_property("fan_speed", fan_speed.value)
+        return self.set_property("fan_speed", fan_speed)
 
     @command()
     def fan_speed_presets(self) -> FanspeedPresets:
