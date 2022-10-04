@@ -213,7 +213,7 @@ class Pro2Status(DeviceStatus):
         return self.data["main_brush_life_level"]
 
     @property
-    @sensor("Main Brush Life Time Left", unit="hr")
+    @sensor("Main Brush Life Time Left")
     def main_brush_time_left(self) -> timedelta:
         """Main Brush Life Time Left(hours)."""
         return timedelta(hours=self.data["main_brush_time_left"])
@@ -225,7 +225,7 @@ class Pro2Status(DeviceStatus):
         return self.data["side_brush_life_level"]
 
     @property
-    @sensor("Side Brush Life Time Left", unit="hr")
+    @sensor("Side Brush Life Time Left")
     def side_brush_time_left(self) -> timedelta:
         """Side Brush Life Time Left(hours)."""
         return timedelta(hours=self.data["side_brush_time_left"])
@@ -237,7 +237,7 @@ class Pro2Status(DeviceStatus):
         return self.data["filter_life_level"]
 
     @property
-    @sensor("Filter Life Time Left", unit="hr")
+    @sensor("Filter Life Time Left")
     def filter_time_left(self) -> timedelta:
         """Filter Life Time Left(hours)."""
         return timedelta(hours=self.data["filter_time_left"])
@@ -249,7 +249,7 @@ class Pro2Status(DeviceStatus):
         return self.data["mop_life_level"]
 
     @property
-    @sensor("Mop Life Time Left", unit="hr")
+    @sensor("Mop Life Time Left")
     def mop_time_left(self) -> timedelta:
         """Mop Life Time Left(hours)."""
         return timedelta(hours=self.data["mop_time_left"])
@@ -261,7 +261,7 @@ class Pro2Status(DeviceStatus):
         return self.data["clean_area"]
 
     @property
-    @sensor("Last Clean Time", unit="mins", icon="mdi:timer-sand")
+    @sensor("Last Clean Time", icon="mdi:timer-sand")
     def clean_time(self) -> timedelta:
         """Last time clean time(mins)."""
         return timedelta(minutes=self.data["clean_time"])
