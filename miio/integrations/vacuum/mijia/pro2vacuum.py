@@ -53,7 +53,7 @@ _MAPPINGS = {
     }
 }
 
-ERROR_CODES: Dict[int, str] = {}
+ERROR_CODES: Dict[int, str] = {2105: "Fully charged"}
 
 
 def _enum_as_dict(cls):
