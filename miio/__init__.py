@@ -65,6 +65,7 @@ from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum import (
     DreameVacuum,
     G1Vacuum,
+    Pro2Vacuum,
     RoborockVacuum,
     RoidmiVacuumMiot,
     VacuumException,
