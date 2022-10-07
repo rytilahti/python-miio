@@ -63,6 +63,9 @@ class DeviceStatus(metaclass=_StatusMeta):
       introspectable way. See :func:`@property`, :func:`switch`, and :func:`@setting`.
     * :func:`embed` allows embedding other status containers.
     * The __repr__ implementation returns all defined properties and their values.
+    * A `Property` of a embeded `ModuleStatus` container of the `MainStatus` container
+      can be accesed using `ModuleStatus.MainStatus.Property`
+      or `getattr(ModuleStatus, MainStatus:Property)`
     """
 
     def __repr__(self):
