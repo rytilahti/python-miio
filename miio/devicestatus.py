@@ -102,7 +102,7 @@ class DeviceStatus(metaclass=_StatusMeta):
 
     def settings(
         self,
-    ) -> Dict[str, Union[EnumSettingDescriptor, NumberSettingDescriptor]]:
+    ) -> Dict[str, SettingDescriptor]:
         """Return the dict of settings exposed by the status container.
 
         You can use @setting decorator to define sensors inside your status class.
