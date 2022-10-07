@@ -273,13 +273,12 @@ class Device(metaclass=DeviceGroupMeta):
                 and setting.choices_attribute is not None
             ):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
-                setting.choices = retrieve_choices_function()
+                setting.choices = retrieve_choices_function() # This can do IO
 
         return settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return sensors."""
-        # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.cached_status().sensors()
         return sensors
 
