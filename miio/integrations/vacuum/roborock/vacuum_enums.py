@@ -58,11 +58,11 @@ class FanspeedS7(FanspeedEnum):
 
 class FanspeedS7_Maxv(FanspeedEnum):
     # Original names from the app: Quiet, Balanced, Turbo, Max, Max+
+    Off = 105
     Silent = 101
     Standard = 102
     Medium = 103
     Turbo = 104
-    Mopping = 105
     Max = 108
 
 
