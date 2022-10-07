@@ -55,6 +55,7 @@ class Device(metaclass=DeviceGroupMeta):
         self.token: Optional[str] = token
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
+        self._status: Optional[DeviceStatus] = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -239,6 +240,13 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
+    def cached_status(self) -> DeviceStatus:
+        """Return device status from cache."""
+        if self._status is None:
+            self._status = self.status()
+
+        return self._status
+
     def buttons(self) -> List[ButtonDescriptor]:
         """Return a list of button-like, clickable actions of the device."""
         return []
@@ -248,7 +256,7 @@ class Device(metaclass=DeviceGroupMeta):
     ) -> Dict[str, Union[EnumSettingDescriptor, NumberSettingDescriptor]]:
         """Return list of settings."""
         settings = (
-            self.status().settings()
+            self.cached_status().settings()
         )  # NOTE that this already does IO so schould be run in executer job in HA
         for setting in settings.values():
             # TODO: Bind setter methods, this should probably done only once during init.
@@ -272,12 +280,12 @@ class Device(metaclass=DeviceGroupMeta):
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return sensors."""
         # TODO: the latest status should be cached and re-used by all meta information getters
-        sensors = self.status().sensors()
+        sensors = self.cached_status().sensors()
         return sensors
 
     def switches(self) -> Dict[str, SwitchDescriptor]:
         """Return toggleable switches."""
-        switches = self.status().switches()
+        switches = self.cached_status().switches()
         for switch in switches.values():
             # TODO: Bind setter methods, this should probably done only once during init.
             if switch.setter is None:
