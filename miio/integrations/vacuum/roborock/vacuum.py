@@ -318,7 +318,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def status(self) -> VacuumStatus:
         """Return status of the vacuum."""
-        status = VacuumStatus(self.send("get_status")[0], self.get_multi_maps())
+        status = self.vacuum_status()
         status.embed(self.consumable_status())
         clean_history = self.clean_history()
         status.embed(clean_history)
@@ -327,6 +327,11 @@ class RoborockVacuum(Device, VacuumInterface):
         status.embed(FloorCleanDetails(clean_details))
         status.embed(self.dnd_status())
         return status
+
+    @command()
+    def vacuum_status(self) -> VacuumStatus:
+        """Return only status of the vacuum."""
+        return VacuumStatus(self.send("get_status")[0], self.get_multi_maps())
 
     def enable_log_upload(self):
         raise NotImplementedError("unknown parameters")
