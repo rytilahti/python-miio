@@ -537,14 +537,20 @@ class FloorCleanDetails(DeviceStatus):
 
         for map_id in self.data:
             if self.data[map_id] is None:
+                setattr(self, f"CleanDetails_{map_id}", None)
                 setattr(self, f"start_{map_id}", None)
                 continue
+            setattr(self, f"CleanDetails_{map_id}", self.data[map_id])
             setattr(self, f"start_{map_id}", self.data[map_id].start)
 
     def __repr__(self):
 
         s = f"<{self.__class__.__name__}"
         for map_id in self.data:
+            name = f"CleanDetails_{map_id}"
+            value = getattr(self, name)
+            s += f" {name}={value}"
+            
             name = f"start_{map_id}"
             value = getattr(self, name)
             s += f" {name}={value}"
