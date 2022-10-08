@@ -2,16 +2,7 @@ import inspect
 import logging
 import warnings
 from enum import Enum
-from typing import (
-    Callable,
-    Dict,
-    Optional,
-    Type,
-    Union,
-    get_args,
-    get_origin,
-    get_type_hints,
-)
+from typing import Dict, Optional, Type, Union, get_args, get_origin, get_type_hints
 
 from .descriptors import (
     ButtonDescriptor,
