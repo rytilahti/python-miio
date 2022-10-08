@@ -264,7 +264,7 @@ def setting(
                 property=property_name,
                 name=name,
                 unit=unit,
-                setter=setter,
+                setter=None,
                 setter_name=setter_name,
                 choices=choices,
                 choices_attribute=choices_attribute,
