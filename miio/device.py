@@ -1,4 +1,5 @@
 import logging
+from inspect import getmembers
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union  # noqa: F401
 
@@ -56,6 +57,7 @@ class Device(metaclass=DeviceGroupMeta):
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
         self._status: Optional[DeviceStatus] = None
+        self._buttons: Optional[List[ButtonDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -249,7 +251,13 @@ class Device(metaclass=DeviceGroupMeta):
 
     def buttons(self) -> List[ButtonDescriptor]:
         """Return a list of button-like, clickable actions of the device."""
-        return []
+        if self._buttons is None:
+            self._buttons = []
+            for button_tuple in getmembers(self, lambda o: hasattr(o, '_button')):
+                method_name, method = button_tuple
+                self._buttons.append(method._button)
+
+        return self._buttons
 
     def settings(
         self,
