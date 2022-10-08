@@ -871,13 +871,14 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("set_dust_collection_mode", {"mode": mode.value})[0] == "ok"
 
     @command()
-    @button(name="Start dust collection")
+    @button(name="Start dust collection", icon="mdi:turbine")
     def start_dust_collection(self):
         """Activate automatic dust collection."""
         self._verify_auto_empty_support()
         return self.send("app_start_collect_dust")
 
     @command()
+    @button(name="Stop dust collection", icon="mdi:turbine")
     def stop_dust_collection(self):
         """Abort in progress dust collection."""
         self._verify_auto_empty_support()
