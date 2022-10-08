@@ -51,6 +51,7 @@ from .vacuumcontainers import (
     SoundStatus,
     Timer,
     VacuumStatus,
+    MultiMapList,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -125,7 +126,7 @@ class RoborockVacuum(Device, VacuumInterface):
     ):
         super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
-        self._multi_maps = None
+        self._multi_maps: Optional[MultiMapList] = None
         self._multi_map_enum = None
         self._floor_clean_details: Dict[str, Optional[CleaningDetails]] = {}
         self._last_clean_details: Optional[CleaningDetails] = None
@@ -360,7 +361,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("get_map_v1")
 
     @command()
-    def get_multi_maps(self, skip_cache=False):
+    def get_multi_maps(self, skip_cache=False) -> MultiMapList:
         """Return list of multi maps."""
         # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
         #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
@@ -370,7 +371,7 @@ class RoborockVacuum(Device, VacuumInterface):
         if self._multi_maps is not None and not skip_cache:
             return self._multi_maps
 
-        self._multi_maps = self.send("get_multi_maps_list")[0]
+        self._multi_maps = MultiMapList(self.send("get_multi_maps_list")[0])
         return self._multi_maps
 
     @command()
@@ -380,11 +381,8 @@ class RoborockVacuum(Device, VacuumInterface):
             return self._multi_map_enum
 
         multi_maps = self.get_multi_maps()
-        maps_dict = {}
-        for map in multi_maps["map_info"]:
-            maps_dict[map["name"]] = map["mapFlag"]
 
-        self._multi_map_enum = enum.Enum("multi_map_enum", maps_dict)
+        self._multi_map_enum = enum.Enum("multi_map_enum", multi_maps.map_name_dict)
         return self._multi_map_enum
 
     @command(click.argument("multi_map_id", type=int))
@@ -513,8 +511,7 @@ class RoborockVacuum(Device, VacuumInterface):
         if history is None:
             history = self.clean_history()
 
-        N_maps = self.get_multi_maps()["multi_map_count"]
-        map_ids = list(range(0, N_maps))
+        map_ids = self.get_multi_maps().map_id_list
 
         # if cache empty, fill with None
         if not self._floor_clean_details:

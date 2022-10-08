@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Union
@@ -10,6 +11,9 @@ from miio.devicestatus import sensor, setting, switch
 from miio.utils import pretty_seconds, pretty_time
 
 from .vacuum_enums import MopIntensity, MopMode
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def pretty_area(x: float) -> float:
@@ -47,7 +51,7 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
 class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
-    def __init__(self, data: Dict[str, Any], multi_maps=None) -> None:
+    def __init__(self, data: Dict[str, Any], multi_maps: Optional[MultiMapList]=None) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
@@ -230,7 +234,7 @@ class VacuumStatus(DeviceStatus):
         if self._multi_maps is None:
             return str(self.multi_map_id)
 
-        return self._multi_maps["map_info"][self.multi_map_id]["name"]
+        return self._multi_maps.map_list[self.multi_map_id]["name"]
 
     @property
     def in_zone_cleaning(self) -> bool:
@@ -304,6 +308,45 @@ class VacuumStatus(DeviceStatus):
     def got_error(self) -> bool:
         """True if an error has occurred."""
         return self.error_code != 0
+
+class MultiMapList(DeviceStatus):
+    """Contains a information about the maps/floors of the vacuum."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
+        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
+        #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
+        #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
+        #  ]}
+        self.data = data
+        if self.map_count != len(self.data['map_info']):
+            _LOGGER.warning("Roborock multi_map_count does not equal amount of maps")
+
+        self._map_name_dict = {}
+        for idx, map in enumerate(self.data['map_info']):
+            self._map_name_dict[map['name']] = map['mapFlag']
+            if map['mapFlag'] != idx:
+                _LOGGER.warning("Roborock mapFlag does not equal map_info list index")
+
+    @property
+    def map_count(self) -> int:
+        """Amount of multi maps stored."""
+        return self.data["multi_map_count"]
+
+    @property
+    def map_id_list(self) -> List[int]:
+        """List of multi map ids."""
+        return self._map_name_dict.values()
+
+    @property
+    def map_list(self) -> List[Dict[str, Any]]:
+        """List of map info."""
+        return self.data["map_info"]
+
+    @property
+    def map_name_dict(self) -> Dict[str, int]:
+        """Dictionary of map names (keys) with there ids (values)."""
+        return self._map_name_dict
 
 
 class CleaningSummary(DeviceStatus):
@@ -389,7 +432,7 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: Union[List[Any], Dict[str, Any]], multi_maps=None) -> None:
+    def __init__(self, data: Union[List[Any], Dict[str, Any]], multi_maps: Optional[MultiMapList]=None) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
@@ -463,7 +506,7 @@ class CleaningDetails(DeviceStatus):
         if self._multi_maps is None:
             return str(self.multi_map_id)
 
-        return self._multi_maps["map_info"][self.multi_map_id]["name"]
+        return self._multi_maps.map_list[self.multi_map_id]["name"]
 
     @property
     def error_code(self) -> int:
