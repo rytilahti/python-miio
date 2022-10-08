@@ -219,7 +219,6 @@ def switch(name: str, *, setter_name: str, **kwargs):
 def setting(
     name: str,
     *,
-    setter: Optional[Callable] = None,
     setter_name: Optional[str] = None,
     unit: Optional[str] = None,
     min_value: Optional[int] = None,
@@ -243,8 +242,8 @@ def setting(
         property_name = str(func.__name__)
         qualified_name = str(func.__qualname__)
 
-        if setter is None and setter_name is None:
-            raise Exception("Either setter or setter_name needs to be defined")
+        if setter_name is None:
+            raise Exception("Setter_name needs to be defined")
 
         if min_value or max_value:
             descriptor = NumberSettingDescriptor(
@@ -252,7 +251,7 @@ def setting(
                 property=property_name,
                 name=name,
                 unit=unit,
-                setter=setter,
+                setter=None,
                 setter_name=setter_name,
                 min_value=min_value or 0,
                 max_value=max_value,
@@ -302,7 +301,7 @@ def button(name: str, **kwargs):
             id=qualified_name,
             name=name,
             method_name=property_name,
-            method=func,
+            method=None,
             extras=kwargs,
         )
         func._button = descriptor

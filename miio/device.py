@@ -255,7 +255,9 @@ class Device(metaclass=DeviceGroupMeta):
             self._buttons = []
             for button_tuple in getmembers(self, lambda o: hasattr(o, '_button')):
                 method_name, method = button_tuple
-                self._buttons.append(method._button)
+                button = method._button
+                button.method = method  # bind the method
+                self._buttons.append(button)
 
         return self._buttons
 
