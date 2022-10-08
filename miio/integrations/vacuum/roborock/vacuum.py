@@ -506,7 +506,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def last_clean_all_floor(
         self, history: Optional[CleaningSummary] = None
-    ) -> Tuple[FloorCleanDetails, CleaningDetails]:
+    ) -> Tuple[FloorCleanDetails, Optional[CleaningDetails]]:
         """Return details from the last cleaning and for each floor.
 
         Returns None if there has been no cleanups for that floor.
@@ -522,7 +522,7 @@ class RoborockVacuum(Device, VacuumInterface):
                 self._floor_clean_details[str(id)] = None
 
         if not history.ids:
-            return self._floor_clean_details
+            return (FloorCleanDetails(self._floor_clean_details), self._last_clean_details)
 
         last_clean_id = history.ids[0]
         for id in history.ids:

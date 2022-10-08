@@ -263,7 +263,7 @@ class Device(metaclass=DeviceGroupMeta):
 
     def settings(
         self,
-    ) -> Dict[str, Union[EnumSettingDescriptor, NumberSettingDescriptor]]:
+    ) -> Dict[str, SettingDescriptor]:
         """Return list of settings."""
         settings = (
             self.cached_status().settings()
