@@ -23,6 +23,7 @@ from miio.click_common import (
 from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
 from miio.interfaces import FanspeedPresets, VacuumInterface
+from miio.devicestatus import button
 
 from .vacuum_enums import (
     CarpetCleaningMode,
@@ -870,6 +871,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("set_dust_collection_mode", {"mode": mode.value})[0] == "ok"
 
     @command()
+    @button(name="Start dust collection")
     def start_dust_collection(self):
         """Activate automatic dust collection."""
         self._verify_auto_empty_support()
