@@ -541,6 +541,20 @@ class FloorCleanDetails(DeviceStatus):
                 continue
             setattr(self, f"start_{map_id}", self.data[map_id].start)
 
+    def __repr__(self):
+
+        s = f"<{self.__class__.__name__}"
+        for map_id in self.data:
+            name = f"start_{map_id}"
+            value = getattr(self, name)
+            s += f" {name}={value}"
+
+        for name, embedded in self._embedded.items():
+            s += f" {name}={repr(embedded)}"
+
+        s += ">"
+        return s
+
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return the dict of sensors exposed by the status container."""
         self._sensors = {}  # type: ignore[attr-defined]
