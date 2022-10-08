@@ -9,6 +9,7 @@ from pytz import BaseTzInfo
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting, switch
 from miio.utils import pretty_seconds, pretty_time
+from miio.descriptors import SensorDescriptor
 
 from .vacuum_enums import MopIntensity, MopMode
 
@@ -46,6 +47,46 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     23: "Docking station not reachable",
     24: "No-go zone or invisible wall detected",
 }
+
+
+class MultiMapList(DeviceStatus):
+    """Contains a information about the maps/floors of the vacuum."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
+        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
+        #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
+        #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
+        #  ]}
+        self.data = data
+        if self.map_count != len(self.data['map_info']):
+            _LOGGER.warning("Roborock multi_map_count does not equal amount of maps")
+
+        self._map_name_dict = {}
+        for idx, map in enumerate(self.data['map_info']):
+            self._map_name_dict[map['name']] = map['mapFlag']
+            if map['mapFlag'] != idx:
+                _LOGGER.warning("Roborock mapFlag does not equal map_info list index")
+
+    @property
+    def map_count(self) -> int:
+        """Amount of multi maps stored."""
+        return self.data["multi_map_count"]
+
+    @property
+    def map_id_list(self) -> List[int]:
+        """List of multi map ids."""
+        return list(self._map_name_dict.values())
+
+    @property
+    def map_list(self) -> List[Dict[str, Any]]:
+        """List of map info."""
+        return self.data["map_info"]
+
+    @property
+    def map_name_dict(self) -> Dict[str, int]:
+        """Dictionary of map names (keys) with there ids (values)."""
+        return self._map_name_dict
 
 
 class VacuumStatus(DeviceStatus):
@@ -309,45 +350,6 @@ class VacuumStatus(DeviceStatus):
         """True if an error has occurred."""
         return self.error_code != 0
 
-class MultiMapList(DeviceStatus):
-    """Contains a information about the maps/floors of the vacuum."""
-
-    def __init__(self, data: Dict[str, Any]) -> None:
-        # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
-        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
-        #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
-        #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
-        #  ]}
-        self.data = data
-        if self.map_count != len(self.data['map_info']):
-            _LOGGER.warning("Roborock multi_map_count does not equal amount of maps")
-
-        self._map_name_dict = {}
-        for idx, map in enumerate(self.data['map_info']):
-            self._map_name_dict[map['name']] = map['mapFlag']
-            if map['mapFlag'] != idx:
-                _LOGGER.warning("Roborock mapFlag does not equal map_info list index")
-
-    @property
-    def map_count(self) -> int:
-        """Amount of multi maps stored."""
-        return self.data["multi_map_count"]
-
-    @property
-    def map_id_list(self) -> List[int]:
-        """List of multi map ids."""
-        return self._map_name_dict.values()
-
-    @property
-    def map_list(self) -> List[Dict[str, Any]]:
-        """List of map info."""
-        return self.data["map_info"]
-
-    @property
-    def map_name_dict(self) -> Dict[str, int]:
-        """Dictionary of map names (keys) with there ids (values)."""
-        return self._map_name_dict
-
 
 class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
@@ -533,69 +535,30 @@ class FloorCleanDetails(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
 
-    @property
-    @sensor(
-        "Floor 0 clean start",
-        icon="mdi:clock-time-twelve",
-        device_class="timestamp",
-        entity_category="diagnostic",
-    )
-    def start_0(self) -> Optional[datetime]:
-        """When cleaning was started."""
-        if "0" not in self.data:
-            return None
-        if self.data["0"] is None:
-            return None
+        for map_id in self.data:
+            if self.data[map_id] is None:
+                setattr(self, f"start_{map_id}", None)
+                continue
+            setattr(self, f"start_{map_id}", self.data[map_id].start)
 
-        return self.data["0"].start
+    def sensors(self) -> Dict[str, SensorDescriptor]:
+        """Return the dict of sensors exposed by the status container."""
+        self._sensors = {}  # type: ignore[attr-defined]
+        
+        for map_id in self.data:
+            self._sensors[f"start_{map_id}"] = SensorDescriptor(
+                id=f"FloorCleanDetails.start_{map_id}",
+                property=f"start_{map_id}",
+                name=f"Floor {map_id} clean start",
+                type="sensor",
+                extras={
+                    "icon":"mdi:clock-time-twelve",
+                    "device_class":"timestamp",
+                    "entity_category":"diagnostic",
+                },
+            )
 
-    @property
-    @sensor(
-        "Floor 1 clean start",
-        icon="mdi:clock-time-twelve",
-        device_class="timestamp",
-        entity_category="diagnostic",
-    )
-    def start_1(self) -> Optional[datetime]:
-        """When cleaning was started."""
-        if "1" not in self.data:
-            return None
-        if self.data["1"] is None:
-            return None
-
-        return self.data["1"].start
-
-    @property
-    @sensor(
-        "Floor 2 clean start",
-        icon="mdi:clock-time-twelve",
-        device_class="timestamp",
-        entity_category="diagnostic",
-    )
-    def start_2(self) -> Optional[datetime]:
-        """When cleaning was started."""
-        if "2" not in self.data:
-            return None
-        if self.data["2"] is None:
-            return None
-
-        return self.data["2"].start
-
-    @property
-    @sensor(
-        "Floor 3 clean start",
-        icon="mdi:clock-time-twelve",
-        device_class="timestamp",
-        entity_category="diagnostic",
-    )
-    def start_3(self) -> Optional[datetime]:
-        """When cleaning was started."""
-        if "3" not in self.data:
-            return None
-        if self.data["3"] is None:
-            return None
-
-        return self.data["3"].start
+        return self._sensors
 
 
 class ConsumableStatus(DeviceStatus):
