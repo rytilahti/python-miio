@@ -14,12 +14,12 @@ from typing import (
 )
 
 from .descriptors import (
+    ButtonDescriptor,
     EnumSettingDescriptor,
     NumberSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
     SwitchDescriptor,
-    ButtonDescriptor,
 )
 
 _LOGGER = logging.getLogger(__name__)

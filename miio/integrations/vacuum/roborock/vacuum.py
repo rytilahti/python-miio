@@ -21,9 +21,9 @@ from miio.click_common import (
     command,
 )
 from miio.device import Device, DeviceInfo
+from miio.devicestatus import button
 from miio.exceptions import DeviceException, DeviceInfoUnavailableException
 from miio.interfaces import FanspeedPresets, VacuumInterface
-from miio.devicestatus import button
 
 from .vacuum_enums import (
     CarpetCleaningMode,
@@ -48,11 +48,11 @@ from .vacuumcontainers import (
     ConsumableStatus,
     DNDStatus,
     FloorCleanDetails,
+    MultiMapList,
     SoundInstallStatus,
     SoundStatus,
     Timer,
     VacuumStatus,
-    MultiMapList,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -325,7 +325,9 @@ class RoborockVacuum(Device, VacuumInterface):
         status.embed(self.consumable_status())
         clean_history = self.clean_history()
         status.embed(clean_history)
-        (details_floors, details_last) = self.last_clean_all_floor(history=clean_history)
+        (details_floors, details_last) = self.last_clean_all_floor(
+            history=clean_history
+        )
         status.embed(details_last)
         status.embed(details_floors)
         status.embed(self.dnd_status())
@@ -497,7 +499,7 @@ class RoborockVacuum(Device, VacuumInterface):
         last_clean_id = history.ids[0]
         if last_clean_id == self._searched_clean_id:
             return self._last_clean_details
-        
+
         self._last_clean_details = self.clean_details(last_clean_id)
         return self._last_clean_details
 

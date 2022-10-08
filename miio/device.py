@@ -1,6 +1,6 @@
 import logging
-from inspect import getmembers
 from enum import Enum
+from inspect import getmembers
 from typing import Any, Dict, List, Optional, Union  # noqa: F401
 
 import click
@@ -253,7 +253,7 @@ class Device(metaclass=DeviceGroupMeta):
         """Return a list of button-like, clickable actions of the device."""
         if self._buttons is None:
             self._buttons = []
-            for button_tuple in getmembers(self, lambda o: hasattr(o, '_button')):
+            for button_tuple in getmembers(self, lambda o: hasattr(o, "_button")):
                 method_name, method = button_tuple
                 button = method._button
                 button.method = method  # bind the method
@@ -283,7 +283,7 @@ class Device(metaclass=DeviceGroupMeta):
                 and setting.choices_attribute is not None
             ):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
-                setting.choices = retrieve_choices_function() # This can do IO
+                setting.choices = retrieve_choices_function()  # This can do IO
 
         return settings
 

@@ -6,13 +6,12 @@ from typing import Any, Dict, List, Optional, Union
 from croniter import croniter
 from pytz import BaseTzInfo
 
+from miio.descriptors import SensorDescriptor
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting, switch
 from miio.utils import pretty_seconds, pretty_time
-from miio.descriptors import SensorDescriptor
 
 from .vacuum_enums import MopIntensity, MopMode
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,13 +58,13 @@ class MultiMapList(DeviceStatus):
         #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
         #  ]}
         self.data = data
-        if self.map_count != len(self.data['map_info']):
+        if self.map_count != len(self.data["map_info"]):
             _LOGGER.warning("Roborock multi_map_count does not equal amount of maps")
 
         self._map_name_dict = {}
-        for idx, map in enumerate(self.data['map_info']):
-            self._map_name_dict[map['name']] = map['mapFlag']
-            if map['mapFlag'] != idx:
+        for idx, map in enumerate(self.data["map_info"]):
+            self._map_name_dict[map["name"]] = map["mapFlag"]
+            if map["mapFlag"] != idx:
                 _LOGGER.warning("Roborock mapFlag does not equal map_info list index")
 
     @property
@@ -92,7 +91,9 @@ class MultiMapList(DeviceStatus):
 class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
-    def __init__(self, data: Dict[str, Any], multi_maps: Optional[MultiMapList]=None) -> None:
+    def __init__(
+        self, data: Dict[str, Any], multi_maps: Optional[MultiMapList] = None
+    ) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
@@ -434,7 +435,11 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: Union[List[Any], Dict[str, Any]], multi_maps: Optional[MultiMapList]=None) -> None:
+    def __init__(
+        self,
+        data: Union[List[Any], Dict[str, Any]],
+        multi_maps: Optional[MultiMapList] = None,
+    ) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
@@ -550,7 +555,7 @@ class FloorCleanDetails(DeviceStatus):
             name = f"CleanDetails_{map_id}"
             value = getattr(self, name)
             s += f" {name}={value}"
-            
+
             name = f"start_{map_id}"
             value = getattr(self, name)
             s += f" {name}={value}"
@@ -564,7 +569,7 @@ class FloorCleanDetails(DeviceStatus):
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return the dict of sensors exposed by the status container."""
         self._sensors = {}  # type: ignore[attr-defined]
-        
+
         for map_id in self.data:
             self._sensors[f"start_{map_id}"] = SensorDescriptor(
                 id=f"FloorCleanDetails.start_{map_id}",
@@ -572,9 +577,9 @@ class FloorCleanDetails(DeviceStatus):
                 name=f"Floor {map_id} clean start",
                 type="sensor",
                 extras={
-                    "icon":"mdi:clock-time-twelve",
-                    "device_class":"timestamp",
-                    "entity_category":"diagnostic",
+                    "icon": "mdi:clock-time-twelve",
+                    "device_class": "timestamp",
+                    "entity_category": "diagnostic",
                 },
             )
 
