@@ -7,7 +7,7 @@ import math
 import os
 import pathlib
 import time
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, List, Optional, Tuple, Type, Union
 
 import click
 import pytz
@@ -128,6 +128,7 @@ class RoborockVacuum(Device, VacuumInterface):
         self._multi_maps = None
         self._multi_map_enum = None
         self._floor_clean_details: Dict[str, Optional[CleaningDetails]] = {}
+        self._last_clean_details: Optional[CleaningDetails] = None
         self._searched_clean_id: Optional[int] = None
 
     @command()
@@ -322,9 +323,9 @@ class RoborockVacuum(Device, VacuumInterface):
         status.embed(self.consumable_status())
         clean_history = self.clean_history()
         status.embed(clean_history)
-        clean_details = self.last_clean_all_floor(history=clean_history)
-        status.embed(clean_details["last"])
-        status.embed(FloorCleanDetails(clean_details))
+        (details_floors, details_last) = self.last_clean_all_floor(history=clean_history)
+        status.embed(details_last)
+        status.embed(details_floors)
         status.embed(self.dnd_status())
         return status
 
@@ -495,12 +496,16 @@ class RoborockVacuum(Device, VacuumInterface):
             return None
 
         last_clean_id = history.ids[0]
-        return self.clean_details(last_clean_id)
+        if last_clean_id == self._searched_clean_id:
+            return self._last_clean_details
+        
+        self._last_clean_details = self.clean_details(last_clean_id)
+        return self._last_clean_details
 
     @command()
     def last_clean_all_floor(
         self, history: Optional[CleaningSummary] = None
-    ) -> Dict[str, Optional[CleaningDetails]]:
+    ) -> Tuple[FloorCleanDetails, CleaningDetails]:
         """Return details from the last cleaning and for each floor.
 
         Returns None if there has been no cleanups for that floor.
@@ -513,7 +518,6 @@ class RoborockVacuum(Device, VacuumInterface):
 
         # if cache empty, fill with None
         if not self._floor_clean_details:
-            self._floor_clean_details["last"] = None
             for id in map_ids:
                 self._floor_clean_details[str(id)] = None
 
@@ -532,14 +536,14 @@ class RoborockVacuum(Device, VacuumInterface):
                 map_ids.remove(clean_detail.multi_map_id)
 
             if id == last_clean_id:
-                self._floor_clean_details["last"] = clean_detail
+                self._last_clean_details = clean_detail
 
             # all floors found
             if not map_ids:
                 break
 
         self._searched_clean_id = last_clean_id
-        return self._floor_clean_details
+        return (FloorCleanDetails(self._floor_clean_details), self._last_clean_details)
 
     @command(
         click.argument("id_", type=int, metavar="ID"),
