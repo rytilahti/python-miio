@@ -9,8 +9,8 @@ from .click_common import DeviceGroupMeta, LiteralParamType, command, format_out
 from .descriptors import (
     ButtonDescriptor,
     EnumSettingDescriptor,
-    NumberSettingDescriptor,
     SensorDescriptor,
+    SettingDescriptor,
     SwitchDescriptor,
 )
 from .deviceinfo import DeviceInfo

@@ -522,7 +522,10 @@ class RoborockVacuum(Device, VacuumInterface):
                 self._floor_clean_details[str(id)] = None
 
         if not history.ids:
-            return (FloorCleanDetails(self._floor_clean_details), self._last_clean_details)
+            return (
+                FloorCleanDetails(self._floor_clean_details),
+                self._last_clean_details,
+            )
 
         last_clean_id = history.ids[0]
         for id in history.ids:
