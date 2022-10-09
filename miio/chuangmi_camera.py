@@ -379,14 +379,20 @@ class ChuangmiCamera(Device):
         video_retention_time: NASVideoRetentionTime = NASVideoRetentionTime.Week,
     ):
         """Set NAS configuration."""
-        share_obj = None
+
+        params = {
+            "state": state,
+            "sync_interval": sync_interval,
+            "video_retention_time": video_retention_time,
+        }
+
         share = urlparse(share)
         if share.scheme == "smb":
             ip = socket.gethostbyname(share.hostname)
             reversed_ip = ".".join(reversed(ip.split(".")))
             addr = int(ipaddress.ip_address(reversed_ip))
 
-            share_obj = {
+            params["share"] = {
                 "type": 1,
                 "name": share.hostname,
                 "addr": addr,
@@ -395,13 +401,5 @@ class ChuangmiCamera(Device):
                 "user": share.username,
                 "pass": share.password,
             }
-        
-        params = {
-            "state": state,
-            "sync_interval": sync_interval,
-            "video_retention_time": video_retention_time,
-        }
-        if share_obj != None:
-            params["share"] = share_obj
-        
+
         return self.send("nas_set_config", params)
