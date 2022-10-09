@@ -366,7 +366,7 @@ class ChuangmiCamera(Device):
 
     @command(
         click.argument("state", type=EnumType(NASState)),
-        click.argument("share", type=click.STRING),
+        click.argument("share", type=str),
         click.argument("sync-interval", type=EnumType(NASSyncInterval)),
         click.argument("video-retention-time", type=EnumType(NASVideoRetentionTime)),
         default_output=format_output("Setting NAS config to '{state.name}'"),
