@@ -1,11 +1,10 @@
 """Xiaomi Chuangmi camera (chuangmi.camera.ipc009, ipc013, ipc019, 038a2) support."""
 
 import enum
-import logging
-from typing import Any, Dict
-
 import ipaddress
+import logging
 import socket
+from typing import Any, Dict
 from urllib.parse import urlparse
 
 import click
