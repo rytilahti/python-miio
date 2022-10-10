@@ -396,7 +396,7 @@ class ChuangmiCamera(Device):
                 "type": 1,
                 "name": share.hostname,
                 "addr": addr,
-                "dir": share.path.lstrip('/'),
+                "dir": share.path.lstrip("/"),
                 "group": "WORKGROUP",
                 "user": share.username,
                 "pass": share.password,
