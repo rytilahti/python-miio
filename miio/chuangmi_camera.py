@@ -379,7 +379,7 @@ class ChuangmiCamera(Device):
     ):
         """Set NAS configuration."""
 
-        params: dict[str, Any] = {
+        params: Dict[str, Any] = {
             "state": state,
             "sync_interval": sync_interval,
             "video_retention_time": video_retention_time,
