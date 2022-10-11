@@ -96,6 +96,16 @@ Contributing
 We welcome all sorts of contributions from patches to add improvements or fixing bugs to improving the documentation.
 To ease the process of setting up a development environment we have prepared `a short guide <https://python-miio.readthedocs.io/en/latest/contributing.html>`__ for getting you started.
 
+How does The Miio module work?
+-----------------------------
+
+All functionality is accessible through the miio module: Each separate device type inherits from miio.Device (and in case of MIoT devices, miio.MiotDevice) which provides a common API. Each command invocation will automatically detect (and cache) the device model necessary for some actions by querying the device.
+
+How do I install Python-Miio?
+----------------------------
+
+You can install the most recent release using pip: Alternatively, you can clone this repository and use poetry to install the current master: This will install python-miio into a separate virtual environment outside of your regular python installation. You can then execute installed programs (like miiocli ):
+
 
 Supported devices
 -----------------
