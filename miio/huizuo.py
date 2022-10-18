@@ -209,7 +209,7 @@ class Huizuo(MiotDevice):
 
     This is basic response for all HUIZUO lamps.
     Also some models supports additional properties, like for Fan or Heating management.
-    If your device does't support some properties, the 'None' will be returned.
+    If your device doesn't support some properties, the 'None' will be returned.
     """
 
     mapping = _MAPPING

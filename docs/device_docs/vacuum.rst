@@ -6,7 +6,7 @@ Following features of the vacuum cleaner are currently supported:
 -  Starting, stopping, pausing, locating.
 -  Controlling the fan speed.
 -  Fetching the current status.
--  Fetching and reseting the state of consumables.
+-  Fetching and resetting the state of consumables.
 -  Fetching and setting the schedules.
 -  Setting and querying the timezone.
 -  Installing sound packs.

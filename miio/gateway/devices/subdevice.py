@@ -213,7 +213,7 @@ class SubDevice:
             return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
         except Exception as ex:
             raise GatewayException(
-                "Got an exception while setting propertie %s to value %s on model %s"
+                "Got an exception while setting property %s to value %s on model %s"
                 % (property, str(value), self.model)
             ) from ex
 
@@ -276,7 +276,7 @@ class SubDevice:
         """Register a external callback function for updates of this subdevice."""
         if id in self._registered_callbacks:
             _LOGGER.error(
-                "A callback with id '%s' was already registed, overwriting previous callback",
+                "A callback with id '%s' was already registered, overwriting previous callback",
                 id,
             )
         self._registered_callbacks[id] = callback
@@ -333,7 +333,7 @@ class SubDevice:
         return result
 
     async def unsubscribe_events(self):
-        """Unsubscibe from events registered in the gateway memory."""
+        """Unsubscribe from events registered in the gateway memory."""
         for event_id in self._event_ids:
             await self._gw._push_server.unsubscribe_event(self._gw, event_id)
             self._event_ids.remove(event_id)

@@ -383,7 +383,7 @@ class RoidmiVacuumStatus(DeviceStatus):
 
     @property
     def led(self) -> bool:
-        """Return True if led/display on vaccum is on."""
+        """Return True if led/display on vacuum is on."""
         return self.data["led_switch"]
 
     @property
@@ -722,7 +722,7 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     @command()
     def disable_dnd(self):
         """Disable do-not-disturb."""
-        # The current do not disturb is read back for a better user expierence,
+        # The current do not disturb is read back for a better user experience,
         # as start/end time must be set together with enabled=False
         try:
             current_dnd_str = self.get_property_by(

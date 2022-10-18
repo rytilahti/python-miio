@@ -175,10 +175,10 @@ def cloud_list(ctx: click.Context, locale: Optional[str], raw: bool):
         click.echo(f"\tIP: {dev.ip} (mac: {dev.mac})")
         click.echo(f"\tDID: {dev.did}")
         click.echo(f"\tLocale: {', '.join(dev.locale)}")
-        childs = [x for x in devices.values() if x.parent_id == dev.did]
-        if childs:
+        children = [x for x in devices.values() if x.parent_id == dev.did]
+        if children:
             click.echo("\tSub devices:")
-            for c in childs:
+            for c in children:
                 click.echo(f"\t\t{c.name}")
                 click.echo(f"\t\t\tDID: {c.did}")
                 click.echo(f"\t\t\tModel: {c.model}")

@@ -184,7 +184,7 @@ class Gateway(Device):
 
         if self.model == GATEWAY_MODEL_ZIG3:
             # self.get_prop("device_list") does not work for the GATEWAY_MODEL_ZIG3
-            # self.send("get_device_list") does work for the GATEWAY_MODEL_ZIG3 but gives slightly diffrent return values
+            # self.send("get_device_list") does work for the GATEWAY_MODEL_ZIG3 but gives slightly different return values
             devices_raw = self.send("get_device_list")
 
             if type(devices_raw) != list:
@@ -382,8 +382,8 @@ class Gateway(Device):
 
     @command()
     def enable_telnet(self):
-        """Enable root telnet acces to the operating system, use login "admin" or "app",
-        no password."""
+        """Enable root telnet access to the operating system, use login "admin" or
+        "app", no password."""
         try:
             return self.send("enable_telnet_service")
         except DeviceError:
@@ -415,7 +415,7 @@ class Gateway(Device):
         """Register a external callback function for updates of this subdevice."""
         if id in self._registered_callbacks:
             _LOGGER.error(
-                "A callback with id '%s' was already registed, overwriting previous callback",
+                "A callback with id '%s' was already registered, overwriting previous callback",
                 id,
             )
         self._registered_callbacks[id] = callback

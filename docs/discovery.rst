@@ -73,7 +73,7 @@ as well as the server locale to use for fetching the tokens.
 
 :ref:`Alternatively, see our documentation for other ways to obtain the tokens<legacy_token_extraction>`.
 
-You can also access this functionality programatically using :class:`miio.cloud.CloudInterface`.
+You can also access this functionality programmatically using :class:`miio.cloud.CloudInterface`.
 
 
 Environment variables for command-line tools

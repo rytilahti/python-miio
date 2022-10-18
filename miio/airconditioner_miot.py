@@ -471,7 +471,7 @@ class AirConditionerMiot(MiotDevice):
     @command(
         click.argument("clean", type=bool),
         default_output=format_output(
-            lambda clean: "Begin auto cleanning" if clean else "Abort auto cleaning"
+            lambda clean: "Begin auto cleaning" if clean else "Abort auto cleaning"
         ),
     )
     def set_clean(self, clean):

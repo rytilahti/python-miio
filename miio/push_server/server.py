@@ -37,7 +37,7 @@ class PushServer:
         # Then start the server
         await push_server.start()
         # Register the miio device to the server and specify a callback function to receive events for this device
-        # The callback function schould have the form of "def callback_func(source_device, action, params):"
+        # The callback function should have the form of "def callback_func(source_device, action, params):"
         push_server.register_miio_device(miio_device, callback_func)
         # create a EventInfo object with the information about the event you which to subscribe to (information taken from packet captures of automations in the mi home app)
         event_info = EventInfo(
@@ -47,7 +47,7 @@ class PushServer:
         )
         # Send a message to the miio_device to subscribe for the event to receive messages on the push_server
         await push_server.subscribe_event(miio_device, event_info)
-        # Now you will see the callback function beeing called whenever the event occurs
+        # Now you will see the callback function being called whenever the event occurs
         await asyncio.sleep(30)
         # When done stop the push_server, this will send messages to all subscribed miio_devices to unsubscribe all events
         await push_server.stop()
@@ -117,7 +117,7 @@ class PushServer:
         event_ids = []
         if device.ip in self._registered_devices:
             _LOGGER.error(
-                "A device for ip '%s' was already registed, overwriting previous callback",
+                "A device for ip '%s' was already registered, overwriting previous callback",
                 device.ip,
             )
             event_ids = self._registered_devices[device.ip]["event_ids"]
@@ -151,7 +151,7 @@ class PushServer:
             return None
 
         if self.server_ip is None:
-            _LOGGER.error("Can not subscribe event withouth starting the push server")
+            _LOGGER.error("Can not subscribe event without starting the push server")
             return None
 
         self._event_id = self._event_id + 1
@@ -316,12 +316,12 @@ class PushServer:
 
     @property
     def server_id(self):
-        """Return the ID of the fake device beeing emulated."""
+        """Return the ID of the fake device being emulated."""
         return self._server_id
 
     @property
     def server_model(self):
-        """Return the model of the fake device beeing emulated."""
+        """Return the model of the fake device being emulated."""
         return self._server_model
 
     @property

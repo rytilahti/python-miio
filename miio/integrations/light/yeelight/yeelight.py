@@ -247,7 +247,7 @@ class Yeelight(Device):
 
     The API is the same as defined in
     https://www.yeelight.com/download/Yeelight_Inter-Operation_Spec.pdf
-    and only partially implmented here.
+    and only partially implemented here.
 
     For a more complete implementation please refer to python-yeelight package
     (https://yeelight.readthedocs.io/en/latest/),

@@ -12,7 +12,7 @@ class Switch(SubDevice):
     """Base class for one channel switch subdevice that supports on/off."""
 
     class ChannelMap(IntEnum):
-        """Option to select wich channel to control."""
+        """Option to select which channel to control."""
 
         channel_0 = 0
         channel_1 = 1

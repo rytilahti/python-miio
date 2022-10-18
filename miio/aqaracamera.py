@@ -268,7 +268,7 @@ class AqaraCamera(Device):
     def sd_format(self):
         """Format the SD card.
 
-        Returns True when formating has started successfully.
+        Returns True when formatting has started successfully.
         """
         return bool(self.send("sdformat"))
 
