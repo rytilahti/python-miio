@@ -12,8 +12,8 @@ from miio.click_common import (
 from miio.miioprotocol import MiIOProtocol
 
 from .cloud import cloud
-from .devtools import devtools
 from .devicefactory import factory
+from .devtools import devtools
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,6 +62,7 @@ def discover(mdns, handshake, network, timeout):
 
 cli.add_command(discover)
 cli.add_command(cloud)
+cli.add_command(devtools)
 cli.add_command(factory)
 
 
