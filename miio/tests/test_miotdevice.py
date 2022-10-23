@@ -150,7 +150,7 @@ def test_mapping_structure(cls):
 
 @pytest.mark.parametrize("cls", MIOT_DEVICES)
 def test_supported_models(cls):
-    assert cls.supported_models == cls._mappings.keys()
+    assert cls.supported_models == list(cls._mappings.keys())
 
     # make sure that that _supported_models is not defined
     assert not cls._supported_models
