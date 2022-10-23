@@ -185,3 +185,7 @@ yeelink.light.lamp22:
   night_light: False
   color_temp: [2700, 6500]
   supports_color: True
+yeelink.light.*:
+  night_light: False
+  color_temp: [1700, 6500]
+  supports_color: False

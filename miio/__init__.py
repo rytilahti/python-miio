@@ -32,6 +32,7 @@ from miio.chuangmi_plug import ChuangmiPlug
 from miio.cloud import CloudInterface
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
+from miio.devicefactory import DeviceFactory
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
