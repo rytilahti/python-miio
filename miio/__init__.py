@@ -9,7 +9,7 @@ from importlib.metadata import version  # type: ignore
 
 from miio.device import Device
 from miio.devicestatus import DeviceStatus
-from miio.exceptions import DeviceError, DeviceException
+from miio.exceptions import DeviceError, DeviceException, UnsupportedFeatureException
 from miio.miot_device import MiotDevice
 from miio.deviceinfo import DeviceInfo
 
@@ -69,7 +69,6 @@ from miio.integrations.vacuum import (
     Pro2Vacuum,
     RoborockVacuum,
     RoidmiVacuumMiot,
-    VacuumException,
     ViomiVacuum,
 )
 from miio.integrations.vacuum.roborock.vacuumcontainers import (

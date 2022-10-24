@@ -3,13 +3,8 @@ from unittest import TestCase
 
 import pytest
 
-from miio import Walkingpad
-from miio.walkingpad import (
-    OperationMode,
-    OperationSensitivity,
-    WalkingpadException,
-    WalkingpadStatus,
-)
+from miio import DeviceException, Walkingpad
+from miio.walkingpad import OperationMode, OperationSensitivity, WalkingpadStatus
 
 from .dummies import DummyDevice
 
@@ -135,13 +130,13 @@ class TestWalkingpad(TestCase):
         self.device.set_mode(OperationMode.Manual)
         assert mode() == OperationMode.Manual
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(ValueError):
             self.device.set_mode(-1)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(ValueError):
             self.device.set_mode(3)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(ValueError):
             self.device.set_mode("blah")
 
     def test_set_speed(self):
@@ -152,16 +147,16 @@ class TestWalkingpad(TestCase):
         self.device.set_speed(3.055)
         assert speed() == 3.055
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(ValueError):
             self.device.set_speed(7.6)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(TypeError):
             self.device.set_speed(-1)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(TypeError):
             self.device.set_speed("blah")
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(DeviceException):
             self.device.off()
             self.device.set_speed(3.4)
 
@@ -174,16 +169,16 @@ class TestWalkingpad(TestCase):
         self.device.set_start_speed(3.055)
         assert speed() == 3.055
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(ValueError):
             self.device.set_start_speed(7.6)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(TypeError):
             self.device.set_start_speed(-1)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(TypeError):
             self.device.set_start_speed("blah")
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(DeviceException):
             self.device.off()
             self.device.set_start_speed(3.4)
 
@@ -197,11 +192,11 @@ class TestWalkingpad(TestCase):
         self.device.set_sensitivity(OperationSensitivity.Medium)
         assert sensitivity() == OperationSensitivity.Medium
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(TypeError):
             self.device.set_sensitivity(-1)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(TypeError):
             self.device.set_sensitivity(99)
 
-        with pytest.raises(WalkingpadException):
+        with pytest.raises(TypeError):
             self.device.set_sensitivity("blah")

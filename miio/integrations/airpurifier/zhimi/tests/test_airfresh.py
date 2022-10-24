@@ -8,7 +8,6 @@ from .. import AirFresh
 from ..airfresh import (
     MODEL_AIRFRESH_VA2,
     MODEL_AIRFRESH_VA4,
-    AirFreshException,
     AirFreshStatus,
     LedBrightness,
     OperationMode,
@@ -193,7 +192,7 @@ class TestAirFresh(TestCase):
         self.device.set_extra_features(2)
         assert extra_features() == 2
 
-        with pytest.raises(AirFreshException):
+        with pytest.raises(ValueError):
             self.device.set_extra_features(-1)
 
     def test_reset_filter(self):

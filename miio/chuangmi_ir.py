@@ -21,11 +21,6 @@ from construct import (
 
 from .click_common import command, format_output
 from .device import Device
-from .exceptions import DeviceException
-
-
-class ChuangmiIrException(DeviceException):
-    pass
 
 
 class ChuangmiIr(Device):
@@ -50,7 +45,7 @@ class ChuangmiIr(Device):
         """
 
         if key < 1 or key > 1000000:
-            raise ChuangmiIrException("Invalid storage slot.")
+            raise ValueError("Invalid storage slot.")
         return self.send("miIO.ir_learn", {"key": str(key)})
 
     @command(
@@ -73,7 +68,7 @@ class ChuangmiIr(Device):
         """
 
         if key < 1 or key > 1000000:
-            raise ChuangmiIrException("Invalid storage slot.")
+            raise ValueError("Invalid storage slot.")
         return self.send("miIO.ir_read", {"key": str(key)})
 
     def play_raw(self, command: str, frequency: int = 38400, length: int = -1):
@@ -110,12 +105,12 @@ class ChuangmiIr(Device):
         :param int repeats: Number of extra signal repeats.
         """
         if repeats < 0:
-            raise ChuangmiIrException("Invalid repeats value")
+            raise ValueError("Invalid repeats value")
 
         try:
             pronto_data = Pronto.parse(bytearray.fromhex(pronto))
         except Exception as ex:
-            raise ChuangmiIrException("Invalid Pronto command") from ex
+            raise ValueError("Invalid Pronto command") from ex
 
         if len(pronto_data.intro) == 0:
             repeats += 1
@@ -161,10 +156,10 @@ class ChuangmiIr(Device):
 
         arg_types = [int, int]
         if len(command_args) > len(arg_types):
-            raise ChuangmiIrException("Invalid command arguments count")
+            raise ValueError("Invalid command arguments count")
 
         if command_type not in ["raw", "pronto"]:
-            raise ChuangmiIrException("Invalid command type")
+            raise ValueError("Invalid command type")
 
         play_method: Callable
         if command_type == "raw":
@@ -176,7 +171,7 @@ class ChuangmiIr(Device):
         try:
             converted_command_args = [t(v) for v, t in zip(command_args, arg_types)]
         except Exception as ex:
-            raise ChuangmiIrException("Invalid command arguments") from ex
+            raise ValueError("Invalid command arguments") from ex
 
         return play_method(command, *converted_command_args)
 

@@ -4,7 +4,6 @@ from unittest import TestCase
 import pytest
 
 from miio import ViomiDishwasher
-from miio.exceptions import DeviceException
 from miio.tests.dummies import DummyDevice
 
 from .viomidishwasher import (
@@ -151,9 +150,7 @@ class TestViomiDishwasher(TestCase):
         assert self.is_on() is True
 
         too_short_time = datetime.now() + timedelta(hours=1)
-        self.assertRaises(
-            DeviceException, self.device.schedule, too_short_time, Program.Eco
-        )
+        self.assertRaises(ValueError, self.device.schedule, too_short_time, Program.Eco)
 
         self.device.stop()
         self.device.state["wash_process"] = 0

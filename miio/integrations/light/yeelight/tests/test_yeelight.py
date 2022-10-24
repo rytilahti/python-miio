@@ -4,7 +4,7 @@ import pytest
 
 from miio.tests.dummies import DummyDevice
 
-from .. import Yeelight, YeelightException, YeelightMode, YeelightStatus
+from .. import Yeelight, YeelightMode, YeelightStatus
 from ..spec_helper import YeelightSpecHelper, YeelightSubLightType
 
 
@@ -112,10 +112,10 @@ class TestYeelightCommon(TestCase):
         assert brightness() == 0
         self.device.set_brightness(100)
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(-100)
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(200)
 
     def test_set_color_temp(self):
@@ -127,10 +127,10 @@ class TestYeelightCommon(TestCase):
         self.device.set_color_temp(6500)
         assert color_temp() == 6500
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_color_temp(1000)
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_color_temp(7000)
 
     def test_set_developer_mode(self):
@@ -285,22 +285,22 @@ class TestYeelightLightColor(TestCase):
         self.device.set_rgb((255, 255, 255))
         assert rgb() == (255, 255, 255)
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_rgb((-1, 0, 0))
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_rgb((256, 0, 0))
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_rgb((0, -1, 0))
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_rgb((0, 256, 0))
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_rgb((0, 0, -1))
 
-        with pytest.raises(YeelightException):
+        with pytest.raises(ValueError):
             self.device.set_rgb((0, 0, 256))
 
     @pytest.mark.skip("hsv is not properly implemented")

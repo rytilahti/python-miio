@@ -4,16 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from miio import RoborockVacuum, VacuumStatus
+from miio import RoborockVacuum, UnsupportedFeatureException, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
-from ..vacuum import (
-    ROCKROBO_S7,
-    CarpetCleaningMode,
-    MopIntensity,
-    MopMode,
-    VacuumException,
-)
+from ..vacuum import ROCKROBO_S7, CarpetCleaningMode, MopIntensity, MopMode
 
 
 class DummyVacuum(DummyDevice, RoborockVacuum):
@@ -343,12 +337,12 @@ class TestVacuum(TestCase):
 
     def test_mop_intensity_model_check(self):
         """Test Roborock S7 check when getting mop intensity."""
-        with pytest.raises(VacuumException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.mop_intensity()
 
     def test_set_mop_intensity_model_check(self):
         """Test Roborock S7 check when setting mop intensity."""
-        with pytest.raises(VacuumException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_mop_intensity(MopIntensity.Intense)
 
 

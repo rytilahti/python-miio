@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import DeviceException, DeviceStatus, MiotDevice
+from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
@@ -42,10 +42,6 @@ _MAPPINGS = {
         "clean_mode": {"siid": 7, "piid": 5},  # bool
     }
 }
-
-
-class AirHumidifierMiotException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -310,7 +306,7 @@ class AirHumidifierMiot(MiotDevice):
     def set_speed(self, rpm: int):
         """Set motor speed."""
         if rpm < 200 or rpm > 2000 or rpm % 10 != 0:
-            raise AirHumidifierMiotException(
+            raise ValueError(
                 "Invalid motor speed: %s. Must be between 200 and 2000 and divisible by 10"
                 % rpm
             )
@@ -323,7 +319,7 @@ class AirHumidifierMiot(MiotDevice):
     def set_target_humidity(self, humidity: int):
         """Set target humidity."""
         if humidity < 30 or humidity > 80:
-            raise AirHumidifierMiotException(
+            raise ValueError(
                 "Invalid target humidity: %s. Must be between 30 and 80" % humidity
             )
         return self.set_property("target_humidity", humidity)

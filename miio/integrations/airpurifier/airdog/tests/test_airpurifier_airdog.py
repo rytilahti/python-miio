@@ -9,7 +9,6 @@ from ..airpurifier_airdog import (
     MODEL_AIRDOG_X3,
     MODEL_AIRDOG_X5,
     MODEL_AIRDOG_X7SM,
-    AirDogException,
     AirDogStatus,
     OperationMode,
     OperationModeMapping,
@@ -113,10 +112,10 @@ class TestAirDogX3(TestCase):
         assert mode() == OperationMode.Manual
         assert speed() == 4
 
-        with pytest.raises(AirDogException):
+        with pytest.raises(ValueError):
             self.device.set_mode_and_speed(OperationMode.Manual, 0)
 
-        with pytest.raises(AirDogException):
+        with pytest.raises(ValueError):
             self.device.set_mode_and_speed(OperationMode.Manual, 5)
 
         self.device.set_mode_and_speed(OperationMode.Idle)
@@ -194,5 +193,5 @@ class TestAirDogX5AndX7SM(TestCase):
         assert mode() == OperationMode.Manual
         assert speed() == 5
 
-        with pytest.raises(AirDogException):
+        with pytest.raises(ValueError):
             self.device.set_mode_and_speed(OperationMode.Manual, 6)

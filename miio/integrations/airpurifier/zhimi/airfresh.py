@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,10 +39,6 @@ AVAILABLE_PROPERTIES = {
     MODEL_AIRFRESH_VA2: AVAILABLE_PROPERTIES_COMMON,
     MODEL_AIRFRESH_VA4: AVAILABLE_PROPERTIES_COMMON + ["ptc_state"],
 }
-
-
-class AirFreshException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -325,7 +321,7 @@ class AirFresh(Device):
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app."""
         if value < 0:
-            raise AirFreshException("Invalid app extra value: %s" % value)
+            raise ValueError("Invalid app extra value: %s" % value)
 
         return self.send("set_app_extra", [value])
 

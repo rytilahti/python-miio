@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.exceptions import DeviceException
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,10 +30,6 @@ _MAPPING = {
 
 SUPPORTED_MODELS = ["deerma.humidifier.jsqs", "deerma.humidifier.jsq5"]
 MIOT_MAPPING = {model: _MAPPING for model in SUPPORTED_MODELS}
-
-
-class AirHumidifierJsqsException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -192,7 +187,7 @@ class AirHumidifierJsqs(MiotDevice):
     def set_target_humidity(self, humidity: int):
         """Set target humidity."""
         if humidity < 40 or humidity > 80:
-            raise AirHumidifierJsqsException(
+            raise ValueError(
                 "Invalid target humidity: %s. Must be between 40 and 80" % humidity
             )
         return self.set_property("target_humidity", humidity)
