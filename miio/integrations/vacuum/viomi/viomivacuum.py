@@ -225,11 +225,6 @@ class ViomiLanguage(Enum):
     EN = 2  # English
 
 
-class ViomiLedState(Enum):
-    Off = 0
-    On = 1
-
-
 class ViomiCarpetTurbo(Enum):
     Off = 0
     Medium = 1
@@ -449,6 +444,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data["hw_info"]
 
     @property
+    @sensor("Is charging")
     def charging(self) -> bool:
         """True if battery is charging.
 
@@ -487,12 +483,14 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
 
         return ViomiRoutePattern(route)
 
-    # @property
-    # def order_time(self) -> int:
-    #    """FIXME: ??? int or bool."""
-    #    return self.data["order_time"]
+    @property
+    @sensor("Order time?")
+    def order_time(self) -> int:
+        """FIXME: ??? int or bool."""
+        return self.data["order_time"]
 
     @property
+    @sensor("Repeat cleaning active")
     def repeat_cleaning(self) -> bool:
         """Secondary clean up state.
 
@@ -500,10 +498,11 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         """
         return self.data["repeat_state"]
 
-    # @property
-    # def start_time(self) -> int:
-    #    """FIXME: ??? int or bool."""
-    #    return self.data["start_time"]
+    @property
+    @sensor("Start time")
+    def start_time(self) -> int:
+        """FIXME: ??? int or bool."""
+        return self.data["start_time"]
 
     @property
     @setting("Sound volume", unit="%", setter_name="set_sound_volume", max_value=100)
@@ -511,15 +510,17 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         """Voice volume level (from 0 to 100%, 0 means Off)."""
         return self.data["v_state"]
 
-    # @property
-    # def water_percent(self) -> int:
-    #    """FIXME: ??? int or bool."""
-    #    return self.data["water_percent"]
+    @property
+    @sensor("Water level", unit="%")
+    def water_percent(self) -> int:
+        """FIXME: ??? int or bool."""
+        return self.data.get("water_percent")
 
-    # @property
-    # def zone_data(self) -> int:
-    #    """FIXME: ??? int or bool."""
-    #    return self.data["zone_data"]
+    @property
+    @sensor("Zone data")
+    def zone_data(self) -> int:
+        """FIXME: ??? int or bool."""
+        return self.data["zone_data"]
 
 
 def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
