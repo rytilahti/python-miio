@@ -53,6 +53,7 @@ import click
 
 from miio.click_common import EnumType, command, format_output
 from miio.device import Device, DeviceStatus
+from miio.devicestatus import sensor, setting, switch
 from miio.exceptions import DeviceException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
     ConsumableStatus,
@@ -164,11 +165,13 @@ class ViomiConsumableStatus(ConsumableStatus):
         self.sensor_dirty_total = timedelta(seconds=0)
 
     @property
+    @sensor("Mop used")
     def mop(self) -> timedelta:
         """Return ``sensor_dirty_time``"""
         return pretty_seconds(self.data["mop_dirty_time"])
 
     @property
+    @sensor("Mop left")
     def mop_left(self) -> timedelta:
         """How long until the mop should be changed."""
         return self.mop_total - self.mop
@@ -269,9 +272,16 @@ class ViomiVacuumStatus(DeviceStatus):
         # ["run_state","mode","err_state","battary_life","box_type","mop_type","s_time","s_area",
         # "suction_grade","water_grade","remember_map","has_map","is_mop","has_newmap"]'
         # 1,               11,           1,            1,         1,       0          ]
+        _LOGGER.debug("Data: %s", data)
         self.data = data
 
     @property
+    def got_error(self) -> bool:
+        """TODO: temporary got_error until homeassistant gets fixed"""
+        return self.error_code != 0
+
+    @property
+    @sensor("Device state")
     def state(self):
         """State of the vacuum."""
         try:
@@ -281,6 +291,7 @@ class ViomiVacuumStatus(DeviceStatus):
             return ViomiVacuumState.Unknown
 
     @property
+    @setting("Vacuum along edges", choices=ViomiEdgeState, setter_name="set_edge")
     def edge_state(self) -> ViomiEdgeState:
         """Vaccum along the edges.
 
@@ -293,16 +304,19 @@ class ViomiVacuumStatus(DeviceStatus):
         return ViomiEdgeState(self.data["mode"])
 
     @property
+    @sensor("Mop installed")
     def mop_installed(self) -> bool:
         """True if the mop is installed."""
         return bool(self.data["mop_type"])
 
     @property
+    @sensor("Error code")
     def error_code(self) -> int:
         """Error code from vacuum."""
         return self.data["err_state"]
 
     @property
+    @sensor("Error")
     def error(self) -> Optional[str]:
         """String presentation for the error code."""
         if self.error_code is None:
@@ -311,56 +325,67 @@ class ViomiVacuumStatus(DeviceStatus):
         return ERROR_CODES.get(self.error_code, f"Unknown error {self.error_code}")
 
     @property
+    @sensor("Battery", unit="%")
     def battery(self) -> int:
         """Battery in percentage."""
         return self.data["battary_life"]
 
     @property
+    @sensor("Bin type")
     def bin_type(self) -> ViomiBinType:
         """Type of the inserted bin."""
         return ViomiBinType(self.data["box_type"])
 
     @property
+    @sensor("Cleaning time", unit="s")
     def clean_time(self) -> timedelta:
         """Cleaning time."""
         return pretty_seconds(self.data["s_time"] * 60)
 
     @property
+    @sensor("Cleaning area", unit="m2")
     def clean_area(self) -> float:
         """Cleaned area in square meters."""
         return self.data["s_area"]
 
     @property
+    @setting("Fan speed", choices=ViomiVacuumSpeed, setter_name="set_fan_speed")
     def fanspeed(self) -> ViomiVacuumSpeed:
         """Current fan speed."""
         return ViomiVacuumSpeed(self.data["suction_grade"])
 
     @property
+    @setting("Water grade", choices=ViomiWaterGrade, setter_name="set_water_grade")
     def water_grade(self) -> ViomiWaterGrade:
         """Water grade."""
         return ViomiWaterGrade(self.data["water_grade"])
 
     @property
+    @switch("Remember map", setter_name="set_remember_map")
     def remember_map(self) -> bool:
         """True to remember the map."""
         return bool(self.data["remember_map"])
 
     @property
+    @sensor("Has map")
     def has_map(self) -> bool:
         """True if device has map?"""
         return bool(self.data["has_map"])
 
     @property
+    @sensor("New map scanned")
     def has_new_map(self) -> bool:
         """True if the device has scanned a new map (like a new floor)."""
         return bool(self.data["has_newmap"])
 
     @property
+    @setting("Cleaning mode", choices=ViomiMode, setter_name="clean_mode")
     def mop_mode(self) -> ViomiMode:
         """Whether mopping is enabled and if so which mode."""
         return ViomiMode(self.data["is_mop"])
 
     @property
+    @sensor("Current map id")
     def current_map_id(self) -> float:
         """Current map id."""
         return self.data["cur_mapid"]
@@ -379,11 +404,13 @@ class ViomiVacuumStatus(DeviceStatus):
         return not bool(self.data["is_charge"])
 
     @property
+    @switch("Power", setter_name="set_power")
     def is_on(self) -> bool:
         """True if device is working."""
         return not bool(self.data["is_work"])
 
     @property
+    @switch("LED state", setter_name="led")
     def light_state(self) -> bool:
         """Led state.
 
@@ -392,14 +419,20 @@ class ViomiVacuumStatus(DeviceStatus):
         return bool(self.data["light_state"])
 
     @property
+    @sensor("Count of saved maps")
     def map_number(self) -> int:
         """Number of saved maps."""
         return self.data["map_num"]
 
     @property
-    def mop_route(self) -> ViomiRoutePattern:
+    @setting("Mop pattern", choices=ViomiRoutePattern, setter_name="set_route_pattern")
+    def mop_route(self) -> Optional[ViomiRoutePattern]:
         """Pattern mode."""
-        return ViomiRoutePattern(self.data["mop_route"])
+        route = self.data["mop_route"]
+        if route is None:
+            return None
+
+        return ViomiRoutePattern(route)
 
     # @property
     # def order_time(self) -> int:
@@ -420,6 +453,7 @@ class ViomiVacuumStatus(DeviceStatus):
     #    return self.data["start_time"]
 
     @property
+    @setting("Sound volume", unit="%", setter_name="set_sound_volume", max_value=100)
     def sound_volume(self) -> int:
         """Voice volume level (from 0 to 100%, 0 means Off)."""
         return self.data["v_state"]
@@ -538,14 +572,44 @@ class ViomiVacuum(Device, VacuumInterface):
     )
     def status(self) -> ViomiVacuumStatus:
         """Retrieve properties."""
-        properties = [
+
+        device_props = {
+            "viomi.vacuum.v8": [
+                "battary_life",
+                "box_type",
+                "err_state",
+                "has_map",
+                "has_newmap",
+                "hw_info",
+                "is_charge",
+                "is_mop",
+                "is_work",
+                "light_state",
+                "mode",
+                "mop_type",
+                "order_time",
+                "remember_map",
+                "repeat_state",
+                "run_state",
+                "s_area",
+                "s_time",
+                "start_time",
+                "suction_grade",
+                "sw_info",
+                "v_state",
+                "water_grade",
+                "zone_data",
+            ]
+        }
+
+        all_properties = [
             "battary_life",
             "box_type",
             "cur_mapid",
             "err_state",
             "has_map",
             "has_newmap",
-            "hw_info",
+            # "hw_info",  # TODO: expose separately
             "is_charge",
             "is_mop",
             "is_work",
@@ -579,14 +643,24 @@ class ViomiVacuum(Device, VacuumInterface):
             # "hypa_life",
         ]
 
+        properties = device_props.get(self.model, all_properties)
+
         values = self.get_properties(properties)
 
-        return ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
+        status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
+        status.embed(self.consumable_status())
+        return status
 
     @command()
     def home(self):
         """Return to home."""
         self.send("set_charge", [1])
+
+    def set_power(self, on: bool):
+        if on:
+            return self.start()
+        else:
+            return self.stop()
 
     @command()
     def start(self):
@@ -933,13 +1007,13 @@ class ViomiVacuum(Device, VacuumInterface):
         """
         return self.send("set_language", [language.value])
 
-    @command(click.argument("state", type=EnumType(ViomiLedState)))
-    def led(self, state: ViomiLedState):
+    @command(click.argument("state", type=bool))
+    def led(self, state: bool):
         """Switch the button leds on or off.
 
         This seems doing nothing on STYJ02YM
         """
-        return self.send("set_light", [state.value])
+        return self.send("set_light", [state])
 
     @command(click.argument("mode", type=EnumType(ViomiCarpetTurbo)))
     def carpet_mode(self, mode: ViomiCarpetTurbo):
