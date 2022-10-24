@@ -96,8 +96,13 @@ ERROR_CODES = {
     530: "Mop and water tank missing",
     531: "Water tank is not installed",
     2101: "Unsufficient battery, continuing cleaning after recharge",
+    2102: "Returning to base",
     2103: "Charging",
+    2104: "Returning to base",
     2105: "Fully charged",
+    2108: "Returning to previous location?",
+    2109: "Cleaning up again (repeat cleaning?)",
+    2110: "Self-inspecting",
 }
 
 
