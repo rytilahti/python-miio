@@ -4,13 +4,7 @@ import pytest
 
 from miio.tests.dummies import DummyDevice
 
-from ..fan_leshow import (
-    MODEL_FAN_LESHOW_SS4,
-    FanLeshow,
-    FanLeshowException,
-    FanLeshowStatus,
-    OperationMode,
-)
+from ..fan_leshow import MODEL_FAN_LESHOW_SS4, FanLeshow, FanLeshowStatus, OperationMode
 
 
 class DummyFanLeshow(DummyDevice, FanLeshow):
@@ -89,10 +83,10 @@ class TestFanLeshow(TestCase):
         self.device.set_speed(100)
         assert speed() == 100
 
-        with pytest.raises(FanLeshowException):
+        with pytest.raises(ValueError):
             self.device.set_speed(-1)
 
-        with pytest.raises(FanLeshowException):
+        with pytest.raises(ValueError):
             self.device.set_speed(101)
 
     def test_set_oscillate(self):
@@ -126,8 +120,8 @@ class TestFanLeshow(TestCase):
         self.device.delay_off(0)
         assert delay_off_countdown() == 0
 
-        with pytest.raises(FanLeshowException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
 
-        with pytest.raises(FanLeshowException):
+        with pytest.raises(ValueError):
             self.device.delay_off(541)

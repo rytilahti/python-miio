@@ -39,11 +39,6 @@ SUPPORTED_MODELS = [
 
 GatewayCallback = Callable[[str, str], None]
 
-
-class GatewayException(DeviceException):
-    """Exception for the Xioami Gateway communication."""
-
-
 from .devices import SubDevice, SubDeviceInfo  # noqa: E402 isort:skip
 
 
@@ -407,7 +402,7 @@ class Gateway(Device):
         try:
             return self.send("get_illumination").pop()
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while getting gateway illumination"
             ) from ex
 

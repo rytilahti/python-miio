@@ -3,11 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import AirQualityMonitorCGDN1
-from miio.airqualitymonitor_miot import (
-    AirQualityMonitorMiotException,
-    ChargingState,
-    DisplayTemperatureUnitCGDN1,
-)
+from miio.airqualitymonitor_miot import ChargingState, DisplayTemperatureUnitCGDN1
 
 from .dummies import DummyMiotDevice
 
@@ -82,10 +78,10 @@ class TestAirQualityMonitor(TestCase):
         self.device.set_monitoring_frequency_duration(600)
         assert monitoring_frequency() == 600
 
-        with pytest.raises(AirQualityMonitorMiotException):
+        with pytest.raises(ValueError):
             self.device.set_monitoring_frequency_duration(-1)
 
-        with pytest.raises(AirQualityMonitorMiotException):
+        with pytest.raises(ValueError):
             self.device.set_monitoring_frequency_duration(601)
 
     def test_set_device_off_duration(self):
@@ -101,10 +97,10 @@ class TestAirQualityMonitor(TestCase):
         self.device.set_device_off_duration(60)
         assert device_off_duration() == 60
 
-        with pytest.raises(AirQualityMonitorMiotException):
+        with pytest.raises(ValueError):
             self.device.set_device_off_duration(-1)
 
-        with pytest.raises(AirQualityMonitorMiotException):
+        with pytest.raises(ValueError):
             self.device.set_device_off_duration(61)
 
     def test_set_screen_off_duration(self):
@@ -120,10 +116,10 @@ class TestAirQualityMonitor(TestCase):
         self.device.set_screen_off_duration(300)
         assert screen_off_duration() == 300
 
-        with pytest.raises(AirQualityMonitorMiotException):
+        with pytest.raises(ValueError):
             self.device.set_screen_off_duration(-1)
 
-        with pytest.raises(AirQualityMonitorMiotException):
+        with pytest.raises(ValueError):
             self.device.set_screen_off_duration(301)
 
     def test_set_display_temperature_unit(self):

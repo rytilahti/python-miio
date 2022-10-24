@@ -5,15 +5,9 @@ import click
 
 from miio.click_common import command, format_output
 from miio.device import Device, DeviceStatus
-from miio.exceptions import DeviceException
 from miio.utils import int_to_rgb, rgb_to_int
 
 from .spec_helper import ColorTempRange, YeelightSpecHelper, YeelightSubLightType
-
-
-class YeelightException(DeviceException):
-    pass
-
 
 SUBLIGHT_PROP_PREFIX = {
     YeelightSubLightType.Main: "",
@@ -355,7 +349,7 @@ class Yeelight(Device):
     def set_brightness(self, level, transition=0):
         """Set brightness."""
         if level < 0 or level > 100:
-            raise YeelightException("Invalid brightness: %s" % level)
+            raise ValueError("Invalid brightness: %s" % level)
         if transition > 0:
             return self.send("set_bright", [level, "smooth", transition])
         return self.send("set_bright", [level])
@@ -371,7 +365,7 @@ class Yeelight(Device):
             level > self.valid_temperature_range.max
             or level < self.valid_temperature_range.min
         ):
-            raise YeelightException("Invalid color temperature: %s" % level)
+            raise ValueError("Invalid color temperature: %s" % level)
         if transition > 0:
             return self.send("set_ct_abx", [level, "smooth", transition])
         else:
@@ -386,7 +380,7 @@ class Yeelight(Device):
         """Set color in RGB."""
         for color in rgb:
             if color < 0 or color > 255:
-                raise YeelightException("Invalid color: %s" % color)
+                raise ValueError("Invalid color: %s" % color)
 
         return self.send("set_rgb", [rgb_to_int(rgb)])
 

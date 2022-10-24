@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceError, DeviceException, DeviceInfo, DeviceStatus
+from miio import Device, DeviceError, DeviceInfo, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 from miio.devicestatus import sensor, setting, switch
 
@@ -45,10 +45,6 @@ AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_CB2: AVAILABLE_PROPERTIES_COMMON
     + ["temperature", "speed", "depth", "dry"],
 }
-
-
-class AirHumidifierException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -189,7 +185,7 @@ class AirHumidifierStatus(DeviceStatus):
         For example 1.2.9_5033.
         """
         if self.device_info.firmware_version is None:
-            raise AirHumidifierException("Missing firmware information")
+            return "missing fw version"
 
         return self.device_info.firmware_version
 
@@ -459,7 +455,7 @@ class AirHumidifier(Device):
     def set_target_humidity(self, humidity: int):
         """Set the target humidity."""
         if humidity not in [30, 40, 50, 60, 70, 80]:
-            raise AirHumidifierException("Invalid target humidity: %s" % humidity)
+            raise ValueError("Invalid target humidity: %s" % humidity)
 
         return self.send("set_limit_hum", [humidity])
 

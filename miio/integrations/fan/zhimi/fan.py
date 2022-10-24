@@ -6,7 +6,7 @@ import click
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 from miio.devicestatus import sensor, setting, switch
-from miio.fan_common import FanException, LedBrightness, MoveDirection
+from miio.fan_common import LedBrightness, MoveDirection
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -282,7 +282,7 @@ class Fan(Device):
     def set_natural_speed(self, speed: int):
         """Set natural level."""
         if speed < 0 or speed > 100:
-            raise FanException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.send("set_natural_level", [speed])
 
@@ -293,7 +293,7 @@ class Fan(Device):
     def set_direct_speed(self, speed: int):
         """Set speed of the direct mode."""
         if speed < 0 or speed > 100:
-            raise FanException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.send("set_speed_level", [speed])
 
@@ -312,7 +312,7 @@ class Fan(Device):
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
         if angle < 0 or angle > 120:
-            raise FanException("Invalid angle: %s" % angle)
+            raise ValueError("Invalid angle: %s" % angle)
 
         return self.send("set_angle", [angle])
 
@@ -395,6 +395,6 @@ class Fan(Device):
         """Set delay off seconds."""
 
         if seconds < 0:
-            raise FanException("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("set_poweroff_time", [seconds])

@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 from .airfilter_util import FilterType, FilterTypeUtil
@@ -29,10 +29,6 @@ SUPPORTED_MODELS = [
     "zhimi.airpurifier.mc1",
     "zhimi.airpurifier.mc2",
 ]
-
-
-class AirPurifierException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -417,7 +413,7 @@ class AirPurifier(Device):
     def set_favorite_level(self, level: int):
         """Set favorite level."""
         if level < 0 or level > 17:
-            raise AirPurifierException("Invalid favorite level: %s" % level)
+            raise ValueError("Invalid favorite level: %s" % level)
 
         # Possible alternative property: set_speed_favorite
 
@@ -479,7 +475,7 @@ class AirPurifier(Device):
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
         if volume < 0 or volume > 100:
-            raise AirPurifierException("Invalid volume: %s" % volume)
+            raise ValueError("Invalid volume: %s" % volume)
 
         return self.send("set_volume", [volume])
 
@@ -526,7 +522,7 @@ class AirPurifier(Device):
         app_extra=1 unlocks a turbo mode supported feature
         """
         if value < 0:
-            raise AirPurifierException("Invalid app extra value: %s" % value)
+            raise ValueError("Invalid app extra value: %s" % value)
 
         return self.send("set_app_extra", [value])
 

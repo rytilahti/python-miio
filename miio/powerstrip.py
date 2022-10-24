@@ -8,7 +8,6 @@ import click
 from .click_common import EnumType, command, format_output
 from .device import Device
 from .devicestatus import DeviceStatus, sensor, switch
-from .exceptions import DeviceException
 from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,10 +36,6 @@ AVAILABLE_PROPERTIES = {
         "power_price",
     ],
 }
-
-
-class PowerStripException(DeviceException):
-    pass
 
 
 class PowerMode(enum.Enum):
@@ -238,7 +233,7 @@ class PowerStrip(Device):
     def set_power_price(self, price: int):
         """Set the power price."""
         if price < 0 or price > 999:
-            raise PowerStripException("Invalid power price: %s" % price)
+            raise ValueError("Invalid power price: %s" % price)
 
         return self.send("set_power_price", [price])
 

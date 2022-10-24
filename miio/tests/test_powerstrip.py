@@ -7,7 +7,6 @@ from miio.powerstrip import (
     MODEL_POWER_STRIP_V1,
     MODEL_POWER_STRIP_V2,
     PowerMode,
-    PowerStripException,
     PowerStripStatus,
 )
 
@@ -227,10 +226,10 @@ class TestPowerStripV2(TestCase):
         self.device.set_power_price(2)
         assert power_price() == 2
 
-        with pytest.raises(PowerStripException):
+        with pytest.raises(ValueError):
             self.device.set_power_price(-1)
 
-        with pytest.raises(PowerStripException):
+        with pytest.raises(ValueError):
             self.device.set_power_price(1000)
 
     def test_status_without_power_price(self):

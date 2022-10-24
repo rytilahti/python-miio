@@ -8,7 +8,6 @@ from ..philips_rwread import (
     MODEL_PHILIPS_LIGHT_RWREAD,
     MotionDetectionSensitivity,
     PhilipsRwread,
-    PhilipsRwreadException,
     PhilipsRwreadStatus,
 )
 
@@ -92,13 +91,13 @@ class TestPhilipsRwread(TestCase):
         assert brightness() == 50
         self.device.set_brightness(100)
 
-        with pytest.raises(PhilipsRwreadException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(-1)
 
-        with pytest.raises(PhilipsRwreadException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(0)
 
-        with pytest.raises(PhilipsRwreadException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(101)
 
     def test_set_scene(self):
@@ -110,13 +109,13 @@ class TestPhilipsRwread(TestCase):
         self.device.set_scene(2)
         assert scene() == 2
 
-        with pytest.raises(PhilipsRwreadException):
+        with pytest.raises(ValueError):
             self.device.set_scene(-1)
 
-        with pytest.raises(PhilipsRwreadException):
+        with pytest.raises(ValueError):
             self.device.set_scene(0)
 
-        with pytest.raises(PhilipsRwreadException):
+        with pytest.raises(ValueError):
             self.device.set_scene(5)
 
     def test_delay_off(self):
@@ -130,7 +129,7 @@ class TestPhilipsRwread(TestCase):
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
 
-        with pytest.raises(PhilipsRwreadException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
 
     def test_set_motion_detection(self):

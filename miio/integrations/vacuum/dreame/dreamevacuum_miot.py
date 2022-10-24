@@ -8,7 +8,6 @@ from typing import Dict, Optional
 import click
 
 from miio.click_common import command, format_output
-from miio.exceptions import DeviceException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
@@ -638,7 +637,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
     def forward(self, distance: int) -> None:
         """Move forward."""
         if distance < self.MANUAL_DISTANCE_MIN or distance > self.MANUAL_DISTANCE_MAX:
-            raise DeviceException(
+            raise ValueError(
                 "Given distance is invalid, should be [%s, %s], was: %s"
                 % (self.MANUAL_DISTANCE_MIN, self.MANUAL_DISTANCE_MAX, distance)
             )
@@ -665,7 +664,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
             rotatation < self.MANUAL_ROTATION_MIN
             or rotatation > self.MANUAL_ROTATION_MAX
         ):
-            raise DeviceException(
+            raise ValueError(
                 "Given rotation is invalid, should be [%s, %s], was %s"
                 % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotatation)
             )

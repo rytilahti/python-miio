@@ -5,7 +5,6 @@ import pytest
 from miio import AirDehumidifier
 from miio.airdehumidifier import (
     MODEL_DEHUMIDIFIER_V1,
-    AirDehumidifierException,
     AirDehumidifierStatus,
     FanSpeed,
     OperationMode,
@@ -182,16 +181,16 @@ class TestAirDehumidifierV1(TestCase):
         self.device.set_target_humidity(60)
         assert target_humidity() == 60
 
-        with pytest.raises(AirDehumidifierException):
+        with pytest.raises(ValueError):
             self.device.set_target_humidity(-1)
 
-        with pytest.raises(AirDehumidifierException):
+        with pytest.raises(ValueError):
             self.device.set_target_humidity(30)
 
-        with pytest.raises(AirDehumidifierException):
+        with pytest.raises(ValueError):
             self.device.set_target_humidity(70)
 
-        with pytest.raises(AirDehumidifierException):
+        with pytest.raises(ValueError):
             self.device.set_target_humidity(110)
 
     def test_set_child_lock(self):

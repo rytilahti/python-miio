@@ -6,7 +6,6 @@ from typing import Any, Dict
 import click
 
 from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -57,10 +56,6 @@ CLEANING_STAGES = [
     "Defrosting the surface",
     "Drying",
 ]
-
-
-class AirConditionerMiotException(DeviceException):
-    pass
 
 
 class CleaningStatus(DeviceStatus):
@@ -349,9 +344,7 @@ class AirConditionerMiot(MiotDevice):
             or target_temperature > 31.0
             or target_temperature % 0.5 != 0
         ):
-            raise AirConditionerMiotException(
-                "Invalid target temperature: %s" % target_temperature
-            )
+            raise ValueError("Invalid target temperature: %s" % target_temperature)
         return self.set_property("target_temperature", target_temperature)
 
     @command(
@@ -443,9 +436,7 @@ class AirConditionerMiot(MiotDevice):
     def set_fan_speed_percent(self, fan_speed_percent):
         """Set fan speed in percent, should be  between 1 to 100 or 101(auto)."""
         if fan_speed_percent < 1 or fan_speed_percent > 101:
-            raise AirConditionerMiotException(
-                "Invalid fan percent: %s" % fan_speed_percent
-            )
+            raise ValueError("Invalid fan percent: %s" % fan_speed_percent)
         return self.set_property("fan_speed_percent", fan_speed_percent)
 
     @command(

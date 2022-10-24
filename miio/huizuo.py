@@ -10,7 +10,7 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import command, format_output
-from .exceptions import DeviceException
+from .exceptions import UnsupportedFeatureException
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -111,10 +111,6 @@ _ADDITIONAL_MAPPING_SCENE = {  # Only for write, send "0" to activate
     "on_or_increase_brightness": {"siid": 3, "piid": 8},
     "on_or_increase_colortemp": {"siid": 3, "piid": 9},
 }
-
-
-class HuizuoException(DeviceException):
-    pass
 
 
 class HuizuoStatus(DeviceStatus):
@@ -283,7 +279,7 @@ class Huizuo(MiotDevice):
     def set_brightness(self, level):
         """Set brightness."""
         if level < 0 or level > 100:
-            raise HuizuoException("Invalid brightness: %s" % level)
+            raise ValueError("Invalid brightness: %s" % level)
 
         return self.set_property("brightness", level)
 
@@ -302,7 +298,7 @@ class Huizuo(MiotDevice):
             max_color_temp = 6400
 
         if color_temp < 3000 or color_temp > max_color_temp:
-            raise HuizuoException("Invalid color temperature: %s" % color_temp)
+            raise ValueError("Invalid color temperature: %s" % color_temp)
 
         return self.set_property("color_temp", color_temp)
 
@@ -323,7 +319,9 @@ class HuizuoLampFan(Huizuo):
         if self.model in MODELS_WITH_FAN_WY or self.model in MODELS_WITH_FAN_WY2:
             return self.set_property("fan_power", True)
 
-        raise HuizuoException("Your device doesn't support a fan management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a fan management"
+        )
 
     @command(
         default_output=format_output("Fan powering off"),
@@ -333,7 +331,9 @@ class HuizuoLampFan(Huizuo):
         if self.model in MODELS_WITH_FAN_WY or self.model in MODELS_WITH_FAN_WY2:
             return self.set_property("fan_power", False)
 
-        raise HuizuoException("Your device doesn't support a fan management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a fan management"
+        )
 
     @command(
         click.argument("fan_level", type=int),
@@ -342,12 +342,14 @@ class HuizuoLampFan(Huizuo):
     def set_fan_level(self, fan_level):
         """Set fan speed level (only for models with fan)"""
         if fan_level < 0 or fan_level > 100:
-            raise HuizuoException("Invalid fan speed level: %s" % fan_level)
+            raise ValueError("Invalid fan speed level: %s" % fan_level)
 
         if self.model in MODELS_WITH_FAN_WY or self.model in MODELS_WITH_FAN_WY2:
             return self.set_property("fan_level", fan_level)
 
-        raise HuizuoException("Your device doesn't support a fan management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a fan management"
+        )
 
     @command(
         default_output=format_output("Setting fan mode to 'Basic'"),
@@ -357,7 +359,9 @@ class HuizuoLampFan(Huizuo):
         if self.model in MODELS_WITH_FAN_WY or self.model in MODELS_WITH_FAN_WY2:
             return self.set_property("fan_mode", 0)
 
-        raise HuizuoException("Your device doesn't support a fan management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a fan management"
+        )
 
     @command(
         default_output=format_output("Setting fan mode to 'Natural wind'"),
@@ -367,7 +371,9 @@ class HuizuoLampFan(Huizuo):
         if self.model in MODELS_WITH_FAN_WY or self.model in MODELS_WITH_FAN_WY2:
             return self.set_property("fan_mode", 1)
 
-        raise HuizuoException("Your device doesn't support a fan management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a fan management"
+        )
 
     @command(
         default_output=format_output(
@@ -404,7 +410,9 @@ class HuizuoLampFan(Huizuo):
         if self.model in MODELS_WITH_FAN_WY:
             return self.set_property("fan_motor_reverse", True)
 
-        raise HuizuoException("Your device doesn't support a fan management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a fan management"
+        )
 
     @command(
         default_output=format_output("Disable fan reverse"),
@@ -414,7 +422,9 @@ class HuizuoLampFan(Huizuo):
         if self.model in MODELS_WITH_FAN_WY:
             return self.set_property("fan_motor_reverse", False)
 
-        raise HuizuoException("Your device doesn't support a fan management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a fan management"
+        )
 
 
 class HuizuoLampHeater(Huizuo):
@@ -433,7 +443,9 @@ class HuizuoLampHeater(Huizuo):
         if self.model in MODELS_WITH_HEATER:
             return self.set_property("heater_power", True)
 
-        raise HuizuoException("Your device doesn't support a heater management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a heater management"
+        )
 
     @command(
         default_output=format_output("Heater powering off"),
@@ -443,7 +455,9 @@ class HuizuoLampHeater(Huizuo):
         if self.model in MODELS_WITH_HEATER:
             return self.set_property("heater_power", False)
 
-        raise HuizuoException("Your device doesn't support a heater management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a heater management"
+        )
 
     @command(
         click.argument("heat_level", type=int),
@@ -452,12 +466,14 @@ class HuizuoLampHeater(Huizuo):
     def set_heat_level(self, heat_level):
         """Set heat level (only for models with heater)"""
         if heat_level not in [1, 2, 3]:
-            raise HuizuoException("Invalid heat level: %s" % heat_level)
+            raise ValueError("Invalid heat level: %s" % heat_level)
 
         if self.model in MODELS_WITH_HEATER:
             return self.set_property("heat_level", heat_level)
 
-        raise HuizuoException("Your device doesn't support a heat management")
+        raise UnsupportedFeatureException(
+            "Your device doesn't support a heat management"
+        )
 
     @command(
         default_output=format_output(
@@ -500,7 +516,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_off", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Increase the brightness"),
@@ -510,7 +526,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("brightness_increase", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Decrease the brightness"),
@@ -520,7 +536,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("brightness_decrease", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Switch between the brightnesses"),
@@ -530,7 +546,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("brightness_switch", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Increase the color temperature"),
@@ -540,7 +556,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("colortemp_increase", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Decrease the color temperature"),
@@ -550,7 +566,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("colortemp_decrease", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Switch between the color temperatures"),
@@ -561,7 +577,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("colortemp_switch", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Switch on or increase brightness"),
@@ -571,7 +587,7 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_or_increase_brightness", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")
 
     @command(
         default_output=format_output("Switch on or increase color temperature"),
@@ -582,4 +598,4 @@ class HuizuoLampScene(Huizuo):
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_or_increase_colortemp", 0)
 
-        raise HuizuoException("Your device doesn't support scenes")
+        raise UnsupportedFeatureException("Your device doesn't support scenes")

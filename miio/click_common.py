@@ -49,7 +49,7 @@ class ExceptionHandlerGroup(click.Group):
     def __call__(self, *args, **kwargs):
         try:
             return self.main(*args, **kwargs)
-        except miio.DeviceException as ex:
+        except (ValueError, miio.DeviceException) as ex:
             _LOGGER.debug("Exception: %s", ex, exc_info=True)
             click.echo(click.style("Error: %s" % ex, fg="red", bold=True))
 

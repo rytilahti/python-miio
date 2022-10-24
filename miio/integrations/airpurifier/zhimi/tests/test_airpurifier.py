@@ -6,7 +6,6 @@ from miio.tests.dummies import DummyDevice
 
 from .. import AirPurifier
 from ..airpurifier import (
-    AirPurifierException,
     AirPurifierStatus,
     FilterType,
     LedBrightness,
@@ -175,10 +174,10 @@ class TestAirPurifier(TestCase):
         self.device.set_favorite_level(10)
         assert favorite_level() == 10
 
-        with pytest.raises(AirPurifierException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_level(-1)
 
-        with pytest.raises(AirPurifierException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_level(18)
 
     def test_set_led_brightness(self):
@@ -235,10 +234,10 @@ class TestAirPurifier(TestCase):
         self.device.set_volume(100)
         assert volume() == 100
 
-        with pytest.raises(AirPurifierException):
+        with pytest.raises(ValueError):
             self.device.set_volume(-1)
 
-        with pytest.raises(AirPurifierException):
+        with pytest.raises(ValueError):
             self.device.set_volume(101)
 
     def test_set_learn_mode(self):
@@ -272,7 +271,7 @@ class TestAirPurifier(TestCase):
         self.device.set_extra_features(2)
         assert extra_features() == 2
 
-        with pytest.raises(AirPurifierException):
+        with pytest.raises(ValueError):
             self.device.set_extra_features(-1)
 
     def test_reset_filter(self):
