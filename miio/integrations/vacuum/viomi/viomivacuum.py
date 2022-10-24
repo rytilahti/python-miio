@@ -352,9 +352,9 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return ViomiEdgeState(self.data["mode"])
 
     @property
-    @sensor("Mop installed")
-    def mop_installed(self) -> bool:
-        """True if the mop is installed."""
+    @sensor("Mop attached")
+    def mop_attached(self) -> bool:
+        """True if the mop is attached."""
         return bool(self.data["mop_type"])
 
     @property
@@ -367,7 +367,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
     @sensor("Error")
     def error(self) -> Optional[str]:
         """String presentation for the error code."""
-        if self.error_code is None:
+        if self.vacuum_state != VacuumState.Error:
             return None
 
         return ERROR_CODES.get(self.error_code, f"Unknown error {self.error_code}")
@@ -428,7 +428,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
 
     @property
     @setting("Cleaning mode", choices=ViomiMode, setter_name="clean_mode")
-    def mop_mode(self) -> ViomiMode:
+    def clean_mode(self) -> ViomiMode:
         """Whether mopping is enabled and if so which mode."""
         return ViomiMode(self.data["is_mop"])
 
@@ -460,7 +460,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
 
     @property
     @switch("LED state", setter_name="led")
-    def light_state(self) -> bool:
+    def led_state(self) -> bool:
         """Led state.
 
         This seems doing nothing on STYJ02YM
@@ -475,7 +475,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
 
     @property
     @setting("Mop pattern", choices=ViomiRoutePattern, setter_name="set_route_pattern")
-    def mop_route(self) -> Optional[ViomiRoutePattern]:
+    def route_pattern(self) -> Optional[ViomiRoutePattern]:
         """Pattern mode."""
         route = self.data["mop_route"]
         if route is None:
@@ -490,7 +490,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data["order_time"]
 
     @property
-    @sensor("Repeat cleaning active")
+    @switch("Repeat cleaning active", setter_name="set_repeat_cleaning")
     def repeat_cleaning(self) -> bool:
         """Secondary clean up state.
 
@@ -599,7 +599,7 @@ class ViomiVacuum(Device, VacuumInterface):
             "Fan speed: {result.fanspeed}\n"
             "Water grade: {result.water_grade}\n"
             "Mop mode: {result.mop_mode}\n"
-            "Mop installed: {result.mop_installed}\n"
+            "Mop attached: {result.mop_attached}\n"
             "Vacuum along the edges: {result.edge_state}\n"
             "Mop route pattern: {result.mop_route}\n"
             "Secondary Cleanup: {result.repeat_cleaning}\n"
@@ -656,6 +656,7 @@ class ViomiVacuum(Device, VacuumInterface):
             ]
         }
 
+        # fallback properties
         all_properties = [
             "battary_life",
             "box_type",
@@ -663,7 +664,7 @@ class ViomiVacuum(Device, VacuumInterface):
             "err_state",
             "has_map",
             "has_newmap",
-            # "hw_info",  # TODO: expose separately
+            "hw_info",
             "is_charge",
             "is_mop",
             "is_work",
@@ -680,21 +681,19 @@ class ViomiVacuum(Device, VacuumInterface):
             "suction_grade",
             "v_state",
             "water_grade",
-            # The following list of properties existing but
-            # there are not used in the code
-            # "order_time",
-            # "start_time",
-            # "water_percent",
-            # "zone_data",
-            # "sw_info",
-            # "main_brush_hours",
-            # "main_brush_life",
-            # "side_brush_hours",
-            # "side_brush_life",
-            # "mop_hours",
-            # "mop_life",
-            # "hypa_hours",
-            # "hypa_life",
+            "order_time",
+            "start_time",
+            "water_percent",
+            "zone_data",
+            "sw_info",
+            "main_brush_hours",
+            "main_brush_life",
+            "side_brush_hours",
+            "side_brush_life",
+            "mop_hours",
+            "mop_life",
+            "hypa_hours",
+            "hypa_life",
         ]
 
         properties = device_props.get(self.model, all_properties)
@@ -703,6 +702,7 @@ class ViomiVacuum(Device, VacuumInterface):
 
         status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
         status.embed(self.consumable_status())
+
         return status
 
     @command()
@@ -711,6 +711,7 @@ class ViomiVacuum(Device, VacuumInterface):
         self.send("set_charge", [1])
 
     def set_power(self, on: bool):
+        """Set power on or off."""
         if on:
             return self.start()
         else:
@@ -876,7 +877,7 @@ class ViomiVacuum(Device, VacuumInterface):
         return self.send("set_mode", [state.value])
 
     @command(click.argument("state", type=bool))
-    def set_repeat(self, state: bool):
+    def set_repeat_cleaning(self, state: bool):
         """Set or Unset repeat mode (Secondary cleanup)."""
         return self.send("set_repeat", [int(state)])
 
