@@ -12,6 +12,7 @@ from miio.devicestatus import DeviceStatus
 from miio.exceptions import DeviceError, DeviceException, UnsupportedFeatureException
 from miio.miot_device import MiotDevice
 from miio.deviceinfo import DeviceInfo
+from miio.interfaces import VacuumInterface, LightInterface, ColorTemperatureRange
 
 # isort: on
 

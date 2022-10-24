@@ -1,10 +1,12 @@
 import logging
 import os
 from enum import IntEnum
-from typing import Dict, NamedTuple
+from typing import Dict
 
 import attr
 import yaml
+
+from miio import ColorTemperatureRange
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,16 +16,9 @@ class YeelightSubLightType(IntEnum):
     Background = 1
 
 
-class ColorTempRange(NamedTuple):
-    """Color temperature range."""
-
-    min: int
-    max: int
-
-
 @attr.s(auto_attribs=True)
 class YeelightLampInfo:
-    color_temp: ColorTempRange
+    color_temp: ColorTemperatureRange
     supports_color: bool
 
 
@@ -48,14 +43,14 @@ class YeelightSpecHelper:
             for key, value in models.items():
                 lamps = {
                     YeelightSubLightType.Main: YeelightLampInfo(
-                        ColorTempRange(*value["color_temp"]),
+                        ColorTemperatureRange(*value["color_temp"]),
                         value["supports_color"],
                     )
                 }
 
                 if "background" in value:
                     lamps[YeelightSubLightType.Background] = YeelightLampInfo(
-                        ColorTempRange(*value["background"]["color_temp"]),
+                        ColorTemperatureRange(*value["background"]["color_temp"]),
                         value["background"]["supports_color"],
                     )
 
