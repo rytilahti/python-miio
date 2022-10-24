@@ -52,7 +52,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.device import Device, DeviceStatus
+from miio.device import Device
 from miio.devicestatus import sensor, setting, switch
 from miio.exceptions import DeviceException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
@@ -60,6 +60,7 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     DNDStatus,
 )
 from miio.interfaces import FanspeedPresets, VacuumInterface
+from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)
@@ -203,11 +204,12 @@ class ViomiVacuumState(Enum):
     Unknown = -1
     IdleNotDocked = 0
     Idle = 1
-    Idle2 = 2
+    Paused = 2
     Cleaning = 3
     Returning = 4
     Docked = 5
     VacuumingAndMopping = 6
+    Mopping = 7
 
 
 class ViomiMode(Enum):
@@ -272,18 +274,64 @@ class ViomiEdgeState(Enum):
     Unknown2 = 5
 
 
-class ViomiVacuumStatus(DeviceStatus):
+class ViomiVacuumStatus(VacuumDeviceStatus):
     def __init__(self, data):
-        # ["run_state","mode","err_state","battary_life","box_type","mop_type","s_time","s_area",
-        # "suction_grade","water_grade","remember_map","has_map","is_mop","has_newmap"]'
-        # 1,               11,           1,            1,         1,       0          ]
-        _LOGGER.debug("Data: %s", data)
+        """Vacuum status container.
+
+        viomi.vacuum.v8 example::
+        {
+             'box_type': 2,
+             'err_state': 2105,
+             'has_map': 1,
+             'has_newmap': 0,
+             'hw_info': '1.0.1',
+             'is_charge': 0,
+             'is_mop': 0,
+             'is_work': 1,
+             'light_state': 0,
+             'mode': 0,
+             'mop_type': 0,
+             'order_time': '0',
+             'remember_map': 1,
+             'repeat_state': 0,
+             'run_state': 5,
+             's_area': 1.2,
+             's_time': 0,
+             'start_time': 0,
+             'suction_grade': 0,
+             'sw_info': '3.5.8_0021',
+             'v_state': 10,
+             'water_grade': 11,
+             'zone_data': '0'
+        }
+        """
         self.data = data
 
     @property
-    def got_error(self) -> bool:
-        """TODO: temporary got_error until homeassistant gets fixed"""
-        return self.error_code != 0
+    @sensor("Vacuum state")
+    def vacuum_state(self) -> VacuumState:
+        """Return simplified vacuum state."""
+
+        # consider error_code >= 2000 as non-errors as they require no action
+        if 0 < self.error_code < 2000:
+            return VacuumState.Error
+
+        state_to_vacuumstate = {
+            ViomiVacuumState.Unknown: VacuumState.Unknown,
+            ViomiVacuumState.Cleaning: VacuumState.Cleaning,
+            ViomiVacuumState.Mopping: VacuumState.Cleaning,
+            ViomiVacuumState.VacuumingAndMopping: VacuumState.Cleaning,
+            ViomiVacuumState.Returning: VacuumState.Returning,
+            ViomiVacuumState.Paused: VacuumState.Paused,
+            ViomiVacuumState.IdleNotDocked: VacuumState.Idle,
+            ViomiVacuumState.Idle: VacuumState.Idle,
+            ViomiVacuumState.Docked: VacuumState.Docked,
+        }
+        try:
+            return state_to_vacuumstate[self.state]
+        except KeyError:
+            _LOGGER.warning("Got unknown state code: %s", self.state)
+            return VacuumState.Unknown
 
     @property
     @sensor("Device state")
