@@ -505,9 +505,9 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data["start_time"]
 
     @property
-    @setting("Sound volume", unit="%", setter_name="set_sound_volume", max_value=100)
+    @setting("Sound volume", setter_name="set_sound_volume", max_value=10)
     def sound_volume(self) -> int:
-        """Voice volume level (from 0 to 100%, 0 means Off)."""
+        """Voice volume level (from 0 to 10, 0 means Off)."""
         return self.data["v_state"]
 
     @property
@@ -924,9 +924,10 @@ class ViomiVacuum(Device, VacuumInterface):
     @command(click.argument("volume", type=click.IntRange(0, 10)))
     def set_sound_volume(self, volume: int):
         """Switch the voice on or off."""
-        enabled = 1
-        if volume == 0:
-            enabled = 0
+        if volume < 0 or volume > 10:
+            raise ValueError("Invalid sound volume, should be [0, 10]")
+
+        enabled = int(volume != 0)
         return self.send("set_voice", [enabled, volume])
 
     @command(click.argument("state", type=bool))
