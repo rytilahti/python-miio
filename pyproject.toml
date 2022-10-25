@@ -67,6 +67,8 @@ cffi = "^1"
 docformatter = "^1"
 mypy = {version = "^0", markers = "platform_python_implementation == 'CPython'"}
 coverage = {extras = ["toml"], version = "^6"}
+freezegun = ">=1.2.1"  # freezegun 1.2.1 is first one with type hints
+
 
 [tool.isort]
 multi_line_output = 3
