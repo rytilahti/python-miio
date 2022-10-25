@@ -7,7 +7,7 @@ import click
 from miio import ColorTemperatureRange, LightInterface
 from miio.click_common import command, format_output
 from miio.device import Device, DeviceStatus
-from miio.devicestatus import sensor, switch
+from miio.devicestatus import sensor, setting, switch
 from miio.utils import int_to_rgb, rgb_to_int
 
 from .spec_helper import YeelightSpecHelper, YeelightSubLightType
@@ -119,12 +119,15 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].is_on
 
     @property
-    @sensor("Brightness", unit="%")
+    @setting("Brightness", unit="%", setter_name="set_brightness", max_value=100)
     def brightness(self) -> int:
         """Return current brightness."""
         return self.lights[0].brightness
 
     @property
+    @sensor(
+        "RGB", setter_name="set_rgb"
+    )  # TODO: we need to extend @setting to support tuples to fix this
     def rgb(self) -> Optional[Tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
         return self.lights[0].rgb
@@ -136,12 +139,17 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].color_mode
 
     @property
+    @sensor(
+        "HSV", setter_name="set_hsv"
+    )  # TODO: we need to extend @setting to support tuples to fix this
     def hsv(self) -> Optional[Tuple[int, int, int]]:
         """Return current color in HSV if HSV mode is active."""
         return self.lights[0].hsv
 
     @property
-    @sensor("Color temperature")
+    @sensor(
+        "Color temperature", setter_name="set_color_temperature"
+    )  # TODO: we need to allow ranges by attribute to fix this
     def color_temp(self) -> Optional[int]:
         """Return current color temperature, if applicable."""
         return self.lights[0].color_temp
@@ -159,7 +167,7 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].color_flow_params
 
     @property
-    @sensor("Developer mode enabled", setter_name="set_developer_mode")
+    @switch("Developer mode enabled", setter_name="set_developer_mode")
     def developer_mode(self) -> Optional[bool]:
         """Return whether the developer mode is active."""
         lan_ctrl = self.data["lan_ctrl"]
@@ -186,7 +194,7 @@ class YeelightStatus(DeviceStatus):
         return int(self.data["delayoff"])
 
     @property
-    @switch("Music mode enabled", setter_name="set_music_mode")
+    @sensor("Music mode enabled")
     def music_mode(self) -> Optional[bool]:
         """Return whether the music mode is active."""
         music_on = self.data["music_on"]
