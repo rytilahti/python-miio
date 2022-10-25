@@ -51,7 +51,7 @@ repos:
   rev: v0.961
   hooks:
   - id: mypy
-    additional_dependencies: [types-attrs, types-PyYAML, types-requests, types-pytz, types-croniter]
+    additional_dependencies: [types-attrs, types-PyYAML, types-requests, types-pytz, types-croniter, types-freezegun]
 
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.37.1
