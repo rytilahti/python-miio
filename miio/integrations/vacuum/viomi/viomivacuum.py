@@ -1078,3 +1078,8 @@ class ViomiVacuum(Device, VacuumInterface):
         This seems doing nothing on STYJ02YM
         """
         return self.send("set_carpetturbo", [mode.value])
+
+    @command()
+    def find(self):
+        """Find the robot."""
+        return self.send("set_resetpos", [1])
