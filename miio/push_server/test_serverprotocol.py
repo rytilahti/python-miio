@@ -141,7 +141,7 @@ def test_datagram_with_exception_raising(protocol: ServerProtocol, mocker):
     protocol.send_error = mocker.Mock()  # type: ignore[assignment]
 
     def _raise(*args, **kwargs):
-        raise Exception("error")
+        raise Exception("error message")
 
     protocol.server.methods = {"raise": _raise}
 
@@ -153,3 +153,4 @@ def test_datagram_with_exception_raising(protocol: ServerProtocol, mocker):
     protocol.send_error.assert_called()  # type: ignore
     cargs = protocol.send_error.call_args[0]  # type: ignore
     assert cargs[4] == ERR_METHOD_EXEC_FAILED
+    assert "error message" in cargs[5]
