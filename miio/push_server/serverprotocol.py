@@ -11,6 +11,10 @@ HELO_BYTES = bytes.fromhex(
     "21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
 )
 
+ERR_INVALID = -1
+ERR_UNSUPPORTED = -2
+ERR_METHOD_EXEC_FAILED = -3
+
 
 class ServerProtocol:
     """Handle responding to UDP packets."""
@@ -73,11 +77,11 @@ class ServerProtocol:
         if payload is None:
             payload = {}
 
-        result = {**payload, "id": msg_id}
-        msg = self._create_message(result, token, device_id=self.server.server_id)
+        data = {**payload, "id": msg_id}
+        msg = self._create_message(data, token, device_id=self.server.server_id)
 
         self.transport.sendto(msg, (host, port))
-        _LOGGER.debug(">> %s:%s: %s", host, port, result)
+        _LOGGER.debug(">> %s:%s: %s", host, port, data)
 
     def send_error(self, host, port, msg_id, token, code, message):
         """Send error message with given code and message to the client."""
@@ -121,19 +125,36 @@ class ServerProtocol:
             msg_value,
         )
 
+        if "method" not in msg_value:
+            return self.send_error(
+                host, port, msg_id, token, ERR_INVALID, "missing method"
+            )
+
         methods = self.server.methods
         if msg_value["method"] not in methods:
-            return self.send_error(host, port, msg_id, token, -1, "unsupported method")
+            return self.send_error(
+                host, port, msg_id, token, ERR_UNSUPPORTED, "unsupported method"
+            )
 
+        _LOGGER.debug("Got method call: %s", msg_value["method"])
         method = methods[msg_value["method"]]
         if callable(method):
             try:
                 response = method(msg_value)
             except Exception as ex:
-                return self.send_error(host, port, msg_id, token, -1, str(ex))
+                _LOGGER.exception(ex)
+                return self.send_error(
+                    host,
+                    port,
+                    msg_id,
+                    token,
+                    ERR_METHOD_EXEC_FAILED,
+                    f"Exception {type(ex)}: {ex}",
+                )
         else:
             response = method
 
+        _LOGGER.debug("Responding %s with %s", msg_id, response)
         return self.send_response(host, port, msg_id, token, payload=response)
 
     def datagram_received(self, data, addr):

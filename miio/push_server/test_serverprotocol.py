@@ -2,7 +2,12 @@ import pytest
 
 from miio import Message
 
-from .serverprotocol import ServerProtocol
+from .serverprotocol import (
+    ERR_INVALID,
+    ERR_METHOD_EXEC_FAILED,
+    ERR_UNSUPPORTED,
+    ServerProtocol,
+)
 
 HOST = "127.0.0.1"
 PORT = 1234
@@ -108,15 +113,44 @@ def test_datagram_with_known_method(protocol: ServerProtocol, mocker):
     assert cargs["payload"] == response_payload
 
 
-def test_datagram_with_unknown_method(protocol: ServerProtocol, mocker):
-    """Test that regular client messages are handled properly."""
+@pytest.mark.parametrize(
+    "method,err_code", [("unknown_method", ERR_UNSUPPORTED), (None, ERR_INVALID)]
+)
+def test_datagram_with_unknown_method(
+    method, err_code, protocol: ServerProtocol, mocker
+):
+    """Test that invalid payloads are erroring out correctly."""
     protocol.send_error = mocker.Mock()  # type: ignore[assignment]
     protocol.server.methods = {}
 
-    msg = protocol._create_message({"id": 1, "method": "miIO.info"}, DUMMY_TOKEN, 1234)
+    data = {"id": 1}
+
+    if method is not None:
+        data["method"] = method
+
+    msg = protocol._create_message(data, DUMMY_TOKEN, 1234)
     protocol._handle_datagram_from_client(HOST, PORT, msg)
 
     protocol.send_error.assert_called()  # type: ignore
     cargs = protocol.send_error.call_args[0]  # type: ignore
-    assert cargs[4] == -1
-    assert cargs[5] == "unsupported method"
+    assert cargs[4] == err_code
+
+
+def test_datagram_with_exception_raising(protocol: ServerProtocol, mocker):
+    """Test that exception raising callbacks are ."""
+    protocol.send_error = mocker.Mock()  # type: ignore[assignment]
+
+    def _raise(*args, **kwargs):
+        raise Exception("error message")
+
+    protocol.server.methods = {"raise": _raise}
+
+    data = {"id": 1, "method": "raise"}
+
+    msg = protocol._create_message(data, DUMMY_TOKEN, 1234)
+    protocol._handle_datagram_from_client(HOST, PORT, msg)
+
+    protocol.send_error.assert_called()  # type: ignore
+    cargs = protocol.send_error.call_args[0]  # type: ignore
+    assert cargs[4] == ERR_METHOD_EXEC_FAILED
+    assert "error message" in cargs[5]
