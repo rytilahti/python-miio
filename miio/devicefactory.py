@@ -62,7 +62,11 @@ class DeviceFactory:
         wildcard_models = {
             m: impl for m, impl in cls._supported_models.items() if m.endswith("*")
         }
-        for wildcard_model, impl in wildcard_models.items():
+        # We sort here to return the implementation with most specific prefix
+        sorted_by_longest_prefix = sorted(
+            wildcard_models.items(), key=lambda item: len(item[0]), reverse=True
+        )
+        for wildcard_model, impl in sorted_by_longest_prefix:
             m = wildcard_model.rstrip("*")
             if model.startswith(m):
                 _LOGGER.debug(

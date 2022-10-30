@@ -1,6 +1,6 @@
 import pytest
 
-from miio import Device, DeviceException, DeviceFactory, Gateway, MiotDevice
+from miio import Device, DeviceFactory, Gateway, GenericMiot, MiotDevice
 
 DEVICE_CLASSES = Device.__subclasses__() + MiotDevice.__subclasses__()  # type: ignore
 DEVICE_CLASSES.remove(MiotDevice)
@@ -37,6 +37,5 @@ def test_device_class_for_wildcard():
 
 
 def test_device_class_for_model_unknown():
-    """Test that unknown model raises an exception."""
-    with pytest.raises(DeviceException):
-        DeviceFactory.class_for_model("foo.foo.xyz")
+    """Test that unknown model returns genericmiot."""
+    assert DeviceFactory.class_for_model("foo.foo.xyz.invalid") == GenericMiot

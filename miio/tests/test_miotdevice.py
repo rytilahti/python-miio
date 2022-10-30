@@ -3,6 +3,7 @@ from unittest.mock import ANY
 import pytest
 
 from miio import Huizuo, MiotDevice
+from miio.integrations.genericmiot import GenericMiot
 from miio.miot_device import MiotValueType, _filter_request_fields
 
 MIOT_DEVICES = MiotDevice.__subclasses__()
@@ -17,16 +18,9 @@ def dev(module_mocker):
     device = MiotDevice(
         "127.0.0.1", "68ffffffffffffffffffffffffffffff", mapping=DUMMY_MAPPING
     )
-    device._model = "testmodel"
+    device._model = "test.model"
     module_mocker.patch.object(device, "send")
     return device
-
-
-def test_missing_mapping(caplog):
-    """Make sure ctor raises exception if neither class nor parameter defines the
-    mapping."""
-    _ = MiotDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-    assert "Neither the class nor the parameter defines the mapping" in caplog.text
 
 
 def test_ctor_mapping():
@@ -115,13 +109,13 @@ def test_call_action_by(dev):
 @pytest.mark.parametrize(
     "model,expected_mapping,expected_log",
     [
-        ("some_model", {"x": {"y": 1}}, ""),
-        ("unknown_model", {"x": {"y": 1}}, "Unable to find mapping"),
+        ("some.model", {"x": {"y": 1}}, ""),
+        ("unknown.model", {"x": {"y": 1}}, "Unable to find mapping"),
     ],
 )
 def test_get_mapping(dev, caplog, model, expected_mapping, expected_log):
     """Test _get_mapping logic for fallbacks."""
-    dev._mappings["some_model"] = {"x": {"y": 1}}
+    dev._mappings["some.model"] = {"x": {"y": 1}}
     dev._model = model
     assert dev._get_mapping() == expected_mapping
 
@@ -145,6 +139,9 @@ def test_mapping_deprecation(cls):
 @pytest.mark.parametrize("cls", MIOT_DEVICES)
 def test_mapping_structure(cls):
     """Check that mappings are structured correctly."""
+    if cls == GenericMiot:
+        pytest.skip("Skipping genericmiot as it provides no mapping")
+
     assert cls._mappings
 
     model, contents = next(iter(cls._mappings.items()))
@@ -163,13 +160,15 @@ def test_mapping_structure(cls):
 @pytest.mark.parametrize("cls", MIOT_DEVICES)
 def test_supported_models(cls):
     assert cls.supported_models == list(cls._mappings.keys())
+    if cls == GenericMiot:
+        pytest.skip("Skipping genericmiot as it uses supported_models for now")
 
     # make sure that that _supported_models is not defined
     assert not cls._supported_models
 
 
 def test_call_action(dev):
-    dev._mappings["testmodel"] = {"test_action": {"siid": 1, "aiid": 1}}
+    dev._mappings["test.model"] = {"test_action": {"siid": 1, "aiid": 1}}
 
     dev.call_action("test_action")
 
@@ -188,7 +187,7 @@ def test_call_action(dev):
 def test_get_properties_for_mapping_readables(mocker, dev, props, included_in_request):
     base_props = {"readable_property": {"siid": 1, "piid": 1}}
     base_request = [{"did": k, **v} for k, v in base_props.items()]
-    dev._mappings["testmodel"] = mapping = {
+    dev._mappings["test.model"] = mapping = {
         **base_props,
         "property_under_test": {"siid": 1, "piid": 2, **props},
     }
