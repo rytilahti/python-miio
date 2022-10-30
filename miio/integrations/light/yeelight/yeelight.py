@@ -57,9 +57,12 @@ class YeelightSubLight(DeviceStatus):
         return None
 
     @property
-    def color_mode(self) -> YeelightMode:
+    def color_mode(self) -> Optional[YeelightMode]:
         """Return current color mode."""
-        return YeelightMode(int(self.data[self.get_prop_name("color_mode")]))
+        try:
+            return YeelightMode(int(self.data[self.get_prop_name("color_mode")]))
+        except ValueError:  # white only bulbs
+            return None
 
     @property
     def hsv(self) -> Optional[Tuple[int, int, int]]:
@@ -120,7 +123,7 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].rgb
 
     @property
-    def color_mode(self) -> YeelightMode:
+    def color_mode(self) -> Optional[YeelightMode]:
         """Return current color mode."""
         return self.lights[0].color_mode
 
@@ -218,7 +221,7 @@ class YeelightStatus(DeviceStatus):
             s += f"{light.type.name} light\n"
             s += f"   Power: {light.is_on}\n"
             s += f"   Brightness: {light.brightness}\n"
-            s += f"   Color mode: {light.color_mode.name}\n"
+            s += f"   Color mode: {light.color_mode}\n"
             if light.color_mode == YeelightMode.RGB:
                 s += f"   RGB: {light.rgb}\n"
             elif light.color_mode == YeelightMode.HSV:
