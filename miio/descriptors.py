@@ -3,11 +3,11 @@
 The descriptors contain information that can be used to provide generic, dynamic user-interfaces.
 
 If you are a downstream developer, use :func:`~miio.device.Device.sensors()`,
-:func:`~miio.device.Device.settings()`, :func:`~miio.device.Device.switches()`, and
-:func:`~miio.device.Device.buttons()` to access the functionality exposed by the integration developer.
+:func:`~miio.device.Device.settings()`, and
+:func:`~miio.device.Device.actions()` to access the functionality exposed by the integration developer.
 
-If you are developing an integration, prefer :func:`~miio.devicestatus.sensor`, :func:`~miio.devicestatus.sensor`, and
-:func:`~miio.devicestatus.sensor` decorators over creating the descriptors manually.
+If you are developing an integration, prefer :func:`~miio.devicestatus.sensor`, :func:`~miio.devicestatus.setting`, and
+:func:`~miio.devicestatus.action` decorators over creating the descriptors manually.
 If needed, you can override the methods listed to add more descriptors to your integration.
 """
 from enum import Enum, auto
@@ -17,7 +17,7 @@ import attr
 
 
 @attr.s(auto_attribs=True)
-class ButtonDescriptor:
+class ActionDescriptor:
     """Describes a button exposed by the device."""
 
     id: str

@@ -59,7 +59,7 @@ class DeviceStatus(metaclass=_StatusMeta):
     All status container classes should inherit from this class:
 
     * This class allows downstream users to access the available information in an
-      introspectable way. See :func:`@property`, :func:`switch`, and :func:`@setting`.
+      introspectable way. See :func:`@sensor` and :func:`@setting`.
     * :func:`embed` allows embedding other status containers.
     * The __repr__ implementation returns all defined properties and their values.
     """

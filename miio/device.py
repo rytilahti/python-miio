@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
-from .descriptors import ButtonDescriptor, SensorDescriptor, SettingDescriptor
+from .descriptors import ActionDescriptor, SensorDescriptor, SettingDescriptor
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
 from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
@@ -241,8 +241,8 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
-    def buttons(self) -> List[ButtonDescriptor]:
-        """Return a list of button-like, clickable actions of the device."""
+    def actions(self) -> List[ActionDescriptor]:
+        """Return a list of actions."""
         return []
 
     def settings(self) -> Dict[str, SettingDescriptor]:
