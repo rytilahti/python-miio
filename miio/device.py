@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
-from .descriptors import ButtonDescriptor, SensorDescriptor, SettingDescriptor
+from .descriptors import ActionDescriptor, SensorDescriptor, SettingDescriptor
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
 from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
@@ -241,12 +241,12 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
-    def buttons(self) -> List[ButtonDescriptor]:
-        """Return a list of button-like, clickable actions of the device."""
-        return []
+    def actions(self) -> Dict[str, ActionDescriptor]:
+        """Return device actions."""
+        return {}
 
     def settings(self) -> Dict[str, SettingDescriptor]:
-        """Return list of settings."""
+        """Return device settings."""
         settings = self.status().settings()
         for setting in settings.values():
             # TODO: Bind setter methods, this should probably done only once during init.
@@ -262,7 +262,7 @@ class Device(metaclass=DeviceGroupMeta):
         return settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
-        """Return sensors."""
+        """Return device sensors."""
         # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.status().sensors()
         return sensors
