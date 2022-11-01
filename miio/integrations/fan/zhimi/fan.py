@@ -5,7 +5,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
-from miio.devicestatus import sensor, setting, switch
+from miio.devicestatus import sensor, setting
 from miio.fan_common import LedBrightness, MoveDirection
 
 _LOGGER = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ class FanStatus(DeviceStatus):
         return self.data["power"]
 
     @property
-    @switch("Power", setter_name="set_power")
+    @setting("Power", setter_name="set_power")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.power == "on"
@@ -104,7 +104,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
-    @switch("LED", setter_name="set_led")
+    @setting("LED", setter_name="set_led")
     def led(self) -> Optional[bool]:
         """True if LED is turned on, if available."""
         if "led" in self.data and self.data["led"] is not None:
@@ -120,13 +120,13 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
-    @switch("Buzzer", setter_name="set_buzzer")
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] in ["on", 1, 2]
 
     @property
-    @switch("Child Lock", setter_name="set_child_lock")
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"] == "on"
@@ -148,7 +148,7 @@ class FanStatus(DeviceStatus):
         return None
 
     @property
-    @switch("Oscillate", setter_name="set_oscillate")
+    @setting("Oscillate", setter_name="set_oscillate")
     def oscillate(self) -> bool:
         """True if oscillation is enabled."""
         return self.data["angle_enable"] == "on"

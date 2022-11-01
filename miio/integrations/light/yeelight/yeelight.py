@@ -7,7 +7,7 @@ import click
 from miio import ColorTemperatureRange, LightInterface
 from miio.click_common import command, format_output
 from miio.device import Device, DeviceStatus
-from miio.devicestatus import sensor, setting, switch
+from miio.devicestatus import sensor, setting
 from miio.utils import int_to_rgb, rgb_to_int
 
 from .spec_helper import YeelightSpecHelper, YeelightSubLightType
@@ -113,7 +113,7 @@ class YeelightStatus(DeviceStatus):
         self.data = data
 
     @property
-    @switch("Power", setter_name="set_power")
+    @setting("Power", setter_name="set_power")
     def is_on(self) -> bool:
         """Return whether the light is on or off."""
         return self.lights[0].is_on
@@ -167,7 +167,7 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].color_flow_params
 
     @property
-    @switch("Developer mode enabled", setter_name="set_developer_mode")
+    @setting("Developer mode enabled", setter_name="set_developer_mode")
     def developer_mode(self) -> Optional[bool]:
         """Return whether the developer mode is active."""
         lan_ctrl = self.data["lan_ctrl"]
@@ -176,7 +176,7 @@ class YeelightStatus(DeviceStatus):
         return None
 
     @property
-    @switch("Save state on change enabled", setter_name="set_save_state_on_change")
+    @setting("Save state on change enabled", setter_name="set_save_state_on_change")
     def save_state_on_change(self) -> bool:
         """Return whether the bulb state is saved on change."""
         return bool(int(self.data["save_state"]))

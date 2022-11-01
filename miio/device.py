@@ -5,12 +5,7 @@ from typing import Any, Dict, List, Optional, Union  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
-from .descriptors import (
-    ButtonDescriptor,
-    SensorDescriptor,
-    SettingDescriptor,
-    SwitchDescriptor,
-)
+from .descriptors import ButtonDescriptor, SensorDescriptor, SettingDescriptor
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
 from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
@@ -271,21 +266,6 @@ class Device(metaclass=DeviceGroupMeta):
         # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.status().sensors()
         return sensors
-
-    def switches(self) -> Dict[str, SwitchDescriptor]:
-        """Return toggleable switches."""
-        switches = self.status().switches()
-        for switch in switches.values():
-            # TODO: Bind setter methods, this should probably done only once during init.
-            if switch.setter is None:
-                if switch.setter_name is None:
-                    # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
-                    raise Exception(
-                        f"Neither setter or setter_name was defined for {switch}"
-                    )
-                switch.setter = getattr(self, switch.setter_name)
-
-        return switches
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"

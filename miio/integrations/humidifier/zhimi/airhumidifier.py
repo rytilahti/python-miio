@@ -7,7 +7,7 @@ import click
 
 from miio import Device, DeviceError, DeviceInfo, DeviceStatus
 from miio.click_common import EnumType, command, format_output
-from miio.devicestatus import sensor, setting, switch
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -112,7 +112,7 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["humidity"]
 
     @property
-    @switch(
+    @setting(
         name="Buzzer",
         icon="mdi:volume-high",
         setter_name="set_buzzer",
@@ -138,7 +138,7 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    @switch(
+    @setting(
         name="Child Lock",
         icon="mdi:lock",
         setter_name="set_child_lock",
@@ -279,7 +279,7 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    @switch(
+    @setting(
         name="Dry Mode",
         icon="mdi:hair-dryer",
         setter_name="set_dry",
