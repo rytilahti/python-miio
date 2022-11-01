@@ -1,13 +1,18 @@
+import logging
 from enum import IntEnum
 from typing import List, Optional, Tuple
 
 import click
 
+from miio import ColorTemperatureRange, LightInterface
 from miio.click_common import command, format_output
 from miio.device import Device, DeviceStatus
+from miio.devicestatus import sensor, setting, switch
 from miio.utils import int_to_rgb, rgb_to_int
 
-from .spec_helper import ColorTempRange, YeelightSpecHelper, YeelightSubLightType
+from .spec_helper import YeelightSpecHelper, YeelightSubLightType
+
+_LOGGER = logging.getLogger(__name__)
 
 SUBLIGHT_PROP_PREFIX = {
     YeelightSubLightType.Main: "",
@@ -108,46 +113,61 @@ class YeelightStatus(DeviceStatus):
         self.data = data
 
     @property
+    @switch("Power", setter_name="set_power")
     def is_on(self) -> bool:
         """Return whether the light is on or off."""
         return self.lights[0].is_on
 
     @property
+    @setting("Brightness", unit="%", setter_name="set_brightness", max_value=100)
     def brightness(self) -> int:
         """Return current brightness."""
         return self.lights[0].brightness
 
     @property
+    @sensor(
+        "RGB", setter_name="set_rgb"
+    )  # TODO: we need to extend @setting to support tuples to fix this
     def rgb(self) -> Optional[Tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
         return self.lights[0].rgb
 
     @property
+    @sensor("Color mode")
     def color_mode(self) -> Optional[YeelightMode]:
         """Return current color mode."""
         return self.lights[0].color_mode
 
     @property
+    @sensor(
+        "HSV", setter_name="set_hsv"
+    )  # TODO: we need to extend @setting to support tuples to fix this
     def hsv(self) -> Optional[Tuple[int, int, int]]:
         """Return current color in HSV if HSV mode is active."""
         return self.lights[0].hsv
 
     @property
+    @sensor(
+        "Color temperature", setter_name="set_color_temperature"
+    )  # TODO: we need to allow ranges by attribute to fix this
     def color_temp(self) -> Optional[int]:
         """Return current color temperature, if applicable."""
         return self.lights[0].color_temp
 
     @property
+    @sensor("Color flow active")
     def color_flowing(self) -> bool:
         """Return whether the color flowing is active."""
         return self.lights[0].color_flowing
 
     @property
+    @sensor("Color flow parameters")
     def color_flow_params(self) -> Optional[str]:
         """Return color flowing params."""
         return self.lights[0].color_flow_params
 
     @property
+    @switch("Developer mode enabled", setter_name="set_developer_mode")
     def developer_mode(self) -> Optional[bool]:
         """Return whether the developer mode is active."""
         lan_ctrl = self.data["lan_ctrl"]
@@ -156,21 +176,25 @@ class YeelightStatus(DeviceStatus):
         return None
 
     @property
+    @switch("Save state on change enabled", setter_name="set_save_state_on_change")
     def save_state_on_change(self) -> bool:
         """Return whether the bulb state is saved on change."""
         return bool(int(self.data["save_state"]))
 
     @property
+    @sensor("Device name")
     def name(self) -> str:
         """Return the internal name of the bulb."""
         return self.data["name"]
 
     @property
+    @sensor("Delayed turn off in", unit="mins")
     def delay_off(self) -> int:
         """Return delay in minute before bulb is off."""
         return int(self.data["delayoff"])
 
     @property
+    @sensor("Music mode enabled")
     def music_mode(self) -> Optional[bool]:
         """Return whether the music mode is active."""
         music_on = self.data["music_on"]
@@ -179,6 +203,7 @@ class YeelightStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Moon light mode active")
     def moonlight_mode(self) -> Optional[bool]:
         """Return whether the moonlight mode is active."""
         active_mode = self.data["active_mode"]
@@ -187,6 +212,7 @@ class YeelightStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Moon light mode brightness", unit="%")
     def moonlight_mode_brightness(self) -> Optional[int]:
         """Return current moonlight brightness."""
         nl_br = self.data["nl_br"]
@@ -239,7 +265,7 @@ class YeelightStatus(DeviceStatus):
         return s
 
 
-class Yeelight(Device):
+class Yeelight(Device, LightInterface):
     """A rudimentary support for Yeelight bulbs.
 
     The API is the same as defined in
@@ -310,7 +336,14 @@ class Yeelight(Device):
         return YeelightStatus(dict(zip(properties, values)))
 
     @property
-    def valid_temperature_range(self) -> ColorTempRange:
+    def valid_temperature_range(self) -> ColorTemperatureRange:
+        """Return supported color temperature range."""
+        _LOGGER.warning("Deprecated, use color_temperature_range instead")
+        return self._color_temp_range
+
+    @property
+    def color_temperature_range(self) -> Optional[ColorTemperatureRange]:
+        """Return supported color temperature range."""
         return self._color_temp_range
 
     @command(
@@ -344,6 +377,13 @@ class Yeelight(Device):
             return self.send("set_power", ["off", "smooth", transition])
         return self.send("set_power", ["off"])
 
+    def set_power(self, on: bool, **kwargs):
+        """Set power on or off."""
+        if on:
+            self.on(**kwargs)
+        else:
+            self.off(**kwargs)
+
     @command(
         click.argument("level", type=int),
         click.option("--transition", type=int, required=False, default=0),
@@ -363,6 +403,16 @@ class Yeelight(Device):
         default_output=format_output("Setting color temperature to {level}"),
     )
     def set_color_temp(self, level, transition=500):
+        """Deprecated, use set_color_temperature instead."""
+        _LOGGER.warning("Deprecated, use set_color_temperature instead.")
+        self.set_color_temperature(level, transition)
+
+    @command(
+        click.argument("level", type=int),
+        click.option("--transition", type=int, required=False, default=0),
+        default_output=format_output("Setting color temperature to {level}"),
+    )
+    def set_color_temperature(self, level, transition=500):
         """Set color temp in kelvin."""
         if (
             level > self.valid_temperature_range.max
