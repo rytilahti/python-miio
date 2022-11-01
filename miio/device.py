@@ -241,12 +241,12 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
-    def actions(self) -> List[ActionDescriptor]:
-        """Return a list of actions."""
-        return []
+    def actions(self) -> Dict[str, ActionDescriptor]:
+        """Return device actions."""
+        return {}
 
     def settings(self) -> Dict[str, SettingDescriptor]:
-        """Return list of settings."""
+        """Return device settings."""
         settings = self.status().settings()
         for setting in settings.values():
             # TODO: Bind setter methods, this should probably done only once during init.
@@ -262,7 +262,7 @@ class Device(metaclass=DeviceGroupMeta):
         return settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
-        """Return sensors."""
+        """Return device sensors."""
         # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.status().sensors()
         return sensors
