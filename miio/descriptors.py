@@ -45,18 +45,6 @@ class SensorDescriptor:
     extras: Optional[Dict] = attr.ib(default={})
 
 
-@attr.s(auto_attribs=True)
-class SwitchDescriptor:
-    """Presents toggleable switch."""
-
-    id: str
-    name: str
-    property: str
-    setter_name: Optional[str] = None
-    setter: Optional[Callable] = None
-    extras: Optional[Dict] = attr.ib(default={})
-
-
 class SettingType(Enum):
     Undefined = auto()
     Number = auto()

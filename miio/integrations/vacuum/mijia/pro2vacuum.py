@@ -6,7 +6,7 @@ from typing import Dict
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.devicestatus import sensor, switch
+from miio.devicestatus import sensor, setting
 from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice
 
@@ -172,7 +172,7 @@ class Pro2Status(DeviceStatus):
         return DeviceState(self.data["state"])
 
     @property
-    @switch(name="Fan Speed", choices=FanSpeedMode, setter_name="set_fan_speed")
+    @setting(name="Fan Speed", choices=FanSpeedMode, setter_name="set_fan_speed")
     def fan_speed(self) -> FanSpeedMode:
         """Fan Speed."""
         return FanSpeedMode(self.data["fan_speed"])

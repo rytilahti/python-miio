@@ -7,7 +7,7 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device
-from .devicestatus import DeviceStatus, sensor, switch
+from .devicestatus import DeviceStatus, sensor, setting
 from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class PowerStripStatus(DeviceStatus):
         return self.data["power"]
 
     @property
-    @switch(name="Power", setter_name="set_power", device_class="outlet")
+    @setting(name="Power", setter_name="set_power", device_class="outlet")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
@@ -105,7 +105,7 @@ class PowerStripStatus(DeviceStatus):
         return self.led
 
     @property
-    @switch(
+    @setting(
         name="LED", icon="mdi:led-outline", setter_name="set_led", device_class="switch"
     )
     def led(self) -> Optional[bool]:

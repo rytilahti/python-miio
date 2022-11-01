@@ -14,11 +14,12 @@ from typing import (
 )
 
 from .descriptors import (
+    BooleanSettingDescriptor,
     EnumSettingDescriptor,
     NumberSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
-    SwitchDescriptor,
+    SettingType,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -32,14 +33,12 @@ class _StatusMeta(type):
 
         # TODO: clean up to contain all of these in a single container
         cls._sensors: Dict[str, SensorDescriptor] = {}
-        cls._switches: Dict[str, SwitchDescriptor] = {}
         cls._settings: Dict[str, SettingDescriptor] = {}
 
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
         descriptor_map = {
             "sensor": cls._sensors,
-            "switch": cls._switches,
             "setting": cls._settings,
         }
         for n in namespace:
@@ -93,17 +92,10 @@ class DeviceStatus(metaclass=_StatusMeta):
         """
         return self._sensors  # type: ignore[attr-defined]
 
-    def switches(self) -> Dict[str, SwitchDescriptor]:
-        """Return the dict of sensors exposed by the status container.
-
-        You can use @sensor decorator to define sensors inside your status class.
-        """
-        return self._switches  # type: ignore[attr-defined]
-
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return the dict of settings exposed by the status container.
 
-        You can use @setting decorator to define sensors inside your status class.
+        You can use @setting decorator to define settings inside your status class.
         """
         return self._settings  # type: ignore[attr-defined]
 
@@ -125,10 +117,6 @@ class DeviceStatus(metaclass=_StatusMeta):
             import attr
 
             self._sensors[final_name] = attr.evolve(sensor, property=final_name)
-
-        for name, switch in other.switches().items():
-            final_name = f"{other_name}:{name}"
-            self._switches[final_name] = attr.evolve(switch, property=final_name)
 
         for name, setting in other.settings().items():
             final_name = f"{other_name}:{name}"
@@ -183,34 +171,6 @@ def sensor(name: str, *, unit: str = "", **kwargs):
     return decorator_sensor
 
 
-def switch(name: str, *, setter_name: str, **kwargs):
-    """Syntactic sugar to create SwitchDescriptor objects.
-
-    The information can be used by users of the library to programmatically find out what
-    types of sensors are available for the device.
-
-    The interface is kept minimal, but you can pass any extra keyword arguments.
-    These extras are made accessible over :attr:`~miio.descriptors.SwitchDescriptor.extras`,
-    and can be interpreted downstream users as they wish.
-    """
-
-    def decorator_sensor(func):
-        property_name = func.__name__
-
-        descriptor = SwitchDescriptor(
-            id=str(property_name),
-            property=str(property_name),
-            name=name,
-            setter_name=setter_name,
-            extras=kwargs,
-        )
-        func._switch = descriptor
-
-        return func
-
-    return decorator_sensor
-
-
 def setting(
     name: str,
     *,
@@ -222,6 +182,7 @@ def setting(
     step: Optional[int] = None,
     choices: Optional[Type[Enum]] = None,
     choices_attribute: Optional[str] = None,
+    type: Optional[SettingType] = None,
     **kwargs,
 ):
     """Syntactic sugar to create SettingDescriptor objects.
@@ -240,18 +201,22 @@ def setting(
         if setter is None and setter_name is None:
             raise Exception("Either setter or setter_name needs to be defined")
 
+        common_values = {
+            "id": str(property_name),
+            "property": str(property_name),
+            "name": name,
+            "unit": unit,
+            "setter": setter,
+            "setter_name": setter_name,
+            "extras": kwargs,
+        }
+
         if min_value or max_value:
             descriptor = NumberSettingDescriptor(
-                id=str(property_name),
-                property=str(property_name),
-                name=name,
-                unit=unit,
-                setter=setter,
-                setter_name=setter_name,
+                **common_values,
                 min_value=min_value or 0,
                 max_value=max_value,
                 step=step or 1,
-                extras=kwargs,
             )
         elif choices or choices_attribute:
             if choices_attribute is not None:
@@ -259,20 +224,12 @@ def setting(
                 # construct enums pointed by the attribute
                 raise NotImplementedError("choices_attribute is not yet implemented")
             descriptor = EnumSettingDescriptor(
-                id=str(property_name),
-                property=str(property_name),
-                name=name,
-                unit=unit,
-                setter=setter,
-                setter_name=setter_name,
+                **common_values,
                 choices=choices,
                 choices_attribute=choices_attribute,
-                extras=kwargs,
             )
         else:
-            raise Exception(
-                "Neither {min,max}_value or choices_{attribute} was defined"
-            )
+            descriptor = BooleanSettingDescriptor(**common_values)
 
         func._setting = descriptor
 

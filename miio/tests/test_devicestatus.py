@@ -4,7 +4,7 @@ import pytest
 
 from miio import Device, DeviceStatus
 from miio.descriptors import EnumSettingDescriptor, NumberSettingDescriptor
-from miio.devicestatus import sensor, setting, switch
+from miio.devicestatus import sensor, setting
 
 
 def test_multiple():
@@ -100,29 +100,6 @@ def test_sensor_decorator():
     assert sensors["only_name"].name == "Only name"
 
     assert "unknown_kwarg" in sensors["unknown"].extras
-
-
-def test_switch_decorator(mocker):
-    class DecoratedSwitches(DeviceStatus):
-        @property
-        @switch(name="Power", setter_name="set_power")
-        def power(self):
-            pass
-
-    mocker.patch("miio.Device.send")
-    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-
-    # Patch status to return our class
-    mocker.patch.object(d, "status", return_value=DecoratedSwitches())
-    # Patch to create a new setter as defined in the status class
-    set_power = mocker.patch.object(d, "set_power", create=True, return_value=1)
-
-    sensors = d.switches()
-    assert len(sensors) == 1
-    assert sensors["power"].name == "Power"
-
-    sensors["power"].setter(True)
-    set_power.assert_called_with(True)
 
 
 def test_setting_decorator_number(mocker):
