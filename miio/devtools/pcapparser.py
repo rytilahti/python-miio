@@ -1,9 +1,16 @@
 """Parse PCAP files for miio traffic."""
 from collections import Counter, defaultdict
 from ipaddress import ip_address
+from pprint import pformat as pf
 from typing import List
 
 import click
+
+try:
+    from rich import print as echo
+except ImportError:
+    echo = click.echo
+
 
 from miio import Message
 
@@ -14,7 +21,7 @@ def read_payloads_from_file(file, tokens: List[str]):
         import dpkt
         from dpkt.ethernet import ETH_TYPE_IP, Ethernet
     except ImportError:
-        print("You need to install dpkt to use this tool")  # noqa: T201
+        echo("You need to install dpkt to use this tool")
         return
 
     pcap = dpkt.pcap.Reader(file)
@@ -70,9 +77,9 @@ def read_payloads_from_file(file, tokens: List[str]):
         yield src_addr, dst_addr, payload
 
     for cat in stats:
-        print(f"\n== {cat} ==")  # noqa: T201
+        echo(f"\n== {cat} ==")
         for stat, value in stats[cat].items():
-            print(f"\t{stat}: {value}")  # noqa: T201
+            echo(f"\t{stat}: {value}")
 
 
 @click.command()
@@ -81,4 +88,4 @@ def read_payloads_from_file(file, tokens: List[str]):
 def parse_pcap(file, token: List[str]):
     """Read PCAP file and output decrypted miio communication."""
     for src_addr, dst_addr, payload in read_payloads_from_file(file, token):
-        print(f"{src_addr:<15} -> {dst_addr:<15} {payload}")  # noqa: T201
+        echo(f"{src_addr:<15} -> {dst_addr:<15} {pf(payload)}")
