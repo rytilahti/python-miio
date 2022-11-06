@@ -15,6 +15,8 @@ from .models import DeviceModel, MiotProperty, MiotService
 _LOGGER = logging.getLogger(__name__)
 UNSET = -10000
 
+ERR_INVALID_SETTING = -1000
+
 
 def create_random(values):
     """Create random value for the given mapping."""
@@ -72,14 +74,14 @@ class SimulatedMiotProperty(MiotProperty):
             raise ValueError(f"{casted_value} not in range {range}")
 
         choices = values["choices"]
-        if choices is not None:
-            return choices[casted_value]
+        if choices is not None and not any(c.value == casted_value for c in choices):
+            raise ValueError(f"{casted_value} not found in {choices}")
 
         return casted_value
 
     class Config:
         validate_assignment = True
-        smart_union = True
+        smart_union = True  # try all types before coercing
 
 
 class SimulatedMiotService(MiotService):
@@ -121,8 +123,13 @@ class MiotSimulator:
         params = payload["params"]
         for p in params:
             res = p.copy()
-            res["value"] = self._state[res["siid"]][res["piid"]].current_value
-            res["code"] = 0
+            try:
+                res["value"] = self._state[res["siid"]][res["piid"]].current_value
+                res["code"] = 0
+            except Exception as ex:
+                res["value"] = ""
+                res["code"] = ERR_INVALID_SETTING
+                res["exception"] = str(ex)
             response.append(res)
 
         return {"result": response}
