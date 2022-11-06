@@ -201,7 +201,7 @@ def test_embed():
     assert len(sensors) == 2
 
     assert getattr(main, sensors["main_sensor"].property) == "main"
-    assert getattr(main, sensors["SubStatus:sub_sensor"].property) == "sub"
+    assert getattr(main, sensors["SubStatus__sub_sensor"].property) == "sub"
 
     with pytest.raises(KeyError):
         main.sensors()["nonexisting_sensor"]

@@ -113,21 +113,21 @@ class DeviceStatus(metaclass=_StatusMeta):
         self._embedded[other_name] = other
 
         for name, sensor in other.sensors().items():
-            final_name = f"{other_name}:{name}"
+            final_name = f"{other_name}__{name}"
             import attr
 
             self._sensors[final_name] = attr.evolve(sensor, property=final_name)
 
         for name, setting in other.settings().items():
-            final_name = f"{other_name}:{name}"
+            final_name = f"{other_name}__{name}"
             self._settings[final_name] = attr.evolve(setting, property=final_name)
 
-    def __getattribute__(self, item):
+    def __getattr__(self, item):
         """Overridden to lookup properties from embedded containers."""
-        if ":" not in item:
-            return super().__getattribute__(item)
+        if "__" not in item:
+            return super().__getattr__(item)
 
-        embed, prop = item.split(":")
+        embed, prop = item.split("__")
         return getattr(self._embedded[embed], prop)
 
 
