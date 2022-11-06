@@ -24,7 +24,7 @@ class ActionDescriptor:
     name: str
     method_name: Optional[str] = None
     method: Optional[Callable] = None
-    extras: Optional[Dict] = attr.ib(default={})
+    extras: Dict = attr.ib(factory=dict)
 
 
 @attr.s(auto_attribs=True)
@@ -42,7 +42,7 @@ class SensorDescriptor:
     name: str
     property: str
     unit: Optional[str] = None
-    extras: Optional[Dict] = attr.ib(default={})
+    extras: Dict = attr.ib(factory=dict)
 
 
 class SettingType(Enum):
@@ -63,7 +63,7 @@ class SettingDescriptor:
     type = SettingType.Undefined
     setter: Optional[Callable] = None
     setter_name: Optional[str] = None
-    extras: Optional[Dict] = attr.ib(default={})
+    extras: Dict = attr.ib(factory=dict)
 
     def cast_value(self, value):
         """Casts value to the expected type."""
