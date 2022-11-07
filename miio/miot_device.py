@@ -150,13 +150,16 @@ class MiotDevice(Device):
         click.argument(
             "value_type", type=EnumType(MiotValueType), required=False, default=None
         ),
+        click.option("--name", required=False),
     )
     def set_property_by(
         self,
         siid: int,
         piid: int,
         value: Union[int, float, str, bool],
+        *,
         value_type: Any = None,
+        name: str = None,
     ):
         """Set a single property (siid/piid) to given value.
 
@@ -166,9 +169,12 @@ class MiotDevice(Device):
         if value_type is not None:
             value = value_type.value(value)
 
+        if name is None:
+            name = f"set-{siid}-{piid}"
+
         return self.send(
             "set_properties",
-            [{"did": f"set-{siid}-{piid}", "siid": siid, "piid": piid, "value": value}],
+            [{"did": name, "siid": siid, "piid": piid, "value": value}],
         )
 
     def set_property(self, property_key: str, value):
