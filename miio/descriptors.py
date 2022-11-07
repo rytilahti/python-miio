@@ -22,9 +22,9 @@ class ActionDescriptor:
 
     id: str
     name: str
-    method_name: Optional[str] = None
-    method: Optional[Callable] = None
-    extras: Dict = attr.ib(factory=dict)
+    method_name: Optional[str] = attr.ib(default=None, repr=False)
+    method: Optional[Callable] = attr.ib(default=None, repr=False)
+    extras: Dict = attr.ib(factory=dict, repr=False)
 
 
 @attr.s(auto_attribs=True)
@@ -42,7 +42,7 @@ class SensorDescriptor:
     name: str
     property: str
     unit: Optional[str] = None
-    extras: Dict = attr.ib(factory=dict)
+    extras: Dict = attr.ib(factory=dict, repr=False)
 
 
 class SettingType(Enum):
@@ -61,11 +61,11 @@ class SettingDescriptor:
     property: str
     unit: Optional[str] = None
     type = SettingType.Undefined
-    setter: Optional[Callable] = None
-    setter_name: Optional[str] = None
-    extras: Dict = attr.ib(factory=dict)
+    setter: Optional[Callable] = attr.ib(default=None, repr=False)
+    setter_name: Optional[str] = attr.ib(default=None, repr=False)
+    extras: Dict = attr.ib(factory=dict, repr=False)
 
-    def cast_value(self, value):
+    def cast_value(self, value: int):
         """Casts value to the expected type."""
         cast_map = {
             SettingType.Boolean: bool,
@@ -87,8 +87,8 @@ class EnumSettingDescriptor(SettingDescriptor):
     """Presents a settable, enum-based value."""
 
     type: SettingType = SettingType.Enum
-    choices_attribute: Optional[str] = None
-    choices: Optional[Type[Enum]] = None
+    choices_attribute: Optional[str] = attr.ib(default=None, repr=False)
+    choices: Optional[Type[Enum]] = attr.ib(default=None, repr=False)
 
 
 @attr.s(auto_attribs=True, kw_only=True)
