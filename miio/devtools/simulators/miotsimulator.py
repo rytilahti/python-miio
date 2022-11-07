@@ -8,6 +8,7 @@ import click
 from pydantic import Field, validator
 
 from miio import PushServer
+from miio.miot_cloud import MiotCloud
 from miio.miot_models import DeviceModel, MiotProperty, MiotService
 
 from .common import create_info_response, mac_from_model
@@ -111,10 +112,12 @@ class MiotSimulator:
     def initialize_state(self):
         """Create initial state for the device."""
         for serv in self._model.services:
+            _LOGGER.debug("Found service: %s", serv)
             for act in serv.actions:
                 _LOGGER.debug("Found action: %s", act)
             for prop in serv.properties:
                 self._state[serv.siid][prop.piid] = prop
+                _LOGGER.debug("Found property: %s", prop)
 
     def get_properties(self, payload):
         """Handle get_properties method."""
@@ -202,12 +205,18 @@ async def main(dev, model):
 
 
 @click.command()
-@click.option("--file", type=click.File("r"), required=True)
+@click.option("--file", type=click.File("r"), required=False)
 @click.option("--model", type=str, required=True, default=None)
 def miot_simulator(file, model):
     """Simulate miot device."""
-    data = file.read()
-    dev = SimulatedDeviceModel.parse_raw(data)
+    if file is not None:
+        data = file.read()
+        dev = SimulatedDeviceModel.parse_raw(data)
+    else:
+        cloud = MiotCloud()
+        # TODO: fix HACK
+        dev = SimulatedDeviceModel.parse_raw(cloud.get_model_schema(model))
+
     loop = asyncio.get_event_loop()
     random.seed(1)  # nosec
     loop.run_until_complete(main(dev, model=model))
