@@ -170,7 +170,7 @@ class MiotDevice(Device):
             value = value_type.value(value)
 
         if name is None:
-            f"set-{siid}-{piid}"
+            name = f"set-{siid}-{piid}"
 
         return self.send(
             "set_properties",
