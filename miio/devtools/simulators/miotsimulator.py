@@ -8,9 +8,9 @@ import click
 from pydantic import Field, validator
 
 from miio import PushServer
+from miio.miot_models import DeviceModel, MiotProperty, MiotService
 
 from .common import create_info_response, mac_from_model
-from .models import DeviceModel, MiotProperty, MiotService
 
 _LOGGER = logging.getLogger(__name__)
 UNSET = -10000
