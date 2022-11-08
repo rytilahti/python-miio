@@ -157,13 +157,17 @@ ROCKROBO_T7 = "roborock.vacuum.a11"  # cn s7
 ROCKROBO_T7S = "roborock.vacuum.a14"
 ROCKROBO_T7SPLUS = "roborock.vacuum.a23"
 ROCKROBO_S7_MAXV = "roborock.vacuum.a27"
+ROCKROBO_S7_PRO_ULTRA = "roborock.vacuum.a62"
 ROCKROBO_Q5 = "roborock.vacuum.a34"
+ROCKROBO_Q7_MAX = "roborock.vacuum.a38"
 ROCKROBO_G10S = "roborock.vacuum.a46"
+
 ROCKROBO_S7 = "roborock.vacuum.a15"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 ROCKROBO_E2 = "roborock.vacuum.e2"
 ROCKROBO_1S = "roborock.vacuum.m1s"
 ROCKROBO_C1 = "roborock.vacuum.c1"
+ROCKROBO_WILD = "roborock.vacuum.*"  # wildcard
 
 SUPPORTED_MODELS = [
     ROCKROBO_V1,
@@ -179,12 +183,15 @@ SUPPORTED_MODELS = [
     ROCKROBO_T7SPLUS,
     ROCKROBO_S7,
     ROCKROBO_S7_MAXV,
+    ROCKROBO_S7_PRO_ULTRA,
     ROCKROBO_Q5,
+    ROCKROBO_Q7_MAX,
     ROCKROBO_G10S,
     ROCKROBO_S6_MAXV,
     ROCKROBO_E2,
     ROCKROBO_1S,
     ROCKROBO_C1,
+    ROCKROBO_WILD,
 ]
 
 AUTO_EMPTY_MODELS = [
