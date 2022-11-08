@@ -80,13 +80,27 @@ class DeviceFactory:
         raise DeviceException("No implementation found for model %s" % model)
 
     @classmethod
-    def create(self, host: str, token: str, model: Optional[str] = None) -> Device:
+    def create(
+        self,
+        host: str,
+        token: str,
+        model: Optional[str] = None,
+        *,
+        force_generic_miot=False,
+    ) -> Device:
         """Return instance for the given host and token, with optional model override.
 
         The optional model parameter can be used to override the model detection.
         """
+        dev: Device
+        if force_generic_miot:  # TODO: find a better way to handle this.
+            from .integrations.genericmiot import GenericMiot
+
+            dev = GenericMiot(host, token, model=model)
+            dev.info()  # HACK: we have to force update to load the miot schema
+            return dev
         if model is None:
-            dev: Device = Device(host, token)
+            dev = Device(host, token)
             info = dev.info()
             model = info.model
 
