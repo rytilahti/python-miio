@@ -199,7 +199,9 @@ def setting(
         property_name = func.__name__
 
         if setter is None and setter_name is None:
-            raise Exception("Either setter or setter_name needs to be defined")
+            raise Exception("setter_name needs to be defined")
+        if setter_name is None:
+            raise Exception("setter not yet implemented, use setter_name instead")
 
         common_values = {
             "id": str(property_name),
