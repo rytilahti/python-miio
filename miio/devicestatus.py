@@ -219,10 +219,6 @@ def setting(
                 step=step or 1,
             )
         elif choices or choices_attribute:
-            if choices_attribute is not None:
-                # TODO: adding choices from attribute is a bit more complex, as it requires a way to
-                # construct enums pointed by the attribute
-                raise NotImplementedError("choices_attribute is not yet implemented")
             descriptor = EnumSettingDescriptor(
                 **common_values,
                 choices=choices,
