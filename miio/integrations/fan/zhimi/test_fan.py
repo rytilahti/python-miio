@@ -9,7 +9,6 @@ from .fan import (
     MODEL_FAN_V2,
     MODEL_FAN_V3,
     Fan,
-    FanException,
     FanStatus,
     LedBrightness,
     MoveDirection,
@@ -165,10 +164,10 @@ class TestFanV2(TestCase):
         self.device.set_direct_speed(100)
         assert direct_speed() == 100
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_direct_speed(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_direct_speed(101)
 
     def test_set_rotate(self):
@@ -202,10 +201,10 @@ class TestFanV2(TestCase):
         self.device.set_angle(120)
         assert angle() == 120
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(121)
 
     def test_set_oscillate(self):
@@ -262,7 +261,7 @@ class TestFanV2(TestCase):
         self.device.delay_off(0)
         assert delay_off_countdown() == 0
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
 
 
@@ -404,10 +403,10 @@ class TestFanV3(TestCase):
         self.device.set_direct_speed(100)
         assert direct_speed() == 100
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_direct_speed(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_direct_speed(101)
 
     def test_set_natural_speed(self):
@@ -421,10 +420,10 @@ class TestFanV3(TestCase):
         self.device.set_natural_speed(100)
         assert natural_speed() == 100
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_natural_speed(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_natural_speed(101)
 
     def test_set_rotate(self):
@@ -458,10 +457,10 @@ class TestFanV3(TestCase):
         self.device.set_angle(120)
         assert angle() == 120
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(121)
 
     def test_set_oscillate(self):
@@ -518,7 +517,7 @@ class TestFanV3(TestCase):
         self.device.delay_off(0)
         assert delay_off_countdown() == 0
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
 
 
@@ -622,10 +621,10 @@ class TestFanSA1(TestCase):
         self.device.set_direct_speed(100)
         assert direct_speed() == 100
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_direct_speed(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_direct_speed(101)
 
     def test_set_natural_speed(self):
@@ -639,10 +638,10 @@ class TestFanSA1(TestCase):
         self.device.set_natural_speed(100)
         assert natural_speed() == 100
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_natural_speed(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_natural_speed(101)
 
     def test_set_rotate(self):
@@ -676,10 +675,10 @@ class TestFanSA1(TestCase):
         self.device.set_angle(120)
         assert angle() == 120
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(121)
 
     def test_set_oscillate(self):
@@ -736,5 +735,5 @@ class TestFanSA1(TestCase):
         self.device.delay_off(0)
         assert delay_off_countdown() == 0
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)

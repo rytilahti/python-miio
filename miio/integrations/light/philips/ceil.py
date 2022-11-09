@@ -4,17 +4,13 @@ from typing import Any, Dict
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
 
 _LOGGER = logging.getLogger(__name__)
 
 
 SUPPORTED_MODELS = ["philips.light.ceiling", "philips.light.zyceiling"]
-
-
-class CeilException(DeviceException):
-    pass
 
 
 class CeilStatus(DeviceStatus):
@@ -113,7 +109,7 @@ class Ceil(Device):
     def set_brightness(self, level: int):
         """Set brightness level."""
         if level < 1 or level > 100:
-            raise CeilException("Invalid brightness: %s" % level)
+            raise ValueError("Invalid brightness: %s" % level)
 
         return self.send("set_bright", [level])
 
@@ -124,7 +120,7 @@ class Ceil(Device):
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         if level < 1 or level > 100:
-            raise CeilException("Invalid color temperature: %s" % level)
+            raise ValueError("Invalid color temperature: %s" % level)
 
         return self.send("set_cct", [level])
 
@@ -138,10 +134,10 @@ class Ceil(Device):
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
-            raise CeilException("Invalid brightness: %s" % brightness)
+            raise ValueError("Invalid brightness: %s" % brightness)
 
         if cct < 1 or cct > 100:
-            raise CeilException("Invalid color temperature: %s" % cct)
+            raise ValueError("Invalid color temperature: %s" % cct)
 
         return self.send("set_bricct", [brightness, cct])
 
@@ -153,7 +149,7 @@ class Ceil(Device):
         """Turn off delay in seconds."""
 
         if seconds < 1:
-            raise CeilException("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("delay_off", [seconds])
 
@@ -164,7 +160,7 @@ class Ceil(Device):
     def set_scene(self, number: int):
         """Set a fixed scene (1-4)."""
         if number < 1 or number > 4:
-            raise CeilException("Invalid fixed scene number: %s" % number)
+            raise ValueError("Invalid fixed scene number: %s" % number)
 
         return self.send("apply_fixed_scene", [number])
 

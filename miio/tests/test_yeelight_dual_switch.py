@@ -3,7 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import YeelightDualControlModule
-from miio.yeelight_dual_switch import Switch, YeelightDualControlModuleException
+from miio.yeelight_dual_switch import Switch
 
 from .dummies import DummyMiotDevice
 
@@ -83,8 +83,8 @@ class TestYeelightDualControlModule(TestCase):
         self.device.set_switch_off_delay(200, Switch.Second)
         assert self.device.status().switch_2_off_delay == 200
 
-        with pytest.raises(YeelightDualControlModuleException):
+        with pytest.raises(ValueError):
             self.device.set_switch_off_delay(-2, Switch.First)
 
-        with pytest.raises(YeelightDualControlModuleException):
+        with pytest.raises(ValueError):
             self.device.set_switch_off_delay(43300, Switch.Second)

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from miio.fan_common import FanException, OperationMode
+from miio.fan_common import OperationMode
 from miio.tests.dummies import DummyMiotDevice
 
 from . import FanZA5
@@ -86,7 +86,7 @@ class TestFanZA5(TestCase):
             assert speed() == s
 
         for s in (-1, 0, 101):
-            with pytest.raises(FanException):
+            with pytest.raises(ValueError):
                 self.device.set_speed(s)
 
     def test_fan_speed_deprecation(self):
@@ -102,7 +102,7 @@ class TestFanZA5(TestCase):
             assert angle() == a
 
         for a in (0, 45, 140):
-            with pytest.raises(FanException):
+            with pytest.raises(ValueError):
                 self.device.set_angle(a)
 
     def test_set_oscillate(self):
@@ -144,7 +144,7 @@ class TestFanZA5(TestCase):
             assert led_brightness() == brightness
 
         for brightness in (-1, 101):
-            with pytest.raises(FanException):
+            with pytest.raises(ValueError):
                 self.device.set_led_brightness(brightness)
 
     def test_delay_off(self):
@@ -156,5 +156,5 @@ class TestFanZA5(TestCase):
             assert delay_off_countdown() == delay
 
         for delay in (-1, 36001):
-            with pytest.raises(FanException):
+            with pytest.raises(ValueError):
                 self.device.delay_off(delay)

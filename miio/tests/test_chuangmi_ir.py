@@ -6,7 +6,6 @@ from unittest import TestCase
 import pytest
 
 from miio import ChuangmiIr
-from miio.chuangmi_ir import ChuangmiIrException
 
 from .dummies import DummyDevice
 
@@ -45,20 +44,20 @@ class TestChuangmiIr(TestCase):
         assert self.device.learn() is True
         assert self.device.learn(30) is True
 
-        with pytest.raises(ChuangmiIrException):
+        with pytest.raises(ValueError):
             self.device.learn(-1)
 
-        with pytest.raises(ChuangmiIrException):
+        with pytest.raises(ValueError):
             self.device.learn(1000001)
 
     def test_read(self):
         assert self.device.read() is True
         assert self.device.read(30) is True
 
-        with pytest.raises(ChuangmiIrException):
+        with pytest.raises(ValueError):
             self.device.read(-1)
 
-        with pytest.raises(ChuangmiIrException):
+        with pytest.raises(ValueError):
             self.device.read(1000001)
 
     def test_play_raw(self):
@@ -78,7 +77,7 @@ class TestChuangmiIr(TestCase):
                 )
 
         for args in test_data["test_pronto_exception"]:
-            with self.subTest(), pytest.raises(ChuangmiIrException):
+            with self.subTest(), pytest.raises(ValueError):
                 ChuangmiIr.pronto_to_raw(*args["in"])
 
     def test_play_pronto(self):
@@ -91,7 +90,7 @@ class TestChuangmiIr(TestCase):
                 )
 
         for args in test_data["test_pronto_exception"]:
-            with pytest.raises(ChuangmiIrException):
+            with pytest.raises(ValueError):
                 self.device.play_pronto(*args["in"])
 
     def test_play_auto(self):
@@ -117,11 +116,11 @@ class TestChuangmiIr(TestCase):
                     self.assertSequenceEqual(
                         self.device.state["last_ir_played"], args["out"]
                     )
-        with pytest.raises(ChuangmiIrException):
+        with pytest.raises(ValueError):
             self.device.play("invalid:command")
 
-        with pytest.raises(ChuangmiIrException):
+        with pytest.raises(ValueError):
             self.device.play("pronto:command:invalid:argument:count")
 
-        with pytest.raises(ChuangmiIrException):
+        with pytest.raises(ValueError):
             self.device.play("pronto:command:invalidargument")

@@ -4,7 +4,6 @@ import pytest
 
 from miio import AirConditionerMiot
 from miio.airconditioner_miot import (
-    AirConditionerMiotException,
     CleaningStatus,
     FanSpeed,
     OperationMode,
@@ -125,13 +124,13 @@ class TestAirConditioner(TestCase):
         self.device.set_target_temperature(31.0)
         assert target_temperature() == 31.0
 
-        with pytest.raises(AirConditionerMiotException):
+        with pytest.raises(ValueError):
             self.device.set_target_temperature(15.5)
 
-        with pytest.raises(AirConditionerMiotException):
+        with pytest.raises(ValueError):
             self.device.set_target_temperature(24.6)
 
-        with pytest.raises(AirConditionerMiotException):
+        with pytest.raises(ValueError):
             self.device.set_target_temperature(31.5)
 
     def test_set_eco(self):
@@ -241,10 +240,10 @@ class TestAirConditioner(TestCase):
         self.device.set_fan_speed_percent(101)
         assert fan_speed_percent() == 101
 
-        with pytest.raises(AirConditionerMiotException):
+        with pytest.raises(ValueError):
             self.device.set_fan_speed_percent(102)
 
-        with pytest.raises(AirConditionerMiotException):
+        with pytest.raises(ValueError):
             self.device.set_fan_speed_percent(0)
 
     def test_set_timer(self):

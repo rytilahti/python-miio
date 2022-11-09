@@ -61,7 +61,7 @@ def test_get_property_by(dev):
 def test_set_property_by(dev, value_type, value):
     siid = 1
     piid = 1
-    _ = dev.set_property_by(siid, piid, value, value_type)
+    _ = dev.set_property_by(siid, piid, value, value_type=value_type)
 
     if value_type is not None:
         value = value_type.value(value)
@@ -69,6 +69,18 @@ def test_set_property_by(dev, value_type, value):
     dev.send.assert_called_with(
         "set_properties",
         [{"did": f"set-{siid}-{piid}", "siid": siid, "piid": piid, "value": value}],
+    )
+
+
+def test_set_property_by_name(dev):
+    siid = 1
+    piid = 1
+    value = 1
+    _ = dev.set_property_by(siid, piid, value, name="test-name")
+
+    dev.send.assert_called_with(
+        "set_properties",
+        [{"did": "test-name", "siid": siid, "piid": piid, "value": value}],
     )
 
 
@@ -150,7 +162,7 @@ def test_mapping_structure(cls):
 
 @pytest.mark.parametrize("cls", MIOT_DEVICES)
 def test_supported_models(cls):
-    assert cls.supported_models == cls._mappings.keys()
+    assert cls.supported_models == list(cls._mappings.keys())
 
     # make sure that that _supported_models is not defined
     assert not cls._supported_models

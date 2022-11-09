@@ -323,7 +323,7 @@ class ViomiDishwasher(Device):
         """
 
         if program == Program.Unknown:
-            DeviceException(f"Program {program.name} is not valid for this function.")
+            ValueError(f"Program {program.name} is not valid for this function.")
 
         scheduled_finish_date = datetime.now().replace(
             hour=time.hour, minute=time.minute, second=0, microsecond=0
@@ -332,7 +332,7 @@ class ViomiDishwasher(Device):
             seconds=program.run_time
         )
         if scheduled_start_date < datetime.now():
-            raise DeviceException(
+            raise ValueError(
                 "Proposed time is in the past (the proposed time is the finishing time, not the start time)."
             )
 

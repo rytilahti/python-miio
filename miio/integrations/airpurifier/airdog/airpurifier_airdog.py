@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
@@ -21,10 +21,6 @@ AVAILABLE_PROPERTIES = {
     MODEL_AIRDOG_X5: MODEL_AIRDOG_COMMON,
     MODEL_AIRDOG_X7SM: MODEL_AIRDOG_COMMON + ["hcho"],
 }
-
-
-class AirDogException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -145,7 +141,7 @@ class AirDogX3(Device):
     def set_mode_and_speed(self, mode: OperationMode, speed: int = 1):
         """Set mode and speed."""
         if mode.value not in (om.value for om in OperationMode):
-            raise AirDogException(f"{mode.value} is not a valid OperationMode value")
+            raise ValueError(f"{mode.value} is not a valid OperationMode value")
 
         if mode in [OperationMode.Auto, OperationMode.Idle]:
             speed = 1
@@ -157,7 +153,7 @@ class AirDogX3(Device):
             max_speed = 5
 
         if speed < 1 or speed > max_speed:
-            raise AirDogException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.send("set_wind", [OperationModeMapping[mode.name].value, speed])
 

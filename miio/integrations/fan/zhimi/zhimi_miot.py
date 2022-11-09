@@ -3,9 +3,9 @@ from typing import Any, Dict
 
 import click
 
-from miio import DeviceStatus, MiotDevice
+from miio import DeviceException, DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
-from miio.fan_common import FanException, MoveDirection, OperationMode
+from miio.fan_common import MoveDirection, OperationMode
 from miio.utils import deprecated
 
 MODEL_FAN_ZA5 = "zhimi.fan.za5"
@@ -236,7 +236,7 @@ class FanZA5(MiotDevice):
     def set_speed(self, speed: int):
         """Set fan speed."""
         if speed < 1 or speed > 100:
-            raise FanException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.set_property("fan_speed", speed)
 
@@ -247,7 +247,7 @@ class FanZA5(MiotDevice):
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
         if angle not in SUPPORTED_ANGLES[self.model]:
-            raise FanException(
+            raise ValueError(
                 "Unsupported angle. Supported values: "
                 + ", ".join(f"{i}" for i in SUPPORTED_ANGLES[self.model])
             )
@@ -293,7 +293,7 @@ class FanZA5(MiotDevice):
     def set_led_brightness(self, brightness: int):
         """Set LED brightness."""
         if brightness < 0 or brightness > 100:
-            raise FanException("Invalid brightness: %s" % brightness)
+            raise ValueError("Invalid brightness: %s" % brightness)
 
         return self.set_property("light", brightness)
 
@@ -313,7 +313,7 @@ class FanZA5(MiotDevice):
         """Set delay off seconds."""
 
         if seconds < 0 or seconds > 10 * 60 * 60:
-            raise FanException("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.set_property("power_off_time", seconds)
 
@@ -325,7 +325,7 @@ class FanZA5(MiotDevice):
         """Rotate fan 7.5 degrees horizontally to given direction."""
         status = self.status()
         if status.oscillate:
-            raise FanException(
+            raise DeviceException(
                 "Rotation requires oscillation to be turned off to function."
             )
         return self.set_property("set_move", direction.name.lower())

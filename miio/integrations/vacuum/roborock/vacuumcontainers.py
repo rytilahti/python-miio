@@ -9,6 +9,7 @@ from pytz import BaseTzInfo
 from miio.descriptors import SensorDescriptor
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting, switch
+from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds, pretty_time
 
 from .vacuum_enums import MopIntensity, MopMode
@@ -20,7 +21,47 @@ def pretty_area(x: float) -> float:
     return int(x) / 1000000
 
 
-error_codes = {  # from vacuum_cleaner-EN.pdf
+STATE_CODE_TO_STRING = {
+    1: "Starting",
+    2: "Charger disconnected",
+    3: "Idle",
+    4: "Remote control active",
+    5: "Cleaning",
+    6: "Returning home",
+    7: "Manual mode",
+    8: "Charging",
+    9: "Charging problem",
+    10: "Paused",
+    11: "Spot cleaning",
+    12: "Error",
+    13: "Shutting down",
+    14: "Updating",
+    15: "Docking",
+    16: "Going to target",
+    17: "Zoned cleaning",
+    18: "Segment cleaning",
+    22: "Emptying the bin",  # on s7+, see #1189
+    23: "Washing the mop",  # on a46, #1435
+    26: "Going to wash the mop",  # on a46, #1435
+    100: "Charging complete",
+    101: "Device offline",
+}
+
+VACUUMSTATE_TO_STATE_CODES = {
+    VacuumState.Idle: [1, 2, 3, 13],
+    VacuumState.Paused: [10],
+    VacuumState.Cleaning: [4, 5, 7, 11, 16, 17, 18],
+    VacuumState.Docked: [8, 14, 22, 100],
+    VacuumState.Returning: [6, 15],
+    VacuumState.Error: [9, 12, 101],
+}
+STATE_CODE_TO_VACUUMSTATE = {}
+for state, codes in VACUUMSTATE_TO_STATE_CODES.items():
+    for code in codes:
+        STATE_CODE_TO_VACUUMSTATE[code] = state
+
+
+ERROR_CODES = {  # from vacuum_cleaner-EN.pdf
     0: "No error",
     1: "Laser distance sensor error",
     2: "Collision sensor error",
@@ -97,7 +138,7 @@ class MultiMapList(DeviceStatus):
         return self._map_name_dict
 
 
-class VacuumStatus(DeviceStatus):
+class VacuumStatus(VacuumDeviceStatus):
     """Container for status reports from the vacuum."""
 
     def __init__(
@@ -155,35 +196,14 @@ class VacuumStatus(DeviceStatus):
     @sensor("State", entity_category="diagnostic")
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
-        states = {
-            1: "Starting",
-            2: "Charger disconnected",
-            3: "Idle",
-            4: "Remote control active",
-            5: "Cleaning",
-            6: "Returning home",
-            7: "Manual mode",
-            8: "Charging",
-            9: "Charging problem",
-            10: "Paused",
-            11: "Spot cleaning",
-            12: "Error",
-            13: "Shutting down",
-            14: "Updating",
-            15: "Docking",
-            16: "Going to target",
-            17: "Zoned cleaning",
-            18: "Segment cleaning",
-            22: "Emptying the bin",  # on s7+, see #1189
-            23: "Washing the mop",  # on a46, #1435
-            26: "Going to wash the mop",  # on a46, #1435
-            100: "Charging complete",
-            101: "Device offline",
-        }
-        try:
-            return states[int(self.state_code)]
-        except KeyError:
-            return "Definition missing for state %s" % self.state_code
+        return STATE_CODE_TO_STRING.get(
+            self.state_code, f"Unknown state (code: {self.state_code})"
+        )
+
+    @sensor("Vacuum state")
+    def vacuum_state(self) -> VacuumState:
+        """Return vacuum state."""
+        return STATE_CODE_TO_VACUUMSTATE.get(self.state_code, VacuumState.Unknown)
 
     @property
     @sensor(
@@ -206,7 +226,7 @@ class VacuumStatus(DeviceStatus):
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
         try:
-            return error_codes[self.error_code]
+            return ERROR_CODES[self.error_code]
         except KeyError:
             return "Definition missing for error %s" % self.error_code
 
@@ -557,7 +577,7 @@ class CleaningDetails(DeviceStatus):
     @property
     def error(self) -> str:
         """Error state of this cleaning run."""
-        return error_codes[self.data["error"]]
+        return ERROR_CODES[self.data["error"]]
 
     @property
     def complete(self) -> bool:

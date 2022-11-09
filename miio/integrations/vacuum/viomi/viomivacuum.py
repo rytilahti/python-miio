@@ -100,10 +100,6 @@ ERROR_CODES = {
 }
 
 
-class ViomiVacuumException(DeviceException):
-    """Exception raised by Viomi Vacuum."""
-
-
 class ViomiPositionPoint:
     """Vacuum position coordinate."""
 
@@ -829,7 +825,7 @@ class ViomiVacuum(Device, VacuumInterface):
         """Change current map."""
         maps = self.get_maps()
         if map_id not in [m["id"] for m in maps]:
-            raise ViomiVacuumException(f"Map id {map_id} doesn't exists")
+            raise ValueError(f"Map id {map_id} doesn't exists")
         return self.send("set_map", [map_id])
 
     @command(click.argument("map_id", type=int))
@@ -837,7 +833,7 @@ class ViomiVacuum(Device, VacuumInterface):
         """Delete map."""
         maps = self.get_maps()
         if map_id not in [m["id"] for m in maps]:
-            raise ViomiVacuumException(f"Map id {map_id} doesn't exists")
+            raise ValueError(f"Map id {map_id} doesn't exists")
         return self.send("del_map", [map_id])
 
     @command(
@@ -848,7 +844,7 @@ class ViomiVacuum(Device, VacuumInterface):
         """Rename map."""
         maps = self.get_maps()
         if map_id not in [m["id"] for m in maps]:
-            raise ViomiVacuumException(f"Map id {map_id} doesn't exists")
+            raise ValueError(f"Map id {map_id} doesn't exists")
         return self.send("rename_map", {"mapID": map_id, "name": map_name})
 
     @command(
@@ -869,16 +865,12 @@ class ViomiVacuum(Device, VacuumInterface):
             map_ids = [map_["id"] for map_ in maps if map_["name"] == map_name]
             if not map_ids:
                 map_names = ", ".join([m["name"] for m in maps])
-                raise ViomiVacuumException(
-                    f"Error: Bad map name, should be in {map_names}"
-                )
+                raise ValueError(f"Error: Bad map name, should be in {map_names}")
         elif map_id:
             maps = self.get_maps()
             if map_id not in [m["id"] for m in maps]:
                 map_ids_str = ", ".join([str(m["id"]) for m in maps])
-                raise ViomiVacuumException(
-                    f"Error: Bad map id, should be in {map_ids_str}"
-                )
+                raise ValueError(f"Error: Bad map id, should be in {map_ids_str}")
         # Get scheduled cleanup
         schedules = self.send("get_ordertime", [])
         scheduled_found, rooms = _get_rooms_from_schedules(schedules)
@@ -898,7 +890,7 @@ class ViomiVacuum(Device, VacuumInterface):
                 "* Select only the missed room\n"
                 "* Set as inactive scheduled cleanup\n"
             )
-            raise ViomiVacuumException(msg)
+            raise DeviceException(msg)
 
         self._cache["rooms"] = rooms
         return rooms

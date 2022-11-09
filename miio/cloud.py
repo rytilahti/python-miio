@@ -5,16 +5,14 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 import attr
 import click
 
+from miio.exceptions import CloudException
+
 _LOGGER = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from micloud import MiCloud  # noqa: F401
 
 AVAILABLE_LOCALES = ["cn", "de", "i2", "ru", "sg", "us"]
-
-
-class CloudException(Exception):
-    """Exception raised for cloud connectivity issues."""
 
 
 @attr.s(auto_attribs=True)

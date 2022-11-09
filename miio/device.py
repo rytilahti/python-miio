@@ -7,7 +7,7 @@ import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
 from .descriptors import (
-    ButtonDescriptor,
+    ActionDescriptor,
     EnumSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
@@ -40,6 +40,14 @@ class Device(metaclass=DeviceGroupMeta):
     timeout = 5
     _mappings: Dict[str, Any] = {}
     _supported_models: List[str] = []
+
+    def __init_subclass__(cls, **kwargs):
+        """Overridden to register all integrations to the factory."""
+        super().__init_subclass__(**kwargs)
+
+        from .devicefactory import DeviceFactory
+
+        DeviceFactory.register(cls)
 
     def __init__(
         self,
@@ -242,6 +250,7 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
+
     def cached_status(self) -> DeviceStatus:
         """Return device status from cache."""
         if self._status is None:
@@ -249,7 +258,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         return self._status
 
-    def buttons(self) -> List[ButtonDescriptor]:
+    def actions(self) -> Dict[str, ActionDescriptor]:
         """Return a list of button-like, clickable actions of the device."""
         if self._buttons is None:
             self._buttons = []
@@ -261,9 +270,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         return self._buttons
 
-    def settings(
-        self,
-    ) -> Dict[str, SettingDescriptor]:
+    def settings(self) -> Dict[str, SettingDescriptor]:
         """Return list of settings."""
         settings = (
             self.cached_status().settings()

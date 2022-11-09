@@ -9,12 +9,7 @@ import click
 from ...click_common import command
 from ...exceptions import DeviceException
 from ...push_server import EventInfo
-from ..gateway import (
-    GATEWAY_MODEL_EU,
-    GATEWAY_MODEL_ZIG3,
-    GatewayCallback,
-    GatewayException,
-)
+from ..gateway import GATEWAY_MODEL_EU, GATEWAY_MODEL_ZIG3, GatewayCallback
 
 _LOGGER = logging.getLogger(__name__)
 if TYPE_CHECKING:
@@ -138,7 +133,7 @@ class SubDevice:
                     self._props[prop_name] = result
                     i = i + 1
             except Exception as ex:
-                raise GatewayException(
+                raise DeviceException(
                     "One or more unexpected results while "
                     "fetching properties %s: %s on model %s"
                     % (self.get_prop_exp_dict, values, self.model)
@@ -150,7 +145,7 @@ class SubDevice:
         try:
             return self._gw.send(command, [self.sid])
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while sending command %s on model %s"
                 % (command, self.model)
             ) from ex
@@ -161,7 +156,7 @@ class SubDevice:
         try:
             return self._gw.send(command, arguments, extra_parameters={"sid": self.sid})
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while sending "
                 "command '%s' with arguments '%s' on model %s"
                 % (command, str(arguments), self.model)
@@ -173,13 +168,13 @@ class SubDevice:
         try:
             response = self._gw.send("get_device_prop", [self.sid, property])
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while fetching property %s on model %s"
                 % (property, self.model)
             ) from ex
 
         if not response:
-            raise GatewayException(
+            raise DeviceException(
                 f"Empty response while fetching property '{property}': {response} on model {self.model}"
             )
 
@@ -193,13 +188,13 @@ class SubDevice:
                 "get_device_prop_exp", [[self.sid] + list(properties)]
             ).pop()
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while fetching properties %s on model %s"
                 % (properties, self.model)
             ) from ex
 
         if len(list(properties)) != len(response):
-            raise GatewayException(
+            raise DeviceException(
                 "unexpected result while fetching properties %s: %s on model %s"
                 % (properties, response, self.model)
             )
@@ -212,7 +207,7 @@ class SubDevice:
         try:
             return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while setting propertie %s to value %s on model %s"
                 % (property, str(value), self.model)
             ) from ex

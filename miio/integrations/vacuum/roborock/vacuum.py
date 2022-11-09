@@ -22,7 +22,7 @@ from miio.click_common import (
 )
 from miio.device import Device, DeviceInfo
 from miio.devicestatus import button
-from miio.exceptions import DeviceException, DeviceInfoUnavailableException
+from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
 from .vacuum_enums import (
@@ -58,10 +58,6 @@ from .vacuumcontainers import (
 _LOGGER = logging.getLogger(__name__)
 
 
-class VacuumException(DeviceException):
-    pass
-
-
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S4 = "roborock.vacuum.s4"
 ROCKROBO_S4_MAX = "roborock.vacuum.a19"
@@ -69,23 +65,30 @@ ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S5_MAX = "roborock.vacuum.s5e"
 ROCKROBO_S6 = "roborock.vacuum.s6"
 ROCKROBO_T6 = "roborock.vacuum.t6"  # cn s6
+ROCKROBO_E4 = "roborock.vacuum.a01"
 ROCKROBO_S6_PURE = "roborock.vacuum.a08"
 ROCKROBO_T7 = "roborock.vacuum.a11"  # cn s7
 ROCKROBO_T7S = "roborock.vacuum.a14"
 ROCKROBO_T7SPLUS = "roborock.vacuum.a23"
 ROCKROBO_S7_MAXV = "roborock.vacuum.a27"
+ROCKROBO_S7_PRO_ULTRA = "roborock.vacuum.a62"
 ROCKROBO_Q5 = "roborock.vacuum.a34"
+ROCKROBO_Q7_MAX = "roborock.vacuum.a38"
 ROCKROBO_G10S = "roborock.vacuum.a46"
+ROCKROBO_G10 = "roborock.vacuum.a29"
+
 ROCKROBO_S7 = "roborock.vacuum.a15"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 ROCKROBO_E2 = "roborock.vacuum.e2"
 ROCKROBO_1S = "roborock.vacuum.m1s"
 ROCKROBO_C1 = "roborock.vacuum.c1"
+ROCKROBO_WILD = "roborock.vacuum.*"  # wildcard
 
 SUPPORTED_MODELS = [
     ROCKROBO_V1,
     ROCKROBO_S4,
     ROCKROBO_S4_MAX,
+    ROCKROBO_E4,
     ROCKROBO_S5,
     ROCKROBO_S5_MAX,
     ROCKROBO_S6,
@@ -96,12 +99,16 @@ SUPPORTED_MODELS = [
     ROCKROBO_T7SPLUS,
     ROCKROBO_S7,
     ROCKROBO_S7_MAXV,
+    ROCKROBO_S7_PRO_ULTRA,
     ROCKROBO_Q5,
+    ROCKROBO_Q7_MAX,
+    ROCKROBO_G10,
     ROCKROBO_G10S,
     ROCKROBO_S6_MAXV,
     ROCKROBO_E2,
     ROCKROBO_1S,
     ROCKROBO_C1,
+    ROCKROBO_WILD,
 ]
 
 AUTO_EMPTY_MODELS = [
@@ -298,12 +305,12 @@ class RoborockVacuum(Device, VacuumInterface):
     ):
         """Give a command over manual control interface."""
         if rotation < self.MANUAL_ROTATION_MIN or rotation > self.MANUAL_ROTATION_MAX:
-            raise DeviceException(
+            raise ValueError(
                 "Given rotation is invalid, should be ]%s, %s[, was %s"
                 % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotation)
             )
         if velocity < self.MANUAL_VELOCITY_MIN or velocity > self.MANUAL_VELOCITY_MAX:
-            raise DeviceException(
+            raise ValueError(
                 "Given velocity is invalid, should be ]%s, %s[, was: %s"
                 % (self.MANUAL_VELOCITY_MIN, self.MANUAL_VELOCITY_MAX, velocity)
             )
@@ -410,7 +417,7 @@ class RoborockVacuum(Device, VacuumInterface):
     def fresh_map(self, version):
         """Return fresh map?"""
         if version not in [1, 2]:
-            raise VacuumException("Unknown map version: %s" % version)
+            raise ValueError("Unknown map version: %s" % version)
 
         if version == 1:
             return self.send("get_fresh_map")
@@ -421,7 +428,7 @@ class RoborockVacuum(Device, VacuumInterface):
     def persist_map(self, version):
         """Return fresh map?"""
         if version not in [1, 2]:
-            raise VacuumException("Unknown map version: %s" % version)
+            raise ValueError("Unknown map version: %s" % version)
 
         if version == 1:
             return self.send("get_persist_map")
@@ -621,7 +628,7 @@ class RoborockVacuum(Device, VacuumInterface):
         :param TimerState mode: either On or Off
         """
         if mode != TimerState.On and mode != TimerState.Off:
-            raise DeviceException("Only 'On' or 'Off' are  allowed")
+            raise ValueError("Only 'On' or 'Off' are  allowed")
         return self.send("upd_timer", [timer_id, mode.value])
 
     @command()
@@ -891,7 +898,7 @@ class RoborockVacuum(Device, VacuumInterface):
 
     def _verify_auto_empty_support(self) -> None:
         if self.model not in self._auto_empty_models:
-            raise VacuumException("Device does not support auto emptying")
+            raise UnsupportedFeatureException("Device does not support auto emptying")
 
     @command()
     def stop_zoned_clean(self):
@@ -977,7 +984,9 @@ class RoborockVacuum(Device, VacuumInterface):
     def mop_intensity(self) -> MopIntensity:
         """Get mop scrub intensity setting."""
         if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
-            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+            raise UnsupportedFeatureException(
+                "Mop scrub intensity not supported by %s", self.model
+            )
 
         return MopIntensity(self.send("get_water_box_custom_mode")[0])
 
@@ -985,7 +994,9 @@ class RoborockVacuum(Device, VacuumInterface):
     def set_mop_intensity(self, mop_intensity: MopIntensity):
         """Set mop scrub intensity setting."""
         if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
-            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+            raise UnsupportedFeatureException(
+                "Mop scrub intensity not supported by %s", self.model
+            )
 
         return self.send("set_water_box_custom_mode", [mop_intensity.value])
 

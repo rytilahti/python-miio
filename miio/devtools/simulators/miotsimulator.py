@@ -8,12 +8,15 @@ import click
 from pydantic import Field, validator
 
 from miio import PushServer
+from miio.miot_cloud import MiotCloud
+from miio.miot_models import DeviceModel, MiotProperty, MiotService
 
 from .common import create_info_response, mac_from_model
-from .models import DeviceModel, MiotProperty, MiotService
 
 _LOGGER = logging.getLogger(__name__)
 UNSET = -10000
+
+ERR_INVALID_SETTING = -1000
 
 
 def create_random(values):
@@ -72,14 +75,14 @@ class SimulatedMiotProperty(MiotProperty):
             raise ValueError(f"{casted_value} not in range {range}")
 
         choices = values["choices"]
-        if choices is not None:
-            return choices[casted_value]
+        if choices is not None and not any(c.value == casted_value for c in choices):
+            raise ValueError(f"{casted_value} not found in {choices}")
 
         return casted_value
 
     class Config:
         validate_assignment = True
-        smart_union = True
+        smart_union = True  # try all types before coercing
 
 
 class SimulatedMiotService(MiotService):
@@ -109,10 +112,12 @@ class MiotSimulator:
     def initialize_state(self):
         """Create initial state for the device."""
         for serv in self._model.services:
+            _LOGGER.debug("Found service: %s", serv)
             for act in serv.actions:
                 _LOGGER.debug("Found action: %s", act)
             for prop in serv.properties:
                 self._state[serv.siid][prop.piid] = prop
+                _LOGGER.debug("Found property: %s", prop)
 
     def get_properties(self, payload):
         """Handle get_properties method."""
@@ -121,8 +126,13 @@ class MiotSimulator:
         params = payload["params"]
         for p in params:
             res = p.copy()
-            res["value"] = self._state[res["siid"]][res["piid"]].current_value
-            res["code"] = 0
+            try:
+                res["value"] = self._state[res["siid"]][res["piid"]].current_value
+                res["code"] = 0
+            except Exception as ex:
+                res["value"] = ""
+                res["code"] = ERR_INVALID_SETTING
+                res["exception"] = str(ex)
             response.append(res)
 
         return {"result": response}
@@ -195,12 +205,18 @@ async def main(dev, model):
 
 
 @click.command()
-@click.option("--file", type=click.File("r"), required=True)
+@click.option("--file", type=click.File("r"), required=False)
 @click.option("--model", type=str, required=True, default=None)
 def miot_simulator(file, model):
     """Simulate miot device."""
-    data = file.read()
-    dev = SimulatedDeviceModel.parse_raw(data)
+    if file is not None:
+        data = file.read()
+        dev = SimulatedDeviceModel.parse_raw(data)
+    else:
+        cloud = MiotCloud()
+        # TODO: fix HACK
+        dev = SimulatedDeviceModel.parse_raw(cloud.get_model_schema(model))
+
     loop = asyncio.get_event_loop()
     random.seed(1)  # nosec
     loop.run_until_complete(main(dev, model=model))

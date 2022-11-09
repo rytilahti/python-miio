@@ -12,10 +12,6 @@ from .exceptions import DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 
-class WalkingpadException(DeviceException):
-    pass
-
-
 class OperationMode(enum.Enum):
     Auto = 0
     Manual = 1
@@ -199,7 +195,7 @@ class Walkingpad(Device):
         """Set mode (auto/manual)."""
 
         if not isinstance(mode, OperationMode):
-            raise WalkingpadException("Invalid mode: %s" % mode)
+            raise ValueError("Invalid mode: %s" % mode)
 
         return self.send("set_mode", [mode.value])
 
@@ -212,13 +208,13 @@ class Walkingpad(Device):
 
         # In case the treadmill is not already turned on, throw an exception.
         if not self.status().is_on:
-            raise WalkingpadException("Cannot set the speed, device is turned off")
+            raise DeviceException("Cannot set the speed, device is turned off")
 
         if not isinstance(speed, float):
-            raise WalkingpadException("Invalid speed: %s" % speed)
+            raise TypeError("Invalid speed: %s" % speed)
 
         if speed < 0 or speed > 6:
-            raise WalkingpadException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.send("set_speed", [speed])
 
@@ -231,15 +227,13 @@ class Walkingpad(Device):
 
         # In case the treadmill is not already turned on, throw an exception.
         if not self.status().is_on:
-            raise WalkingpadException(
-                "Cannot set the start speed, device is turned off"
-            )
+            raise DeviceException("Cannot set the start speed, device is turned off")
 
         if not isinstance(speed, float):
-            raise WalkingpadException("Invalid start speed: %s" % speed)
+            raise TypeError("Invalid start speed: %s" % speed)
 
         if speed < 0 or speed > 6:
-            raise WalkingpadException("Invalid start speed: %s" % speed)
+            raise ValueError("Invalid start speed: %s" % speed)
 
         return self.send("set_start_speed", [speed])
 
@@ -251,7 +245,7 @@ class Walkingpad(Device):
         """Set sensitivity."""
 
         if not isinstance(sensitivity, OperationSensitivity):
-            raise WalkingpadException("Invalid mode: %s" % sensitivity)
+            raise TypeError("Invalid mode: %s" % sensitivity)
 
         return self.send("set_sensitivity", [sensitivity.value])
 

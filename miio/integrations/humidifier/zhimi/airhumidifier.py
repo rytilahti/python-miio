@@ -5,9 +5,9 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceError, DeviceException, DeviceInfo, DeviceStatus
+from miio import Device, DeviceError, DeviceInfo, DeviceStatus
 from miio.click_common import EnumType, command, format_output
-from miio.devicestatus import sensor, setting, switch
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,10 +45,6 @@ AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_CB2: AVAILABLE_PROPERTIES_COMMON
     + ["temperature", "speed", "depth", "dry"],
 }
-
-
-class AirHumidifierException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -116,7 +112,7 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["humidity"]
 
     @property
-    @switch(
+    @setting(
         name="Buzzer",
         icon="mdi:volume-high",
         setter_name="set_buzzer",
@@ -142,7 +138,7 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    @switch(
+    @setting(
         name="Child Lock",
         icon="mdi:lock",
         setter_name="set_child_lock",
@@ -189,7 +185,7 @@ class AirHumidifierStatus(DeviceStatus):
         For example 1.2.9_5033.
         """
         if self.device_info.firmware_version is None:
-            raise AirHumidifierException("Missing firmware information")
+            return "missing fw version"
 
         return self.device_info.firmware_version
 
@@ -283,7 +279,7 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    @switch(
+    @setting(
         name="Dry Mode",
         icon="mdi:hair-dryer",
         setter_name="set_dry",
@@ -459,7 +455,7 @@ class AirHumidifier(Device):
     def set_target_humidity(self, humidity: int):
         """Set the target humidity."""
         if humidity not in [30, 40, 50, 60, 70, 80]:
-            raise AirHumidifierException("Invalid target humidity: %s" % humidity)
+            raise ValueError("Invalid target humidity: %s" % humidity)
 
         return self.send("set_limit_hum", [humidity])
 

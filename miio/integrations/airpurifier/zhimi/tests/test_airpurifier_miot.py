@@ -2,11 +2,12 @@ from unittest import TestCase
 
 import pytest
 
+from miio.exceptions import UnsupportedFeatureException
 from miio.tests.dummies import DummyMiotDevice
 
 from .. import AirPurifierMiot
 from ..airfilter_util import FilterType
-from ..airpurifier_miot import AirPurifierMiotException, LedBrightness, OperationMode
+from ..airpurifier_miot import LedBrightness, OperationMode
 
 _INITIAL_STATE = {
     "power": True,
@@ -148,10 +149,10 @@ class TestAirPurifier(TestCase):
         self.device.set_fan_level(3)
         assert fan_level() == 3
 
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(ValueError):
             self.device.set_fan_level(0)
 
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(ValueError):
             self.device.set_fan_level(4)
 
     def test_set_mode(self):
@@ -181,10 +182,10 @@ class TestAirPurifier(TestCase):
         self.device.set_favorite_level(14)
         assert favorite_level() == 14
 
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_level(-1)
 
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_level(15)
 
     def test_set_led_brightness(self):
@@ -231,7 +232,7 @@ class TestAirPurifier(TestCase):
         assert child_lock() is False
 
     def test_set_anion(self):
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_anion(True)
 
 
@@ -282,19 +283,19 @@ class TestAirPurifierMB4(TestCase):
         assert led_brightness_level() == 2
 
     def test_set_fan_level(self):
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_fan_level(0)
 
     def test_set_favorite_level(self):
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_favorite_level(0)
 
     def test_set_led_brightness(self):
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_led_brightness(LedBrightness.Bright)
 
     def test_set_led(self):
-        with pytest.raises(AirPurifierMiotException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_led(True)
 
 

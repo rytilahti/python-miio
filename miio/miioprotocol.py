@@ -8,6 +8,7 @@ import codecs
 import logging
 import socket
 from datetime import datetime, timedelta
+from pprint import pformat as pf
 from typing import Any, Dict, List
 
 import construct
@@ -172,7 +173,7 @@ class MiIOProtocol:
 
         msg = {"data": {"value": request}, "header": {"value": header}, "checksum": 0}
         m = Message.build(msg, token=self.token)
-        _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, request)
+        _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, pf(request))
         if self.debug > 1:
             _LOGGER.debug(
                 "send (timeout %s): %s",
@@ -208,7 +209,7 @@ class MiIOProtocol:
                 self.port,
                 header["ts"],
                 payload["id"],
-                payload,
+                pf(payload),
             )
             if "error" in payload:
                 self._handle_error(payload["error"])
