@@ -5,7 +5,12 @@ from typing import Any, Dict, List, Optional, Union  # noqa: F401
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
-from .descriptors import ActionDescriptor, SensorDescriptor, SettingDescriptor
+from .descriptors import (
+    ActionDescriptor,
+    EnumSettingDescriptor,
+    SensorDescriptor,
+    SettingDescriptor,
+)
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
 from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
@@ -258,6 +263,12 @@ class Device(metaclass=DeviceGroupMeta):
                     )
 
                 setting.setter = getattr(self, setting.setter_name)
+            if (
+                isinstance(setting, EnumSettingDescriptor)
+                and setting.choices_attribute is not None
+            ):
+                retrieve_choices_function = getattr(self, setting.choices_attribute)
+                setting.choices = retrieve_choices_function()  # This can do IO
 
         return settings
 
