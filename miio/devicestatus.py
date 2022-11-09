@@ -171,34 +171,6 @@ def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
     return decorator_sensor
 
 
-def switch(name: str, *, setter_name: str, **kwargs):
-    """Syntactic sugar to create SwitchDescriptor objects.
-
-    The information can be used by users of the library to programmatically find out what
-    types of sensors are available for the device.
-
-    The interface is kept minimal, but you can pass any extra keyword arguments.
-    These extras are made accessible over :attr:`~miio.descriptors.SwitchDescriptor.extras`,
-    and can be interpreted downstream users as they wish.
-    """
-
-    def decorator_switch(func):
-        property_name = str(func.__name__)
-        qualified_name = str(func.__qualname__)
-
-        descriptor = SwitchDescriptor(
-            id=qualified_name,
-            property=property_name,
-            name=name,
-            setter_name=setter_name,
-            extras=kwargs,
-        )
-        func._switch = descriptor
-
-        return func
-
-    return decorator_switch
-
 def setting(
     name: str,
     *,
@@ -230,8 +202,8 @@ def setting(
             raise Exception("Setter_name needs to be defined")
 
         common_values = {
-            "id": str(property_name),
-            "property": str(property_name),
+            "id": qualified_name,
+            "property": property_name,
             "name": name,
             "unit": unit,
             "setter": setter,
@@ -241,24 +213,14 @@ def setting(
 
         if min_value or max_value:
             descriptor = NumberSettingDescriptor(
-                id=qualified_name,
-                property=property_name,
-                name=name,
-                unit=unit,
-                setter=None,
-                setter_name=setter_name,
+                **common_values,
                 min_value=min_value or 0,
                 max_value=max_value,
                 step=step or 1,
             )
         elif choices or choices_attribute:
             descriptor = EnumSettingDescriptor(
-                id=qualified_name,
-                property=property_name,
-                name=name,
-                unit=unit,
-                setter=None,
-                setter_name=setter_name,
+                **common_values,
                 choices=choices,
                 choices_attribute=choices_attribute,
             )
