@@ -203,7 +203,7 @@ class VacuumStatus(VacuumDeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def dock_error(self) -> str:
+    def dock_error(self) -> Optional[str]:
         """Human readable dock error description, see also :func:`dock_error_code`."""
         if self.dock_error_code is None:
             return None
