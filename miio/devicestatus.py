@@ -198,7 +198,6 @@ def setting(
             "property": property_name,
             "name": name,
             "unit": unit,
-            "setter": setter,
             "setter_name": setter_name,
             "extras": kwargs,
         }
