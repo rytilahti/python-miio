@@ -20,8 +20,8 @@ from miio.click_common import (
     LiteralParamType,
     command,
 )
-from miio.devicestatus import action
 from miio.device import Device, DeviceInfo
+from miio.devicestatus import action
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
