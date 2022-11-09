@@ -8,7 +8,7 @@ from pytz import BaseTzInfo
 
 from miio.descriptors import SensorDescriptor
 from miio.device import DeviceStatus
-from miio.devicestatus import sensor, setting, switch
+from miio.devicestatus import sensor, setting
 from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds, pretty_time
 
@@ -384,7 +384,7 @@ class VacuumStatus(VacuumDeviceStatus):
         return None
 
     @property
-    @switch(
+    @setting(
         "Auto dust collection",
         setter_name="set_dust_collection",
         icon="mdi:turbine",

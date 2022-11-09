@@ -11,7 +11,6 @@ from .descriptors import (
     EnumSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
-    SwitchDescriptor,
 )
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
@@ -298,21 +297,6 @@ class Device(metaclass=DeviceGroupMeta):
         """Return sensors."""
         sensors = self.cached_status().sensors()
         return sensors
-
-    def switches(self) -> Dict[str, SwitchDescriptor]:
-        """Return toggleable switches."""
-        switches = self.cached_status().switches()
-        for switch in switches.values():
-            # TODO: Bind setter methods, this should probably done only once during init.
-            if switch.setter is None:
-                if switch.setter_name is None:
-                    # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
-                    raise Exception(
-                        f"Neither setter or setter_name was defined for {switch}"
-                    )
-                switch.setter = getattr(self, switch.setter_name)
-
-        return switches
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
