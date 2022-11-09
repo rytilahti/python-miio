@@ -20,6 +20,7 @@ from miio.click_common import (
     LiteralParamType,
     command,
 )
+from miio.devicestatus import action
 from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.interfaces import FanspeedPresets, VacuumInterface
@@ -866,12 +867,14 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("set_dust_collection_mode", {"mode": mode.value})[0] == "ok"
 
     @command()
+    @action(name="Start dust collection", icon="mdi:turbine")
     def start_dust_collection(self):
         """Activate automatic dust collection."""
         self._verify_auto_empty_support()
         return self.send("app_start_collect_dust")
 
     @command()
+    @action(name="Stop dust collection", icon="mdi:turbine")
     def stop_dust_collection(self):
         """Abort in progress dust collection."""
         self._verify_auto_empty_support()
