@@ -190,9 +190,11 @@ class VacuumStatus(VacuumDeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def dock_error_code(self) -> int:
+    def dock_error_code(self) -> Optional[int]:
         """Dock error status as returned by the device."""
-        return int(self.data["dock_error_status"])
+        if "dock_error_status" in self.data:
+            return int(self.data["dock_error_status"])
+        return None
 
     @property
     @sensor(
@@ -203,6 +205,8 @@ class VacuumStatus(VacuumDeviceStatus):
     )
     def dock_error(self) -> str:
         """Human readable dock error description, see also :func:`dock_error_code`."""
+        if self.dock_error_code is None:
+            return None
         try:
             return dock_error_codes[self.dock_error_code]
         except KeyError:
@@ -239,9 +243,11 @@ class VacuumStatus(VacuumDeviceStatus):
         setter_name="set_mop_intensity",
         icon="mdi:checkbox-multiple-blank-circle-outline",
     )
-    def mop_intensity(self) -> int:
+    def mop_intensity(self) -> Optional[int]:
         """Current mop intensity."""
-        return int(self.data["water_box_mode"])
+        if "water_box_mode" in self.data:
+            return int(self.data["water_box_mode"])
+        return None
 
     @property
     @setting(
@@ -250,9 +256,11 @@ class VacuumStatus(VacuumDeviceStatus):
         setter_name="set_mop_mode",
         icon="mdi:swap-horizontal-variant",
     )
-    def mop_route(self) -> int:
+    def mop_route(self) -> Optional[int]:
         """Current mop route."""
-        return int(self.data["mop_mode"])
+        if "mop_mode" in self.data:
+            return int(self.data["mop_mode"])
+        return None
 
     @property
     @sensor(
@@ -642,9 +650,11 @@ class ConsumableStatus(DeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def dustbin_auto_empty_used(self) -> int:
+    def dustbin_auto_empty_used(self) -> Optional[int]:
         """Return ``dust_collection_work_times``"""
-        return self.data["dust_collection_work_times"]
+        if "dust_collection_work_times" in self.data:
+            return self.data["dust_collection_work_times"]
+        return None
 
 
 class DNDStatus(DeviceStatus):
