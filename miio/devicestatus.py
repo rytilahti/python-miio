@@ -14,6 +14,7 @@ from typing import (
 )
 
 from .descriptors import (
+    ActionDescriptor,
     BooleanSettingDescriptor,
     EnumSettingDescriptor,
     NumberSettingDescriptor,
@@ -236,3 +237,32 @@ def setting(
         return func
 
     return decorator_setting
+
+
+def action(name: str, **kwargs):
+    """Syntactic sugar to create ActionDescriptor objects.
+
+    The information can be used by users of the library to programmatically find out what
+    types of actions are available for the device.
+
+    The interface is kept minimal, but you can pass any extra keyword arguments.
+    These extras are made accessible over :attr:`~miio.descriptors.ActionDescriptor.extras`,
+    and can be interpreted downstream users as they wish.
+    """
+
+    def decorator_action(func):
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
+
+        descriptor = ActionDescriptor(
+            id=qualified_name,
+            name=name,
+            method_name=property_name,
+            method=None,
+            extras=kwargs,
+        )
+        func._action = descriptor
+
+        return func
+
+    return decorator_action
