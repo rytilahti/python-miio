@@ -1,13 +1,12 @@
 import contextlib
 import datetime
-import enum
 import json
 import logging
 import math
 import os
 import pathlib
 import time
-from typing import Dict, List, Optional, Tuple, Type, Union
+from typing import List, Optional, Type, Union
 
 import click
 import pytz
@@ -24,7 +23,22 @@ from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
-from .vacuum_enums import *
+from .vacuum_enums import (
+    CarpetCleaningMode,
+    Consumable,
+    DustCollectionMode,
+    FanspeedE2,
+    FanspeedEnum,
+    FanspeedS7,
+    FanspeedS7_Maxv,
+    FanspeedV1,
+    FanspeedV2,
+    FanspeedV3,
+    MopIntensity,
+    MopMode,
+    TimerState,
+    WaterFlow,
+)
 from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,
