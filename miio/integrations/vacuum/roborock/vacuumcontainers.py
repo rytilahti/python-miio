@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Optional, Union
 from croniter import croniter
 from pytz import BaseTzInfo
 
-from miio.descriptors import SensorDescriptor
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting, switch
 from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
