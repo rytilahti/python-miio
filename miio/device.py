@@ -249,7 +249,6 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
-
     def cached_status(self) -> DeviceStatus:
         """Return device status from cache."""
         if self._status is None:
