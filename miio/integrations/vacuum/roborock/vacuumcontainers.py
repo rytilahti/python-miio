@@ -45,6 +45,15 @@ error_codes = {  # from vacuum_cleaner-EN.pdf
     22: "Clean the dock charging contacts",
     23: "Docking station not reachable",
     24: "No-go zone or invisible wall detected",
+    26: "Wall sensor is dirty",
+    27: "VibraRise system is jammed",
+    28: "Roborock is on carpet",
+}
+
+dock_error_codes = {  # from vacuum_cleaner-EN.pdf
+    0: "No error",
+    38: "Clean water tank empty",
+    39: "Dirty water tank full",
 }
 
 
@@ -200,6 +209,31 @@ class VacuumStatus(DeviceStatus):
             return error_codes[self.error_code]
         except KeyError:
             return "Definition missing for error %s" % self.error_code
+
+    @property
+    @sensor(
+        "Dock error code",
+        icon="mdi:alert",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def dock_error_code(self) -> int:
+        """Dock error status as returned by the device."""
+        return int(self.data["dock_error_status"])
+
+    @property
+    @sensor(
+        "Dock error string",
+        icon="mdi:alert",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def dock_error(self) -> str:
+        """Human readable dock error description, see also :func:`dock_error_code`."""
+        try:
+            return dock_error_codes[self.dock_error_code]
+        except KeyError:
+            return "Definition missing for dock error %s" % self.dock_error_code
 
     @property
     @sensor("Battery", unit="%", device_class="battery", enabled_default=False)
