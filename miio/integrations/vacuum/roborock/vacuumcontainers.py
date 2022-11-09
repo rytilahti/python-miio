@@ -228,6 +228,7 @@ class VacuumStatus(VacuumDeviceStatus):
         """Current fan speed."""
         fan_power = int(self.data["fan_power"])
         if fan_power > 100:
+            # values 100+ are reserved for presets
             return None
         return fan_power
 
