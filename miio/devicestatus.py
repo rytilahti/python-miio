@@ -131,7 +131,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         return getattr(self._embedded[embed], prop)
 
 
-def sensor(name: str, *, unit: str = "", **kwargs):
+def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
     """Syntactic sugar to create SensorDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
