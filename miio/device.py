@@ -62,6 +62,9 @@ class Device(metaclass=DeviceGroupMeta):
         self.token: Optional[str] = token
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
+        self._status: Optional[DeviceStatus] = None
+        self._settings: Optional[Dict[str, SettingDescriptor]] = None
+        self._sensors: Optional[Dict[str, SensorDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -246,14 +249,27 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
+
+    def cached_status(self) -> DeviceStatus:
+        """Return device status from cache."""
+        if self._status is None:
+            self._status = self.status()
+
+        return self._status
+
     def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
         return {}
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""
-        settings = self.status().settings()
-        for setting in settings.values():
+        if self._settings is not None:
+            return self._settings
+
+        self._settings = (
+            self.cached_status().settings()
+        )  # NOTE that this already does IO so schould be run in executer job in HA
+        for setting in self._settings.values():
             # TODO: Bind setter methods, this should probably done only once during init.
             if setting.setter is None:
                 # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
@@ -270,13 +286,13 @@ class Device(metaclass=DeviceGroupMeta):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
                 setting.choices = retrieve_choices_function()  # This can do IO
 
-        return settings
+        return self._settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return device sensors."""
-        # TODO: the latest status should be cached and re-used by all meta information getters
-        sensors = self.status().sensors()
-        return sensors
+        if self._sensors is None:
+            self._sensors = self.cached_status().sensors()
+        return self._sensors
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
