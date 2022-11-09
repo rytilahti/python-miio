@@ -224,7 +224,7 @@ class VacuumStatus(VacuumDeviceStatus):
         step=1,
         icon="mdi:fan",
     )
-    def fanspeed(self) -> int:
+    def fanspeed(self) -> Optional[int]:
         """Current fan speed."""
         fan_power = int(self.data["fan_power"])
         if fan_power > 100:
