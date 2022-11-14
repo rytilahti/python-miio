@@ -181,7 +181,7 @@ class Device(metaclass=DeviceGroupMeta):
                     )
                 setting.setter = getattr(self, setting.setter_name)
             if (
-                isinstance(setting, EnumSettingDescriptor)
+                setting.type == SettingType.Enum
                 and setting.choices_attribute is not None
             ):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
