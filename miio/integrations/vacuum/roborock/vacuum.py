@@ -1,6 +1,5 @@
 import contextlib
 import datetime
-import enum
 import json
 import logging
 import math
@@ -24,6 +23,22 @@ from miio.device import Device, DeviceInfo
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
+from .vacuum_enums import (
+    CarpetCleaningMode,
+    Consumable,
+    DustCollectionMode,
+    FanspeedE2,
+    FanspeedEnum,
+    FanspeedS7,
+    FanspeedS7_Maxv,
+    FanspeedV1,
+    FanspeedV2,
+    FanspeedV3,
+    MopIntensity,
+    MopMode,
+    TimerState,
+    WaterFlow,
+)
 from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,
@@ -37,112 +52,6 @@ from .vacuumcontainers import (
 )
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class TimerState(enum.Enum):
-    On = "on"
-    Off = "off"
-
-
-class Consumable(enum.Enum):
-    MainBrush = "main_brush_work_time"
-    SideBrush = "side_brush_work_time"
-    Filter = "filter_work_time"
-    SensorDirty = "sensor_dirty_time"
-
-
-class FanspeedEnum(enum.Enum):
-    pass
-
-
-class FanspeedV1(FanspeedEnum):
-    Silent = 38
-    Standard = 60
-    Medium = 77
-    Turbo = 90
-
-
-class FanspeedV2(FanspeedEnum):
-    Silent = 101
-    Standard = 102
-    Medium = 103
-    Turbo = 104
-    Gentle = 105
-    Auto = 106
-
-
-class FanspeedV3(FanspeedEnum):
-    Silent = 38
-    Standard = 60
-    Medium = 75
-    Turbo = 100
-
-
-class FanspeedE2(FanspeedEnum):
-    # Original names from the app: Gentle, Silent, Standard, Strong, Max
-    Gentle = 41
-    Silent = 50
-    Standard = 68
-    Medium = 79
-    Turbo = 100
-
-
-class FanspeedS7(FanspeedEnum):
-    Silent = 101
-    Standard = 102
-    Medium = 103
-    Turbo = 104
-
-
-class FanspeedS7_Maxv(FanspeedEnum):
-    Silent = 101
-    Standard = 102
-    Medium = 103
-    Turbo = 104
-    Max = 108
-
-
-class WaterFlow(enum.Enum):
-    """Water flow strength on s5 max."""
-
-    Minimum = 200
-    Low = 201
-    High = 202
-    Maximum = 203
-
-
-class MopMode(enum.Enum):
-    """Mop routing on S7."""
-
-    Standard = 300
-    Deep = 301
-
-
-class MopIntensity(enum.Enum):
-    """Mop scrub intensity on S7 + S7MAXV."""
-
-    Close = 200
-    Mild = 201
-    Moderate = 202
-    Intense = 203
-
-
-class CarpetCleaningMode(enum.Enum):
-    """Type of carpet cleaning/avoidance."""
-
-    Avoid = 0
-    Rise = 1
-    Ignore = 2
-
-
-class DustCollectionMode(enum.Enum):
-    """Auto emptying mode (S7 + S7MAXV only)"""
-
-    Smart = 0
-    Quick = 1
-    Daily = 2
-    Strong = 3
-    Max = 4
 
 
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
@@ -410,10 +319,16 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def status(self) -> VacuumStatus:
         """Return status of the vacuum."""
-        status = VacuumStatus(self.send("get_status")[0])
+        status = self.vacuum_status()
         status.embed(self.consumable_status())
         status.embed(self.clean_history())
+        status.embed(self.dnd_status())
         return status
+
+    @command()
+    def vacuum_status(self) -> VacuumStatus:
+        """Return only status of the vacuum."""
+        return VacuumStatus(self.send("get_status")[0])
 
     def enable_log_upload(self):
         raise NotImplementedError("unknown parameters")
@@ -964,7 +879,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def mop_intensity(self) -> MopIntensity:
         """Get mop scrub intensity setting."""
-        if self.model != ROCKROBO_S7:
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
             raise UnsupportedFeatureException(
                 "Mop scrub intensity not supported by %s", self.model
             )
@@ -974,7 +889,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command(click.argument("mop_intensity", type=EnumType(MopIntensity)))
     def set_mop_intensity(self, mop_intensity: MopIntensity):
         """Set mop scrub intensity setting."""
-        if self.model != ROCKROBO_S7:
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
             raise UnsupportedFeatureException(
                 "Mop scrub intensity not supported by %s", self.model
             )
