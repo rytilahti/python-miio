@@ -62,7 +62,6 @@ class Device(metaclass=DeviceGroupMeta):
         self.token: Optional[str] = token
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
-        self._status: Optional[DeviceStatus] = None
         self._settings: Optional[Dict[str, SettingDescriptor]] = None
         self._sensors: Optional[Dict[str, SensorDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
@@ -129,9 +128,13 @@ class Device(metaclass=DeviceGroupMeta):
 
         This includes information about connected wlan network, and hardware and
         software versions.
+        This also caches the descriptors for sensors, settings and actions 
+        which makes additional IO calls.
 
         :param skip_cache bool: Skip the cache
         """
+        self._initialize_descriptors()
+
         if self._info is not None and not skip_cache:
             return self._info
 
@@ -157,6 +160,32 @@ class Device(metaclass=DeviceGroupMeta):
             raise DeviceInfoUnavailableException(
                 "Unable to request miIO.info from the device"
             ) from ex
+
+    def _initialize_descriptors(self) -> None:
+        """Cache all the descriptors once on the first call."""
+        if self._sensors is not None:
+            return
+
+        status = self.status()
+
+        # Sensors
+        self._sensors = status.sensors()
+
+        # Settings
+        self._settings = status.settings()
+        for setting in self._settings.values():
+            if setting.setter is None:
+                if setting.setter_name is None:
+                    raise Exception(
+                        f"Neither setter or setter_name was defined for {setting}"
+                    )
+                setting.setter = getattr(self, setting.setter_name)
+            if (
+                isinstance(setting, EnumSettingDescriptor)
+                and setting.choices_attribute is not None
+            ):
+                retrieve_choices_function = getattr(self, setting.choices_attribute)
+                setting.choices = retrieve_choices_function()
 
     @property
     def device_id(self) -> int:
@@ -249,48 +278,26 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
-    def cached_status(self) -> DeviceStatus:
-        """Return device status from cache."""
-        if self._status is None:
-            self._status = self.status()
-
-        return self._status
-
     def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
         return {}
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""
-        if self._settings is not None:
-            return self._settings
-
-        self._settings = (
-            self.cached_status().settings()
-        )  # NOTE that this already does IO so schould be run in executer job in HA
-        for setting in self._settings.values():
-            # TODO: Bind setter methods, this should probably done only once during init.
-            if setting.setter is None:
-                # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
-                if setting.setter_name is None:
-                    raise Exception(
-                        f"Neither setter or setter_name was defined for {setting}"
-                    )
-
-                setting.setter = getattr(self, setting.setter_name)
-            if (
-                isinstance(setting, EnumSettingDescriptor)
-                and setting.choices_attribute is not None
-            ):
-                retrieve_choices_function = getattr(self, setting.choices_attribute)
-                setting.choices = retrieve_choices_function()  # This can do IO
+        if self._settings is None:
+            raise Exception(
+                "setting descriptors schould first be cached using the info() call"
+            ) 
 
         return self._settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return device sensors."""
         if self._sensors is None:
-            self._sensors = self.cached_status().sensors()
+            raise Exception(
+                "sensor descriptors schould first be cached using the info() call"
+            )
+
         return self._sensors
 
     def __repr__(self):
