@@ -128,8 +128,7 @@ class Device(metaclass=DeviceGroupMeta):
 
         This includes information about connected wlan network, and hardware and
         software versions.
-        This also caches the descriptors for sensors, settings and actions
-        which makes additional IO calls.
+        This method implicitly populates the internal data structures needed prior accessing `sensors()`, `settings()`, or `actions()`.
 
         :param skip_cache bool: Skip the cache
         """
