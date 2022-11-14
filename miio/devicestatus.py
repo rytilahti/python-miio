@@ -131,7 +131,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         return getattr(self._embedded[embed], prop)
 
 
-def sensor(name: str, *, unit: str = "", **kwargs):
+def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
     """Syntactic sugar to create SensorDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
@@ -143,7 +143,8 @@ def sensor(name: str, *, unit: str = "", **kwargs):
     """
 
     def decorator_sensor(func):
-        property_name = func.__name__
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
 
         def _sensor_type_for_return_type(func):
             rtype = get_type_hints(func).get("return")
@@ -157,8 +158,8 @@ def sensor(name: str, *, unit: str = "", **kwargs):
 
         sensor_type = _sensor_type_for_return_type(func)
         descriptor = SensorDescriptor(
-            id=str(property_name),
-            property=str(property_name),
+            id=qualified_name,
+            property=property_name,
             name=name,
             unit=unit,
             type=sensor_type,
@@ -196,14 +197,19 @@ def setting(
     """
 
     def decorator_setting(func):
-        property_name = func.__name__
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
 
         if setter is None and setter_name is None:
-            raise Exception("Either setter or setter_name needs to be defined")
+            raise Exception("setter_name needs to be defined")
+        if setter_name is None:
+            raise NotImplementedError(
+                "setter not yet implemented, use setter_name instead"
+            )
 
         common_values = {
-            "id": str(property_name),
-            "property": str(property_name),
+            "id": qualified_name,
+            "property": property_name,
             "name": name,
             "unit": unit,
             "setter": setter,
