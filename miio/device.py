@@ -133,10 +133,10 @@ class Device(metaclass=DeviceGroupMeta):
 
         :param skip_cache bool: Skip the cache
         """
-        self._initialize_descriptors()
-
         if self._info is not None and not skip_cache:
             return self._info
+
+        self._initialize_descriptors()
 
         return self._fetch_info()
 
