@@ -128,7 +128,8 @@ class Device(metaclass=DeviceGroupMeta):
 
         This includes information about connected wlan network, and hardware and
         software versions.
-        This method implicitly populates the internal data structures needed prior accessing `sensors()`, `settings()`, or `actions()`.
+        This also caches the descriptors for sensors, settings and actions
+        which makes additional IO calls.
 
         :param skip_cache bool: Skip the cache
         """
@@ -173,12 +174,12 @@ class Device(metaclass=DeviceGroupMeta):
         # Settings
         self._settings = status.settings()
         for setting in self._settings.values():
-            if setting.setter is None:
-                if setting.setter_name is None:
-                    raise Exception(
-                        f"Neither setter or setter_name was defined for {setting}"
-                    )
+            if setting.setter_name is not None:
                 setting.setter = getattr(self, setting.setter_name)
+            if setting.setter is None:
+                raise Exception(
+                    f"Neither setter or setter_name was defined for {setting}"
+                )
             if (
                 setting.type == SettingType.Enum
                 and setting.choices_attribute is not None
