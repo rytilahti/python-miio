@@ -191,8 +191,12 @@ def setting(
         property_name = str(func.__name__)
         qualified_name = str(func.__qualname__)
 
+        if setter is None and setter_name is None:
+            raise Exception("setter_name needs to be defined")
         if setter_name is None:
-            raise Exception("Setter_name needs to be defined")
+            raise NotImplementedError(
+                "setter not yet implemented, use setter_name instead"
+            )
 
         common_values = {
             "id": qualified_name,
