@@ -30,6 +30,7 @@ from .vacuumcontainers import (
     CleaningSummary,
     ConsumableStatus,
     DNDStatus,
+    MultiMapList,
     SoundInstallStatus,
     SoundStatus,
     Timer,
@@ -221,6 +222,8 @@ class RoborockVacuum(Device, VacuumInterface):
     ):
         super().__init__(ip, token, start_id, debug, model=model)
         self.manual_seqnum = -1
+        self._multi_maps: Optional[MultiMapList] = None
+        self._multi_map_enum = None
 
     @command()
     def start(self):
@@ -439,6 +442,36 @@ class RoborockVacuum(Device, VacuumInterface):
         """Return map token."""
         # returns ['retry'] without internet
         return self.send("get_map_v1")
+
+    @command()
+    def get_multi_maps(self, skip_cache=False) -> MultiMapList:
+        """Return list of multi maps."""
+        if self._multi_maps is not None and not skip_cache:
+            return self._multi_maps
+
+        self._multi_maps = MultiMapList(self.send("get_multi_maps_list")[0])
+        return self._multi_maps
+
+    @command()
+    def multi_map_enum(self, skip_cache=False) -> Optional[enum.Enum]:
+        """Enum of the available map names."""
+        if self._multi_map_enum is not None and not skip_cache:
+            return self._multi_map_enum
+
+        multi_maps = self.get_multi_maps()
+
+        self._multi_map_enum = enum.Enum("multi_map_enum", multi_maps.map_name_dict)
+        return self._multi_map_enum
+
+    @command(click.argument("multi_map_id", type=int))
+    def load_multi_map(self, multi_map_id: int):
+        """Change the current map used."""
+        return self.send("load_multi_map", [multi_map_id])[0] == "ok"
+
+    @command()
+    def load_multi_map_by_enum(self, multi_map_enum):
+        """Change the current map used by enum."""
+        return self.load_multi_map(multi_map_enum.value)
 
     @command(click.argument("start", type=bool))
     def edit_map(self, start):
