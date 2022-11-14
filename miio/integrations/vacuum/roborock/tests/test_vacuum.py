@@ -71,6 +71,36 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
                 "end_hour": 8,
             }
         ]
+        self.dummies["multi_maps"] = [
+            {
+                "max_multi_map": 4,
+                "max_bak_map": 1,
+                "multi_map_count": 3,
+                "map_info": [
+                    {
+                        "mapFlag": 0,
+                        "add_time": 1664448893,
+                        "length": 10,
+                        "name": "Downstairs",
+                        "bak_maps": [{"mapFlag": 4, "add_time": 1663577737}],
+                    },
+                    {
+                        "mapFlag": 1,
+                        "add_time": 1663580330,
+                        "length": 8,
+                        "name": "Upstairs",
+                        "bak_maps": [{"mapFlag": 5, "add_time": 1663577752}],
+                    },
+                    {
+                        "mapFlag": 2,
+                        "add_time": 1663580384,
+                        "length": 5,
+                        "name": "Attic",
+                        "bak_maps": [{"mapFlag": 6, "add_time": 1663577765}],
+                    },
+                ],
+            }
+        ]
 
         self.return_values = {
             "get_status": lambda x: [self.state],
@@ -86,6 +116,7 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "miIO.info": "dummy info",
             "get_clean_record": lambda x: [[1488347071, 1488347123, 16, 0, 0, 0]],
             "get_dnd_timer": lambda x: self.dummies["dnd_timer"],
+            "get_multi_maps_list": lambda x: self.dummies["multi_maps"],
         }
 
         super().__init__(args, kwargs)
