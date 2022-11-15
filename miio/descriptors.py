@@ -38,7 +38,7 @@ class SensorDescriptor:
     """
 
     id: str
-    type: str
+    type: type
     name: str
     property: str
     unit: Optional[str] = None
