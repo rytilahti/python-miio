@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
 from inspect import getmembers
-from typing import Any, cast, Dict, List, Optional, Union  # noqa: F401
+from typing import Any, Dict, List, Optional, Union, cast  # noqa: F401
 
 import click
 
