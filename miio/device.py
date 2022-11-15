@@ -285,18 +285,14 @@ class Device(metaclass=DeviceGroupMeta):
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""
         if self._settings is None:
-            raise Exception(
-                "setting descriptors schould first be cached using the info() call"
-            )
+            self._initialize_descriptors()
 
         return self._settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return device sensors."""
         if self._sensors is None:
-            raise Exception(
-                "sensor descriptors schould first be cached using the info() call"
-            )
+            self._initialize_descriptors()
 
         return self._sensors
 
