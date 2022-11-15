@@ -1,13 +1,14 @@
 import logging
 from enum import Enum
 from inspect import getmembers
-from typing import Any, Dict, List, Optional, Union  # noqa: F401
+from typing import Any, cast, Dict, List, Optional, Union  # noqa: F401
 
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
 from .descriptors import (
     ActionDescriptor,
+    EnumSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
     SettingType,
@@ -182,6 +183,7 @@ class Device(metaclass=DeviceGroupMeta):
                 raise Exception(
                     f"Neither setter or setter_name was defined for {setting}"
                 )
+            setting = cast(setting, EnumSettingDescriptor)
             if (
                 setting.type == SettingType.Enum
                 and setting.choices_attribute is not None
@@ -288,21 +290,21 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
-    def actions(self) -> Dict[str, ActionDescriptor]:
+    def actions(self) -> Optional[Dict[str, ActionDescriptor]]:
         """Return device actions."""
         if self._actions is None:
             self._initialize_descriptors()
 
         return self._actions
 
-    def settings(self) -> Dict[str, SettingDescriptor]:
+    def settings(self) -> Optional[Dict[str, SettingDescriptor]]:
         """Return device settings."""
         if self._settings is None:
             self._initialize_descriptors()
 
         return self._settings
 
-    def sensors(self) -> Dict[str, SensorDescriptor]:
+    def sensors(self) -> Optional[Dict[str, SensorDescriptor]]:
         """Return device sensors."""
         if self._sensors is None:
             self._initialize_descriptors()
