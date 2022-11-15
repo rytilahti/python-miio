@@ -151,10 +151,7 @@ def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
             if get_origin(rtype) is Union:  # Unwrap Optional[]
                 rtype, _ = get_args(rtype)
 
-            if rtype == bool:
-                return "binary"
-            else:
-                return "sensor"
+            return rtype
 
         sensor_type = _sensor_type_for_return_type(func)
         descriptor = SensorDescriptor(
