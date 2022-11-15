@@ -62,6 +62,15 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
                 1487548800,
             ],
         ]
+        self.dummies["dnd_timer"] = [
+            {
+                "enabled": 1,
+                "start_minute": 0,
+                "end_minute": 0,
+                "start_hour": 22,
+                "end_hour": 8,
+            }
+        ]
 
         self.return_values = {
             "get_status": lambda x: [self.state],
@@ -75,6 +84,8 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
             "app_charge": lambda x: self.change_mode("charge"),
             "miIO.info": "dummy info",
+            "get_clean_record": lambda x: [[1488347071, 1488347123, 16, 0, 0, 0]],
+            "get_dnd_timer": lambda x: self.dummies["dnd_timer"],
         }
 
         super().__init__(args, kwargs)
