@@ -1,5 +1,6 @@
 import logging
 from enum import Enum
+from inspect import getmembers
 from typing import Any, Dict, List, Optional, Union  # noqa: F401
 
 import click
@@ -64,6 +65,7 @@ class Device(metaclass=DeviceGroupMeta):
         self._info: Optional[DeviceInfo] = None
         self._settings: Optional[Dict[str, SettingDescriptor]] = None
         self._sensors: Optional[Dict[str, SensorDescriptor]] = None
+        self._actions: Optional[Dict[str, ActionDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -280,7 +282,15 @@ class Device(metaclass=DeviceGroupMeta):
 
     def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
-        return {}
+        if self._actions is None:
+            self._actions = {}
+            for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
+                method_name, method = action_tuple
+                action = method._action
+                action.method = method  # bind the method
+                self._actions[method_name] = action
+
+        return self._actions
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""

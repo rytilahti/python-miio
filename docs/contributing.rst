@@ -344,6 +344,28 @@ If the device has a setting with some pre-defined values, you want to use this.
         """Return the LED brightness."""
 
 
+Actions
+"""""""
+
+Use :meth:`@action <miio.devicestatus.action>` to create :class:`~miio.descriptors.ActionDescriptor`
+objects for the device.
+This will make all decorated actions accessible through :meth:`~miio.device.Device.actions` for downstream users.
+
+.. code-block:: python
+
+    @command()
+    @action(name="Do Something", some_kwarg_for_downstream="hi there")
+    def do_something(self):
+        """Execute some action on the device."""
+
+.. note::
+
+    All keywords arguments not defined in the decorator signature will be available
+    through the :attr:`~miio.descriptors.ActionDescriptor.extras` variable.
+
+    This information can be used to pass information to the downstream users.
+
+
 .. _adding_tests:
 
 Adding tests
