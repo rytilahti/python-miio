@@ -189,6 +189,14 @@ class Device(metaclass=DeviceGroupMeta):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
                 setting.choices = retrieve_choices_function()
 
+        # Actions
+        self._actions = {}
+        for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
+            method_name, method = action_tuple
+            action = method._action
+            action.method = method  # bind the method
+            self._actions[method_name] = action
+
     @property
     def device_id(self) -> int:
         """Return device id (did), if available."""
@@ -283,12 +291,7 @@ class Device(metaclass=DeviceGroupMeta):
     def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
         if self._actions is None:
-            self._actions = {}
-            for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
-                method_name, method = action_tuple
-                action = method._action
-                action.method = method  # bind the method
-                self._actions[method_name] = action
+            self._initialize_descriptors()
 
         return self._actions
 
