@@ -65,6 +65,7 @@ class Device(metaclass=DeviceGroupMeta):
         self._info: Optional[DeviceInfo] = None
         self._status: Optional[DeviceStatus] = None
         self._buttons: Optional[List[ButtonDescriptor]] = None
+        self._actions: Optional[Dict[str, ActionDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -258,16 +259,16 @@ class Device(metaclass=DeviceGroupMeta):
         return self._status
 
     def actions(self) -> Dict[str, ActionDescriptor]:
-        """Return a list of button-like, clickable actions of the device."""
-        if self._buttons is None:
-            self._buttons = []
-            for button_tuple in getmembers(self, lambda o: hasattr(o, "_button")):
-                method_name, method = button_tuple
-                button = method._button
-                button.method = method  # bind the method
-                self._buttons.append(button)
+        """Return device actions."""
+        if self._actions is None:
+            self._actions = {}
+            for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
+                method_name, method = action_tuple
+                action = method._action
+                action.method = method  # bind the method
+                self._actions[method_name] = action
 
-        return self._buttons
+        return self._actions
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return list of settings."""

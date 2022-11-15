@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Dict, Optional, Type, Union, get_args, get_origin, get_type_hints
 
 from .descriptors import (
-    ButtonDescriptor,
+    ActionDescriptor,
     BooleanSettingDescriptor,
     EnumSettingDescriptor,
     NumberSettingDescriptor,
@@ -143,10 +143,7 @@ def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
             if get_origin(rtype) is Union:  # Unwrap Optional[]
                 rtype, _ = get_args(rtype)
 
-            if rtype == bool:
-                return "binary"
-            else:
-                return "sensor"
+            return rtype
 
         sensor_type = _sensor_type_for_return_type(func)
         descriptor = SensorDescriptor(
@@ -231,30 +228,30 @@ def setting(
     return decorator_setting
 
 
-def button(name: str, **kwargs):
-    """Syntactic sugar to create ButtonDescriptor objects.
+def action(name: str, **kwargs):
+    """Syntactic sugar to create ActionDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
-    types of sensors are available for the device.
+    types of actions are available for the device.
 
     The interface is kept minimal, but you can pass any extra keyword arguments.
-    These extras are made accessible over :attr:`~miio.descriptors.ButtonDescriptor.extras`,
+    These extras are made accessible over :attr:`~miio.descriptors.ActionDescriptor.extras`,
     and can be interpreted downstream users as they wish.
     """
 
-    def decorator_button(func):
+    def decorator_action(func):
         property_name = str(func.__name__)
         qualified_name = str(func.__qualname__)
 
-        descriptor = ButtonDescriptor(
+        descriptor = ActionDescriptor(
             id=qualified_name,
             name=name,
             method_name=property_name,
             method=None,
             extras=kwargs,
         )
-        func._button = descriptor
+        func._action = descriptor
 
         return func
 
-    return decorator_button
+    return decorator_action

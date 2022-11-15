@@ -20,7 +20,7 @@ from miio.click_common import (
     command,
 )
 from miio.device import Device, DeviceInfo
-from miio.devicestatus import button
+from miio.devicestatus import action
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
@@ -145,6 +145,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_start")
 
     @command()
+    @action(name="Stop cleaning", type="vacuum")
     def stop(self):
         """Stop cleaning.
 
@@ -154,16 +155,19 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_stop")
 
     @command()
+    @action(name="Spot cleaning", type="vacuum")
     def spot(self):
         """Start spot cleaning."""
         return self.send("app_spot")
 
     @command()
+    @action(name="Pause cleaning", type="vacuum")
     def pause(self):
         """Pause cleaning."""
         return self.send("app_pause")
 
     @command()
+    @action(name="Start cleaning", type="vacuum")
     def resume_or_start(self):
         """A shortcut for resuming or starting cleaning."""
         status = self.status()
@@ -216,6 +220,7 @@ class RoborockVacuum(Device, VacuumInterface):
             return self._info
 
     @command()
+    @action(name="Home", type="vacuum")
     def home(self):
         """Stop cleaning and return home."""
 
@@ -571,6 +576,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return res
 
     @command()
+    @action(name="Find robot", type="vacuum")
     def find(self):
         """Find the robot."""
         return self.send("find_me", [""])
@@ -748,6 +754,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("change_sound_volume", [vol])
 
     @command()
+    @action(name="Test sound volume", type="vacuum")
     def test_sound_volume(self):
         """Test current sound volume."""
         return self.send("test_sound_volume")
@@ -882,14 +889,14 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("set_dust_collection_mode", {"mode": mode.value})[0] == "ok"
 
     @command()
-    @button(name="Start dust collection", icon="mdi:turbine")
+    @action(name="Start dust collection", icon="mdi:turbine")
     def start_dust_collection(self):
         """Activate automatic dust collection."""
         self._verify_auto_empty_support()
         return self.send("app_start_collect_dust")
 
     @command()
-    @button(name="Stop dust collection", icon="mdi:turbine")
+    @action(name="Stop dust collection", icon="mdi:turbine")
     def stop_dust_collection(self):
         """Abort in progress dust collection."""
         self._verify_auto_empty_support()
