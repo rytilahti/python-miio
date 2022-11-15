@@ -183,7 +183,7 @@ class Device(metaclass=DeviceGroupMeta):
                 raise Exception(
                     f"Neither setter or setter_name was defined for {setting}"
                 )
-            setting = cast(setting, EnumSettingDescriptor)
+            setting = cast(EnumSettingDescriptor, setting)
             if (
                 setting.type == SettingType.Enum
                 and setting.choices_attribute is not None
