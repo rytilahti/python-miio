@@ -286,7 +286,7 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device settings."""
         if self._settings is None:
             raise Exception(
-                "setting descriptors schould first be cached using the info() call"
+                "setting descriptors should first be cached using the info() call"
             )
 
         return self._settings
