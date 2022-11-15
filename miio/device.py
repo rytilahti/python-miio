@@ -8,9 +8,9 @@ import click
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
 from .descriptors import (
     ActionDescriptor,
-    EnumSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
+    SettingType,
 )
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
