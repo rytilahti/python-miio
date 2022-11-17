@@ -290,23 +290,26 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device status."""
         raise NotImplementedError()
 
-    def actions(self) -> Optional[Dict[str, ActionDescriptor]]:
+    def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
         if self._actions is None:
+            self._actions = {}
             self._initialize_descriptors()
 
         return self._actions
 
-    def settings(self) -> Optional[Dict[str, SettingDescriptor]]:
+    def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""
         if self._settings is None:
+            self._settings = {}
             self._initialize_descriptors()
 
         return self._settings
 
-    def sensors(self) -> Optional[Dict[str, SensorDescriptor]]:
+    def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return device sensors."""
         if self._sensors is None:
+            self._sensors = {}
             self._initialize_descriptors()
 
         return self._sensors
