@@ -139,9 +139,12 @@ class Device(metaclass=DeviceGroupMeta):
         if self._info is not None and not skip_cache:
             return self._info
 
-        self._initialize_descriptors()
-
         return self._fetch_info()
+
+    def initialize(self) -> None:
+        """Initialize the device by caching information."""
+        self.info()
+        self._initialize_descriptors()
 
     def _fetch_info(self) -> DeviceInfo:
         """Perform miIO.info query on the device and cache the result."""
