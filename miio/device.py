@@ -164,19 +164,10 @@ class Device(metaclass=DeviceGroupMeta):
                 "Unable to request miIO.info from the device"
             ) from ex
 
-    def _initialize_descriptors(self) -> None:
-        """Cache all the descriptors once on the first call."""
-        if self._sensors is not None:
-            return
-
-        status = self.status()
-
-        # Sensors
-        self._sensors = status.sensors()
-
-        # Settings
-        self._settings = status.settings()
-        for setting in self._settings.values():
+    def _setting_descriptors_from_status(self, status: DeviceStatus) -> Dict[str, SettingDescriptor]:
+        """Get the setting descriptors from a DeviceStatus."""
+        settings = status.settings()
+        for setting in settings.values():
             if setting.setter_name is not None:
                 setting.setter = getattr(self, setting.setter_name)
             if setting.setter is None:
@@ -191,13 +182,33 @@ class Device(metaclass=DeviceGroupMeta):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
                 setting.choices = retrieve_choices_function()
 
-        # Actions
-        self._actions = {}
+        return settings
+
+    def _sensor_descriptors_from_status(self, status: DeviceStatus) -> Dict[str, SensorDescriptor]:
+        """Get the sensor descriptors from a DeviceStatus."""
+        return status.sensors()
+
+    def _action_descriptors(self) -> Dict[str, ActionDescriptor]:
+        """Get the action descriptors from a DeviceStatus."""
+        actions = {}
         for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
             method_name, method = action_tuple
             action = method._action
             action.method = method  # bind the method
-            self._actions[method_name] = action
+            actions[method_name] = action
+
+        return actions
+
+    def _initialize_descriptors(self) -> None:
+        """Cache all the descriptors once on the first call."""
+        if self._sensors is not None:
+            return
+
+        status = self.status()
+
+        self._sensors = self._sensor_descriptors_from_status(status)
+        self._settings = self._setting_descriptors_from_status(status)
+        self._actions = self._action_descriptors()
 
     @property
     def device_id(self) -> int:
