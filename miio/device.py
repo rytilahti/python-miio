@@ -131,8 +131,6 @@ class Device(metaclass=DeviceGroupMeta):
 
         This includes information about connected wlan network, and hardware and
         software versions.
-        This also caches the descriptors for sensors, settings and actions
-        which makes additional IO calls.
 
         :param skip_cache bool: Skip the cache
         """
@@ -142,7 +140,10 @@ class Device(metaclass=DeviceGroupMeta):
         return self._fetch_info()
 
     def initialize(self) -> None:
-        """Initialize the device by caching information."""
+        """
+        This method implicitly populates the internal data structures needed
+        prior accessing `info()`, `sensors()`, `settings()`, or `actions()`.
+        """
         self.info()
         self._initialize_descriptors()
 
