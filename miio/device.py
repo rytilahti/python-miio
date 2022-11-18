@@ -140,10 +140,8 @@ class Device(metaclass=DeviceGroupMeta):
         return self._fetch_info()
 
     def initialize(self) -> None:
-        """
-        This method implicitly populates the internal data structures needed
-        prior accessing `info()`, `sensors()`, `settings()`, or `actions()`.
-        """
+        """This method implicitly populates the internal data structures needed
+        prior accessing `info()`, `sensors()`, `settings()`, or `actions()`."""
         self.info()
         self._initialize_descriptors()
 
