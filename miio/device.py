@@ -167,7 +167,9 @@ class Device(metaclass=DeviceGroupMeta):
                 "Unable to request miIO.info from the device"
             ) from ex
 
-    def _setting_descriptors_from_status(self, status: DeviceStatus) -> Dict[str, SettingDescriptor]:
+    def _setting_descriptors_from_status(
+        self, status: DeviceStatus
+    ) -> Dict[str, SettingDescriptor]:
         """Get the setting descriptors from a DeviceStatus."""
         settings = status.settings()
         for setting in settings.values():
@@ -187,7 +189,9 @@ class Device(metaclass=DeviceGroupMeta):
 
         return settings
 
-    def _sensor_descriptors_from_status(self, status: DeviceStatus) -> Dict[str, SensorDescriptor]:
+    def _sensor_descriptors_from_status(
+        self, status: DeviceStatus
+    ) -> Dict[str, SensorDescriptor]:
         """Get the sensor descriptors from a DeviceStatus."""
         return status.sensors()
 
