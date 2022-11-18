@@ -31,4 +31,12 @@ class DeviceError(DeviceException):
 
 
 class RecoverableError(DeviceError):
-    """Exception communicating an recoverable error delivered by the target device."""
+    """Exception communicating a recoverable error delivered by the target device."""
+
+
+class UnsupportedFeatureException(DeviceException):
+    """Exception communicating that the device does not support the wanted feature."""
+
+
+class CloudException(Exception):
+    """Exception raised for cloud connectivity issues."""

@@ -1,7 +1,9 @@
+from unittest.mock import ANY
+
 import pytest
 
 from miio import Huizuo, MiotDevice
-from miio.miot_device import MiotValueType
+from miio.miot_device import MiotValueType, _filter_request_fields
 
 MIOT_DEVICES = MiotDevice.__subclasses__()
 # TODO: huizuo needs to be refactored to use _mappings,
@@ -15,6 +17,7 @@ def dev(module_mocker):
     device = MiotDevice(
         "127.0.0.1", "68ffffffffffffffffffffffffffffff", mapping=DUMMY_MAPPING
     )
+    device._model = "testmodel"
     module_mocker.patch.object(device, "send")
     return device
 
@@ -58,7 +61,7 @@ def test_get_property_by(dev):
 def test_set_property_by(dev, value_type, value):
     siid = 1
     piid = 1
-    _ = dev.set_property_by(siid, piid, value, value_type)
+    _ = dev.set_property_by(siid, piid, value, value_type=value_type)
 
     if value_type is not None:
         value = value_type.value(value)
@@ -66,6 +69,18 @@ def test_set_property_by(dev, value_type, value):
     dev.send.assert_called_with(
         "set_properties",
         [{"did": f"set-{siid}-{piid}", "siid": siid, "piid": piid, "value": value}],
+    )
+
+
+def test_set_property_by_name(dev):
+    siid = 1
+    piid = 1
+    value = 1
+    _ = dev.set_property_by(siid, piid, value, name="test-name")
+
+    dev.send.assert_called_with(
+        "set_properties",
+        [{"did": "test-name", "siid": siid, "piid": piid, "value": value}],
     )
 
 
@@ -147,7 +162,55 @@ def test_mapping_structure(cls):
 
 @pytest.mark.parametrize("cls", MIOT_DEVICES)
 def test_supported_models(cls):
-    assert cls.supported_models == cls._mappings.keys()
+    assert cls.supported_models == list(cls._mappings.keys())
 
     # make sure that that _supported_models is not defined
     assert not cls._supported_models
+
+
+def test_call_action(dev):
+    dev._mappings["testmodel"] = {"test_action": {"siid": 1, "aiid": 1}}
+
+    dev.call_action("test_action")
+
+
+@pytest.mark.parametrize(
+    "props,included_in_request",
+    [
+        ({"access": ["read"]}, True),  # read only
+        ({"access": ["read", "write"]}, True),  # read-write
+        ({}, True),  # not defined
+        ({"access": ["write"]}, False),  # write-only
+        ({"aiid": "1"}, False),  # action
+    ],
+    ids=["read-only", "read-write", "access-not-defined", "write-only", "action"],
+)
+def test_get_properties_for_mapping_readables(mocker, dev, props, included_in_request):
+    base_props = {"readable_property": {"siid": 1, "piid": 1}}
+    base_request = [{"did": k, **v} for k, v in base_props.items()]
+    dev._mappings["testmodel"] = mapping = {
+        **base_props,
+        "property_under_test": {"siid": 1, "piid": 2, **props},
+    }
+    expected_request = [
+        {"did": k, **_filter_request_fields(v)} for k, v in mapping.items()
+    ]
+
+    req = mocker.patch.object(dev, "get_properties")
+    dev.get_properties_for_mapping()
+
+    try:
+
+        req.assert_called_with(
+            expected_request, property_getter=ANY, max_properties=ANY
+        )
+    except AssertionError:
+        if included_in_request:
+            raise AssertionError("Required property was not requested")
+        else:
+            try:
+                req.assert_called_with(
+                    base_request, property_getter=ANY, max_properties=ANY
+                )
+            except AssertionError as ex:
+                raise AssertionError("Tried to read unreadable property") from ex

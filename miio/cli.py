@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Dict
 
 import click
 
@@ -12,6 +13,8 @@ from miio.click_common import (
 from miio.miioprotocol import MiIOProtocol
 
 from .cloud import cloud
+from .devicefactory import factory
+from .devtools import devtools
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,11 +30,22 @@ _LOGGER = logging.getLogger(__name__)
 @click.version_option()
 @click.pass_context
 def cli(ctx, debug: int, output: str):
-    if debug:
-        logging.basicConfig(level=logging.DEBUG)
-        _LOGGER.info("Debug mode active")
-    else:
-        logging.basicConfig(level=logging.INFO)
+    logging_config: Dict[str, Any] = {
+        "level": logging.DEBUG if debug > 0 else logging.INFO
+    }
+    try:
+        from rich.logging import RichHandler
+
+        rich_config = {
+            "show_time": False,
+        }
+        logging_config["handlers"] = [RichHandler(**rich_config)]
+        logging_config["format"] = "%(message)s"
+    except ImportError:
+        pass
+
+    # The configuration should be converted to use dictConfig, but this keeps mypy happy for now
+    logging.basicConfig(**logging_config)  # type: ignore
 
     if output in ("json", "json_pretty"):
         output_func = json_output(pretty=output == "json_pretty")
@@ -60,6 +74,8 @@ def discover(mdns, handshake, network, timeout):
 
 cli.add_command(discover)
 cli.add_command(cloud)
+cli.add_command(devtools)
+cli.add_command(factory)
 
 
 def create_cli():

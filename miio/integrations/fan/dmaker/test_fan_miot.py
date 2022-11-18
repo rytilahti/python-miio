@@ -10,7 +10,6 @@ from .fan_miot import (
     MODEL_FAN_P10,
     MODEL_FAN_P11,
     Fan1C,
-    FanException,
     FanMiot,
     OperationMode,
 )
@@ -81,10 +80,10 @@ class TestFanMiot(TestCase):
         self.device.set_speed(100)
         assert speed() == 100
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_speed(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_speed(101)
 
     def test_set_angle(self):
@@ -102,19 +101,19 @@ class TestFanMiot(TestCase):
         self.device.set_angle(150)
         assert angle() == 150
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(31)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(140)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(151)
 
     def test_set_oscillate(self):
@@ -168,9 +167,9 @@ class TestFanMiot(TestCase):
         self.device.delay_off(480)
         assert delay_off_countdown() == 480
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(481)
 
 
@@ -202,19 +201,19 @@ class TestFanMiotP10(TestCase):
         self.device.set_angle(140)
         assert angle() == 140
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(31)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(150)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(141)
 
 
@@ -298,10 +297,10 @@ class TestFan1C(TestCase):
         self.device.set_speed(3)
         assert speed() == 3
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_speed(0)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_speed(4)
 
     def test_set_oscillate(self):
@@ -355,7 +354,7 @@ class TestFan1C(TestCase):
         self.device.delay_off(480)
         assert delay_off_countdown() == 480
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(481)

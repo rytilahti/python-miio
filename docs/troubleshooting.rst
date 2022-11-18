@@ -5,6 +5,10 @@ This page lists some known issues and potential solutions.
 If you are having problems with incorrectly working commands or missing features,
 please refer to :ref:`new_devices` for information how to analyze the device traffic.
 
+.. contents:: Contents
+   :local:
+
+
 Discover devices across subnets
 -------------------------------
 

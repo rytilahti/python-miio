@@ -9,7 +9,6 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -69,10 +68,6 @@ COOKING_STAGES = {
     },
     16: {"name": "Cooking finished", "description": ""},
 }
-
-
-class CookerException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -323,113 +318,113 @@ class CookerSettings(DeviceStatus):
           Bit 5-8: Unused
         """
         if settings is None:
-            self.settings = [0, 4]
+            self._settings = [0, 4]
         else:
-            self.settings = [
+            self._settings = [
                 int(settings[i : i + 2], 16) for i in range(0, len(settings), 2)
             ]
 
     @property
     def pressure_supported(self) -> bool:
-        return self.settings[0] & 1 != 0
+        return self._settings[0] & 1 != 0
 
     @pressure_supported.setter
     def pressure_supported(self, supported: bool):
         if supported:
-            self.settings[0] |= 1
+            self._settings[0] |= 1
         else:
-            self.settings[0] &= 254
+            self._settings[0] &= 254
 
     @property
     def led_on(self) -> bool:
-        return self.settings[0] & 2 != 0
+        return self._settings[0] & 2 != 0
 
     @led_on.setter
     def led_on(self, on: bool):
         if on:
-            self.settings[0] |= 2
+            self._settings[0] |= 2
         else:
-            self.settings[0] &= 253
+            self._settings[0] &= 253
 
     @property
     def auto_keep_warm(self) -> bool:
-        return self.settings[0] & 4 != 0
+        return self._settings[0] & 4 != 0
 
     @auto_keep_warm.setter
     def auto_keep_warm(self, keep_warm: bool):
         if keep_warm:
-            self.settings[0] |= 4
+            self._settings[0] |= 4
         else:
-            self.settings[0] &= 251
+            self._settings[0] &= 251
 
     @property
     def lid_open_warning(self) -> bool:
-        return self.settings[0] & 8 != 0
+        return self._settings[0] & 8 != 0
 
     @lid_open_warning.setter
     def lid_open_warning(self, alarm: bool):
         if alarm:
-            self.settings[0] |= 8
+            self._settings[0] |= 8
         else:
-            self.settings[0] &= 247
+            self._settings[0] &= 247
 
     @property
     def lid_open_warning_delayed(self) -> bool:
-        return self.settings[0] & 16 != 0
+        return self._settings[0] & 16 != 0
 
     @lid_open_warning_delayed.setter
     def lid_open_warning_delayed(self, alarm: bool):
         if alarm:
-            self.settings[0] |= 16
+            self._settings[0] |= 16
         else:
-            self.settings[0] &= 239
+            self._settings[0] &= 239
 
     @property
     def jingzhu_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 1 != 0
+        return self._settings[1] & 1 != 0
 
     @jingzhu_auto_keep_warm.setter
     def jingzhu_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
-            self.settings[1] |= 1
+            self._settings[1] |= 1
         else:
-            self.settings[1] &= 254
+            self._settings[1] &= 254
 
     @property
     def kuaizhu_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 2 != 0
+        return self._settings[1] & 2 != 0
 
     @kuaizhu_auto_keep_warm.setter
     def kuaizhu_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
-            self.settings[1] |= 2
+            self._settings[1] |= 2
         else:
-            self.settings[1] &= 253
+            self._settings[1] &= 253
 
     @property
     def zhuzhou_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 4 != 0
+        return self._settings[1] & 4 != 0
 
     @zhuzhou_auto_keep_warm.setter
     def zhuzhou_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
-            self.settings[1] |= 4
+            self._settings[1] |= 4
         else:
-            self.settings[1] &= 251
+            self._settings[1] &= 251
 
     @property
     def favorite_auto_keep_warm(self) -> bool:
-        return self.settings[1] & 8 != 0
+        return self._settings[1] & 8 != 0
 
     @favorite_auto_keep_warm.setter
     def favorite_auto_keep_warm(self, auto_keep_warm: bool):
         if auto_keep_warm:
-            self.settings[1] |= 8
+            self._settings[1] |= 8
         else:
-            self.settings[1] &= 247
+            self._settings[1] &= 247
 
     def __str__(self) -> str:
-        return "".join([f"{value:02x}" for value in self.settings])
+        return "".join([f"{value:02x}" for value in self._settings])
 
 
 class CookerStatus(DeviceStatus):
@@ -540,7 +535,7 @@ class CookerStatus(DeviceStatus):
         return int(self.data["t_cook"])
 
     @property
-    def settings(self) -> CookerSettings:
+    def cooker_settings(self) -> CookerSettings:
         """Settings of the cooker."""
         return CookerSettings(self.data["setting"])
 
@@ -593,7 +588,7 @@ class Cooker(Device):
             "Remaining: {result.remaining}\n"
             "Cooking delayed: {result.cooking_delayed}\n"
             "Duration: {result.duration}\n"
-            "Settings: {result.settings}\n"
+            "Settings: {result.cooker_settings}\n"
             "Interaction timeouts: {result.interaction_timeouts}\n"
             "Hardware version: {result.hardware_version}\n"
             "Firmware version: {result.firmware_version}\n"
@@ -644,7 +639,7 @@ class Cooker(Device):
     def start(self, profile: str):
         """Start cooking a profile."""
         if not self._validate_profile(profile):
-            raise CookerException("Invalid cooking profile: %s" % profile)
+            raise ValueError("Invalid cooking profile: %s" % profile)
 
         self.send("set_start", [profile])
 
@@ -691,7 +686,7 @@ class Cooker(Device):
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles."""
         if not self._validate_profile(profile):
-            raise CookerException("Invalid cooking profile: %s" % profile)
+            raise ValueError("Invalid cooking profile: %s" % profile)
 
         self.send("set_menu", [profile])
 

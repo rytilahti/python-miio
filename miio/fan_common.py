@@ -1,11 +1,5 @@
 import enum
 
-from .exceptions import DeviceException
-
-
-class FanException(DeviceException):
-    pass
-
 
 class OperationMode(enum.Enum):
     Normal = "normal"

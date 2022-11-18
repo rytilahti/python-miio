@@ -4,8 +4,9 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import DeviceException, DeviceStatus, MiotDevice
+from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
+from miio.exceptions import UnsupportedFeatureException
 
 from .airfilter_util import FilterType, FilterTypeUtil
 
@@ -186,7 +187,7 @@ _MAPPING_RMB1 = {
     "child_lock": {"siid": 8, "piid": 1},
     # custom-service
     "motor_speed": {"siid": 9, "piid": 1},
-    "favorite_level": {"siid": 9, "piid": 5},
+    "favorite_level": {"siid": 9, "piid": 11},
     # aqi
     "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
     # Screen
@@ -237,12 +238,14 @@ _MAPPING_ZA1 = {
 _MAPPINGS = {
     "zhimi.airpurifier.ma4": _MAPPING,  # airpurifier 3
     "zhimi.airpurifier.mb3": _MAPPING,  # airpurifier 3h
-    "zhimi.airpurifier.mb3a": _MAPPING,  # airpurifier 3h
+    "zhimi.airpurifier.mb3a": _MAPPING,  # airpurifier 3h, unsure if both models are used for this device
+    "zhimi.airp.mb3a": _MAPPING,  # airpurifier 3h
     "zhimi.airpurifier.va1": _MAPPING,  # airpurifier proh
     "zhimi.airpurifier.vb2": _MAPPING,  # airpurifier proh
     "zhimi.airpurifier.mb4": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb4a": _MAPPING_MB4,  # airpurifier 3c
     "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
+    "zhimi.airp.mb5a": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
@@ -250,9 +253,14 @@ _MAPPINGS = {
     "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
 }
 
-
-class AirPurifierMiotException(DeviceException):
-    pass
+# Models requiring reversed led brightness value
+REVERSED_LED_BRIGHTNESS = [
+    "zhimi.airp.va2",
+    "zhimi.airp.mb5",
+    "zhimi.airp.mb5a",
+    "zhimi.airp.vb4",
+    "zhimi.airp.rmb1",
+]
 
 
 class OperationMode(enum.Enum):
@@ -400,15 +408,9 @@ class AirPurifierMiotStatus(DeviceStatus):
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
         """Brightness of the LED."""
-
         value = self.data.get("led_brightness")
         if value is not None:
-            if self.model in (
-                "zhimi.airp.va2",
-                "zhimi.airp.mb5",
-                "zhimi.airp.vb4",
-                "zhimi.airp.rmb1",
-            ):
+            if self.model in REVERSED_LED_BRIGHTNESS:
                 value = 2 - value
             try:
                 return LedBrightness(value)
@@ -546,13 +548,13 @@ class AirPurifierMiot(MiotDevice):
     def set_favorite_rpm(self, rpm: int):
         """Set favorite motor speed."""
         if "favorite_rpm" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported favorite rpm for model '%s'" % self.model
             )
 
         # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
         if rpm < 300 or rpm > 2300 or rpm % 10 != 0:
-            raise AirPurifierMiotException(
+            raise ValueError(
                 "Invalid favorite motor speed: %s. Must be between 300 and 2300 and divisible by 10"
                 % rpm
             )
@@ -575,7 +577,7 @@ class AirPurifierMiot(MiotDevice):
     def set_anion(self, anion: bool):
         """Set anion on/off."""
         if "anion" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported anion for model '%s'" % self.model
             )
         return self.set_property("anion", anion)
@@ -589,7 +591,7 @@ class AirPurifierMiot(MiotDevice):
     def set_buzzer(self, buzzer: bool):
         """Set buzzer on/off."""
         if "buzzer" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported buzzer for model '%s'" % self.model
             )
 
@@ -606,7 +608,7 @@ class AirPurifierMiot(MiotDevice):
     def set_gestures(self, gestures: bool):
         """Set gestures on/off."""
         if "gestures" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Gestures not support for model '%s'" % self.model
             )
 
@@ -621,7 +623,7 @@ class AirPurifierMiot(MiotDevice):
     def set_child_lock(self, lock: bool):
         """Set child lock on/off."""
         if "child_lock" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported child lock for model '%s'" % self.model
             )
         return self.set_property("child_lock", lock)
@@ -633,12 +635,12 @@ class AirPurifierMiot(MiotDevice):
     def set_fan_level(self, level: int):
         """Set fan level."""
         if "fan_level" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported fan level for model '%s'" % self.model
             )
 
         if level < 1 or level > 3:
-            raise AirPurifierMiotException("Invalid fan level: %s" % level)
+            raise ValueError("Invalid fan level: %s" % level)
         return self.set_property("fan_level", level)
 
     @command(
@@ -648,14 +650,12 @@ class AirPurifierMiot(MiotDevice):
     def set_volume(self, volume: int):
         """Set buzzer volume."""
         if "volume" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported volume for model '%s'" % self.model
             )
 
         if volume < 0 or volume > 100:
-            raise AirPurifierMiotException(
-                "Invalid volume: %s. Must be between 0 and 100" % volume
-            )
+            raise ValueError("Invalid volume: %s. Must be between 0 and 100" % volume)
         return self.set_property("buzzer_volume", volume)
 
     @command(
@@ -668,12 +668,12 @@ class AirPurifierMiot(MiotDevice):
         Needs to be between 0 and 14.
         """
         if "favorite_level" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported favorite level for model '%s'" % self.model
             )
 
         if level < 0 or level > 14:
-            raise AirPurifierMiotException("Invalid favorite level: %s" % level)
+            raise ValueError("Invalid favorite level: %s" % level)
 
         return self.set_property("favorite_level", level)
 
@@ -684,16 +684,12 @@ class AirPurifierMiot(MiotDevice):
     def set_led_brightness(self, brightness: LedBrightness):
         """Set led brightness."""
         if "led_brightness" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported led brightness for model '%s'" % self.model
             )
 
         value = brightness.value
-        if (
-            self.model
-            in ("zhimi.airp.va2", "zhimi.airp.mb5", "zhimi.airp.vb4", "zhimi.airp.rmb1")
-            and value is not None
-        ):
+        if self.model in REVERSED_LED_BRIGHTNESS and value is not None:
             value = 2 - value
         return self.set_property("led_brightness", value)
 
@@ -706,7 +702,7 @@ class AirPurifierMiot(MiotDevice):
     def set_led(self, led: bool):
         """Turn led on/off."""
         if "led" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported led for model '%s'" % self.model
             )
         return self.set_property("led", led)
@@ -718,10 +714,10 @@ class AirPurifierMiot(MiotDevice):
     def set_led_brightness_level(self, level: int):
         """Set led brightness level (0..8)."""
         if "led_brightness_level" not in self._get_mapping():
-            raise AirPurifierMiotException(
+            raise UnsupportedFeatureException(
                 "Unsupported led brightness level for model '%s'" % self.model
             )
         if level < 0 or level > 8:
-            raise AirPurifierMiotException("Invalid brightness level: %s" % level)
+            raise ValueError("Invalid brightness level: %s" % level)
 
         return self.set_property("led_brightness_level", level)

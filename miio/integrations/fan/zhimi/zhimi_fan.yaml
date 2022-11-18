@@ -1,0 +1,103 @@
+models:
+  - model: zhimi.fan.sa1
+  - model: zhimi.fan.za1
+  - model: zhimi.fan.za3
+  - model: zhimi.fan.za4
+  - model: zhimi.fan.v3
+  - model: zhimi.fan.v2
+type: fan
+properties:
+  - name: angle
+    value: 120
+    type: int
+    min: 0
+    max: 120
+    setter: set_angle
+  - name: speed
+    value: 277
+    type: int
+    setter: set_speed_level
+    min: 0
+    max: 100
+  - name: poweroff_time
+    value: 12
+    type: int
+    setter: set_poweroff_time
+  - name: power
+    value: 'on'
+    type: str_bool
+    setter: set_power
+  - name: ac_power
+    value: 'on'
+    type: str_bool
+  - name: angle_enable
+    value: 'off'
+    setter: set_angle_enable
+    type: str_bool
+  - name: speed_level
+    value: 1
+    type: int
+    min: 0
+    max: 100
+    setter: set_speed_level
+  - name: natural_level
+    value: 2
+    type: int
+    setter: set_natural_level
+  - name: child_lock
+    value: 'off'
+    type: str_bool
+    setter: set_child_lock
+  - name: buzzer
+    value: 0
+    type: int
+    setter: set_buzzer
+  - name: led_b
+    value: 0
+    type: int
+    setter: set_led_b
+  - name: use_time
+    value: 2318
+    type: int
+  # V2 & V3 only
+  - name: temp_dec
+    value: 232
+    type: float
+    models:
+      - zhimi.fan.v3
+      - zhimi.fan.v2
+  - name: humidity
+    value: 46
+    type: int
+    models:
+      - zhimi.fan.v3
+      - zhimi.fan.v2
+  - name: battery
+    type: int
+    value: 98
+    models:
+      - zhimi.fan.v3
+      - zhimi.fan.v2
+  - name: bat_charge
+    value: "complete"
+    type: str
+    models:
+      - zhimi.fan.v3
+      - zhimi.fan.v2
+  - name: button_pressed
+    type: str
+    value: speed
+    models:
+      - zhimi.fan.v3
+      - zhimi.fan.v2
+  # V2 only properties
+  - name: led
+    type: str
+    value: null
+    models:
+      - zhimi.fan.v2
+  - name: bat_state
+    type: str
+    value: "unknown state"
+    models:
+      - zhimi.fan.v2

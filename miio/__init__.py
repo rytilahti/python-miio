@@ -7,10 +7,12 @@ from importlib.metadata import version  # type: ignore
 
 # isort: off
 
-from miio.device import Device, DeviceStatus
-from miio.exceptions import DeviceError, DeviceException
+from miio.device import Device
+from miio.devicestatus import DeviceStatus
+from miio.exceptions import DeviceError, DeviceException, UnsupportedFeatureException
 from miio.miot_device import MiotDevice
 from miio.deviceinfo import DeviceInfo
+from miio.interfaces import VacuumInterface, LightInterface, ColorTemperatureRange
 
 # isort: on
 
@@ -31,6 +33,7 @@ from miio.chuangmi_plug import ChuangmiPlug
 from miio.cloud import CloudInterface
 from miio.cooker import Cooker
 from miio.curtain_youpin import CurtainMiot
+from miio.devicefactory import DeviceFactory
 from miio.gateway import Gateway
 from miio.heater import Heater
 from miio.heater_miot import HeaterMiot
@@ -64,9 +67,9 @@ from miio.integrations.petwaterdispenser import PetWaterDispenser
 from miio.integrations.vacuum import (
     DreameVacuum,
     G1Vacuum,
+    Pro2Vacuum,
     RoborockVacuum,
     RoidmiVacuumMiot,
-    VacuumException,
     ViomiVacuum,
 )
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
@@ -77,6 +80,7 @@ from miio.integrations.vacuum.roborock.vacuumcontainers import (
     Timer,
     VacuumStatus,
 )
+from miio.integrations.viomidishwasher import ViomiDishwasher
 from miio.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.push_server import EventInfo, PushServer

@@ -1,7 +1,11 @@
+import logging
 from dataclasses import dataclass, field
+from operator import attrgetter
 from typing import Any, Dict, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, config
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def pretty_name(name):
@@ -34,20 +38,36 @@ class InstanceInfo:
     type: str
     version: int
 
+    @property
+    def filename(self) -> str:
+        return f"{self.model}_{self.status}_{self.version}.json"
+
 
 @dataclass
 class ModelMapping(DataClassJsonMixin):
     instances: List[InstanceInfo]
 
-    def urn_for_model(self, model: str):
+    def info_for_model(self, model: str, *, status_filter="released") -> InstanceInfo:
         matches = [inst for inst in self.instances if inst.model == model]
+
         if len(matches) > 1:
-            print(  # noqa: T201
-                "WARNING more than a single match for model %s, using the first one: %s"
-                % (model, matches)
+            _LOGGER.warning(
+                "more than a single match for model %s: %s, filtering with status=%s",
+                model,
+                matches,
+                status_filter,
             )
 
-        return matches[0]
+        released_versions = [inst for inst in matches if inst.status == status_filter]
+        if not released_versions:
+            raise Exception(f"No releases for {model}, adjust status_filter if you ")
+
+        _LOGGER.debug("Got %s releases, picking the newest one", released_versions)
+
+        match = max(released_versions, key=attrgetter("version"))
+        _LOGGER.debug("Using %s", match)
+
+        return match
 
 
 @dataclass

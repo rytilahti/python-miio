@@ -6,7 +6,6 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,10 +34,6 @@ AVAILABLE_PROPERTIES = {
     MODEL_AIRQUALITYMONITOR_B1: AVAILABLE_PROPERTIES_B1,
     MODEL_AIRQUALITYMONITOR_S1: AVAILABLE_PROPERTIES_S1,
 }
-
-
-class AirQualityMonitorException(DeviceException):
-    pass
 
 
 class AirQualityMonitorStatus(DeviceStatus):
@@ -175,6 +170,13 @@ class AirQualityMonitor(Device):
             self.model, AVAILABLE_PROPERTIES[MODEL_AIRQUALITYMONITOR_V1]
         )
 
+        is_s1_firmware_version_4 = (
+            self.model == MODEL_AIRQUALITYMONITOR_S1
+            and self.info().firmware_version.startswith("4")
+        )
+        if is_s1_firmware_version_4 and "battery" in properties:
+            properties.remove("battery")
+
         if self.model == MODEL_AIRQUALITYMONITOR_B1:
             values = self.send("get_air_data")
         else:
@@ -268,6 +270,6 @@ class AirQualityMonitor(Device):
         end = end_hour * 3600 + end_minute * 60
 
         if begin < 0 or begin > 86399 or end < 0 or end > 86399:
-            AirQualityMonitorException("Begin or/and end time invalid.")
+            ValueError("Begin or/and end time invalid.")
 
         self.send("set_night_time", [begin, end])

@@ -4,12 +4,7 @@ from typing import Any, Dict
 import click
 
 from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice, MiotMapping
-
-
-class YeelightDualControlModuleException(DeviceException):
-    pass
 
 
 class Switch(enum.Enum):
@@ -204,7 +199,7 @@ class YeelightDualControlModule(MiotDevice):
     def set_switch_off_delay(self, delay: int, switch: Switch):
         """Set switch off delay, should be between -1 to 43200 (in seconds)"""
         if delay < -1 or delay > 43200:
-            raise YeelightDualControlModuleException(
+            raise ValueError(
                 "Invalid switch delay: %s (should be between -1 to 43200)" % delay
             )
 

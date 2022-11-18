@@ -112,7 +112,8 @@ Supported devices
 -  Xiaomi Mijia 360 1080p
 -  Xiaomi Mijia STYJ02YM (Viomi)
 -  Xiaomi Mijia 1C STYTJ01ZHM (Dreame)
--  Dreame F9, D9, Z10 Pro
+-  Dreame F9, D9, L10 Pro, Z10 Pro
+-  Dreame Trouver Finder
 -  Xiaomi Mi Home (Mijia) G1 Robot Vacuum Mop MJSTG1
 -  Xiaomi Roidmi Eve
 -  Xiaomi Mi Smart WiFi Socket
@@ -129,7 +130,7 @@ Supported devices
 -  Xiaomi Philips Zhirui Bedroom Smart Lamp
 -  Huayi Huizuo Lamps
 -  Xiaomi Universal IR Remote Controller (Chuangmi IR)
--  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, ZA5 1C, P5, P9, P10, P11, P33
+-  Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, ZA5 1C, P5, P9, P10, P11, P15, P18, P33
 -  Xiaomi Rosou SS4 Ventilator (leshow.fan.ss4)
 -  Xiaomi Mi Air Humidifier V1, CA1, CA4, CB1, MJJSQ, JSQ, JSQ1, JSQ001
 -  Xiaomi Mi Water Purifier (Basic support: Turn on & off)
@@ -148,6 +149,7 @@ Supported devices
 -  Smartmi Radiant Heater Smart Version (ZA1 version)
 -  Xiaomi Mi Smart Space Heater
 -  Xiaomiyoupin Curtain Controller (Wi-Fi) (lumi.curtain.hagl05)
+-  Xiaomi Dishwasher (viomi.dishwasher.m02)
 -  Xiaomi Xiaomi Mi Smart Space Heater S (zhimi.heater.mc2)
 -  Xiaomi Xiaomi Mi Smart Space Heater 1S (zhimi.heater.za2)
 -  Yeelight Dual Control Module (yeelink.switch.sw1)

@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,10 +44,6 @@ AVAILABLE_PROPERTIES = {
         "filter_day",
     ],
 }
-
-
-class AirFreshException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -324,20 +320,23 @@ class AirFreshA1(Device):
     def set_favorite_speed(self, speed: int):
         """Sets the fan speed in favorite mode."""
         if speed < 0 or speed > 150:
-            raise AirFreshException("Invalid favorite speed: %s" % speed)
+            raise ValueError("Invalid favorite speed: %s" % speed)
 
         return self.send("set_favourite_speed", [speed])
 
     @command()
     def set_ptc_timer(self):
-        """
-        value = time.index + '-' +
-            time.hexSum + '-' +
-            time.startTime + '-' +
-            time.ptcTimer.endTime + '-' +
-            time.level + '-' +
-            time.status;
-        return self.send("set_ptc_timer", [value])
+        """Set PTC timer (not implemented)
+
+        Value construction::
+
+            value = time.index + '-' +
+                time.hexSum + '-' +
+                time.startTime + '-' +
+                time.ptcTimer.endTime + '-' +
+                time.level + '-' +
+                time.status;
+            return self.send("set_ptc_timer", [value])
         """
         raise NotImplementedError()
 
@@ -388,7 +387,7 @@ class AirFreshT2017(AirFreshA1):
     def set_favorite_speed(self, speed: int):
         """Sets the fan speed in favorite mode."""
         if speed < 60 or speed > 300:
-            raise AirFreshException("Invalid favorite speed: %s" % speed)
+            raise ValueError("Invalid favorite speed: %s" % speed)
 
         return self.send("set_favourite_speed", [speed])
 

@@ -34,7 +34,7 @@ repos:
     - id: docformatter
       args: [--in-place, --wrap-summaries, '88', --wrap-descriptions, '88']
 
-- repo: https://gitlab.com/pycqa/flake8
+- repo: https://github.com/pycqa/flake8
   rev: 3.9.2
   hooks:
   - id: flake8
@@ -51,7 +51,7 @@ repos:
   rev: v0.961
   hooks:
   - id: mypy
-    additional_dependencies: [types-attrs, types-PyYAML, types-requests, types-pytz, types-croniter]
+    additional_dependencies: [types-attrs, types-PyYAML, types-requests, types-pytz, types-croniter, types-freezegun]
 
 - repo: https://github.com/asottile/pyupgrade
   rev: v2.37.1

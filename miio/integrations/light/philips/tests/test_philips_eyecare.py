@@ -4,11 +4,7 @@ import pytest
 
 from miio.tests.dummies import DummyDevice
 
-from ..philips_eyecare import (
-    PhilipsEyecare,
-    PhilipsEyecareException,
-    PhilipsEyecareStatus,
-)
+from ..philips_eyecare import PhilipsEyecare, PhilipsEyecareStatus
 
 
 class DummyPhilipsEyecare(DummyDevice, PhilipsEyecare):
@@ -105,13 +101,13 @@ class TestPhilipsEyecare(TestCase):
         assert brightness() == 50
         self.device.set_brightness(100)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(-1)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(0)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(101)
 
     def test_set_scene(self):
@@ -123,13 +119,13 @@ class TestPhilipsEyecare(TestCase):
         self.device.set_scene(2)
         assert scene() == 2
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_scene(-1)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_scene(0)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_scene(5)
 
     def test_delay_off(self):
@@ -143,7 +139,7 @@ class TestPhilipsEyecare(TestCase):
         self.device.delay_off(200)
         assert delay_off_countdown() == 200
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
 
     def test_smart_night_light(self):
@@ -183,11 +179,11 @@ class TestPhilipsEyecare(TestCase):
         assert ambient_brightness() == 50
         self.device.set_ambient_brightness(100)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_ambient_brightness(-1)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_ambient_brightness(0)
 
-        with pytest.raises(PhilipsEyecareException):
+        with pytest.raises(ValueError):
             self.device.set_ambient_brightness(101)

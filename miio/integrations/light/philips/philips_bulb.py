@@ -4,13 +4,14 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
 
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_PHILIPS_LIGHT_BULB = "philips.light.bulb"
 MODEL_PHILIPS_LIGHT_HBULB = "philips.light.hbulb"
+MODEL_PHILIPS_LIGHT_CBULB = "philips.light.cbulb"
 MODEL_PHILIPS_ZHIRUI_DOWNLIGHT = "philips.light.downlight"
 MODEL_PHILIPS_CANDLE = "philips.light.candle"
 MODEL_PHILIPS_CANDLE2 = "philips.light.candle2"
@@ -21,14 +22,11 @@ AVAILABLE_PROPERTIES_COLORTEMP = AVAILABLE_PROPERTIES_COMMON + ["bright", "cct",
 AVAILABLE_PROPERTIES = {
     MODEL_PHILIPS_LIGHT_HBULB: AVAILABLE_PROPERTIES_COMMON + ["bri"],
     MODEL_PHILIPS_LIGHT_BULB: AVAILABLE_PROPERTIES_COLORTEMP,
+    MODEL_PHILIPS_LIGHT_CBULB: AVAILABLE_PROPERTIES_COLORTEMP,
     MODEL_PHILIPS_ZHIRUI_DOWNLIGHT: AVAILABLE_PROPERTIES_COLORTEMP,
     MODEL_PHILIPS_CANDLE: AVAILABLE_PROPERTIES_COLORTEMP,
     MODEL_PHILIPS_CANDLE2: AVAILABLE_PROPERTIES_COLORTEMP,
 }
-
-
-class PhilipsBulbException(DeviceException):
-    pass
 
 
 class PhilipsBulbStatus(DeviceStatus):
@@ -113,7 +111,7 @@ class PhilipsWhiteBulb(Device):
     def set_brightness(self, level: int):
         """Set brightness level."""
         if level < 1 or level > 100:
-            raise PhilipsBulbException("Invalid brightness: %s" % level)
+            raise ValueError("Invalid brightness: %s" % level)
 
         return self.send("set_bright", [level])
 
@@ -125,9 +123,7 @@ class PhilipsWhiteBulb(Device):
         """Set delay off seconds."""
 
         if seconds < 1:
-            raise PhilipsBulbException(
-                "Invalid value for a delayed turn off: %s" % seconds
-            )
+            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("delay_off", [seconds])
 
@@ -144,7 +140,7 @@ class PhilipsBulb(PhilipsWhiteBulb):
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         if level < 1 or level > 100:
-            raise PhilipsBulbException("Invalid color temperature: %s" % level)
+            raise ValueError("Invalid color temperature: %s" % level)
 
         return self.send("set_cct", [level])
 
@@ -158,10 +154,10 @@ class PhilipsBulb(PhilipsWhiteBulb):
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
-            raise PhilipsBulbException("Invalid brightness: %s" % brightness)
+            raise ValueError("Invalid brightness: %s" % brightness)
 
         if cct < 1 or cct > 100:
-            raise PhilipsBulbException("Invalid color temperature: %s" % cct)
+            raise ValueError("Invalid color temperature: %s" % cct)
 
         return self.send("set_bricct", [brightness, cct])
 
@@ -172,6 +168,6 @@ class PhilipsBulb(PhilipsWhiteBulb):
     def set_scene(self, number: int):
         """Set scene number."""
         if number < 1 or number > 4:
-            raise PhilipsBulbException("Invalid fixed scene number: %s" % number)
+            raise ValueError("Invalid fixed scene number: %s" % number)
 
         return self.send("apply_fixed_scene", [number])

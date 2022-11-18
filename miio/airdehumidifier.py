@@ -33,10 +33,6 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class AirDehumidifierException(DeviceException):
-    pass
-
-
 class OperationMode(enum.Enum):
     On = "on"
     Auto = "auto"
@@ -227,7 +223,7 @@ class AirDehumidifier(Device):
             return self.send("set_fan_level", [fan_speed.value])
         except DeviceError as ex:
             if ex.code == -10000:
-                raise AirDehumidifierException(
+                raise DeviceException(
                     "Unable to set fan speed, this can happen if device is turned off."
                 ) from ex
 
@@ -279,8 +275,6 @@ class AirDehumidifier(Device):
     def set_target_humidity(self, humidity: int):
         """Set the auto target humidity."""
         if humidity not in [40, 50, 60]:
-            raise AirDehumidifierException(
-                "Invalid auto target humidity: %s" % humidity
-            )
+            raise ValueError("Invalid auto target humidity: %s" % humidity)
 
         return self.send("set_auto", [humidity])

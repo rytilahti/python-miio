@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from miio.fan_common import FanException, OperationMode
+from miio.fan_common import OperationMode
 from miio.tests.dummies import DummyDevice
 
 from .fan import MODEL_FAN_P5, FanP5, FanStatusP5
@@ -102,10 +102,10 @@ class TestFanP5(TestCase):
         self.device.set_speed(100)
         assert speed() == 100
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_speed(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_speed(101)
 
     def test_set_angle(self):
@@ -123,16 +123,16 @@ class TestFanP5(TestCase):
         self.device.set_angle(140)
         assert angle() == 140
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(-1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(1)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(31)
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.set_angle(141)
 
     def test_set_oscillate(self):
@@ -186,5 +186,5 @@ class TestFanP5(TestCase):
         self.device.delay_off(0)
         assert delay_off_countdown() == 0
 
-        with pytest.raises(FanException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)

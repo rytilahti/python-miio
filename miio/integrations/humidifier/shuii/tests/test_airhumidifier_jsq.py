@@ -8,7 +8,6 @@ from miio.tests.dummies import DummyDevice
 from .. import AirHumidifierJsq
 from ..airhumidifier_jsq import (
     MODEL_HUMIDIFIER_JSQ001,
-    AirHumidifierException,
     AirHumidifierStatus,
     LedBrightness,
     OperationMode,
@@ -167,17 +166,17 @@ class TestAirHumidifierJsq(TestCase):
         self.device.set_mode(OperationMode.Level3)
         assert mode() == OperationMode.Level3
 
-        with pytest.raises(AirHumidifierException) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             self.device.set_mode(Bunch(value=10))
         assert str(excinfo.value) == "10 is not a valid OperationMode value"
         assert mode() == OperationMode.Level3
 
-        with pytest.raises(AirHumidifierException) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             self.device.set_mode(Bunch(value=-1))
         assert str(excinfo.value) == "-1 is not a valid OperationMode value"
         assert mode() == OperationMode.Level3
 
-        with pytest.raises(AirHumidifierException) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             self.device.set_mode(Bunch(value="smth"))
         assert str(excinfo.value) == "smth is not a valid OperationMode value"
         assert mode() == OperationMode.Level3
@@ -202,17 +201,17 @@ class TestAirHumidifierJsq(TestCase):
         self.device.set_led_brightness(LedBrightness.Low)
         assert led_brightness() == LedBrightness.Low
 
-        with pytest.raises(AirHumidifierException) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             self.device.set_led_brightness(Bunch(value=10))
         assert str(excinfo.value) == "10 is not a valid LedBrightness value"
         assert led_brightness() == LedBrightness.Low
 
-        with pytest.raises(AirHumidifierException) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             self.device.set_led_brightness(Bunch(value=-10))
         assert str(excinfo.value) == "-10 is not a valid LedBrightness value"
         assert led_brightness() == LedBrightness.Low
 
-        with pytest.raises(AirHumidifierException) as excinfo:
+        with pytest.raises(ValueError) as excinfo:
             self.device.set_led_brightness(Bunch(value="smth"))
         assert str(excinfo.value) == "smth is not a valid LedBrightness value"
         assert led_brightness() == LedBrightness.Low

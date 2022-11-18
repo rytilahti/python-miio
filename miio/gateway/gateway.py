@@ -39,11 +39,6 @@ SUPPORTED_MODELS = [
 
 GatewayCallback = Callable[[str, str], None]
 
-
-class GatewayException(DeviceException):
-    """Exception for the Xioami Gateway communication."""
-
-
 from .devices import SubDevice, SubDeviceInfo  # noqa: E402 isort:skip
 
 
@@ -407,7 +402,7 @@ class Gateway(Device):
         try:
             return self.send("get_illumination").pop()
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while getting gateway illumination"
             ) from ex
 
@@ -446,7 +441,7 @@ class Gateway(Device):
         device = self.devices[source_device]
         device.push_callback(action, params)
 
-    def close(self):
+    async def close(self):
         """Cleanup all subscribed events and registered callbacks."""
         if self._push_server is not None:
-            self._push_server.unregister_miio_device(self)
+            await self._push_server.unregister_miio_device(self)

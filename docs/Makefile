@@ -1,6 +1,9 @@
 # Minimal makefile for Sphinx documentation
 #
 
+SPHINXOPTS="-W --keep-going"
+
+
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx

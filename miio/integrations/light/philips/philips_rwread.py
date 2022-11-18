@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
@@ -15,10 +15,6 @@ MODEL_PHILIPS_LIGHT_RWREAD = "philips.light.rwread"
 AVAILABLE_PROPERTIES = {
     MODEL_PHILIPS_LIGHT_RWREAD: ["power", "bright", "dv", "snm", "flm", "chl", "flmv"]
 }
-
-
-class PhilipsRwreadException(DeviceException):
-    pass
 
 
 class MotionDetectionSensitivity(enum.Enum):
@@ -122,7 +118,7 @@ class PhilipsRwread(Device):
     def set_brightness(self, level: int):
         """Set brightness level of the primary light."""
         if level < 1 or level > 100:
-            raise PhilipsRwreadException("Invalid brightness: %s" % level)
+            raise ValueError("Invalid brightness: %s" % level)
 
         return self.send("set_bright", [level])
 
@@ -133,7 +129,7 @@ class PhilipsRwread(Device):
     def set_scene(self, number: int):
         """Set one of the fixed eyecare user scenes."""
         if number < 1 or number > 4:
-            raise PhilipsRwreadException("Invalid fixed scene number: %s" % number)
+            raise ValueError("Invalid fixed scene number: %s" % number)
 
         return self.send("apply_fixed_scene", [number])
 
@@ -145,9 +141,7 @@ class PhilipsRwread(Device):
         """Set delay off in seconds."""
 
         if seconds < 0:
-            raise PhilipsRwreadException(
-                "Invalid value for a delayed turn off: %s" % seconds
-            )
+            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 
         return self.send("delay_off", [seconds])
 
