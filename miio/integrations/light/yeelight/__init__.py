@@ -1,2 +1,2 @@
 # flake8: noqa
-from .yeelight import Yeelight, YeelightException, YeelightMode, YeelightStatus
+from .yeelight import Yeelight, YeelightMode, YeelightStatus

@@ -7,7 +7,6 @@ from miio.tests.dummies import DummyDevice
 from .. import AirHumidifierMjjsq
 from ..airhumidifier_mjjsq import (
     MODEL_HUMIDIFIER_JSQ1,
-    AirHumidifierException,
     AirHumidifierStatus,
     OperationMode,
 )
@@ -133,13 +132,13 @@ class TestAirHumidifierMjjsq(TestCase):
         self.device.set_target_humidity(99)
         assert target_humidity() == 99
 
-        with pytest.raises(AirHumidifierException):
+        with pytest.raises(ValueError):
             self.device.set_target_humidity(-1)
 
-        with pytest.raises(AirHumidifierException):
+        with pytest.raises(ValueError):
             self.device.set_target_humidity(100)
 
-        with pytest.raises(AirHumidifierException):
+        with pytest.raises(ValueError):
             self.device.set_target_humidity(101)
 
     def test_set_wet_protection(self):

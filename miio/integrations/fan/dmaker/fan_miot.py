@@ -5,7 +5,7 @@ import click
 
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
-from miio.fan_common import FanException, MoveDirection, OperationMode
+from miio.fan_common import MoveDirection, OperationMode
 
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"
@@ -101,6 +101,8 @@ SUPPORTED_ANGLES = {
     MODEL_FAN_P9: [30, 60, 90, 120, 150],
     MODEL_FAN_P10: [30, 60, 90, 120, 140],
     MODEL_FAN_P11: [30, 60, 90, 120, 140],
+    MODEL_FAN_P15: [30, 60, 90, 120, 140],  # mapped to P11
+    MODEL_FAN_P18: [30, 60, 90, 120, 140],  # mapped to P10
     MODEL_FAN_P33: [30, 60, 90, 120, 140],
 }
 
@@ -308,7 +310,7 @@ class FanMiot(MiotDevice):
     def set_speed(self, speed: int):
         """Set speed."""
         if speed < 0 or speed > 100:
-            raise FanException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.set_property("fan_speed", speed)
 
@@ -319,7 +321,7 @@ class FanMiot(MiotDevice):
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
         if angle not in SUPPORTED_ANGLES[self.model]:
-            raise FanException(
+            raise ValueError(
                 "Unsupported angle. Supported values: "
                 + ", ".join(f"{i}" for i in SUPPORTED_ANGLES[self.model])
             )
@@ -376,7 +378,7 @@ class FanMiot(MiotDevice):
         """Set delay off minutes."""
 
         if minutes < 0 or minutes > 480:
-            raise FanException("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 
         return self.set_property("power_off_time", minutes)
 
@@ -460,7 +462,7 @@ class Fan1C(MiotDevice):
     def set_speed(self, speed: int):
         """Set speed."""
         if speed not in (1, 2, 3):
-            raise FanException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.set_property("fan_level", speed)
 
@@ -514,6 +516,6 @@ class Fan1C(MiotDevice):
         """Set delay off minutes."""
 
         if minutes < 0 or minutes > 480:
-            raise FanException("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 
         return self.set_property("power_off_time", minutes)

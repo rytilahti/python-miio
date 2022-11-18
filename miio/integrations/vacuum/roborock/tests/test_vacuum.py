@@ -4,16 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from miio import RoborockVacuum, VacuumStatus
+from miio import RoborockVacuum, UnsupportedFeatureException, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
-from ..vacuum import (
-    ROCKROBO_S7,
-    CarpetCleaningMode,
-    MopIntensity,
-    MopMode,
-    VacuumException,
-)
+from ..vacuum import ROCKROBO_S7, CarpetCleaningMode, MopIntensity, MopMode
 
 
 class DummyVacuum(DummyDevice, RoborockVacuum):
@@ -45,8 +39,43 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "water_box_status": 1,
         }
 
+        self.dummies = {}
+        self.dummies["consumables"] = [
+            {
+                "filter_work_time": 32454,
+                "sensor_dirty_time": 3798,
+                "side_brush_work_time": 32454,
+                "main_brush_work_time": 32454,
+            }
+        ]
+        self.dummies["clean_summary"] = [
+            174145,
+            2410150000,
+            82,
+            [
+                1488240000,
+                1488153600,
+                1488067200,
+                1487980800,
+                1487894400,
+                1487808000,
+                1487548800,
+            ],
+        ]
+        self.dummies["dnd_timer"] = [
+            {
+                "enabled": 1,
+                "start_minute": 0,
+                "end_minute": 0,
+                "start_hour": 22,
+                "end_hour": 8,
+            }
+        ]
+
         self.return_values = {
-            "get_status": self.vacuum_state,
+            "get_status": lambda x: [self.state],
+            "get_consumable": lambda x: self.dummies["consumables"],
+            "get_clean_summary": lambda x: self.dummies["clean_summary"],
             "app_start": lambda x: self.change_mode("start"),
             "app_stop": lambda x: self.change_mode("stop"),
             "app_pause": lambda x: self.change_mode("pause"),
@@ -55,6 +84,8 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
             "app_charge": lambda x: self.change_mode("charge"),
             "miIO.info": "dummy info",
+            "get_clean_record": lambda x: [[1488347071, 1488347123, 16, 0, 0, 0]],
+            "get_dnd_timer": lambda x: self.dummies["dnd_timer"],
         }
 
         super().__init__(args, kwargs)
@@ -76,9 +107,6 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             self.state["state"] = DummyVacuum.STATE_ZONED_CLEAN
         elif new_mode == "charge":
             self.state["state"] = DummyVacuum.STATE_CHARGING
-
-    def vacuum_state(self, _):
-        return [self.state]
 
 
 @pytest.fixture(scope="class")
@@ -320,12 +348,12 @@ class TestVacuum(TestCase):
 
     def test_mop_intensity_model_check(self):
         """Test Roborock S7 check when getting mop intensity."""
-        with pytest.raises(VacuumException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.mop_intensity()
 
     def test_set_mop_intensity_model_check(self):
         """Test Roborock S7 check when setting mop intensity."""
-        with pytest.raises(VacuumException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_mop_intensity(MopIntensity.Intense)
 
 

@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -63,10 +62,6 @@ class LedBrightness(enum.Enum):
     On = 0
     Off = 1
     Dim = 2
-
-
-class HeaterMiotException(DeviceException):
-    pass
 
 
 class HeaterMiotStatus(DeviceStatus):
@@ -189,7 +184,7 @@ class HeaterMiot(MiotDevice):
             self.model, {"temperature_range": (18, 28)}
         )["temperature_range"]
         if target_temperature < min_temp or target_temperature > max_temp:
-            raise HeaterMiotException(
+            raise ValueError(
                 "Invalid temperature: %s. Must be between %s and %s."
                 % (target_temperature, min_temp, max_temp)
             )
@@ -240,7 +235,7 @@ class HeaterMiot(MiotDevice):
             self.model, {"delay_off_range": (0, 12 * 3600)}
         )["delay_off_range"]
         if seconds < min_delay or seconds > max_delay:
-            raise HeaterMiotException(
+            raise ValueError(
                 "Invalid scheduled turn off: %s. Must be between %s and %s"
                 % (seconds, min_delay, max_delay)
             )

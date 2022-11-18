@@ -1,6 +1,9 @@
 Getting started
 ***************
 
+.. contents:: Contents
+   :local:
+
 Installation
 ============
 

@@ -8,13 +8,16 @@ import json
 import logging
 import re
 from functools import partial, wraps
-from typing import Callable, Set, Type, Union
+from typing import Any, Callable, ClassVar, Dict, List, Set, Type, Union
 
 import click
 
-import miio
-
 from .exceptions import DeviceError
+
+try:
+    from rich import print as echo
+except ImportError:
+    echo = click.echo
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,9 +52,8 @@ class ExceptionHandlerGroup(click.Group):
     def __call__(self, *args, **kwargs):
         try:
             return self.main(*args, **kwargs)
-        except miio.DeviceException as ex:
-            _LOGGER.debug("Exception: %s", ex, exc_info=True)
-            click.echo(click.style("Error: %s" % ex, fg="red", bold=True))
+        except Exception as ex:
+            _LOGGER.exception("Exception: %s", ex)
 
 
 class EnumType(click.Choice):
@@ -110,6 +112,8 @@ class GlobalContextObject:
 class DeviceGroupMeta(type):
 
     _device_classes: Set[Type] = set()
+    _supported_models: ClassVar[List[str]]
+    _mappings: ClassVar[Dict[str, Any]]
 
     def __new__(mcs, name, bases, namespace):
         commands = {}
@@ -146,9 +150,9 @@ class DeviceGroupMeta(type):
         return cls
 
     @property
-    def supported_models(cls):
+    def supported_models(cls) -> List[str]:
         """Return list of supported models."""
-        return cls._mappings.keys() or cls._supported_models
+        return list(cls._mappings.keys()) or cls._supported_models
 
 
 class DeviceGroup(click.MultiCommand):
@@ -177,10 +181,7 @@ class DeviceGroup(click.MultiCommand):
                         and self._model is None
                         and self._info is None
                     ):
-                        _LOGGER.debug(
-                            "Unknown model, trying autodetection. %s %s"
-                            % (self._model, self._info)
-                        )
+                        _LOGGER.debug("Unknown model, trying autodetection")
                         self._fetch_info()
                     return func(self, *args, **kwargs)
 
@@ -302,7 +303,7 @@ def format_output(
                 else:
                     msg = msg_fmt.format(**kwargs)
                 if msg:
-                    click.echo(msg.strip())
+                    echo(msg.strip())
             kwargs["result"] = func(*args, **kwargs)
             if result_msg_fmt:
                 if callable(result_msg_fmt):
@@ -310,7 +311,7 @@ def format_output(
                 else:
                     result_msg = result_msg_fmt.format(**kwargs)
                 if result_msg:
-                    click.echo(result_msg.strip())
+                    echo(result_msg.strip())
 
         return wrap
 
@@ -326,7 +327,7 @@ def json_output(pretty=False):
             try:
                 result = func(*args, **kwargs)
             except DeviceError as ex:
-                click.echo(json.dumps(ex.args[0], indent=indent))
+                echo(json.dumps(ex.args[0], indent=indent))
                 return
 
             get_json_data_func = getattr(result, "__json__", None)
@@ -335,7 +336,7 @@ def json_output(pretty=False):
                 result = get_json_data_func()
             elif data_variable is not None:
                 result = data_variable
-            click.echo(json.dumps(result, indent=indent))
+            echo(json.dumps(result, indent=indent))
 
         return wrap
 

@@ -2,12 +2,11 @@ from unittest import TestCase
 
 import pytest
 
-from miio import Huizuo, HuizuoLampFan, HuizuoLampHeater
+from miio import Huizuo, HuizuoLampFan, HuizuoLampHeater, UnsupportedFeatureException
 from miio.huizuo import MODEL_HUIZUO_FANWY  # Fan model extended
 from miio.huizuo import MODEL_HUIZUO_FANWY2  # Fan model basic
 from miio.huizuo import MODEL_HUIZUO_PIS123  # Basic model
 from miio.huizuo import MODEL_HUIZUO_WYHEAT  # Heater model
-from miio.huizuo import HuizuoException
 
 from .dummies import DummyMiotDevice
 
@@ -117,10 +116,10 @@ class TestHuizuo(TestCase):
         self.device.set_brightness(100)
         assert lamp_brightness() == 100
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(-1)
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_brightness(101)
 
     def test_color_temp(self):
@@ -134,10 +133,10 @@ class TestHuizuo(TestCase):
         self.device.set_color_temp(6400)
         assert lamp_color_temp() == 6400
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_color_temp(2999)
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_color_temp(6401)
 
 
@@ -173,10 +172,10 @@ class TestHuizuoFan(TestCase):
         self.device.set_fan_level(100)
         assert fan_level() == 100
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_fan_level(-1)
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_fan_level(101)
 
     def test_fan_motor_reverse(self):
@@ -202,10 +201,10 @@ class TestHuizuoFan(TestCase):
 class TestHuizuoFan2(TestCase):
     # This device has no 'reverse' mode, so let's check this
     def test_fan_motor_reverse(self):
-        with pytest.raises(HuizuoException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.fan_reverse_on()
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.fan_reverse_off()
 
 
@@ -234,7 +233,7 @@ class TestHuizuoHeater(TestCase):
         self.device.set_heat_level(3)
         assert heat_level() == 3
 
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_heat_level(0)
-        with pytest.raises(HuizuoException):
+        with pytest.raises(ValueError):
             self.device.set_heat_level(4)

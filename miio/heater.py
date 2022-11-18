@@ -6,7 +6,6 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,10 +36,6 @@ SUPPORTED_MODELS: Dict[str, Dict[str, Any]] = {
         "delay_off_range": (0, 5 * 3600),
     },
 }
-
-
-class HeaterException(DeviceException):
-    pass
 
 
 class Brightness(enum.Enum):
@@ -182,7 +177,7 @@ class Heater(Device):
             self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
         )["temperature_range"]
         if not min_temp <= temperature <= max_temp:
-            raise HeaterException("Invalid target temperature: %s" % temperature)
+            raise ValueError("Invalid target temperature: %s" % temperature)
 
         return self.send("set_target_temperature", [temperature])
 
@@ -232,7 +227,7 @@ class Heater(Device):
             self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
         )["delay_off_range"]
         if not min_delay <= seconds <= max_delay:
-            raise HeaterException("Invalid delay time: %s" % seconds)
+            raise ValueError("Invalid delay time: %s" % seconds)
 
         if self.model == MODEL_HEATER_ZA1:
             return self.send("set_poweroff_time", [seconds])

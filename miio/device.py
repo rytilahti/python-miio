@@ -1,14 +1,19 @@
-import inspect
 import logging
-import warnings
 from enum import Enum
-from pprint import pformat as pf
-from typing import Any, Dict, List, Optional  # noqa: F401
+from inspect import getmembers
+from typing import Any, Dict, List, Optional, Union  # noqa: F401
 
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
+from .descriptors import (
+    ActionDescriptor,
+    EnumSettingDescriptor,
+    SensorDescriptor,
+    SettingDescriptor,
+)
 from .deviceinfo import DeviceInfo
+from .devicestatus import DeviceStatus
 from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 from .miioprotocol import MiIOProtocol
 
@@ -20,31 +25,6 @@ class UpdateState(Enum):
     Installing = "installing"
     Failed = "failed"
     Idle = "idle"
-
-
-class DeviceStatus:
-    """Base class for status containers.
-
-    All status container classes should inherit from this class. The __repr__
-    implementation returns all defined properties and their values.
-    """
-
-    def __repr__(self):
-        props = inspect.getmembers(self.__class__, lambda o: isinstance(o, property))
-
-        s = f"<{self.__class__.__name__}"
-        for prop_tuple in props:
-            name, prop = prop_tuple
-            try:
-                # ignore deprecation warnings
-                with warnings.catch_warnings():
-                    prop_value = prop.fget(self)
-            except Exception as ex:
-                prop_value = ex.__class__.__name__
-
-            s += f" {name}={prop_value}"
-        s += ">"
-        return s
 
 
 class Device(metaclass=DeviceGroupMeta):
@@ -59,6 +39,14 @@ class Device(metaclass=DeviceGroupMeta):
     timeout = 5
     _mappings: Dict[str, Any] = {}
     _supported_models: List[str] = []
+
+    def __init_subclass__(cls, **kwargs):
+        """Overridden to register all integrations to the factory."""
+        super().__init_subclass__(**kwargs)
+
+        from .devicefactory import DeviceFactory
+
+        DeviceFactory.register(cls)
 
     def __init__(
         self,
@@ -75,6 +63,7 @@ class Device(metaclass=DeviceGroupMeta):
         self.token: Optional[str] = token
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
+        self._actions: Optional[Dict[str, ActionDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
@@ -255,97 +244,49 @@ class Device(metaclass=DeviceGroupMeta):
 
         return values
 
-    @command(
-        click.argument("properties", type=str, nargs=-1, required=True),
-    )
-    def test_properties(self, properties):
-        """Helper to test device properties."""
+    def status(self) -> DeviceStatus:
+        """Return device status."""
+        raise NotImplementedError()
 
-        def ok(x):
-            click.echo(click.style(str(x), fg="green", bold=True))
+    def actions(self) -> Dict[str, ActionDescriptor]:
+        """Return device actions."""
+        if self._actions is None:
+            self._actions = {}
+            for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
+                method_name, method = action_tuple
+                action = method._action
+                action.method = method  # bind the method
+                self._actions[method_name] = action
 
-        def fail(x):
-            click.echo(click.style(str(x), fg="red", bold=True))
+        return self._actions
 
-        try:
-            model = self.info().model
-        except Exception as ex:
-            _LOGGER.warning("Unable to obtain device model: %s", ex)
-            model = "<unavailable>"
-
-        click.echo(f"Testing properties {properties} for {model}")
-        valid_properties = {}
-        max_property_len = max(len(p) for p in properties)
-        for property in properties:
-            try:
-                click.echo(f"Testing {property:{max_property_len+2}} ", nl=False)
-                value = self.get_properties([property])
-                # Handle list responses
-                if isinstance(value, list):
-                    # unwrap single-element lists
-                    if len(value) == 1:
-                        value = value.pop()
-                    # report on unexpected multi-element lists
-                    elif len(value) > 1:
-                        _LOGGER.error("Got an array as response: %s", value)
-                    # otherwise we received an empty list, which we consider here as None
-                    else:
-                        value = None
-
-                if value is None:
-                    fail("None")
-                else:
-                    valid_properties[property] = value
-                    ok(f"{repr(value)} {type(value)}")
-            except Exception as ex:
-                _LOGGER.warning("Unable to request %s: %s", property, ex)
-
-        click.echo(
-            f"Found {len(valid_properties)} valid properties, testing max_properties.."
-        )
-
-        props_to_test = list(valid_properties.keys())
-        max_properties = -1
-        while len(props_to_test) > 0:
-            try:
-                click.echo(
-                    f"Testing {len(props_to_test)} properties at once ({' '.join(props_to_test)}): ",
-                    nl=False,
-                )
-                resp = self.get_properties(props_to_test)
-
-                if len(resp) == len(props_to_test):
-                    max_properties = len(props_to_test)
-                    ok(f"OK for {max_properties} properties")
-                    break
-                else:
-                    removed_property = props_to_test.pop()
-                    fail(
-                        f"Got different amount of properties ({len(props_to_test)}) than requested ({len(resp)}), removing {removed_property}"
+    def settings(self) -> Dict[str, SettingDescriptor]:
+        """Return device settings."""
+        settings = self.status().settings()
+        for setting in settings.values():
+            # TODO: Bind setter methods, this should probably done only once during init.
+            if setting.setter is None:
+                # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
+                if setting.setter_name is None:
+                    raise Exception(
+                        f"Neither setter or setter_name was defined for {setting}"
                     )
 
-            except Exception as ex:
-                removed_property = props_to_test.pop()
-                msg = f"Unable to request properties: {ex} - removing {removed_property} for next try"
-                _LOGGER.warning(msg)
-                fail(ex)
+                setting.setter = getattr(self, setting.setter_name)
+            if (
+                isinstance(setting, EnumSettingDescriptor)
+                and setting.choices_attribute is not None
+            ):
+                retrieve_choices_function = getattr(self, setting.choices_attribute)
+                setting.choices = retrieve_choices_function()  # This can do IO
 
-        non_empty_properties = {
-            k: v for k, v in valid_properties.items() if v is not None
-        }
+        return settings
 
-        click.echo(
-            click.style("\nPlease copy the results below to your report", bold=True)
-        )
-        click.echo("### Results ###")
-        click.echo(f"Model: {model}")
-        _LOGGER.debug(f"All responsive properties:\n{pf(valid_properties)}")
-        click.echo(f"Total responsives: {len(valid_properties)}")
-        click.echo(f"Total non-empty: {len(non_empty_properties)}")
-        click.echo(f"All non-empty properties:\n{pf(non_empty_properties)}")
-        click.echo(f"Max properties: {max_properties}")
-
-        return "Done"
+    def sensors(self) -> Dict[str, SensorDescriptor]:
+        """Return device sensors."""
+        # TODO: the latest status should be cached and re-used by all meta information getters
+        sensors = self.status().sensors()
+        return sensors
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"

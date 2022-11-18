@@ -3,7 +3,7 @@ from unittest import TestCase
 import pytest
 
 from miio import Heater
-from miio.heater import MODEL_HEATER_ZA1, Brightness, HeaterException, HeaterStatus
+from miio.heater import MODEL_HEATER_ZA1, Brightness, HeaterStatus
 
 from .dummies import DummyDevice
 
@@ -100,10 +100,10 @@ class TestHeater(TestCase):
         self.device.set_target_temperature(32)
         assert target_temperature() == 32
 
-        with pytest.raises(HeaterException):
+        with pytest.raises(ValueError):
             self.device.set_target_temperature(15)
 
-        with pytest.raises(HeaterException):
+        with pytest.raises(ValueError):
             self.device.set_target_temperature(33)
 
     def test_set_brightness(self):
@@ -148,8 +148,8 @@ class TestHeater(TestCase):
         self.device.delay_off(9)
         assert delay_off_countdown() == 9
 
-        with pytest.raises(HeaterException):
+        with pytest.raises(ValueError):
             self.device.delay_off(-1)
 
-        with pytest.raises(HeaterException):
+        with pytest.raises(ValueError):
             self.device.delay_off(9 * 3600 + 1)

@@ -3,7 +3,7 @@ import logging
 import socket
 from json import dumps
 from random import randint
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional, Union
 
 from ..device import Device
 from ..protocol import Utils
@@ -17,6 +17,7 @@ FAKE_DEVICE_ID = "120009025"
 FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
 
 PushServerCallback = Callable[[str, str, str], None]
+MethodDict = Dict[str, Union[Dict, Callable]]
 
 
 def calculated_token_enc(token):
@@ -46,14 +47,14 @@ class PushServer:
             trigger_token=miio_device.token,
         )
         # Send a message to the miio_device to subscribe for the event to receive messages on the push_server
-        await loop.run_in_executor(None, push_server.subscribe_event, miio_device, event_info)
+        await push_server.subscribe_event(miio_device, event_info)
         # Now you will see the callback function beeing called whenever the event occurs
         await asyncio.sleep(30)
         # When done stop the push_server, this will send messages to all subscribed miio_devices to unsubscribe all events
-        push_server.stop()
+        await push_server.stop()
     """
 
-    def __init__(self, device_ip):
+    def __init__(self, device_ip=None):
         """Initialize the class."""
         self._device_ip = device_ip
 
@@ -62,8 +63,11 @@ class PushServer:
         self._server_id = int(FAKE_DEVICE_ID)
         self._server_model = FAKE_DEVICE_MODEL
 
+        self._loop = None
         self._listen_couroutine = None
         self._registered_devices = {}
+
+        self._methods: MethodDict = {}
 
         self._event_id = 1000000
 
@@ -73,19 +77,30 @@ class PushServer:
             _LOGGER.error("Miio push server already started, not starting another one.")
             return
 
-        listen_task = self._create_udp_server()
-        _, self._listen_couroutine = await listen_task
+        self._loop = asyncio.get_event_loop()
 
-    def stop(self):
+        transport, self._listen_couroutine = await self._create_udp_server()
+
+        return transport, self._listen_couroutine
+
+    async def stop(self):
         """Stop Miio push server."""
         if self._listen_couroutine is None:
             return
 
         for ip in list(self._registered_devices):
-            self.unregister_miio_device(self._registered_devices[ip]["device"])
+            await self.unregister_miio_device(self._registered_devices[ip]["device"])
 
         self._listen_couroutine.close()
         self._listen_couroutine = None
+        self._loop = None
+
+    def add_method(self, name: str, response: Union[Dict, Callable]):
+        """Add a method to server.
+
+        The response can be either a callable or a dictionary to send back as response.
+        """
+        self._methods[name] = response
 
     def register_miio_device(self, device: Device, callback: PushServerCallback):
         """Register a miio device to this push server."""
@@ -115,7 +130,7 @@ class PushServer:
             "device": device,
         }
 
-    def unregister_miio_device(self, device: Device):
+    async def unregister_miio_device(self, device: Device):
         """Unregister a miio device from this push server."""
         device_info = self._registered_devices.get(device.ip)
         if device_info is None:
@@ -123,11 +138,13 @@ class PushServer:
             return
 
         for event_id in device_info["event_ids"]:
-            self.unsubscribe_event(device, event_id)
+            await self.unsubscribe_event(device, event_id)
         self._registered_devices.pop(device.ip)
         _LOGGER.debug("push server: unregistered miio device with ip %s", device.ip)
 
-    def subscribe_event(self, device: Device, event_info: EventInfo) -> Optional[str]:
+    async def subscribe_event(
+        self, device: Device, event_info: EventInfo
+    ) -> Optional[str]:
         """Subscribe to a event such that the device will start pushing data for that
         event."""
         if device.ip not in self._registered_devices:
@@ -141,9 +158,18 @@ class PushServer:
         self._event_id = self._event_id + 1
         event_id = f"x.scene.{self._event_id}"
 
-        event_payload = self._construct_event(event_id, event_info, device)
+        # device.device_id and device.model may do IO if device info is not cached, so run in executor.
+        event_payload = await self._loop.run_in_executor(
+            None,
+            self._construct_event,
+            event_id,
+            event_info,
+            device,
+        )
 
-        response = device.send(
+        response = await self._loop.run_in_executor(
+            None,
+            device.send,
             "send_data_frame",
             {
                 "cur": 0,
@@ -167,9 +193,11 @@ class PushServer:
 
         return event_id
 
-    def unsubscribe_event(self, device: Device, event_id: str):
+    async def unsubscribe_event(self, device: Device, event_id: str):
         """Unsubscribe from a event by id."""
-        result = device.send("miIO.xdel", [event_id])
+        result = await self._loop.run_in_executor(
+            None, device.send, "miIO.xdel", [event_id]
+        )
         if result == ["ok"]:
             event_ids = self._registered_devices[device.ip]["event_ids"]
             if event_id in event_ids:
@@ -179,28 +207,29 @@ class PushServer:
 
         return result
 
-    def _get_server_ip(self):
+    async def _get_server_ip(self):
         """Connect to the miio device to get server_ip using a one time use socket."""
         get_ip_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         get_ip_socket.bind((self._address, SERVER_PORT))
-        get_ip_socket.connect((self._device_ip, SERVER_PORT))
+        get_ip_socket.setblocking(False)
+        await self._loop.sock_connect(get_ip_socket, (self._device_ip, SERVER_PORT))
         server_ip = get_ip_socket.getsockname()[0]
         get_ip_socket.close()
         _LOGGER.debug("Miio push server device ip=%s", server_ip)
         return server_ip
 
-    def _create_udp_server(self):
+    async def _create_udp_server(self):
         """Create the UDP socket and protocol."""
-        self._server_ip = self._get_server_ip()
+        if self._device_ip is not None:
+            self._server_ip = await self._get_server_ip()
 
         # Create a fresh socket that will be used for the push server
         udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
         udp_socket.bind((self._address, SERVER_PORT))
+        udp_socket.setblocking(False)
 
-        loop = asyncio.get_event_loop()
-
-        return loop.create_datagram_endpoint(
-            lambda: ServerProtocol(loop, udp_socket, self),
+        return await self._loop.create_datagram_endpoint(
+            lambda: ServerProtocol(self._loop, udp_socket, self),
             sock=udp_socket,
         )
 
@@ -295,3 +324,8 @@ class PushServer:
     def server_model(self):
         """Return the model of the fake device beeing emulated."""
         return self._server_model
+
+    @property
+    def methods(self) -> MethodDict:
+        """Return a dict of implemented methods."""
+        return self._methods

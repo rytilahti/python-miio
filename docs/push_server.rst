@@ -6,6 +6,9 @@ such as those from Zigbee devices connected to a gateway device.
 The server itself acts as a miio device receiving the events it has :ref:`subscribed to receive<events_subscribe>`,
 and calling the registered callbacks accordingly.
 
+.. contents:: Contents
+   :local:
+
 .. note::
 
     While the eventing has been so far tested only on gateway devices, other devices that allow scene definitions on the
@@ -104,7 +107,7 @@ we assume that a device class has already been initialized to which the events b
 
 ::
 
-    push_server.subscribe_event(miio_device, event_info)
+    await push_server.subscribe_event(miio_device, event_info)
 
 7. The callback function should now be called whenever a matching event occurs.
 
@@ -114,7 +117,7 @@ we assume that a device class has already been initialized to which the events b
 
 ::
 
-    push_server.stop()
+    await push_server.stop()
 
 
 .. _obtain_event_info:

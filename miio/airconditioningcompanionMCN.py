@@ -5,15 +5,10 @@ from typing import Any, Optional
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_ACPARTNER_MCN02 = "lumi.acpartner.mcn02"
-
-
-class AirConditioningCompanionException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):

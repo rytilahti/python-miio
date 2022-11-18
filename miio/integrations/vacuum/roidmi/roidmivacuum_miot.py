@@ -456,7 +456,7 @@ class RoidmiVacuumStatus(DeviceStatus):
 
     @property
     def got_error(self) -> bool:
-        """True if an error has occured."""
+        """True if an error has occurred."""
         return self.error_code != 0
 
 

@@ -27,6 +27,27 @@ class MiotValueType(Enum):
 MiotMapping = Dict[str, Dict[str, Any]]
 
 
+def _filter_request_fields(req):
+    """Return only the parts that belong to the request.."""
+    return {k: v for k, v in req.items() if k in ["did", "siid", "piid"]}
+
+
+def _is_readable_property(prop):
+    """Returns True if a property in the mapping can be read."""
+    # actions cannot be read
+    if "aiid" in prop:
+        _LOGGER.debug("Ignoring action %s for the request", prop)
+        return False
+
+    # if the mapping has access defined, check if the property is readable
+    access = getattr(prop, "access", None)
+    if access is not None and "read" not in access:
+        _LOGGER.debug("Ignoring %s as it has non-read access defined", prop)
+        return False
+
+    return True
+
+
 class MiotDevice(Device):
     """Main class representing a MIoT device.
 
@@ -64,10 +85,14 @@ class MiotDevice(Device):
 
     def get_properties_for_mapping(self, *, max_properties=15) -> list:
         """Retrieve raw properties based on mapping."""
+        mapping = self._get_mapping()
 
         # We send property key in "did" because it's sent back via response and we can identify the property.
-        mapping = self._get_mapping()
-        properties = [{"did": k, **v} for k, v in mapping.items() if "aiid" not in v]
+        properties = [
+            {"did": k, **_filter_request_fields(v)}
+            for k, v in mapping.items()
+            if _is_readable_property(v)
+        ]
 
         return self.get_properties(
             properties, property_getter="get_properties", max_properties=max_properties
@@ -125,13 +150,16 @@ class MiotDevice(Device):
         click.argument(
             "value_type", type=EnumType(MiotValueType), required=False, default=None
         ),
+        click.option("--name", required=False),
     )
     def set_property_by(
         self,
         siid: int,
         piid: int,
         value: Union[int, float, str, bool],
+        *,
         value_type: Any = None,
+        name: str = None,
     ):
         """Set a single property (siid/piid) to given value.
 
@@ -141,9 +169,12 @@ class MiotDevice(Device):
         if value_type is not None:
             value = value_type.value(value)
 
+        if name is None:
+            name = f"set-{siid}-{piid}"
+
         return self.send(
             "set_properties",
-            [{"did": f"set-{siid}-{piid}", "siid": siid, "piid": piid, "value": value}],
+            [{"did": name, "siid": siid, "piid": piid, "value": value}],
         )
 
     def set_property(self, property_key: str, value):

@@ -6,8 +6,8 @@ from typing import Any, Dict, Optional
 import click
 
 from .click_common import EnumType, command, format_output
-from .device import Device, DeviceStatus
-from .exceptions import DeviceException
+from .device import Device
+from .devicestatus import DeviceStatus, sensor, setting
 from .utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,10 +38,6 @@ AVAILABLE_PROPERTIES = {
 }
 
 
-class PowerStripException(DeviceException):
-    pass
-
-
 class PowerMode(enum.Enum):
     Eco = "green"
     Normal = "normal"
@@ -65,16 +61,19 @@ class PowerStripStatus(DeviceStatus):
         return self.data["power"]
 
     @property
+    @setting(name="Power", setter_name="set_power", device_class="outlet")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @sensor(name="Temperature", unit="C", device_class="temperature")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
 
     @property
+    @sensor(name="Current", unit="A", device_class="current")
     def current(self) -> Optional[float]:
         """Current, if available.
 
@@ -85,6 +84,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Load power", unit="W", device_class="power")
     def load_power(self) -> Optional[float]:
         """Current power load, if available."""
         if self.data["power_consume_rate"] is not None:
@@ -105,6 +105,9 @@ class PowerStripStatus(DeviceStatus):
         return self.led
 
     @property
+    @setting(
+        name="LED", icon="mdi:led-outline", setter_name="set_led", device_class="switch"
+    )
     def led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
@@ -119,6 +122,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Leakage current", unit="A", device_class="current")
     def leakage_current(self) -> Optional[int]:
         """The leakage current, if available."""
         if "elec_leakage" in self.data and self.data["elec_leakage"] is not None:
@@ -126,6 +130,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Voltage", unit="V", device_class="voltage")
     def voltage(self) -> Optional[float]:
         """The voltage, if available."""
         if "voltage" in self.data and self.data["voltage"] is not None:
@@ -133,6 +138,7 @@ class PowerStripStatus(DeviceStatus):
         return None
 
     @property
+    @sensor(name="Power Factor", unit="%", device_class="power_factor")
     def power_factor(self) -> Optional[float]:
         """The power factor, if available."""
         if "power_factor" in self.data and self.data["power_factor"] is not None:
@@ -168,6 +174,13 @@ class PowerStrip(Device):
         values = self.get_properties(properties)
 
         return PowerStripStatus(defaultdict(lambda: None, zip(properties, values)))
+
+    @command(click.argument("power", type=bool))
+    def set_power(self, power: bool):
+        """Set the power on or off."""
+        if power:
+            return self.on()
+        return self.off()
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -220,7 +233,7 @@ class PowerStrip(Device):
     def set_power_price(self, price: int):
         """Set the power price."""
         if price < 0 or price > 999:
-            raise PowerStripException("Invalid power price: %s" % price)
+            raise ValueError("Invalid power price: %s" % price)
 
         return self.send("set_power_price", [price])
 

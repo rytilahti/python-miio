@@ -4,7 +4,6 @@ import logging
 import click
 
 from .click_common import command, format_output
-from .exceptions import DeviceException
 from .miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,10 +44,6 @@ _MAPPINGS = {
         "temperature_unit": {"siid": 9, "piid": 7},
     }
 }
-
-
-class AirQualityMonitorMiotException(DeviceException):
-    pass
 
 
 class ChargingState(enum.Enum):
@@ -205,7 +200,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
     def set_monitoring_frequency_duration(self, duration):
         """Set monitoring frequency."""
         if duration < 0 or duration > 600:
-            raise AirQualityMonitorMiotException(
+            raise ValueError(
                 "Invalid duration: %s. Must be between 0 and 600" % duration
             )
         return self.set_property("monitoring_frequency", duration)
@@ -217,7 +212,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
     def set_device_off_duration(self, duration):
         """Set device off duration."""
         if duration < 0 or duration > 60:
-            raise AirQualityMonitorMiotException(
+            raise ValueError(
                 "Invalid duration: %s. Must be between 0 and 60" % duration
             )
         return self.set_property("device_off", duration)
@@ -229,7 +224,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
     def set_screen_off_duration(self, duration):
         """Set screen off duration."""
         if duration < 0 or duration > 300:
-            raise AirQualityMonitorMiotException(
+            raise ValueError(
                 "Invalid duration: %s. Must be between 0 and 300" % duration
             )
         return self.set_property("screen_off", duration)

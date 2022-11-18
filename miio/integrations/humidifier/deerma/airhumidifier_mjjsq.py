@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,10 +31,6 @@ AVAILABLE_PROPERTIES = {
     MODEL_HUMIDIFIER_JSQ: MODEL_HUMIDIFIER_JSQ_COMMON,
     MODEL_HUMIDIFIER_JSQ1: MODEL_HUMIDIFIER_JSQ_COMMON + ["wet_and_protect"],
 }
-
-
-class AirHumidifierException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -203,7 +199,7 @@ class AirHumidifierMjjsq(Device):
     def set_target_humidity(self, humidity: int):
         """Set the target humidity in percent."""
         if humidity < 0 or humidity > 99:
-            raise AirHumidifierException("Invalid target humidity: %s" % humidity)
+            raise ValueError("Invalid target humidity: %s" % humidity)
 
         return self.send("Set_HumiValue", [humidity])
 

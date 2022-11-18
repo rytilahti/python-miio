@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,10 +24,6 @@ AVAILABLE_PROPERTIES_COMMON = [
 AVAILABLE_PROPERTIES = {
     MODEL_FAN_LESHOW_SS4: AVAILABLE_PROPERTIES_COMMON,
 }
-
-
-class FanLeshowException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -140,7 +136,7 @@ class FanLeshow(Device):
     def set_speed(self, speed: int):
         """Set a speed level between 0 and 100."""
         if speed < 0 or speed > 100:
-            raise FanLeshowException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.send("set_blow", [speed])
 
@@ -174,8 +170,6 @@ class FanLeshow(Device):
         """Set delay off minutes."""
 
         if minutes < 0 or minutes > 540:
-            raise FanLeshowException(
-                "Invalid value for a delayed turn off: %s" % minutes
-            )
+            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 
         return self.send("set_timer", [minutes])
