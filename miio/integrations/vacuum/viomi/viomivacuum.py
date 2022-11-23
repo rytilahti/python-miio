@@ -53,7 +53,7 @@ import click
 
 from miio.click_common import EnumType, command, format_output
 from miio.device import Device
-from miio.devicestatus import sensor, setting
+from miio.devicestatus import action, sensor, setting
 from miio.exceptions import DeviceException
 from miio.integrations.vacuum.roborock.vacuumcontainers import (
     ConsumableStatus,
@@ -725,6 +725,7 @@ class ViomiVacuum(Device, VacuumInterface):
 
         status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
         status.embed(self.consumable_status())
+        status.embed(self.dnd_status())
 
         return status
 
@@ -741,6 +742,7 @@ class ViomiVacuum(Device, VacuumInterface):
             return self.stop()
 
     @command()
+    @action("Start cleaning")
     def start(self):
         """Start cleaning."""
         # params: [edge, 1, roomIds.length, *list_of_room_ids]
@@ -789,6 +791,7 @@ class ViomiVacuum(Device, VacuumInterface):
         )
 
     @command()
+    @action("Pause cleaning")
     def pause(self):
         """Pause cleaning."""
         # params: [edge_state, 0]
@@ -799,6 +802,7 @@ class ViomiVacuum(Device, VacuumInterface):
         self.send("set_mode", self._cache["edge_state"] + [2])
 
     @command()
+    @action("Stop cleaning")
     def stop(self):
         """Validate that Stop cleaning."""
         # params: [edge_state, 0]
@@ -1103,6 +1107,7 @@ class ViomiVacuum(Device, VacuumInterface):
         return self.send("set_carpetturbo", [mode.value])
 
     @command()
+    @action("Find robot")
     def find(self):
         """Find the robot."""
         return self.send("set_resetpos", [1])
