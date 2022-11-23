@@ -3,7 +3,11 @@ from enum import Enum
 import pytest
 
 from miio import Device, DeviceStatus
-from miio.descriptors import EnumSettingDescriptor, NumberSettingDescriptor
+from miio.descriptors import (
+    EnumSettingDescriptor,
+    NumberSettingDescriptor,
+    ValidSettingRange,
+)
 from miio.devicestatus import sensor, setting
 
 
@@ -140,6 +144,52 @@ def test_setting_decorator_number(mocker):
 
     settings["level"].setter(1)
     setter.assert_called_with(1)
+
+
+def test_setting_decorator_number_range_attribute(mocker):
+    """Tests for setting decorator with range_attribute.
+
+    This makes sure the range_attribute overrides {min,max}_value and step.
+    """
+
+    class Settings(DeviceStatus):
+        @property
+        @setting(
+            name="Level",
+            unit="something",
+            setter_name="set_level",
+            min_value=0,
+            max_value=2,
+            step=1,
+            range_attribute="valid_range",
+        )
+        def level(self) -> int:
+            return 1
+
+    mocker.patch("miio.Device.send")
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+
+    # Patch status to return our class
+    mocker.patch.object(d, "status", return_value=Settings())
+    mocker.patch.object(d, "valid_range", create=True, new=ValidSettingRange(1, 100, 2))
+    # Patch to create a new setter as defined in the status class
+    setter = mocker.patch.object(d, "set_level", create=True)
+
+    settings = d.settings()
+    assert len(settings) == 1
+
+    desc = settings["level"]
+    assert isinstance(desc, NumberSettingDescriptor)
+
+    assert getattr(d.status(), desc.property) == 1
+
+    assert desc.name == "Level"
+    assert desc.min_value == 1
+    assert desc.max_value == 100
+    assert desc.step == 2
+
+    settings["level"].setter(50)
+    setter.assert_called_with(50)
 
 
 def test_setting_decorator_enum(mocker):
