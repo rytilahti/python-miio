@@ -316,12 +316,28 @@ Numerical Settings
 ^^^^^^^^^^^^^^^^^^
 
 The number descriptor allows defining a range of values and information about the steps.
-The *max_value* is the only mandatory parameter. If not given, *min_value* defaults to ``0`` and *steps* to ``1``.
+*range_attribute* can be used to define an attribute that is used to read the definitions,
+which is useful when the values depend on a device model.
+
+.. code-block::
+
+    class ExampleStatus(DeviceStatus):
+
+        @property
+        @setting(name="Color temperature", range_attribute="color_temperature_range")
+        def colortemp(): ...
+
+    class ExampleDevice(Device):
+        def color_temperature_range() -> ValidSettingRange:
+            return ValidSettingRange(0, 100, 5)
+
+Alternatively, *min_value*, *max_value*, and *step* can be used.
+The *max_value* is the only mandatory parameter. If not given, *min_value* defaults to ``0`` and *step* to ``1``.
 
 .. code-block::
 
     @property
-    @setting(name="Fan Speed", min_value=0, max_value=100, steps=5, setter_name="set_fan_speed")
+    @setting(name="Fan Speed", min_value=0, max_value=100, step=5, setter_name="set_fan_speed")
     def fan_speed(self) -> int:
         """Return the current fan speed."""
 
