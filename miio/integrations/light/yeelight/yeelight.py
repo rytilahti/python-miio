@@ -4,8 +4,9 @@ from typing import List, Optional, Tuple
 
 import click
 
-from miio import ColorTemperatureRange, LightInterface
+from miio import LightInterface
 from miio.click_common import command, format_output
+from miio.descriptors import ValidSettingRange
 from miio.device import Device, DeviceStatus
 from miio.devicestatus import sensor, setting
 from miio.utils import int_to_rgb, rgb_to_int
@@ -23,6 +24,37 @@ SUBLIGHT_COLOR_MODE_PROP = {
     YeelightSubLightType.Main: "color_mode",
     YeelightSubLightType.Background: "bg_lmode",
 }
+
+
+def cli_format_yeelight(result) -> str:
+    """Return human readable sub lights string."""
+    s = f"Name: {result.name}\n"
+    s += f"Update default on change: {result.save_state_on_change}\n"
+    s += f"Delay in minute before off: {result.delay_off}\n"
+    if result.music_mode is not None:
+        s += f"Music mode: {result.music_mode}\n"
+    if result.developer_mode is not None:
+        s += f"Developer mode: {result.developer_mode}\n"
+    for light in result.lights:
+        s += f"{light.type.name} light\n"
+        s += f"   Power: {light.is_on}\n"
+        s += f"   Brightness: {light.brightness}\n"
+        s += f"   Color mode: {light.color_mode}\n"
+        if light.color_mode == YeelightMode.RGB:
+            s += f"   RGB: {light.rgb}\n"
+        elif light.color_mode == YeelightMode.HSV:
+            s += f"   HSV: {light.hsv}\n"
+        else:
+            s += f"   Temperature: {light.color_temp}\n"
+        s += f"   Color flowing mode: {light.color_flowing}\n"
+        if light.color_flowing:
+            s += f"   Color flowing parameters: {light.color_flow_params}\n"
+    if result.moonlight_mode is not None:
+        s += "Moonlight\n"
+        s += f"   Is in mode: {result.moonlight_mode}\n"
+        s += f"   Moonlight mode brightness: {result.moonlight_mode_brightness}\n"
+    s += "\n"
+    return s
 
 
 class YeelightMode(IntEnum):
@@ -113,13 +145,19 @@ class YeelightStatus(DeviceStatus):
         self.data = data
 
     @property
-    @setting("Power", setter_name="set_power")
+    @setting("Power", setter_name="set_power", id="light:on")
     def is_on(self) -> bool:
         """Return whether the light is on or off."""
         return self.lights[0].is_on
 
     @property
-    @setting("Brightness", unit="%", setter_name="set_brightness", max_value=100)
+    @setting(
+        "Brightness",
+        unit="%",
+        setter_name="set_brightness",
+        max_value=100,
+        id="light:brightness",
+    )
     def brightness(self) -> int:
         """Return current brightness."""
         return self.lights[0].brightness
@@ -147,9 +185,13 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].hsv
 
     @property
-    @sensor(
-        "Color temperature", setter_name="set_color_temperature"
-    )  # TODO: we need to allow ranges by attribute to fix this
+    @setting(
+        "Color temperature",
+        setter_name="set_color_temperature",
+        range_attribute="color_temperature_range",
+        id="light:color-temp",
+        unit="kelvin",
+    )
     def color_temp(self) -> Optional[int]:
         """Return current color temperature, if applicable."""
         return self.lights[0].color_temp
@@ -233,37 +275,6 @@ class YeelightStatus(DeviceStatus):
             )
         return sub_lights
 
-    @property
-    def cli_format(self) -> str:
-        """Return human readable sub lights string."""
-        s = f"Name: {self.name}\n"
-        s += f"Update default on change: {self.save_state_on_change}\n"
-        s += f"Delay in minute before off: {self.delay_off}\n"
-        if self.music_mode is not None:
-            s += f"Music mode: {self.music_mode}\n"
-        if self.developer_mode is not None:
-            s += f"Developer mode: {self.developer_mode}\n"
-        for light in self.lights:
-            s += f"{light.type.name} light\n"
-            s += f"   Power: {light.is_on}\n"
-            s += f"   Brightness: {light.brightness}\n"
-            s += f"   Color mode: {light.color_mode}\n"
-            if light.color_mode == YeelightMode.RGB:
-                s += f"   RGB: {light.rgb}\n"
-            elif light.color_mode == YeelightMode.HSV:
-                s += f"   HSV: {light.hsv}\n"
-            else:
-                s += f"   Temperature: {light.color_temp}\n"
-            s += f"   Color flowing mode: {light.color_flowing}\n"
-            if light.color_flowing:
-                s += f"   Color flowing parameters: {light.color_flow_params}\n"
-        if self.moonlight_mode is not None:
-            s += "Moonlight\n"
-            s += f"   Is in mode: {self.moonlight_mode}\n"
-            s += f"   Moonlight mode brightness: {self.moonlight_mode_brightness}\n"
-        s += "\n"
-        return s
-
 
 class Yeelight(Device, LightInterface):
     """A rudimentary support for Yeelight bulbs.
@@ -294,9 +305,8 @@ class Yeelight(Device, LightInterface):
         self._model_info = Yeelight._spec_helper.get_model_info(self.model)
         self._light_type = YeelightSubLightType.Main
         self._light_info = self._model_info.lamps[self._light_type]
-        self._color_temp_range = self._light_info.color_temp
 
-    @command(default_output=format_output("", "{result.cli_format}"))
+    @command(default_output=format_output("", result_msg_fmt=cli_format_yeelight))
     def status(self) -> YeelightStatus:
         """Retrieve properties."""
         properties = [
@@ -336,15 +346,16 @@ class Yeelight(Device, LightInterface):
         return YeelightStatus(dict(zip(properties, values)))
 
     @property
-    def valid_temperature_range(self) -> ColorTemperatureRange:
+    def valid_temperature_range(self) -> ValidSettingRange:
         """Return supported color temperature range."""
         _LOGGER.warning("Deprecated, use color_temperature_range instead")
-        return self._color_temp_range
+        return self.color_temperature_range
 
     @property
-    def color_temperature_range(self) -> Optional[ColorTemperatureRange]:
+    def color_temperature_range(self) -> ValidSettingRange:
         """Return supported color temperature range."""
-        return self._color_temp_range
+        temps = self._light_info.color_temp
+        return ValidSettingRange(min_value=temps[0], max_value=temps[1])
 
     @command(
         click.option("--transition", type=int, required=False, default=0),
@@ -415,8 +426,8 @@ class Yeelight(Device, LightInterface):
     def set_color_temperature(self, level, transition=500):
         """Set color temp in kelvin."""
         if (
-            level > self.valid_temperature_range.max
-            or level < self.valid_temperature_range.min
+            level > self.color_temperature_range.max_value
+            or level < self.color_temperature_range.min_value
         ):
             raise ValueError("Invalid color temperature: %s" % level)
         if transition > 0:

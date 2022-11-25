@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
 from inspect import getmembers
-from typing import Any, Dict, List, Optional, Union  # noqa: F401
+from typing import Any, Dict, List, Optional, Union, cast  # noqa: F401
 
 import click
 
@@ -9,8 +9,10 @@ from .click_common import DeviceGroupMeta, LiteralParamType, command, format_out
 from .descriptors import (
     ActionDescriptor,
     EnumSettingDescriptor,
+    NumberSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
+    SettingType,
 )
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
@@ -279,6 +281,13 @@ class Device(metaclass=DeviceGroupMeta):
             ):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
                 setting.choices = retrieve_choices_function()  # This can do IO
+            if setting.type == SettingType.Number:
+                setting = cast(NumberSettingDescriptor, setting)
+                if setting.range_attribute is not None:
+                    range_def = getattr(self, setting.range_attribute)
+                    setting.min_value = range_def.min_value
+                    setting.max_value = range_def.max_value
+                    setting.step = range_def.step
 
         return settings
 

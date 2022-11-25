@@ -2,6 +2,8 @@
 from abc import abstractmethod
 from typing import NamedTuple, Optional, Tuple
 
+from miio.descriptors import ValidSettingRange
+
 
 class ColorTemperatureRange(NamedTuple):
     """Color temperature range."""
@@ -22,7 +24,7 @@ class LightInterface:
         """Set the light brightness [0,100]."""
 
     @property
-    def color_temperature_range(self) -> Optional[ColorTemperatureRange]:
+    def color_temperature_range(self) -> Optional[ValidSettingRange]:
         """Return the color temperature range, if supported."""
         return None
 
