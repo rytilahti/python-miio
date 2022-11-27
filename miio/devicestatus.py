@@ -179,6 +179,7 @@ def setting(
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
     step: Optional[int] = None,
+    range_attribute: Optional[str] = None,
     choices: Optional[Type[Enum]] = None,
     choices_attribute: Optional[str] = None,
     type: Optional[SettingType] = None,
@@ -192,6 +193,8 @@ def setting(
     The interface is kept minimal, but you can pass any extra keyword arguments.
     These extras are made accessible over :attr:`~miio.descriptors.SettingDescriptor.extras`,
     and can be interpreted downstream users as they wish.
+
+    The `_attribute` suffixed options allow defining a property to be used to return the information dynamically.
     """
 
     def decorator_setting(func):
@@ -215,12 +218,13 @@ def setting(
             "extras": kwargs,
         }
 
-        if min_value or max_value:
+        if min_value or max_value or range_attribute:
             descriptor = NumberSettingDescriptor(
                 **common_values,
                 min_value=min_value or 0,
                 max_value=max_value,
                 step=step or 1,
+                range_attribute=range_attribute,
             )
         elif choices or choices_attribute:
             descriptor = EnumSettingDescriptor(

@@ -50,6 +50,7 @@ class FanspeedE2(FanspeedEnum):
 
 
 class FanspeedS7(FanspeedEnum):
+    Off = 105
     Silent = 101
     Standard = 102
     Medium = 103

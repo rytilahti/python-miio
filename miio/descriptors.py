@@ -17,6 +17,15 @@ import attr
 
 
 @attr.s(auto_attribs=True)
+class ValidSettingRange:
+    """Describes a valid input range for a setting."""
+
+    min_value: int
+    max_value: int
+    step: int = 1
+
+
+@attr.s(auto_attribs=True)
 class ActionDescriptor:
     """Describes a button exposed by the device."""
 
@@ -93,9 +102,14 @@ class EnumSettingDescriptor(SettingDescriptor):
 
 @attr.s(auto_attribs=True, kw_only=True)
 class NumberSettingDescriptor(SettingDescriptor):
-    """Presents a settable, numerical value."""
+    """Presents a settable, numerical value.
+
+    If `range_attribute` is set, the named property that should return
+    :class:ValidSettingRange will be used to obtain {min,max}_value and step.
+    """
 
     min_value: int
     max_value: int
     step: int
+    range_attribute: Optional[str] = attr.ib(default=None)
     type: SettingType = SettingType.Number
