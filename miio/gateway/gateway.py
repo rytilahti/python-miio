@@ -153,7 +153,7 @@ class Gateway(Device):
     def mac(self):
         """Return the mac address of the gateway."""
         if self._info is None:
-            self._info = self.info()
+            self._info = self._fetch_info()
         return self._info.mac_address
 
     @property

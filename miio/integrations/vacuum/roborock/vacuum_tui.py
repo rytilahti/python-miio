@@ -70,7 +70,7 @@ class VacuumTUI:
             return f"Ignoring {key}: {e}.\n", False
 
         done = self.dispatch_control(ctl)
-        return self.info(), done
+        return self._fetch_info(), done
 
     def dispatch_control(self, ctl: Control) -> bool:
         if ctl == Control.Quit:

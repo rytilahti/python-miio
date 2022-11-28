@@ -596,7 +596,7 @@ class RoborockVacuum(Device, VacuumInterface):
 
         if self.model == ROCKROBO_V1:
             _LOGGER.debug("Got robov1, checking for firmware version")
-            fw_version = self.info().firmware_version
+            fw_version = self._fetch_info().firmware_version
             version, build = fw_version.split("_")
             version = tuple(map(int, version.split(".")))
             if version >= (3, 5, 8):

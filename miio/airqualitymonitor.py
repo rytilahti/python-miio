@@ -172,7 +172,7 @@ class AirQualityMonitor(Device):
 
         is_s1_firmware_version_4 = (
             self.model == MODEL_AIRQUALITYMONITOR_S1
-            and self.info().firmware_version.startswith("4")
+            and self._fetch_info().firmware_version.startswith("4")
         )
         if is_s1_firmware_version_4 and "battery" in properties:
             properties.remove("battery")

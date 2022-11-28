@@ -132,9 +132,9 @@ class WifiRepeater(Device):
     )
     def wifi_roaming(self) -> bool:
         """Return the roaming setting."""
-        return self.info().raw["desc"]["wifi_explorer"] == 1
+        return self._fetch_info().raw["desc"]["wifi_explorer"] == 1
 
     @command(default_output=format_output("RSSI of the accesspoint: {result}"))
     def rssi_accesspoint(self) -> int:
         """Received signal strength indicator of the accesspoint."""
-        return self.info().accesspoint["rssi"]
+        return self._fetch_info().accesspoint["rssi"]

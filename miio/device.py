@@ -135,19 +135,18 @@ class Device(metaclass=DeviceGroupMeta):
 
         :param skip_cache bool: Skip the cache
         """
+        self._initialize_descriptors()
+        
         if self._info is not None and not skip_cache:
             return self._info
 
         return self._fetch_info()
 
-    def initialize(self) -> None:
-        """This method implicitly populates the internal data structures needed
-        prior accessing `info()`, `sensors()`, `settings()`, or `actions()`."""
-        self.info()
-        self._initialize_descriptors()
-
-    def _fetch_info(self) -> DeviceInfo:
+    def _fetch_info(self, *, skip_cache=False) -> DeviceInfo:
         """Perform miIO.info query on the device and cache the result."""
+        if self._info is not None and not skip_cache:
+            return self._info
+
         try:
             devinfo = DeviceInfo(self.send("miIO.info"))
             self._info = devinfo
@@ -247,7 +246,7 @@ class Device(metaclass=DeviceGroupMeta):
         if self._model is not None:
             return self._model
 
-        return self.info().model
+        return self._fetch_info().model
 
     def update(self, url: str, md5: str):
         """Start an OTA update."""

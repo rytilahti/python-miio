@@ -370,7 +370,7 @@ class AirHumidifier(Device):
         values = self.get_properties(properties, max_properties=_props_per_request)
 
         return AirHumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values)), self.info()
+            defaultdict(lambda: None, zip(properties, values)), self._fetch_info()
         )
 
     @command(default_output=format_output("Powering on"))
