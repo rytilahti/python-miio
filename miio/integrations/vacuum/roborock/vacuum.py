@@ -126,10 +126,14 @@ class RoborockVacuum(Device, VacuumInterface):
         token: str = None,
         start_id: int = 0,
         debug: int = 0,
+        lazy_discover: bool = True,
+        timeout: int = None,
         *,
         model=None,
     ):
-        super().__init__(ip, token, start_id, debug, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout, model=model
+        )
         self.manual_seqnum = -1
 
     @command()
