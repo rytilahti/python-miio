@@ -366,18 +366,18 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("get_map_v1")
 
     @command()
-    def get_multi_maps(self, skip_cache=False) -> MultiMapList:
+    def get_multi_maps(self) -> MultiMapList:
         """Return list of multi maps."""
-        if self._multi_maps is not None and not skip_cache:
+        if self._multi_maps is not None:
             return self._multi_maps
 
         self._multi_maps = MultiMapList(self.send("get_multi_maps_list")[0])
         return self._multi_maps
 
     @command()
-    def multi_map_enum(self, skip_cache=False) -> Optional[enum.Enum]:
+    def multi_map_enum(self) -> Optional[enum.Enum]:
         """Enum of the available map names."""
-        if self._multi_map_enum is not None and not skip_cache:
+        if self._multi_map_enum is not None:
             return self._multi_map_enum
 
         multi_maps = self.get_multi_maps()
