@@ -390,7 +390,11 @@ class RoborockVacuum(Device, VacuumInterface):
         return self._multi_map_enum
 
     @command(click.argument("multi_map_id", type=int))
-    def load_multi_map(self, multi_map_enum: Optional[enum.Enum] = None, multi_map_id: Optional[int] = None):
+    def load_multi_map(
+        self,
+        multi_map_enum: Optional[enum.Enum] = None,
+        multi_map_id: Optional[int] = None,
+    ):
         """Change the current map used."""
         if multi_map_enum is None and multi_map_id is None:
             _LOGGER.error("Either multi_map_enum or multi_map_id is required.")
