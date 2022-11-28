@@ -35,6 +35,9 @@ class DummyAirQualityMonitorV1(DummyDevice, AirQualityMonitor):
         }
         super().__init__(args, kwargs)
 
+    def _fetch_info(self):
+        return DummyDeviceInfo(version=self.version)
+
 
 @pytest.fixture(scope="class")
 def airqualitymonitorv1(request):
