@@ -64,7 +64,7 @@ class DummyAirDehumidifierV1(DummyDevice, AirDehumidifier):
             "set_child_lock": lambda x: self._set_state("child_lock", x),
             "set_fan_speed": lambda x: self._set_state("fan_st", x),
             "set_auto": lambda x: self._set_state("auto", x),
-            "miIO.info": self._get_device_info,
+            "miIO._fetch_info": self._get_device_info,
         }
         super().__init__(args, kwargs)
 
