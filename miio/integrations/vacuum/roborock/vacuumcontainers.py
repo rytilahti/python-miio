@@ -109,7 +109,7 @@ class MultiMapList(DeviceStatus):
         self.data = data
 
         self._map_name_dict = {}
-        for idx, map in enumerate(self.data["map_info"]):
+        for map in self.data["map_info"]:
             self._map_name_dict[map["name"]] = map["mapFlag"]
 
     @property
