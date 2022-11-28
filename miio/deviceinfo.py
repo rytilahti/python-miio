@@ -56,9 +56,9 @@ class DeviceInfo:
         return self.data.get("ap", {})
 
     @property
-    def model(self) -> Optional[str]:
+    def model(self) -> str:
         """Model string if available."""
-        return self.data.get("model")
+        return self.data.get("model", "Unknown")
 
     @property
     def firmware_version(self) -> Optional[str]:
