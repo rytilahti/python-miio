@@ -241,7 +241,7 @@ class Device(metaclass=DeviceGroupMeta):
         return list(self._mappings.keys()) or self._supported_models
 
     @property
-    def model(self) -> str:
+    def model(self) -> Optional[str]:
         """Return device model."""
         if self._model is not None:
             return self._model
