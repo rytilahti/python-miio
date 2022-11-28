@@ -32,10 +32,9 @@ class UpdateState(Enum):
 class Device(metaclass=DeviceGroupMeta):
     """Base class for all device implementations.
 
-    This is the main class providing the basic protocol handling for
-    devices using the ``miIO`` protocol. This class should not be
-    initialized directly but a device- specific class inheriting it
-    should be used instead of it.
+    This is the main class providing the basic protocol handling for devices using the
+    ``miIO`` protocol. This class should not be initialized directly but a device-
+    specific class inheriting it should be used instead of it.
     """
 
     retry_count = 3
@@ -111,8 +110,8 @@ class Device(metaclass=DeviceGroupMeta):
         click.argument("parameters", type=LiteralParamType(), required=False),
     )
     def raw_command(self, command, parameters):
-        """Send a raw command to the device. This is mostly useful when trying
-        out commands which are not implemented by a given device instance.
+        """Send a raw command to the device. This is mostly useful when trying out
+        commands which are not implemented by a given device instance.
 
         :param str command: Command to send
         :param dict parameters: Parameters to send
