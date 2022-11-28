@@ -317,25 +317,25 @@ class Device(metaclass=DeviceGroupMeta):
     def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
         if self._actions is None:
-            self._actions = {}
             self._initialize_descriptors()
 
+        self._actions = cast(Dict[str, ActionDescriptor], self._actions)
         return self._actions
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""
         if self._settings is None:
-            self._settings = {}
             self._initialize_descriptors()
 
+        self._settings = cast(Dict[str, SettingDescriptor], self._settings)
         return self._settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return device sensors."""
         if self._sensors is None:
-            self._sensors = {}
             self._initialize_descriptors()
 
+        self._sensors = cast(Dict[str, SensorDescriptor], self._sensors)
         return self._sensors
 
     def __repr__(self):
