@@ -327,7 +327,7 @@ class VacuumStatus(VacuumDeviceStatus):
     @setting(
         "Multi map",
         choices_attribute="multi_map_enum",
-        setter_name="load_multi_map_by_enum",
+        setter_name="load_multi_map",
         icon="mdi:floor-plan",
     )
     def multi_map_id(self) -> int:
