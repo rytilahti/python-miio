@@ -37,9 +37,9 @@ class DummyDevice:
         self.start_state = self.state.copy()
         self._protocol = DummyMiIOProtocol(self)
         self._info = None
-        self._settings = None
-        self._sensors = None
-        self._actions = None
+        self._settings = {}
+        self._sensors = {}
+        self._actions = {}
         # TODO: ugly hack to check for pre-existing _model
         if getattr(self, "_model", None) is None:
             self._model = "dummy.model"

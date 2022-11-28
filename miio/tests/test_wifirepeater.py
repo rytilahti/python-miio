@@ -70,7 +70,7 @@ class DummyWifiRepeater(DummyDevice, WifiRepeater):
             "miIO.get_repeater_ap_info": self._get_configuration,
             "miIO.switch_wifi_explorer": self._set_wifi_explorer,
             "miIO.switch_wifi_ssid": self._set_configuration,
-            "miIO._fetch_info": self._get_info,
+            "miIO.info": self._get_info,
         }
         self.start_state = self.state.copy()
         self.start_config = self.config.copy()
