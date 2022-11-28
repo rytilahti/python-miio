@@ -241,12 +241,12 @@ class Device(metaclass=DeviceGroupMeta):
         return list(self._mappings.keys()) or self._supported_models
 
     @property
-    def model(self) -> Optional[str]:
+    def model(self) -> str:
         """Return device model."""
         if self._model is not None:
             return self._model
 
-        return self._fetch_info().model
+        return cast(str, self._fetch_info().model)
 
     def update(self, url: str, md5: str):
         """Start an OTA update."""
