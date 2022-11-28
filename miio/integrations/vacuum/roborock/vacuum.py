@@ -602,10 +602,10 @@ class RoborockVacuum(Device, VacuumInterface):
             fw_version = self._fetch_info().firmware_version
             if fw_version is not None:
                 version, build = fw_version.split("_")
-                version = tuple(map(int, version.split(".")))
-                if version >= (3, 5, 8):
+                version_tuple = tuple(map(int, version.split(".")))
+                if version_tuple >= (3, 5, 8):
                     fanspeeds = FanspeedV3
-                elif version == (3, 5, 7):
+                elif version_tuple == (3, 5, 7):
                     fanspeeds = FanspeedV2
                 else:
                     fanspeeds = FanspeedV1
