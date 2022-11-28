@@ -231,9 +231,12 @@ class AirConditioningCompanion(Device):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: int = None,
         model: str = MODEL_ACPARTNER_V2,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
+        )
 
         if self.model not in MODELS_SUPPORTED:
             _LOGGER.error(
