@@ -600,12 +600,15 @@ class RoborockVacuum(Device, VacuumInterface):
         if self.model == ROCKROBO_V1:
             _LOGGER.debug("Got robov1, checking for firmware version")
             fw_version = self._fetch_info().firmware_version
-            version, build = fw_version.split("_")
-            version = tuple(map(int, version.split(".")))
-            if version >= (3, 5, 8):
-                fanspeeds = FanspeedV3
-            elif version == (3, 5, 7):
-                fanspeeds = FanspeedV2
+            if fw_version is not None:
+                version, build = fw_version.split("_")
+                version = tuple(map(int, version.split(".")))
+                if version >= (3, 5, 8):
+                    fanspeeds = FanspeedV3
+                elif version == (3, 5, 7):
+                    fanspeeds = FanspeedV2
+                else:
+                    fanspeeds = FanspeedV1
             else:
                 fanspeeds = FanspeedV1
         elif self.model == ROCKROBO_E2:
