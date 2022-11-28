@@ -107,14 +107,10 @@ class MultiMapList(DeviceStatus):
         #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
         #  ]}
         self.data = data
-        if self.map_count != len(self.data["map_info"]):
-            _LOGGER.warning("Roborock multi_map_count does not equal amount of maps")
 
         self._map_name_dict = {}
         for idx, map in enumerate(self.data["map_info"]):
             self._map_name_dict[map["name"]] = map["mapFlag"]
-            if map["mapFlag"] != idx:
-                _LOGGER.warning("Roborock mapFlag does not equal map_info list index")
 
     @property
     def map_count(self) -> int:
