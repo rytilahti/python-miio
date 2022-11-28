@@ -598,11 +598,18 @@ class ViomiVacuum(Device, VacuumInterface):
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = False,
+        timeout: int = None,
         *,
         model: str = None,
     ) -> None:
         super().__init__(
-            ip, token, start_id, debug, lazy_discover=lazy_discover, model=model
+            ip,
+            token,
+            start_id,
+            debug,
+            lazy_discover=lazy_discover,
+            timeout=timeout,
+            model=model,
         )
         self.manual_seqnum = -1
         self._cache: Dict[str, Any] = {"edge_state": None, "rooms": {}, "maps": {}}
