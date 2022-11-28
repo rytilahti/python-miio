@@ -122,6 +122,7 @@ def test_setting_decorator_number(mocker):
             return 1
 
     mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
 
     # Patch status to return our class

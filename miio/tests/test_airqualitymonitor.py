@@ -100,7 +100,7 @@ class DummyAirQualityMonitorS1(DummyDevice, AirQualityMonitor):
         """Return wanted properties."""
         return self.state
 
-    def info(self):
+    def _fetch_info(self):
         return DummyDeviceInfo(version=self.version)
 
 
