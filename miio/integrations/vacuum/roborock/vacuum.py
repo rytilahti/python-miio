@@ -175,12 +175,15 @@ class RoborockVacuum(Device, VacuumInterface):
 
         return self.start()
 
-    def _fetch_info(self) -> DeviceInfo:
+    def _fetch_info(self, *, skip_cache=False) -> DeviceInfo:
         """Return info about the device.
 
         This is overrides the base class info to account for gen1 devices that do not
         respond to info query properly when not connected to the cloud.
         """
+        if self._info is not None and not skip_cache:
+            return self._info
+
         try:
             info = super()._fetch_info()
             return info
