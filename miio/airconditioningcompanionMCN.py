@@ -106,11 +106,14 @@ class AirConditioningCompanionMcn02(Device):
         start_id: int = None,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: int = None,
         model: str = MODEL_ACPARTNER_MCN02,
     ) -> None:
         if start_id is None:
             start_id = random.randint(0, 999)  # nosec
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
+        )
 
         if model != MODEL_ACPARTNER_MCN02:
             _LOGGER.error(
