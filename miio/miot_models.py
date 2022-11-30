@@ -17,6 +17,8 @@ class URN(BaseModel):
     model: str
     version: int
 
+    parent_urn: Optional["URN"] = Field(None, repr=False)
+
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -38,7 +40,7 @@ class URN(BaseModel):
         )
 
     def __repr__(self):
-        return f"urn:{self.namespace}:{self.type}:{self.name}:{self.internal_id}:{self.model}:{self.version}"
+        return f"<URN urn:{self.namespace}:{self.type}:{self.name}:{self.internal_id}:{self.model}:{self.version} parent:{self.parent_urn}>"
 
 
 class MiotFormat(type):
@@ -60,21 +62,6 @@ class MiotFormat(type):
         return type_map[input]
 
 
-class MiotEvent(BaseModel):
-    """Presentation of miot event."""
-
-    eiid: int = Field(alias="iid")
-    urn: URN = Field(alias="type")
-    description: str
-
-    arguments: Any
-
-    service: Optional["MiotService"] = None  # backref to containing service
-
-    class Config:
-        extra = "forbid"
-
-
 class MiotEnumValue(BaseModel):
     """Enum value for miot."""
 
@@ -92,19 +79,20 @@ class MiotEnumValue(BaseModel):
         extra = "forbid"
 
 
-class MiotAction(BaseModel):
-    """Action presentation for miot."""
+class MiotBaseModel(BaseModel):
+    """Base model for all other miot models."""
 
-    aiid: int = Field(alias="iid")
     urn: URN = Field(alias="type")
     description: str
 
-    inputs: Any = Field(alias="in")
-    outputs: Any = Field(alias="out")
-
     extras: Dict = Field(default_factory=dict, repr=False)
-
     service: Optional["MiotService"] = None  # backref to containing service
+
+    def fill_from_parent(self, service: "MiotService"):
+        """Fill some information from the parent service."""
+        # TODO: this could be done using a validator
+        self.service = service
+        self.urn.parent_urn = service.urn
 
     @property
     def siid(self) -> Optional[int]:
@@ -122,18 +110,33 @@ class MiotAction(BaseModel):
     @property
     def name(self) -> str:
         """Return combined name of the service and the action."""
-        return f"{self.service.name}:{self.urn.name}"  # type: ignore
+        if self.service is not None and self.urn.name is not None:
+            return f"{self.service.name}:{self.urn.name}"  # type: ignore
+        return "unitialized"
+
+
+class MiotAction(MiotBaseModel):
+    """Action presentation for miot."""
+
+    aiid: int = Field(alias="iid")
+
+    inputs: Any = Field(alias="in")
+    outputs: Any = Field(alias="out")
+
+    def fill_from_parent(self, service: "MiotService"):
+        """Overridden to convert inputs and outputs to property references."""
+        super().fill_from_parent(service)
+        self.inputs = [service.get_property_by_id(piid) for piid in self.inputs]
+        self.outputs = [service.get_property_by_id(piid) for piid in self.outputs]
 
     class Config:
         extra = "forbid"
 
 
-class MiotProperty(BaseModel):
+class MiotProperty(MiotBaseModel):
     """Property presentation for miot."""
 
     piid: int = Field(alias="iid")
-    urn: URN = Field(alias="type")
-    description: str
 
     format: MiotFormat
     access: Any = Field(default=["read"])
@@ -142,31 +145,9 @@ class MiotProperty(BaseModel):
     range: Optional[List[int]] = Field(alias="value-range")
     choices: Optional[List[MiotEnumValue]] = Field(alias="value-list")
 
-    extras: Dict[str, Any] = Field(default_factory=dict, repr=False)
-
-    service: Optional["MiotService"] = None  # backref to containing service
-
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
     value: Optional[Any] = None
-
-    @property
-    def siid(self) -> Optional[int]:
-        """Return siid."""
-        if self.service is not None:
-            return self.service.siid
-
-        return None
-
-    @property
-    def plain_name(self):
-        """Return plain name."""
-        return self.urn.name
-
-    @property
-    def name(self) -> str:
-        """Return combined name of the service and the property."""
-        return f"{self.service.name}:{self.urn.name}"  # type: ignore
 
     @property
     def pretty_value(self):
@@ -201,6 +182,16 @@ class MiotProperty(BaseModel):
         extra = "forbid"
 
 
+class MiotEvent(MiotBaseModel):
+    """Presentation of miot event."""
+
+    eiid: int = Field(alias="iid")
+    arguments: Any
+
+    class Config:
+        extra = "forbid"
+
+
 class MiotService(BaseModel):
     """Service presentation for miot."""
 
@@ -212,19 +203,32 @@ class MiotService(BaseModel):
     events: List[MiotEvent] = Field(default_factory=list, repr=False)
     actions: List[MiotAction] = Field(default_factory=list, repr=False)
 
+    _property_by_id: Dict[int, MiotProperty] = PrivateAttr(default_factory=dict)
+    _action_by_id: Dict[int, MiotAction] = PrivateAttr(default_factory=dict)
+
     def __init__(self, *args, **kwargs):
         """Initialize a service.
 
-        Overridden to propagate the siid to the children.
+        Overridden to propagate the service to the children.
         """
         super().__init__(*args, **kwargs)
 
         for prop in self.properties:
-            prop.service = self
+            self._property_by_id[prop.piid] = prop
+            prop.fill_from_parent(self)
         for act in self.actions:
-            act.service = self
+            self._action_by_id[act.aiid] = act
+            act.fill_from_parent(self)
         for ev in self.events:
-            ev.service = self
+            ev.fill_from_parent(self)
+
+    def get_property_by_id(self, piid):
+        """Return property by id."""
+        return self._property_by_id[piid]
+
+    def get_action_by_id(self, aiid):
+        """Return action by id."""
+        return self._action_by_id[aiid]
 
     @property
     def name(self) -> str:
