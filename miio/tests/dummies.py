@@ -5,6 +5,7 @@ class DummyMiIOProtocol:
         # TODO: Ideally, return_values should be passed in here. Passing in dummy_device (which must have
         #       return_values) is a temporary workaround to minimize diff size.
         self.dummy_device = dummy_device
+        self._device_id = b"12345678"
 
     def send(self, command: str, parameters=None, retry_count=3, extra_parameters=None):
         """Overridden send() to return values from `self.return_values`."""
