@@ -137,9 +137,7 @@ class MapList(DeviceStatus):
 class VacuumStatus(VacuumDeviceStatus):
     """Container for status reports from the vacuum."""
 
-    def __init__(
-        self, data: Dict[str, Any], maps: Optional[MapList] = None
-    ) -> None:
+    def __init__(self, data: Dict[str, Any], maps: Optional[MapList] = None) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
