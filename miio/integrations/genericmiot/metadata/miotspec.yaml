@@ -1,0 +1,102 @@
+description: Metadata miot-spec-v2 namespace
+services:
+  battery:
+    description: Battery service
+    icon: mdi:battery
+    action:
+      start-charge:
+        description: Go charging
+    property:
+      charging-state:
+        description: Charging status
+      battery-level:
+        description: Battery level
+        icon: mdi:battery
+
+  filter:
+    description: Filter service
+    action:
+      reset-filter-life:
+        description: Reset filter life
+        icon: mdi:air-filter
+    property:
+      filter-life-level:
+        description: Filter life level
+        icon: mdi:air-filter
+      filter-left-time:
+        description: Filter time left
+        icon: mdi:air-filter
+
+  brush-cleaner:
+    description: Brush service
+    action:
+      reset-brush-life:
+        description: Reset brush life level
+        icon: mdi:brush
+    property:
+      brush-life-level:
+        description: Brush life level
+        icon: mdi:brush
+      brush-left-time:
+        description: Brush time left
+        icon: mdi:brush
+
+  identify:
+    description: Find device service
+    action:
+      identify:
+        description: Find device
+        icon: mdi:target
+
+  light:
+    description: Light service
+    action:
+      toggle:
+        description: Toggle
+        icon: mdi:toggle-switch
+      brightness-down:
+        description: Decrease brightness
+        icon: mdi:brightness-3
+      brightness-up:
+        description: Increase brightness
+        icon: mdi:brightness-4
+    property:
+      brightness:
+        description: Brightness
+        icon: mdi:brightness-6
+
+  vacuum:
+    description: Vacuum service
+    icon: mdi:vacuum
+    action:
+      start-sweep:
+        description: Start cleaning
+        icon: mdi:play
+      stop-sweeping:
+        description: Stop cleaning
+        icon: mdi:stop
+      start-mop:
+        description: Start mopping
+        icon: mdi:play
+      start-sweep-mop:
+        description: Start cleaning and mopping
+        icon: mdi:play
+      start-charge:
+        description: Return home
+        icon: mdi:home
+
+    property:
+      status:
+        description: Status
+      fault:
+        description: Error
+        icon: mdi:alert
+      mode:
+        description: Fan speed
+        icon: mdi:fan
+      cleaning-time:
+        description: Time cleaned
+        icon: mdi:timer-sand
+      cleaning-area:
+        description: Area cleaned
+        icon: mdi:texture-box
