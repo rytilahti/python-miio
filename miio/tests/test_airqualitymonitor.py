@@ -16,6 +16,7 @@ from .dummies import DummyDevice
 class DummyAirQualityMonitorV1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
         self._model = MODEL_AIRQUALITYMONITOR_V1
+        self.version = "3.1.8_9999"
         self.state = {
             "power": "on",
             "aqi": 34,
@@ -188,6 +189,7 @@ class TestAirQualityMonitorS1_V4(TestCase):
 class DummyAirQualityMonitorB1(DummyDevice, AirQualityMonitor):
     def __init__(self, *args, **kwargs):
         self._model = MODEL_AIRQUALITYMONITOR_B1
+        self.version = "3.1.8_9999"
         self.state = {
             "co2e": 1466,
             "humidity": 59.79999923706055,
@@ -203,6 +205,9 @@ class DummyAirQualityMonitorB1(DummyDevice, AirQualityMonitor):
     def _get_state(self, props):
         """Return wanted properties."""
         return self.state
+
+    def _fetch_info(self):
+        return DummyDeviceInfo(version=self.version)
 
 
 @pytest.fixture(scope="class")
