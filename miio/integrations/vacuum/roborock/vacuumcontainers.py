@@ -325,12 +325,12 @@ class VacuumStatus(VacuumDeviceStatus):
 
     @property
     @setting(
-        "Map",
+        "Current map",
         choices_attribute="map_enum",
         setter_name="load_map",
         icon="mdi:floor-plan",
     )
-    def map_id(self) -> int:
+    def current_map_id(self) -> int:
         """The id of the current map with regards to the multi map feature,
 
         [3,7,11,15] -> [0,1,2,3].
