@@ -1,5 +1,6 @@
 import contextlib
 import datetime
+import enum
 import json
 import logging
 import math
@@ -47,7 +48,7 @@ from .vacuumcontainers import (
     ConsumableStatus,
     DNDStatus,
     FloorCleanDetails,
-    MultiMapList,
+    MapList,
     SoundInstallStatus,
     SoundStatus,
     Timer,
@@ -128,16 +129,20 @@ class RoborockVacuum(Device, VacuumInterface):
         token: str = None,
         start_id: int = 0,
         debug: int = 0,
+        lazy_discover: bool = True,
+        timeout: int = None,
         *,
         model=None,
     ):
-        super().__init__(ip, token, start_id, debug, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout, model=model
+        )
         self.manual_seqnum = -1
-        self._multi_maps: Optional[MultiMapList] = None
-        self._multi_map_enum = None
         self._floor_clean_details: Dict[str, Optional[CleaningDetails]] = {}
         self._last_clean_details: Optional[CleaningDetails] = None
         self._searched_clean_id: Optional[int] = None
+        self._maps: Optional[MapList] = None
+        self._map_enum_cache = None
 
     @command()
     def start(self):
@@ -375,39 +380,38 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("get_map_v1")
 
     @command()
-    def get_multi_maps(self, skip_cache=False) -> MultiMapList:
-        """Return list of multi maps."""
-        # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
-        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
-        #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
-        #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
-        #  ]}
-        if self._multi_maps is not None and not skip_cache:
-            return self._multi_maps
+    def get_maps(self) -> MapList:
+        """Return list of maps."""
+        if self._maps is not None:
+            return self._maps
 
-        self._multi_maps = MultiMapList(self.send("get_multi_maps_list")[0])
-        return self._multi_maps
+        self._maps = MapList(self.send("get_multi_maps_list")[0])
+        return self._maps
 
-    @command()
-    def multi_map_enum(self, skip_cache=False) -> Optional[enum.Enum]:
+    def _map_enum(self) -> Optional[enum.Enum]:
         """Enum of the available map names."""
-        if self._multi_map_enum is not None and not skip_cache:
-            return self._multi_map_enum
+        if self._map_enum_cache is not None:
+            return self._map_enum_cache
 
-        multi_maps = self.get_multi_maps()
+        maps = self.get_maps()
 
-        self._multi_map_enum = enum.Enum("multi_map_enum", multi_maps.map_name_dict)
-        return self._multi_map_enum
+        self._map_enum_cache = enum.Enum("map_enum", maps.map_name_dict)
+        return self._map_enum_cache
 
-    @command(click.argument("multi_map_id", type=int))
-    def load_multi_map(self, multi_map_id: int):
+    @command(click.argument("map_id", type=int))
+    def load_map(
+        self,
+        map_enum: Optional[enum.Enum] = None,
+        map_id: Optional[int] = None,
+    ):
         """Change the current map used."""
-        return self.send("load_multi_map", [multi_map_id])[0] == "ok"
+        if map_enum is None and map_id is None:
+            raise ValueError("Either map_enum or map_id is required.")
 
-    @command()
-    def load_multi_map_by_enum(self, multi_map_enum):
-        """Change the current map used by enum."""
-        return self.load_multi_map(multi_map_enum.value)
+        if map_enum is not None:
+            map_id = map_enum.value
+
+        return self.send("load_multi_map", [map_id])[0] == "ok"
 
     @command(click.argument("start", type=bool))
     def edit_map(self, start):

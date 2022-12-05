@@ -38,6 +38,8 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "msg_seq": 320,
             "water_box_status": 1,
         }
+        self._maps = None
+        self._map_enum_cache = None
 
         self.dummies = {}
         self.dummies["consumables"] = [
@@ -346,6 +348,50 @@ class TestVacuum(TestCase):
             )
 
             assert len(self.device.clean_history().ids) == 0
+
+    def test_get_maps_dict(self):
+        MAP_LIST = [
+            {
+                "mapFlag": 0,
+                "add_time": 1664448893,
+                "length": 10,
+                "name": "Downstairs",
+                "bak_maps": [{"mapFlag": 4, "add_time": 1663577737}],
+            },
+            {
+                "mapFlag": 1,
+                "add_time": 1663580330,
+                "length": 8,
+                "name": "Upstairs",
+                "bak_maps": [{"mapFlag": 5, "add_time": 1663577752}],
+            },
+            {
+                "mapFlag": 2,
+                "add_time": 1663580384,
+                "length": 5,
+                "name": "Attic",
+                "bak_maps": [{"mapFlag": 6, "add_time": 1663577765}],
+            },
+        ]
+
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                {
+                    "max_multi_map": 4,
+                    "max_bak_map": 1,
+                    "multi_map_count": 3,
+                    "map_info": MAP_LIST,
+                }
+            ],
+        ):
+            maps = self.device.get_maps()
+
+        assert maps.map_count == 3
+        assert maps.map_id_list == [0, 1, 2]
+        assert maps.map_list == MAP_LIST
+        assert maps.map_name_dict == {"Downstairs": 0, "Upstairs": 1, "Attic": 2}
 
     def test_info_no_cloud(self):
         """Test the info functionality for non-cloud connected device."""
