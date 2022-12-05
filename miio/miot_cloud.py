@@ -84,6 +84,12 @@ class MiotCloud:
 
         return ReleaseList.parse_raw(data)
 
+    def _write_to_cache(self, file: Path, data: str):
+        """Write given *data* to cache file *file*."""
+        file.parent.mkdir(exist_ok=True)
+        written = file.write_text(data)
+        _LOGGER.debug("Written %s bytes to %s", written, file)
+
     def _fetch(self, url: str, target_file: Path, cache_hours=6):
         """Fetch the URL and cache results, if expired."""
 
@@ -106,7 +112,6 @@ class MiotCloud:
         content.raise_for_status()
 
         response = content.text
-        written = target_file.write_text(response)
-        _LOGGER.debug("Written %s bytes to %s", written, target_file)
+        self._write_to_cache(target_file, response)
 
         return response
