@@ -1,5 +1,6 @@
 import contextlib
 import datetime
+import enum
 import json
 import logging
 import math
@@ -46,6 +47,7 @@ from .vacuumcontainers import (
     CleaningSummary,
     ConsumableStatus,
     DNDStatus,
+    MapList,
     SoundInstallStatus,
     SoundStatus,
     Timer,
@@ -135,6 +137,8 @@ class RoborockVacuum(Device, VacuumInterface):
             ip, token, start_id, debug, lazy_discover, timeout, model=model
         )
         self.manual_seqnum = -1
+        self._maps: Optional[MapList] = None
+        self._map_enum_cache = None
 
     @command()
     def start(self):
@@ -364,6 +368,40 @@ class RoborockVacuum(Device, VacuumInterface):
         """Return map token."""
         # returns ['retry'] without internet
         return self.send("get_map_v1")
+
+    @command()
+    def get_maps(self) -> MapList:
+        """Return list of maps."""
+        if self._maps is not None:
+            return self._maps
+
+        self._maps = MapList(self.send("get_multi_maps_list")[0])
+        return self._maps
+
+    def _map_enum(self) -> Optional[enum.Enum]:
+        """Enum of the available map names."""
+        if self._map_enum_cache is not None:
+            return self._map_enum_cache
+
+        maps = self.get_maps()
+
+        self._map_enum_cache = enum.Enum("map_enum", maps.map_name_dict)
+        return self._map_enum_cache
+
+    @command(click.argument("map_id", type=int))
+    def load_map(
+        self,
+        map_enum: Optional[enum.Enum] = None,
+        map_id: Optional[int] = None,
+    ):
+        """Change the current map used."""
+        if map_enum is None and map_id is None:
+            raise ValueError("Either map_enum or map_id is required.")
+
+        if map_enum is not None:
+            map_id = map_enum.value
+
+        return self.send("load_multi_map", [map_id])[0] == "ok"
 
     @command(click.argument("start", type=bool))
     def edit_map(self, start):

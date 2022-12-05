@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Union
@@ -11,6 +12,8 @@ from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds, pretty_time
 
 from .vacuum_enums import MopIntensity, MopMode
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def pretty_area(x: float) -> float:
@@ -92,6 +95,42 @@ dock_error_codes = {  # from vacuum_cleaner-EN.pdf
     38: "Clean water tank empty",
     39: "Dirty water tank full",
 }
+
+
+class MapList(DeviceStatus):
+    """Contains a information about the maps/floors of the vacuum."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
+        #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
+        #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
+        #    {'mapFlag': 2, 'add_time': 1663580384, 'length': 5, 'name': 'Attic', 'bak_maps': [{'mapFlag': 6, 'add_time': 1663577765}]}
+        #  ]}
+        self.data = data
+
+        self._map_name_dict = {}
+        for map in self.data["map_info"]:
+            self._map_name_dict[map["name"]] = map["mapFlag"]
+
+    @property
+    def map_count(self) -> int:
+        """Amount of maps stored."""
+        return self.data["multi_map_count"]
+
+    @property
+    def map_id_list(self) -> List[int]:
+        """List of map ids."""
+        return list(self._map_name_dict.values())
+
+    @property
+    def map_list(self) -> List[Dict[str, Any]]:
+        """List of map info."""
+        return self.data["map_info"]
+
+    @property
+    def map_name_dict(self) -> Dict[str, int]:
+        """Dictionary of map names (keys) with there ids (values)."""
+        return self._map_name_dict
 
 
 class VacuumStatus(VacuumDeviceStatus):
@@ -283,6 +322,20 @@ class VacuumStatus(VacuumDeviceStatus):
     def map(self) -> bool:
         """Map token."""
         return bool(self.data["map_present"])
+
+    @property
+    @setting(
+        "Current map",
+        choices_attribute="_map_enum",
+        setter_name="load_map",
+        icon="mdi:floor-plan",
+    )
+    def current_map_id(self) -> int:
+        """The id of the current map with regards to the multi map feature,
+
+        [3,7,11,15] -> [0,1,2,3].
+        """
+        return int((self.data["map_status"] + 1) / 4 - 1)
 
     @property
     def in_zone_cleaning(self) -> bool:
@@ -501,6 +554,11 @@ class CleaningDetails(DeviceStatus):
     def area(self) -> float:
         """Total cleaned area."""
         return pretty_area(self.data["area"])
+
+    @property
+    def map_id(self) -> int:
+        """Map id used (multi map feature) during the cleaning run."""
+        return self.data.get("map_flag", 0)
 
     @property
     def error_code(self) -> int:
