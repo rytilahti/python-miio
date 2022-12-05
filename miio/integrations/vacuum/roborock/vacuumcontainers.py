@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Union
 from croniter import croniter
 from pytz import BaseTzInfo
 
+from miio.descriptors import SensorDescriptor
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
 from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
@@ -136,7 +137,9 @@ class MapList(DeviceStatus):
 class VacuumStatus(VacuumDeviceStatus):
     """Container for status reports from the vacuum."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(
+        self, data: Dict[str, Any], maps: Optional[MapList] = None
+    ) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
@@ -177,6 +180,7 @@ class VacuumStatus(VacuumDeviceStatus):
         # 'water_shortage_status': 0, 'dock_type': 0, 'dust_collection_status': 0,
         # 'auto_dust_collection': 1,  'mop_mode': 300, 'debug_mode': 0}]
         self.data = data
+        self._maps = maps
 
     @property
     @sensor("State code", entity_category="diagnostic", enabled_default=False)
@@ -338,6 +342,14 @@ class VacuumStatus(VacuumDeviceStatus):
         return int((self.data["map_status"] + 1) / 4 - 1)
 
     @property
+    def current_map_name(self) -> str:
+        """The name of the current map with regards to the multi map feature."""
+        if self._maps is None:
+            return str(self.current_map_id)
+
+        return self._maps.map_list[self.current_map_id]["name"]
+
+    @property
     def in_zone_cleaning(self) -> bool:
         """Return True if the vacuum is in zone cleaning mode."""
         return self.data["in_cleaning"] == 2
@@ -494,10 +506,15 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
+    def __init__(
+        self,
+        data: Union[List[Any], Dict[str, Any]],
+        maps: Optional[MapList] = None,
+    ) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
+        self._maps = maps
         if isinstance(data, list):
             self.data = {
                 "begin": data[0],
@@ -561,6 +578,15 @@ class CleaningDetails(DeviceStatus):
         return self.data.get("map_flag", 0)
 
     @property
+    @sensor("Last clean map name", icon="mdi:floor-plan", entity_category="diagnostic")
+    def map_name(self) -> str:
+        """The name of the map used (multi map feature) during the cleaning run."""
+        if self._maps is None:
+            return str(self.map_id)
+
+        return self._maps.map_list[self.map_id]["name"]
+
+    @property
     def error_code(self) -> int:
         """Error code."""
         return int(self.data["error"])
@@ -577,6 +603,58 @@ class CleaningDetails(DeviceStatus):
         see also :func:`error`.
         """
         return self.data["complete"] == 1
+
+
+class FloorCleanDetails(DeviceStatus):
+    """Contains details about a last cleaning run per floor."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.data = data
+
+        for map_id in self.data:
+            if self.data[map_id] is None:
+                setattr(self, f"CleanDetails_{map_id}", None)
+                setattr(self, f"start_{map_id}", None)
+                continue
+            setattr(self, f"CleanDetails_{map_id}", self.data[map_id])
+            setattr(self, f"start_{map_id}", self.data[map_id].start)
+
+    def __repr__(self):
+
+        s = f"<{self.__class__.__name__}"
+        for map_id in self.data:
+            name = f"CleanDetails_{map_id}"
+            value = getattr(self, name)
+            s += f" {name}={value}"
+
+            name = f"start_{map_id}"
+            value = getattr(self, name)
+            s += f" {name}={value}"
+
+        for name, embedded in self._embedded.items():
+            s += f" {name}={repr(embedded)}"
+
+        s += ">"
+        return s
+
+    def sensors(self) -> Dict[str, SensorDescriptor]:
+        """Return the dict of sensors exposed by the status container."""
+        self._sensors = {}  # type: ignore[attr-defined]
+
+        for map_id in self.data:
+            self._sensors[f"start_{map_id}"] = SensorDescriptor(
+                id=f"FloorCleanDetails.start_{map_id}",
+                property=f"start_{map_id}",
+                name=f"Floor {map_id} clean start",
+                type="sensor",
+                extras={
+                    "icon": "mdi:clock-time-twelve",
+                    "device_class": "timestamp",
+                    "entity_category": "diagnostic",
+                },
+            )
+
+        return self._sensors
 
 
 class ConsumableStatus(DeviceStatus):

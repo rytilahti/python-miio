@@ -7,7 +7,7 @@ import math
 import os
 import pathlib
 import time
-from typing import List, Optional, Type, Union
+from typing import Dict, List, Optional, Tuple, Type, Union
 
 import click
 import pytz
@@ -47,6 +47,7 @@ from .vacuumcontainers import (
     CleaningSummary,
     ConsumableStatus,
     DNDStatus,
+    FloorCleanDetails,
     MapList,
     SoundInstallStatus,
     SoundStatus,
@@ -137,6 +138,9 @@ class RoborockVacuum(Device, VacuumInterface):
             ip, token, start_id, debug, lazy_discover, timeout, model=model
         )
         self.manual_seqnum = -1
+        self._floor_clean_details: Dict[int, Optional[CleaningDetails]] = {}
+        self._last_clean_details: Optional[CleaningDetails] = None
+        self._searched_clean_id: Optional[int] = None
         self._maps: Optional[MapList] = None
         self._map_enum_cache = None
 
@@ -335,14 +339,20 @@ class RoborockVacuum(Device, VacuumInterface):
         """Return status of the vacuum."""
         status = self.vacuum_status()
         status.embed(self.consumable_status())
-        status.embed(self.clean_history())
+        clean_history = self.clean_history()
+        status.embed(clean_history)
+        (details_floors, details_last) = self.last_clean_all_floor(
+            history=clean_history
+        )
+        status.embed(details_last)
+        status.embed(details_floors)
         status.embed(self.dnd_status())
         return status
 
     @command()
     def vacuum_status(self) -> VacuumStatus:
         """Return only status of the vacuum."""
-        return VacuumStatus(self.send("get_status")[0])
+        return VacuumStatus(self.send("get_status")[0], self.get_maps())
 
     def enable_log_upload(self):
         raise NotImplementedError("unknown parameters")
@@ -489,17 +499,69 @@ class RoborockVacuum(Device, VacuumInterface):
         return CleaningSummary(self.send("get_clean_summary"))
 
     @command()
-    def last_clean_details(self) -> Optional[CleaningDetails]:
+    def last_clean_details(
+        self, history: Optional[CleaningSummary] = None
+    ) -> Optional[CleaningDetails]:
         """Return details from the last cleaning.
 
         Returns None if there has been no cleanups.
         """
-        history = self.clean_history()
+        if history is None:
+            history = self.clean_history()
         if not history.ids:
             return None
 
-        last_clean_id = history.ids.pop(0)
-        return self.clean_details(last_clean_id)
+        last_clean_id = history.ids[0]
+        if last_clean_id == self._searched_clean_id:
+            return self._last_clean_details
+
+        self._last_clean_details = self.clean_details(last_clean_id)
+        return self._last_clean_details
+
+    @command()
+    def last_clean_all_floor(
+        self, history: Optional[CleaningSummary] = None
+    ) -> Tuple[FloorCleanDetails, Optional[CleaningDetails]]:
+        """Return details from the last cleaning and for each floor.
+
+        Returns None if there has been no cleanups for that floor.
+        """
+        if history is None:
+            history = self.clean_history()
+
+        map_ids = self.get_maps().map_id_list
+
+        # if cache empty, fill with None
+        if not self._floor_clean_details:
+            for id in map_ids:
+                self._floor_clean_details[id] = None
+
+        if not history.ids:
+            return (
+                FloorCleanDetails(self._floor_clean_details),
+                self._last_clean_details,
+            )
+
+        last_clean_id = history.ids[0]
+        for id in history.ids:
+            # already searched this record
+            if id == self._searched_clean_id:
+                break
+
+            clean_detail = self.clean_details(id)
+            if clean_detail.map_id in map_ids:
+                self._floor_clean_details[clean_detail.map_id] = clean_detail
+                map_ids.remove(clean_detail.map_id)
+
+            if id == last_clean_id:
+                self._last_clean_details = clean_detail
+
+            # all floors found
+            if not map_ids:
+                break
+
+        self._searched_clean_id = last_clean_id
+        return (FloorCleanDetails(self._floor_clean_details), self._last_clean_details)
 
     @command(
         click.argument("id_", type=int, metavar="ID"),
@@ -514,8 +576,7 @@ class RoborockVacuum(Device, VacuumInterface):
             _LOGGER.warning("No cleaning record found for id %s", id_)
             return None
 
-        res = CleaningDetails(details.pop())
-        return res
+        return CleaningDetails(details.pop(), self.get_maps())
 
     @command()
     @action(name="Find robot", type="vacuum")
