@@ -39,8 +39,13 @@ class URN(BaseModel):
             version=version,
         )
 
+    @property
+    def urn_string(self) -> str:
+        """Return string presentation of the URN."""
+        return f"urn:{self.namespace}:{self.type}:{self.name}:{self.internal_id}:{self.model}:{self.version}"
+
     def __repr__(self):
-        return f"<URN urn:{self.namespace}:{self.type}:{self.name}:{self.internal_id}:{self.model}:{self.version} parent:{self.parent_urn}>"
+        return f"<URN {self.urn_string} parent:{self.parent_urn}>"
 
 
 class MiotFormat(type):

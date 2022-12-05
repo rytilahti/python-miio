@@ -98,8 +98,9 @@ def test_urn():
     assert urn.model == "dummy.model"
     assert urn.version == 1
 
-    # Check that the serialization works, too
-    assert repr(urn) == urn_string
+    # Check that the serialization works
+    assert urn.urn_string == urn_string
+    assert repr(urn) == f"<URN {urn_string} parent:None>"
 
 
 def test_service():
