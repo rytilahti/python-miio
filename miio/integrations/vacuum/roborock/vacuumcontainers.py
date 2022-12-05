@@ -326,7 +326,7 @@ class VacuumStatus(VacuumDeviceStatus):
     @property
     @setting(
         "Current map",
-        choices_attribute="map_enum",
+        choices_attribute="_map_enum",
         setter_name="load_map",
         icon="mdi:floor-plan",
     )

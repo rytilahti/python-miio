@@ -138,7 +138,7 @@ class RoborockVacuum(Device, VacuumInterface):
         )
         self.manual_seqnum = -1
         self._maps: Optional[MapList] = None
-        self._map_enum = None
+        self._map_enum_cache = None
 
     @command()
     def start(self):
@@ -378,16 +378,15 @@ class RoborockVacuum(Device, VacuumInterface):
         self._maps = MapList(self.send("get_multi_maps_list")[0])
         return self._maps
 
-    @command()
-    def map_enum(self) -> Optional[enum.Enum]:
+    def _map_enum(self) -> Optional[enum.Enum]:
         """Enum of the available map names."""
-        if self._map_enum is not None:
-            return self._map_enum
+        if self._map_enum_cache is not None:
+            return self._map_enum_cache
 
         maps = self.get_maps()
 
-        self._map_enum = enum.Enum("map_enum", maps.map_name_dict)
-        return self._map_enum
+        self._map_enum_cache = enum.Enum("map_enum", maps.map_name_dict)
+        return self._map_enum_cache
 
     @command(click.argument("map_id", type=int))
     def load_map(
