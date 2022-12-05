@@ -38,6 +38,8 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "msg_seq": 320,
             "water_box_status": 1,
         }
+        self._maps = None
+        self._map_enum_cache = None
 
         self.dummies = {}
         self.dummies["consumables"] = [
