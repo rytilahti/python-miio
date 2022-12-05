@@ -47,6 +47,7 @@ from miio.integrations.airpurifier import (
     AirPurifierMiot,
 )
 from miio.integrations.fan import Fan, Fan1C, FanLeshow, FanMiot, FanP5, FanZA5
+from miio.integrations.genericmiot import GenericMiot
 from miio.integrations.humidifier import (
     AirHumidifier,
     AirHumidifierJsq,

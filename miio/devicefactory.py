@@ -33,11 +33,12 @@ class DeviceFactory:
         for model in integration_cls.supported_models:  # type: ignore
             if model in cls._supported_models:
                 _LOGGER.debug(
-                    "Got duplicate of %s for %s, previously registered by %s",
+                    "Ignoring duplicate of %s for %s, previously registered by %s",
                     model,
                     integration_cls,
                     cls._supported_models[model],
                 )
+                continue
 
             _LOGGER.debug("  * %s => %s", model, integration_cls)
             cls._supported_models[model] = integration_cls
@@ -62,7 +63,11 @@ class DeviceFactory:
         wildcard_models = {
             m: impl for m, impl in cls._supported_models.items() if m.endswith("*")
         }
-        for wildcard_model, impl in wildcard_models.items():
+        # We sort here to return the implementation with most specific prefix
+        sorted_by_longest_prefix = sorted(
+            wildcard_models.items(), key=lambda item: len(item[0]), reverse=True
+        )
+        for wildcard_model, impl in sorted_by_longest_prefix:
             m = wildcard_model.rstrip("*")
             if model.startswith(m):
                 _LOGGER.debug(
@@ -76,13 +81,27 @@ class DeviceFactory:
         raise DeviceException("No implementation found for model %s" % model)
 
     @classmethod
-    def create(self, host: str, token: str, model: Optional[str] = None) -> Device:
+    def create(
+        self,
+        host: str,
+        token: str,
+        model: Optional[str] = None,
+        *,
+        force_generic_miot=False,
+    ) -> Device:
         """Return instance for the given host and token, with optional model override.
 
         The optional model parameter can be used to override the model detection.
         """
+        dev: Device
+        if force_generic_miot:  # TODO: find a better way to handle this.
+            from .integrations.genericmiot import GenericMiot
+
+            dev = GenericMiot(host, token, model=model)
+            dev.info()
+            return dev
         if model is None:
-            dev: Device = Device(host, token)
+            dev = Device(host, token)
             info = dev.info()
             model = info.model
 

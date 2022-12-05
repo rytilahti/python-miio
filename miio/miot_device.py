@@ -77,9 +77,6 @@ class MiotDevice(Device):
             ip, token, start_id, debug, lazy_discover, timeout, model=model
         )
 
-        if mapping is None and not hasattr(self, "mapping") and not self._mappings:
-            _LOGGER.warning("Neither the class nor the parameter defines the mapping")
-
         if mapping is not None:
             self.mapping = mapping
 
