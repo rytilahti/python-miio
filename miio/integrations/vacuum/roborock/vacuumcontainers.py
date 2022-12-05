@@ -97,7 +97,7 @@ dock_error_codes = {  # from vacuum_cleaner-EN.pdf
 }
 
 
-class MultiMapList(DeviceStatus):
+class MapList(DeviceStatus):
     """Contains a information about the maps/floors of the vacuum."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -114,12 +114,12 @@ class MultiMapList(DeviceStatus):
 
     @property
     def map_count(self) -> int:
-        """Amount of multi maps stored."""
+        """Amount of maps stored."""
         return self.data["multi_map_count"]
 
     @property
     def map_id_list(self) -> List[int]:
-        """List of multi map ids."""
+        """List of map ids."""
         return list(self._map_name_dict.values())
 
     @property
@@ -325,12 +325,12 @@ class VacuumStatus(VacuumDeviceStatus):
 
     @property
     @setting(
-        "Multi map",
-        choices_attribute="multi_map_enum",
-        setter_name="load_multi_map",
+        "Map",
+        choices_attribute="map_enum",
+        setter_name="load_map",
         icon="mdi:floor-plan",
     )
-    def multi_map_id(self) -> int:
+    def map_id(self) -> int:
         """The id of the current map with regards to the multi map feature,
 
         [3,7,11,15] -> [0,1,2,3].
@@ -556,7 +556,7 @@ class CleaningDetails(DeviceStatus):
         return pretty_area(self.data["area"])
 
     @property
-    def multi_map_id(self) -> int:
+    def map_id(self) -> int:
         """Map id used (multi map feature) during the cleaning run."""
         return self.data.get("map_flag", 0)
 
