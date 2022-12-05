@@ -33,11 +33,12 @@ class DeviceFactory:
         for model in integration_cls.supported_models:  # type: ignore
             if model in cls._supported_models:
                 _LOGGER.debug(
-                    "Got duplicate of %s for %s, previously registered by %s",
+                    "Ignoring duplicate of %s for %s, previously registered by %s",
                     model,
                     integration_cls,
                     cls._supported_models[model],
                 )
+                continue
 
             _LOGGER.debug("  * %s => %s", model, integration_cls)
             cls._supported_models[model] = integration_cls
@@ -97,7 +98,7 @@ class DeviceFactory:
             from .integrations.genericmiot import GenericMiot
 
             dev = GenericMiot(host, token, model=model)
-            dev.info()  # HACK: we have to force update to load the miot schema
+            dev.info()
             return dev
         if model is None:
             dev = Device(host, token)
