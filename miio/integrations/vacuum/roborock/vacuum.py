@@ -397,7 +397,7 @@ class RoborockVacuum(Device, VacuumInterface):
     ):
         """Change the current map used."""
         if multi_map_enum is None and multi_map_id is None:
-            _LOGGER.error("Either multi_map_enum or multi_map_id is required.")
+            raise ValueError("Either multi_map_enum or multi_map_id is required.")
 
         if multi_map_enum is not None:
             multi_map_id = multi_map_enum.value
