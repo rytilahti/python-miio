@@ -76,9 +76,12 @@ class GenericMiotStatus(DeviceStatus):
     """Generic status for miot devices."""
 
     def __init__(self, response, dev):
-        self._model = dev._miot_model
+        self._model: DeviceModel = dev._miot_model
         self._dev = dev
         self._data = {elem["did"]: elem["value"] for elem in response}
+        self._data_by_siid_piid = {
+            (elem["siid"], elem["piid"]): elem["value"] for elem in response
+        }
 
     def __getattr__(self, item):
         """Return attribute for name.
@@ -103,13 +106,14 @@ class GenericMiotStatus(DeviceStatus):
         return self._data[item]
 
     def property_dict(self) -> Dict[str, MiotProperty]:
-        """Return (siid, piid)-keyed dictionary of properties."""
+        """Return name-keyed dictionary of properties."""
         res = {}
-        for did, value in self._data.items():
-            service, prop_name = did.split(":")
-            prop = self._model.get_property(service, prop_name)
+
+        # We use (siid, piid) to locate the property as not all devices mirror the did in response
+        for (siid, piid), value in self._data_by_siid_piid.items():
+            prop = self._model.get_property_by_siid_piid(siid, piid)
             prop.value = value
-            res[did] = prop
+            res[prop.name] = prop
 
         return res
 
