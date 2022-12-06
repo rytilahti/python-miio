@@ -48,6 +48,8 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
                 "sensor_dirty_time": 3798,
                 "side_brush_work_time": 32454,
                 "main_brush_work_time": 32454,
+                "strainer_work_times": 44,
+                "cleaning_brush_work_times": 44,
             }
         ]
         self.dummies["clean_summary"] = [
@@ -432,6 +434,14 @@ class TestVacuum(TestCase):
         """Test Roborock S7 check when setting mop intensity."""
         with pytest.raises(UnsupportedFeatureException):
             self.device.set_mop_intensity(MopIntensity.Intense)
+
+    def test_strainer_cleaned_count(self):
+        """Test getting strainer cleaned count."""
+        assert self.device.consumable_status().strainer_cleaned_count == 44
+
+    def test_cleaning_brush_cleaned_count(self):
+        """Test getting cleaning brush cleaned count."""
+        assert self.device.consumable_status().cleaning_brush_cleaned_count == 44
 
 
 class DummyVacuumS7(DummyVacuum):
