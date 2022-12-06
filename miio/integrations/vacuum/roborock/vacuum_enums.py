@@ -11,6 +11,8 @@ class Consumable(enum.Enum):
     SideBrush = "side_brush_work_time"
     Filter = "filter_work_time"
     SensorDirty = "sensor_dirty_time"
+    CleaningBrush = "cleaning_brush_work_times"
+    Strainer = "strainer_work_times"
 
 
 class FanspeedEnum(enum.Enum):

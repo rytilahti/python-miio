@@ -714,6 +714,32 @@ class ConsumableStatus(DeviceStatus):
             return self.data["dust_collection_work_times"]
         return None
 
+    @property
+    @sensor(
+        "Strainer cleaned count",
+        icon="mdi:air-filter",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def strainer_cleaned_count(self) -> Optional[int]:
+        """Return strainer cleaned count."""
+        if "strainer_work_times" in self.data:
+            return self.data["strainer_work_times"]
+        return None
+
+    @property
+    @sensor(
+        "Cleaning brush cleaned count",
+        icon="mdi:brush",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def cleaning_brush_cleaned_count(self) -> Optional[int]:
+        """Return cleaning brush cleaned count."""
+        if "cleaning_brush_work_times" in self.data:
+            return self.data["cleaning_brush_work_times"]
+        return None
+
 
 class DNDStatus(DeviceStatus):
     """A container for the do-not-disturb status."""
