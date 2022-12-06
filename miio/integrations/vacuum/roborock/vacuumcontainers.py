@@ -716,26 +716,26 @@ class ConsumableStatus(DeviceStatus):
 
     @property
     @sensor(
-        "Strainer used",
+        "Strainer cleaned count",
         icon="mdi:air-filter",
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def strainer_used(self) -> Optional[int]:
-        """Return ``strainer_work_times``"""
+    def strainer_cleaned_count(self) -> Optional[int]:
+        """Return strainer cleaned count."""
         if "strainer_work_times" in self.data:
             return self.data["strainer_work_times"]
         return None
 
     @property
     @sensor(
-        "Cleaning brush used",
+        "Cleaning brush cleaned count",
         icon="mdi:brush",
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def cleaning_brush_used(self) -> Optional[int]:
-        """Return ``cleaning_brush_work_times``"""
+    def cleaning_brush_cleaned_count(self) -> Optional[int]:
+        """Return cleaning brush cleaned count."""
         if "cleaning_brush_work_times" in self.data:
             return self.data["cleaning_brush_work_times"]
         return None
