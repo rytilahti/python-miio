@@ -443,10 +443,51 @@ class TestVacuum(TestCase):
         """Test getting cleaning brush cleaned count."""
         assert self.device.consumable_status().cleaning_brush_cleaned_count == 44
 
+    def test_mop_dryer_model_check(self):
+        """Test Roborock S7 check when getting mop dryer status."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.mop_dryer_status()
+
+    def test_set_mop_dryer_enabled_model_check(self):
+        """Test Roborock S7 check when setting mop dryer enabled."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_mop_dryer_enabled(enabled=True)
+
+    def test_set_mop_dryer_dry_time_model_check(self):
+        """Test Roborock S7 check when setting mop dryer dry time."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_mop_dryer_dry_time(dry_time=2)
+
+    def test_start_mop_drying_model_check(self):
+        """Test Roborock S7 check when starting mop drying."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.start_mop_drying()
+
+    def test_stop_mop_drying_model_check(self):
+        """Test Roborock S7 check when stopping mop drying."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.stop_mop_drying()
+
 
 class DummyVacuumS7(DummyVacuum):
     def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+
         self._model = ROCKROBO_S7
+        self.state = self.state | {
+            "dry_status": 1,
+        }
+        self.return_values = self.return_values | {
+            "get_water_box_custom_mode": lambda x: [203],
+            "set_water_box_custom_mode": lambda x: [203],
+            "app_get_dryer_setting": lambda x: {
+                "status": 0,
+                "on": {"cliff_on": 1, "cliff_off": 1, "count": 10, "dry_time": 10800},
+                "off": {"cliff_on": 2, "cliff_off": 1, "count": 10},
+            },
+            "app_set_dryer_setting": lambda x: ["ok"],
+            "app_set_dryer_status": lambda x: ["ok"],
+        }
 
 
 @pytest.fixture(scope="class")
@@ -458,12 +499,28 @@ def dummyvacuums7(request):
 class TestVacuumS7(TestCase):
     def test_mop_intensity(self):
         """Test getting mop intensity."""
-        with patch.object(self.device, "send", return_value=[203]) as mock_method:
-            assert self.device.mop_intensity()
-            mock_method.assert_called_once_with("get_water_box_custom_mode")
+        assert self.device.mop_intensity() == MopIntensity.Intense
 
     def test_set_mop_intensity(self):
         """Test setting mop intensity."""
-        with patch.object(self.device, "send", return_value=[203]) as mock_method:
-            assert self.device.set_mop_intensity(MopIntensity.Intense)
-            mock_method.assert_called_once_with("set_water_box_custom_mode", [203])
+        assert self.device.set_mop_intensity(MopIntensity.Intense)
+
+    def test_mop_dryer_status(self):
+        """Test getting mop dryer status."""
+        assert not self.device.mop_dryer_status().enabled
+
+    def test_set_mop_dryer_enabled_model_check(self):
+        """Test setting mop dryer enabled."""
+        assert self.device.set_mop_dryer_enabled(enabled=True)
+
+    def test_set_mop_dryer_dry_time_model_check(self):
+        """Test setting mop dryer dry time."""
+        assert self.device.set_mop_dryer_dry_time(dry_time=2)
+
+    def test_start_mop_drying_model_check(self):
+        """Test starting mop drying."""
+        assert self.device.start_mop_drying()
+
+    def test_stop_mop_drying_model_check(self):
+        """Test stopping mop drying."""
+        assert self.device.stop_mop_drying()

@@ -48,11 +48,11 @@ from .vacuumcontainers import (
     ConsumableStatus,
     DNDStatus,
     MapList,
+    MopDryerSettings,
     SoundInstallStatus,
     SoundStatus,
     Timer,
     VacuumStatus,
-    MopDryerStatus,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -962,21 +962,19 @@ class RoborockVacuum(Device, VacuumInterface):
     def _verify_mop_dryer_supported(self) -> None:
         """Checks if model supports mop dryer add-on."""
         # dryer add-on is only supported by following models
-        if self.model not in [ROCKROBO_S7_MAXV]:
-            raise UnsupportedFeatureException(
-                "Dryer not supported by %s", self.model
-            )
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
+            raise UnsupportedFeatureException("Dryer not supported by %s", self.model)
 
         # check if `dry_status` attribute is in status response
         # this a good indication if the add-on has been installed
-        if not hasattr(self.status(), "dry_status"):
+        if self.status().is_mop_drying is None:
             raise UnsupportedFeatureException("Mop dryer add-on not installed")
 
     @command()
-    def mop_dryer_status(self) -> MopDryerStatus:
+    def mop_dryer_status(self) -> MopDryerSettings:
         """Get mop dryer status."""
         self._verify_mop_dryer_supported()
-        return MopDryerStatus(self.send("app_get_dryer_setting"), self.status())
+        return MopDryerSettings(self.send("app_get_dryer_setting"))
 
     @command(click.argument("enabled", type=bool))
     def set_mop_dryer_enabled(self, enabled: bool) -> bool:
@@ -988,21 +986,24 @@ class RoborockVacuum(Device, VacuumInterface):
     def set_mop_dryer_dry_time(self, dry_time: int) -> bool:
         """Set mop dryer add-on dry time."""
         self._verify_mop_dryer_supported()
-        return self.send("app_set_dryer_setting", {"on": {"dry_time": dry_time * 3600}})[0] == "ok"
+        return (
+            self.send("app_set_dryer_setting", {"on": {"dry_time": dry_time * 3600}})[0]
+            == "ok"
+        )
 
     @command()
     @action(name="Start mop drying", icon="mdi:tumble-dryer")
-    def start_mop_drying(self):
+    def start_mop_drying(self) -> bool:
         """Start mop drying."""
         self._verify_mop_dryer_supported()
-        self.send("app_set_dryer_status", {"status": 1})
+        return self.send("app_set_dryer_status", {"status": 1})[0] == "ok"
 
     @command()
     @action(name="Stop mop drying", icon="mdi:tumble-dryer")
-    def stop_mop_drying(self):
+    def stop_mop_drying(self) -> bool:
         """Stop mop drying."""
         self._verify_mop_dryer_supported()
-        self.send("app_set_dryer_status", {"status": 0})
+        return self.send("app_set_dryer_status", {"status": 0})[0] == "ok"
 
     @classmethod
     def get_device_group(cls):

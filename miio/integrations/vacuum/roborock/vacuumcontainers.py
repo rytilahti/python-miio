@@ -410,6 +410,32 @@ class VacuumStatus(VacuumDeviceStatus):
         """True if an error has occurred."""
         return self.error_code != 0
 
+    @property
+    @sensor(
+        "Mop is drying",
+        icon="mdi:tumble-dryer",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def is_mop_drying(self) -> Optional[bool]:
+        """Return if mop drying is running."""
+        if "dry_status" in self.data:
+            return self.data["dry_status"] == 1
+        return None
+
+    @property
+    @sensor(
+        "Dryer remaining seconds",
+        unit="s",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def mop_dryer_remaining_seconds(self) -> Optional[int]:
+        """Return remaining mop drying seconds."""
+        if "rdt" in self.data:
+            return self.data["rdt"]
+        return None
+
 
 class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
@@ -955,14 +981,13 @@ class CarpetModeStatus(DeviceStatus):
         return self.data["current_integral"]
 
 
-class MopDryerStatus(DeviceStatus):
+class MopDryerSettings(DeviceStatus):
     """Container for mop dryer add-on."""
 
-    def __init__(self, data: Dict[str, Any], status_data: Dict[str, Any]):
+    def __init__(self, data: Dict[str, Any]):
         # {'status': 0, 'on': {'cliff_on': 1, 'cliff_off': 1, 'count': 10, 'dry_time': 10800},
         # 'off': {'cliff_on': 2, 'cliff_off': 1, 'count': 10}}
         self.data = data
-        self.status_data = status_data
 
     @property
     @setting(
@@ -991,29 +1016,3 @@ class MopDryerStatus(DeviceStatus):
     def dry_time(self) -> bool:
         """Return mop dry time."""
         return self.data["on"]["dry_time"] * 3600
-
-    @property
-    @sensor(
-        "Mop is drying",
-        icon="mdi:tumble-dryer",
-        entity_category="diagnostic",
-        enabled_default=False,
-    )
-    def is_drying(self) -> Optional[bool]:
-        """Return if mop drying is running."""
-        if "dry_status" in self.status_data:
-            return self.status_data["dry_status"] == 1
-        return None
-
-    @property
-    @sensor(
-        "Dryer remaining seconds",
-        unit="s",
-        entity_category="diagnostic",
-        enabled_default=False,
-    )
-    def remaining_seconds(self) -> Optional[int]:
-        """Return remaining mop drying seconds."""
-        if "rdt" in self.status_data:
-            return self.status_data["rdt"]
-        return None
