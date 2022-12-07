@@ -971,8 +971,8 @@ class RoborockVacuum(Device, VacuumInterface):
             raise UnsupportedFeatureException("Mop dryer add-on not installed")
 
     @command()
-    def mop_dryer_status(self) -> MopDryerSettings:
-        """Get mop dryer status."""
+    def mop_dryer_settings(self) -> MopDryerSettings:
+        """Get mop dryer settings."""
         self._verify_mop_dryer_supported()
         return MopDryerSettings(self.send("app_get_dryer_setting"))
 

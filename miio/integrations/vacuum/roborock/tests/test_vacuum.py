@@ -41,70 +41,71 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
         self._maps = None
         self._map_enum_cache = None
 
-        self.dummies = {}
-        self.dummies["consumables"] = [
-            {
-                "filter_work_time": 32454,
-                "sensor_dirty_time": 3798,
-                "side_brush_work_time": 32454,
-                "main_brush_work_time": 32454,
-                "strainer_work_times": 44,
-                "cleaning_brush_work_times": 44,
-            }
-        ]
-        self.dummies["clean_summary"] = [
-            174145,
-            2410150000,
-            82,
-            [
-                1488240000,
-                1488153600,
-                1488067200,
-                1487980800,
-                1487894400,
-                1487808000,
-                1487548800,
+        self.dummies = {
+            "consumables": [
+                {
+                    "filter_work_time": 32454,
+                    "sensor_dirty_time": 3798,
+                    "side_brush_work_time": 32454,
+                    "main_brush_work_time": 32454,
+                    "strainer_work_times": 44,
+                    "cleaning_brush_work_times": 44,
+                }
             ],
-        ]
-        self.dummies["dnd_timer"] = [
-            {
-                "enabled": 1,
-                "start_minute": 0,
-                "end_minute": 0,
-                "start_hour": 22,
-                "end_hour": 8,
-            }
-        ]
-        self.dummies["multi_maps"] = [
-            {
-                "max_multi_map": 4,
-                "max_bak_map": 1,
-                "multi_map_count": 3,
-                "map_info": [
-                    {
-                        "mapFlag": 0,
-                        "add_time": 1664448893,
-                        "length": 10,
-                        "name": "Downstairs",
-                        "bak_maps": [{"mapFlag": 4, "add_time": 1663577737}],
-                    },
-                    {
-                        "mapFlag": 1,
-                        "add_time": 1663580330,
-                        "length": 8,
-                        "name": "Upstairs",
-                        "bak_maps": [{"mapFlag": 5, "add_time": 1663577752}],
-                    },
-                    {
-                        "mapFlag": 2,
-                        "add_time": 1663580384,
-                        "length": 5,
-                        "name": "Attic",
-                        "bak_maps": [{"mapFlag": 6, "add_time": 1663577765}],
-                    },
+            "clean_summary": [
+                174145,
+                2410150000,
+                82,
+                [
+                    1488240000,
+                    1488153600,
+                    1488067200,
+                    1487980800,
+                    1487894400,
+                    1487808000,
+                    1487548800,
                 ],
-            }
-        ]
+            ],
+            "dnd_timer": [
+                {
+                    "enabled": 1,
+                    "start_minute": 0,
+                    "end_minute": 0,
+                    "start_hour": 22,
+                    "end_hour": 8,
+                }
+            ],
+            "multi_maps": [
+                {
+                    "max_multi_map": 4,
+                    "max_bak_map": 1,
+                    "multi_map_count": 3,
+                    "map_info": [
+                        {
+                            "mapFlag": 0,
+                            "add_time": 1664448893,
+                            "length": 10,
+                            "name": "Downstairs",
+                            "bak_maps": [{"mapFlag": 4, "add_time": 1663577737}],
+                        },
+                        {
+                            "mapFlag": 1,
+                            "add_time": 1663580330,
+                            "length": 8,
+                            "name": "Upstairs",
+                            "bak_maps": [{"mapFlag": 5, "add_time": 1663577752}],
+                        },
+                        {
+                            "mapFlag": 2,
+                            "add_time": 1663580384,
+                            "length": 5,
+                            "name": "Attic",
+                            "bak_maps": [{"mapFlag": 6, "add_time": 1663577765}],
+                        },
+                    ],
+                }
+            ],
+        }
 
         self.return_values = {
             "get_status": lambda x: [self.state],
@@ -446,7 +447,7 @@ class TestVacuum(TestCase):
     def test_mop_dryer_model_check(self):
         """Test Roborock S7 check when getting mop dryer status."""
         with pytest.raises(UnsupportedFeatureException):
-            self.device.mop_dryer_status()
+            self.device.mop_dryer_settings()
 
     def test_set_mop_dryer_enabled_model_check(self):
         """Test Roborock S7 check when setting mop dryer enabled."""
@@ -474,19 +475,30 @@ class DummyVacuumS7(DummyVacuum):
         super().__init__(args, kwargs)
 
         self._model = ROCKROBO_S7
-        self.state = self.state | {
-            "dry_status": 1,
-        }
-        self.return_values = self.return_values | {
-            "get_water_box_custom_mode": lambda x: [203],
-            "set_water_box_custom_mode": lambda x: [203],
-            "app_get_dryer_setting": lambda x: {
-                "status": 0,
-                "on": {"cliff_on": 1, "cliff_off": 1, "count": 10, "dry_time": 10800},
-                "off": {"cliff_on": 2, "cliff_off": 1, "count": 10},
+        self.state = {
+            **self.state,
+            **{
+                "dry_status": 1,
             },
-            "app_set_dryer_setting": lambda x: ["ok"],
-            "app_set_dryer_status": lambda x: ["ok"],
+        }
+        self.return_values = {
+            **self.return_values,
+            **{
+                "get_water_box_custom_mode": lambda x: [203],
+                "set_water_box_custom_mode": lambda x: [203],
+                "app_get_dryer_setting": lambda x: {
+                    "status": 0,
+                    "on": {
+                        "cliff_on": 1,
+                        "cliff_off": 1,
+                        "count": 10,
+                        "dry_time": 10800,
+                    },
+                    "off": {"cliff_on": 2, "cliff_off": 1, "count": 10},
+                },
+                "app_set_dryer_setting": lambda x: ["ok"],
+                "app_set_dryer_status": lambda x: ["ok"],
+            },
         }
 
 
@@ -505,9 +517,9 @@ class TestVacuumS7(TestCase):
         """Test setting mop intensity."""
         assert self.device.set_mop_intensity(MopIntensity.Intense)
 
-    def test_mop_dryer_status(self):
-        """Test getting mop dryer status."""
-        assert not self.device.mop_dryer_status().enabled
+    def test_mop_dryer_settings(self):
+        """Test getting mop dryer settings."""
+        assert not self.device.mop_dryer_settings().enabled
 
     def test_set_mop_dryer_enabled_model_check(self):
         """Test setting mop dryer enabled."""
