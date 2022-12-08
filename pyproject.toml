@@ -38,7 +38,7 @@ appdirs = "^1"
 tqdm = "^4"
 netifaces = { version = "^0", optional = true }
 android_backup = { version = "^0", optional = true }
-micloud = { version = "*", optional = true }
+micloud = { version = ">=0.6" }
 croniter = ">=1"
 defusedxml = "^0"
 pydantic = "*"

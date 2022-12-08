@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import appdirs
-from micloud import MiotSpec
+from micloud.miotspec import MiotSpec
 from pydantic import BaseModel, Field
 
 from miio.miot_models import DeviceModel
@@ -62,7 +62,7 @@ class MiotCloud:
     def get_device_model(self, model: str) -> DeviceModel:
         """Get device model for model name."""
         file = self._cache_dir / f"{model}.json"
-        spec = self.file_from_cache(file)
+        spec = self._file_from_cache(file)
         if spec is not None:
             return DeviceModel.parse_obj(spec)
 
@@ -74,20 +74,22 @@ class MiotCloud:
         release_info = specs.info_for_model(model)
 
         model_file = self._cache_dir / f"{release_info.model}.json"
-        spec = self.file_from_cache(model_file)
+        spec = self._file_from_cache(model_file)
         if spec is not None:
             return spec
 
-        spec = json.loads(MiotSpec.get_spec_for_urn(device_urn=release_info.type))
+        spec = MiotSpec.get_spec_for_urn(device_urn=release_info.type)
+        self._write_to_cache(model_file, spec)
 
-    def _write_to_cache(self, file: Path, data: str):
+        return spec
+
+    def _write_to_cache(self, file: Path, data: Dict):
         """Write given *data* to cache file *file*."""
         file.parent.mkdir(exist_ok=True)
-        written = file.write_text(data)
+        written = file.write_text(json.dumps(data))
         _LOGGER.debug("Written %s bytes to %s", written, file)
 
-
-    def file_from_cache(self, file, cache_hours=6) -> Optional[Dict]:
+    def _file_from_cache(self, file, cache_hours=6) -> Optional[Dict]:
         def _valid_cache():
             expiration = timedelta(hours=cache_hours)
             if (
@@ -110,11 +112,11 @@ class MiotCloud:
         mapping_file = "model-to-urn.json"
 
         cache_file = self._cache_dir / mapping_file
-        mapping = self.file_from_cache(cache_file)
+        mapping = self._file_from_cache(cache_file)
         if mapping is not None:
             return ReleaseList.parse_obj(mapping)
 
         specs = MiotSpec.get_specs()
-        cache_file.write_text(json.dumps(specs))
+        self._write_to_cache(cache_file, specs)
 
         return ReleaseList.parse_obj(specs)
