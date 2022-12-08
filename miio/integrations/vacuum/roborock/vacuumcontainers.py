@@ -999,7 +999,7 @@ class MopDryerSettings(DeviceStatus):
     )
     def enabled(self) -> bool:
         """Return if mop dryer is enabled."""
-        return self.data["status"] == "1"
+        return self.data["status"] == 1
 
     @property
     @setting(

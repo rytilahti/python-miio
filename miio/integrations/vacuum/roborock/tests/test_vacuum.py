@@ -479,6 +479,7 @@ class DummyVacuumS7(DummyVacuum):
             **self.state,
             **{
                 "dry_status": 1,
+                "rdt": 3600,
             },
         }
         self.return_values = {
@@ -487,7 +488,7 @@ class DummyVacuumS7(DummyVacuum):
                 "get_water_box_custom_mode": lambda x: [203],
                 "set_water_box_custom_mode": lambda x: [203],
                 "app_get_dryer_setting": lambda x: {
-                    "status": 0,
+                    "status": 1,
                     "on": {
                         "cliff_on": 1,
                         "cliff_off": 1,
@@ -519,7 +520,15 @@ class TestVacuumS7(TestCase):
 
     def test_mop_dryer_settings(self):
         """Test getting mop dryer settings."""
-        assert not self.device.mop_dryer_settings().enabled
+        assert self.device.mop_dryer_settings().enabled
+
+    def test_mop_dryer_is_drying(self):
+        """Test getting mop dryer status."""
+        assert self.device.status().is_mop_drying
+
+    def test_mop_dryer_remaining_seconds(self):
+        """Test getting mop dryer remaining seconds."""
+        assert self.device.status().mop_dryer_remaining_seconds == 3600
 
     def test_set_mop_dryer_enabled_model_check(self):
         """Test setting mop dryer enabled."""
