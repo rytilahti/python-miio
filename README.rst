@@ -185,7 +185,7 @@ this library supports also the following devices::
 -  Scishare coffee maker (scishare.coffee.s1102)
 -  Qingping Air Monitor Lite (cgllc.airm.cgdn1)
 -  Xiaomi Walkingpad A1 (ksmb.walkingpad.v3)
--  Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4)
+-  Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4, wi11)
 -  Xiaomi Mi Smart Humidifer S (jsqs, jsq5)
 -  Xiaomi Mi Robot Vacuum Mop 2 (Pro+, Ultra)
 

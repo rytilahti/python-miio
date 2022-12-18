@@ -37,16 +37,17 @@ _MAPPING_COMMON: Dict[str, Dict[str, int]] = {
 
 _MAPPING_S: Dict[str, Dict[str, int]] = {
     "fault": {"siid": 2, "piid": 1},
-    "on": {"siid": 2, "piid": 2}
+    "on": {"siid": 2, "piid": 2},
 }
 
 _MAPPING_WI: Dict[str, Dict[str, int]] = {
     "on": {"siid": 2, "piid": 1},
-    "fault": {"siid": 2, "piid": 2}
+    "fault": {"siid": 2, "piid": 2},
 }
 
-MIOT_MAPPING = {model: _MAPPING_COMMON | _MAPPING_S for model in S_MODELS} | \
-               {model: _MAPPING_COMMON | _MAPPING_WI for model in WI_MODELS}
+MIOT_MAPPING = {model: _MAPPING_COMMON | _MAPPING_S for model in S_MODELS} | {
+    model: _MAPPING_COMMON | _MAPPING_WI for model in WI_MODELS
+}
 
 
 class PetWaterDispenser(MiotDevice):
