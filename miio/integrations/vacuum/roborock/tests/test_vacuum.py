@@ -457,7 +457,7 @@ class TestVacuum(TestCase):
     def test_set_mop_dryer_dry_time_model_check(self):
         """Test Roborock S7 check when setting mop dryer dry time."""
         with pytest.raises(UnsupportedFeatureException):
-            self.device.set_mop_dryer_dry_time(dry_time=2)
+            self.device.set_mop_dryer_dry_time(dry_time_seconds=10800)
 
     def test_start_mop_drying_model_check(self):
         """Test Roborock S7 check when starting mop drying."""
@@ -528,15 +528,23 @@ class TestVacuumS7(TestCase):
 
     def test_mop_dryer_remaining_seconds(self):
         """Test getting mop dryer remaining seconds."""
-        assert self.device.status().mop_dryer_remaining_seconds == 3600
+        assert self.device.status().mop_dryer_remaining_seconds == datetime.timedelta(
+            seconds=3600
+        )
 
     def test_set_mop_dryer_enabled_model_check(self):
         """Test setting mop dryer enabled."""
-        assert self.device.set_mop_dryer_enabled(enabled=True)
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_mop_dryer_enabled(enabled=False)
+            mock_method.assert_called_once_with("app_set_dryer_setting", {"status": 0})
 
     def test_set_mop_dryer_dry_time_model_check(self):
         """Test setting mop dryer dry time."""
-        assert self.device.set_mop_dryer_dry_time(dry_time=2)
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_mop_dryer_dry_time(dry_time_seconds=14400)
+            mock_method.assert_called_once_with(
+                "app_set_dryer_setting", {"on": {"dry_time": 14400}}
+            )
 
     def test_start_mop_drying_model_check(self):
         """Test starting mop drying."""

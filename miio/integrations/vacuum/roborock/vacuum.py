@@ -965,11 +965,6 @@ class RoborockVacuum(Device, VacuumInterface):
         if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
             raise UnsupportedFeatureException("Dryer not supported by %s", self.model)
 
-        # check if `dry_status` attribute is in status response
-        # this a good indication if the add-on has been installed
-        if self.status().is_mop_drying is None:
-            raise UnsupportedFeatureException("Mop dryer add-on not installed")
-
     @command()
     def mop_dryer_settings(self) -> MopDryerSettings:
         """Get mop dryer settings."""
@@ -983,11 +978,13 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_set_dryer_setting", {"status": int(enabled)})[0] == "ok"
 
     @command(click.argument("dry_time", type=int))
-    def set_mop_dryer_dry_time(self, dry_time: int) -> bool:
+    def set_mop_dryer_dry_time(self, dry_time_seconds: int) -> bool:
         """Set mop dryer add-on dry time."""
         self._verify_mop_dryer_supported()
         return (
-            self.send("app_set_dryer_setting", {"on": {"dry_time": dry_time * 3600}})[0]
+            self.send("app_set_dryer_setting", {"on": {"dry_time": dry_time_seconds}})[
+                0
+            ]
             == "ok"
         )
 

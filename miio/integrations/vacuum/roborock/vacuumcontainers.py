@@ -430,10 +430,10 @@ class VacuumStatus(VacuumDeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def mop_dryer_remaining_seconds(self) -> Optional[int]:
+    def mop_dryer_remaining_seconds(self) -> Optional[timedelta]:
         """Return remaining mop drying seconds."""
         if "rdt" in self.data:
-            return self.data["rdt"]
+            return pretty_seconds(self.data["rdt"])
         return None
 
 
@@ -1006,13 +1006,13 @@ class MopDryerSettings(DeviceStatus):
         "Mop dry time",
         setter_name="set_mop_dryer_dry_time",
         icon="mdi:fan",
-        unit="hour",
-        min_value=2,
-        max_value=4,
-        step=1,
+        unit="s",
+        min_value=7200,
+        max_value=14400,
+        step=3600,
         entity_category="config",
         enabled_default=False,
     )
-    def dry_time(self) -> bool:
+    def dry_time(self) -> timedelta:
         """Return mop dry time."""
-        return self.data["on"]["dry_time"] * 3600
+        return pretty_seconds(self.data["on"]["dry_time"])
