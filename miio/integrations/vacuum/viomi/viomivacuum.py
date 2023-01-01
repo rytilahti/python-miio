@@ -594,13 +594,13 @@ class ViomiVacuum(Device, VacuumInterface):
     def __init__(
         self,
         ip: str,
-        token: str = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = False,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         *,
-        model: str = None,
+        model: Optional[str] = None,
     ) -> None:
         super().__init__(
             ip,
@@ -1017,7 +1017,10 @@ class ViomiVacuum(Device, VacuumInterface):
         click.option("--refresh", type=bool, default=False),
     )
     def get_rooms(
-        self, map_id: int = None, map_name: str = None, refresh: bool = False
+        self,
+        map_id: Optional[int] = None,
+        map_name: Optional[str] = None,
+        refresh: bool = False,
     ):
         """Return room ids and names."""
         if self._cache["rooms"] and not refresh:

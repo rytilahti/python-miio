@@ -1,7 +1,7 @@
 """Xiaomi Gateway device base class."""
 
 import logging
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from ..exceptions import DeviceException
 
@@ -20,7 +20,7 @@ class GatewayDevice:
 
     def __init__(
         self,
-        parent: "Gateway" = None,
+        parent: Optional["Gateway"] = None,
     ) -> None:
         if parent is None:
             raise DeviceException(

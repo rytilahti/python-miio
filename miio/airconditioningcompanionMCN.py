@@ -101,12 +101,12 @@ class AirConditioningCompanionMcn02(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
+        start_id: Optional[int] = None,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         model: str = MODEL_ACPARTNER_MCN02,
     ) -> None:
         if start_id is None:
@@ -153,7 +153,7 @@ class AirConditioningCompanionMcn02(Device):
     @command(
         default_output=format_output("Sending a command to the air conditioner"),
     )
-    def send_command(self, command: str, parameters: Any = None) -> Any:
+    def send_command(self, command: str, parameters: Optional[Any] = None) -> Any:
         """Send a command to the air conditioner.
 
         :param str command: Command to execute

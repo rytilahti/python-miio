@@ -210,7 +210,6 @@ class TestAirConditioningCompanion(TestCase):
         assert self.device.send_command("0000000") is True
 
     def test_send_configuration(self):
-
         for args in test_data["test_send_configuration_ok"]:
             with self.subTest():
                 self.device._reset_state()

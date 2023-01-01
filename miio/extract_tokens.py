@@ -64,7 +64,7 @@ class BackupDatabaseReader:
     """
 
     def __init__(self, dump_raw=False):
-        self.dump_raw = dump_raw
+        self._dump_raw = dump_raw
 
     @staticmethod
     def dump_raw(dev):
@@ -93,7 +93,7 @@ class BackupDatabaseReader:
         _LOGGER.info("Reading tokens from Apple DB")
         c = self.conn.execute("SELECT * FROM ZDEVICE WHERE ZTOKEN IS NOT '';")
         for dev in c.fetchall():
-            if self.dump_raw:
+            if self._dump_raw:
                 BackupDatabaseReader.dump_raw(dev)
             ip = dev["ZLOCALIP"]
             mac = dev["ZMAC"]
@@ -111,7 +111,7 @@ class BackupDatabaseReader:
         _LOGGER.info("Reading tokens from Android DB")
         c = self.conn.execute("SELECT * FROM devicerecord WHERE token IS NOT '';")
         for dev in c.fetchall():
-            if self.dump_raw:
+            if self._dump_raw:
                 BackupDatabaseReader.dump_raw(dev)
             ip = dev["localIP"]
             mac = dev["mac"]
