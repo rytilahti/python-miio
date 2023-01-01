@@ -410,6 +410,32 @@ class VacuumStatus(VacuumDeviceStatus):
         """True if an error has occurred."""
         return self.error_code != 0
 
+    @property
+    @sensor(
+        "Mop is drying",
+        icon="mdi:tumble-dryer",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def is_mop_drying(self) -> Optional[bool]:
+        """Return if mop drying is running."""
+        if "dry_status" in self.data:
+            return self.data["dry_status"] == 1
+        return None
+
+    @property
+    @sensor(
+        "Dryer remaining seconds",
+        unit="s",
+        entity_category="diagnostic",
+        enabled_default=False,
+    )
+    def mop_dryer_remaining_seconds(self) -> Optional[timedelta]:
+        """Return remaining mop drying seconds."""
+        if "rdt" in self.data:
+            return pretty_seconds(self.data["rdt"])
+        return None
+
 
 class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
@@ -953,3 +979,40 @@ class CarpetModeStatus(DeviceStatus):
     @property
     def current_integral(self) -> int:
         return self.data["current_integral"]
+
+
+class MopDryerSettings(DeviceStatus):
+    """Container for mop dryer add-on."""
+
+    def __init__(self, data: Dict[str, Any]):
+        # {'status': 0, 'on': {'cliff_on': 1, 'cliff_off': 1, 'count': 10, 'dry_time': 10800},
+        # 'off': {'cliff_on': 2, 'cliff_off': 1, 'count': 10}}
+        self.data = data
+
+    @property
+    @setting(
+        "Mop dryer enabled",
+        setter_name="set_mop_dryer_enabled",
+        icon="mdi:tumble-dryer",
+        entity_category="config",
+        enabled_default=False,
+    )
+    def enabled(self) -> bool:
+        """Return if mop dryer is enabled."""
+        return self.data["status"] == 1
+
+    @property
+    @setting(
+        "Mop dry time",
+        setter_name="set_mop_dryer_dry_time",
+        icon="mdi:fan",
+        unit="s",
+        min_value=7200,
+        max_value=14400,
+        step=3600,
+        entity_category="config",
+        enabled_default=False,
+    )
+    def dry_time(self) -> timedelta:
+        """Return mop dry time."""
+        return pretty_seconds(self.data["on"]["dry_time"])
