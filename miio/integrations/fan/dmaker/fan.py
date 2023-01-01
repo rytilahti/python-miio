@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
@@ -95,12 +95,12 @@ class FanP5(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         model: str = MODEL_FAN_P5,
     ) -> None:
         super().__init__(

@@ -8,7 +8,7 @@ import json
 import logging
 import re
 from functools import partial, wraps
-from typing import Any, Callable, ClassVar, Dict, List, Set, Type, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Set, Type, Union
 
 import click
 
@@ -104,13 +104,12 @@ class LiteralParamType(click.ParamType):
 
 
 class GlobalContextObject:
-    def __init__(self, debug: int = 0, output: Callable = None):
+    def __init__(self, debug: int = 0, output: Optional[Callable] = None):
         self.debug = debug
         self.output = output
 
 
 class DeviceGroupMeta(type):
-
     _device_classes: Set[Type] = set()
     _supported_models: ClassVar[List[str]]
     _mappings: ClassVar[Dict[str, Any]]

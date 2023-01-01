@@ -12,7 +12,6 @@ from .vacuum import RoborockVacuum as Vacuum
 
 
 class Control(enum.Enum):
-
     Quit = "q"
     Forward = "w"
     ForwardFast = "W"

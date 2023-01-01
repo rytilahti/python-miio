@@ -253,7 +253,7 @@ class CookingStage(DeviceStatus):
 
 
 class InteractionTimeouts(DeviceStatus):
-    def __init__(self, timeouts: str = None):
+    def __init__(self, timeouts: Optional[str] = None):
         """Example timeouts: 05040f, 05060f.
 
         Data structure:
@@ -298,7 +298,7 @@ class InteractionTimeouts(DeviceStatus):
 
 
 class CookerSettings(DeviceStatus):
-    def __init__(self, settings: str = None):
+    def __init__(self, settings: Optional[str] = None):
         """Example settings: 1407, 0607, 0207.
 
         Data structure:

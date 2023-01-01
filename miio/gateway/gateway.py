@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 import click
 import yaml
@@ -89,14 +89,14 @@ class Gateway(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         *,
-        model: str = None,
+        model: Optional[str] = None,
         push_server=None,
     ) -> None:
         super().__init__(

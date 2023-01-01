@@ -371,7 +371,7 @@ class ViomiDishwasher(Device):
     @command(
         click.argument("program", type=EnumType(Program), required=False),
     )
-    def start(self, program: [Program, None]) -> str:
+    def start(self, program: Optional[Program]) -> str:
         """Start a program (with optional program or current)."""
 
         if program:

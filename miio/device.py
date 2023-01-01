@@ -52,14 +52,14 @@ class Device(metaclass=DeviceGroupMeta):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         *,
-        model: str = None,
+        model: Optional[str] = None,
     ) -> None:
         self.ip = ip
         self.token: Optional[str] = token
@@ -74,8 +74,8 @@ class Device(metaclass=DeviceGroupMeta):
     def send(
         self,
         command: str,
-        parameters: Any = None,
-        retry_count: int = None,
+        parameters: Optional[Any] = None,
+        retry_count: Optional[int] = None,
         *,
         extra_parameters=None,
     ) -> Any:

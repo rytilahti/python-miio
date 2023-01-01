@@ -65,7 +65,6 @@ class YeelightMode(IntEnum):
 
 class YeelightSubLight(DeviceStatus):
     def __init__(self, data, type):
-
         self.data = data
         self.type = type
 
@@ -293,13 +292,13 @@ class Yeelight(Device, LightInterface):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
-        model: str = None,
+        timeout: Optional[int] = None,
+        model: Optional[str] = None,
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model

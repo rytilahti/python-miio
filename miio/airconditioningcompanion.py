@@ -226,12 +226,12 @@ class AirConditioningCompanion(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         model: str = MODEL_ACPARTNER_V2,
     ) -> None:
         super().__init__(
@@ -413,8 +413,8 @@ class AirConditioningCompanion(Device):
 class AirConditioningCompanionV3(AirConditioningCompanion):
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,

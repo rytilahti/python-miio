@@ -126,11 +126,11 @@ class RoborockVacuum(Device, VacuumInterface):
     def __init__(
         self,
         ip: str,
-        token: str = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         *,
         model=None,
     ):

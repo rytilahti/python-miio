@@ -133,15 +133,15 @@ class GenericMiot(MiotDevice):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         *,
-        model: str = None,
-        mapping: MiotMapping = None,
+        model: Optional[str] = None,
+        mapping: Optional[MiotMapping] = None,
     ):
         super().__init__(
             ip,
@@ -269,7 +269,6 @@ class GenericMiot(MiotDevice):
 
     def _descriptor_for_property(self, prop: MiotProperty):
         """Create a descriptor based on the property information."""
-        desc: SettingDescriptor
         name = prop.description
         property_name = prop.name
 
