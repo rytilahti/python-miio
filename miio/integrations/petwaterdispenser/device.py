@@ -12,32 +12,43 @@ _LOGGER = logging.getLogger(__name__)
 
 MODEL_MMGG_PET_WATERER_S1 = "mmgg.pet_waterer.s1"
 MODEL_MMGG_PET_WATERER_S4 = "mmgg.pet_waterer.s4"
+MODEL_MMGG_PET_WATERER_WI11 = "mmgg.pet_waterer.wi11"
 
-SUPPORTED_MODELS: List[str] = [MODEL_MMGG_PET_WATERER_S1, MODEL_MMGG_PET_WATERER_S4]
+S_MODELS: List[str] = [MODEL_MMGG_PET_WATERER_S1, MODEL_MMGG_PET_WATERER_S4]
+WI_MODELS: List[str] = [MODEL_MMGG_PET_WATERER_WI11]
 
-_MAPPING: Dict[str, Dict[str, int]] = {
-    # https://home.miot-spec.com/spec/mmgg.pet_waterer.s1
-    # https://home.miot-spec.com/spec/mmgg.pet_waterer.s4
+_MAPPING_COMMON: Dict[str, Dict[str, int]] = {
+    "mode": {"siid": 2, "piid": 3},
+    "filter_left_time": {"siid": 3, "piid": 1},
+    "reset_filter_life": {"siid": 3, "aiid": 1},
+    "indicator_light": {"siid": 4, "piid": 1},
     "cotton_left_time": {"siid": 5, "piid": 1},
     "reset_cotton_life": {"siid": 5, "aiid": 1},
+    "remain_clean_time": {"siid": 6, "piid": 1},
     "reset_clean_time": {"siid": 6, "aiid": 1},
-    "fault": {"siid": 2, "piid": 1},
-    "filter_left_time": {"siid": 3, "piid": 1},
-    "indicator_light": {"siid": 4, "piid": 1},
-    "lid_up_flag": {"siid": 7, "piid": 4},  # missing on mmgg.pet_waterer.s4
-    "location": {"siid": 9, "piid": 2},
-    "mode": {"siid": 2, "piid": 3},
     "no_water_flag": {"siid": 7, "piid": 1},
     "no_water_time": {"siid": 7, "piid": 2},
-    "on": {"siid": 2, "piid": 2},
     "pump_block_flag": {"siid": 7, "piid": 3},
-    "remain_clean_time": {"siid": 6, "piid": 1},
-    "reset_filter_life": {"siid": 3, "aiid": 1},
+    "lid_up_flag": {"siid": 7, "piid": 4},
     "reset_device": {"siid": 8, "aiid": 1},
     "timezone": {"siid": 9, "piid": 1},
+    "location": {"siid": 9, "piid": 2},
 }
 
-MIOT_MAPPING = {model: _MAPPING for model in SUPPORTED_MODELS}
+_MAPPING_S: Dict[str, Dict[str, int]] = {
+    "fault": {"siid": 2, "piid": 1},
+    "on": {"siid": 2, "piid": 2},
+}
+
+_MAPPING_WI: Dict[str, Dict[str, int]] = {
+    "on": {"siid": 2, "piid": 1},
+    "fault": {"siid": 2, "piid": 2},
+}
+
+MIOT_MAPPING = {
+    **{model: {**_MAPPING_COMMON, **_MAPPING_S} for model in S_MODELS},
+    **{model: {**_MAPPING_COMMON, **_MAPPING_WI} for model in WI_MODELS},
+}
 
 
 class PetWaterDispenser(MiotDevice):
