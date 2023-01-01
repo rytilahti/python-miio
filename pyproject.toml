@@ -110,8 +110,10 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-# disables "Decorated property not supported", see https://github.com/python/mypy/issues/1362
-disable_error_code = "misc"
+# misc disables "Decorated property not supported", see https://github.com/python/mypy/issues/1362
+# annotation-unchecked disables "By default the bodies of untyped functions are not checked"
+disable_error_code = "misc,annotation-unchecked"
+
 
 [build-system]
 requires = ["poetry-core"]
