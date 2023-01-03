@@ -7,7 +7,14 @@ import pytest
 from miio import RoborockVacuum, UnsupportedFeatureException, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
-from ..vacuum import ROCKROBO_S7, CarpetCleaningMode, MopIntensity, MopMode
+from ..vacuum import (
+    ROCKROBO_Q7_MAX,
+    ROCKROBO_S7,
+    CarpetCleaningMode,
+    MopIntensity,
+    MopMode,
+    WaterFlow,
+)
 
 
 class DummyVacuum(DummyDevice, RoborockVacuum):
@@ -105,6 +112,7 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
                     ],
                 }
             ],
+            "water_box_custom_mode": [202],
         }
 
         self.return_values = {
@@ -122,9 +130,17 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "get_clean_record": lambda x: [[1488347071, 1488347123, 16, 0, 0, 0]],
             "get_dnd_timer": lambda x: self.dummies["dnd_timer"],
             "get_multi_maps_list": lambda x: self.dummies["multi_maps"],
+            "get_water_box_custom_mode": lambda x: self.dummies[
+                "water_box_custom_mode"
+            ],
+            "set_water_box_custom_mode": self.set_water_box_custom_mode_callback,
         }
 
         super().__init__(args, kwargs)
+
+    def set_water_box_custom_mode_callback(self, parameters):
+        assert parameters == self.dummies["water_box_custom_mode"]
+        return self.dummies["water_box_custom_mode"]
 
     def change_mode(self, new_mode):
         if new_mode == "spot":
@@ -469,6 +485,12 @@ class TestVacuum(TestCase):
         with pytest.raises(UnsupportedFeatureException):
             self.device.stop_mop_drying()
 
+    def test_waterflow(self):
+        assert self.device.waterflow() == WaterFlow.High
+
+    def test_set_waterflow(self):
+        self.device.set_waterflow(WaterFlow.High)
+
 
 class DummyVacuumS7(DummyVacuum):
     def __init__(self, *args, **kwargs):
@@ -482,11 +504,10 @@ class DummyVacuumS7(DummyVacuum):
                 "rdt": 3600,
             },
         }
+        self.dummies["water_box_custom_mode"] = [203]
         self.return_values = {
             **self.return_values,
             **{
-                "get_water_box_custom_mode": lambda x: [203],
-                "set_water_box_custom_mode": lambda x: [203],
                 "app_get_dryer_setting": lambda x: {
                     "status": 1,
                     "on": {
@@ -553,3 +574,28 @@ class TestVacuumS7(TestCase):
     def test_stop_mop_drying_model_check(self):
         """Test stopping mop drying."""
         assert self.device.stop_mop_drying()
+
+
+class DummyVacuumQ7Max(DummyVacuum):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+
+        self._model = ROCKROBO_Q7_MAX
+        self.dummies["water_box_custom_mode"] = {
+            "water_box_mode": 202,
+            "distance_off": 205,
+        }
+
+
+@pytest.fixture(scope="class")
+def dummyvacuumq7max(request):
+    request.cls.device = DummyVacuumQ7Max()
+
+
+@pytest.mark.usefixtures("dummyvacuumq7max")
+class TestVacuumQ7Max(TestCase):
+    def test_waterflow(self):
+        assert self.device.waterflow() == WaterFlow.High
+
+    def test_set_waterflow(self):
+        self.device.set_waterflow(WaterFlow.High)
