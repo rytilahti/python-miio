@@ -14,7 +14,7 @@ Before submitting a new request, use the search to see if there is an existing i
   - Name(s) of the device:
   - Link:
 
-Use `miiocli device --ip <ip address> --token <token>`.
+Use `miiocli device --ip <ip address> --token <token> info`.
 
   - Model: [e.g., lumi.gateway.v3]
   - Hardware version:
