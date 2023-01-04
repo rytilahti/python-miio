@@ -227,7 +227,13 @@ class DeviceStatus(FormattableEnum):
     GoCharging = 5
     Charging = 6
     Mopping = 7
-    ManualSweeping = 13
+    Drying = 8
+    Washing = 9
+    ReturningWashing = 10
+    Building = 11
+    SweepingAndMopping = 12
+    ChargingComplete = 13
+    Upgrading = 14
 
 
 class WaterFlow(FormattableEnum):
