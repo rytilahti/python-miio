@@ -909,11 +909,24 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def waterflow(self) -> WaterFlow:
         """Get water flow setting."""
-        return WaterFlow(self.send("get_water_box_custom_mode")[0])
+        flow_raw = self.send("get_water_box_custom_mode")
+        if self.model == ROCKROBO_Q7_MAX:
+            flow_value = flow_raw["water_box_mode"]
+            # There is additional "distance_off" key which
+            # specifies custom level with water_box_mode=207.
+            # App has 30 levels (1-30), distance_off = 210 - 5 * level
+        else:
+            flow_value = flow_raw[0]
+        return WaterFlow(flow_value)
 
     @command(click.argument("waterflow", type=EnumType(WaterFlow)))
     def set_waterflow(self, waterflow: WaterFlow):
         """Set water flow setting."""
+        if self.model == ROCKROBO_Q7_MAX:
+            return self.send(
+                "set_water_box_custom_mode",
+                {"water_box_mode": waterflow.value, "distance_off": 205},
+            )
         return self.send("set_water_box_custom_mode", [waterflow.value])
 
     @command()
