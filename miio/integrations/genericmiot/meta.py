@@ -68,7 +68,7 @@ class Metadata(BaseModel):
     namespaces: Dict[str, Namespace]
 
     @classmethod
-    def load(cls, file: Path = None):
+    def load(cls, file: Optional[Path] = None):
         if file is None:
             datadir = Path(__file__).resolve().parent
             file = datadir / "metadata" / "extras.yaml"
