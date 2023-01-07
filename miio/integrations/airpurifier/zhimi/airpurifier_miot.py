@@ -96,7 +96,6 @@ _MAPPING_VA2 = {
     # aqi
     "purify_volume": {"siid": 11, "piid": 1},
     "average_aqi": {"siid": 11, "piid": 2},
-    "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
     # RFID
     "filter_rfid_tag": {"siid": 12, "piid": 1},
     "filter_rfid_product_id": {"siid": 12, "piid": 3},
@@ -517,11 +516,6 @@ class AirPurifierMiot(MiotDevice):
     )
     def status(self) -> AirPurifierMiotStatus:
         """Retrieve properties."""
-        # Some devices update the aqi information only every 30min.
-        # This forces the device to poll the sensor for 5 seconds,
-        # so that we get always the most recent values. See #1281.
-        if self.model == "zhimi.airpurifier.mb3":
-            self.set_property("aqi_realtime_update_duration", 5)
 
         return AirPurifierMiotStatus(
             {
