@@ -16,7 +16,11 @@ from .descriptors import (
 )
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
-from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
+from .exceptions import (
+    DeviceError,
+    DeviceInfoUnavailableException,
+    PayloadDecodeException,
+)
 from .miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
@@ -297,6 +301,18 @@ class Device(metaclass=DeviceGroupMeta):
         # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.status().sensors()
         return sensors
+
+    def supports_miot(self) -> bool:
+        """Return True if the device supports miot commands.
+
+        This requests a single property (siid=1, piid=1) and returns True on success.
+        """
+        try:
+            self.send("get_properties", [{"did": "dummy", "siid": 1, "piid": 1}])
+        except DeviceError as ex:
+            _LOGGER.debug("miot query failed, likely non-miot device: %s", repr(ex))
+            return False
+        return True
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
