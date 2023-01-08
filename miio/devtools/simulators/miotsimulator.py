@@ -194,7 +194,7 @@ async def main(dev, model):
 
     mac = mac_from_model(model)
     simulator = MiotSimulator(device_model=dev)
-    server.add_method("miIO.info", create_info_response(model, mac))
+    server.add_method("miIO.info", create_info_response(model, "127.0.0.1", mac))
     server.add_method("action", simulator.action)
     server.add_method("get_properties", simulator.get_properties)
     server.add_method("set_properties", simulator.set_properties)
@@ -215,7 +215,7 @@ def miot_simulator(file, model):
     else:
         cloud = MiotCloud()
         # TODO: fix HACK
-        dev = SimulatedDeviceModel.parse_raw(cloud.get_model_schema(model))
+        dev = SimulatedDeviceModel.parse_obj(cloud.get_model_schema(model))
 
     loop = asyncio.get_event_loop()
     random.seed(1)  # nosec

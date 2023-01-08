@@ -2,7 +2,7 @@
 from hashlib import md5
 
 
-def create_info_response(model, mac):
+def create_info_response(model, addr, mac):
     """Create a response for miIO.info call using the given model and mac."""
     INFO_RESPONSE = {
         "ap": {"bssid": "FF:FF:FF:FF:FF:FF", "rssi": -68, "ssid": "network"},
@@ -15,7 +15,7 @@ def create_info_response(model, mac):
         "model": model,
         "netif": {
             "gw": "192.168.xxx.x",
-            "localIp": "192.168.xxx.x",
+            "localIp": addr,
             "mask": "255.255.255.0",
         },
         "ot": "otu",

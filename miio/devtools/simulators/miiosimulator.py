@@ -139,7 +139,7 @@ async def main(dev):
 
     _ = MiioSimulator(dev=dev, server=server)
     mac = mac_from_model(dev._model)
-    server.add_method("miIO.info", create_info_response(dev._model, mac))
+    server.add_method("miIO.info", create_info_response(dev._model, "127.0.0.1", mac))
 
     transport, proto = await server.start()
 
