@@ -3,12 +3,7 @@ import pytest
 from miio.tests.dummies import DummyMiotDevice
 
 from .. import AirHumidifierMiot
-from ..airhumidifier_miot import (
-    AirHumidifierMiotException,
-    LedBrightness,
-    OperationMode,
-    PressedButton,
-)
+from ..airhumidifier_miot import LedBrightness, OperationMode, PressedButton
 
 _INITIAL_STATE = {
     "power": True,
@@ -103,10 +98,10 @@ def test_set_speed(dev):
     dev.set_speed(2000)
     assert speed_level() == 2000
 
-    with pytest.raises(AirHumidifierMiotException):
+    with pytest.raises(ValueError):
         dev.set_speed(199)
 
-    with pytest.raises(AirHumidifierMiotException):
+    with pytest.raises(ValueError):
         dev.set_speed(2001)
 
 
@@ -119,10 +114,10 @@ def test_set_target_humidity(dev):
     dev.set_target_humidity(80)
     assert target_humidity() == 80
 
-    with pytest.raises(AirHumidifierMiotException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(29)
 
-    with pytest.raises(AirHumidifierMiotException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(81)
 
 

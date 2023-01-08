@@ -9,7 +9,6 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -69,10 +68,6 @@ COOKING_STAGES = {
     },
     16: {"name": "Cooking finished", "description": ""},
 }
-
-
-class CookerException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -258,7 +253,7 @@ class CookingStage(DeviceStatus):
 
 
 class InteractionTimeouts(DeviceStatus):
-    def __init__(self, timeouts: str = None):
+    def __init__(self, timeouts: Optional[str] = None):
         """Example timeouts: 05040f, 05060f.
 
         Data structure:
@@ -303,7 +298,7 @@ class InteractionTimeouts(DeviceStatus):
 
 
 class CookerSettings(DeviceStatus):
-    def __init__(self, settings: str = None):
+    def __init__(self, settings: Optional[str] = None):
         """Example settings: 1407, 0607, 0207.
 
         Data structure:
@@ -644,7 +639,7 @@ class Cooker(Device):
     def start(self, profile: str):
         """Start cooking a profile."""
         if not self._validate_profile(profile):
-            raise CookerException("Invalid cooking profile: %s" % profile)
+            raise ValueError("Invalid cooking profile: %s" % profile)
 
         self.send("set_start", [profile])
 
@@ -691,7 +686,7 @@ class Cooker(Device):
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles."""
         if not self._validate_profile(profile):
-            raise CookerException("Invalid cooking profile: %s" % profile)
+            raise ValueError("Invalid cooking profile: %s" % profile)
 
         self.send("set_menu", [profile])
 

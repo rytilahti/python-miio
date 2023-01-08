@@ -3,7 +3,7 @@ import pytest
 from miio import AirHumidifierJsqs
 from miio.tests.dummies import DummyMiotDevice
 
-from ..airhumidifier_jsqs import AirHumidifierJsqsException, OperationMode
+from ..airhumidifier_jsqs import OperationMode
 
 _INITIAL_STATE = {
     "power": True,
@@ -80,10 +80,10 @@ def test_set_target_humidity(dev):
     dev.set_target_humidity(80)
     assert target_humidity() == 80
 
-    with pytest.raises(AirHumidifierJsqsException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(39)
 
-    with pytest.raises(AirHumidifierJsqsException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(81)
 
 

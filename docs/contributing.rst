@@ -194,7 +194,7 @@ Development checklist
    listing the known models (as reported by :meth:`~miio.device.Device.info()`).
 4. Status containers is derived from :class:`~miio.devicestatus.DeviceStatus` class and all properties should
    have type annotations for their return values. The information that should be exposed directly
-   to end users should be decorated using appropriate decorators (e.g., `@sensor` or `@switch`) to make
+   to end users should be decorated using appropriate decorators (e.g., `@sensor` or `@setting`) to make
    them discoverable (:ref:`status_containers`).
 5. Add tests at least for the status container handling (:ref:`adding_tests`).
 6. Updating documentation is generally not needed as the API documentation
@@ -293,36 +293,19 @@ This will make all decorated sensors accessible through :meth:`~miio.device.Devi
     device class information to Home Assistant.
 
 
-Switches
-""""""""
-
-Use :meth:`@switch <miio.devicestatus.switch>` to create :class:`~miio.descriptors.SwitchDescriptor` objects.
-This will make all decorated switches accessible through :meth:`~miio.device.Device.switches` for downstream users.
-
-.. code-block::
-
-    @property
-    @switch(name="Power", setter_name="set_power")
-    def power(self) -> bool:
-        """Return if device is turned on."""
-
-You can either use *setter* to define a callable that can be used to adjust the value of the property,
-or alternatively define *setter_name* which will be used to bind the method during the initialization
-to the the :meth:`~miio.descriptors.SwitchDescriptor.setter` callable.
-
-
 Settings
 """"""""
 
-Use :meth:`@switch <miio.devicestatus.setting>` to create :meth:`~miio.descriptors.SettingDescriptor` objects.
+Use :meth:`@setting <miio.devicestatus.setting>` to create :meth:`~miio.descriptors.SettingDescriptor` objects.
 This will make all decorated settings accessible through :meth:`~miio.device.Device.settings` for downstream users.
 
 The type of the descriptor depends on the input parameters:
 
     * Passing *min_value* or *max_value* will create a :class:`~miio.descriptors.NumberSettingDescriptor`,
       which is useful for presenting ranges of values.
-    * Passing an Enum object using *choices* will create a :class:`~miio.descriptors.EnumSettingDescriptor`,
-      which is useful for presenting a fixed set of options.
+    * Passing an :class:`enum.Enum` object using *choices* will create a
+      :class:`~miio.descriptors.EnumSettingDescriptor`, which is useful for presenting a fixed set of options.
+    * Otherwise, the setting is considered to be boolean switch.
 
 
 You can either use *setter* to define a callable that can be used to adjust the value of the property,
@@ -333,12 +316,28 @@ Numerical Settings
 ^^^^^^^^^^^^^^^^^^
 
 The number descriptor allows defining a range of values and information about the steps.
-The *max_value* is the only mandatory parameter. If not given, *min_value* defaults to ``0`` and *steps* to ``1``.
+*range_attribute* can be used to define an attribute that is used to read the definitions,
+which is useful when the values depend on a device model.
+
+.. code-block::
+
+    class ExampleStatus(DeviceStatus):
+
+        @property
+        @setting(name="Color temperature", range_attribute="color_temperature_range")
+        def colortemp(): ...
+
+    class ExampleDevice(Device):
+        def color_temperature_range() -> ValidSettingRange:
+            return ValidSettingRange(0, 100, 5)
+
+Alternatively, *min_value*, *max_value*, and *step* can be used.
+The *max_value* is the only mandatory parameter. If not given, *min_value* defaults to ``0`` and *step* to ``1``.
 
 .. code-block::
 
     @property
-    @switch(name="Fan Speed", min_value=0, max_value=100, steps=5, setter_name="set_fan_speed")
+    @setting(name="Fan Speed", min_value=0, max_value=100, step=5, setter_name="set_fan_speed")
     def fan_speed(self) -> int:
         """Return the current fan speed."""
 
@@ -356,9 +355,31 @@ If the device has a setting with some pre-defined values, you want to use this.
         Off = 2
 
     @property
-    @switch(name="LED Brightness", choices=SomeEnum, setter_name="set_led_brightness")
+    @setting(name="LED Brightness", choices=SomeEnum, setter_name="set_led_brightness")
     def led_brightness(self) -> LedBrightness:
         """Return the LED brightness."""
+
+
+Actions
+"""""""
+
+Use :meth:`@action <miio.devicestatus.action>` to create :class:`~miio.descriptors.ActionDescriptor`
+objects for the device.
+This will make all decorated actions accessible through :meth:`~miio.device.Device.actions` for downstream users.
+
+.. code-block:: python
+
+    @command()
+    @action(name="Do Something", some_kwarg_for_downstream="hi there")
+    def do_something(self):
+        """Execute some action on the device."""
+
+.. note::
+
+    All keywords arguments not defined in the decorator signature will be available
+    through the :attr:`~miio.descriptors.ActionDescriptor.extras` variable.
+
+    This information can be used to pass information to the downstream users.
 
 
 .. _adding_tests:

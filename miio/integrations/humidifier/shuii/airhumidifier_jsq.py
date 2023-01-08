@@ -4,14 +4,10 @@ from typing import Any, Dict, Optional
 
 import click
 
-from miio import Device, DeviceException, DeviceStatus
+from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class AirHumidifierException(DeviceException):
-    pass
 
 
 # Xiaomi Zero Fog Humidifier
@@ -212,7 +208,7 @@ class AirHumidifierJsq(Device):
         """Set mode."""
         value = mode.value
         if value not in (om.value for om in OperationMode):
-            raise AirHumidifierException(f"{value} is not a valid OperationMode value")
+            raise ValueError(f"{value} is not a valid OperationMode value")
 
         return self.send("set_mode", [value])
 
@@ -224,7 +220,7 @@ class AirHumidifierJsq(Device):
         """Set led brightness."""
         value = brightness.value
         if value not in (lb.value for lb in LedBrightness):
-            raise AirHumidifierException(f"{value} is not a valid LedBrightness value")
+            raise ValueError(f"{value} is not a valid LedBrightness value")
 
         return self.send("set_brightness", [value])
 

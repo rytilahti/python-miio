@@ -8,7 +8,6 @@ from ..airhumidifier import (
     MODEL_HUMIDIFIER_CA1,
     MODEL_HUMIDIFIER_CB1,
     MODEL_HUMIDIFIER_V1,
-    AirHumidifierException,
     LedBrightness,
     OperationMode,
 )
@@ -183,16 +182,16 @@ def test_set_target_humidity(dev):
     dev.set_target_humidity(80)
     assert target_humidity() == 80
 
-    with pytest.raises(AirHumidifierException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(-1)
 
-    with pytest.raises(AirHumidifierException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(20)
 
-    with pytest.raises(AirHumidifierException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(90)
 
-    with pytest.raises(AirHumidifierException):
+    with pytest.raises(ValueError):
         dev.set_target_humidity(110)
 
 

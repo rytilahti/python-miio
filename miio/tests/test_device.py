@@ -146,3 +146,39 @@ def test_device_ctor_model(cls):
 def test_device_supported_models(cls):
     """Make sure that every device subclass has a non-empty supported models."""
     assert cls.supported_models
+
+
+@pytest.mark.parametrize("cls", DEVICE_CLASSES)
+def test_init_signature(cls, mocker):
+    """Make sure that __init__ of every device-inheriting class accepts the expected
+    parameters."""
+    mocker.patch("miio.Device.send")
+    parent_init = mocker.spy(Device, "__init__")
+    kwargs = {
+        "ip": "IP",
+        "token": None,
+        "start_id": 0,
+        "debug": False,
+        "lazy_discover": True,
+        "timeout": None,
+        "model": None,
+    }
+    cls(**kwargs)
+
+    # A rather hacky way to check for the arguments, we cannot use assert_called_with
+    # as some arguments are passed by inheriting classes using kwargs
+    total_args = len(parent_init.call_args.args) + len(parent_init.call_args.kwargs)
+    assert total_args == 8
+
+
+def test_supports_miot(mocker):
+    from miio.exceptions import DeviceError
+
+    send = mocker.patch(
+        "miio.Device.send", side_effect=DeviceError({"code": 1, "message": 1})
+    )
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    assert d.supports_miot() is False
+
+    send.side_effect = None
+    assert d.supports_miot() is True

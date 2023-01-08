@@ -8,7 +8,6 @@ from typing import Dict, Optional
 import click
 
 from miio.click_common import command, format_output
-from miio.exceptions import DeviceException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
@@ -22,6 +21,7 @@ DREAME_F9 = "dreame.vacuum.p2008"
 DREAME_D9 = "dreame.vacuum.p2009"
 DREAME_Z10_PRO = "dreame.vacuum.p2028"
 DREAME_L10_PRO = "dreame.vacuum.p2029"
+DREAME_L10S_ULTRA = "dreame.vacuum.r2228o"
 DREAME_MOP_2_PRO_PLUS = "dreame.vacuum.p2041o"
 DREAME_MOP_2_ULTRA = "dreame.vacuum.p2150a"
 DREAME_MOP_2 = "dreame.vacuum.p2150o"
@@ -170,6 +170,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_D9: _DREAME_F9_MAPPING,
     DREAME_Z10_PRO: _DREAME_F9_MAPPING,
     DREAME_L10_PRO: _DREAME_TROUVER_FINDER_MAPPING,
+    DREAME_L10S_ULTRA: _DREAME_TROUVER_FINDER_MAPPING,
     DREAME_MOP_2_PRO_PLUS: _DREAME_F9_MAPPING,
     DREAME_MOP_2_ULTRA: _DREAME_F9_MAPPING,
     DREAME_MOP_2: _DREAME_F9_MAPPING,
@@ -226,7 +227,13 @@ class DeviceStatus(FormattableEnum):
     GoCharging = 5
     Charging = 6
     Mopping = 7
-    ManualSweeping = 13
+    Drying = 8
+    Washing = 9
+    ReturningWashing = 10
+    Building = 11
+    SweepingAndMopping = 12
+    ChargingComplete = 13
+    Upgrading = 14
 
 
 class WaterFlow(FormattableEnum):
@@ -248,6 +255,7 @@ def _get_cleaning_mode_enum_class(model):
         DREAME_D9,
         DREAME_Z10_PRO,
         DREAME_L10_PRO,
+        DREAME_L10S_ULTRA,
         DREAME_MOP_2_PRO_PLUS,
         DREAME_MOP_2_ULTRA,
         DREAME_MOP_2,
@@ -638,7 +646,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
     def forward(self, distance: int) -> None:
         """Move forward."""
         if distance < self.MANUAL_DISTANCE_MIN or distance > self.MANUAL_DISTANCE_MAX:
-            raise DeviceException(
+            raise ValueError(
                 "Given distance is invalid, should be [%s, %s], was: %s"
                 % (self.MANUAL_DISTANCE_MIN, self.MANUAL_DISTANCE_MAX, distance)
             )
@@ -665,7 +673,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
             rotatation < self.MANUAL_ROTATION_MIN
             or rotatation > self.MANUAL_ROTATION_MAX
         ):
-            raise DeviceException(
+            raise ValueError(
                 "Given rotation is invalid, should be [%s, %s], was %s"
                 % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotatation)
             )

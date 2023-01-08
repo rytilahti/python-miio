@@ -6,7 +6,6 @@ import click
 
 from .click_common import EnumType, command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,10 +14,6 @@ MODEL_ACPARTNER_V2 = "lumi.acpartner.v2"
 MODEL_ACPARTNER_V3 = "lumi.acpartner.v3"
 
 MODELS_SUPPORTED = [MODEL_ACPARTNER_V1, MODEL_ACPARTNER_V2, MODEL_ACPARTNER_V3]
-
-
-class AirConditioningCompanionException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -231,14 +226,17 @@ class AirConditioningCompanion(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: Optional[int] = None,
         model: str = MODEL_ACPARTNER_V2,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
+        )
 
         if self.model not in MODELS_SUPPORTED:
             _LOGGER.error(
@@ -313,19 +311,15 @@ class AirConditioningCompanion(Device):
         try:
             model_bytes = bytes.fromhex(model)
         except ValueError:
-            raise AirConditioningCompanionException(
-                "Invalid model. A hexadecimal string must be provided"
-            )
+            raise ValueError("Invalid model. A hexadecimal string must be provided")
 
         try:
             code_bytes = bytes.fromhex(code)
         except ValueError:
-            raise AirConditioningCompanionException(
-                "Invalid code. A hexadecimal string must be provided"
-            )
+            raise ValueError("Invalid code. A hexadecimal string must be provided")
 
         if slot < 0 or slot > 134:
-            raise AirConditioningCompanionException("Invalid slot: %s" % slot)
+            raise ValueError("Invalid slot: %s" % slot)
 
         slot_bytes = bytes([121 + slot])
 
@@ -419,8 +413,8 @@ class AirConditioningCompanion(Device):
 class AirConditioningCompanionV3(AirConditioningCompanion):
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,

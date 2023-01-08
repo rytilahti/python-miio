@@ -16,13 +16,8 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class CameraException(DeviceException):
-    pass
 
 
 @attr.s
@@ -255,7 +250,7 @@ class AqaraCamera(Device):
     def pair(self, timeout: int):
         """Start (or stop with "0") pairing."""
         if timeout < 0:
-            raise CameraException("Invalid timeout: %s" % timeout)
+            raise ValueError("Invalid timeout: %s" % timeout)
 
         return self.send("start_zigbee_join", [timeout])
 
@@ -292,7 +287,7 @@ class AqaraCamera(Device):
     def set_alarm_volume(self, volume):
         """Set alarm volume."""
         if volume < 0 or volume > 100:
-            raise CameraException("Volume has to be [0,100], was %s" % volume)
+            raise ValueError("Volume has to be [0,100], was %s" % volume)
         return self.send("set_alarming_volume", [volume])[0] == "ok"
 
     @command(click.argument("sound_id", type=str, required=False, default=None))

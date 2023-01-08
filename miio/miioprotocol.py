@@ -8,7 +8,8 @@ import codecs
 import logging
 import socket
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from pprint import pformat as pf
+from typing import Any, Dict, List, Optional
 
 import construct
 
@@ -21,8 +22,8 @@ _LOGGER = logging.getLogger(__name__)
 class MiIOProtocol:
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
@@ -90,7 +91,7 @@ class MiIOProtocol:
         return m
 
     @staticmethod
-    def discover(addr: str = None, timeout: int = 5) -> Any:
+    def discover(addr: Optional[str] = None, timeout: int = 5) -> Any:
         """Scan for devices in the network. This method is used to discover supported
         devices by sending a handshake message to the broadcast address on port 54321.
         If the target IP address is given, the handshake will be send as an unicast
@@ -99,7 +100,7 @@ class MiIOProtocol:
         :param str addr: Target IP address
         """
         is_broadcast = addr is None
-        seen_addrs = []  # type: List[str]
+        seen_addrs: List[str] = []
         if is_broadcast:
             addr = "<broadcast>"
             is_broadcast = True
@@ -117,7 +118,7 @@ class MiIOProtocol:
         while True:
             try:
                 data, recv_addr = s.recvfrom(1024)
-                m = Message.parse(data)  # type: Message
+                m: Message = Message.parse(data)
                 _LOGGER.debug("Got a response: %s", m)
                 if not is_broadcast:
                     return m
@@ -141,10 +142,10 @@ class MiIOProtocol:
     def send(
         self,
         command: str,
-        parameters: Any = None,
+        parameters: Optional[Any] = None,
         retry_count: int = 3,
         *,
-        extra_parameters: Dict = None
+        extra_parameters: Optional[Dict] = None
     ) -> Any:
         """Build and send the given command. Note that this will implicitly call
         :func:`send_handshake` to do a handshake, and will re-try in case of errors
@@ -172,7 +173,7 @@ class MiIOProtocol:
 
         msg = {"data": {"value": request}, "header": {"value": header}, "checksum": 0}
         m = Message.build(msg, token=self.token)
-        _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, request)
+        _LOGGER.debug("%s:%s >>: %s", self.ip, self.port, pf(request))
         if self.debug > 1:
             _LOGGER.debug(
                 "send (timeout %s): %s",
@@ -208,7 +209,7 @@ class MiIOProtocol:
                 self.port,
                 header["ts"],
                 payload["id"],
-                payload,
+                pf(payload),
             )
             if "error" in payload:
                 self._handle_error(payload["error"])
@@ -275,7 +276,7 @@ class MiIOProtocol:
         raise DeviceError(error)
 
     def _create_request(
-        self, command: str, parameters: Any, extra_parameters: Dict = None
+        self, command: str, parameters: Any, extra_parameters: Optional[Dict] = None
     ):
         """Create request payload."""
         request = {"id": self._id, "method": command}

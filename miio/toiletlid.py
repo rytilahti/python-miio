@@ -140,7 +140,6 @@ class Toiletlid(Device):
         default_output=format_output("Bind xiaomi band to xiaomi id."),
     )
     def bind_xiaomi_band(self, xiaomi_id: str, band_mac: str, alias: str):
-
         """Bind xiaomi band to xiaomi id."""
         return self.send("uid_mac_op", [xiaomi_id, band_mac, alias, "bind"])
 

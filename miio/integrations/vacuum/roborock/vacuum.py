@@ -21,15 +21,34 @@ from miio.click_common import (
     command,
 )
 from miio.device import Device, DeviceInfo
-from miio.exceptions import DeviceException, DeviceInfoUnavailableException
+from miio.devicestatus import action
+from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
+from .vacuum_enums import (
+    CarpetCleaningMode,
+    Consumable,
+    DustCollectionMode,
+    FanspeedE2,
+    FanspeedEnum,
+    FanspeedS7,
+    FanspeedS7_Maxv,
+    FanspeedV1,
+    FanspeedV2,
+    FanspeedV3,
+    MopIntensity,
+    MopMode,
+    TimerState,
+    WaterFlow,
+)
 from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,
     CleaningSummary,
     ConsumableStatus,
     DNDStatus,
+    MapList,
+    MopDryerSettings,
     SoundInstallStatus,
     SoundStatus,
     Timer,
@@ -39,116 +58,6 @@ from .vacuumcontainers import (
 _LOGGER = logging.getLogger(__name__)
 
 
-class VacuumException(DeviceException):
-    pass
-
-
-class TimerState(enum.Enum):
-    On = "on"
-    Off = "off"
-
-
-class Consumable(enum.Enum):
-    MainBrush = "main_brush_work_time"
-    SideBrush = "side_brush_work_time"
-    Filter = "filter_work_time"
-    SensorDirty = "sensor_dirty_time"
-
-
-class FanspeedEnum(enum.Enum):
-    pass
-
-
-class FanspeedV1(FanspeedEnum):
-    Silent = 38
-    Standard = 60
-    Medium = 77
-    Turbo = 90
-
-
-class FanspeedV2(FanspeedEnum):
-    Silent = 101
-    Standard = 102
-    Medium = 103
-    Turbo = 104
-    Gentle = 105
-    Auto = 106
-
-
-class FanspeedV3(FanspeedEnum):
-    Silent = 38
-    Standard = 60
-    Medium = 75
-    Turbo = 100
-
-
-class FanspeedE2(FanspeedEnum):
-    # Original names from the app: Gentle, Silent, Standard, Strong, Max
-    Gentle = 41
-    Silent = 50
-    Standard = 68
-    Medium = 79
-    Turbo = 100
-
-
-class FanspeedS7(FanspeedEnum):
-    Silent = 101
-    Standard = 102
-    Medium = 103
-    Turbo = 104
-
-
-class FanspeedS7_Maxv(FanspeedEnum):
-    Silent = 101
-    Standard = 102
-    Medium = 103
-    Turbo = 104
-    Max = 108
-
-
-class WaterFlow(enum.Enum):
-    """Water flow strength on s5 max."""
-
-    Minimum = 200
-    Low = 201
-    High = 202
-    Maximum = 203
-
-
-class MopMode(enum.Enum):
-    """Mop routing on S7."""
-
-    Standard = 300
-    Deep = 301
-
-
-class MopIntensity(enum.Enum):
-    """Mop scrub intensity on S7 + S7MAXV."""
-
-    Close = 200
-    Mild = 201
-    Moderate = 202
-    Intense = 203
-
-
-class CarpetCleaningMode(enum.Enum):
-    """Type of carpet cleaning/avoidance."""
-
-    Avoid = 0
-    Rise = 1
-    Ignore = 2
-
-
-class DustCollectionMode(enum.Enum):
-    """Auto emptying mode (S7 + S7MAXV only)"""
-
-    Smart = 0
-    Quick = 1
-    Daily = 2
-    Strong = 3
-    Max = 4
-
-
 ROCKROBO_V1 = "rockrobo.vacuum.v1"
 ROCKROBO_S4 = "roborock.vacuum.s4"
 ROCKROBO_S4_MAX = "roborock.vacuum.a19"
@@ -156,23 +65,30 @@ ROCKROBO_S5 = "roborock.vacuum.s5"
 ROCKROBO_S5_MAX = "roborock.vacuum.s5e"
 ROCKROBO_S6 = "roborock.vacuum.s6"
 ROCKROBO_T6 = "roborock.vacuum.t6"  # cn s6
+ROCKROBO_E4 = "roborock.vacuum.a01"
 ROCKROBO_S6_PURE = "roborock.vacuum.a08"
 ROCKROBO_T7 = "roborock.vacuum.a11"  # cn s7
 ROCKROBO_T7S = "roborock.vacuum.a14"
 ROCKROBO_T7SPLUS = "roborock.vacuum.a23"
 ROCKROBO_S7_MAXV = "roborock.vacuum.a27"
+ROCKROBO_S7_PRO_ULTRA = "roborock.vacuum.a62"
 ROCKROBO_Q5 = "roborock.vacuum.a34"
+ROCKROBO_Q7_MAX = "roborock.vacuum.a38"
 ROCKROBO_G10S = "roborock.vacuum.a46"
+ROCKROBO_G10 = "roborock.vacuum.a29"
+
 ROCKROBO_S7 = "roborock.vacuum.a15"
 ROCKROBO_S6_MAXV = "roborock.vacuum.a10"
 ROCKROBO_E2 = "roborock.vacuum.e2"
 ROCKROBO_1S = "roborock.vacuum.m1s"
 ROCKROBO_C1 = "roborock.vacuum.c1"
+ROCKROBO_WILD = "roborock.vacuum.*"  # wildcard
 
 SUPPORTED_MODELS = [
     ROCKROBO_V1,
     ROCKROBO_S4,
     ROCKROBO_S4_MAX,
+    ROCKROBO_E4,
     ROCKROBO_S5,
     ROCKROBO_S5_MAX,
     ROCKROBO_S6,
@@ -183,17 +99,22 @@ SUPPORTED_MODELS = [
     ROCKROBO_T7SPLUS,
     ROCKROBO_S7,
     ROCKROBO_S7_MAXV,
+    ROCKROBO_S7_PRO_ULTRA,
     ROCKROBO_Q5,
+    ROCKROBO_Q7_MAX,
+    ROCKROBO_G10,
     ROCKROBO_G10S,
     ROCKROBO_S6_MAXV,
     ROCKROBO_E2,
     ROCKROBO_1S,
     ROCKROBO_C1,
+    ROCKROBO_WILD,
 ]
 
 AUTO_EMPTY_MODELS = [
     ROCKROBO_S7,
     ROCKROBO_S7_MAXV,
+    ROCKROBO_Q7_MAX,
 ]
 
 
@@ -206,14 +127,20 @@ class RoborockVacuum(Device, VacuumInterface):
     def __init__(
         self,
         ip: str,
-        token: str = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
+        lazy_discover: bool = True,
+        timeout: Optional[int] = None,
         *,
         model=None,
     ):
-        super().__init__(ip, token, start_id, debug, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout, model=model
+        )
         self.manual_seqnum = -1
+        self._maps: Optional[MapList] = None
+        self._map_enum_cache = None
 
     @command()
     def start(self):
@@ -221,6 +148,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_start")
 
     @command()
+    @action(name="Stop cleaning", type="vacuum")
     def stop(self):
         """Stop cleaning.
 
@@ -230,16 +158,19 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_stop")
 
     @command()
+    @action(name="Spot cleaning", type="vacuum")
     def spot(self):
         """Start spot cleaning."""
         return self.send("app_spot")
 
     @command()
+    @action(name="Pause cleaning", type="vacuum")
     def pause(self):
         """Pause cleaning."""
         return self.send("app_pause")
 
     @command()
+    @action(name="Start cleaning", type="vacuum")
     def resume_or_start(self):
         """A shortcut for resuming or starting cleaning."""
         status = self.status()
@@ -292,6 +223,7 @@ class RoborockVacuum(Device, VacuumInterface):
             return self._info
 
     @command()
+    @action(name="Home", type="vacuum")
     def home(self):
         """Stop cleaning and return home."""
 
@@ -380,12 +312,12 @@ class RoborockVacuum(Device, VacuumInterface):
     ):
         """Give a command over manual control interface."""
         if rotation < self.MANUAL_ROTATION_MIN or rotation > self.MANUAL_ROTATION_MAX:
-            raise DeviceException(
+            raise ValueError(
                 "Given rotation is invalid, should be ]%s, %s[, was %s"
                 % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotation)
             )
         if velocity < self.MANUAL_VELOCITY_MIN or velocity > self.MANUAL_VELOCITY_MAX:
-            raise DeviceException(
+            raise ValueError(
                 "Given velocity is invalid, should be ]%s, %s[, was: %s"
                 % (self.MANUAL_VELOCITY_MIN, self.MANUAL_VELOCITY_MAX, velocity)
             )
@@ -403,10 +335,16 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def status(self) -> VacuumStatus:
         """Return status of the vacuum."""
-        status = VacuumStatus(self.send("get_status")[0])
+        status = self.vacuum_status()
         status.embed(self.consumable_status())
         status.embed(self.clean_history())
+        status.embed(self.dnd_status())
         return status
+
+    @command()
+    def vacuum_status(self) -> VacuumStatus:
+        """Return only status of the vacuum."""
+        return VacuumStatus(self.send("get_status")[0])
 
     def enable_log_upload(self):
         raise NotImplementedError("unknown parameters")
@@ -433,6 +371,40 @@ class RoborockVacuum(Device, VacuumInterface):
         # returns ['retry'] without internet
         return self.send("get_map_v1")
 
+    @command()
+    def get_maps(self) -> MapList:
+        """Return list of maps."""
+        if self._maps is not None:
+            return self._maps
+
+        self._maps = MapList(self.send("get_multi_maps_list")[0])
+        return self._maps
+
+    def _map_enum(self) -> Optional[enum.Enum]:
+        """Enum of the available map names."""
+        if self._map_enum_cache is not None:
+            return self._map_enum_cache
+
+        maps = self.get_maps()
+
+        self._map_enum_cache = enum.Enum("map_enum", maps.map_name_dict)
+        return self._map_enum_cache
+
+    @command(click.argument("map_id", type=int))
+    def load_map(
+        self,
+        map_enum: Optional[enum.Enum] = None,
+        map_id: Optional[int] = None,
+    ):
+        """Change the current map used."""
+        if map_enum is None and map_id is None:
+            raise ValueError("Either map_enum or map_id is required.")
+
+        if map_enum is not None:
+            map_id = map_enum.value
+
+        return self.send("load_multi_map", [map_id])[0] == "ok"
+
     @command(click.argument("start", type=bool))
     def edit_map(self, start):
         """Start map editing?"""
@@ -445,7 +417,7 @@ class RoborockVacuum(Device, VacuumInterface):
     def fresh_map(self, version):
         """Return fresh map?"""
         if version not in [1, 2]:
-            raise VacuumException("Unknown map version: %s" % version)
+            raise ValueError("Unknown map version: %s" % version)
 
         if version == 1:
             return self.send("get_fresh_map")
@@ -456,7 +428,7 @@ class RoborockVacuum(Device, VacuumInterface):
     def persist_map(self, version):
         """Return fresh map?"""
         if version not in [1, 2]:
-            raise VacuumException("Unknown map version: %s" % version)
+            raise ValueError("Unknown map version: %s" % version)
 
         if version == 1:
             return self.send("get_persist_map")
@@ -548,6 +520,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return res
 
     @command()
+    @action(name="Find robot", type="vacuum")
     def find(self):
         """Find the robot."""
         return self.send("find_me", [""])
@@ -604,7 +577,7 @@ class RoborockVacuum(Device, VacuumInterface):
         :param TimerState mode: either On or Off
         """
         if mode != TimerState.On and mode != TimerState.Off:
-            raise DeviceException("Only 'On' or 'Off' are  allowed")
+            raise ValueError("Only 'On' or 'Off' are  allowed")
         return self.send("upd_timer", [timer_id, mode.value])
 
     @command()
@@ -725,6 +698,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("change_sound_volume", [vol])
 
     @command()
+    @action(name="Test sound volume", type="vacuum")
     def test_sound_volume(self):
         """Test current sound volume."""
         return self.send("test_sound_volume")
@@ -859,12 +833,14 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("set_dust_collection_mode", {"mode": mode.value})[0] == "ok"
 
     @command()
+    @action(name="Start dust collection", icon="mdi:turbine")
     def start_dust_collection(self):
         """Activate automatic dust collection."""
         self._verify_auto_empty_support()
         return self.send("app_start_collect_dust")
 
     @command()
+    @action(name="Stop dust collection", icon="mdi:turbine")
     def stop_dust_collection(self):
         """Abort in progress dust collection."""
         self._verify_auto_empty_support()
@@ -872,7 +848,7 @@ class RoborockVacuum(Device, VacuumInterface):
 
     def _verify_auto_empty_support(self) -> None:
         if self.model not in self._auto_empty_models:
-            raise VacuumException("Device does not support auto emptying")
+            raise UnsupportedFeatureException("Device does not support auto emptying")
 
     @command()
     def stop_zoned_clean(self):
@@ -933,11 +909,24 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def waterflow(self) -> WaterFlow:
         """Get water flow setting."""
-        return WaterFlow(self.send("get_water_box_custom_mode")[0])
+        flow_raw = self.send("get_water_box_custom_mode")
+        if self.model == ROCKROBO_Q7_MAX:
+            flow_value = flow_raw["water_box_mode"]
+            # There is additional "distance_off" key which
+            # specifies custom level with water_box_mode=207.
+            # App has 30 levels (1-30), distance_off = 210 - 5 * level
+        else:
+            flow_value = flow_raw[0]
+        return WaterFlow(flow_value)
 
     @command(click.argument("waterflow", type=EnumType(WaterFlow)))
     def set_waterflow(self, waterflow: WaterFlow):
         """Set water flow setting."""
+        if self.model == ROCKROBO_Q7_MAX:
+            return self.send(
+                "set_water_box_custom_mode",
+                {"water_box_mode": waterflow.value, "distance_off": 205},
+            )
         return self.send("set_water_box_custom_mode", [waterflow.value])
 
     @command()
@@ -957,16 +946,20 @@ class RoborockVacuum(Device, VacuumInterface):
     @command()
     def mop_intensity(self) -> MopIntensity:
         """Get mop scrub intensity setting."""
-        if self.model != ROCKROBO_S7:
-            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
+            raise UnsupportedFeatureException(
+                "Mop scrub intensity not supported by %s", self.model
+            )
 
         return MopIntensity(self.send("get_water_box_custom_mode")[0])
 
     @command(click.argument("mop_intensity", type=EnumType(MopIntensity)))
     def set_mop_intensity(self, mop_intensity: MopIntensity):
         """Set mop scrub intensity setting."""
-        if self.model != ROCKROBO_S7:
-            raise VacuumException("Mop scrub intensity not supported by %s", self.model)
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
+            raise UnsupportedFeatureException(
+                "Mop scrub intensity not supported by %s", self.model
+            )
 
         return self.send("set_water_box_custom_mode", [mop_intensity.value])
 
@@ -979,6 +972,49 @@ class RoborockVacuum(Device, VacuumInterface):
     def set_child_lock(self, lock: bool) -> bool:
         """Set child lock setting."""
         return self.send("set_child_lock_status", {"lock_status": int(lock)})[0] == "ok"
+
+    def _verify_mop_dryer_supported(self) -> None:
+        """Checks if model supports mop dryer add-on."""
+        # dryer add-on is only supported by following models
+        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
+            raise UnsupportedFeatureException("Dryer not supported by %s", self.model)
+
+    @command()
+    def mop_dryer_settings(self) -> MopDryerSettings:
+        """Get mop dryer settings."""
+        self._verify_mop_dryer_supported()
+        return MopDryerSettings(self.send("app_get_dryer_setting"))
+
+    @command(click.argument("enabled", type=bool))
+    def set_mop_dryer_enabled(self, enabled: bool) -> bool:
+        """Set mop dryer add-on enabled."""
+        self._verify_mop_dryer_supported()
+        return self.send("app_set_dryer_setting", {"status": int(enabled)})[0] == "ok"
+
+    @command(click.argument("dry_time", type=int))
+    def set_mop_dryer_dry_time(self, dry_time_seconds: int) -> bool:
+        """Set mop dryer add-on dry time."""
+        self._verify_mop_dryer_supported()
+        return (
+            self.send("app_set_dryer_setting", {"on": {"dry_time": dry_time_seconds}})[
+                0
+            ]
+            == "ok"
+        )
+
+    @command()
+    @action(name="Start mop drying", icon="mdi:tumble-dryer")
+    def start_mop_drying(self) -> bool:
+        """Start mop drying."""
+        self._verify_mop_dryer_supported()
+        return self.send("app_set_dryer_status", {"status": 1})[0] == "ok"
+
+    @command()
+    @action(name="Stop mop drying", icon="mdi:tumble-dryer")
+    def stop_mop_drying(self) -> bool:
+        """Stop mop drying."""
+        self._verify_mop_dryer_supported()
+        return self.send("app_set_dryer_status", {"status": 0})[0] == "ok"
 
     @classmethod
     def get_device_group(cls):

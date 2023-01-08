@@ -5,15 +5,10 @@ from typing import Any, Optional
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
 MODEL_ACPARTNER_MCN02 = "lumi.acpartner.mcn02"
-
-
-class AirConditioningCompanionException(DeviceException):
-    pass
 
 
 class OperationMode(enum.Enum):
@@ -106,16 +101,19 @@ class AirConditioningCompanionMcn02(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
-        start_id: int = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
+        start_id: Optional[int] = None,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: Optional[int] = None,
         model: str = MODEL_ACPARTNER_MCN02,
     ) -> None:
         if start_id is None:
             start_id = random.randint(0, 999)  # nosec
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
+        )
 
         if model != MODEL_ACPARTNER_MCN02:
             _LOGGER.error(
@@ -155,7 +153,7 @@ class AirConditioningCompanionMcn02(Device):
     @command(
         default_output=format_output("Sending a command to the air conditioner"),
     )
-    def send_command(self, command: str, parameters: Any = None) -> Any:
+    def send_command(self, command: str, parameters: Optional[Any] = None) -> Any:
         """Send a command to the air conditioner.
 
         :param str command: Command to execute

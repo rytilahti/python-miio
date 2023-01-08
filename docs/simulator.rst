@@ -198,4 +198,60 @@ concrete example for a device using custom method names for obtaining the status
 MiOT Simulator
 --------------
 
-.. note:: TBD.
+The ``miiocli devtools miot-simulator`` command can be used to simulate MiOT devices for a given description file.
+You can command the simulated devices using the ``miiocli`` tool or any other implementation that supports the device.
+
+Behind the scenes, the simulator uses :class:`the push server <miio.push_server.server.PushServer>` to
+handle the low-level protocol handling.
+
+The simulator implements the following methods:
+
+  * ``miIO.info`` returns the device information
+  * ``get_properties`` returns randomized (leveraging the schema limits) values for the given ``siid`` and ``piid``
+  * ``set_properties`` allows setting the property for the given ``siid`` and ``piid`` combination
+  * ``action`` to call actions that simply respond that the action succeeded
+
+Furthermore, two custom methods are implemented help with development:
+
+  * ``dump_services`` returns the :ref:`list of available services <dump_services>`
+  * ``dump_properties`` returns the :ref:`available properties and their values <dump_properties>` the given ``siid``
+
+
+Usage
+"""""
+
+You start the simulator like this::
+
+    miiocli devtools miot-simulator --file some.vacuum.model.json --model some.vacuum.model
+
+The mandatory ``--file`` option takes a path to a MiOT description file, while ``--model`` defines the model
+the simulator should report in its ``miIO.info`` response.
+
+.. note::
+
+    The default token is hardcoded to full of zeros (``00000000000000000000000000000000``).
+
+
+.. _dump_services:
+
+Dump Service Information
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+``dump_services`` method that returns a JSON dictionary keyed with the ``siid`` containing the simulated services::
+
+
+  $ miiocli device --ip 127.0.0.1 --token 00000000000000000000000000000000 raw_command dump_services
+  Running command raw_command
+  {'services': {'1': {'siid': 1, 'description': 'Device Information'}, '2': {'siid': 2, 'description': 'Heater'}, '3': {'siid': 3, 'description': 'Countdown'}, '4': {'siid': 4, 'description': 'Environment'}, '5': {'siid': 5, 'description': 'Physical Control Locked'}, '6': {'siid': 6, 'description': 'Alarm'}, '7': {'siid': 7, 'description': 'Indicator Light'}, '8': {'siid': 8, 'description': '私有服务'}}, 'id': 2}
+
+
+.. _dump_properties:
+
+Dump Service Properties
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``dump_properties`` method can be used to return the current state of the device on service-basis::
+
+  $ miiocli device --ip 127.0.0.1 --token 00000000000000000000000000000000 raw_command dump_properties '{"siid": 2}'
+  Running command raw_command
+  [{'siid': 2, 'piid': 1, 'prop': 'Switch Status', 'value': False}, {'siid': 2, 'piid': 2, 'prop': 'Device Fault', 'value': 167}, {'siid': 2, 'piid': 5, 'prop': 'Target Temperature', 'value': 28}]

@@ -8,7 +8,6 @@ from .. import AirFresh
 from ..airfresh import (
     MODEL_AIRFRESH_VA2,
     MODEL_AIRFRESH_VA4,
-    AirFreshException,
     AirFreshStatus,
     LedBrightness,
     OperationMode,
@@ -59,6 +58,11 @@ class DummyAirFresh(DummyDevice, AirFresh):
 
 @pytest.fixture(scope="class")
 def airfresh(request):
+    # pytest 7.2.0 changed the handling of marks, see https://github.com/pytest-dev/pytest/issues/7792
+    # the result is subclass device attribute to be overridden for TestAirFreshVA4,
+    # this hack checks if we already have a device to avoid doing that
+    if getattr(request.cls, "device", None) is not None:
+        return
     request.cls.device = DummyAirFresh()
     # TODO add ability to test on a real device
 
@@ -193,7 +197,7 @@ class TestAirFresh(TestCase):
         self.device.set_extra_features(2)
         assert extra_features() == 2
 
-        with pytest.raises(AirFreshException):
+        with pytest.raises(ValueError):
             self.device.set_extra_features(-1)
 
     def test_reset_filter(self):

@@ -4,15 +4,16 @@ from unittest.mock import patch
 
 import pytest
 
-from miio import RoborockVacuum, VacuumStatus
+from miio import RoborockVacuum, UnsupportedFeatureException, VacuumStatus
 from miio.tests.dummies import DummyDevice
 
 from ..vacuum import (
+    ROCKROBO_Q7_MAX,
     ROCKROBO_S7,
     CarpetCleaningMode,
     MopIntensity,
     MopMode,
-    VacuumException,
+    WaterFlow,
 )
 
 
@@ -44,30 +45,75 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "msg_seq": 320,
             "water_box_status": 1,
         }
+        self._maps = None
+        self._map_enum_cache = None
 
-        self.dummies = {}
-        self.dummies["consumables"] = [
-            {
-                "filter_work_time": 32454,
-                "sensor_dirty_time": 3798,
-                "side_brush_work_time": 32454,
-                "main_brush_work_time": 32454,
-            }
-        ]
-        self.dummies["clean_summary"] = [
-            174145,
-            2410150000,
-            82,
-            [
-                1488240000,
-                1488153600,
-                1488067200,
-                1487980800,
-                1487894400,
-                1487808000,
-                1487548800,
+        self.dummies = {
+            "consumables": [
+                {
+                    "filter_work_time": 32454,
+                    "sensor_dirty_time": 3798,
+                    "side_brush_work_time": 32454,
+                    "main_brush_work_time": 32454,
+                    "strainer_work_times": 44,
+                    "cleaning_brush_work_times": 44,
+                }
             ],
-        ]
+            "clean_summary": [
+                174145,
+                2410150000,
+                82,
+                [
+                    1488240000,
+                    1488153600,
+                    1488067200,
+                    1487980800,
+                    1487894400,
+                    1487808000,
+                    1487548800,
+                ],
+            ],
+            "dnd_timer": [
+                {
+                    "enabled": 1,
+                    "start_minute": 0,
+                    "end_minute": 0,
+                    "start_hour": 22,
+                    "end_hour": 8,
+                }
+            ],
+            "multi_maps": [
+                {
+                    "max_multi_map": 4,
+                    "max_bak_map": 1,
+                    "multi_map_count": 3,
+                    "map_info": [
+                        {
+                            "mapFlag": 0,
+                            "add_time": 1664448893,
+                            "length": 10,
+                            "name": "Downstairs",
+                            "bak_maps": [{"mapFlag": 4, "add_time": 1663577737}],
+                        },
+                        {
+                            "mapFlag": 1,
+                            "add_time": 1663580330,
+                            "length": 8,
+                            "name": "Upstairs",
+                            "bak_maps": [{"mapFlag": 5, "add_time": 1663577752}],
+                        },
+                        {
+                            "mapFlag": 2,
+                            "add_time": 1663580384,
+                            "length": 5,
+                            "name": "Attic",
+                            "bak_maps": [{"mapFlag": 6, "add_time": 1663577765}],
+                        },
+                    ],
+                }
+            ],
+            "water_box_custom_mode": [202],
+        }
 
         self.return_values = {
             "get_status": lambda x: [self.state],
@@ -81,9 +127,20 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
             "app_zoned_clean": lambda x: self.change_mode("zoned clean"),
             "app_charge": lambda x: self.change_mode("charge"),
             "miIO.info": "dummy info",
+            "get_clean_record": lambda x: [[1488347071, 1488347123, 16, 0, 0, 0]],
+            "get_dnd_timer": lambda x: self.dummies["dnd_timer"],
+            "get_multi_maps_list": lambda x: self.dummies["multi_maps"],
+            "get_water_box_custom_mode": lambda x: self.dummies[
+                "water_box_custom_mode"
+            ],
+            "set_water_box_custom_mode": self.set_water_box_custom_mode_callback,
         }
 
         super().__init__(args, kwargs)
+
+    def set_water_box_custom_mode_callback(self, parameters):
+        assert parameters == self.dummies["water_box_custom_mode"]
+        return self.dummies["water_box_custom_mode"]
 
     def change_mode(self, new_mode):
         if new_mode == "spot":
@@ -306,6 +363,50 @@ class TestVacuum(TestCase):
 
             assert len(self.device.clean_history().ids) == 0
 
+    def test_get_maps_dict(self):
+        MAP_LIST = [
+            {
+                "mapFlag": 0,
+                "add_time": 1664448893,
+                "length": 10,
+                "name": "Downstairs",
+                "bak_maps": [{"mapFlag": 4, "add_time": 1663577737}],
+            },
+            {
+                "mapFlag": 1,
+                "add_time": 1663580330,
+                "length": 8,
+                "name": "Upstairs",
+                "bak_maps": [{"mapFlag": 5, "add_time": 1663577752}],
+            },
+            {
+                "mapFlag": 2,
+                "add_time": 1663580384,
+                "length": 5,
+                "name": "Attic",
+                "bak_maps": [{"mapFlag": 6, "add_time": 1663577765}],
+            },
+        ]
+
+        with patch.object(
+            self.device,
+            "send",
+            return_value=[
+                {
+                    "max_multi_map": 4,
+                    "max_bak_map": 1,
+                    "multi_map_count": 3,
+                    "map_info": MAP_LIST,
+                }
+            ],
+        ):
+            maps = self.device.get_maps()
+
+        assert maps.map_count == 3
+        assert maps.map_id_list == [0, 1, 2]
+        assert maps.map_list == MAP_LIST
+        assert maps.map_name_dict == {"Downstairs": 0, "Upstairs": 1, "Attic": 2}
+
     def test_info_no_cloud(self):
         """Test the info functionality for non-cloud connected device."""
         from miio.exceptions import DeviceInfoUnavailableException
@@ -343,18 +444,84 @@ class TestVacuum(TestCase):
 
     def test_mop_intensity_model_check(self):
         """Test Roborock S7 check when getting mop intensity."""
-        with pytest.raises(VacuumException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.mop_intensity()
 
     def test_set_mop_intensity_model_check(self):
         """Test Roborock S7 check when setting mop intensity."""
-        with pytest.raises(VacuumException):
+        with pytest.raises(UnsupportedFeatureException):
             self.device.set_mop_intensity(MopIntensity.Intense)
+
+    def test_strainer_cleaned_count(self):
+        """Test getting strainer cleaned count."""
+        assert self.device.consumable_status().strainer_cleaned_count == 44
+
+    def test_cleaning_brush_cleaned_count(self):
+        """Test getting cleaning brush cleaned count."""
+        assert self.device.consumable_status().cleaning_brush_cleaned_count == 44
+
+    def test_mop_dryer_model_check(self):
+        """Test Roborock S7 check when getting mop dryer status."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.mop_dryer_settings()
+
+    def test_set_mop_dryer_enabled_model_check(self):
+        """Test Roborock S7 check when setting mop dryer enabled."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_mop_dryer_enabled(enabled=True)
+
+    def test_set_mop_dryer_dry_time_model_check(self):
+        """Test Roborock S7 check when setting mop dryer dry time."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_mop_dryer_dry_time(dry_time_seconds=10800)
+
+    def test_start_mop_drying_model_check(self):
+        """Test Roborock S7 check when starting mop drying."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.start_mop_drying()
+
+    def test_stop_mop_drying_model_check(self):
+        """Test Roborock S7 check when stopping mop drying."""
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.stop_mop_drying()
+
+    def test_waterflow(self):
+        assert self.device.waterflow() == WaterFlow.High
+
+    def test_set_waterflow(self):
+        self.device.set_waterflow(WaterFlow.High)
 
 
 class DummyVacuumS7(DummyVacuum):
     def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+
         self._model = ROCKROBO_S7
+        self.state = {
+            **self.state,
+            **{
+                "dry_status": 1,
+                "rdt": 3600,
+            },
+        }
+        self.dummies["water_box_custom_mode"] = [203]
+        self.return_values = {
+            **self.return_values,
+            **{
+                "app_get_dryer_setting": lambda x: {
+                    "status": 1,
+                    "on": {
+                        "cliff_on": 1,
+                        "cliff_off": 1,
+                        "count": 10,
+                        "dry_time": 10800,
+                    },
+                    "off": {"cliff_on": 2, "cliff_off": 1, "count": 10},
+                },
+                "app_set_dryer_setting": lambda x: ["ok"],
+                "app_set_dryer_status": lambda x: ["ok"],
+            },
+        }
 
 
 @pytest.fixture(scope="class")
@@ -366,12 +533,69 @@ def dummyvacuums7(request):
 class TestVacuumS7(TestCase):
     def test_mop_intensity(self):
         """Test getting mop intensity."""
-        with patch.object(self.device, "send", return_value=[203]) as mock_method:
-            assert self.device.mop_intensity()
-            mock_method.assert_called_once_with("get_water_box_custom_mode")
+        assert self.device.mop_intensity() == MopIntensity.Intense
 
     def test_set_mop_intensity(self):
         """Test setting mop intensity."""
-        with patch.object(self.device, "send", return_value=[203]) as mock_method:
-            assert self.device.set_mop_intensity(MopIntensity.Intense)
-            mock_method.assert_called_once_with("set_water_box_custom_mode", [203])
+        assert self.device.set_mop_intensity(MopIntensity.Intense)
+
+    def test_mop_dryer_settings(self):
+        """Test getting mop dryer settings."""
+        assert self.device.mop_dryer_settings().enabled
+
+    def test_mop_dryer_is_drying(self):
+        """Test getting mop dryer status."""
+        assert self.device.status().is_mop_drying
+
+    def test_mop_dryer_remaining_seconds(self):
+        """Test getting mop dryer remaining seconds."""
+        assert self.device.status().mop_dryer_remaining_seconds == datetime.timedelta(
+            seconds=3600
+        )
+
+    def test_set_mop_dryer_enabled_model_check(self):
+        """Test setting mop dryer enabled."""
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_mop_dryer_enabled(enabled=False)
+            mock_method.assert_called_once_with("app_set_dryer_setting", {"status": 0})
+
+    def test_set_mop_dryer_dry_time_model_check(self):
+        """Test setting mop dryer dry time."""
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_method:
+            assert self.device.set_mop_dryer_dry_time(dry_time_seconds=14400)
+            mock_method.assert_called_once_with(
+                "app_set_dryer_setting", {"on": {"dry_time": 14400}}
+            )
+
+    def test_start_mop_drying_model_check(self):
+        """Test starting mop drying."""
+        assert self.device.start_mop_drying()
+
+    def test_stop_mop_drying_model_check(self):
+        """Test stopping mop drying."""
+        assert self.device.stop_mop_drying()
+
+
+class DummyVacuumQ7Max(DummyVacuum):
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+
+        self._model = ROCKROBO_Q7_MAX
+        self.dummies["water_box_custom_mode"] = {
+            "water_box_mode": 202,
+            "distance_off": 205,
+        }
+
+
+@pytest.fixture(scope="class")
+def dummyvacuumq7max(request):
+    request.cls.device = DummyVacuumQ7Max()
+
+
+@pytest.mark.usefixtures("dummyvacuumq7max")
+class TestVacuumQ7Max(TestCase):
+    def test_waterflow(self):
+        assert self.device.waterflow() == WaterFlow.High
+
+    def test_set_waterflow(self):
+        self.device.set_waterflow(WaterFlow.High)

@@ -14,11 +14,13 @@ from typing import (
 )
 
 from .descriptors import (
+    ActionDescriptor,
+    BooleanSettingDescriptor,
     EnumSettingDescriptor,
     NumberSettingDescriptor,
     SensorDescriptor,
     SettingDescriptor,
-    SwitchDescriptor,
+    SettingType,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -32,14 +34,12 @@ class _StatusMeta(type):
 
         # TODO: clean up to contain all of these in a single container
         cls._sensors: Dict[str, SensorDescriptor] = {}
-        cls._switches: Dict[str, SwitchDescriptor] = {}
         cls._settings: Dict[str, SettingDescriptor] = {}
 
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
         descriptor_map = {
             "sensor": cls._sensors,
-            "switch": cls._switches,
             "setting": cls._settings,
         }
         for n in namespace:
@@ -60,7 +60,7 @@ class DeviceStatus(metaclass=_StatusMeta):
     All status container classes should inherit from this class:
 
     * This class allows downstream users to access the available information in an
-      introspectable way. See :func:`@property`, :func:`switch`, and :func:`@setting`.
+      introspectable way. See :func:`@sensor` and :func:`@setting`.
     * :func:`embed` allows embedding other status containers.
     * The __repr__ implementation returns all defined properties and their values.
     """
@@ -93,17 +93,10 @@ class DeviceStatus(metaclass=_StatusMeta):
         """
         return self._sensors  # type: ignore[attr-defined]
 
-    def switches(self) -> Dict[str, SwitchDescriptor]:
-        """Return the dict of sensors exposed by the status container.
-
-        You can use @sensor decorator to define sensors inside your status class.
-        """
-        return self._switches  # type: ignore[attr-defined]
-
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return the dict of settings exposed by the status container.
 
-        You can use @setting decorator to define sensors inside your status class.
+        You can use @setting decorator to define settings inside your status class.
         """
         return self._settings  # type: ignore[attr-defined]
 
@@ -121,29 +114,25 @@ class DeviceStatus(metaclass=_StatusMeta):
         self._embedded[other_name] = other
 
         for name, sensor in other.sensors().items():
-            final_name = f"{other_name}:{name}"
+            final_name = f"{other_name}__{name}"
             import attr
 
             self._sensors[final_name] = attr.evolve(sensor, property=final_name)
 
-        for name, switch in other.switches().items():
-            final_name = f"{other_name}:{name}"
-            self._switches[final_name] = attr.evolve(switch, property=final_name)
-
         for name, setting in other.settings().items():
-            final_name = f"{other_name}:{name}"
+            final_name = f"{other_name}__{name}"
             self._settings[final_name] = attr.evolve(setting, property=final_name)
 
-    def __getattribute__(self, item):
+    def __getattr__(self, item):
         """Overridden to lookup properties from embedded containers."""
-        if ":" not in item:
-            return super().__getattribute__(item)
+        if "__" not in item:
+            return super().__getattr__(item)
 
-        embed, prop = item.split(":")
+        embed, prop = item.split("__")
         return getattr(self._embedded[embed], prop)
 
 
-def sensor(name: str, *, unit: str = "", **kwargs):
+def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
     """Syntactic sugar to create SensorDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
@@ -155,56 +144,26 @@ def sensor(name: str, *, unit: str = "", **kwargs):
     """
 
     def decorator_sensor(func):
-        property_name = func.__name__
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
 
         def _sensor_type_for_return_type(func):
             rtype = get_type_hints(func).get("return")
             if get_origin(rtype) is Union:  # Unwrap Optional[]
                 rtype, _ = get_args(rtype)
 
-            if rtype == bool:
-                return "binary"
-            else:
-                return "sensor"
+            return rtype
 
         sensor_type = _sensor_type_for_return_type(func)
         descriptor = SensorDescriptor(
-            id=str(property_name),
-            property=str(property_name),
+            id=qualified_name,
+            property=property_name,
             name=name,
             unit=unit,
             type=sensor_type,
             extras=kwargs,
         )
         func._sensor = descriptor
-
-        return func
-
-    return decorator_sensor
-
-
-def switch(name: str, *, setter_name: str, **kwargs):
-    """Syntactic sugar to create SwitchDescriptor objects.
-
-    The information can be used by users of the library to programmatically find out what
-    types of sensors are available for the device.
-
-    The interface is kept minimal, but you can pass any extra keyword arguments.
-    These extras are made accessible over :attr:`~miio.descriptors.SwitchDescriptor.extras`,
-    and can be interpreted downstream users as they wish.
-    """
-
-    def decorator_sensor(func):
-        property_name = func.__name__
-
-        descriptor = SwitchDescriptor(
-            id=str(property_name),
-            property=str(property_name),
-            name=name,
-            setter_name=setter_name,
-            extras=kwargs,
-        )
-        func._switch = descriptor
 
         return func
 
@@ -220,8 +179,10 @@ def setting(
     min_value: Optional[int] = None,
     max_value: Optional[int] = None,
     step: Optional[int] = None,
+    range_attribute: Optional[str] = None,
     choices: Optional[Type[Enum]] = None,
     choices_attribute: Optional[str] = None,
+    type: Optional[SettingType] = None,
     **kwargs,
 ):
     """Syntactic sugar to create SettingDescriptor objects.
@@ -232,50 +193,79 @@ def setting(
     The interface is kept minimal, but you can pass any extra keyword arguments.
     These extras are made accessible over :attr:`~miio.descriptors.SettingDescriptor.extras`,
     and can be interpreted downstream users as they wish.
+
+    The `_attribute` suffixed options allow defining a property to be used to return the information dynamically.
     """
 
     def decorator_setting(func):
-        property_name = func.__name__
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
 
         if setter is None and setter_name is None:
-            raise Exception("Either setter or setter_name needs to be defined")
+            raise Exception("setter_name needs to be defined")
+        if setter_name is None:
+            raise NotImplementedError(
+                "setter not yet implemented, use setter_name instead"
+            )
 
-        if min_value or max_value:
+        common_values = {
+            "id": qualified_name,
+            "property": property_name,
+            "name": name,
+            "unit": unit,
+            "setter": setter,
+            "setter_name": setter_name,
+            "extras": kwargs,
+        }
+
+        if min_value or max_value or range_attribute:
             descriptor = NumberSettingDescriptor(
-                id=str(property_name),
-                property=str(property_name),
-                name=name,
-                unit=unit,
-                setter=setter,
-                setter_name=setter_name,
+                **common_values,
                 min_value=min_value or 0,
                 max_value=max_value,
                 step=step or 1,
-                extras=kwargs,
+                range_attribute=range_attribute,
             )
         elif choices or choices_attribute:
-            if choices_attribute is not None:
-                # TODO: adding choices from attribute is a bit more complex, as it requires a way to
-                # construct enums pointed by the attribute
-                raise NotImplementedError("choices_attribute is not yet implemented")
             descriptor = EnumSettingDescriptor(
-                id=str(property_name),
-                property=str(property_name),
-                name=name,
-                unit=unit,
-                setter=setter,
-                setter_name=setter_name,
+                **common_values,
                 choices=choices,
                 choices_attribute=choices_attribute,
-                extras=kwargs,
             )
         else:
-            raise Exception(
-                "Neither {min,max}_value or choices_{attribute} was defined"
-            )
+            descriptor = BooleanSettingDescriptor(**common_values)
 
         func._setting = descriptor
 
         return func
 
     return decorator_setting
+
+
+def action(name: str, **kwargs):
+    """Syntactic sugar to create ActionDescriptor objects.
+
+    The information can be used by users of the library to programmatically find out what
+    types of actions are available for the device.
+
+    The interface is kept minimal, but you can pass any extra keyword arguments.
+    These extras are made accessible over :attr:`~miio.descriptors.ActionDescriptor.extras`,
+    and can be interpreted downstream users as they wish.
+    """
+
+    def decorator_action(func):
+        property_name = str(func.__name__)
+        qualified_name = str(func.__qualname__)
+
+        descriptor = ActionDescriptor(
+            id=qualified_name,
+            name=name,
+            method_name=property_name,
+            method=None,
+            extras=kwargs,
+        )
+        func._action = descriptor
+
+        return func
+
+    return decorator_action

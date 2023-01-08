@@ -8,7 +8,6 @@ from .. import AirFreshA1, AirFreshT2017
 from ..airfresh_t2017 import (
     MODEL_AIRFRESH_A1,
     MODEL_AIRFRESH_T2017,
-    AirFreshException,
     AirFreshStatus,
     DisplayOrientation,
     OperationMode,
@@ -166,10 +165,10 @@ class TestAirFreshA1(TestCase):
         self.device.set_favorite_speed(150)
         assert favorite_speed() == 150
 
-        with pytest.raises(AirFreshException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_speed(-1)
 
-        with pytest.raises(AirFreshException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_speed(151)
 
     def test_set_ptc(self):
@@ -361,13 +360,13 @@ class TestAirFreshT2017(TestCase):
         self.device.set_favorite_speed(300)
         assert favorite_speed() == 300
 
-        with pytest.raises(AirFreshException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_speed(-1)
 
-        with pytest.raises(AirFreshException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_speed(59)
 
-        with pytest.raises(AirFreshException):
+        with pytest.raises(ValueError):
             self.device.set_favorite_speed(301)
 
     def test_set_ptc(self):

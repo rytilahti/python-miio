@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 import click
 import yaml
@@ -38,11 +38,6 @@ SUPPORTED_MODELS = [
 ]
 
 GatewayCallback = Callable[[str, str], None]
-
-
-class GatewayException(DeviceException):
-    """Exception for the Xioami Gateway communication."""
-
 
 from .devices import SubDevice, SubDeviceInfo  # noqa: E402 isort:skip
 
@@ -94,16 +89,19 @@ class Gateway(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: Optional[int] = None,
         *,
-        model: str = None,
+        model: Optional[str] = None,
         push_server=None,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
+        )
 
         self._alarm = Alarm(parent=self)
         self._radio = Radio(parent=self)
@@ -407,7 +405,7 @@ class Gateway(Device):
         try:
             return self.send("get_illumination").pop()
         except Exception as ex:
-            raise GatewayException(
+            raise DeviceException(
                 "Got an exception while getting gateway illumination"
             ) from ex
 

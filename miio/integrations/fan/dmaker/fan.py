@@ -1,10 +1,10 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
-from miio.fan_common import FanException, MoveDirection, OperationMode
+from miio.fan_common import MoveDirection, OperationMode
 
 MODEL_FAN_P5 = "dmaker.fan.p5"
 
@@ -95,14 +95,17 @@ class FanP5(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
+        timeout: Optional[int] = None,
         model: str = MODEL_FAN_P5,
     ) -> None:
-        super().__init__(ip, token, start_id, debug, lazy_discover, model=model)
+        super().__init__(
+            ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
+        )
 
     @command(
         default_output=format_output(
@@ -150,7 +153,7 @@ class FanP5(Device):
     def set_speed(self, speed: int):
         """Set speed."""
         if speed < 0 or speed > 100:
-            raise FanException("Invalid speed: %s" % speed)
+            raise ValueError("Invalid speed: %s" % speed)
 
         return self.send("s_speed", [speed])
 
@@ -161,7 +164,7 @@ class FanP5(Device):
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
         if angle not in [30, 60, 90, 120, 140]:
-            raise FanException(
+            raise ValueError(
                 "Unsupported angle. Supported values: 30, 60, 90, 120, 140"
             )
 
@@ -229,7 +232,7 @@ class FanP5(Device):
         """Set delay off minutes."""
 
         if minutes < 0:
-            raise FanException("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 
         return self.send("s_t_off", [minutes])
 

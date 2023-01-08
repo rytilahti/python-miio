@@ -9,12 +9,13 @@ This library (and its accompanying cli tool) can be used to interface with devic
 Getting started
 ---------------
 
-If you already have a token for your device and the device type, you can directly start using `miiocli` tool.
-If you don't have a token for your device, refer to `Getting started <https://python-miio.readthedocs.io/en/latest/discovery.html>`__ section of `the manual <https://python-miio.readthedocs.io>`__ for instructions how to obtain it.
+The ``miiocli`` command allows controlling supported devices from the command line,
+given that you know their IP addresses and tokens.
+You can use ``miiocli cloud`` command to obtain this information from the cloud.
+Refer to `Getting started <https://python-miio.readthedocs.io/en/latest/discovery.html>`__ section of `the manual <https://python-miio.readthedocs.io>`__ for more detailed instructions.
 
-The `miiocli` is the main way to execute commands from command line.
-You can always use `--help` to get more information about the available commands.
-For example, executing it without any extra arguments will print out options and available commands::
+You can always use ``--help`` to get more information about available commands, subcommands, and their options.
+For example, to print out options and available commands::
 
     $ miiocli --help
     Usage: miiocli [OPTIONS] COMMAND [ARGS]...
@@ -28,7 +29,7 @@ For example, executing it without any extra arguments will print out options and
       airconditioningcompanion
       ..
 
-You can get some information from any miIO/MIoT device, including its device model, using the `info` command::
+You can get some information from any miIO/MIoT device, including its device model, using the ``info`` command::
 
     miiocli device --ip <ip> --token <token> info
 
@@ -38,8 +39,28 @@ You can get some information from any miIO/MIoT device, including its device mod
     Network: {'localIp': '<ip>', 'mask': '255.255.255.0', 'gw': '<ip>'}
     AP: {'rssi': -73, 'ssid': '<nnetwork>', 'primary': 11, 'bssid': '<bssid>'}
 
-Different devices are supported by their corresponding modules (e.g., `roborockvacuum` or `fan`).
-You can get the list of available commands for any given module by passing `--help` argument to it::
+
+Controlling MIoT devices
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+MiOT devices are supported by the ``genericmiot`` integration which provides basic support for all MiOT devices.
+Internally, it downloads ``miot-spec`` files to find out about supported features.
+All features of supported devices are available using these common commands::
+
+-  ``miiocli genericmiot status`` to print the device status information, including settings (prefixed with ``[S]``).
+-  ``miiocli genericmiot set`` to change settings.
+-  ``miiocli genericmiot actions`` to list available actions.
+-  ``miiocli genericmiot call`` to execute actions.
+
+Use ``miiocli genericmiot --help`` for more available commands.
+
+
+Controlling other devices
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Older devices are mainly supported by their corresponding modules (e.g., ``roborockvacuum`` or ``fan``).
+
+You can get the list of available commands for any given module by passing ``--help`` argument to it::
 
     $ miiocli roborockvacuum --help
 
@@ -63,25 +84,30 @@ You can avoid this by specifying the model manually::
 
 API usage
 ---------
-All functionality is accessible through the `miio` module::
+All functionalities of this library are accessible through the ``miio`` module.
+While you can initialize individual integration classes manually,
+the simplest way to obtain a device instance is to use ``DeviceFactory``::
 
-    from miio import RoborockVacuum
+    from miio import DeviceFactory
 
-    vac = RoborockVacuum("<ip address>", "<token>")
-    vac.start()
+    dev = DeviceFactory.create("<ip address>", "<token>")
+    dev.info()
 
-Each separate device type inherits from `miio.Device`
-(and in case of MIoT devices, `miio.MiotDevice`) which provides a common API.
 
-Each command invocation will automatically detect (and cache) the device model necessary for some actions
-by querying the device.
-You can avoid this by specifying the model manually::
+This will perform an ``info`` query to the device to detect its model information,
+which is crucial especially for MiOT devices.
 
-    from miio import RoborockVacuum
+Introspecting supported features
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    vac = RoborockVacuum("<ip address>", "<token>", model="roborock.vacuum.s5")
+You can introspect device classes using the following methods::
 
-Please refer to `API documentation <https://python-miio.readthedocs.io/en/latest/api/miio.html>`__ for more information.
+-  ``actions()`` to return information about available device actions.
+-  ``settings()`` to obtain information about available settings that can be changed.
+-  ``sensors()`` to obtain information about sensors.
+
+Each of these return `device descriptor objects <https://python-miio.readthedocs.io/en/latest/api/miio.descriptors.html>`__,
+which contain the necessary metadata about the available features to allow constructing generic interfaces.
 
 
 Troubleshooting
@@ -89,6 +115,7 @@ Troubleshooting
 You can find some solutions for the most common problems can be found in `Troubleshooting <https://python-miio.readthedocs.io/en/latest/troubleshooting.html>`__ section.
 
 If you have any questions, or simply want to join up for a chat, check `our Matrix room <https://matrix.to/#/#python-miio-chat:matrix.org>`__.
+
 
 Contributing
 ------------
@@ -100,11 +127,14 @@ To ease the process of setting up a development environment we have prepared `a 
 Supported devices
 -----------------
 
+While all MIoT devices are supported through the ``genericmiot`` integration,
+this library supports also the following devices::
+
 -  Xiaomi Mi Robot Vacuum V1, S4, S4 MAX, S5, S5 MAX, S6 Pure, M1S, S7
 -  Xiaomi Mi Home Air Conditioner Companion
 -  Xiaomi Mi Smart Air Conditioner A (xiaomi.aircondition.mc1, mc2, mc4, mc5)
 -  Xiaomi Mi Air Purifier 2, 3H, 3C, 4, Pro, Pro H, 4 Pro (zhimi.airpurifier.m2, mb3, mb4, mb5, v7, vb2, va2), 4 Lite
--  Xiaomi Mi Air (Purifier) Dog X3, X5, X7SM (airdog.airpurifier.x3, airdog.airpurifier.x5, airdog.airpurifier.x7sm)
+-  Xiaomi Mi Air (Purifier) Dog X3, X5, X7SM (airdog.airpurifier.x3, x5, x7sm)
 -  Xiaomi Mi Air Humidifier
 -  Smartmi Air Purifier
 -  Xiaomi Aqara Camera
@@ -139,9 +169,8 @@ Supported devices
 -  Xiaomi Smart WiFi Speaker
 -  Xiaomi Mi WiFi Repeater 2
 -  Xiaomi Mi Smart Rice Cooker
--  Xiaomi Smartmi Fresh Air System VA2 (zhimi.airfresh.va2), VA4 (zhimi.airfresh.va4),
-   A1 (dmaker.airfresh.a1), T2017 (dmaker.airfresh.t2017)
--  Yeelight lights (basic support, we recommend using `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__)
+-  Xiaomi Smartmi Fresh Air System VA2 (zhimi.airfresh.va2), VA4 (va4), T2017 (t2017), A1 (dmaker.airfresh.a1)
+-  Yeelight lights (see also `python-yeelight <https://gitlab.com/stavros/python-yeelight/>`__)
 -  Xiaomi Mi Air Dehumidifier
 -  Xiaomi Tinymu Smart Toilet Cover
 -  Xiaomi 16 Relays Module
@@ -156,7 +185,7 @@ Supported devices
 -  Scishare coffee maker (scishare.coffee.s1102)
 -  Qingping Air Monitor Lite (cgllc.airm.cgdn1)
 -  Xiaomi Walkingpad A1 (ksmb.walkingpad.v3)
--  Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4)
+-  Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4, wi11)
 -  Xiaomi Mi Smart Humidifer S (jsqs, jsq5)
 -  Xiaomi Mi Robot Vacuum Mop 2 (Pro+, Ultra)
 

@@ -13,7 +13,6 @@ from miio import (
 from miio.airconditioningcompanion import (
     MODEL_ACPARTNER_V3,
     STORAGE_SLOT_ID,
-    AirConditioningCompanionException,
     AirConditioningCompanionStatus,
     FanSpeed,
     Led,
@@ -204,14 +203,13 @@ class TestAirConditioningCompanion(TestCase):
                 self.assertSequenceEqual(self.device.get_last_ir_played(), args["out"])
 
         for args in test_data["test_send_ir_code_exception"]:
-            with pytest.raises(AirConditioningCompanionException):
+            with pytest.raises(ValueError):
                 self.device.send_ir_code(*args["in"])
 
     def test_send_command(self):
         assert self.device.send_command("0000000") is True
 
     def test_send_configuration(self):
-
         for args in test_data["test_send_configuration_ok"]:
             with self.subTest():
                 self.device._reset_state()

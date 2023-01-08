@@ -38,7 +38,7 @@ appdirs = "^1"
 tqdm = "^4"
 netifaces = { version = "^0", optional = true }
 android_backup = { version = "^0", optional = true }
-micloud = { version = "*", optional = true }
+micloud = { version = ">=0.6" }
 croniter = ">=1"
 defusedxml = "^0"
 pydantic = "*"
@@ -67,6 +67,8 @@ cffi = "^1"
 docformatter = "^1"
 mypy = {version = "^0", markers = "platform_python_implementation == 'CPython'"}
 coverage = {extras = ["toml"], version = "^6"}
+freezegun = ">=1.2.1"  # freezegun 1.2.1 is first one with type hints
+
 
 [tool.isort]
 multi_line_output = 3
@@ -108,8 +110,10 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-# disables "Decorated property not supported", see https://github.com/python/mypy/issues/1362
-disable_error_code = "misc"
+# misc disables "Decorated property not supported", see https://github.com/python/mypy/issues/1362
+# annotation-unchecked disables "By default the bodies of untyped functions are not checked"
+disable_error_code = "misc,annotation-unchecked"
+
 
 [build-system]
 requires = ["poetry-core"]

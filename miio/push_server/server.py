@@ -17,6 +17,7 @@ FAKE_DEVICE_ID = "120009025"
 FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
 
 PushServerCallback = Callable[[str, str, str], None]
+MethodDict = Dict[str, Union[Dict, Callable]]
 
 
 def calculated_token_enc(token):
@@ -66,7 +67,7 @@ class PushServer:
         self._listen_couroutine = None
         self._registered_devices = {}
 
-        self._methods = {}
+        self._methods: MethodDict = {}
 
         self._event_id = 1000000
 
@@ -325,6 +326,6 @@ class PushServer:
         return self._server_model
 
     @property
-    def methods(self):
+    def methods(self) -> MethodDict:
         """Return a dict of implemented methods."""
         return self._methods

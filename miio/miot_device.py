@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
 from functools import partial
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import click
 
@@ -62,23 +62,20 @@ class MiotDevice(Device):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         *,
-        model: str = None,
-        mapping: MiotMapping = None,
+        model: Optional[str] = None,
+        mapping: Optional[MiotMapping] = None,
     ):
         """Overloaded to accept keyword-only `mapping` parameter."""
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout, model=model
         )
-
-        if mapping is None and not hasattr(self, "mapping") and not self._mappings:
-            _LOGGER.warning("Neither the class nor the parameter defines the mapping")
 
         if mapping is not None:
             self.mapping = mapping
@@ -150,13 +147,16 @@ class MiotDevice(Device):
         click.argument(
             "value_type", type=EnumType(MiotValueType), required=False, default=None
         ),
+        click.option("--name", required=False),
     )
     def set_property_by(
         self,
         siid: int,
         piid: int,
         value: Union[int, float, str, bool],
-        value_type: Any = None,
+        *,
+        value_type: Optional[Any] = None,
+        name: Optional[str] = None,
     ):
         """Set a single property (siid/piid) to given value.
 
@@ -166,9 +166,12 @@ class MiotDevice(Device):
         if value_type is not None:
             value = value_type.value(value)
 
+        if name is None:
+            name = f"set-{siid}-{piid}"
+
         return self.send(
             "set_properties",
-            [{"did": f"set-{siid}-{piid}", "siid": siid, "piid": piid, "value": value}],
+            [{"did": name, "siid": siid, "piid": piid, "value": value}],
         )
 
     def set_property(self, property_key: str, value):

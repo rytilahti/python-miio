@@ -4,13 +4,8 @@ import click
 
 from .click_common import command, format_output
 from .device import Device, DeviceStatus
-from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class WifiRepeaterException(DeviceException):
-    pass
 
 
 class WifiRepeaterStatus(DeviceStatus):
