@@ -119,6 +119,11 @@ class MiotBaseModel(BaseModel):
             return f"{self.service.name}:{self.urn.name}"  # type: ignore
         return "unitialized"
 
+    @property
+    def full_name(self) -> str:
+        """Returns full name including the namespace and type."""
+        return f"{self.urn.namespace}:{self.urn.type}:{self.name}"
+
 
 class MiotAction(MiotBaseModel):
     """Action presentation for miot."""

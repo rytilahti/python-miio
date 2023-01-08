@@ -6,6 +6,8 @@ repos:
   - id: end-of-file-fixer
   - id: check-docstring-first
   - id: check-yaml
+    # unsafe to workaround '!include' syntax
+    args: ['--unsafe']
   - id: check-json
   - id: check-toml
   - id: debug-statements

@@ -19,10 +19,12 @@ from miio.miot_cloud import MiotCloud
 from miio.miot_device import MiotMapping
 from miio.miot_models import DeviceModel, MiotAction, MiotProperty, MiotService
 
+from .meta import Metadata
+
 _LOGGER = logging.getLogger(__name__)
 
 
-def pretty_status(result: "GenericMiotStatus"):
+def pretty_status(result: "GenericMiotStatus", verbose=False):
     """Pretty print status information."""
     out = ""
     props = result.property_dict()
@@ -45,6 +47,9 @@ def pretty_status(result: "GenericMiotStatus"):
             out += (
                 f" (min: {prop.range[0]}, max: {prop.range[1]}, step: {prop.range[2]})"
             )
+
+        if verbose:
+            out += f" ({prop.full_name})"
 
         out += "\n"
 
@@ -131,6 +136,8 @@ class GenericMiot(MiotDevice):
         "*"
     ]  # we support all devices, if not, it is a responsibility of caller to verify that
 
+    _meta = Metadata.load()
+
     def __init__(
         self,
         ip: Optional[str] = None,
@@ -171,8 +178,16 @@ class GenericMiot(MiotDevice):
         _LOGGER.debug("Initialized: %s", self._miot_model)
         self._create_descriptors()
 
-    @command(default_output=format_output(result_msg_fmt=pretty_status))
-    def status(self) -> GenericMiotStatus:
+    @command(
+        click.option(
+            "-v",
+            "--verbose",
+            is_flag=True,
+            help="Output full property path for metadata ",
+        ),
+        default_output=format_output(result_msg_fmt=pretty_status),
+    )
+    def status(self, verbose=False) -> GenericMiotStatus:
         """Return status based on the miot model."""
         properties = []
         for prop in self._properties:
@@ -194,12 +209,36 @@ class GenericMiot(MiotDevice):
 
         return GenericMiotStatus(response, self)
 
+    def get_extras(self, miot_entity):
+        """Enriches descriptor with extra meta data from yaml definitions."""
+        extras = miot_entity.extras
+        extras["urn"] = miot_entity.urn
+        extras["siid"] = miot_entity.siid
+
+        # TODO: ugly way to detect the type
+        if getattr(miot_entity, "aiid", None):
+            extras["aiid"] = miot_entity.aiid
+        if getattr(miot_entity, "piid", None):
+            extras["piid"] = miot_entity.piid
+
+        meta = self._meta.get_metadata(miot_entity)
+        if meta:
+            extras.update(meta)
+        else:
+            _LOGGER.warning(
+                "Unable to find extras for %s %s",
+                miot_entity.service,
+                repr(miot_entity.urn),
+            )
+
+        return extras
+
     def _create_action(self, act: MiotAction) -> Optional[ActionDescriptor]:
         """Create action descriptor for miot action."""
         if act.inputs:
             # TODO: need to figure out how to expose input parameters for downstreams
             _LOGGER.warning(
-                "Got inputs for action, skipping as handling is unknown: %s", act
+                "Got inputs for action, skipping %s for %s", act, act.service
             )
             return None
 
@@ -207,15 +246,13 @@ class GenericMiot(MiotDevice):
 
         id_ = act.name
 
-        # TODO: move extras handling to the model
-        extras = act.extras
-        extras["urn"] = act.urn
-        extras["siid"] = act.siid
-        extras["aiid"] = act.aiid
+        extras = self.get_extras(act)
+        # TODO: ugly name override
+        name = extras.pop("description", act.description)
 
         return ActionDescriptor(
             id=id_,
-            name=act.description,
+            name=name,
             method=call_action,
             extras=extras,
         )
@@ -227,10 +264,9 @@ class GenericMiot(MiotDevice):
             if act_desc is None:  # skip actions we cannot handle for now..
                 continue
 
-            if (
-                act_desc.name in self._actions
-            ):  # TODO: find a way to handle duplicates, suffix maybe?
-                _LOGGER.warning("Got used name name, ignoring '%s': %s", act.name, act)
+            # TODO: find a way to handle duplicates, suffix maybe?
+            if act_desc.name in self._actions:
+                _LOGGER.warning("Got a duplicate, ignoring '%s': %s", act.name, act)
                 continue
 
             self._actions[act_desc.name] = act_desc
@@ -254,7 +290,7 @@ class GenericMiot(MiotDevice):
                 _LOGGER.debug("Skipping notify-only property: %s", prop)
                 continue
             if "read" not in prop.access:  # TODO: handle write-only properties
-                _LOGGER.warning("Skipping write-only: %s", prop)
+                _LOGGER.warning("Skipping write-only: %s for %s", prop, serv)
                 continue
 
             desc = self._descriptor_for_property(prop)
@@ -269,16 +305,18 @@ class GenericMiot(MiotDevice):
 
     def _descriptor_for_property(self, prop: MiotProperty):
         """Create a descriptor based on the property information."""
-        name = prop.description
+        orig_name = prop.description
         property_name = prop.name
 
         setter = partial(self.set_property_by, prop.siid, prop.piid, name=property_name)
 
-        # TODO: move extras handling to the model
-        extras = prop.extras
-        extras["urn"] = prop.urn
-        extras["siid"] = prop.siid
-        extras["piid"] = prop.piid
+        extras = self.get_extras(prop)
+
+        # TODO: ugly name override, refactor
+        name = extras.pop("description", orig_name)
+        prop.description = name
+        if name != orig_name:
+            _LOGGER.debug("Renamed %s to %s", orig_name, name)
 
         # Handle settable ranged properties
         if prop.range is not None:
@@ -313,7 +351,7 @@ class GenericMiot(MiotDevice):
             choices = Enum(
                 prop.description, {c.description: c.value for c in prop.choices}
             )
-            _LOGGER.debug("Created enum %s", choices)
+            _LOGGER.debug("Created enum %s for %s", choices, prop)
         except ValueError as ex:
             _LOGGER.error("Unable to create enum for %s: %s", prop, ex)
             raise
