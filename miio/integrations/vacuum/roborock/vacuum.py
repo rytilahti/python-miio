@@ -1016,6 +1016,15 @@ class RoborockVacuum(Device, VacuumInterface):
         self._verify_mop_dryer_supported()
         return self.send("app_set_dryer_status", {"status": 0})[0] == "ok"
 
+    @command()
+    def firmware_features(self) -> List[int]:
+        """Return a list of available firmware features.
+
+        Information: https://github.com/marcelrv/XiaomiRobotVacuumProtocol/blob/master/fw_features.md
+        Feel free to contribute information from your vacuum if it is not yet listed.
+        """
+        return self.send("get_fw_features")
+
     @classmethod
     def get_device_group(cls):
         @click.pass_context
