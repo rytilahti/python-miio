@@ -185,8 +185,65 @@ class MiotSimulator:
 
     def action(self, payload):
         """Handle action method."""
+        params = payload["params"]
+        if (
+            "did" not in params
+            or "siid" not in params
+            or "aiid" not in params
+            or "in" not in params
+        ):
+            raise ValueError("did, siid, or aiid missing")
+
+        siid = params["siid"]
+        aiid = params["aiid"]
+        inputs = params["in"]
+        service = self._model.get_service_by_siid(siid)
+
+        action = service.get_action_by_id(aiid)
+        action_inputs = action.inputs
+        if len(inputs) != len(action_inputs):
+            raise ValueError(
+                "Invalid parameter count, was expecting %s params, got %s"
+                % (len(inputs), len(action_inputs))
+            )
+
+        for idx, param in enumerate(inputs):
+            wanted_input = action_inputs[idx]
+
+            if wanted_input.choices:
+                if not isinstance(param, int):
+                    raise TypeError(
+                        "Param #%s: enum value expects an integer %s, got %s"
+                        % (idx, wanted_input, param)
+                    )
+                for choice in wanted_input.choices:
+                    if param == choice.value:
+                        break
+                else:
+                    raise ValueError(
+                        "Param #%s: invalid value '%s' for %s"
+                        % (idx, param, wanted_input.choices)
+                    )
+
+            elif wanted_input.range:
+                if not isinstance(param, int):
+                    raise TypeError(
+                        "Param #%s: ranged value expects an integer %s, got %s"
+                        % (idx, wanted_input, param)
+                    )
+
+                min, max, step = wanted_input.range
+                if param < min or param > max:
+                    raise ValueError(
+                        "Param #%s: value '%s' out of range [%s, %s]"
+                        % (idx, param, min, max)
+                    )
+
+            elif wanted_input.format == str and not isinstance(param, str):
+                raise TypeError(f"Param #{idx}: expected string but got {type(param)}")
+
         _LOGGER.info("Got called %s", payload)
-        return {"result": 0}
+        return {"result": ["ok"]}
 
 
 async def main(dev, model):
