@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from miio.miot_models import (
     URN,
+    MiotAccess,
     MiotAction,
     MiotEnumValue,
     MiotEvent,
@@ -206,7 +207,7 @@ def test_property():
     assert prop.piid == 1
     assert prop.urn.type == "property"
     assert prop.format == str
-    assert prop.access == ["read"]
+    assert prop.access == [MiotAccess.Read]
     assert prop.description == "Device Manufacturer"
 
     assert prop.plain_name == "manufacturer"
