@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, PrivateAttr, root_validator
@@ -138,13 +139,19 @@ class MiotAction(MiotBaseModel):
         extra = "forbid"
 
 
+class MiotAccess(Enum):
+    Read = "read"
+    Write = "write"
+    Notify = "notify"
+
+
 class MiotProperty(MiotBaseModel):
     """Property presentation for miot."""
 
     piid: int = Field(alias="iid")
 
     format: MiotFormat
-    access: Any = Field(default=["read"])
+    access: List[MiotAccess] = Field(default=["read"])
     unit: Optional[str] = None
 
     range: Optional[List[int]] = Field(alias="value-range")
@@ -182,6 +189,35 @@ class MiotProperty(MiotBaseModel):
             value = f"{value} {unit}"
 
         return value
+
+    @property
+    def pretty_access(self):
+        """Return pretty-printable access."""
+        acc = ""
+        if MiotAccess.Read in self.access:
+            acc += "R"
+        if MiotAccess.Write in self.access:
+            acc += "W"
+        # Just for completeness, as notifications are not supported
+        # if MiotAccess.Notify in self.access:
+        #    acc += "N"
+
+        return acc
+
+    @property
+    def pretty_input_constraints(self) -> str:
+        """Return input constraints for writable settings."""
+        out = ""
+        if self.choices is not None:
+            out += (
+                "choices: "
+                + ", ".join([f"{c.description} ({c.value})" for c in self.choices])
+                + ""
+            )
+        if self.range is not None:
+            out += f"min: {self.range[0]}, max: {self.range[1]}, step: {self.range[2]}"
+
+        return out
 
     class Config:
         extra = "forbid"

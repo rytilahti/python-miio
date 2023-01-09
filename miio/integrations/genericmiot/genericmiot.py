@@ -17,7 +17,13 @@ from miio.descriptors import (
 )
 from miio.miot_cloud import MiotCloud
 from miio.miot_device import MiotMapping
-from miio.miot_models import DeviceModel, MiotAction, MiotProperty, MiotService
+from miio.miot_models import (
+    DeviceModel,
+    MiotAccess,
+    MiotAction,
+    MiotProperty,
+    MiotService,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,13 +32,20 @@ def pretty_status(result: "GenericMiotStatus"):
     """Pretty print status information."""
     out = ""
     props = result.property_dict()
+    service = None
     for _name, prop in props.items():
-        pretty_value = prop.pretty_value
+        miot_prop: MiotProperty = prop.extras["miot_property"]
+        if service is None or miot_prop.siid != service.siid:
+            service = miot_prop.service
+            out += f"Service [bold]{service.description} ({service.name})[/bold]\n"  # type: ignore  # FIXME
 
-        if "write" in prop.access:
-            out += "[S] "
+        out += f"\t{prop.description} ({prop.name}, access: {prop.pretty_access}): {prop.pretty_value}"
 
-        out += f"{prop.description} ({prop.name}): {pretty_value}"
+        if MiotAccess.Write in miot_prop.access:
+            out += f" ({prop.format}"
+            if prop.pretty_input_constraints is not None:
+                out += f", {prop.pretty_input_constraints}"
+            out += ")"
 
         if prop.choices is not None:  # TODO: hide behind verbose flag?
             out += (
@@ -105,6 +118,11 @@ class GenericMiotStatus(DeviceStatus):
 
         return self._data[item]
 
+    @property
+    def device(self) -> "GenericMiot":
+        """Return the device which returned this status."""
+        return self._dev
+
     def property_dict(self) -> Dict[str, MiotProperty]:
         """Return name-keyed dictionary of properties."""
         res = {}
@@ -129,7 +147,7 @@ class GenericMiotStatus(DeviceStatus):
 class GenericMiot(MiotDevice):
     _supported_models = [
         "*"
-    ]  # we support all devices, if not, it is a responsibility of caller to verify that
+    ]
 
     def __init__(
         self,
@@ -176,14 +194,11 @@ class GenericMiot(MiotDevice):
         """Return status based on the miot model."""
         properties = []
         for prop in self._properties:
-            if "read" not in prop.access:
-                _LOGGER.debug("Property has no read access, skipping: %s", prop)
+            if MiotAccess.Read not in prop.access:
                 continue
 
-            siid = prop.siid
-            piid = prop.piid
-            name = prop.name  # f"{prop.service.urn.name}:{prop.name}"
-            q = {"siid": siid, "piid": piid, "did": name}
+            name = prop.name
+            q = {"siid": prop.siid, "piid": prop.piid, "did": name}
             properties.append(q)
 
         # TODO: max properties needs to be made configurable (or at least splitted to avoid too large udp datagrams
@@ -250,11 +265,12 @@ class GenericMiot(MiotDevice):
     def _create_sensors_and_settings(self, serv: MiotService):
         """Create sensor and setting descriptors for a service."""
         for prop in serv.properties:
-            if prop.access == ["notify"]:
+            if prop.access == [MiotAccess.Notify]:
                 _LOGGER.debug("Skipping notify-only property: %s", prop)
                 continue
-            if "read" not in prop.access:  # TODO: handle write-only properties
-                _LOGGER.warning("Skipping write-only: %s", prop)
+            if not prop.access:
+                # some properties are defined only to be used as inputs for actions
+                _LOGGER.debug("%s (%s) reported no access information", prop.name, prop.description)
                 continue
 
             desc = self._descriptor_for_property(prop)
@@ -279,6 +295,7 @@ class GenericMiot(MiotDevice):
         extras["urn"] = prop.urn
         extras["siid"] = prop.siid
         extras["piid"] = prop.piid
+        extras["miot_property"] = prop
 
         # Handle settable ranged properties
         if prop.range is not None:
@@ -292,7 +309,7 @@ class GenericMiot(MiotDevice):
             )
 
         # Handle settable booleans
-        elif "write" in prop.access and prop.format == bool:
+        elif MiotAccess.Write in prop.access and prop.format == bool:
             return BooleanSettingDescriptor(
                 id=property_name,
                 name=name,
@@ -326,7 +343,7 @@ class GenericMiot(MiotDevice):
             choices=choices,
             extras=extras,
         )
-        if "write" in prop.access:
+        if MiotAccess.Write in prop.access:
             desc.setter = setter
             return desc
         else:
@@ -344,7 +361,7 @@ class GenericMiot(MiotDevice):
             unit=prop.unit,
             extras=extras,
         )
-        if "write" in prop.access:
+        if MiotAccess.Write in prop.access:
             desc.setter = setter
             return desc
         else:
