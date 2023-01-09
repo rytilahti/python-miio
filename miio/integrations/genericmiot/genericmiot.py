@@ -145,6 +145,7 @@ class GenericMiotStatus(DeviceStatus):
 
 
 class GenericMiot(MiotDevice):
+    # we support all devices, if not, it is a responsibility of caller to verify that
     _supported_models = ["*"]
 
     def __init__(
