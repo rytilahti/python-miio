@@ -145,9 +145,7 @@ class GenericMiotStatus(DeviceStatus):
 
 
 class GenericMiot(MiotDevice):
-    _supported_models = [
-        "*"
-    ]
+    _supported_models = ["*"]
 
     def __init__(
         self,
@@ -270,7 +268,11 @@ class GenericMiot(MiotDevice):
                 continue
             if not prop.access:
                 # some properties are defined only to be used as inputs for actions
-                _LOGGER.debug("%s (%s) reported no access information", prop.name, prop.description)
+                _LOGGER.debug(
+                    "%s (%s) reported no access information",
+                    prop.name,
+                    prop.description,
+                )
                 continue
 
             desc = self._descriptor_for_property(prop)
