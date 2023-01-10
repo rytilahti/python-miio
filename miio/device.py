@@ -16,7 +16,11 @@ from .descriptors import (
 )
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
-from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
+from .exceptions import (
+    DeviceError,
+    DeviceInfoUnavailableException,
+    PayloadDecodeException,
+)
 from .miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,6 +31,23 @@ class UpdateState(Enum):
     Installing = "installing"
     Failed = "failed"
     Idle = "idle"
+
+
+def _info_output(result):
+    """Format the output for info command."""
+    s = f"Model: {result.model}\n"
+    s += f"Hardware version: {result.hardware_version}\n"
+    s += f"Firmware version: {result.firmware_version}\n"
+
+    from .devicefactory import DeviceFactory
+
+    cls = DeviceFactory.class_for_model(result.model)
+    dev = DeviceFactory.create(result.ip_address, result.token, force_generic_miot=True)
+    s += f"Supported using: {cls.__name__}\n"
+    s += f"Command: miiocli {cls.__name__.lower()} --ip {result.ip_address} --token {result.token}\n"
+    s += f"Supported by genericmiot: {dev.supports_miot()}"
+
+    return s
 
 
 class Device(metaclass=DeviceGroupMeta):
@@ -117,12 +138,7 @@ class Device(metaclass=DeviceGroupMeta):
         return self.send(command, parameters)
 
     @command(
-        default_output=format_output(
-            "",
-            "Model: {result.model}\n"
-            "Hardware version: {result.hardware_version}\n"
-            "Firmware version: {result.firmware_version}\n",
-        ),
+        default_output=format_output(result_msg_fmt=_info_output),
         skip_autodetect=True,
     )
     def info(self, *, skip_cache=False) -> DeviceInfo:
@@ -297,6 +313,18 @@ class Device(metaclass=DeviceGroupMeta):
         # TODO: the latest status should be cached and re-used by all meta information getters
         sensors = self.status().sensors()
         return sensors
+
+    def supports_miot(self) -> bool:
+        """Return True if the device supports miot commands.
+
+        This requests a single property (siid=1, piid=1) and returns True on success.
+        """
+        try:
+            self.send("get_properties", [{"did": "dummy", "siid": 1, "piid": 1}])
+        except DeviceError as ex:
+            _LOGGER.debug("miot query failed, likely non-miot device: %s", repr(ex))
+            return False
+        return True
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"

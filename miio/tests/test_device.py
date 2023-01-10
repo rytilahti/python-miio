@@ -169,3 +169,16 @@ def test_init_signature(cls, mocker):
     # as some arguments are passed by inheriting classes using kwargs
     total_args = len(parent_init.call_args.args) + len(parent_init.call_args.kwargs)
     assert total_args == 8
+
+
+def test_supports_miot(mocker):
+    from miio.exceptions import DeviceError
+
+    send = mocker.patch(
+        "miio.Device.send", side_effect=DeviceError({"code": 1, "message": 1})
+    )
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    assert d.supports_miot() is False
+
+    send.side_effect = None
+    assert d.supports_miot() is True
