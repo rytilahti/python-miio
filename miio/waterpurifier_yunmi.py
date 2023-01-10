@@ -247,7 +247,7 @@ class WaterPurifierYunmi(Device):
     @command(
         default_output=format_output(
             "",
-            "Operaton status: {result.operation_status}\n"
+            "Operation status: {result.operation_status}\n"
             "Filter1 total time: {result.filter1_life_total}\n"
             "Filter1 used time: {result.filter1_life_used}\n"
             "Filter1 remaining time: {result.filter1_life_remaining}\n"

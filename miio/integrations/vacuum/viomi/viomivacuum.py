@@ -96,7 +96,7 @@ ERROR_CODES = {
     529: "Mop and water tank missing",
     530: "Mop and water tank missing",
     531: "Water tank is not installed",
-    2101: "Unsufficient battery, continuing cleaning after recharge",
+    2101: "Insufficient battery, continuing cleaning after recharge",
     2102: "Returning to base",
     2103: "Charging",
     2104: "Returning to base",
@@ -341,7 +341,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
     @property
     @setting("Vacuum along edges", choices=ViomiEdgeState, setter_name="set_edge")
     def edge_state(self) -> ViomiEdgeState:
-        """Vaccum along the edges.
+        """Vacuum along the edges.
 
         The settings is valid once
         0: Off

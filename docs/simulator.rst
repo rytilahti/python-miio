@@ -15,7 +15,7 @@ MiIO Simulator
 
 The ``miiocli devtools miio-simulator`` command can be used to simulate devices.
 You can command the simulated devices using the ``miiocli`` tool or any other implementation
-that talks the MiIO proocol, like `Home Assistant <https://www.home-assistant.io>`_.
+that talks the MiIO protocol, like `Home Assistant <https://www.home-assistant.io>`_.
 
 Behind the scenes, the simulator uses :class:`the push server <miio.push_server.server.PushServer>` to
 handle the low-level protocol handling.

@@ -17,8 +17,8 @@
 # Explanation push properties:
 #  push_properties:
 #    l_click_ch0:                    = action event that you receive back from the gateway (can be changed to any arbitrary string)
-#      property: last_press             = name of property to wich this event is coupled
-#      value: "long_click_ch0"          = the value to wich the coupled property schould be set upon receiving this event
+#      property: last_press             = name of property to which this event is coupled
+#      value: "long_click_ch0"          = the value to which the coupled property should be set upon receiving this event
 #      extra: "[1,13,1,85,[0,0],0,0]"   = "[a,b,c,d,[e,f],g,h]"
 #                                           c = part of the device that caused the event (1 = left switch, 2 = right switch, 3 = both switches)
 #                                           f = event number on which this event is fired (0 = long_click/close, 1 = click/open, 2 = double_click)

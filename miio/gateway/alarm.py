@@ -46,12 +46,12 @@ class Alarm(GatewayDevice):
         return self._gateway.set_prop("alarm_time_len", seconds)
 
     def triggering_light(self) -> int:
-        """Return the time the gateway light blinks when the alarm is triggerd."""
+        """Return the time the gateway light blinks when the alarm is triggered."""
         # Response: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._gateway.get_prop("en_alarm_light").pop()
 
     def set_triggering_light(self, seconds):
-        """Set the time the gateway light blinks when the alarm is triggerd."""
+        """Set the time the gateway light blinks when the alarm is triggered."""
         # values: 0=do not blink, 1=always blink, x>1=blink for x seconds
         return self._gateway.set_prop("en_alarm_light", seconds)
 
@@ -90,7 +90,7 @@ class Alarm(GatewayDevice):
         return True
 
     async def unsubscribe_events(self):
-        """Unsubscibe from events registered in the gateway memory."""
+        """Unsubscribe from events registered in the gateway memory."""
         for event_id in self._event_ids:
             await self._gateway._push_server.unsubscribe_event(self._gateway, event_id)
             self._event_ids.remove(event_id)
