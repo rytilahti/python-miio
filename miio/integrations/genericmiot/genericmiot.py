@@ -71,7 +71,10 @@ def pretty_actions(result: Dict[str, ActionDescriptor]):
 
         out += f"\t{desc.id}\t\t{desc.name}"
         if desc.inputs:
-            for idx, param in enumerate(desc.inputs, start=1):
+            for idx, input_ in enumerate(desc.inputs, start=1):
+                param = input_.extras[
+                    "miot_property"
+                ]  # TODO: hack until descriptors get support for descriptions
                 param_desc = f"\n\t\tParameter #{idx}: {param.name} ({param.description}) ({param.format}) {param.pretty_input_constraints}"
                 out += param_desc
 
