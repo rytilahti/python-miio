@@ -238,10 +238,15 @@ class GenericMiot(MiotDevice):
         extras["aiid"] = act.aiid
         extras["miot_action"] = act
 
+        inputs = act.inputs
+        if inputs:
+            # TODO: this is just temporarily here, pending refactoring the descriptor creation into the model
+            inputs = [self._descriptor_for_property(prop) for prop in act.inputs]
+
         return ActionDescriptor(
             id=id_,
             name=act.description,
-            inputs=act.inputs,  # TODO: convert inputs from properties to descriptors
+            inputs=inputs,
             method=call_action,
             extras=extras,
         )
