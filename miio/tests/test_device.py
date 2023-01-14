@@ -123,10 +123,10 @@ def test_missing_supported(mocker, caplog, cls, hidden):
 
     if hidden:
         assert "Found an unsupported model" not in caplog.text
-        assert f"for class '{cls.__name__}'" not in caplog.text
+        assert f"for class {cls.__name__!r}" not in caplog.text
     else:
         assert "Found an unsupported model" in caplog.text
-        assert f"for class '{cls.__name__}'" in caplog.text
+        assert f"for class {cls.__name__!r}" in caplog.text
 
 
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)

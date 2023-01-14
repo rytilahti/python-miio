@@ -91,7 +91,7 @@ def test_format(format, expected_type):
 
         format: MiotFormat
 
-    data = f'{{"format": "{format}"}}'
+    data = f'{{"format": "{format}"}}'  # noqa: B028
     f = Wrapper.parse_raw(data)
     assert f.format == expected_type
 
@@ -119,7 +119,7 @@ def test_action():
 def test_urn():
     """Test the parsing of URN strings."""
     urn_string = "urn:namespace:type:name:41414141:dummy.model:1"
-    example_urn = f'{{"urn": "{urn_string}"}}'
+    example_urn = f'{{"urn": "{urn_string}"}}'  # noqa: B028
 
     class Wrapper(BaseModel):
         """Need to wrap as plain string is not valid json."""

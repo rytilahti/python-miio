@@ -168,7 +168,7 @@ def reset_consumable(vac: RoborockVacuum, name):
         click.echo("Unexpected state name: %s" % name)
         return
 
-    click.echo(f"Resetting consumable '{name}': {vac.consumable_reset(consumable)}")
+    click.echo(f"Resetting consumable {name!r}: {vac.consumable_reset(consumable)}")
 
 
 @cli.command()

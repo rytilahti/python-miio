@@ -175,7 +175,7 @@ class SubDevice:
 
         if not response:
             raise DeviceException(
-                f"Empty response while fetching property '{property}': {response} on model {self.model}"
+                f"Empty response while fetching property {property!r}: {response} on model {self.model}"
             )
 
         return response
