@@ -88,6 +88,7 @@ class Device(metaclass=DeviceGroupMeta):
         self._info: Optional[DeviceInfo] = None
         self._actions: Optional[Dict[str, ActionDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
+        self._debug = debug
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
         )

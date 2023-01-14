@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
 from functools import partial
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, cast
 
 import click
 
@@ -47,17 +47,10 @@ def pretty_status(result: "GenericMiotStatus"):
                 out += f", {prop.pretty_input_constraints}"
             out += ")"
 
-        if prop.choices is not None:  # TODO: hide behind verbose flag?
-            out += (
-                " (from: "
-                + ", ".join([f"{c.description} ({c.value})" for c in prop.choices])
-                + ")"
-            )
-
-        if prop.range is not None:  # TODO: hide behind verbose flag?
-            out += (
-                f" (min: {prop.range[0]}, max: {prop.range[1]}, step: {prop.range[2]})"
-            )
+        if result.device._debug > 1:
+            out += "\n\t[bold]Extras[/bold]\n"
+            for extra_key, extra_value in prop.extras.items():
+                out += f"\t\t{extra_key} = {extra_value}\n"
 
         out += "\n"
 
@@ -76,11 +69,21 @@ def pretty_actions(result: Dict[str, ActionDescriptor]):
 def pretty_settings(result: Dict[str, SettingDescriptor]):
     """Pretty print settings."""
     out = ""
+    verbose = False
+    service = None
     for _, desc in result.items():
-        out += f"# {desc.id} ({desc.name})"
-        out += f'  urn: {repr(desc.extras["urn"])}\n'
-        out += f'  siid: {desc.extras["siid"]}\n'
-        out += f'  piid: {desc.extras["piid"]}\n'
+        miot_prop: MiotProperty = desc.extras["miot_property"]
+        # service is marked as optional due pydantic backrefs..
+        serv = cast(MiotService, miot_prop.service)
+        if service is None or service.siid != serv.siid:
+            service = serv
+            out += f"[bold]{service.name}[/bold] ({service.description})\n"
+
+        out += f"\t{desc.name} ({desc.id}, access: {miot_prop.pretty_access})\n"
+        if verbose:
+            out += f'  urn: {repr(desc.extras["urn"])}\n'
+            out += f'  siid: {desc.extras["siid"]}\n'
+            out += f'  piid: {desc.extras["piid"]}\n'
 
     return out
 
