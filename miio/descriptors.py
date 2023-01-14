@@ -26,11 +26,17 @@ class ValidSettingRange:
 
 
 @attr.s(auto_attribs=True)
-class ActionDescriptor:
-    """Describes a button exposed by the device."""
+class Descriptor:
+    """Base class for all descriptors."""
 
     id: str
     name: str
+
+
+@attr.s(auto_attribs=True)
+class ActionDescriptor(Descriptor):
+    """Describes a button exposed by the device."""
+
     method_name: Optional[str] = attr.ib(default=None, repr=False)
     method: Optional[Callable] = attr.ib(default=None, repr=False)
     inputs: Optional[List[Any]] = attr.ib(default=None, repr=True)
@@ -38,7 +44,7 @@ class ActionDescriptor:
 
 
 @attr.s(auto_attribs=True)
-class SensorDescriptor:
+class SensorDescriptor(Descriptor):
     """Describes a sensor exposed by the device.
 
     This information can be used by library users to programatically
@@ -47,10 +53,8 @@ class SensorDescriptor:
     Prefer :meth:`@sensor <miio.devicestatus.sensor>` for constructing these.
     """
 
-    id: str
-    type: type
-    name: str
     property: str
+    type: type
     unit: Optional[str] = None
     extras: Dict = attr.ib(factory=dict, repr=False)
 
@@ -63,11 +67,9 @@ class SettingType(Enum):
 
 
 @attr.s(auto_attribs=True, kw_only=True)
-class SettingDescriptor:
+class SettingDescriptor(Descriptor):
     """Presents a settable value."""
 
-    id: str
-    name: str
     property: str
     unit: Optional[str] = None
     type = SettingType.Undefined
