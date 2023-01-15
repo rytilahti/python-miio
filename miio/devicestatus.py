@@ -128,6 +128,9 @@ class DeviceStatus(metaclass=_StatusMeta):
         if "__" not in item:
             return super().__getattr__(item)
 
+        if item == "__json__":  # special handling for custom json dunder
+            return None
+
         embed, prop = item.split("__")
         return getattr(self._embedded[embed], prop)
 
