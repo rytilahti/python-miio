@@ -11,7 +11,7 @@ Main:
 - Battery - battery_life
 - Dock - set_charge
 - Start/Pause - set_mode_withroom
-- Modes (Vacuum/Vacuum&Mop/Mop) - set_mop/id_mop
+- Modes (Vacuum/Vacuum&Mop/Mop) - set_mop/is_mop
 - Fan Speed (Silent/Standard/Medium/Turbo) - set_suction/suction_grade
 - Water Level (Low/Medium/High) - set_suction/water_grade
 
@@ -29,7 +29,7 @@ Settings:
 - Area editor - MISSING
 - Reset map - MISSING
 - Device leveling - MISSING
-- Looking for the vacuum-mop - MISSING (find_me)
+- Looking for the vacuum-mop
 - Consumables statistics - get_properties
 - Remote Control - MISSING
 
@@ -511,7 +511,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
 
         True if the cleaning is performed twice
         """
-        return self.data["repeat_state"]
+        return bool(self.data["repeat_state"])
 
     @property
     @sensor("Start time")
@@ -628,14 +628,14 @@ class ViomiVacuum(Device, VacuumInterface):
             "Box type: {result.bin_type}\n"
             "Fan speed: {result.fanspeed}\n"
             "Water grade: {result.water_grade}\n"
-            "Mop mode: {result.mop_mode}\n"
             "Mop attached: {result.mop_attached}\n"
             "Vacuum along the edges: {result.edge_state}\n"
-            "Mop route pattern: {result.mop_route}\n"
+            "Mop route pattern: {result.route_pattern}\n"
             "Secondary Cleanup: {result.repeat_cleaning}\n"
             "Sound Volume: {result.sound_volume}\n"
             "Clean time: {result.clean_time}\n"
             "Clean area: {result.clean_area} m²\n"
+            "LED state: {result.led_state}\n"
             "\n"
             "Map\n"
             "===\n\n"
@@ -643,15 +643,7 @@ class ViomiVacuum(Device, VacuumInterface):
             "Remember map: {result.remember_map}\n"
             "Has map: {result.has_map}\n"
             "Has new map: {result.has_new_map}\n"
-            "Number of maps: {result.map_number}\n"
-            "\n"
-            "Unknown properties\n"
-            "=================\n\n"
-            "Light state: {result.light_state}\n"
-            # "Order time: {result.order_time}\n"
-            # "Start time: {result.start_time}\n"
-            # "water_percent: {result.water_percent}\n"
-            # "zone_data: {result.zone_data}\n",
+            "Number of maps: {result.map_number}\n",
         )
     )
     def status(self) -> ViomiVacuumStatus:
@@ -915,10 +907,10 @@ class ViomiVacuum(Device, VacuumInterface):
         """Set or Unset repeat mode (Secondary cleanup)."""
         return self.send("set_repeat", [int(state)])
 
-    @command(click.argument("mop_mode", type=EnumType(ViomiRoutePattern)))
-    def set_route_pattern(self, mop_mode: ViomiRoutePattern):
+    @command(click.argument("route_pattern", type=EnumType(ViomiRoutePattern)))
+    def set_route_pattern(self, route_pattern: ViomiRoutePattern):
         """Set the mop route pattern."""
-        self.send("set_moproute", [mop_mode.value])
+        self.send("set_moproute", [route_pattern.value])
 
     @command()
     def dnd_status(self):
