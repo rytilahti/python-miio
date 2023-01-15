@@ -1,20 +1,12 @@
 import logging
-from enum import Enum
 from functools import partial
-from typing import Dict, List, Optional, Union, cast
+from typing import Dict, List, Optional, cast
 
 import click
 
 from miio import DeviceInfo, DeviceStatus, MiotDevice
 from miio.click_common import LiteralParamType, command, format_output
-from miio.descriptors import (
-    ActionDescriptor,
-    BooleanSettingDescriptor,
-    EnumSettingDescriptor,
-    NumberSettingDescriptor,
-    SensorDescriptor,
-    SettingDescriptor,
-)
+from miio.descriptors import ActionDescriptor, SensorDescriptor, SettingDescriptor
 from miio.miot_cloud import MiotCloud
 from miio.miot_device import MiotMapping
 from miio.miot_models import (
@@ -230,29 +222,14 @@ class GenericMiot(MiotDevice):
 
     def _create_action(self, act: MiotAction) -> Optional[ActionDescriptor]:
         """Create action descriptor for miot action."""
+        desc = act.get_descriptor()
+        if not desc:
+            return None
+
         call_action = partial(self.call_action_by, act.siid, act.aiid)
+        desc.method = call_action
 
-        id_ = act.name
-
-        # TODO: move extras handling to the model
-        extras = act.extras
-        extras["urn"] = act.urn
-        extras["siid"] = act.siid
-        extras["aiid"] = act.aiid
-        extras["miot_action"] = act
-
-        inputs = act.inputs
-        if inputs:
-            # TODO: this is just temporarily here, pending refactoring the descriptor creation into the model
-            inputs = [self._descriptor_for_property(prop) for prop in act.inputs]
-
-        return ActionDescriptor(
-            id=id_,
-            name=act.description,
-            inputs=inputs,
-            method=call_action,
-            extras=extras,
-        )
+        return desc
 
     def _create_actions(self, serv: MiotService):
         """Create action descriptors."""
@@ -269,18 +246,6 @@ class GenericMiot(MiotDevice):
 
             self._actions[act_desc.name] = act_desc
 
-    def _create_sensor(self, prop: MiotProperty) -> SensorDescriptor:
-        """Create sensor descriptor for a property."""
-        property_name = prop.name
-
-        return SensorDescriptor(
-            id=property_name,
-            name=prop.description,
-            property=property_name,
-            type=prop.format,
-            extras=prop.extras,
-        )
-
     def _create_sensors_and_settings(self, serv: MiotService):
         """Create sensor and setting descriptors for a service."""
         for prop in serv.properties:
@@ -296,99 +261,19 @@ class GenericMiot(MiotDevice):
                 )
                 continue
 
-            desc = self._descriptor_for_property(prop)
+            desc = prop.get_descriptor()
+
             if isinstance(desc, SensorDescriptor):
                 self._sensors[prop.name] = desc
             elif isinstance(desc, SettingDescriptor):
+                desc.setter = partial(
+                    self.set_property_by, prop.siid, prop.piid, name=prop.name
+                )
                 self._settings[prop.name] = desc
             else:
                 raise Exception("unknown descriptor type")
 
             self._properties.append(prop)
-
-    def _descriptor_for_property(self, prop: MiotProperty):
-        """Create a descriptor based on the property information."""
-        name = prop.description
-        property_name = prop.name
-
-        setter = partial(self.set_property_by, prop.siid, prop.piid, name=property_name)
-
-        # TODO: move extras handling to the model
-        extras = prop.extras
-        extras["urn"] = prop.urn
-        extras["siid"] = prop.siid
-        extras["piid"] = prop.piid
-        extras["miot_property"] = prop
-
-        # Handle settable ranged properties
-        if prop.range is not None:
-            return self._create_range_setting(name, prop, property_name, setter, extras)
-
-        # Handle settable enums
-        elif prop.choices is not None:
-            # TODO: handle two-value enums as booleans?
-            return self._create_choices_setting(
-                name, prop, property_name, setter, extras
-            )
-
-        # Handle settable booleans
-        elif MiotAccess.Write in prop.access and prop.format == bool:
-            return BooleanSettingDescriptor(
-                id=property_name,
-                name=name,
-                property=property_name,
-                setter=setter,
-                unit=prop.unit,
-                extras=extras,
-            )
-
-        # Fallback to sensors
-        return self._create_sensor(prop)
-
-    def _create_choices_setting(
-        self, name, prop, property_name, setter, extras
-    ) -> Union[SensorDescriptor, EnumSettingDescriptor]:
-        """Create a descriptor for enum-based setting."""
-        try:
-            choices = Enum(
-                prop.description, {c.description: c.value for c in prop.choices}
-            )
-            _LOGGER.debug("Created enum %s", choices)
-        except ValueError as ex:
-            _LOGGER.error("Unable to create enum for %s: %s", prop, ex)
-            raise
-
-        desc = EnumSettingDescriptor(
-            id=property_name,
-            name=name,
-            property=property_name,
-            unit=prop.unit,
-            choices=choices,
-            extras=extras,
-        )
-        if MiotAccess.Write in prop.access:
-            desc.setter = setter
-            return desc
-        else:
-            return self._create_sensor(prop)
-
-    def _create_range_setting(self, name, prop, property_name, setter, extras):
-        """Create a descriptor for range-based setting."""
-        desc = NumberSettingDescriptor(
-            id=property_name,
-            name=name,
-            property=property_name,
-            min_value=prop.range[0],
-            max_value=prop.range[1],
-            step=prop.range[2],
-            unit=prop.unit,
-            extras=extras,
-        )
-        if MiotAccess.Write in prop.access:
-            desc.setter = setter
-            return desc
-        else:
-            return self._create_sensor(prop)
 
     def _create_descriptors(self):
         """Create descriptors based on the miot model."""
@@ -440,9 +325,6 @@ class GenericMiot(MiotDevice):
     def change_setting(self, name: str, params=None):
         """Change setting value."""
         params = params if params is not None else []
-        # TODO: create a name/plain name getter to the device model
-        service, prop_name = name.split(":")
-        # prop = self._miot_model.get_property(service, prop)
         setting = self._settings.get(name, None)
         if setting is None:
             raise ValueError("No setting found for name %s" % name)
