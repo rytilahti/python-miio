@@ -287,7 +287,8 @@ class DeviceModel(BaseModel):
     urn: URN = Field(alias="type")
     services: List[MiotService] = Field(repr=False)
 
-    # internal mappings to simplify accesses to a specific (siid, piid)
+    # internal mappings to simplify accesses
+    _services_by_id: Dict[int, MiotService] = PrivateAttr(default_factory=dict)
     _properties_by_id: Dict[int, Dict[int, MiotProperty]] = PrivateAttr(
         default_factory=dict
     )
@@ -302,6 +303,7 @@ class DeviceModel(BaseModel):
         """
         super().__init__(*args, **kwargs)
         for serv in self.services:
+            self._services_by_id[serv.siid] = serv
             self._properties_by_name[serv.name] = dict()
             self._properties_by_id[serv.siid] = dict()
             for prop in serv.properties:
@@ -312,6 +314,10 @@ class DeviceModel(BaseModel):
     def device_type(self) -> str:
         """Return device type as string."""
         return self.urn.type
+
+    def get_service_by_siid(self, siid: int) -> MiotService:
+        """Return the service for given siid."""
+        return self._services_by_id[siid]
 
     def get_property(self, service: str, prop_name: str) -> MiotProperty:
         """Return the property model for given service and property name."""

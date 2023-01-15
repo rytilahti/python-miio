@@ -60,8 +60,25 @@ def pretty_status(result: "GenericMiotStatus"):
 def pretty_actions(result: Dict[str, ActionDescriptor]):
     """Pretty print actions."""
     out = ""
+    service = None
     for _, desc in result.items():
-        out += f"{desc.id}\t\t{desc.name}\n"
+        miot_prop: MiotProperty = desc.extras["miot_action"]
+        # service is marked as optional due pydantic backrefs..
+        serv = cast(MiotService, miot_prop.service)
+        if service is None or service.siid != serv.siid:
+            service = serv
+            out += f"[bold]{service.description} ({service.name})[/bold]\n"
+
+        out += f"\t{desc.id}\t\t{desc.name}"
+        if desc.inputs:
+            for idx, input_ in enumerate(desc.inputs, start=1):
+                param = input_.extras[
+                    "miot_property"
+                ]  # TODO: hack until descriptors get support for descriptions
+                param_desc = f"\n\t\tParameter #{idx}: {param.name} ({param.description}) ({param.format}) {param.pretty_input_constraints}"
+                out += param_desc
+
+        out += "\n"
 
     return out
 
@@ -213,13 +230,6 @@ class GenericMiot(MiotDevice):
 
     def _create_action(self, act: MiotAction) -> Optional[ActionDescriptor]:
         """Create action descriptor for miot action."""
-        if act.inputs:
-            # TODO: need to figure out how to expose input parameters for downstreams
-            _LOGGER.warning(
-                "Got inputs for action, skipping as handling is unknown: %s", act
-            )
-            return None
-
         call_action = partial(self.call_action_by, act.siid, act.aiid)
 
         id_ = act.name
@@ -229,10 +239,17 @@ class GenericMiot(MiotDevice):
         extras["urn"] = act.urn
         extras["siid"] = act.siid
         extras["aiid"] = act.aiid
+        extras["miot_action"] = act
+
+        inputs = act.inputs
+        if inputs:
+            # TODO: this is just temporarily here, pending refactoring the descriptor creation into the model
+            inputs = [self._descriptor_for_property(prop) for prop in act.inputs]
 
         return ActionDescriptor(
             id=id_,
             name=act.description,
+            inputs=inputs,
             method=call_action,
             extras=extras,
         )
