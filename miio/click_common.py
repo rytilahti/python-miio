@@ -329,6 +329,7 @@ def json_output(pretty=False):
                 echo(json.dumps(ex.args[0], indent=indent))
                 return
 
+            # TODO: __json__ is not used anywhere and could be removed
             get_json_data_func = getattr(result, "__json__", None)
             data_variable = getattr(result, "data", None)
             if get_json_data_func is not None:

@@ -13,6 +13,8 @@ from typing import (
     get_type_hints,
 )
 
+import attr
+
 from .descriptors import (
     ActionDescriptor,
     BooleanSettingDescriptor,
@@ -115,7 +117,6 @@ class DeviceStatus(metaclass=_StatusMeta):
 
         for name, sensor in other.sensors().items():
             final_name = f"{other_name}__{name}"
-            import attr
 
             self._sensors[final_name] = attr.evolve(sensor, property=final_name)
 
@@ -125,13 +126,13 @@ class DeviceStatus(metaclass=_StatusMeta):
 
     def __getattr__(self, item):
         """Overridden to lookup properties from embedded containers."""
-        if "__" not in item:
-            return super().__getattr__(item)
+        if item.startswith("__") and item.endswith("__"):
+            return super().__getattribute__(item)
 
-        if item == "__json__":  # special handling for custom json dunder
-            return None
+        embed, prop = item.split("__", maxsplit=1)
+        if not embed or not prop:
+            return super().__getattribute__(item)
 
-        embed, prop = item.split("__")
         return getattr(self._embedded[embed], prop)
 
 
