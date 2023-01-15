@@ -104,6 +104,9 @@ class GenericMiotStatus(DeviceStatus):
         self._model: DeviceModel = dev._miot_model
         self._dev = dev
         self._data = {elem["did"]: elem["value"] for elem in response}
+        # for hardcoded json output.. see click_common.json_output
+        self.data = self._data
+
         self._data_by_siid_piid = {
             (elem["siid"], elem["piid"]): elem["value"] for elem in response
         }
@@ -113,6 +116,10 @@ class GenericMiotStatus(DeviceStatus):
 
         This is overridden to provide access to properties using (siid, piid) tuple.
         """
+        # let devicestatus handle dunder methods
+        if item.startswith("__") and item.endswith("__"):
+            return super().__getattr__(item)
+
         # TODO: find a better way to encode the property information
         serv, prop = item.split(":")
         prop = self._model.get_property(serv, prop)
