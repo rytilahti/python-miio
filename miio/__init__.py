@@ -32,6 +32,7 @@ from miio.chuangmi_ir import ChuangmiIr
 from miio.chuangmi_plug import ChuangmiPlug
 from miio.cloud import CloudInterface
 from miio.cooker import Cooker
+from miio.cooker_multi import MultiCooker
 from miio.curtain_youpin import CurtainMiot
 from miio.devicefactory import DeviceFactory
 from miio.gateway import Gateway
