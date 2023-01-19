@@ -76,6 +76,24 @@ def test_none():
     assert repr(NoneStatus()) == "<NoneStatus return_none=None>"
 
 
+def test_get_attribute(mocker):
+    """Make sure that __get_attribute__ works as expected."""
+
+    class TestStatus(DeviceStatus):
+        @property
+        def existing_attribute(self):
+            return None
+
+    status = TestStatus()
+    with pytest.raises(AttributeError):
+        _ = status.__missing_attribute
+
+    with pytest.raises(AttributeError):
+        _ = status.__missing_dunder__
+
+    assert status.existing_attribute is None
+
+
 def test_sensor_decorator():
     class DecoratedProps(DeviceStatus):
         @property
