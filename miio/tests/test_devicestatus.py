@@ -279,6 +279,9 @@ def test_embed():
         == "<MainStatus main_sensor=main SubStatus=<SubStatus sub_sensor=sub>>"
     )
 
+    # Test attribute access to the sub status
+    assert isinstance(main.SubStatus, SubStatus)
+
     # Test that __dir__ is implemented correctly
     assert "SubStatus" in dir(main)
     assert "SubStatus__sub_sensor" in dir(main)
