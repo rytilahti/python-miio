@@ -5,6 +5,7 @@ from enum import Enum
 from typing import (
     Callable,
     Dict,
+    Iterable,
     Optional,
     Type,
     Union,
@@ -124,10 +125,22 @@ class DeviceStatus(metaclass=_StatusMeta):
             final_name = f"{other_name}__{name}"
             self._settings[final_name] = attr.evolve(setting, property=final_name)
 
+    def __dir__(self) -> Iterable[str]:
+        """Overridden to include properties from embedded containers."""
+        return (
+            list(super().__dir__())
+            + list(self._embedded)
+            + list(self._sensors)
+            + list(self._settings)
+        )
+
     def __getattr__(self, item):
         """Overridden to lookup properties from embedded containers."""
         if item.startswith("__") and item.endswith("__"):
             return super().__getattribute__(item)
+
+        if item in self._embedded:
+            return self._embedded[item]
 
         embed, prop = item.split("__", maxsplit=1)
         if not embed or not prop:
