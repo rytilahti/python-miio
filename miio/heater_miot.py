@@ -57,7 +57,7 @@ _MAPPINGS = {
         "buzzer": {"siid": 6, "piid": 1},
         # Indicator light (siid=7)
         "led_brightness": {"siid": 7, "piid": 1},
-    },    
+    },
 }
 
 HEATER_PROPERTIES = {
