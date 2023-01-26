@@ -44,7 +44,6 @@ class ReleaseList(BaseModel):
                 len(releases),
                 model,
                 releases,
-                status_filter,
             )
 
         newest_release = max(releases, key=attrgetter("version"))
