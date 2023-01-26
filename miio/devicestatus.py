@@ -144,6 +144,10 @@ class DeviceStatus(metaclass=_StatusMeta):
             except KeyError:
                 continue  # skip missing properties
 
+            if value is None:  # skip none values
+                _LOGGER.debug("Skipping %s because it's None", entry.name)
+                continue
+
             if isinstance(entry, SettingDescriptor):
                 out += "[RW] "
 
