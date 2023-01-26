@@ -18,7 +18,11 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class URN(BaseModel):
-    """Parsed type URN."""
+    """Parsed type URN.
+
+    The expected format is urn:<namespace>:<type>:<name>:<id>:<model>:<version>.
+    All extraneous parts are stored inside *unexpected*.
+    """
 
     namespace: str
     type: str
@@ -26,6 +30,7 @@ class URN(BaseModel):
     internal_id: str
     model: str
     version: int
+    unexpected: Optional[List[str]]
 
     parent_urn: Optional["URN"] = Field(None, repr=False)
 
@@ -38,7 +43,7 @@ class URN(BaseModel):
         if not isinstance(v, str) or ":" not in v:
             raise TypeError("invalid type")
 
-        _, namespace, type, name, id_, model, version = v.split(":")
+        _, namespace, type, name, id_, model, version, *unexpected = v.split(":")
 
         return cls(
             namespace=namespace,
@@ -47,12 +52,16 @@ class URN(BaseModel):
             internal_id=id_,
             model=model,
             version=version,
+            unexpected=unexpected if unexpected else None,
         )
 
     @property
     def urn_string(self) -> str:
         """Return string presentation of the URN."""
-        return f"urn:{self.namespace}:{self.type}:{self.name}:{self.internal_id}:{self.model}:{self.version}"
+        urn = f"urn:{self.namespace}:{self.type}:{self.name}:{self.internal_id}:{self.model}:{self.version}"
+        if self.unexpected is not None:
+            urn = f"{urn}:{':'.join(self.unexpected)}"
+        return urn
 
     def __repr__(self):
         return f"<URN {self.urn_string} parent:{self.parent_urn}>"

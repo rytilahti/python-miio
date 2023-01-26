@@ -116,9 +116,26 @@ def test_action():
     assert act.plain_name == "dummy-action"
 
 
-def test_urn():
+@pytest.mark.parametrize(
+    ("urn_string", "unexpected"),
+    [
+        pytest.param(
+            "urn:namespace:type:name:41414141:dummy.model:1", None, id="regular_urn"
+        ),
+        pytest.param(
+            "urn:namespace:type:name:41414141:dummy.model:1:unexpected",
+            ["unexpected"],
+            id="unexpected_component",
+        ),
+        pytest.param(
+            "urn:namespace:type:name:41414141:dummy.model:1:unexpected:unexpected2",
+            ["unexpected", "unexpected2"],
+            id="multiple_unexpected_components",
+        ),
+    ],
+)
+def test_urn(urn_string, unexpected):
     """Test the parsing of URN strings."""
-    urn_string = "urn:namespace:type:name:41414141:dummy.model:1"
     example_urn = f'{{"urn": "{urn_string}"}}'  # noqa: B028
 
     class Wrapper(BaseModel):
@@ -134,6 +151,7 @@ def test_urn():
     assert urn.internal_id == "41414141"
     assert urn.model == "dummy.model"
     assert urn.version == 1
+    assert urn.unexpected == unexpected
 
     # Check that the serialization works
     assert urn.urn_string == urn_string
