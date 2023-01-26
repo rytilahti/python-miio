@@ -42,6 +42,22 @@ _MAPPINGS = {
         # Indicator light (siid=7)
         "led_brightness": {"siid": 6, "piid": 1},
     },
+    "leshow.heater.bs1s": {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:leshow-bs1:1
+        # Heater (siid=2)
+        "power": {"siid": 2, "piid": 1},
+        "target_temperature": {"siid": 2, "piid": 3},
+        # Countdown (siid=3)
+        "countdown_time": {"siid": 3, "piid": 1},
+        # Environment (siid=4)
+        "temperature": {"siid": 4, "piid": 7},
+        # Physical Control Locked (siid=5)
+        "child_lock": {"siid": 5, "piid": 1},
+        # Alarm (siid=6)
+        "buzzer": {"siid": 6, "piid": 1},
+        # Indicator light (siid=7)
+        "led_brightness": {"siid": 7, "piid": 1},
+    },
 }
 
 HEATER_PROPERTIES = {
