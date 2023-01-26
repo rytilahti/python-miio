@@ -21,7 +21,7 @@ class URN(BaseModel):
     """Parsed type URN.
 
     The expected format is urn:<namespace>:<type>:<name>:<id>:<model>:<version>.
-    All extraneous parts are stored in :ref:`unexpected`.
+    All extraneous parts are stored inside *unexpected*.
     """
 
     namespace: str
