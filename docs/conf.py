@@ -194,3 +194,5 @@ apidoc_toc_file = False
 autodoc_member_order = "groupwise"
 autodoc_inherit_docstrings = True
 autodoc_default_options = {"inherited-members": True}
+
+myst_heading_anchors = 2

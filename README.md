@@ -26,7 +26,7 @@ The full documentation is available at [python-miio.readthedocs.io](https://pyth
 ---
 
 * [Getting started](#getting-started)
-* [Controlling MIoT devices](#controlling-miot-devices)
+* [Controlling devices](#controlling-modern-devices)
 * [Controlling older (miIO) devices](#controlling-older-miio-devices)
 * [API usage](#api-usage)
 * [Troubleshooting](#troubleshooting)
