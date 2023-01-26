@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import random
 from collections import defaultdict
@@ -271,7 +272,20 @@ def miot_simulator(file, model):
         dev = SimulatedDeviceModel.parse_raw(data)
     else:
         cloud = MiotCloud()
-        dev = SimulatedDeviceModel.parse_obj(cloud.get_model_schema(model))
+        try:
+            schema = cloud.get_model_schema(model)
+        except Exception as ex:
+            _LOGGER.error("Unable to get schema: %s" % ex)
+            return
+        try:
+            dev = SimulatedDeviceModel.parse_obj(schema)
+        except Exception as ex:
+            # this is far from optimal, but considering this is a developer tool it can be fixed later
+            fn = f"/tmp/pythonmiio_unparseable_{model}.json"  # nosec
+            with open(fn, "w") as f:
+                json.dump(schema, f, indent=4)
+            _LOGGER.error("Unable to parse the schema, see %s: %s", fn, ex)
+            return
 
     loop = asyncio.get_event_loop()
     random.seed(1)  # nosec
