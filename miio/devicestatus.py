@@ -74,6 +74,8 @@ class DeviceStatus(metaclass=_StatusMeta):
         s = f"<{self.__class__.__name__}"
         for prop_tuple in props:
             name, prop = prop_tuple
+            if name.startswith("_"):  # skip internals
+                continue
             try:
                 # ignore deprecation warnings
                 with warnings.catch_warnings(record=True):
@@ -135,7 +137,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         )
 
     @property
-    def cli_output(self) -> str:
+    def __cli_output__(self) -> str:
         """Return a CLI formatted output of the status."""
         out = ""
         for entry in list(self.sensors().values()) + list(self.settings().values()):

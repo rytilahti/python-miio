@@ -126,7 +126,7 @@ class GenericMiotStatus(DeviceStatus):
         return res
 
     @property
-    def cli_output(self):
+    def __cli_output__(self):
         """Return a CLI printable status."""
         out = ""
         props = self.property_dict()
