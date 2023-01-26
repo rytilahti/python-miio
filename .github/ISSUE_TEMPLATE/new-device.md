@@ -8,6 +8,9 @@ assignees: ''
 ---
 
 Before submitting a new request, use the search to see if there is an existing issue for the device.
+**Also, if your device is rather new, it is likely supported already by the `genericmiot` integration.
+This is currently available only on the git version (until version 0.6.0 is released), so please give it a try before opening a new issue.
+**
 
 **Device information:**
 
