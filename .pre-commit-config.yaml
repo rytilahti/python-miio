@@ -15,7 +15,7 @@ repos:
   rev: 'v0.0.235'
   hooks:
     - id: ruff
-      args: ["--force-exclude", "--fix"]
+      args: ["--fix"]
 
 
 - repo: https://github.com/psf/black
