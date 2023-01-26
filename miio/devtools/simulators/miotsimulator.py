@@ -9,7 +9,7 @@ from pydantic import Field, validator
 
 from miio import PushServer
 from miio.miot_cloud import MiotCloud
-from miio.miot_models import DeviceModel, MiotProperty, MiotService
+from miio.miot_models import DeviceModel, MiotAccess, MiotProperty, MiotService
 
 from .common import create_info_response, mac_from_model
 
@@ -62,7 +62,7 @@ class SimulatedMiotProperty(MiotProperty):
         """
         if v == UNSET:
             return create_random(values)
-        if "write" not in values["access"]:
+        if MiotAccess.Write not in values["access"]:
             raise ValueError("Tried to set read-only property")
 
         try:
@@ -271,7 +271,6 @@ def miot_simulator(file, model):
         dev = SimulatedDeviceModel.parse_raw(data)
     else:
         cloud = MiotCloud()
-        # TODO: fix HACK
         dev = SimulatedDeviceModel.parse_obj(cloud.get_model_schema(model))
 
     loop = asyncio.get_event_loop()
