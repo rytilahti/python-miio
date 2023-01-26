@@ -244,6 +244,7 @@ The status container should inherit :class:`~miio.devicestatus.DeviceStatus`.
 Doing so ensures that a developer-friendly :meth:`~miio.devicestatus.DeviceStatus.__repr__` based on the defined
 properties is there to help with debugging.
 Furthermore, it allows defining meta information about properties that are especially interesting for end users.
+The ``miiocli`` tool will automatically use the defined information to generate a user-friendly output.
 
 .. note::
 
