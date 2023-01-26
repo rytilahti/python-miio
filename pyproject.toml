@@ -63,7 +63,6 @@ pre-commit = "^2"
 doc8 = "^0"
 restructuredtext_lint = "^1"
 tox = "^3"
-isort = "^4"
 cffi = "^1"
 docformatter = "^1"
 mypy = {version = "^0", markers = "platform_python_implementation == 'CPython'"}
