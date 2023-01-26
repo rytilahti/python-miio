@@ -303,8 +303,13 @@ def format_output(
                     msg = msg_fmt.format(**kwargs)
                 if msg:
                     echo(msg.strip())
-            kwargs["result"] = func(*args, **kwargs)
-            if result_msg_fmt:
+            result = kwargs["result"] = func(*args, **kwargs)
+            if (
+                not callable(result_msg_fmt)
+                and getattr(result, "__cli_output__", None) is not None
+            ):
+                echo(result.__cli_output__)
+            elif result_msg_fmt:
                 if callable(result_msg_fmt):
                     result_msg = result_msg_fmt(**kwargs)
                 else:

@@ -326,28 +326,7 @@ class AirHumidifier(Device):
 
     _supported_models = SUPPORTED_MODELS
 
-    @command(
-        default_output=format_output(
-            "",
-            "Power: {result.power}\n"
-            "Mode: {result.mode}\n"
-            "Temperature: {result.temperature} °C\n"
-            "Humidity: {result.humidity} %\n"
-            "LED brightness: {result.led_brightness}\n"
-            "Buzzer: {result.buzzer}\n"
-            "Child lock: {result.child_lock}\n"
-            "Target humidity: {result.target_humidity} %\n"
-            "Trans level: {result.trans_level}\n"
-            "Speed: {result.motor_speed}\n"
-            "Depth: {result.depth}\n"
-            "Water Level: {result.water_level} %\n"
-            "Water tank attached: {result.water_tank_attached}\n"
-            "Dry: {result.dry}\n"
-            "Use time: {result.use_time}\n"
-            "Hardware version: {result.hardware_version}\n"
-            "Button pressed: {result.button_pressed}\n",
-        )
-    )
+    @command()
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
 

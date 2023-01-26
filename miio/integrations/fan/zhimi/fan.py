@@ -219,26 +219,7 @@ class Fan(Device):
 
     _supported_models = list(AVAILABLE_PROPERTIES.keys())
 
-    @command(
-        default_output=format_output(
-            "",
-            "Power: {result.power}\n"
-            "Battery: {result.battery} %\n"
-            "AC power: {result.ac_power}\n"
-            "Temperature: {result.temperature} °C\n"
-            "Humidity: {result.humidity} %\n"
-            "LED: {result.led}\n"
-            "LED brightness: {result.led_brightness}\n"
-            "Buzzer: {result.buzzer}\n"
-            "Child lock: {result.child_lock}\n"
-            "Speed: {result.speed}\n"
-            "Natural speed: {result.natural_speed}\n"
-            "Direct speed: {result.direct_speed}\n"
-            "Oscillate: {result.oscillate}\n"
-            "Power-off time: {result.delay_off_countdown}\n"
-            "Angle: {result.angle}\n",
-        )
-    )
+    @command()
     def status(self) -> FanStatus:
         """Retrieve properties."""
         properties = AVAILABLE_PROPERTIES[self.model]

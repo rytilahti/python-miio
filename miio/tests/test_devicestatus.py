@@ -76,7 +76,7 @@ def test_none():
     assert repr(NoneStatus()) == "<NoneStatus return_none=None>"
 
 
-def test_get_attribute(mocker):
+def test_get_attribute():
     """Make sure that __get_attribute__ works as expected."""
 
     class TestStatus(DeviceStatus):
@@ -285,3 +285,39 @@ def test_embed():
     # Test that __dir__ is implemented correctly
     assert "SubStatus" in dir(main)
     assert "SubStatus__sub_sensor" in dir(main)
+
+
+def test_cli_output():
+    """Test the cli output string."""
+
+    class Status(DeviceStatus):
+        @property
+        @sensor("sensor_without_unit")
+        def sensor_without_unit(self) -> int:
+            return 1
+
+        @property
+        @sensor("sensor_with_unit", unit="V")
+        def sensor_with_unit(self) -> int:
+            return 2
+
+        @property
+        @setting("setting_without_unit", setter_name="dummy")
+        def setting_without_unit(self):
+            return 3
+
+        @property
+        @setting("setting_with_unit", unit="V", setter_name="dummy")
+        def setting_with_unit(self):
+            return 4
+
+        @property
+        @sensor("none_sensor")
+        def sensor_returning_none(self):
+            return None
+
+    status = Status()
+    assert (
+        status.__cli_output__
+        == "sensor_without_unit: 1\nsensor_with_unit: 2 V\n[RW] setting_without_unit: 3\n[RW] setting_with_unit: 4 V\n"
+    )
