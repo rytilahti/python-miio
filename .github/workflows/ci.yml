@@ -26,24 +26,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip poetry
           poetry install --extras docs
-      - name: "Run pyupgrade"
-        run: |
-          poetry run pre-commit run pyupgrade --all-files
       - name: "Code formating (black)"
         run: |
           poetry run pre-commit run black --all-files
-      - name: "Code formating (flake8)"
+      - name: "Code formating (ruff)"
         run: |
-          poetry run pre-commit run flake8 --all-files
-      - name: "Order of imports (isort)"
-        run: |
-          poetry run pre-commit run isort --all-files
+          poetry run pre-commit run ruff --all-files
       - name: "Docstring formating (docformatter)"
         run: |
           poetry run pre-commit run docformatter --all-files
-      - name: "Potential security issues (bandit)"
-        run: |
-          poetry run pre-commit run bandit --all-files
       - name: "Documentation build (sphinx)"
         run: |
           poetry run sphinx-build docs/ generated_docs

@@ -11,17 +11,18 @@ repos:
   - id: debug-statements
   - id: check-ast
 
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: 'v0.0.235'
+  hooks:
+    - id: ruff
+      args: ["--force-exclude", "--fix"]
+
+
 - repo: https://github.com/psf/black
   rev: 22.12.0
   hooks:
   - id: black
     language_version: python3
-
-- repo: https://github.com/pre-commit/mirrors-isort
-  rev: v5.10.1
-  hooks:
-  - id: isort
-    additional_dependencies: [toml]
 
 - repo: https://github.com/PyCQA/doc8
   rev: v1.1.1
@@ -29,22 +30,10 @@ repos:
   - id: doc8
 
 - repo: https://github.com/myint/docformatter
-  rev: v1.5.1
+  rev: v1.6.0.rc1
   hooks:
     - id: docformatter
       args: [--in-place, --wrap-summaries, '88', --wrap-descriptions, '88']
-
-- repo: https://github.com/pycqa/flake8
-  rev: 6.0.0
-  hooks:
-  - id: flake8
-    additional_dependencies: [flake8-docstrings, flake8-bugbear, flake8-builtins, flake8-print, flake8-pytest-style, flake8-return, flake8-simplify, flake8-annotations]
-
-- repo: https://github.com/PyCQA/bandit
-  rev: 1.7.4
-  hooks:
-  - id: bandit
-    args: [-x, 'tests', -x, '**/test_*.py']
 
 
 - repo: https://github.com/pre-commit/mirrors-mypy
@@ -52,9 +41,3 @@ repos:
   hooks:
   - id: mypy
     additional_dependencies: [types-attrs, types-PyYAML, types-requests, types-pytz, types-croniter, types-freezegun]
-
-- repo: https://github.com/asottile/pyupgrade
-  rev: v3.3.1
-  hooks:
-  - id: pyupgrade
-    args: ['--py38-plus']
