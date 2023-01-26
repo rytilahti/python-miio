@@ -86,10 +86,11 @@ commands, subcommands, and their options.
 ## Controlling modern (MIoT) devices
 
 Most modern (MIoT) devices are automatically supported by the `genericmiot` integration.
-Internally, it uses ([`miot spec`](https://home.miot-spec.com/)) JSON files to find out about supported features,
+Internally, it uses (["miot spec"](https://home.miot-spec.com/)) files to find out about supported features,
 such as sensors, settings and actions.
 
-The device model specific file will be downloaded (and cached locally) when you use the `genericmiot` integration for the first time.
+This device model specific file will be downloaded (and cached locally) when you use the `genericmiot` integration for the first time.
+
 All features of supported devices are available using the common commands `status` (to show the device state), `set` (to change the settings), `actions` to list available actions and `call` to execute actions.
 
 ### Device status
