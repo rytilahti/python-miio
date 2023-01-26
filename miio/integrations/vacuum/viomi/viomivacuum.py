@@ -51,7 +51,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
-from miio.click_common import EnumType, command, format_output
+from miio.click_common import EnumType, command
 from miio.device import Device
 from miio.devicestatus import action, sensor, setting
 from miio.exceptions import DeviceException
@@ -614,38 +614,7 @@ class ViomiVacuum(Device, VacuumInterface):
         self.manual_seqnum = -1
         self._cache: Dict[str, Any] = {"edge_state": None, "rooms": {}, "maps": {}}
 
-    @command(
-        default_output=format_output(
-            "\n",
-            "General\n"
-            "=======\n\n"
-            "Hardware version: {result.hw_info}\n"
-            "State: {result.state}\n"
-            "Working: {result.is_on}\n"
-            "Battery status: {result.error}\n"
-            "Battery: {result.battery}\n"
-            "Charging: {result.charging}\n"
-            "Box type: {result.bin_type}\n"
-            "Fan speed: {result.fanspeed}\n"
-            "Water grade: {result.water_grade}\n"
-            "Mop attached: {result.mop_attached}\n"
-            "Vacuum along the edges: {result.edge_state}\n"
-            "Mop route pattern: {result.route_pattern}\n"
-            "Secondary Cleanup: {result.repeat_cleaning}\n"
-            "Sound Volume: {result.sound_volume}\n"
-            "Clean time: {result.clean_time}\n"
-            "Clean area: {result.clean_area} m²\n"
-            "LED state: {result.led_state}\n"
-            "\n"
-            "Map\n"
-            "===\n\n"
-            "Current map ID: {result.current_map_id}\n"
-            "Remember map: {result.remember_map}\n"
-            "Has map: {result.has_map}\n"
-            "Has new map: {result.has_new_map}\n"
-            "Number of maps: {result.map_number}\n",
-        )
-    )
+    @command()
     def status(self) -> ViomiVacuumStatus:
         """Retrieve properties."""
 
