@@ -26,11 +26,12 @@ The full documentation is available at [python-miio.readthedocs.io](https://pyth
 ---
 
 * [Getting started](#getting-started)
-* [Controlling devices](#controlling-modern-devices)
+* [Controlling modern (MIoT) devices](#controlling-modern-miot-devices)
 * [Controlling older (miIO) devices](#controlling-older-miio-devices)
-* [API usage](#api-usage)
 * [Troubleshooting](#troubleshooting)
+* [API usage](#api-usage)
 * [Contributing](#contributing)
+* [Simulators](#simulators)
 * [Supported devices](#supported-devices)
 * [Projects using this library](#projects-using-this-library)
 * [Other related projects](#other-related-projects)
@@ -43,12 +44,12 @@ The `miiocli` command allows controlling supported devices from the
 command line, given that you know their IP addresses and tokens.
 
 The simplest way to acquire the tokens is by using the `miiocli cloud` command,
-which fetches them for you from your cloud account.
-[The manual](https://python-miio.readthedocs.io/en/latest/legacy_token_extraction.html#legacy-token-extraction)
-list some alternative ways to do that.
+which fetches them for you from your cloud account using [micloud](https://github.com/Squachen/micloud/).
+Alternatively, see [the docs](https://python-miio.readthedocs.io/en/latest/legacy_token_extraction.html#legacy-token-extraction)
+for other ways to obtain them.
 
 After you have your token, you can start controlling the device.
-get some information from any supported device using the `info` command:
+First, you can use `info` to get some generic information from any (even yet unsupported) device:
 
     miiocli device --ip <ip> --token <token> info
 
@@ -59,28 +60,63 @@ get some information from any supported device using the `info` command:
     Command: miiocli roborockvacuum --ip 127.0.0.1 --token 00000000000000000000000000000000
     Supported by genericmiot: True
 
-Note the command field which gives you the direct command to use for controlling the device.
+Note that the command field which gives you the direct command to use for controlling the device.
 If the device is supported by the `genericmiot` integration as stated in the output,
 you can also use [`miiocli genericmiot` for commanding it](#controlling-modern-devices).
 
 You can always use `--help` to get more information about available
 commands, subcommands, and their options.
 
-## Controlling modern devices
+## Controlling modern (MIoT) devices
 
-Most modern (MIoT) devices are supported by the `genericmiot` integration.
-Internally, it leverages downloadable `miot-spec` files to find out about supported features.
+Most modern (MIoT) devices are automatically supported by the `genericmiot` integration.
+Internally, it uses ([`miot spec`](https://home.miot-spec.com/)) JSON files to find out about supported features,
+such as sensors, settings and actions.
 
-In practice, this means that the first initialization will require access to the Internet
-to fetch the specification which will be cached for future uses.
-All features of supported devices are available using these common commands:
+The device model specific file will be downloaded (and cached locally) when you use the `genericmiot` integration for the first time.
+All features of supported devices are available using the common commands `status` (to show the device state), `set` (to change the settings), `actions` to list available actions and `call` to execute actions.
 
-* `miiocli genericmiot status` to print the device status information, including settings.
-* `miiocli genericmiot set` to change settings.
-* `miiocli genericmiot actions` to list available actions.
-* `miiocli genericmiot call` to execute actions.
+### Device status
+
+Executing `status` will show the current device state, and also the accepted values for settings (marked with access `RW`):
+
+    miiocli genericmiot --ip 127.0.0.1 --token 00000000000000000000000000000000 status
+
+    Service Light (light)
+            Switch Status (light:on, access: RW): False (<class 'bool'>, )
+            Brightness (light:brightness, access: RW): 60 % (<class 'int'>, min: 1, max: 100, step: 1)
+            Power Off Delay Time (light:off-delay-time, access: RW): 1:47:00 (<class 'int'>, min: 0, max: 120, step: 1)
+
+### Changing settings
+
+To change a setting, you need to provide the name of the setting (e.g., `light:brightness` in the example above):
+
+     miiocli genericmiot --ip 127.0.0.1 --token 00000000000000000000000000000000 set light:brightness 0
+
+     [{'did': 'light:brightness', 'siid': 2, 'piid': 3, 'code': 0}]
+
+### Using actions
+
+Most devices will also offer actions:
+
+    miiocli genericmiot --ip 127.0.0.1 --token 00000000000000000000000000000000 actions
+
+    Light (light)
+            light:toggle            Toggle
+            light:brightness-down   Brightness Down
+            light:brightness-up     Brightness Up
+
+
+These can be executed using the `call` command:
+
+    miiocli genericmiot --ip 127.0.0.1 --token 00000000000000000000000000000000 call light:toggle
+
+    {'code': 0, 'out': []}
+
 
 Use `miiocli genericmiot --help` for more available commands.
+
+**Note, using this integration requires you to use the git version until [version 0.6.0](https://github.com/rytilahti/python-miio/issues/1114) is released.**
 
 ## Controlling older (miIO) devices
 
@@ -112,6 +148,19 @@ Defining the model manually allows to skip the model detection:
 
     miiocli roborockvacuum --model roborock.vacuum.s5 --ip <ip> --token <token> start
 
+## Troubleshooting
+
+The `miiocli` tool has a `--debug` (`-d`) flag that can be used to enable debug logging.
+You can repeat this multiple times (e.g., `-dd`) to increase the verbosity of the output.
+
+You can find some solutions for the most common problems can be found in
+[Troubleshooting](https://python-miio.readthedocs.io/en/latest/troubleshooting.html)
+section.
+
+If you have any questions, feel free to create an issue or start a discussion on GitHub.
+Alternatively, you can check [our Matrix room](https://matrix.to/#/#python-miio-chat:matrix.org).
+
+
 ## API usage
 
 All functionalities of this library are accessible through the `miio`
@@ -131,9 +180,9 @@ and construct the corresponding device class for you.
 
 You can introspect device classes using the following methods:
 
-* `actions()` to return information about available device actions.
-* `settings()` to obtain information about available settings that can be changed.
 * `sensors()` to obtain information about sensors.
+* `settings()` to obtain information about available settings that can be changed.
+* `actions()` to return information about available device actions.
 
 Each of these return [device descriptor
 objects](https://python-miio.readthedocs.io/en/latest/api/miio.descriptors.html),
@@ -142,21 +191,19 @@ allow constructing generic interfaces.
 
 **Note: some integrations may not have descriptors defined. [Adding them is straightforward](https://python-miio.readthedocs.io/en/latest/contributing.html#status-containers), so feel free to contribute!**
 
-## Troubleshooting
-
-You can find some solutions for the most common problems can be found in
-[Troubleshooting](https://python-miio.readthedocs.io/en/latest/troubleshooting.html)
-section.
-
-If you have any questions, or simply want to join up for a chat, check
-[our Matrix room](https://matrix.to/#/#python-miio-chat:matrix.org).
-
 ## Contributing
 
 We welcome all sorts of contributions: from improvements
 or fixing bugs to improving the documentation. We have prepared [a short
 guide](https://python-miio.readthedocs.io/en/latest/contributing.html)
 for getting you started.
+
+## Simulators
+
+If you are a developer working on a project that communicates using the miIO/MIoT protocol,
+or want to contribute to this project but do not have a specific device,
+you can use the simulators provided by this project.
+The `miiocli` tool ships with [simple simulators for both miIO and MIoT](https://python-miio.readthedocs.io/en/latest/simulator.html) that can be used to test your code.
 
 ## Supported devices
 
