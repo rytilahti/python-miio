@@ -69,29 +69,6 @@ mypy = {version = "^0", markers = "platform_python_implementation == 'CPython'"}
 coverage = {extras = ["toml"], version = "^6"}
 freezegun = ">=1.2.1"  # freezegun 1.2.1 is first one with type hints
 
-
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 88
-forced_separate = "miio.discover"
-known_first_party = "miio"
-known_third_party = ["appdirs",
-  "attr",
-  "click",
-  "construct",
-  "croniter",
-  "cryptography",
-  "netifaces",
-  "pytest",
-  "pytz",
-  "setuptools",
-  "tqdm",
-  "zeroconf"
-]
-
 [tool.ruff]
 target-version = "py38"
 line-length = 88
@@ -152,6 +129,12 @@ ignore = [
 # PLR2004: magic constant
 "**/test_*.py" = ["S101", "D1", "PLR2004"]
 
+[tool.ruff.isort]
+known-first-party = ["miio"]
+# check if this is necessary
+known-third-party = ["appdirs", "attr", "click", "construct", "croniter", "cryptography", "netifaces", "pytest", "pytz", "setuptools", "tqdm", "zeroconf"]
+# enable later for pep604 comp
+# required-imports = ["from __future__ import annotations"]
 
 [tool.coverage.run]
 source = ["miio"]
