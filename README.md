@@ -48,6 +48,7 @@ The most recent release can be installed using `pip`:
 Alternatively, you can install the latest development version from GitHub:
 
     git clone https://github.com/rytilahti/python-miio.git
+    cd python-miio
     poetry install
     poetry run miiocli  # or use `poetry shell` to enter the virtualenv
 
@@ -78,7 +79,7 @@ First, you can use `info` to get some generic information from any (even yet uns
 
 Note that the command field which gives you the direct command to use for controlling the device.
 If the device is supported by the `genericmiot` integration as stated in the output,
-you can also use [`miiocli genericmiot` for commanding it](#controlling-modern-miot-devices).
+you can also use [`miiocli genericmiot` for controlling it](#controlling-modern-miot-devices).
 
 You can always use `--help` to get more information about available
 commands, subcommands, and their options.
