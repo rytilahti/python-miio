@@ -272,30 +272,7 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
 
     _mappings = _MAPPINGS
 
-    @command(
-        default_output=format_output(
-            "",
-            "State: {result.state}\n"
-            "Error: {result.error}\n"
-            "Battery: {result.battery}%\n"
-            "Sweep Mode: {result.sweep_mode}\n"
-            "Sweep Type: {result.sweep_type}\n"
-            "Mop State: {result.mop_state}\n"
-            "Fan speed: {result.fan_speed}\n"
-            "Water level: {result.water_level}\n"
-            "Main Brush Life Level: {result.main_brush_life_level}%\n"
-            "Main Brush Life Time: {result.main_brush_time_left}h\n"
-            "Side Brush Life Level: {result.side_brush_life_level}%\n"
-            "Side Brush Life Time: {result.side_brush_time_left}h\n"
-            "Filter Life Level: {result.filter_life_level}%\n"
-            "Filter Life Time: {result.filter_time_left}h\n"
-            "Mop Life Level: {result.mop_life_level}%\n"
-            "Mop Life Time: {result.mop_time_left}h\n"
-            "Clean Area: {result.clean_area} m^2\n"
-            "Clean Time: {result.clean_time} mins\n"
-            "Current Language: {result.current_language}\n",
-        )
-    )
+    @command()
     def status(self) -> Pro2Status:
         """Retrieve properties."""
         return Pro2Status(
