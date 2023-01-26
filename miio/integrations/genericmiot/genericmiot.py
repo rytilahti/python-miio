@@ -20,35 +20,6 @@ from miio.miot_models import (
 _LOGGER = logging.getLogger(__name__)
 
 
-def pretty_status(result: "GenericMiotStatus"):
-    """Pretty print status information."""
-    out = ""
-    props = result.property_dict()
-    service = None
-    for _name, prop in props.items():
-        miot_prop: MiotProperty = prop.extras["miot_property"]
-        if service is None or miot_prop.siid != service.siid:
-            service = miot_prop.service
-            out += f"Service [bold]{service.description} ({service.name})[/bold]\n"  # type: ignore  # FIXME
-
-        out += f"\t{prop.description} ({prop.name}, access: {prop.pretty_access}): {prop.pretty_value}"
-
-        if MiotAccess.Write in miot_prop.access:
-            out += f" ({prop.format}"
-            if prop.pretty_input_constraints is not None:
-                out += f", {prop.pretty_input_constraints}"
-            out += ")"
-
-        if result.device._debug > 1:
-            out += "\n\t[bold]Extras[/bold]\n"
-            for extra_key, extra_value in prop.extras.items():
-                out += f"\t\t{extra_key} = {extra_value}\n"
-
-        out += "\n"
-
-    return out
-
-
 def pretty_actions(result: Dict[str, ActionDescriptor]):
     """Pretty print actions."""
     out = ""
@@ -154,6 +125,35 @@ class GenericMiotStatus(DeviceStatus):
 
         return res
 
+    @property
+    def cli_output(self):
+        """Return a CLI printable status."""
+        out = ""
+        props = self.property_dict()
+        service = None
+        for _name, prop in props.items():
+            miot_prop: MiotProperty = prop.extras["miot_property"]
+            if service is None or miot_prop.siid != service.siid:
+                service = miot_prop.service
+                out += f"Service [bold]{service.description} ({service.name})[/bold]\n"  # type: ignore  # FIXME
+
+            out += f"\t{prop.description} ({prop.name}, access: {prop.pretty_access}): {prop.pretty_value}"
+
+            if MiotAccess.Write in miot_prop.access:
+                out += f" ({prop.format}"
+                if prop.pretty_input_constraints is not None:
+                    out += f", {prop.pretty_input_constraints}"
+                out += ")"
+
+            if self.device._debug > 1:
+                out += "\n\t[bold]Extras[/bold]\n"
+                for extra_key, extra_value in prop.extras.items():
+                    out += f"\t\t{extra_key} = {extra_value}\n"
+
+            out += "\n"
+
+        return out
+
     def __repr__(self):
         s = f"<{self.__class__.__name__}"
         for name, value in self.property_dict().items():
@@ -207,7 +207,7 @@ class GenericMiot(MiotDevice):
         _LOGGER.debug("Initialized: %s", self._miot_model)
         self._create_descriptors()
 
-    @command(default_output=format_output(result_msg_fmt=pretty_status))
+    @command()
     def status(self) -> GenericMiotStatus:
         """Return status based on the miot model."""
         properties = []
