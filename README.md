@@ -52,7 +52,7 @@ Alternatively, you can install the latest development version from GitHub:
     poetry run miiocli  # or use `poetry shell` to enter the virtualenv
 
 **This project is currently ongoing [a major refactoring effort](https://github.com/rytilahti/python-miio/issues/1114).
-If you are interested in controlling modern (MIoT) devices, you probably want to use the git master until version 0.6.0 is released.**
+If you are interested in controlling modern (MIoT) devices, you want to use the git master until version 0.6.0 is released.**
 
 ## Getting started
 
