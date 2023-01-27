@@ -11,7 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Listener(zeroconf.ServiceListener):
-    """mDNS listener creating Device objects based on detected devices."""
+    """mDNS listener creating Device objects for detected devices."""
 
     def __init__(self):
         self.found_devices: Dict[str, Device] = {}
@@ -19,8 +19,8 @@ class Listener(zeroconf.ServiceListener):
     def create_device(self, info, addr) -> Optional[Device]:
         """Get a device instance for a mdns response."""
         name = info.name
-        # e.g. XXXX in the name could be a
-        # yeelink-light-color1_miioXXXX._miio._udp.local.
+        # Example: yeelink-light-color1_miioXXXX._miio._udp.local.
+        # XXXX in the label is the device id
         _LOGGER.debug("Got mdns name: %s", name)
 
         model, _ = name.split("_", maxsplit=1)
@@ -52,20 +52,19 @@ class Listener(zeroconf.ServiceListener):
                 self.found_devices[str(addr)] = dev
 
     def update_service(self, zc: "zeroconf.Zeroconf", type_: str, name: str) -> None:
-        """Callback for state updates, which we ignore for now."""
+        """Callback for state updates."""
 
 
 class Discovery:
     """mDNS discoverer for miIO based devices (_miio._udp.local).
 
-    Calling :func:`discover_mdns` will cause this to subscribe for updates on
-    ``_miio._udp.local`` until any key is pressed, after which a dict of detected
-    devices is returned.
+    Call :func:`discover_mdns` to discover devices advertising `_miio._udp.local` on the
+    local network.
     """
 
     @staticmethod
     def discover_mdns(*, timeout=5) -> Dict[str, Device]:
-        """Discover devices with mdns until any keyboard input."""
+        """Discover devices with mdns."""
         _LOGGER.info("Discovering devices with mDNS for %s seconds...", timeout)
 
         listener = Listener()
