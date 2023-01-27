@@ -7,7 +7,7 @@ import pytest
 from pytz import UTC
 
 from miio.device import Device
-from miio.integrations.vacuum.roborock.vacuum import ROCKROBO_V1, Timer
+from miio.integrations.roborock.vacuum.vacuum import ROCKROBO_V1, Timer
 from miio.interfaces import VacuumInterface
 
 # list of all supported vacuum classes
