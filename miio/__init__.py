@@ -20,14 +20,16 @@ from miio.cloud import CloudInterface
 from miio.devicefactory import DeviceFactory
 from miio.integrations.airdog.airpurifier import AirDogX3
 from miio.integrations.cgllc.airmonitor import AirQualityMonitor, AirQualityMonitorCGDN1
-from miio.integrations.chuangmi import ChuangmiCamera, ChuangmiIr, ChuangmiPlug
-from miio.integrations.chunmi import Cooker
+from miio.integrations.chuangmi.camera import ChuangmiCamera
+from miio.integrations.chuangmi.plug import ChuangmiPlug
+from miio.integrations.chuangmi.remote import ChuangmiIr
+from miio.integrations.chunmi.cooker import Cooker
 from miio.integrations.deerma.humidifier import AirHumidifierJsqs, AirHumidifierMjjsq
 from miio.integrations.dmaker.airfresh import AirFreshA1, AirFreshT2017
 from miio.integrations.dmaker.fan import Fan1C, FanMiot, FanP5
 from miio.integrations.dreame.vacuum import DreameVacuum
 from miio.integrations.genericmiot import GenericMiot
-from miio.integrations.huayi import (
+from miio.integrations.huayi.light import (
     Huizuo,
     HuizuoLampFan,
     HuizuoLampHeater,
@@ -47,7 +49,7 @@ from miio.integrations.lumi.gateway import Gateway
 from miio.integrations.mijia.vacuum import G1Vacuum
 from miio.integrations.mmgg.petwaterdispenser import PetWaterDispenser
 from miio.integrations.nwt.dehumidifier import AirDehumidifier
-from miio.integrations.philips import (
+from miio.integrations.philips.light import (
     Ceil,
     PhilipsBulb,
     PhilipsEyecare,
@@ -55,7 +57,7 @@ from miio.integrations.philips import (
     PhilipsRwread,
     PhilipsWhiteBulb,
 )
-from miio.integrations.pwzn import PwznRelay
+from miio.integrations.pwzn.relay import PwznRelay
 from miio.integrations.roborock.vacuum import RoborockVacuum
 from miio.integrations.roidmi.vacuum import RoidmiVacuumMiot
 from miio.integrations.scishare.coffee import ScishareCoffee
