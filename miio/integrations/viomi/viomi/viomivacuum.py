@@ -55,8 +55,7 @@ from miio.click_common import EnumType, command
 from miio.device import Device
 from miio.devicestatus import action, sensor, setting
 from miio.exceptions import DeviceException
-# TODO: remove roborock import
-from miio.integrations.roborock.vacuum.vacuumcontainers import (
+from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
     ConsumableStatus,
     DNDStatus,
 )

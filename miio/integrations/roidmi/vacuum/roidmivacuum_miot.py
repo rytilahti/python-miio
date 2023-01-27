@@ -10,8 +10,9 @@ from enum import Enum
 import click
 
 from miio.click_common import EnumType, command
-# TODO: remove roborock import
-from miio.integrations.roborock.vacuum.vacuumcontainers import DNDStatus
+from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
+    DNDStatus,
+)
 from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
