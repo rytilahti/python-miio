@@ -21,6 +21,7 @@ class Listener(zeroconf.ServiceListener):
         name = info.name
         # e.g. XXXX in the name could be a
         # yeelink-light-color1_miioXXXX._miio._udp.local.
+        _LOGGER.debug("Got mdns name: %s", name)
 
         model, _ = name.split("_", maxsplit=1)
         model = model.replace("-", ".")
