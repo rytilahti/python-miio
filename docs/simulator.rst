@@ -33,7 +33,7 @@ Usage
 
 You start the simulator like this::
 
-    miiocli devtools miio-simulator --file miio/integrations/fan/zhimi/zhimi_fan.yaml
+    miiocli devtools miio-simulator --file miio/integrations/zhimi/fan/zhimi_fan.yaml
 
 The mandatory ``--file`` option takes a path to :ref:`a device description file <miio_device_descriptions>` file
 that defines information about the device to be simulated.
@@ -180,7 +180,7 @@ Example Description File
 The following description file shows a complete,
 concrete example for a device using ``get_prop`` for accessing the properties (``zhimi_fan.yaml``):
 
-.. literalinclude:: ../miio/integrations/fan/zhimi/zhimi_fan.yaml
+.. literalinclude:: ../miio/integrations/zhimi/fan/zhimi_fan.yaml
    :language: yaml
 
 .. _example_desc_methods:
@@ -191,7 +191,7 @@ Example Description File Using Methods
 The following description file (``simulated_roborock.yaml``) shows a complete,
 concrete example for a device using custom method names for obtaining the status.
 
-.. literalinclude:: ../miio/integrations/vacuum/roborock/simulated_roborock.yaml
+.. literalinclude:: ../miio/integrations/roborock/vacuum/simulated_roborock.yaml
    :language: yaml
 
 

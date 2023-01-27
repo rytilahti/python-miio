@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [tool.poetry.scripts]
-mirobo = "miio.integrations.vacuum.roborock.vacuum_cli:cli"
+mirobo = "miio.integrations.roborock.vacuum.vacuum_cli:cli"
 miio-extract-tokens = "miio.extract_tokens:main"
 miiocli = "miio.cli:create_cli"
 

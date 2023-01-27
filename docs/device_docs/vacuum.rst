@@ -306,8 +306,8 @@ so it is also possible to pass dicts.
 `mirobo --help`
 ~~~~~~~~~~~~~~~
 
-.. click:: miio.integrations.vacuum.roborock.vacuum_cli:cli
+.. click:: miio.integrations.roborock.vacuum.vacuum_cli:cli
    :prog: mirobo
    :show-nested:
 
-:py:class:`API <miio.vacuum>`
+:py:class:`API <miio.integrations.roborocok.vacuum>`
