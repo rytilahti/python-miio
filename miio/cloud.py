@@ -33,7 +33,7 @@ class CloudDeviceInfo(BaseModel):
     """Model for the xiaomi cloud device information.
 
     Note that only some selected information is directly exposed, raw data is available
-    using :ref:`raw_data`.
+    using :meth:`raw_data`.
     """
 
     ip: str = Field(alias="localip")
@@ -104,7 +104,6 @@ class CloudInterface:
             )
 
         self._micloud: MiCloud = MiCloud(username=self.username, password=self.password)
-
         try:  # login() can either return False or raise an exception on failure
             if not self._micloud.login():
                 raise CloudException("Login failed")
