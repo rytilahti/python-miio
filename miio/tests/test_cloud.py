@@ -35,7 +35,6 @@ def test_login_success(cloud: CloudInterface, mocker):
     login = mocker.patch("micloud.MiCloud.login", return_value=True)
     cloud._login()
     login.assert_called()
-    login.reset_mock()
 
 
 @pytest.mark.parametrize(
