@@ -87,6 +87,8 @@ class Device(metaclass=DeviceGroupMeta):
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
         self._actions: Optional[Dict[str, ActionDescriptor]] = None
+        self._settings: Optional[Dict[str, SettingDescriptor]] = None
+        self._sensors: Optional[Dict[str, SensorDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
         self._debug = debug
         self._protocol = MiIOProtocol(
@@ -176,6 +178,63 @@ class Device(metaclass=DeviceGroupMeta):
             raise DeviceInfoUnavailableException(
                 "Unable to request miIO.info from the device"
             ) from ex
+
+    def _setting_descriptors_from_status(
+        self, status: DeviceStatus
+    ) -> Dict[str, SettingDescriptor]:
+        """Get the setting descriptors from a DeviceStatus."""
+        settings = status.settings()
+        for setting in settings.values():
+            if setting.setter_name is not None:
+                setting.setter = getattr(self, setting.setter_name)
+            if setting.setter is None:
+                raise Exception(
+                    f"Neither setter or setter_name was defined for {setting}"
+                )
+            setting = cast(EnumSettingDescriptor, setting)
+            if (
+                setting.type == SettingType.Enum
+                and setting.choices_attribute is not None
+            ):
+                retrieve_choices_function = getattr(self, setting.choices_attribute)
+                setting.choices = retrieve_choices_function()
+            if setting.type == SettingType.Number:
+                setting = cast(NumberSettingDescriptor, setting)
+                if setting.range_attribute is not None:
+                    range_def = getattr(self, setting.range_attribute)
+                    setting.min_value = range_def.min_value
+                    setting.max_value = range_def.max_value
+                    setting.step = range_def.step
+
+        return settings
+
+    def _sensor_descriptors_from_status(
+        self, status: DeviceStatus
+    ) -> Dict[str, SensorDescriptor]:
+        """Get the sensor descriptors from a DeviceStatus."""
+        return status.sensors()
+
+    def _action_descriptors(self) -> Dict[str, ActionDescriptor]:
+        """Get the action descriptors from a DeviceStatus."""
+        actions = {}
+        for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
+            method_name, method = action_tuple
+            action = method._action
+            action.method = method  # bind the method
+            actions[method_name] = action
+
+        return actions
+
+    def _initialize_descriptors(self) -> None:
+        """Cache all the descriptors once on the first call."""
+        if self._sensors is not None:
+            return
+
+        status = self.status()
+
+        self._sensors = self._sensor_descriptors_from_status(status)
+        self._settings = self._setting_descriptors_from_status(status)
+        self._actions = self._action_descriptors()
 
     @property
     def device_id(self) -> int:
@@ -271,49 +330,23 @@ class Device(metaclass=DeviceGroupMeta):
     def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
         if self._actions is None:
-            self._actions = {}
-            for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
-                method_name, method = action_tuple
-                action = method._action
-                action.method = method  # bind the method
-                self._actions[method_name] = action
+            self._initialize_descriptors()
 
         return self._actions
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""
-        settings = self.status().settings()
-        for setting in settings.values():
-            # TODO: Bind setter methods, this should probably done only once during init.
-            if setting.setter is None:
-                # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
-                if setting.setter_name is None:
-                    raise Exception(
-                        f"Neither setter or setter_name was defined for {setting}"
-                    )
+        if self._settings is None:
+            self._initialize_descriptors()
 
-                setting.setter = getattr(self, setting.setter_name)
-            if (
-                isinstance(setting, EnumSettingDescriptor)
-                and setting.choices_attribute is not None
-            ):
-                retrieve_choices_function = getattr(self, setting.choices_attribute)
-                setting.choices = retrieve_choices_function()  # This can do IO
-            if setting.type == SettingType.Number:
-                setting = cast(NumberSettingDescriptor, setting)
-                if setting.range_attribute is not None:
-                    range_def = getattr(self, setting.range_attribute)
-                    setting.min_value = range_def.min_value
-                    setting.max_value = range_def.max_value
-                    setting.step = range_def.step
-
-        return settings
+        return self._settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return device sensors."""
-        # TODO: the latest status should be cached and re-used by all meta information getters
-        sensors = self.status().sensors()
-        return sensors
+        if self._sensors is None:
+            self._initialize_descriptors()
+
+        return self._sensors
 
     def supports_miot(self) -> bool:
         """Return True if the device supports miot commands.
