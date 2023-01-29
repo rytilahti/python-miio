@@ -1,9 +1,15 @@
+import json
 import logging
-from pprint import pprint
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, Optional
 
-import attr
 import click
+from pydantic import BaseModel, Field
+
+try:
+    from rich import print as echo
+except ImportError:
+    echo = click.echo
+
 
 from miio.exceptions import CloudException
 
@@ -12,50 +18,64 @@ _LOGGER = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from micloud import MiCloud  # noqa: F401
 
-AVAILABLE_LOCALES = ["cn", "de", "i2", "ru", "sg", "us"]
+AVAILABLE_LOCALES = {
+    "all": "All",
+    "cn": "China",
+    "de": "Germany",
+    "i2": "i2",  # unknown
+    "ru": "Russia",
+    "sg": "Singapore",
+    "us": "USA",
+}
 
 
-@attr.s(auto_attribs=True)
-class CloudDeviceInfo:
-    """Container for device data from the cloud.
+class CloudDeviceInfo(BaseModel):
+    """Model for the xiaomi cloud device information.
 
-    Note that only some selected information is directly exposed, but you can access the
-    raw data using `raw_data`.
+    Note that only some selected information is directly exposed, raw data is available
+    using :ref:`raw_data`.
     """
 
-    did: str
+    ip: str = Field(alias="localip")
     token: str
+    did: str
+    mac: str
     name: str
     model: str
-    ip: str
-    description: str
-    parent_id: str
-    ssid: str
-    mac: str
-    locale: List[str]
-    raw_data: str = attr.ib(repr=False)
+    description: str = Field(alias="desc")
 
-    @classmethod
-    def from_micloud(cls, response, locale):
-        micloud_to_info = {
-            "did": "did",
-            "token": "token",
-            "name": "name",
-            "model": "model",
-            "ip": "localip",
-            "description": "desc",
-            "ssid": "ssid",
-            "parent_id": "parent_id",
-            "mac": "mac",
-        }
-        data = {k: response[v] for k, v in micloud_to_info.items()}
-        return cls(raw_data=response, locale=[locale], **data)
+    locale: str
+
+    parent_id: str
+    parent_model: str
+
+    # network info
+    ssid: str
+    bssid: str
+    is_online: bool = Field(alias="isOnline")
+    rssi: int
+
+    _raw_data: dict
+
+    def is_child(self):
+        """Return True for gateway sub devices."""
+        return self.parent_id != ""
+
+    @property
+    def raw_data(self):
+        """Return the raw data."""
+        return self._raw_data
+
+    class Config:
+        extra = "allow"
 
 
 class CloudInterface:
     """Cloud interface using micloud library.
 
-    Currently used only for obtaining the list of registered devices.
+    You can use this to obtain a list of devices and their tokens.
+    The :meth:`get_devices` takes the locale string (e.g., 'us') as an argument,
+    defaulting to all known locales (accessible through :meth:`available_locales`).
 
     Example::
 
@@ -83,9 +103,7 @@ class CloudInterface:
                 "You need to install 'micloud' package to use cloud interface"
             )
 
-        self._micloud = MiCloud = MiCloud(
-            username=self.username, password=self.password
-        )
+        self._micloud: MiCloud = MiCloud(username=self.username, password=self.password)
 
         try:  # login() can either return False or raise an exception on failure
             if not self._micloud.login():
@@ -97,10 +115,20 @@ class CloudInterface:
         """Parse device list response from micloud."""
         devs = {}
         for single_entry in data:
-            devinfo = CloudDeviceInfo.from_micloud(single_entry, locale)
-            devs[devinfo.did] = devinfo
+            single_entry["locale"] = locale
+            devinfo = CloudDeviceInfo.parse_obj(single_entry)
+            devinfo._raw_data = single_entry
+            devs[f"{devinfo.did}_{locale}"] = devinfo
 
         return devs
+
+    @classmethod
+    def available_locales(cls) -> Dict[str, str]:
+        """Return available locales.
+
+        The value is the human-readable name of the locale.
+        """
+        return AVAILABLE_LOCALES
 
     def get_devices(self, locale: Optional[str] = None) -> Dict[str, CloudDeviceInfo]:
         """Return a list of available devices keyed with a device id.
@@ -108,20 +136,19 @@ class CloudInterface:
         If no locale is given, all known locales are browsed. If a device id is already
         seen in another locale, it is excluded from the results.
         """
+        _LOGGER.debug("Getting devices for locale %s", locale)
         self._login()
-        if locale is not None:
+        if locale is not None and locale != "all":
             return self._parse_device_list(
                 self._micloud.get_devices(country=locale), locale=locale
             )
 
         all_devices: Dict[str, CloudDeviceInfo] = {}
         for loc in AVAILABLE_LOCALES:
+            if loc == "all":
+                continue
             devs = self.get_devices(locale=loc)
             for did, dev in devs.items():
-                if did in all_devices:
-                    _LOGGER.debug("Already seen device with %s, appending", did)
-                    all_devices[did].locale.extend(dev.locale)
-                    continue
                 all_devices[did] = dev
         return all_devices
 
@@ -145,41 +172,45 @@ def cloud(ctx: click.Context, username, password):
 
 @cloud.command(name="list")
 @click.pass_context
-@click.option("--locale", prompt=True, type=click.Choice(AVAILABLE_LOCALES + ["all"]))
+@click.option("--locale", prompt=True, type=click.Choice(AVAILABLE_LOCALES.keys()))
 @click.option("--raw", is_flag=True, default=False)
 def cloud_list(ctx: click.Context, locale: Optional[str], raw: bool):
     """List devices connected to the cloud account."""
 
     ci = ctx.obj
-    if locale == "all":
-        locale = None
 
     devices = ci.get_devices(locale=locale)
 
     if raw:
-        click.echo(f"Printing devices for {locale}")
-        click.echo("===================================")
-        for dev in devices.values():
-            pprint(dev.raw_data)  # noqa: T203
-        click.echo("===================================")
+        jsonified = json.dumps([dev.raw_data for dev in devices.values()], indent=4)
+        print(jsonified)  # noqa: T201
+        return
 
     for dev in devices.values():
         if dev.parent_id:
             continue  # we handle children separately
 
-        click.echo(f"== {dev.name} ({dev.description}) ==")
-        click.echo(f"\tModel: {dev.model}")
-        click.echo(f"\tToken: {dev.token}")
-        click.echo(f"\tIP: {dev.ip} (mac: {dev.mac})")
-        click.echo(f"\tDID: {dev.did}")
-        click.echo(f"\tLocale: {', '.join(dev.locale)}")
+        echo(f"== {dev.name} ({dev.description}) ==")
+        echo(f"\tModel: {dev.model}")
+        echo(f"\tToken: {dev.token}")
+        echo(f"\tIP: {dev.ip} (mac: {dev.mac})")
+        echo(f"\tDID: {dev.did}")
+        echo(f"\tLocale: {dev.locale}")
         childs = [x for x in devices.values() if x.parent_id == dev.did]
         if childs:
-            click.echo("\tSub devices:")
+            echo("\tSub devices:")
             for c in childs:
-                click.echo(f"\t\t{c.name}")
-                click.echo(f"\t\t\tDID: {c.did}")
-                click.echo(f"\t\t\tModel: {c.model}")
+                echo(f"\t\t{c.name}")
+                echo(f"\t\t\tDID: {c.did}")
+                echo(f"\t\t\tModel: {c.model}")
+
+        other_fields = dev.__fields_set__ - set(dev.__fields__.keys())
+        echo("\tOther fields:")
+        for field in other_fields:
+            if field.startswith("_"):
+                continue
+
+            echo(f"\t\t{field}: {getattr(dev, field)}")
 
     if not devices:
-        click.echo(f"Unable to find devices for locale {locale}")
+        echo(f"Unable to find devices for locale {locale}")
