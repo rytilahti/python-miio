@@ -57,6 +57,7 @@ class CloudDeviceInfo(BaseModel):
 
     _raw_data: dict
 
+    @property
     def is_child(self):
         """Return True for gateway sub devices."""
         return self.parent_id != ""
