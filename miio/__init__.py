@@ -16,7 +16,7 @@ from miio.interfaces import VacuumInterface, LightInterface, ColorTemperatureRan
 
 # isort: on
 
-from miio.cloud import CloudInterface
+from miio.cloud import CloudDeviceInfo, CloudException, CloudInterface
 from miio.devicefactory import DeviceFactory
 from miio.integrations.airdog.airpurifier import AirDogX3
 from miio.integrations.cgllc.airmonitor import AirQualityMonitor, AirQualityMonitorCGDN1
