@@ -137,7 +137,7 @@ class MapList(DeviceStatus):
 class VacuumStatus(VacuumDeviceStatus):
     """Container for status reports from the vacuum."""
 
-    def __init__(self, data: Dict[str, Any], maps: Optional[MapList] = None) -> None:
+    def __init__(self, data: Dict[str, Any]) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
@@ -178,7 +178,6 @@ class VacuumStatus(VacuumDeviceStatus):
         # 'water_shortage_status': 0, 'dock_type': 0, 'dust_collection_status': 0,
         # 'auto_dust_collection': 1,  'mop_mode': 300, 'debug_mode': 0}]
         self.data = data
-        self._maps = maps
 
     @property
     @sensor("State code", entity_category="diagnostic", enabled_default=False)
@@ -342,10 +341,12 @@ class VacuumStatus(VacuumDeviceStatus):
     @property
     def current_map_name(self) -> str:
         """The name of the current map with regards to the multi map feature."""
-        if self._maps is None:
+        try:
+            map_list = self.MapList__map_list
+        except AttributeError:
             return str(self.current_map_id)
 
-        return self._maps.map_list[self.current_map_id]["name"]
+        return map_list[self.current_map_id]["name"]
 
     @property
     def in_zone_cleaning(self) -> bool:
