@@ -182,3 +182,17 @@ def test_supports_miot(mocker):
 
     send.side_effect = None
     assert d.supports_miot() is True
+
+
+@pytest.mark.parametrize("getter_name", ["actions", "settings", "sensors"])
+def test_cached_descriptors(getter_name, mocker):
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    getter = getattr(d, getter_name)
+    initialize_descriptors = mocker.spy(d, "_initialize_descriptors")
+    mocker.patch("miio.Device.status")
+    mocker.patch("miio.Device._sensor_descriptors_from_status", return_value={})
+    mocker.patch("miio.Device._setting_descriptors_from_status", return_value={})
+    mocker.patch("miio.Device._action_descriptors", return_value={})
+    for _i in range(5):
+        getter()
+    initialize_descriptors.assert_called_once()
