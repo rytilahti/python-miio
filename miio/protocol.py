@@ -16,7 +16,7 @@ import datetime
 import hashlib
 import json
 import logging
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, Union
 
 from construct import (
     Adapter,
@@ -159,18 +159,13 @@ class EncryptionAdapter(Adapter):
             json.dumps(obj).encode("utf-8") + b"\x00", context["_"]["token"]
         )
 
-    def _decode(self, obj, context, path):
-        """Decrypts the given payload with the token stored in the context.
-
-        :return str: JSON object
-        """
+    def _decode(self, obj, context, path) -> Union[Dict, bytes]:
+        """Decrypts the payload using the token stored in the context."""
         try:
-            # pp(context)
             decrypted = Utils.decrypt(obj, context["_"]["token"])
             decrypted = decrypted.rstrip(b"\x00")
         except Exception:
-            if obj:
-                _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
+            _LOGGER.debug("Unable to decrypt, returning raw bytes: %s", obj)
             return obj
 
         # list of adaption functions for malformed json payload (quirks)
@@ -201,12 +196,12 @@ class EncryptionAdapter(Adapter):
                 # log the error when decrypted bytes couldn't be loaded
                 # after trying all quirk adaptions
                 if i == len(decrypted_quirks) - 1:
-                    _LOGGER.debug("Unable to parse json '%s': %s", decoded, ex)
+                    _LOGGER.error("Unable to parse json '%s': %s", decrypted, ex)
                     raise PayloadDecodeException(
                         "Unable to parse message payload"
                     ) from ex
 
-        return None
+        raise Exception("this should never happen")
 
 
 Message = Struct(

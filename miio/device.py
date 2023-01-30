@@ -16,7 +16,11 @@ from .descriptors import (
 )
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
-from .exceptions import DeviceInfoUnavailableException, PayloadDecodeException
+from .exceptions import (
+    DeviceError,
+    DeviceInfoUnavailableException,
+    PayloadDecodeException,
+)
 from .miioprotocol import MiIOProtocol
 
 _LOGGER = logging.getLogger(__name__)
@@ -27,6 +31,23 @@ class UpdateState(Enum):
     Installing = "installing"
     Failed = "failed"
     Idle = "idle"
+
+
+def _info_output(result):
+    """Format the output for info command."""
+    s = f"Model: {result.model}\n"
+    s += f"Hardware version: {result.hardware_version}\n"
+    s += f"Firmware version: {result.firmware_version}\n"
+
+    from .devicefactory import DeviceFactory
+
+    cls = DeviceFactory.class_for_model(result.model)
+    dev = DeviceFactory.create(result.ip_address, result.token, force_generic_miot=True)
+    s += f"Supported using: {cls.__name__}\n"
+    s += f"Command: miiocli {cls.__name__.lower()} --ip {result.ip_address} --token {result.token}\n"
+    s += f"Supported by genericmiot: {dev.supports_miot()}"
+
+    return s
 
 
 class Device(metaclass=DeviceGroupMeta):
@@ -52,21 +73,24 @@ class Device(metaclass=DeviceGroupMeta):
 
     def __init__(
         self,
-        ip: str = None,
-        token: str = None,
+        ip: Optional[str] = None,
+        token: Optional[str] = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         *,
-        model: str = None,
+        model: Optional[str] = None,
     ) -> None:
         self.ip = ip
         self.token: Optional[str] = token
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
         self._actions: Optional[Dict[str, ActionDescriptor]] = None
+        self._settings: Optional[Dict[str, SettingDescriptor]] = None
+        self._sensors: Optional[Dict[str, SensorDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
+        self._debug = debug
         self._protocol = MiIOProtocol(
             ip, token, start_id, debug, lazy_discover, timeout
         )
@@ -74,8 +98,8 @@ class Device(metaclass=DeviceGroupMeta):
     def send(
         self,
         command: str,
-        parameters: Any = None,
-        retry_count: int = None,
+        parameters: Optional[Any] = None,
+        retry_count: Optional[int] = None,
         *,
         extra_parameters=None,
     ) -> Any:
@@ -117,12 +141,7 @@ class Device(metaclass=DeviceGroupMeta):
         return self.send(command, parameters)
 
     @command(
-        default_output=format_output(
-            "",
-            "Model: {result.model}\n"
-            "Hardware version: {result.hardware_version}\n"
-            "Firmware version: {result.firmware_version}\n",
-        ),
+        default_output=format_output(result_msg_fmt=_info_output),
         skip_autodetect=True,
     )
     def info(self, *, skip_cache=False) -> DeviceInfo:
@@ -145,7 +164,8 @@ class Device(metaclass=DeviceGroupMeta):
             self._info = devinfo
             _LOGGER.debug("Detected model %s", devinfo.model)
             cls = self.__class__.__name__
-            bases = ["Device", "MiotDevice"]
+            # Ignore bases and generic classes
+            bases = ["Device", "MiotDevice", "GenericMiot"]
             if devinfo.model not in self.supported_models and cls not in bases:
                 _LOGGER.warning(
                     "Found an unsupported model '%s' for class '%s'. If this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
@@ -158,6 +178,61 @@ class Device(metaclass=DeviceGroupMeta):
             raise DeviceInfoUnavailableException(
                 "Unable to request miIO.info from the device"
             ) from ex
+
+    def _setting_descriptors_from_status(
+        self, status: DeviceStatus
+    ) -> Dict[str, SettingDescriptor]:
+        """Get the setting descriptors from a DeviceStatus."""
+        settings = status.settings()
+        for setting in settings.values():
+            if setting.setter_name is not None:
+                setting.setter = getattr(self, setting.setter_name)
+            if setting.setter is None:
+                raise Exception(
+                    f"Neither setter or setter_name was defined for {setting}"
+                )
+            setting = cast(EnumSettingDescriptor, setting)
+            if (
+                setting.type == SettingType.Enum
+                and setting.choices_attribute is not None
+            ):
+                retrieve_choices_function = getattr(self, setting.choices_attribute)
+                setting.choices = retrieve_choices_function()
+            if setting.type == SettingType.Number:
+                setting = cast(NumberSettingDescriptor, setting)
+                if setting.range_attribute is not None:
+                    range_def = getattr(self, setting.range_attribute)
+                    setting.min_value = range_def.min_value
+                    setting.max_value = range_def.max_value
+                    setting.step = range_def.step
+
+        return settings
+
+    def _sensor_descriptors_from_status(
+        self, status: DeviceStatus
+    ) -> Dict[str, SensorDescriptor]:
+        """Get the sensor descriptors from a DeviceStatus."""
+        return status.sensors()
+
+    def _action_descriptors(self) -> Dict[str, ActionDescriptor]:
+        """Get the action descriptors from a DeviceStatus."""
+        actions = {}
+        for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
+            method_name, method = action_tuple
+            action = method._action
+            action.method = method  # bind the method
+            actions[method_name] = action
+
+        return actions
+
+    def _initialize_descriptors(self) -> None:
+        """Cache all the descriptors once on the first call."""
+
+        status = self.status()
+
+        self._sensors = self._sensor_descriptors_from_status(status)
+        self._settings = self._setting_descriptors_from_status(status)
+        self._actions = self._action_descriptors()
 
     @property
     def device_id(self) -> int:
@@ -253,49 +328,38 @@ class Device(metaclass=DeviceGroupMeta):
     def actions(self) -> Dict[str, ActionDescriptor]:
         """Return device actions."""
         if self._actions is None:
-            self._actions = {}
-            for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
-                method_name, method = action_tuple
-                action = method._action
-                action.method = method  # bind the method
-                self._actions[method_name] = action
+            self._initialize_descriptors()
+            self._actions = cast(Dict[str, ActionDescriptor], self._actions)
 
         return self._actions
 
     def settings(self) -> Dict[str, SettingDescriptor]:
         """Return device settings."""
-        settings = self.status().settings()
-        for setting in settings.values():
-            # TODO: Bind setter methods, this should probably done only once during init.
-            if setting.setter is None:
-                # TODO: this is ugly, how to fix the issue where setter_name is optional and thus not acceptable for getattr?
-                if setting.setter_name is None:
-                    raise Exception(
-                        f"Neither setter or setter_name was defined for {setting}"
-                    )
+        if self._settings is None:
+            self._initialize_descriptors()
+            self._settings = cast(Dict[str, SettingDescriptor], self._settings)
 
-                setting.setter = getattr(self, setting.setter_name)
-            if (
-                isinstance(setting, EnumSettingDescriptor)
-                and setting.choices_attribute is not None
-            ):
-                retrieve_choices_function = getattr(self, setting.choices_attribute)
-                setting.choices = retrieve_choices_function()  # This can do IO
-            if setting.type == SettingType.Number:
-                setting = cast(NumberSettingDescriptor, setting)
-                if setting.range_attribute is not None:
-                    range_def = getattr(self, setting.range_attribute)
-                    setting.min_value = range_def.min_value
-                    setting.max_value = range_def.max_value
-                    setting.step = range_def.step
-
-        return settings
+        return self._settings
 
     def sensors(self) -> Dict[str, SensorDescriptor]:
         """Return device sensors."""
-        # TODO: the latest status should be cached and re-used by all meta information getters
-        sensors = self.status().sensors()
-        return sensors
+        if self._sensors is None:
+            self._initialize_descriptors()
+            self._sensors = cast(Dict[str, SensorDescriptor], self._sensors)
+
+        return self._sensors
+
+    def supports_miot(self) -> bool:
+        """Return True if the device supports miot commands.
+
+        This requests a single property (siid=1, piid=1) and returns True on success.
+        """
+        try:
+            self.send("get_properties", [{"did": "dummy", "siid": 1, "piid": 1}])
+        except DeviceError as ex:
+            _LOGGER.debug("miot query failed, likely non-miot device: %s", repr(ex))
+            return False
+        return True
 
     def __repr__(self):
         return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"

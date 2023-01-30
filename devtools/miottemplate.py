@@ -27,7 +27,7 @@ class Generator:
     def print_infos(self):
         dev = Device.from_json(self.data)
         click.echo(
-            f"Device '{dev.type}': {dev.description} with {len(dev.services)} services"
+            f"Device {dev.type!r}: {dev.description} with {len(dev.services)} services"
         )
         for serv in dev.services:
             click.echo(f"\n* Service {serv}")

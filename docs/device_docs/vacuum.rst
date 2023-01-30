@@ -190,7 +190,7 @@ and updating from an URL requires you to pass the md5 hash of the file.
 
     mirobo update-firmware v11_003094.pkg
 
-If you can control the device but the firmware update is not working (e.g., you are receiving a ```BrokenPipeError`` during the update process <https://github.com/rytilahti/python-miio/issues/1154>`_ , you can host the file on any HTTP server (such as ``python2 -m SimpleHTTPServer``) by passing the URL and the md5sum of the file to the command:
+If you can control the device but the firmware update is not working (e.g., you are receiving a ```BrokenPipeError`` during the update process <https://github.com/rytilahti/python-miio/issues/1154>`_ , you can host the file on any HTTP server (such as ``python3 -m http.server``) by passing the URL and the md5sum of the file to the command:
 
 ::
 
@@ -306,8 +306,8 @@ so it is also possible to pass dicts.
 `mirobo --help`
 ~~~~~~~~~~~~~~~
 
-.. click:: miio.integrations.vacuum.roborock.vacuum_cli:cli
+.. click:: miio.integrations.roborock.vacuum.vacuum_cli:cli
    :prog: mirobo
    :show-nested:
 
-:py:class:`API <miio.vacuum>`
+:py:class:`API <miio.integrations.roborocok.vacuum>`

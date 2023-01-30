@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import random
 from collections import defaultdict
@@ -9,7 +10,7 @@ from pydantic import Field, validator
 
 from miio import PushServer
 from miio.miot_cloud import MiotCloud
-from miio.miot_models import DeviceModel, MiotProperty, MiotService
+from miio.miot_models import DeviceModel, MiotAccess, MiotProperty, MiotService
 
 from .common import create_info_response, mac_from_model
 
@@ -62,7 +63,7 @@ class SimulatedMiotProperty(MiotProperty):
         """
         if v == UNSET:
             return create_random(values)
-        if "write" not in values["access"]:
+        if MiotAccess.Write not in values["access"]:
             raise ValueError("Tried to set read-only property")
 
         try:
@@ -185,8 +186,65 @@ class MiotSimulator:
 
     def action(self, payload):
         """Handle action method."""
+        params = payload["params"]
+        if (
+            "did" not in params
+            or "siid" not in params
+            or "aiid" not in params
+            or "in" not in params
+        ):
+            raise ValueError("did, siid, or aiid missing")
+
+        siid = params["siid"]
+        aiid = params["aiid"]
+        inputs = params["in"]
+        service = self._model.get_service_by_siid(siid)
+
+        action = service.get_action_by_id(aiid)
+        action_inputs = action.inputs
+        if len(inputs) != len(action_inputs):
+            raise ValueError(
+                "Invalid parameter count, was expecting %s params, got %s"
+                % (len(inputs), len(action_inputs))
+            )
+
+        for idx, param in enumerate(inputs):
+            wanted_input = action_inputs[idx]
+
+            if wanted_input.choices:
+                if not isinstance(param, int):
+                    raise TypeError(
+                        "Param #%s: enum value expects an integer %s, got %s"
+                        % (idx, wanted_input, param)
+                    )
+                for choice in wanted_input.choices:
+                    if param == choice.value:
+                        break
+                else:
+                    raise ValueError(
+                        "Param #%s: invalid value '%s' for %s"
+                        % (idx, param, wanted_input.choices)
+                    )
+
+            elif wanted_input.range:
+                if not isinstance(param, int):
+                    raise TypeError(
+                        "Param #%s: ranged value expects an integer %s, got %s"
+                        % (idx, wanted_input, param)
+                    )
+
+                min, max, step = wanted_input.range
+                if param < min or param > max:
+                    raise ValueError(
+                        "Param #%s: value '%s' out of range [%s, %s]"
+                        % (idx, param, min, max)
+                    )
+
+            elif wanted_input.format == str and not isinstance(param, str):
+                raise TypeError(f"Param #{idx}: expected string but got {type(param)}")
+
         _LOGGER.info("Got called %s", payload)
-        return {"result": 0}
+        return {"result": ["ok"]}
 
 
 async def main(dev, model):
@@ -194,7 +252,7 @@ async def main(dev, model):
 
     mac = mac_from_model(model)
     simulator = MiotSimulator(device_model=dev)
-    server.add_method("miIO.info", create_info_response(model, mac))
+    server.add_method("miIO.info", create_info_response(model, "127.0.0.1", mac))
     server.add_method("action", simulator.action)
     server.add_method("get_properties", simulator.get_properties)
     server.add_method("set_properties", simulator.set_properties)
@@ -214,8 +272,20 @@ def miot_simulator(file, model):
         dev = SimulatedDeviceModel.parse_raw(data)
     else:
         cloud = MiotCloud()
-        # TODO: fix HACK
-        dev = SimulatedDeviceModel.parse_raw(cloud.get_model_schema(model))
+        try:
+            schema = cloud.get_model_schema(model)
+        except Exception as ex:
+            _LOGGER.error("Unable to get schema: %s" % ex)
+            return
+        try:
+            dev = SimulatedDeviceModel.parse_obj(schema)
+        except Exception as ex:
+            # this is far from optimal, but considering this is a developer tool it can be fixed later
+            fn = f"/tmp/pythonmiio_unparseable_{model}.json"  # nosec
+            with open(fn, "w") as f:
+                json.dump(schema, f, indent=4)
+            _LOGGER.error("Unable to parse the schema, see %s: %s", fn, ex)
+            return
 
     loop = asyncio.get_event_loop()
     random.seed(1)  # nosec

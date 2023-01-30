@@ -123,10 +123,10 @@ def test_missing_supported(mocker, caplog, cls, hidden):
 
     if hidden:
         assert "Found an unsupported model" not in caplog.text
-        assert f"for class '{cls.__name__}'" not in caplog.text
+        assert f"for class {cls.__name__!r}" not in caplog.text
     else:
         assert "Found an unsupported model" in caplog.text
-        assert f"for class '{cls.__name__}'" in caplog.text
+        assert f"for class {cls.__name__!r}" in caplog.text
 
 
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)
@@ -169,3 +169,30 @@ def test_init_signature(cls, mocker):
     # as some arguments are passed by inheriting classes using kwargs
     total_args = len(parent_init.call_args.args) + len(parent_init.call_args.kwargs)
     assert total_args == 8
+
+
+def test_supports_miot(mocker):
+    from miio.exceptions import DeviceError
+
+    send = mocker.patch(
+        "miio.Device.send", side_effect=DeviceError({"code": 1, "message": 1})
+    )
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    assert d.supports_miot() is False
+
+    send.side_effect = None
+    assert d.supports_miot() is True
+
+
+@pytest.mark.parametrize("getter_name", ["actions", "settings", "sensors"])
+def test_cached_descriptors(getter_name, mocker):
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    getter = getattr(d, getter_name)
+    initialize_descriptors = mocker.spy(d, "_initialize_descriptors")
+    mocker.patch("miio.Device.status")
+    mocker.patch("miio.Device._sensor_descriptors_from_status", return_value={})
+    mocker.patch("miio.Device._setting_descriptors_from_status", return_value={})
+    mocker.patch("miio.Device._action_descriptors", return_value={})
+    for _i in range(5):
+        getter()
+    initialize_descriptors.assert_called_once()

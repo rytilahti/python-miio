@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 from miio.miot_models import (
     URN,
+    MiotAccess,
     MiotAction,
     MiotEnumValue,
     MiotEvent,
@@ -12,6 +13,42 @@ from miio.miot_models import (
     MiotProperty,
     MiotService,
 )
+
+DUMMY_SERVICE = """
+    {
+        "iid": 1,
+        "description": "test service",
+        "type": "urn:miot-spec-v2:service:device-information:00000001:dummy:1",
+        "properties": [
+        {
+            "iid": 4,
+            "type": "urn:miot-spec-v2:property:firmware-revision:00000005:dummy:1",
+            "description": "Current Firmware Version",
+            "format": "string",
+            "access": [
+              "read"
+            ]
+        }
+        ],
+        "actions": [
+        {
+            "iid": 1,
+            "type": "urn:miot-spec-v2:action:start-sweep:00000004:dummy:1",
+            "description": "Start Sweep",
+            "in": [],
+            "out": []
+        }
+        ],
+        "events": [
+        {
+            "iid": 1,
+            "type": "urn:miot-spec-v2:event:low-battery:00000003:dummy:1",
+            "description": "Low Battery",
+            "arguments": []
+        }
+        ]
+    }
+"""
 
 
 def test_enum():
@@ -54,7 +91,7 @@ def test_format(format, expected_type):
 
         format: MiotFormat
 
-    data = f'{{"format": "{format}"}}'
+    data = f'{{"format": "{format}"}}'  # noqa: B028
     f = Wrapper.parse_raw(data)
     assert f.format == expected_type
 
@@ -79,10 +116,27 @@ def test_action():
     assert act.plain_name == "dummy-action"
 
 
-def test_urn():
+@pytest.mark.parametrize(
+    ("urn_string", "unexpected"),
+    [
+        pytest.param(
+            "urn:namespace:type:name:41414141:dummy.model:1", None, id="regular_urn"
+        ),
+        pytest.param(
+            "urn:namespace:type:name:41414141:dummy.model:1:unexpected",
+            ["unexpected"],
+            id="unexpected_component",
+        ),
+        pytest.param(
+            "urn:namespace:type:name:41414141:dummy.model:1:unexpected:unexpected2",
+            ["unexpected", "unexpected2"],
+            id="multiple_unexpected_components",
+        ),
+    ],
+)
+def test_urn(urn_string, unexpected):
     """Test the parsing of URN strings."""
-    urn_string = "urn:namespace:type:name:41414141:dummy.model:1"
-    example_urn = f'{{"urn": "{urn_string}"}}'
+    example_urn = f'{{"urn": "{urn_string}"}}'  # noqa: B028
 
     class Wrapper(BaseModel):
         """Need to wrap as plain string is not valid json."""
@@ -97,9 +151,11 @@ def test_urn():
     assert urn.internal_id == "41414141"
     assert urn.model == "dummy.model"
     assert urn.version == 1
+    assert urn.unexpected == unexpected
 
-    # Check that the serialization works, too
-    assert repr(urn) == urn_string
+    # Check that the serialization works
+    assert urn.urn_string == urn_string
+    assert repr(urn) == f"<URN {urn_string} parent:None>"
 
 
 def test_service():
@@ -116,6 +172,32 @@ def test_service():
     assert serv.actions == []
     assert serv.properties == []
     assert serv.events == []
+
+
+@pytest.mark.parametrize("entity_type", ["actions", "properties", "events"])
+def test_service_back_references(entity_type):
+    """Check that backrefs are created correctly for properties, actions, and events."""
+    serv = MiotService.parse_raw(DUMMY_SERVICE)
+    assert serv.siid == 1
+    assert serv.urn.type == "service"
+
+    entities = getattr(serv, entity_type)
+    assert len(entities) == 1
+    entity_to_test = entities[0]
+
+    assert entity_to_test.service.siid == serv.siid
+
+
+@pytest.mark.parametrize("entity_type", ["actions", "properties", "events"])
+def test_entity_names(entity_type):
+    """Check that entity name consists of service name and entity's plain name."""
+    serv = MiotService.parse_raw(DUMMY_SERVICE)
+
+    entities = getattr(serv, entity_type)
+    assert len(entities) == 1
+    entity_to_test = entities[0]
+
+    assert entity_to_test.name == f"{serv.name}:{entity_to_test.plain_name}"
 
 
 def test_event():
@@ -143,7 +225,7 @@ def test_property():
     assert prop.piid == 1
     assert prop.urn.type == "property"
     assert prop.format == str
-    assert prop.access == ["read"]
+    assert prop.access == [MiotAccess.Read]
     assert prop.description == "Device Manufacturer"
 
     assert prop.plain_name == "manufacturer"

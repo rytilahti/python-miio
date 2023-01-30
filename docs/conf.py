@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinxcontrib.apidoc",
     "sphinx_click.ext",
+    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -193,3 +194,5 @@ apidoc_toc_file = False
 autodoc_member_order = "groupwise"
 autodoc_inherit_docstrings = True
 autodoc_default_options = {"inherited-members": True}
+
+myst_heading_anchors = 2

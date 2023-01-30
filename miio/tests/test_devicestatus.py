@@ -76,6 +76,24 @@ def test_none():
     assert repr(NoneStatus()) == "<NoneStatus return_none=None>"
 
 
+def test_get_attribute():
+    """Make sure that __get_attribute__ works as expected."""
+
+    class TestStatus(DeviceStatus):
+        @property
+        def existing_attribute(self):
+            return None
+
+    status = TestStatus()
+    with pytest.raises(AttributeError):
+        _ = status.__missing_attribute
+
+    with pytest.raises(AttributeError):
+        _ = status.__missing_dunder__
+
+    assert status.existing_attribute is None
+
+
 def test_sensor_decorator():
     class DecoratedProps(DeviceStatus):
         @property
@@ -123,6 +141,7 @@ def test_setting_decorator_number(mocker):
 
     mocker.patch("miio.Device.send")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d._protocol._device_id = b"12345678"
 
     # Patch status to return our class
     mocker.patch.object(d, "status", return_value=Settings())
@@ -168,6 +187,7 @@ def test_setting_decorator_number_range_attribute(mocker):
 
     mocker.patch("miio.Device.send")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d._protocol._device_id = b"12345678"
 
     # Patch status to return our class
     mocker.patch.object(d, "status", return_value=Settings())
@@ -209,6 +229,7 @@ def test_setting_decorator_enum(mocker):
 
     mocker.patch("miio.Device.send")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d._protocol._device_id = b"12345678"
 
     # Patch status to return our class
     mocker.patch.object(d, "status", return_value=Settings())
@@ -259,4 +280,47 @@ def test_embed():
     assert (
         repr(main)
         == "<MainStatus main_sensor=main SubStatus=<SubStatus sub_sensor=sub>>"
+    )
+
+    # Test attribute access to the sub status
+    assert isinstance(main.SubStatus, SubStatus)
+
+    # Test that __dir__ is implemented correctly
+    assert "SubStatus" in dir(main)
+    assert "SubStatus__sub_sensor" in dir(main)
+
+
+def test_cli_output():
+    """Test the cli output string."""
+
+    class Status(DeviceStatus):
+        @property
+        @sensor("sensor_without_unit")
+        def sensor_without_unit(self) -> int:
+            return 1
+
+        @property
+        @sensor("sensor_with_unit", unit="V")
+        def sensor_with_unit(self) -> int:
+            return 2
+
+        @property
+        @setting("setting_without_unit", setter_name="dummy")
+        def setting_without_unit(self):
+            return 3
+
+        @property
+        @setting("setting_with_unit", unit="V", setter_name="dummy")
+        def setting_with_unit(self):
+            return 4
+
+        @property
+        @sensor("none_sensor")
+        def sensor_returning_none(self):
+            return None
+
+    status = Status()
+    assert (
+        status.__cli_output__
+        == "sensor_without_unit: 1\nsensor_with_unit: 2 V\n[RW] setting_without_unit: 3\n[RW] setting_with_unit: 4 V\n"
     )

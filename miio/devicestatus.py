@@ -5,6 +5,7 @@ from enum import Enum
 from typing import (
     Callable,
     Dict,
+    Iterable,
     Optional,
     Type,
     Union,
@@ -12,6 +13,8 @@ from typing import (
     get_origin,
     get_type_hints,
 )
+
+import attr
 
 from .descriptors import (
     ActionDescriptor,
@@ -71,6 +74,8 @@ class DeviceStatus(metaclass=_StatusMeta):
         s = f"<{self.__class__.__name__}"
         for prop_tuple in props:
             name, prop = prop_tuple
+            if name.startswith("_"):  # skip internals
+                continue
             try:
                 # ignore deprecation warnings
                 with warnings.catch_warnings(record=True):
@@ -115,7 +120,6 @@ class DeviceStatus(metaclass=_StatusMeta):
 
         for name, sensor in other.sensors().items():
             final_name = f"{other_name}__{name}"
-            import attr
 
             self._sensors[final_name] = attr.evolve(sensor, property=final_name)
 
@@ -123,12 +127,56 @@ class DeviceStatus(metaclass=_StatusMeta):
             final_name = f"{other_name}__{name}"
             self._settings[final_name] = attr.evolve(setting, property=final_name)
 
+    def __dir__(self) -> Iterable[str]:
+        """Overridden to include properties from embedded containers."""
+        return (
+            list(super().__dir__())
+            + list(self._embedded)
+            + list(self._sensors)
+            + list(self._settings)
+        )
+
+    @property
+    def __cli_output__(self) -> str:
+        """Return a CLI formatted output of the status."""
+        out = ""
+        for entry in list(self.sensors().values()) + list(self.settings().values()):
+            try:
+                value = getattr(self, entry.property)
+            except KeyError:
+                continue  # skip missing properties
+
+            if value is None:  # skip none values
+                _LOGGER.debug("Skipping %s because it's None", entry.name)
+                continue
+
+            if isinstance(entry, SettingDescriptor):
+                out += "[RW] "
+
+            out += f"{entry.name}: {value}"
+
+            if entry.unit is not None:
+                out += f" {entry.unit}"
+
+            out += "\n"
+
+        return out
+
     def __getattr__(self, item):
         """Overridden to lookup properties from embedded containers."""
-        if "__" not in item:
-            return super().__getattr__(item)
+        if item.startswith("__") and item.endswith("__"):
+            return super().__getattribute__(item)
 
-        embed, prop = item.split("__")
+        if item in self._embedded:
+            return self._embedded[item]
+
+        if "__" not in item:
+            return super().__getattribute__(item)
+
+        embed, prop = item.split("__", maxsplit=1)
+        if not embed or not prop:
+            return super().__getattribute__(item)
+
         return getattr(self._embedded[embed], prop)
 
 

@@ -8,7 +8,7 @@ import json
 import logging
 import re
 from functools import partial, wraps
-from typing import Any, Callable, ClassVar, Dict, List, Set, Type, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Set, Type, Union
 
 import click
 
@@ -104,13 +104,12 @@ class LiteralParamType(click.ParamType):
 
 
 class GlobalContextObject:
-    def __init__(self, debug: int = 0, output: Callable = None):
+    def __init__(self, debug: int = 0, output: Optional[Callable] = None):
         self.debug = debug
         self.output = output
 
 
 class DeviceGroupMeta(type):
-
     _device_classes: Set[Type] = set()
     _supported_models: ClassVar[List[str]]
     _mappings: ClassVar[Dict[str, Any]]
@@ -304,8 +303,13 @@ def format_output(
                     msg = msg_fmt.format(**kwargs)
                 if msg:
                     echo(msg.strip())
-            kwargs["result"] = func(*args, **kwargs)
-            if result_msg_fmt:
+            result = kwargs["result"] = func(*args, **kwargs)
+            if (
+                not callable(result_msg_fmt)
+                and getattr(result, "__cli_output__", None) is not None
+            ):
+                echo(result.__cli_output__)
+            elif result_msg_fmt:
                 if callable(result_msg_fmt):
                     result_msg = result_msg_fmt(**kwargs)
                 else:
@@ -330,6 +334,7 @@ def json_output(pretty=False):
                 echo(json.dumps(ex.args[0], indent=indent))
                 return
 
+            # TODO: __json__ is not used anywhere and could be removed
             get_json_data_func = getattr(result, "__json__", None)
             data_variable = getattr(result, "data", None)
             if get_json_data_func is not None:

@@ -82,4 +82,4 @@ Status reporting
     or an issue, if you do not want to implement it on your own!
 
 
-:py:class:`API <miio.yeelight>`
+:py:class:`API <miio.integrations.yeelight.light>`
