@@ -140,6 +140,7 @@ def test_setting_decorator_number(mocker):
             return 1
 
     mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
 
     # Patch status to return our class
@@ -185,7 +186,9 @@ def test_setting_decorator_number_range_attribute(mocker):
             return 1
 
     mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d._protocol._device_id = b"12345678"
 
     # Patch status to return our class
     mocker.patch.object(d, "status", return_value=Settings())
@@ -226,7 +229,9 @@ def test_setting_decorator_enum(mocker):
             return TestEnum.First
 
     mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    d._protocol._device_id = b"12345678"
 
     # Patch status to return our class
     mocker.patch.object(d, "status", return_value=Settings())
