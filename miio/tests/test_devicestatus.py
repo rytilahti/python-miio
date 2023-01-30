@@ -263,7 +263,7 @@ def test_cached_descriptors(getter_name, mocker):
     mocker.patch("miio.Device._sensor_descriptors_from_status", return_value={})
     mocker.patch("miio.Device._setting_descriptors_from_status", return_value={})
     mocker.patch("miio.Device._action_descriptors", return_value={})
-    for i in range(5):
+    for _i in range(5):
         getter()
     initialize_descriptors.assert_called_once()
 
