@@ -227,8 +227,6 @@ class Device(metaclass=DeviceGroupMeta):
 
     def _initialize_descriptors(self) -> None:
         """Cache all the descriptors once on the first call."""
-        if self._sensors is not None:
-            return
 
         status = self.status()
 
