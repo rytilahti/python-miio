@@ -54,13 +54,14 @@ class PushServer:
         await push_server.stop()
     """
 
-    def __init__(self, device_ip=None):
+    def __init__(self, *, device_ip=None, device_id=None):
         """Initialize the class."""
         self._device_ip = device_ip
 
         self._address = "0.0.0.0"  # nosec
         self._server_ip = None
-        self._server_id = int(FAKE_DEVICE_ID)
+
+        self._device_id = device_id if device_id is not None else int(FAKE_DEVICE_ID)
         self._server_model = FAKE_DEVICE_MODEL
 
         self._loop = None
@@ -282,7 +283,7 @@ class PushServer:
 
         target_data = {
             "command": command,
-            "did": str(self.server_id),
+            "did": str(self.device_id),
             "extra": info.command_extra,
             "id": message_id,
             "ip": self.server_ip,
@@ -316,9 +317,9 @@ class PushServer:
         return self._server_ip
 
     @property
-    def server_id(self):
+    def device_id(self):
         """Return the ID of the fake device beeing emulated."""
-        return self._server_id
+        return self._device_id
 
     @property
     def server_model(self):

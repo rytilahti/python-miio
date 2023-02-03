@@ -11,7 +11,7 @@ from .serverprotocol import (
 
 HOST = "127.0.0.1"
 PORT = 1234
-SERVER_ID = 4141
+DEVICE_ID = 4141
 DUMMY_TOKEN = bytes.fromhex("0" * 32)
 
 
@@ -20,7 +20,7 @@ def protocol(mocker, event_loop) -> ServerProtocol:
     server = mocker.Mock()
 
     # Mock server id
-    type(server).server_id = mocker.PropertyMock(return_value=SERVER_ID)
+    type(server).device_id = mocker.PropertyMock(return_value=DEVICE_ID)
     socket = mocker.Mock()
 
     proto = ServerProtocol(event_loop, socket, server)
@@ -37,7 +37,7 @@ def test_send_ping_ack(protocol: ServerProtocol, mocker):
     cargs = protocol.transport.sendto.call_args[0]
 
     m = Message.parse(cargs[0])
-    assert int.from_bytes(m.header.value.device_id, "big") == SERVER_ID
+    assert int.from_bytes(m.header.value.device_id, "big") == DEVICE_ID
     assert m.data.length == 0
 
     assert cargs[1][0] == HOST
