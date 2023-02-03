@@ -32,7 +32,7 @@ class ServerProtocol:
         timestamp = calendar.timegm(datetime.datetime.now().timetuple())
         # ACK packet not signed, 16 bytes header + 16 bytes of zeroes
         return struct.pack(
-            ">HHIII16s", 0x2131, 32, 0, self.server.server_id, timestamp, bytes(16)
+            ">HHIII16s", 0x2131, 32, 0, self.server.device_id, timestamp, bytes(16)
         )
 
     def connection_made(self, transport):
@@ -42,7 +42,7 @@ class ServerProtocol:
         _LOGGER.info(
             "Miio push server started with address=%s server_id=%s",
             self.server._address,
-            self.server.server_id,
+            self.server.device_id,
         )
 
     def connection_lost(self, exc):
@@ -54,7 +54,7 @@ class ServerProtocol:
         _LOGGER.debug("%s:%s=>PING", host, port)
         m = self._build_ack()
         self.transport.sendto(m, (host, port))
-        _LOGGER.debug("%s:%s<=ACK(server_id=%s)", host, port, self.server.server_id)
+        _LOGGER.debug("%s:%s<=ACK(server_id=%s)", host, port, self.server.device_id)
 
     def _create_message(self, data, token, device_id):
         """Create a message to be sent to the client."""
@@ -78,7 +78,7 @@ class ServerProtocol:
             payload = {}
 
         data = {**payload, "id": msg_id}
-        msg = self._create_message(data, token, device_id=self.server.server_id)
+        msg = self._create_message(data, token, device_id=self.server.device_id)
 
         self.transport.sendto(msg, (host, port))
         _LOGGER.debug(">> %s:%s: %s", host, port, data)
