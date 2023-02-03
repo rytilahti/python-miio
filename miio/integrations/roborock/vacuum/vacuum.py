@@ -338,9 +338,9 @@ class RoborockVacuum(Device, VacuumInterface):
     def status(self) -> VacuumStatus:
         """Return status of the vacuum."""
         status = self.vacuum_status()
-        status.embed(self.consumable_status())
-        status.embed(self.clean_history())
-        status.embed(self.dnd_status())
+        status.embed("consumables", self.consumable_status())
+        status.embed("cleaning_history", self.clean_history())
+        status.embed("dnd", self.dnd_status())
         return status
 
     @command()
