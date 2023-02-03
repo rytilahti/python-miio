@@ -30,7 +30,7 @@ class UpdateHelper:
         main_status = self._main_update_method()
         for name, method in statuses.items():
             try:
-                main_status.embed(method())
+                main_status.embed(name, method())
                 _LOGGER.debug(f"Success for {name}")
             except DeviceException as ex:
                 _LOGGER.debug(
