@@ -106,7 +106,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         """
         return self._settings  # type: ignore[attr-defined]
 
-    def embed(self, other: "DeviceStatus"):
+    def embed(self, name: str, other: "DeviceStatus"):
         """Embed another status container to current one.
 
         This makes it easy to provide a single status response for cases where responses
@@ -115,18 +115,16 @@ class DeviceStatus(metaclass=_StatusMeta):
         Internally, this will prepend the name of the other class to the property names,
         and override the __getattribute__ to lookup attributes in the embedded containers.
         """
-        other_name = str(other.__class__.__name__)
-
-        self._embedded[other_name] = other
+        self._embedded[name] = other
         other._parent = self  # type: ignore[attr-defined]
 
-        for name, sensor in other.sensors().items():
-            final_name = f"{other_name}__{name}"
+        for sensor_name, sensor in other.sensors().items():
+            final_name = f"{name}__{sensor_name}"
 
             self._sensors[final_name] = attr.evolve(sensor, property=final_name)
 
-        for name, setting in other.settings().items():
-            final_name = f"{other_name}__{name}"
+        for setting_name, setting in other.settings().items():
+            final_name = f"{name}__{setting_name}"
             self._settings[final_name] = attr.evolve(setting, property=final_name)
 
     def __dir__(self) -> Iterable[str]:
