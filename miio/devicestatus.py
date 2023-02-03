@@ -39,6 +39,7 @@ class _StatusMeta(type):
         cls._sensors: Dict[str, SensorDescriptor] = {}
         cls._settings: Dict[str, SettingDescriptor] = {}
 
+        cls._parent: Optional["DeviceStatus"] = None
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
         descriptor_map = {
@@ -117,6 +118,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         other_name = str(other.__class__.__name__)
 
         self._embedded[other_name] = other
+        other._parent = self  # type: ignore[attr-defined]
 
         for name, sensor in other.sensors().items():
             final_name = f"{other_name}__{name}"

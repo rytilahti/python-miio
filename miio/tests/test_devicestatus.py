@@ -270,6 +270,7 @@ def test_embed():
     main.embed(sub)
     sensors = main.sensors()
     assert len(sensors) == 2
+    assert sub._parent == main
 
     assert getattr(main, sensors["main_sensor"].property) == "main"
     assert getattr(main, sensors["SubStatus__sub_sensor"].property) == "sub"
