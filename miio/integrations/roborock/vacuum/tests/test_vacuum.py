@@ -4,9 +4,10 @@ from unittest.mock import patch
 
 import pytest
 
-from miio import RoborockVacuum, UnsupportedFeatureException
-from miio.tests.dummies import DummyDevice
+from miio import DeviceError, RoborockVacuum, UnsupportedFeatureException
+from miio.tests.dummies import DummyDevice, DummyMiIOProtocol
 
+from ..updatehelper import UpdateHelper
 from ..vacuum import (
     ROCKROBO_Q7_MAX,
     ROCKROBO_S7,
@@ -16,6 +17,20 @@ from ..vacuum import (
     WaterFlow,
 )
 from ..vacuumcontainers import VacuumStatus
+
+
+class DummyRoborockProtocol(DummyMiIOProtocol):
+    """Roborock-specific dummy protocol handler.
+
+    The vacuum reports 'unknown_method' instead of device error for unknown commands.
+    """
+
+    def send(self, command: str, parameters=None, retry_count=3, extra_parameters=None):
+        """Overridden send() to return values from `self.return_values`."""
+        try:
+            return super().send(command, parameters, retry_count, extra_parameters)
+        except DeviceError:
+            return "unknown_method"
 
 
 class DummyVacuum(DummyDevice, RoborockVacuum):
@@ -48,7 +63,7 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
         }
         self._maps = None
         self._map_enum_cache = None
-
+        self._status_helper = UpdateHelper(self.vacuum_status)
         self.dummies = {
             "consumables": [
                 {
@@ -138,6 +153,7 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
         }
 
         super().__init__(args, kwargs)
+        self._protocol = DummyRoborockProtocol(self)
 
     def set_water_box_custom_mode_callback(self, parameters):
         assert parameters == self.dummies["water_box_custom_mode"]

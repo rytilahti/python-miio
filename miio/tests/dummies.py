@@ -1,3 +1,6 @@
+from miio import DeviceError
+
+
 class DummyMiIOProtocol:
     """DummyProtocol allows you mock MiIOProtocol."""
 
@@ -8,7 +11,10 @@ class DummyMiIOProtocol:
 
     def send(self, command: str, parameters=None, retry_count=3, extra_parameters=None):
         """Overridden send() to return values from `self.return_values`."""
-        return self.dummy_device.return_values[command](parameters)
+        try:
+            return self.dummy_device.return_values[command](parameters)
+        except KeyError:
+            raise DeviceError({"code": -32601, "message": "Method not found."})
 
 
 class DummyDevice:
