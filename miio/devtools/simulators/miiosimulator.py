@@ -10,7 +10,7 @@ from yaml import safe_load
 
 from miio import PushServer
 
-from .common import create_info_response, mac_from_model
+from .common import create_info_response, did_and_mac_for_model
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -135,13 +135,13 @@ class MiioSimulator:
 
 
 async def main(dev):
-    server = PushServer()
+    did, mac = did_and_mac_for_model(dev)
+    server = PushServer(device_id=did)
 
     _ = MiioSimulator(dev=dev, server=server)
-    mac = mac_from_model(dev._model)
     server.add_method("miIO.info", create_info_response(dev._model, "127.0.0.1", mac))
 
-    transport, proto = await server.start()
+    await server.start()
 
 
 @click.command()
