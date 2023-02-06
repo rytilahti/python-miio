@@ -193,12 +193,12 @@ class Device(metaclass=DeviceGroupMeta):
                 )
             setting = cast(EnumSettingDescriptor, setting)
             if (
-                setting.type == SettingType.Enum
+                setting.setting_type == SettingType.Enum
                 and setting.choices_attribute is not None
             ):
                 retrieve_choices_function = getattr(self, setting.choices_attribute)
                 setting.choices = retrieve_choices_function()
-            if setting.type == SettingType.Number:
+            if setting.setting_type == SettingType.Number:
                 setting = cast(NumberSettingDescriptor, setting)
                 if setting.range_attribute is not None:
                     range_def = getattr(self, setting.range_attribute)
