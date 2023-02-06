@@ -82,6 +82,7 @@ class MiotFormat(type):
             "bool": bool,
             "string": str,
             "float": float,
+            "none": None,
         }
         return type_map[input]
 
@@ -303,6 +304,7 @@ class MiotProperty(MiotBaseModel):
                 unit=self.unit,
                 choices=choices,
                 extras=self.extras,
+                type=self.format,
             )
             return desc
         else:
@@ -322,6 +324,7 @@ class MiotProperty(MiotBaseModel):
                 step=self.range[2],
                 unit=self.unit,
                 extras=self.extras,
+                type=self.format,
             )
             return desc
         else:
@@ -335,6 +338,7 @@ class MiotProperty(MiotBaseModel):
             property=self.name,
             unit=self.unit,
             extras=self.extras,
+            type=bool,
         )
 
     def _create_sensor(self) -> SensorDescriptor:

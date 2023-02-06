@@ -191,20 +191,28 @@ class Device(metaclass=DeviceGroupMeta):
                 raise Exception(
                     f"Neither setter or setter_name was defined for {setting}"
                 )
-            setting = cast(EnumSettingDescriptor, setting)
-            if (
-                setting.type == SettingType.Enum
-                and setting.choices_attribute is not None
-            ):
-                retrieve_choices_function = getattr(self, setting.choices_attribute)
-                setting.choices = retrieve_choices_function()
-            if setting.type == SettingType.Number:
+
+            if setting.setting_type == SettingType.Enum:
+                setting = cast(EnumSettingDescriptor, setting)
+                if setting.choices_attribute is not None:
+                    retrieve_choices_function = getattr(self, setting.choices_attribute)
+                    setting.choices = retrieve_choices_function()
+
+            elif setting.setting_type == SettingType.Number:
                 setting = cast(NumberSettingDescriptor, setting)
                 if setting.range_attribute is not None:
                     range_def = getattr(self, setting.range_attribute)
                     setting.min_value = range_def.min_value
                     setting.max_value = range_def.max_value
                     setting.step = range_def.step
+
+            elif setting.setting_type == SettingType.Boolean:
+                pass  # just to exhaust known types
+
+            else:
+                raise NotImplementedError(
+                    "Unknown setting type: %s" % setting.setting_type
+                )
 
         return settings
 
