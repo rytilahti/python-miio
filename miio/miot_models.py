@@ -280,7 +280,7 @@ class MiotProperty(MiotBaseModel):
 
         # Handle settable booleans
         elif MiotAccess.Write in self.access and self.format == bool:
-            self._create_boolean_setting()
+            return self._create_boolean_setting()
 
         # Fallback to sensors
         return self._create_sensor()
