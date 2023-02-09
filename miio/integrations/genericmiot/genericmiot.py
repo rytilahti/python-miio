@@ -1,10 +1,10 @@
 import logging
 from functools import partial
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional
 
 import click
 
-from miio import DeviceInfo, DeviceStatus, MiotDevice
+from miio import DeviceInfo, MiotDevice
 from miio.click_common import LiteralParamType, command, format_output
 from miio.descriptors import ActionDescriptor, SensorDescriptor, SettingDescriptor
 from miio.miot_cloud import MiotCloud
@@ -17,150 +17,10 @@ from miio.miot_models import (
     MiotService,
 )
 
+from .cli_helpers import pretty_actions, pretty_settings
+from .status import GenericMiotStatus
+
 _LOGGER = logging.getLogger(__name__)
-
-
-def pretty_actions(result: Dict[str, ActionDescriptor]):
-    """Pretty print actions."""
-    out = ""
-    service = None
-    for _, desc in result.items():
-        miot_prop: MiotProperty = desc.extras["miot_action"]
-        # service is marked as optional due pydantic backrefs..
-        serv = cast(MiotService, miot_prop.service)
-        if service is None or service.siid != serv.siid:
-            service = serv
-            out += f"[bold]{service.description} ({service.name})[/bold]\n"
-
-        out += f"\t{desc.id}\t\t{desc.name}"
-        if desc.inputs:
-            for idx, input_ in enumerate(desc.inputs, start=1):
-                param = input_.extras[
-                    "miot_property"
-                ]  # TODO: hack until descriptors get support for descriptions
-                param_desc = f"\n\t\tParameter #{idx}: {param.name} ({param.description}) ({param.format}) {param.pretty_input_constraints}"
-                out += param_desc
-
-        out += "\n"
-
-    return out
-
-
-def pretty_settings(result: Dict[str, SettingDescriptor]):
-    """Pretty print settings."""
-    out = ""
-    verbose = False
-    service = None
-    for _, desc in result.items():
-        miot_prop: MiotProperty = desc.extras["miot_property"]
-        # service is marked as optional due pydantic backrefs..
-        serv = cast(MiotService, miot_prop.service)
-        if service is None or service.siid != serv.siid:
-            service = serv
-            out += f"[bold]{service.name}[/bold] ({service.description})\n"
-
-        out += f"\t{desc.name} ({desc.id}, access: {miot_prop.pretty_access})\n"
-        if verbose:
-            out += f'  urn: {repr(desc.extras["urn"])}\n'
-            out += f'  siid: {desc.extras["siid"]}\n'
-            out += f'  piid: {desc.extras["piid"]}\n'
-
-    return out
-
-
-class GenericMiotStatus(DeviceStatus):
-    """Generic status for miot devices."""
-
-    def __init__(self, response, dev):
-        self._model: DeviceModel = dev._miot_model
-        self._dev = dev
-        self._data = {elem["did"]: elem["value"] for elem in response}
-        # for hardcoded json output.. see click_common.json_output
-        self.data = self._data
-
-        self._data_by_siid_piid = {
-            (elem["siid"], elem["piid"]): elem["value"] for elem in response
-        }
-
-    def __getattr__(self, item):
-        """Return attribute for name.
-
-        This is overridden to provide access to properties using (siid, piid) tuple.
-        """
-        # let devicestatus handle dunder methods
-        if item.startswith("__") and item.endswith("__"):
-            return super().__getattr__(item)
-
-        # TODO: find a better way to encode the property information
-        serv, prop = item.split(":")
-        prop = self._model.get_property(serv, prop)
-        value = self._data[item]
-
-        # TODO: this feels like a wrong place to convert value to enum..
-        if prop.choices is not None:
-            for choice in prop.choices:
-                if choice.value == value:
-                    return choice.description
-
-            _LOGGER.warning(
-                "Unable to find choice for value: %s: %s", value, prop.choices
-            )
-
-        return self._data[item]
-
-    @property
-    def device(self) -> "GenericMiot":
-        """Return the device which returned this status."""
-        return self._dev
-
-    def property_dict(self) -> Dict[str, MiotProperty]:
-        """Return name-keyed dictionary of properties."""
-        res = {}
-
-        # We use (siid, piid) to locate the property as not all devices mirror the did in response
-        for (siid, piid), value in self._data_by_siid_piid.items():
-            prop = self._model.get_property_by_siid_piid(siid, piid)
-            prop.value = value
-            res[prop.name] = prop
-
-        return res
-
-    @property
-    def __cli_output__(self):
-        """Return a CLI printable status."""
-        out = ""
-        props = self.property_dict()
-        service = None
-        for _name, prop in props.items():
-            miot_prop: MiotProperty = prop.extras["miot_property"]
-            if service is None or miot_prop.siid != service.siid:
-                service = miot_prop.service
-                out += f"Service [bold]{service.description} ({service.name})[/bold]\n"  # type: ignore  # FIXME
-
-            out += f"\t{prop.description} ({prop.name}, access: {prop.pretty_access}): {prop.pretty_value}"
-
-            if MiotAccess.Write in miot_prop.access:
-                out += f" ({prop.format}"
-                if prop.pretty_input_constraints is not None:
-                    out += f", {prop.pretty_input_constraints}"
-                out += ")"
-
-            if self.device._debug > 1:
-                out += "\n\t[bold]Extras[/bold]\n"
-                for extra_key, extra_value in prop.extras.items():
-                    out += f"\t\t{extra_key} = {extra_value}\n"
-
-            out += "\n"
-
-        return out
-
-    def __repr__(self):
-        s = f"<{self.__class__.__name__}"
-        for name, value in self.property_dict().items():
-            s += f" {name}={value}"
-        s += ">"
-
-        return s
 
 
 class GenericMiot(MiotDevice):

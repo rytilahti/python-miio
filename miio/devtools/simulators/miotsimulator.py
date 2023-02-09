@@ -12,7 +12,7 @@ from miio import PushServer
 from miio.miot_cloud import MiotCloud
 from miio.miot_models import DeviceModel, MiotAccess, MiotProperty, MiotService
 
-from .common import create_info_response, mac_from_model
+from .common import create_info_response, did_and_mac_for_model
 
 _LOGGER = logging.getLogger(__name__)
 UNSET = -10000
@@ -248,9 +248,8 @@ class MiotSimulator:
 
 
 async def main(dev, model):
-    server = PushServer()
-
-    mac = mac_from_model(model)
+    device_id, mac = did_and_mac_for_model(model)
+    server = PushServer(device_id=device_id)
     simulator = MiotSimulator(device_model=dev)
     server.add_method("miIO.info", create_info_response(model, "127.0.0.1", mac))
     server.add_method("action", simulator.action)

@@ -82,6 +82,7 @@ class MiotFormat(type):
             "bool": bool,
             "string": str,
             "float": float,
+            "none": None,
         }
         return type_map[input]
 
@@ -137,6 +138,15 @@ class MiotBaseModel(BaseModel):
         if self.service is not None and self.urn.name is not None:
             return f"{self.service.name}:{self.urn.name}"  # type: ignore
         return "unitialized"
+
+    @property
+    def normalized_name(self) -> str:
+        """Return a normalized name.
+
+        This returns a normalized :meth:`name` that can be used as a python identifier,
+        currently meaning that ':' and '-' are replaced with '_'.
+        """
+        return self.name.replace(":", "_").replace("-", "_")
 
 
 class MiotAction(MiotBaseModel):
@@ -196,6 +206,7 @@ class MiotProperty(MiotBaseModel):
 
     range: Optional[List[int]] = Field(alias="value-range")
     choices: Optional[List[MiotEnumValue]] = Field(alias="value-list")
+    gatt_access: Optional[List[Any]] = Field(alias="gatt-access")
 
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
@@ -279,7 +290,7 @@ class MiotProperty(MiotBaseModel):
 
         # Handle settable booleans
         elif MiotAccess.Write in self.access and self.format == bool:
-            self._create_boolean_setting()
+            return self._create_boolean_setting()
 
         # Fallback to sensors
         return self._create_sensor()
@@ -299,10 +310,11 @@ class MiotProperty(MiotBaseModel):
             desc = EnumSettingDescriptor(
                 id=self.name,
                 name=self.description,
-                property=self.name,
+                property=self.normalized_name,
                 unit=self.unit,
                 choices=choices,
                 extras=self.extras,
+                type=self.format,
             )
             return desc
         else:
@@ -316,12 +328,13 @@ class MiotProperty(MiotBaseModel):
             desc = NumberSettingDescriptor(
                 id=self.name,
                 name=self.description,
-                property=self.name,
+                property=self.normalized_name,
                 min_value=self.range[0],
                 max_value=self.range[1],
                 step=self.range[2],
                 unit=self.unit,
                 extras=self.extras,
+                type=self.format,
             )
             return desc
         else:
@@ -332,9 +345,10 @@ class MiotProperty(MiotBaseModel):
         return BooleanSettingDescriptor(
             id=self.name,
             name=self.description,
-            property=self.name,
+            property=self.normalized_name,
             unit=self.unit,
             extras=self.extras,
+            type=bool,
         )
 
     def _create_sensor(self) -> SensorDescriptor:
@@ -342,7 +356,7 @@ class MiotProperty(MiotBaseModel):
         return SensorDescriptor(
             id=self.name,
             name=self.description,
-            property=self.name,
+            property=self.normalized_name,
             type=self.format,
             extras=self.extras,
         )
@@ -403,6 +417,15 @@ class MiotService(BaseModel):
     def name(self) -> str:
         """Return service name."""
         return self.urn.name
+
+    @property
+    def normalized_name(self) -> str:
+        """Return normalized service name.
+
+        This returns a normalized :meth:`name` that can be used as a python identifier,
+        currently meaning that ':' and '-' are replaced with '_'.
+        """
+        return self.urn.name.replace(":", "_").replace("-", "_")
 
     class Config:
         extra = "forbid"

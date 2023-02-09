@@ -39,6 +39,7 @@ class _StatusMeta(type):
         cls._sensors: Dict[str, SensorDescriptor] = {}
         cls._settings: Dict[str, SettingDescriptor] = {}
 
+        cls._parent: Optional["DeviceStatus"] = None
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
         descriptor_map = {
@@ -105,7 +106,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         """
         return self._settings  # type: ignore[attr-defined]
 
-    def embed(self, other: "DeviceStatus"):
+    def embed(self, name: str, other: "DeviceStatus"):
         """Embed another status container to current one.
 
         This makes it easy to provide a single status response for cases where responses
@@ -114,17 +115,16 @@ class DeviceStatus(metaclass=_StatusMeta):
         Internally, this will prepend the name of the other class to the property names,
         and override the __getattribute__ to lookup attributes in the embedded containers.
         """
-        other_name = str(other.__class__.__name__)
+        self._embedded[name] = other
+        other._parent = self  # type: ignore[attr-defined]
 
-        self._embedded[other_name] = other
-
-        for name, sensor in other.sensors().items():
-            final_name = f"{other_name}__{name}"
+        for sensor_name, sensor in other.sensors().items():
+            final_name = f"{name}__{sensor_name}"
 
             self._sensors[final_name] = attr.evolve(sensor, property=final_name)
 
-        for name, setting in other.settings().items():
-            final_name = f"{other_name}__{name}"
+        for setting_name, setting in other.settings().items():
+            final_name = f"{name}__{setting_name}"
             self._settings[final_name] = attr.evolve(setting, property=final_name)
 
     def __dir__(self) -> Iterable[str]:
@@ -180,7 +180,9 @@ class DeviceStatus(metaclass=_StatusMeta):
         return getattr(self._embedded[embed], prop)
 
 
-def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
+def sensor(
+    name: str, *, id: Optional[str] = None, unit: Optional[str] = None, **kwargs
+):
     """Syntactic sugar to create SensorDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
@@ -193,7 +195,7 @@ def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
 
     def decorator_sensor(func):
         property_name = str(func.__name__)
-        qualified_name = str(func.__qualname__)
+        qualified_name = id or str(func.__qualname__)
 
         def _sensor_type_for_return_type(func):
             rtype = get_type_hints(func).get("return")
@@ -221,6 +223,7 @@ def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
 def setting(
     name: str,
     *,
+    id: Optional[str] = None,
     setter: Optional[Callable] = None,
     setter_name: Optional[str] = None,
     unit: Optional[str] = None,
@@ -247,7 +250,7 @@ def setting(
 
     def decorator_setting(func):
         property_name = str(func.__name__)
-        qualified_name = str(func.__qualname__)
+        qualified_name = id or str(func.__qualname__)
 
         if setter is None and setter_name is None:
             raise Exception("setter_name needs to be defined")
@@ -290,7 +293,7 @@ def setting(
     return decorator_setting
 
 
-def action(name: str, **kwargs):
+def action(name: str, *, id: Optional[str] = None, **kwargs):
     """Syntactic sugar to create ActionDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
@@ -303,7 +306,7 @@ def action(name: str, **kwargs):
 
     def decorator_action(func):
         property_name = str(func.__name__)
-        qualified_name = str(func.__qualname__)
+        qualified_name = id or str(func.__qualname__)
 
         descriptor = ActionDescriptor(
             id=qualified_name,

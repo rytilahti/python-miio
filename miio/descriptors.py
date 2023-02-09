@@ -31,6 +31,8 @@ class Descriptor:
 
     id: str
     name: str
+    type: Optional[type] = None
+    extras: Dict = attr.ib(factory=dict, repr=False)
 
 
 @attr.s(auto_attribs=True)
@@ -40,10 +42,9 @@ class ActionDescriptor(Descriptor):
     method_name: Optional[str] = attr.ib(default=None, repr=False)
     method: Optional[Callable] = attr.ib(default=None, repr=False)
     inputs: Optional[List[Any]] = attr.ib(default=None, repr=True)
-    extras: Dict = attr.ib(factory=dict, repr=False)
 
 
-@attr.s(auto_attribs=True)
+@attr.s(auto_attribs=True, kw_only=True)
 class SensorDescriptor(Descriptor):
     """Describes a sensor exposed by the device.
 
@@ -54,9 +55,7 @@ class SensorDescriptor(Descriptor):
     """
 
     property: str
-    type: type
     unit: Optional[str] = None
-    extras: Dict = attr.ib(factory=dict, repr=False)
 
 
 class SettingType(Enum):
@@ -72,10 +71,9 @@ class SettingDescriptor(Descriptor):
 
     property: str
     unit: Optional[str] = None
-    type = SettingType.Undefined
+    setting_type = SettingType.Undefined
     setter: Optional[Callable] = attr.ib(default=None, repr=False)
     setter_name: Optional[str] = attr.ib(default=None, repr=False)
-    extras: Dict = attr.ib(factory=dict, repr=False)
 
     def cast_value(self, value: int):
         """Casts value to the expected type."""
@@ -84,21 +82,22 @@ class SettingDescriptor(Descriptor):
             SettingType.Enum: int,
             SettingType.Number: int,
         }
-        return cast_map[self.type](int(value))
+        return cast_map[self.setting_type](int(value))
 
 
 @attr.s(auto_attribs=True, kw_only=True)
 class BooleanSettingDescriptor(SettingDescriptor):
     """Presents a settable boolean value."""
 
-    type: SettingType = SettingType.Boolean
+    type: type = bool
+    setting_type: SettingType = SettingType.Boolean
 
 
 @attr.s(auto_attribs=True, kw_only=True)
 class EnumSettingDescriptor(SettingDescriptor):
     """Presents a settable, enum-based value."""
 
-    type: SettingType = SettingType.Enum
+    setting_type: SettingType = SettingType.Enum
     choices_attribute: Optional[str] = attr.ib(default=None, repr=False)
     choices: Optional[Type[Enum]] = attr.ib(default=None, repr=False)
 
@@ -115,4 +114,5 @@ class NumberSettingDescriptor(SettingDescriptor):
     max_value: int
     step: int
     range_attribute: Optional[str] = attr.ib(default=None)
-    type: SettingType = SettingType.Number
+    type: type = int
+    setting_type: SettingType = SettingType.Number
