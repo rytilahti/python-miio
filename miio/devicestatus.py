@@ -180,7 +180,9 @@ class DeviceStatus(metaclass=_StatusMeta):
         return getattr(self._embedded[embed], prop)
 
 
-def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
+def sensor(
+    name: str, *, id: Optional[str] = None, unit: Optional[str] = None, **kwargs
+):
     """Syntactic sugar to create SensorDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
@@ -193,7 +195,7 @@ def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
 
     def decorator_sensor(func):
         property_name = str(func.__name__)
-        qualified_name = str(func.__qualname__)
+        qualified_name = id or str(func.__qualname__)
 
         def _sensor_type_for_return_type(func):
             rtype = get_type_hints(func).get("return")
@@ -221,6 +223,7 @@ def sensor(name: str, *, unit: Optional[str] = None, **kwargs):
 def setting(
     name: str,
     *,
+    id: Optional[str] = None,
     setter: Optional[Callable] = None,
     setter_name: Optional[str] = None,
     unit: Optional[str] = None,
@@ -247,7 +250,7 @@ def setting(
 
     def decorator_setting(func):
         property_name = str(func.__name__)
-        qualified_name = str(func.__qualname__)
+        qualified_name = id or str(func.__qualname__)
 
         if setter is None and setter_name is None:
             raise Exception("setter_name needs to be defined")
@@ -290,7 +293,7 @@ def setting(
     return decorator_setting
 
 
-def action(name: str, **kwargs):
+def action(name: str, *, id: Optional[str] = None, **kwargs):
     """Syntactic sugar to create ActionDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
@@ -303,7 +306,7 @@ def action(name: str, **kwargs):
 
     def decorator_action(func):
         property_name = str(func.__name__)
-        qualified_name = str(func.__qualname__)
+        qualified_name = id or str(func.__qualname__)
 
         descriptor = ActionDescriptor(
             id=qualified_name,
