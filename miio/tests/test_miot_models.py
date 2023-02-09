@@ -226,6 +226,7 @@ def test_entity_names(entity_type):
         entity_to_test.normalized_name
         == f"{_normalize_name(serv.name)}_{_normalize_name(plain_name)}"
     )
+    assert entity_to_test.normalized_name.isidentifier() is True
 
 
 def test_event():
