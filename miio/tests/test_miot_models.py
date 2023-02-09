@@ -214,8 +214,18 @@ def test_entity_names(entity_type):
     entities = getattr(serv, entity_type)
     assert len(entities) == 1
     entity_to_test = entities[0]
+    plain_name = entity_to_test.plain_name
 
-    assert entity_to_test.name == f"{serv.name}:{entity_to_test.plain_name}"
+    assert entity_to_test.name == f"{serv.name}:{plain_name}"
+
+    def _normalize_name(x):
+        return x.replace("-", "_").replace(":", "_")
+
+    # normalized_name should be a valid python identifier based on the normalized service name and normalized plain name
+    assert (
+        entity_to_test.normalized_name
+        == f"{_normalize_name(serv.name)}_{_normalize_name(plain_name)}"
+    )
 
 
 def test_event():

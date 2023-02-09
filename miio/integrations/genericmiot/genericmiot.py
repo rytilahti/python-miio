@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from typing import Dict, List, Optional, cast
+from typing import Dict, Iterable, List, Optional, cast
 
 import click
 
@@ -81,6 +81,13 @@ class GenericMiotStatus(DeviceStatus):
         self._data_by_siid_piid = {
             (elem["siid"], elem["piid"]): elem["value"] for elem in response
         }
+        self._data_by_normalized_name = {
+            self._normalize_name(elem["did"]): elem["value"] for elem in response
+        }
+
+    def _normalize_name(self, id_: str) -> str:
+        """Return a cleaned id for dict searches."""
+        return id_.replace(":", "_").replace("-", "_")
 
     def __getattr__(self, item):
         """Return attribute for name.
@@ -91,20 +98,26 @@ class GenericMiotStatus(DeviceStatus):
         if item.startswith("__") and item.endswith("__"):
             return super().__getattr__(item)
 
-        # TODO: find a better way to encode the property information
-        serv, prop = item.split(":")
-        prop = self._model.get_property(serv, prop)
-        value = self._data[item]
+        normalized_name = self._normalize_name(item)
+        if normalized_name in self._data_by_normalized_name:
+            return self._data_by_normalized_name[normalized_name]
 
-        # TODO: this feels like a wrong place to convert value to enum..
-        if prop.choices is not None:
-            for choice in prop.choices:
-                if choice.value == value:
-                    return choice.description
+        # TODO: create a helper method and prohibit using non-normalized names
+        if ":" in item:
+            _LOGGER.warning("Use normalized names for accessing properties")
+            serv, prop = item.split(":")
+            prop = self._model.get_property(serv, prop)
+            value = self._data[item]
 
-            _LOGGER.warning(
-                "Unable to find choice for value: %s: %s", value, prop.choices
-            )
+            # TODO: this feels like a wrong place to convert value to enum..
+            if prop.choices is not None:
+                for choice in prop.choices:
+                    if choice.value == value:
+                        return choice.description
+
+                _LOGGER.warning(
+                    "Unable to find choice for value: %s: %s", value, prop.choices
+                )
 
         return self._data[item]
 
@@ -153,6 +166,10 @@ class GenericMiotStatus(DeviceStatus):
             out += "\n"
 
         return out
+
+    def __dir__(self) -> Iterable[str]:
+        """Return a list of properties."""
+        return list(super().__dir__()) + list(self._data_by_normalized_name.keys())
 
     def __repr__(self):
         s = f"<{self.__class__.__name__}"

@@ -139,6 +139,15 @@ class MiotBaseModel(BaseModel):
             return f"{self.service.name}:{self.urn.name}"  # type: ignore
         return "unitialized"
 
+    @property
+    def normalized_name(self) -> str:
+        """Return a normalized name.
+
+        This returns a normalized :meth:`name` that can be used as a python identifier,
+        currently meaning that ':' and '-' are replaced with '_'.
+        """
+        return self.name.replace(":", "_").replace("-", "_")
+
 
 class MiotAction(MiotBaseModel):
     """Action presentation for miot."""
@@ -300,7 +309,7 @@ class MiotProperty(MiotBaseModel):
             desc = EnumSettingDescriptor(
                 id=self.name,
                 name=self.description,
-                property=self.name,
+                property=self.normalized_name,
                 unit=self.unit,
                 choices=choices,
                 extras=self.extras,
@@ -318,7 +327,7 @@ class MiotProperty(MiotBaseModel):
             desc = NumberSettingDescriptor(
                 id=self.name,
                 name=self.description,
-                property=self.name,
+                property=self.normalized_name,
                 min_value=self.range[0],
                 max_value=self.range[1],
                 step=self.range[2],
@@ -335,7 +344,7 @@ class MiotProperty(MiotBaseModel):
         return BooleanSettingDescriptor(
             id=self.name,
             name=self.description,
-            property=self.name,
+            property=self.normalized_name,
             unit=self.unit,
             extras=self.extras,
             type=bool,
@@ -346,7 +355,7 @@ class MiotProperty(MiotBaseModel):
         return SensorDescriptor(
             id=self.name,
             name=self.description,
-            property=self.name,
+            property=self.normalized_name,
             type=self.format,
             extras=self.extras,
         )
@@ -407,6 +416,15 @@ class MiotService(BaseModel):
     def name(self) -> str:
         """Return service name."""
         return self.urn.name
+
+    @property
+    def normalized_name(self) -> str:
+        """Return normalized service name.
+
+        This returns a normalized :meth:`name` that can be used as a python identifier,
+        currently meaning that ':' and '-' are replaced with '_'.
+        """
+        return self.urn.name.replace(":", "_").replace("-", "_")
 
     class Config:
         extra = "forbid"
