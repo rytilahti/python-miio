@@ -20,6 +20,7 @@ from .exceptions import (
     DeviceError,
     DeviceInfoUnavailableException,
     PayloadDecodeException,
+    UnsupportedFeatureException,
 )
 from .miioprotocol import MiIOProtocol
 
@@ -184,7 +185,7 @@ class Device(metaclass=DeviceGroupMeta):
     ) -> Dict[str, SettingDescriptor]:
         """Get the setting descriptors from a DeviceStatus."""
         settings = status.settings()
-        for setting in settings.values():
+        for key, setting in settings.items():
             if setting.setter_name is not None:
                 setting.setter = getattr(self, setting.setter_name)
             if setting.setter is None:
@@ -196,7 +197,11 @@ class Device(metaclass=DeviceGroupMeta):
                 setting = cast(EnumSettingDescriptor, setting)
                 if setting.choices_attribute is not None:
                     retrieve_choices_function = getattr(self, setting.choices_attribute)
-                    setting.choices = retrieve_choices_function()
+                    try:
+                        setting.choices = retrieve_choices_function()
+                    except UnsupportedFeatureException:
+                        settings.pop(key)
+                        continue
 
             elif setting.setting_type == SettingType.Number:
                 setting = cast(NumberSettingDescriptor, setting)
