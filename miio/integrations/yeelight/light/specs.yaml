@@ -110,6 +110,10 @@ yeelink.light.color7:
   night_light: False
   color_temp: [1700, 6500]
   supports_color: True
+yeelink.light.colora:
+  night_light: False
+  color_temp: [1700, 6500]
+  supports_color: True
 yeelink.light.colorb:
   night_light: False
   color_temp: [1700, 6500]
