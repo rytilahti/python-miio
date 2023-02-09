@@ -197,6 +197,7 @@ class MiotProperty(MiotBaseModel):
 
     range: Optional[List[int]] = Field(alias="value-range")
     choices: Optional[List[MiotEnumValue]] = Field(alias="value-list")
+    gatt_access: Optional[List[Any]] = Field(alias="gatt-access")
 
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
