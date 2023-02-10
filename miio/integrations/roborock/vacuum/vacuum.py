@@ -7,8 +7,8 @@ import math
 import os
 import pathlib
 import time
-from typing import Any, Dict, List, Optional, Type
 from enum import Enum
+from typing import Any, Dict, List, Optional, Type
 
 import click
 import pytz
