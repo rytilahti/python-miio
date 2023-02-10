@@ -531,10 +531,7 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(
-        self,
-        data: Union[List[Any], Dict[str, Any]],
-    ) -> None:
+    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
