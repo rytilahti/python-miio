@@ -342,7 +342,7 @@ class VacuumStatus(VacuumDeviceStatus):
     def current_map_name(self) -> str:
         """The name of the current map with regards to the multi map feature."""
         try:
-            map_list = self.map_list__map_list
+            map_list = self.map_list.map_list
         except AttributeError:
             return str(self.current_map_id)
 
@@ -602,7 +602,7 @@ class CleaningDetails(DeviceStatus):
     def map_name(self) -> str:
         """The name of the map used (multi map feature) during the cleaning run."""
         try:
-            map_list = self._parent.map_list__map_list
+            map_list = self._parent.map_list.map_list
         except AttributeError:
             return str(self.map_id)
 
