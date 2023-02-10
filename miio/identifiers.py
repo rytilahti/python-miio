@@ -11,7 +11,7 @@ class VacuumId(Enum):
     Start = "vacuum:start-sweep"
     Stop = "vacuum:stop-sweeping"
     Pause = "vacuum:pause-sweeping"
-    Home = "battery:start-charge"
+    ReturnHome = "battery:start-charge"
     Locate = "identify:identify"
 
     # Settings
@@ -19,6 +19,6 @@ class VacuumId(Enum):
     FanSpeedPreset = "vacuum:mode"
 
     # Sensors
-    Status = "vacuum:status"
+    State = "vacuum:status"
     ErrorMessage = "vacuum:fault"
     Battery = "battery:level"
