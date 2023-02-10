@@ -144,7 +144,7 @@ class RoborockVacuum(Device, VacuumInterface):
             ip, token, start_id, debug, lazy_discover, timeout, model=model
         )
         self.manual_seqnum = -1
-        self._clean_history = Optional[CleaningSummary] = None
+        self._clean_history: Optional[CleaningSummary] = None
         self._searched_clean_id: Optional[int] = None
         self._floor_clean_details: Dict[int, Optional[CleaningDetails]] = {}
         self._last_clean_details: Optional[CleaningDetails] = None
