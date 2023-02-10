@@ -1,7 +1,11 @@
 from enum import Enum
 
 
-class VacuumId(Enum):
+class StandardIdentifier(Enum):
+    """Base class for standardized descriptor identifiers."""
+
+
+class VacuumId(StandardIdentifier):
     """Vacuum-specific standardized descriptor identifiers.
 
     TODO: this is a temporary solution, and might be named to 'Vacuum' later on.
