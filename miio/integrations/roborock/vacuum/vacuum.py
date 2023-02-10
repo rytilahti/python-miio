@@ -150,10 +150,11 @@ class RoborockVacuum(Device, VacuumInterface):
         self._maps: Optional[MapList] = None
         self._map_enum_cache = None
         self._status_helper = UpdateHelper(self.vacuum_status)
+        self._status_helper.add_update_method("map_list", self.get_maps)
         self._status_helper.add_update_method("consumables", self.consumable_status)
         self._status_helper.add_update_method("dnd_status", self.dnd_status)
         self._status_helper.add_update_method("clean_history", self.clean_history)
-        self._status_helper.add_update_method("last_clean", self.last_clean_details)
+        self._status_helper.add_update_method("last_clean", self.last_clean_all_floor)
         self._status_helper.add_update_method("mop_dryer", self.mop_dryer_settings)
 
     def send(
