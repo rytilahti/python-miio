@@ -532,7 +532,8 @@ class RoborockVacuum(Device, VacuumInterface):
         Returns None if there has been no cleanups.
         """
         if self._clean_history is None or skip_cache:
-            self._clean_history = self.clean_history()
+            self.clean_history()
+        assert isinstance(self._clean_history, CleaningSummary)
         if not self._clean_history.ids:
             return None
 
@@ -550,7 +551,8 @@ class RoborockVacuum(Device, VacuumInterface):
         Returns None if there has been no cleanups for that floor.
         """
         if self._clean_history is None or skip_cache:
-            self._clean_history = self.clean_history()
+            self.clean_history()
+        assert isinstance(self._clean_history, CleaningSummary)
 
         map_ids = self.get_maps().map_id_list
 

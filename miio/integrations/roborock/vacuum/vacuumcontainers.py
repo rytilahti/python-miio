@@ -630,7 +630,7 @@ class CleaningDetails(DeviceStatus):
 class FloorCleanDetails(DeviceStatus):
     """Contains details about a last cleaning run per floor."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[int, Any]) -> None:
         self.data = data
 
         for map_id in self.data:
@@ -667,7 +667,7 @@ class FloorCleanDetails(DeviceStatus):
                 id=f"FloorCleanDetails.start_{map_id}",
                 property=f"start_{map_id}",
                 name=f"Floor {map_id} clean start",
-                type="sensor",
+                type=datetime,
                 extras={
                     "icon": "mdi:clock-time-twelve",
                     "device_class": "timestamp",
