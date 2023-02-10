@@ -594,7 +594,7 @@ class RoborockVacuum(Device, VacuumInterface):
             _LOGGER.warning("No cleaning record found for id %s", id_)
             return None
 
-        return CleaningDetails(details.pop(), self.get_maps())
+        return CleaningDetails(details.pop())
 
     @command()
     @action(name="Find robot", type="vacuum")

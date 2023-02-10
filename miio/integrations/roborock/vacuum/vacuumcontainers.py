@@ -342,7 +342,7 @@ class VacuumStatus(VacuumDeviceStatus):
     def current_map_name(self) -> str:
         """The name of the current map with regards to the multi map feature."""
         try:
-            map_list = self.MapList__map_list
+            map_list = self.map_list__map_list
         except AttributeError:
             return str(self.current_map_id)
 
@@ -534,12 +534,10 @@ class CleaningDetails(DeviceStatus):
     def __init__(
         self,
         data: Union[List[Any], Dict[str, Any]],
-        maps: Optional[MapList] = None,
     ) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
-        self._maps = maps
         if isinstance(data, list):
             self.data = {
                 "begin": data[0],
@@ -606,10 +604,12 @@ class CleaningDetails(DeviceStatus):
     @sensor("Last clean map name", icon="mdi:floor-plan", entity_category="diagnostic")
     def map_name(self) -> str:
         """The name of the map used (multi map feature) during the cleaning run."""
-        if self._maps is None:
+        try:
+            map_list = self._parent.map_list__map_list
+        except AttributeError:
             return str(self.map_id)
 
-        return self._maps.map_list[self.map_id]["name"]
+        return map_list[self.map_id]["name"]
 
     @property
     def error_code(self) -> int:
