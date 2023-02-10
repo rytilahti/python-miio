@@ -692,8 +692,8 @@ class ViomiVacuum(Device, VacuumInterface):
         values = self.get_properties(properties)
 
         status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
-        status.embed(self.consumable_status())
-        status.embed(self.dnd_status())
+        status.embed("consumables", self.consumable_status())
+        status.embed("dnd", self.dnd_status())
 
         return status
 

@@ -1,0 +1,11 @@
+{
+    "iid": 1,
+    "type": "urn:miot-spec-v2:property:on:00000006:model:1",
+    "description": "Switch",
+    "format": "bool",
+    "access": [
+        "read",
+        "write",
+        "notify"
+    ]
+}

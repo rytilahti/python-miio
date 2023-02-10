@@ -1,0 +1,17 @@
+{
+  "iid": 3,
+  "type": "urn:miot-spec-v2:property:brightness:0000000D:model:1",
+  "description": "Brightness",
+  "format": "uint8",
+  "access": [
+    "read",
+    "write",
+    "notify"
+  ],
+  "unit": "percentage",
+  "value-range": [
+    1,
+    100,
+    1
+  ]
+}

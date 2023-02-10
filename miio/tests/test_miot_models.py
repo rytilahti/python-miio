@@ -1,8 +1,18 @@
 """Tests for miot model parsing."""
 
+import json
+from pathlib import Path
+
 import pytest
 from pydantic import BaseModel
 
+from miio.descriptors import (
+    BooleanSettingDescriptor,
+    EnumSettingDescriptor,
+    NumberSettingDescriptor,
+    SensorDescriptor,
+    SettingType,
+)
 from miio.miot_models import (
     URN,
     MiotAccess,
@@ -13,6 +23,14 @@ from miio.miot_models import (
     MiotProperty,
     MiotService,
 )
+
+
+def load_fixture(filename: str) -> str:
+    """Load a fixture."""
+    file = Path(__file__).parent.absolute() / "fixtures" / "miot" / filename
+    with file.open() as f:
+        return json.load(f)
+
 
 DUMMY_SERVICE = """
     {
@@ -196,8 +214,19 @@ def test_entity_names(entity_type):
     entities = getattr(serv, entity_type)
     assert len(entities) == 1
     entity_to_test = entities[0]
+    plain_name = entity_to_test.plain_name
 
-    assert entity_to_test.name == f"{serv.name}:{entity_to_test.plain_name}"
+    assert entity_to_test.name == f"{serv.name}:{plain_name}"
+
+    def _normalize_name(x):
+        return x.replace("-", "_").replace(":", "_")
+
+    # normalized_name should be a valid python identifier based on the normalized service name and normalized plain name
+    assert (
+        entity_to_test.normalized_name
+        == f"{_normalize_name(serv.name)}_{_normalize_name(plain_name)}"
+    )
+    assert entity_to_test.normalized_name.isidentifier() is True
 
 
 def test_event():
@@ -229,6 +258,63 @@ def test_property():
     assert prop.description == "Device Manufacturer"
 
     assert prop.plain_name == "manufacturer"
+
+
+@pytest.mark.parametrize(
+    ("read_only", "expected"),
+    [(True, SensorDescriptor), (False, BooleanSettingDescriptor)],
+)
+def test_get_descriptor_bool_property(read_only, expected):
+    """Test that boolean property creates a sensor."""
+    boolean_prop = load_fixture("boolean_property.json")
+    if read_only:
+        boolean_prop["access"].remove("write")
+
+    prop = MiotProperty.parse_obj(boolean_prop)
+    desc = prop.get_descriptor()
+
+    assert isinstance(desc, expected)
+    assert desc.type == bool
+    if not read_only:
+        assert desc.setting_type == SettingType.Boolean
+
+
+@pytest.mark.parametrize(
+    ("read_only", "expected"),
+    [(True, SensorDescriptor), (False, NumberSettingDescriptor)],
+)
+def test_get_descriptor_ranged_property(read_only, expected):
+    """Test value-range descriptors."""
+    ranged_prop = load_fixture("ranged_property.json")
+    if read_only:
+        ranged_prop["access"].remove("write")
+
+    prop = MiotProperty.parse_obj(ranged_prop)
+    desc = prop.get_descriptor()
+
+    assert isinstance(desc, expected)
+    assert desc.type == int
+    if not read_only:
+        assert desc.setting_type == SettingType.Number
+
+
+@pytest.mark.parametrize(
+    ("read_only", "expected"),
+    [(True, SensorDescriptor), (False, EnumSettingDescriptor)],
+)
+def test_get_descriptor_enum_property(read_only, expected):
+    """Test enum descriptors."""
+    enum_prop = load_fixture("enum_property.json")
+    if read_only:
+        enum_prop["access"].remove("write")
+
+    prop = MiotProperty.parse_obj(enum_prop)
+    desc = prop.get_descriptor()
+
+    assert isinstance(desc, expected)
+    assert desc.type == int
+    if not read_only:
+        assert desc.setting_type == SettingType.Enum
 
 
 @pytest.mark.xfail(reason="not implemented")
