@@ -642,7 +642,6 @@ class FloorCleanDetails(DeviceStatus):
             setattr(self, f"start_{map_id}", self.data[map_id].start)
 
     def __repr__(self):
-
         s = f"<{self.__class__.__name__}"
         for map_id in self.data:
             name = f"CleanDetails_{map_id}"
