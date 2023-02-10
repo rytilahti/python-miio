@@ -533,7 +533,7 @@ class RoborockVacuum(Device, VacuumInterface):
         """
         if self._clean_history is None or skip_cache:
             self.clean_history()
-        assert isinstance(self._clean_history, CleaningSummary) # nosec assert_used
+        assert isinstance(self._clean_history, CleaningSummary)  # nosec assert_used
         if not self._clean_history.ids:
             return None
 
@@ -552,7 +552,7 @@ class RoborockVacuum(Device, VacuumInterface):
         """
         if self._clean_history is None or skip_cache:
             self.clean_history()
-        assert isinstance(self._clean_history, CleaningSummary) # nosec assert_used
+        assert isinstance(self._clean_history, CleaningSummary)  # nosec assert_used
 
         map_ids = self.get_maps().map_id_list
 
