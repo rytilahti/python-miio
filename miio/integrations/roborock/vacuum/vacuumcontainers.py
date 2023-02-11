@@ -8,6 +8,7 @@ from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
+from miio.identifiers import VacuumId
 from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds, pretty_time
 
@@ -192,7 +193,7 @@ class VacuumStatus(VacuumDeviceStatus):
             self.state_code, f"Unknown state (code: {self.state_code})"
         )
 
-    @sensor("Vacuum state")
+    @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return vacuum state."""
         return STATE_CODE_TO_VACUUMSTATE.get(self.state_code, VacuumState.Unknown)
@@ -211,6 +212,7 @@ class VacuumStatus(VacuumDeviceStatus):
     @property
     @sensor(
         "Error string",
+        id=VacuumId.ErrorMessage,
         icon="mdi:alert",
         entity_category="diagnostic",
         enabled_default=False,
@@ -252,7 +254,7 @@ class VacuumStatus(VacuumDeviceStatus):
             return "Definition missing for dock error %s" % self.dock_error_code
 
     @property
-    @sensor("Battery", unit="%", device_class="battery", enabled_default=False)
+    @sensor("Battery", unit="%", id=VacuumId.Battery)
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return int(self.data["battery"])

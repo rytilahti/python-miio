@@ -24,6 +24,7 @@ from miio.click_common import (
 from miio.device import Device, DeviceInfo
 from miio.devicestatus import DeviceStatus, action
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
+from miio.identifiers import VacuumId
 from miio.interfaces import FanspeedPresets, VacuumInterface
 
 from .updatehelper import UpdateHelper
@@ -179,7 +180,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_start")
 
     @command()
-    @action(name="Stop cleaning", type="vacuum")
+    @action(name="Stop cleaning", id=VacuumId.Stop)
     def stop(self):
         """Stop cleaning.
 
@@ -189,19 +190,19 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_stop")
 
     @command()
-    @action(name="Spot cleaning", type="vacuum")
+    @action(name="Spot cleaning", id=VacuumId.Spot)
     def spot(self):
         """Start spot cleaning."""
         return self.send("app_spot")
 
     @command()
-    @action(name="Pause cleaning", type="vacuum")
+    @action(name="Pause cleaning", id=VacuumId.Pause)
     def pause(self):
         """Pause cleaning."""
         return self.send("app_pause")
 
     @command()
-    @action(name="Start cleaning", type="vacuum")
+    @action(name="Start cleaning", id=VacuumId.Start)
     def resume_or_start(self):
         """A shortcut for resuming or starting cleaning."""
         status = self.status()
@@ -254,7 +255,7 @@ class RoborockVacuum(Device, VacuumInterface):
             return self._info
 
     @command()
-    @action(name="Home", type="vacuum")
+    @action(name="Home", id=VacuumId.ReturnHome)
     def home(self):
         """Stop cleaning and return home."""
 
@@ -545,7 +546,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return res
 
     @command()
-    @action(name="Find robot", type="vacuum")
+    @action(name="Find robot", id=VacuumId.Locate)
     def find(self):
         """Find the robot."""
         return self.send("find_me", [""])
@@ -723,7 +724,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("change_sound_volume", [vol])
 
     @command()
-    @action(name="Test sound volume", type="vacuum")
+    @action(name="Test sound volume")
     def test_sound_volume(self):
         """Test current sound volume."""
         return self.send("test_sound_volume")
