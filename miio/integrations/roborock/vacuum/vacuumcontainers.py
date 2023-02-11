@@ -253,7 +253,7 @@ class VacuumStatus(VacuumDeviceStatus):
             return "Definition missing for dock error %s" % self.dock_error_code
 
     @property
-    @sensor("Battery", unit="%", id=VacuumId.Battery, device_class="battery", enabled_default=False)
+    @sensor("Battery", unit="%", id=VacuumId.Battery)
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return int(self.data["battery"])
