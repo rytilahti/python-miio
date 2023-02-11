@@ -17,6 +17,7 @@ class VacuumId(StandardIdentifier):
     Pause = "vacuum:pause-sweeping"
     ReturnHome = "battery:start-charge"
     Locate = "identify:identify"
+    Spot = "vacuum:spot-cleaning"
 
     # Settings
     FanSpeed = "vacuum:fan-speed"  # TODO: invented name
