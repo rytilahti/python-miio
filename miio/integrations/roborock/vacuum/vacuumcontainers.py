@@ -8,6 +8,7 @@ from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
+from miio.identifiers import VacuumId
 from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds, pretty_time
 
