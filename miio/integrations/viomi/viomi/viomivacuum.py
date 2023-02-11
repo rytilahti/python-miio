@@ -55,6 +55,7 @@ from miio.click_common import EnumType, command
 from miio.device import Device
 from miio.devicestatus import action, sensor, setting
 from miio.exceptions import DeviceException
+from miio.identifiers import VacuumId
 from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
     ConsumableStatus,
     DNDStatus,
@@ -303,7 +304,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         self.data = data
 
     @property
-    @sensor("Vacuum state")
+    @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return simplified vacuum state."""
 
@@ -364,7 +365,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data["err_state"]
 
     @property
-    @sensor("Error", icon="mdi:alert")
+    @sensor("Error", icon="mdi:alert", id=VacuumId.ErrorMessage)
     def error(self) -> Optional[str]:
         """String presentation for the error code."""
         if self.vacuum_state != VacuumState.Error:
@@ -373,7 +374,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return ERROR_CODES.get(self.error_code, f"Unknown error {self.error_code}")
 
     @property
-    @sensor("Battery", unit="%", device_class="battery")
+    @sensor("Battery", unit="%", device_class="battery", id=VacuumId.Battery)
     def battery(self) -> int:
         """Battery in percentage."""
         return self.data["battary_life"]
@@ -402,6 +403,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         choices=ViomiVacuumSpeed,
         setter_name="set_fan_speed",
         icon="mdi:fan",
+        id=VacuumId.FanSpeedPreset,
     )
     def fanspeed(self) -> ViomiVacuumSpeed:
         """Current fan speed."""
@@ -698,6 +700,7 @@ class ViomiVacuum(Device, VacuumInterface):
         return status
 
     @command()
+    @action("Return home", id=VacuumId.ReturnHome)
     def home(self):
         """Return to home."""
         self.send("set_charge", [1])
@@ -710,7 +713,7 @@ class ViomiVacuum(Device, VacuumInterface):
             return self.stop()
 
     @command()
-    @action("Start cleaning")
+    @action("Start cleaning", id=VacuumId.Start)
     def start(self):
         """Start cleaning."""
         # params: [edge, 1, roomIds.length, *list_of_room_ids]
@@ -759,7 +762,7 @@ class ViomiVacuum(Device, VacuumInterface):
         )
 
     @command()
-    @action("Pause cleaning")
+    @action("Pause cleaning", id=VacuumId.Pause)
     def pause(self):
         """Pause cleaning."""
         # params: [edge_state, 0]
@@ -770,7 +773,7 @@ class ViomiVacuum(Device, VacuumInterface):
         self.send("set_mode", self._cache["edge_state"] + [2])
 
     @command()
-    @action("Stop cleaning")
+    @action("Stop cleaning", id=VacuumId.Stop)
     def stop(self):
         """Validate that Stop cleaning."""
         # params: [edge_state, 0]
@@ -1078,7 +1081,7 @@ class ViomiVacuum(Device, VacuumInterface):
         return self.send("set_carpetturbo", [mode.value])
 
     @command()
-    @action("Find robot")
+    @action("Find robot", id=VacuumId.Locate)
     def find(self):
         """Find the robot."""
         return self.send("set_resetpos", [1])

@@ -1,3 +1,4 @@
+import re
 from enum import Enum
 
 import pytest
@@ -321,7 +322,12 @@ def test_cli_output():
             return None
 
     status = Status()
-    assert (
-        status.__cli_output__
-        == "sensor_without_unit: 1\nsensor_with_unit: 2 V\n[RW] setting_without_unit: 3\n[RW] setting_with_unit: 4 V\n"
-    )
+    expected_regex = [
+        "sensor_without_unit (.+?): 1",
+        "sensor_with_unit (.+?): 2 V",
+        r"\[RW\] setting_without_unit (.+?): 3",
+        r"\[RW\] setting_with_unit (.+?): 4 V",
+    ]
+
+    for idx, line in enumerate(status.__cli_output__.splitlines()):
+        assert re.match(expected_regex[idx], line) is not None
