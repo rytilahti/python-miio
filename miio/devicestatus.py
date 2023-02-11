@@ -25,6 +25,7 @@ from .descriptors import (
     SettingDescriptor,
     SettingType,
 )
+from .identifiers import StandardIdentifier
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -153,7 +154,7 @@ class DeviceStatus(metaclass=_StatusMeta):
             if isinstance(entry, SettingDescriptor):
                 out += "[RW] "
 
-            out += f"{entry.name}: {value}"
+            out += f"{entry.name} ({entry.id}): {value}"
 
             if entry.unit is not None:
                 out += f" {entry.unit}"
@@ -180,8 +181,19 @@ class DeviceStatus(metaclass=_StatusMeta):
         return getattr(self._embedded[embed], prop)
 
 
+def _get_qualified_name(func, id_: Optional[Union[str, StandardIdentifier]]):
+    """Return qualified name for a descriptor identifier."""
+    if id_ is not None and isinstance(id_, StandardIdentifier):
+        return str(id_.value)
+    return id_ or str(func.__qualname__)
+
+
 def sensor(
-    name: str, *, id: Optional[str] = None, unit: Optional[str] = None, **kwargs
+    name: str,
+    *,
+    id: Optional[Union[str, StandardIdentifier]] = None,
+    unit: Optional[str] = None,
+    **kwargs,
 ):
     """Syntactic sugar to create SensorDescriptor objects.
 
@@ -195,7 +207,7 @@ def sensor(
 
     def decorator_sensor(func):
         property_name = str(func.__name__)
-        qualified_name = id or str(func.__qualname__)
+        qualified_name = _get_qualified_name(func, id)
 
         def _sensor_type_for_return_type(func):
             rtype = get_type_hints(func).get("return")
@@ -223,7 +235,7 @@ def sensor(
 def setting(
     name: str,
     *,
-    id: Optional[str] = None,
+    id: Optional[Union[str, StandardIdentifier]] = None,
     setter: Optional[Callable] = None,
     setter_name: Optional[str] = None,
     unit: Optional[str] = None,
@@ -250,7 +262,7 @@ def setting(
 
     def decorator_setting(func):
         property_name = str(func.__name__)
-        qualified_name = id or str(func.__qualname__)
+        qualified_name = _get_qualified_name(func, id)
 
         if setter is None and setter_name is None:
             raise Exception("setter_name needs to be defined")
@@ -293,7 +305,7 @@ def setting(
     return decorator_setting
 
 
-def action(name: str, *, id: Optional[str] = None, **kwargs):
+def action(name: str, *, id: Optional[Union[str, StandardIdentifier]] = None, **kwargs):
     """Syntactic sugar to create ActionDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what
@@ -306,7 +318,7 @@ def action(name: str, *, id: Optional[str] = None, **kwargs):
 
     def decorator_action(func):
         property_name = str(func.__name__)
-        qualified_name = id or str(func.__qualname__)
+        qualified_name = _get_qualified_name(func, id)
 
         descriptor = ActionDescriptor(
             id=qualified_name,

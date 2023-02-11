@@ -19,7 +19,7 @@ If the enhancement is device-specific, please include also the following informa
   - Name(s) of the device:
   - Link:
 
-Use `miiocli device --ip <ip address> --token <token>`.
+Use `miiocli device --ip <ip address> --token <token> info`.
 
   - Model: [e.g., lumi.gateway.v3]
   - Hardware version:

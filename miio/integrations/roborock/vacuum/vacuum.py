@@ -1019,6 +1019,18 @@ class RoborockVacuum(Device, VacuumInterface):
         )
 
     @command()
+    @action(name="Start mop washing", icon="mdi:wiper-wash")
+    def start_mop_washing(self) -> bool:
+        """Start mop washing."""
+        return self.send("app_start_wash")[0] == "ok"
+
+    @command()
+    @action(name="Stop mop washing", icon="mdi:wiper-wash")
+    def stop_mop_washing(self) -> bool:
+        """Start mop washing."""
+        return self.send("app_stop_wash")[0] == "ok"
+
+    @command()
     @action(name="Start mop drying", icon="mdi:tumble-dryer")
     def start_mop_drying(self) -> bool:
         """Start mop drying."""
