@@ -52,6 +52,8 @@ PyYAML = ">=5,<7"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme", "myst-parser"]
+updater = ["netifaces"]
+backup_extract = ["android_backup"]
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.2.5"
