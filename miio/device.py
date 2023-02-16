@@ -185,6 +185,7 @@ class Device(metaclass=DeviceGroupMeta):
     ) -> Dict[str, SettingDescriptor]:
         """Get the setting descriptors from a DeviceStatus."""
         settings = status.settings()
+        unsupported_settings = []
         for key, setting in settings.items():
             if setting.setter_name is not None:
                 setting.setter = getattr(self, setting.setter_name)
@@ -200,7 +201,7 @@ class Device(metaclass=DeviceGroupMeta):
                     try:
                         setting.choices = retrieve_choices_function()
                     except UnsupportedFeatureException:
-                        settings.pop(key)
+                        unsupported_settings.append(key)
                         continue
 
             elif setting.setting_type == SettingType.Number:
@@ -218,6 +219,9 @@ class Device(metaclass=DeviceGroupMeta):
                 raise NotImplementedError(
                     "Unknown setting type: %s" % setting.setting_type
                 )
+
+        for unsupp_key in unsupported_settings:
+            settings.pop(unsupp_key)
 
         return settings
 
