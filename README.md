@@ -47,13 +47,10 @@ The most recent release can be installed using `pip`:
 
 Alternatively, you can install the latest development version from GitHub:
 
-    git clone https://github.com/rytilahti/python-miio.git
-    cd python-miio
-    poetry install
-    poetry run miiocli  # or use `poetry shell` to enter the virtualenv
+    pip install git+https://github.com/rytilahti/python-miio.git
 
 **This project is currently ongoing [a major refactoring effort](https://github.com/rytilahti/python-miio/issues/1114).
-If you are interested in controlling modern (MIoT) devices, you want to use the git master until version 0.6.0 is released.**
+If you are interested in controlling modern (MIoT) devices, you want to use the git version until version 0.6.0 is released.**
 
 ## Getting started
 
