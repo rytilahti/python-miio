@@ -365,7 +365,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data["err_state"]
 
     @property
-    @sensor("Error", icon="mdi:alert", id=VacuumId.ErrorMessage)
+    @sensor("Error", icon="mdi:alert")
     def error(self) -> Optional[str]:
         """String presentation for the error code."""
         if self.vacuum_state != VacuumState.Error:
