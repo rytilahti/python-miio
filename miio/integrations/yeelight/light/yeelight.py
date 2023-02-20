@@ -1,14 +1,19 @@
 import logging
 from enum import IntEnum
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import click
 
 from miio import LightInterface
 from miio.click_common import command, format_output
-from miio.descriptors import ValidSettingRange
+from miio.descriptors import (
+    NumberSettingDescriptor,
+    SettingDescriptor,
+    ValidSettingRange,
+)
 from miio.device import Device, DeviceStatus
 from miio.devicestatus import sensor, setting
+from miio.identifiers import LightId
 from miio.utils import int_to_rgb, rgb_to_int
 
 from .spec_helper import YeelightSpecHelper, YeelightSubLightType
@@ -87,9 +92,18 @@ class YeelightSubLight(DeviceStatus):
     @property
     def rgb(self) -> Optional[Tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
+        rgb_int = self.rgb_int
+        if rgb_int is not None:
+            return int_to_rgb(rgb_int)
+
+        return None
+
+    @property
+    def rgb_int(self) -> Optional[int]:
+        """Return color as single integer RGB if RGB mode is active."""
         rgb = self.data[self.get_prop_name("rgb")]
         if self.color_mode == YeelightMode.RGB and rgb:
-            return int_to_rgb(int(rgb))
+            return int(rgb)
         return None
 
     @property
@@ -144,7 +158,7 @@ class YeelightStatus(DeviceStatus):
         self.data = data
 
     @property
-    @setting("Power", setter_name="set_power", id="light:on")
+    @setting("Power", setter_name="set_power", id=LightId.On)
     def is_on(self) -> bool:
         """Return whether the light is on or off."""
         return self.lights[0].is_on
@@ -155,22 +169,23 @@ class YeelightStatus(DeviceStatus):
         unit="%",
         setter_name="set_brightness",
         max_value=100,
-        id="light:brightness",
+        id=LightId.Brightness,
     )
     def brightness(self) -> int:
         """Return current brightness."""
         return self.lights[0].brightness
 
     @property
-    @sensor(
-        "RGB", setter_name="set_rgb"
-    )  # TODO: we need to extend @setting to support tuples to fix this
     def rgb(self) -> Optional[Tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
         return self.lights[0].rgb
 
     @property
-    @sensor("Color mode")
+    def rgb_int(self) -> Optional[int]:
+        """Return color as single integer if RGB mode is active."""
+        return self.lights[0].rgb_int
+
+    @property
     def color_mode(self) -> Optional[YeelightMode]:
         """Return current color mode."""
         return self.lights[0].color_mode
@@ -184,13 +199,6 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].hsv
 
     @property
-    @setting(
-        "Color temperature",
-        setter_name="set_color_temperature",
-        range_attribute="color_temperature_range",
-        id="light:color-temp",
-        unit="kelvin",
-    )
     def color_temp(self) -> Optional[int]:
         """Return current color temperature, if applicable."""
         return self.lights[0].color_temp
@@ -347,11 +355,40 @@ class Yeelight(Device, LightInterface):
 
         return YeelightStatus(dict(zip(properties, values)))
 
-    @property
-    def valid_temperature_range(self) -> ValidSettingRange:
-        """Return supported color temperature range."""
-        _LOGGER.warning("Deprecated, use color_temperature_range instead")
-        return self.color_temperature_range
+    def settings(self) -> Dict[str, SettingDescriptor]:
+        """Return settings based on supported features.
+
+        This extends the decorated settings with color temperature and color, if
+        supported by the device.
+        """
+        # TODO: unclear semantics on settings, as making changes here will affect other instances of the class...
+        settings = super().settings().copy()
+        ct = self._light_info.color_temp
+        if ct.min != ct.max:
+            _LOGGER.info("Got ct for %s: %s", self.model, ct)
+            settings[LightId.ColorTemperature.value] = NumberSettingDescriptor(
+                name="Color temperature",
+                id=LightId.ColorTemperature.value,
+                property="color_temp",
+                setter=self.set_color_temperature,
+                min_value=self.color_temperature_range.min_value,
+                max_value=self.color_temperature_range.max_value,
+                step=1,
+                unit="kelvin",
+            )
+        if self._light_info.supports_color:
+            _LOGGER.info("Got color for %s", self.model)
+            settings[LightId.Color.value] = NumberSettingDescriptor(
+                name="Color",
+                id=LightId.Color.value,
+                property="rgb_int",
+                setter=self.set_rgb_int,
+                min_value=1,
+                max_value=0xFFFFFF,
+                step=1,
+            )
+
+        return settings
 
     @property
     def color_temperature_range(self) -> ValidSettingRange:
@@ -448,7 +485,11 @@ class Yeelight(Device, LightInterface):
             if color < 0 or color > 255:
                 raise ValueError("Invalid color: %s" % color)
 
-        return self.send("set_rgb", [rgb_to_int(rgb)])
+        return self.set_rgb_int(rgb_to_int(rgb))
+
+    def set_rgb_int(self, rgb: int):
+        """Set color from single RGB integer."""
+        return self.send("set_rgb", [rgb])
 
     def set_hsv(self, hsv):
         """Set color in HSV."""

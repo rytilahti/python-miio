@@ -1,3 +1,4 @@
+"""Compat layer for homeassistant."""
 from enum import Enum
 
 
@@ -38,3 +39,12 @@ class FanId(StandardIdentifier):
     Speed = "fan:speed-level"
     Preset = "fan:mode"
     Toggle = "fan:toggle"
+
+
+class LightId(StandardIdentifier):
+    """Standard identifiers for lights."""
+
+    On = "light:on"
+    Brightness = "light:brightness"
+    ColorTemperature = "light:color-temperature"
+    Color = "light:color"
