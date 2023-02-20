@@ -53,15 +53,13 @@ import click
 
 from miio.click_common import EnumType, command
 from miio.device import Device
-from miio.devicestatus import action, sensor, setting
+from miio.devicestatus import DeviceStatus, action, sensor, setting
 from miio.exceptions import DeviceException
-from miio.identifiers import VacuumId
+from miio.identifiers import VacuumId, VacuumState
 from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
     ConsumableStatus,
     DNDStatus,
 )
-from miio.interfaces import FanspeedPresets, VacuumInterface
-from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)
@@ -270,7 +268,7 @@ class ViomiEdgeState(Enum):
     Unknown2 = 5
 
 
-class ViomiVacuumStatus(VacuumDeviceStatus):
+class ViomiVacuumStatus(DeviceStatus):
     def __init__(self, data):
         """Vacuum status container.
 
@@ -582,7 +580,7 @@ def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
     return scheduled_found, rooms
 
 
-class ViomiVacuum(Device, VacuumInterface):
+class ViomiVacuum(Device):
     """Interface for Viomi vacuums (viomi.vacuum.v7)."""
 
     _supported_models = SUPPORTED_MODELS
@@ -794,7 +792,7 @@ class ViomiVacuum(Device, VacuumInterface):
         self.send("set_suction", [speed.value])
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
         return {x.name: x.value for x in list(ViomiVacuumSpeed)}
 

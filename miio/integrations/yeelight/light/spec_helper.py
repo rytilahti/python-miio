@@ -6,7 +6,7 @@ from typing import Dict
 import attr
 import yaml
 
-from miio import ColorTemperatureRange
+from miio.descriptors import ValidSettingRange
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class YeelightSubLightType(IntEnum):
 
 @attr.s(auto_attribs=True)
 class YeelightLampInfo:
-    color_temp: ColorTemperatureRange
+    color_temp: ValidSettingRange
     supports_color: bool
 
 
@@ -43,14 +43,14 @@ class YeelightSpecHelper:
             for key, value in models.items():
                 lamps = {
                     YeelightSubLightType.Main: YeelightLampInfo(
-                        ColorTemperatureRange(*value["color_temp"]),
+                        ValidSettingRange(*value["color_temp"]),
                         value["supports_color"],
                     )
                 }
 
                 if "background" in value:
                     lamps[YeelightSubLightType.Background] = YeelightLampInfo(
-                        ColorTemperatureRange(*value["background"]["color_temp"]),
+                        ValidSettingRange(*value["background"]["color_temp"]),
                         value["background"]["supports_color"],
                     )
 

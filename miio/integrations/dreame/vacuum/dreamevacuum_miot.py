@@ -8,7 +8,6 @@ from typing import Dict, Optional
 import click
 
 from miio.click_common import command, format_output
-from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus as DeviceStatusContainer
 from miio.miot_device import MiotDevice, MiotMapping
 from miio.updater import OneShotServer
@@ -464,7 +463,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         return None
 
 
-class DreameVacuum(MiotDevice, VacuumInterface):
+class DreameVacuum(MiotDevice):
     _mappings = MIOT_MAPPING
 
     @command(
@@ -588,7 +587,7 @@ class DreameVacuum(MiotDevice, VacuumInterface):
         return self.set_property("cleaning_mode", fanspeed.value)
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
         fanspeeds_enum = _get_cleaning_mode_enum_class(self.model)
         if not fanspeeds_enum:

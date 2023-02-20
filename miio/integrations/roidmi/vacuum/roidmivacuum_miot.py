@@ -6,6 +6,7 @@ import logging
 import math
 from datetime import timedelta
 from enum import Enum
+from typing import Dict
 
 import click
 
@@ -13,7 +14,6 @@ from miio.click_common import EnumType, command
 from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
     DNDStatus,
 )
-from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
@@ -548,7 +548,7 @@ class RoidmiConsumableStatus(DeviceStatus):
         return timedelta(minutes=self.data["sensor_dirty_time_left_minutes"])
 
 
-class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
+class RoidmiVacuumMiot(MiotDevice):
     """Interface for Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
     _mappings = _MAPPINGS
@@ -651,7 +651,7 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
         return self.set_property("fanspeed_mode", fanspeed_mode.value)
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
         return {"Sweep": 0, "Silent": 1, "Basic": 2, "Strong": 3, "FullSpeed": 4}
 
