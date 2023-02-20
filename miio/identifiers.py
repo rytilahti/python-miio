@@ -1,3 +1,4 @@
+"""Compat layer for homeassistant."""
 from enum import Enum
 
 
@@ -27,3 +28,12 @@ class VacuumId(StandardIdentifier):
     State = "vacuum:status"
     ErrorMessage = "vacuum:fault"
     Battery = "battery:level"
+
+
+class LightId(StandardIdentifier):
+    """Standard identifiers for lights."""
+
+    On = "light:on"
+    Brightness = "light:brightness"
+    ColorTemperature = "light:color-temperature"
+    Color = "light:color"
