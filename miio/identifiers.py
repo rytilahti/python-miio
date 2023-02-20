@@ -27,3 +27,14 @@ class VacuumId(StandardIdentifier):
     State = "vacuum:status"
     ErrorMessage = "vacuum:fault"
     Battery = "battery:level"
+
+
+class FanId(StandardIdentifier):
+    """Standard identifiers for fans."""
+
+    On = "fan:on"
+    Oscillate = "fan:horizontal-swing"
+    Angle = "fan:horizontal-angle"
+    Speed = "fan:speed-level"
+    Preset = "fan:mode"
+    Toggle = "fan:toggle"
