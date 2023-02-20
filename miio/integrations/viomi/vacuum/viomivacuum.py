@@ -511,7 +511,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data["start_time"]
 
     @property
-    @setting("Repeat cleaning active", setter_name="set_repeat_cleaning")
+    @setting("Clean twice", setter_name="set_repeat_cleaning")
     def repeat_cleaning(self) -> bool:
         """Secondary clean up state.
 
