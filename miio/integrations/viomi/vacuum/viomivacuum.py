@@ -365,7 +365,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data["err_state"]
 
     @property
-    @sensor("Error", icon="mdi:alert", id=VacuumId.ErrorMessage)
+    @sensor("Error", icon="mdi:alert")
     def error(self) -> Optional[str]:
         """String presentation for the error code."""
         if self.vacuum_state != VacuumState.Error:
@@ -471,7 +471,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return not bool(self.data["is_work"])
 
     @property
-    @setting("LED state", setter_name="led", icon="mdi:led-outline")
+    @setting("LED", setter_name="led", icon="mdi:led-outline")
     def led_state(self) -> bool:
         """Led state.
 
@@ -501,25 +501,23 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return ViomiRoutePattern(route)
 
     @property
-    @sensor("Order time?")
     def order_time(self) -> int:
-        """FIXME: ??? int or bool."""
+        """Unknown."""
         return self.data["order_time"]
 
     @property
-    @setting("Repeat cleaning active", setter_name="set_repeat_cleaning")
+    def start_time(self) -> int:
+        """Unknown."""
+        return self.data["start_time"]
+
+    @property
+    @setting("Clean twice", setter_name="set_repeat_cleaning")
     def repeat_cleaning(self) -> bool:
         """Secondary clean up state.
 
         True if the cleaning is performed twice
         """
         return bool(self.data["repeat_state"])
-
-    @property
-    @sensor("Start time")
-    def start_time(self) -> int:
-        """FIXME: ??? int or bool."""
-        return self.data["start_time"]
 
     @property
     @setting(
@@ -539,9 +537,8 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data.get("water_percent")
 
     @property
-    @sensor("Zone data")
     def zone_data(self) -> int:
-        """FIXME: ??? int or bool."""
+        """Unknown."""
         return self.data["zone_data"]
 
 
