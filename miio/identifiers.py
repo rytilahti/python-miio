@@ -1,5 +1,5 @@
 """Compat layer for homeassistant."""
-from enum import Enum
+from enum import Enum, auto
 
 
 class StandardIdentifier(Enum):
@@ -48,3 +48,20 @@ class LightId(StandardIdentifier):
     Brightness = "light:brightness"
     ColorTemperature = "light:color-temperature"
     Color = "light:color"
+
+
+class VacuumState(Enum):
+    """Vacuum state enum.
+
+    This offers a simplified API to the vacuum state.
+
+    # TODO: the interpretation of simplified state should be done downstream.
+    """
+
+    Unknown = auto()
+    Cleaning = auto()
+    Returning = auto()
+    Idle = auto()
+    Docked = auto()
+    Paused = auto()
+    Error = auto()

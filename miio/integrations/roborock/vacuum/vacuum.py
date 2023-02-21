@@ -8,7 +8,7 @@ import os
 import pathlib
 import time
 from enum import Enum
-from typing import Any, List, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 
 import click
 import pytz
@@ -25,7 +25,6 @@ from miio.device import Device, DeviceInfo
 from miio.devicestatus import DeviceStatus, action
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
 from miio.identifiers import VacuumId
-from miio.interfaces import FanspeedPresets, VacuumInterface
 
 from .updatehelper import UpdateHelper
 from .vacuum_enums import (
@@ -123,7 +122,7 @@ AUTO_EMPTY_MODELS = [
 ]
 
 
-class RoborockVacuum(Device, VacuumInterface):
+class RoborockVacuum(Device):
     """Main class for roborock vacuums (roborock.vacuum.*)."""
 
     _supported_models = SUPPORTED_MODELS
@@ -649,7 +648,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("get_custom_mode")[0]
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
 
         def _enum_as_dict(cls):

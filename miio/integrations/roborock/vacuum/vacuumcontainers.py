@@ -8,8 +8,7 @@ from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
-from miio.identifiers import VacuumId
-from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
+from miio.identifiers import VacuumId, VacuumState
 from miio.utils import pretty_seconds, pretty_time
 
 from .vacuum_enums import MopIntensity, MopMode
@@ -134,7 +133,7 @@ class MapList(DeviceStatus):
         return self._map_name_dict
 
 
-class VacuumStatus(VacuumDeviceStatus):
+class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
     def __init__(self, data: Dict[str, Any]) -> None:

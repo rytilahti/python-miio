@@ -4,7 +4,6 @@ from typing import Dict, List, Optional, Tuple
 
 import click
 
-from miio import LightInterface
 from miio.click_common import command, format_output
 from miio.descriptors import (
     NumberSettingDescriptor,
@@ -283,7 +282,7 @@ class YeelightStatus(DeviceStatus):
         return sub_lights
 
 
-class Yeelight(Device, LightInterface):
+class Yeelight(Device):
     """A rudimentary support for Yeelight bulbs.
 
     The API is the same as defined in
@@ -364,8 +363,8 @@ class Yeelight(Device, LightInterface):
         # TODO: unclear semantics on settings, as making changes here will affect other instances of the class...
         settings = super().settings().copy()
         ct = self._light_info.color_temp
-        if ct.min != ct.max:
-            _LOGGER.info("Got ct for %s: %s", self.model, ct)
+        if ct.min_value != ct.max_value:
+            _LOGGER.debug("Got ct for %s: %s", self.model, ct)
             settings[LightId.ColorTemperature.value] = NumberSettingDescriptor(
                 name="Color temperature",
                 id=LightId.ColorTemperature.value,
@@ -377,7 +376,7 @@ class Yeelight(Device, LightInterface):
                 unit="kelvin",
             )
         if self._light_info.supports_color:
-            _LOGGER.info("Got color for %s", self.model)
+            _LOGGER.debug("Got color for %s", self.model)
             settings[LightId.Color.value] = NumberSettingDescriptor(
                 name="Color",
                 id=LightId.Color.value,
@@ -393,8 +392,7 @@ class Yeelight(Device, LightInterface):
     @property
     def color_temperature_range(self) -> ValidSettingRange:
         """Return supported color temperature range."""
-        temps = self._light_info.color_temp
-        return ValidSettingRange(min_value=temps[0], max_value=temps[1])
+        return self._light_info.color_temp
 
     @command(
         click.option("--transition", type=int, required=False, default=0),
