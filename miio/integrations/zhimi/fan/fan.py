@@ -1,3 +1,4 @@
+import enum
 import logging
 from typing import Any, Dict, Optional
 
@@ -6,7 +7,18 @@ import click
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 from miio.devicestatus import sensor, setting
-from miio.fan_common import LedBrightness, MoveDirection
+
+
+class MoveDirection(enum.Enum):
+    Left = "left"
+    Right = "right"
+
+
+class LedBrightness(enum.Enum):
+    Bright = 0
+    Dim = 1
+    Off = 2
+
 
 _LOGGER = logging.getLogger(__name__)
 

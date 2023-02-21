@@ -5,8 +5,18 @@ import click
 
 from miio import DeviceException, DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
-from miio.fan_common import MoveDirection, OperationMode
 from miio.utils import deprecated
+
+
+class OperationMode(enum.Enum):
+    Normal = "normal"
+    Nature = "nature"
+
+
+class MoveDirection(enum.Enum):
+    Left = "left"
+    Right = "right"
+
 
 MODEL_FAN_ZA5 = "zhimi.fan.za5"
 
