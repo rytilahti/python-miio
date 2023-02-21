@@ -5,7 +5,17 @@ import click
 
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
-from miio.fan_common import MoveDirection, OperationMode
+
+
+class OperationMode(enum.Enum):
+    Normal = "normal"
+    Nature = "nature"
+
+
+class MoveDirection(enum.Enum):
+    Left = "left"
+    Right = "right"
+
 
 MODEL_FAN_P9 = "dmaker.fan.p9"
 MODEL_FAN_P10 = "dmaker.fan.p10"

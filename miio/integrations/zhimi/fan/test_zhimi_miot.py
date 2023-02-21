@@ -2,11 +2,10 @@ from unittest import TestCase
 
 import pytest
 
-from miio.fan_common import OperationMode
 from miio.tests.dummies import DummyMiotDevice
 
 from . import FanZA5
-from .zhimi_miot import MODEL_FAN_ZA5, OperationModeFanZA5
+from .zhimi_miot import MODEL_FAN_ZA5, OperationMode, OperationModeFanZA5
 
 
 class DummyFanZA5(DummyMiotDevice, FanZA5):
