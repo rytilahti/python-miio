@@ -28,7 +28,11 @@ _MAPPING = {
     "overwet_protect": {"siid": 7, "piid": 3},  # bool
 }
 
-SUPPORTED_MODELS = ["deerma.humidifier.jsqs", "deerma.humidifier.jsq5", "deerma.humidifier.jsq2w"]
+SUPPORTED_MODELS = [
+    "deerma.humidifier.jsqs",
+    "deerma.humidifier.jsq5",
+    "deerma.humidifier.jsq2w",
+]
 MIOT_MAPPING = {model: _MAPPING for model in SUPPORTED_MODELS}
 
 
