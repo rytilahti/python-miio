@@ -55,7 +55,7 @@ class CloudDeviceInfo(BaseModel):
     is_online: bool = Field(alias="isOnline")
     rssi: int
 
-    _raw_data: dict
+    _raw_data: dict = Field(repr=False)
 
     @property
     def is_child(self):
