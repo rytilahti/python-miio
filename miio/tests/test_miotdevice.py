@@ -199,7 +199,6 @@ def test_get_properties_for_mapping_readables(mocker, dev, props, included_in_re
     dev.get_properties_for_mapping()
 
     try:
-
         req.assert_called_with(
             expected_request, property_getter=ANY, max_properties=ANY
         )

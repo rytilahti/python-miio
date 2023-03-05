@@ -14,7 +14,6 @@ def deprecated(reason):
 
     string_types = (bytes, str)
     if isinstance(reason, string_types):
-
         # The @deprecated is used with a 'reason'.
         #
         # .. code-block:: python
@@ -45,7 +44,6 @@ def deprecated(reason):
         return decorator
 
     elif inspect.isclass(reason) or inspect.isfunction(reason):  # noqa: SIM106
-
         # The @deprecated is used without any 'reason'.
         #
         # .. code-block:: python

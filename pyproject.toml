@@ -117,6 +117,13 @@ exclude_lines = [
 # annotation-unchecked disables "By default the bodies of untyped functions are not checked"
 disable_error_code = "misc,annotation-unchecked"
 
+[tool.doc8]
+paths = ["docs"]
+# docs/index.rst:7: D000 Error in "include" directive:
+# invalid option value: (option: "parser"; value: 'myst_parser.sphinx_')
+# Parser "myst_parser.sphinx_" not found. No module named 'myst_parser'.
+ignore-path-errors = ["docs/index.rst;D000"]
+
 
 [build-system]
 requires = ["poetry-core"]
