@@ -115,9 +115,19 @@ class GenericMiotStatus(DeviceStatus):
         return list(super().__dir__()) + list(self._data_by_normalized_name.keys())
 
     def __repr__(self):
+        """Return string representation of the status."""
         s = f"<{self.__class__.__name__}"
         for name, value in self.property_dict().items():
             s += f" {name}={value}"
+        s += ">"
+
+        return s
+
+    def __str__(self):
+        """Return simplified string representation of the status."""
+        s = f"<{self.__class__.__name__}"
+        for name, value in self.property_dict().items():
+            s += f" {name}={value.pretty_value}"
         s += ">"
 
         return s
