@@ -7,11 +7,11 @@ import pytest
 from pydantic import BaseModel
 
 from miio.descriptors import (
-    BooleanSettingDescriptor,
-    EnumSettingDescriptor,
-    NumberSettingDescriptor,
-    SensorDescriptor,
-    SettingType,
+    AccessFlags,
+    EnumDescriptor,
+    PropertyConstraint,
+    PropertyDescriptor,
+    RangeDescriptor,
 )
 from miio.miot_models import (
     URN,
@@ -261,10 +261,13 @@ def test_property():
 
 
 @pytest.mark.parametrize(
-    ("read_only", "expected"),
-    [(True, SensorDescriptor), (False, BooleanSettingDescriptor)],
+    ("read_only", "access"),
+    [
+        (True, AccessFlags.Read),
+        (False, AccessFlags.Read | AccessFlags.Write),
+    ],
 )
-def test_get_descriptor_bool_property(read_only, expected):
+def test_get_descriptor_bool_property(read_only, access):
     """Test that boolean property creates a sensor."""
     boolean_prop = load_fixture("boolean_property.json")
     if read_only:
@@ -273,15 +276,16 @@ def test_get_descriptor_bool_property(read_only, expected):
     prop = MiotProperty.parse_obj(boolean_prop)
     desc = prop.get_descriptor()
 
-    assert isinstance(desc, expected)
     assert desc.type == bool
-    if not read_only:
-        assert desc.setting_type == SettingType.Boolean
+    assert desc.access == access
+
+    if read_only:
+        assert desc.access ^ AccessFlags.Write
 
 
 @pytest.mark.parametrize(
     ("read_only", "expected"),
-    [(True, SensorDescriptor), (False, NumberSettingDescriptor)],
+    [(True, PropertyDescriptor), (False, RangeDescriptor)],
 )
 def test_get_descriptor_ranged_property(read_only, expected):
     """Test value-range descriptors."""
@@ -295,12 +299,12 @@ def test_get_descriptor_ranged_property(read_only, expected):
     assert isinstance(desc, expected)
     assert desc.type == int
     if not read_only:
-        assert desc.setting_type == SettingType.Number
+        assert desc.constraint == PropertyConstraint.Range
 
 
 @pytest.mark.parametrize(
     ("read_only", "expected"),
-    [(True, SensorDescriptor), (False, EnumSettingDescriptor)],
+    [(True, PropertyDescriptor), (False, EnumDescriptor)],
 )
 def test_get_descriptor_enum_property(read_only, expected):
     """Test enum descriptors."""
@@ -314,7 +318,7 @@ def test_get_descriptor_enum_property(read_only, expected):
     assert isinstance(desc, expected)
     assert desc.type == int
     if not read_only:
-        assert desc.setting_type == SettingType.Enum
+        assert desc.constraint == PropertyConstraint.Choice
 
 
 @pytest.mark.xfail(reason="not implemented")

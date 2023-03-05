@@ -4,11 +4,7 @@ from enum import Enum
 import pytest
 
 from miio import Device, DeviceStatus
-from miio.descriptors import (
-    EnumSettingDescriptor,
-    NumberSettingDescriptor,
-    ValidSettingRange,
-)
+from miio.descriptors import EnumDescriptor, RangeDescriptor, ValidSettingRange
 from miio.devicestatus import sensor, setting
 
 
@@ -113,7 +109,7 @@ def test_sensor_decorator():
             pass
 
     status = DecoratedProps()
-    sensors = status.sensors()
+    sensors = status.properties()
     assert len(sensors) == 3
 
     all_kwargs = sensors["all_kwargs"]
@@ -131,6 +127,7 @@ def test_setting_decorator_number(mocker):
     class Settings(DeviceStatus):
         @property
         @setting(
+            id="level",
             name="Level",
             unit="something",
             setter_name="set_level",
@@ -153,7 +150,7 @@ def test_setting_decorator_number(mocker):
     assert len(settings) == 1
 
     desc = settings["level"]
-    assert isinstance(desc, NumberSettingDescriptor)
+    assert isinstance(desc, RangeDescriptor)
 
     assert getattr(d.status(), desc.property) == 1
 
@@ -175,6 +172,7 @@ def test_setting_decorator_number_range_attribute(mocker):
     class Settings(DeviceStatus):
         @property
         @setting(
+            id="level",
             name="Level",
             unit="something",
             setter_name="set_level",
@@ -200,7 +198,7 @@ def test_setting_decorator_number_range_attribute(mocker):
     assert len(settings) == 1
 
     desc = settings["level"]
-    assert isinstance(desc, NumberSettingDescriptor)
+    assert isinstance(desc, RangeDescriptor)
 
     assert getattr(d.status(), desc.property) == 1
 
@@ -223,7 +221,11 @@ def test_setting_decorator_enum(mocker):
     class Settings(DeviceStatus):
         @property
         @setting(
-            name="Level", unit="something", setter_name="set_level", choices=TestEnum
+            id="level",
+            name="Level",
+            unit="something",
+            setter_name="set_level",
+            choices=TestEnum,
         )
         def level(self) -> TestEnum:
             return TestEnum.First
@@ -241,7 +243,7 @@ def test_setting_decorator_enum(mocker):
     assert len(settings) == 1
 
     desc = settings["level"]
-    assert isinstance(desc, EnumSettingDescriptor)
+    assert isinstance(desc, EnumDescriptor)
     assert getattr(d.status(), desc.property) == TestEnum.First
 
     assert desc.name == "Level"
@@ -265,11 +267,11 @@ def test_embed():
             return "sub"
 
     main = MainStatus()
-    assert len(main.sensors()) == 1
+    assert len(main.properties()) == 1
 
     sub = SubStatus()
     main.embed("SubStatus", sub)
-    sensors = main.sensors()
+    sensors = main.properties()
     assert len(sensors) == 2
     assert sub._parent == main
 
@@ -277,7 +279,7 @@ def test_embed():
     assert getattr(main, sensors["SubStatus__sub_sensor"].property) == "sub"
 
     with pytest.raises(KeyError):
-        main.sensors()["nonexisting_sensor"]
+        main.properties()["nonexisting_sensor"]
 
     assert (
         repr(main)
@@ -323,10 +325,10 @@ def test_cli_output():
 
     status = Status()
     expected_regex = [
-        "sensor_without_unit (.+?): 1",
-        "sensor_with_unit (.+?): 2 V",
-        r"\[RW\] setting_without_unit (.+?): 3",
-        r"\[RW\] setting_with_unit (.+?): 4 V",
+        "r-- sensor_without_unit (.+?): 1",
+        "r-- sensor_with_unit (.+?): 2 V",
+        r"rw- setting_without_unit (.+?): 3",
+        r"rw- setting_with_unit (.+?): 4 V",
     ]
 
     for idx, line in enumerate(status.__cli_output__.splitlines()):

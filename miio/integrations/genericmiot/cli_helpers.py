@@ -1,6 +1,6 @@
 from typing import Dict, cast
 
-from miio.descriptors import ActionDescriptor, SettingDescriptor
+from miio.descriptors import ActionDescriptor, PropertyDescriptor
 from miio.miot_models import MiotProperty, MiotService
 
 # TODO: these should be moved to a generic implementation covering all actions and settings
@@ -32,7 +32,7 @@ def pretty_actions(result: Dict[str, ActionDescriptor]):
     return out
 
 
-def pretty_settings(result: Dict[str, SettingDescriptor]):
+def pretty_properties(result: Dict[str, PropertyDescriptor]):
     """Pretty print settings."""
     out = ""
     verbose = False

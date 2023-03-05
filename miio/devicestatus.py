@@ -17,13 +17,11 @@ from typing import (
 import attr
 
 from .descriptors import (
+    AccessFlags,
     ActionDescriptor,
-    BooleanSettingDescriptor,
-    EnumSettingDescriptor,
-    NumberSettingDescriptor,
-    SensorDescriptor,
-    SettingDescriptor,
-    SettingType,
+    EnumDescriptor,
+    PropertyDescriptor,
+    RangeDescriptor,
 )
 from .identifiers import StandardIdentifier
 
@@ -36,25 +34,20 @@ class _StatusMeta(type):
     def __new__(metacls, name, bases, namespace, **kwargs):
         cls = super().__new__(metacls, name, bases, namespace)
 
-        # TODO: clean up to contain all of these in a single container
-        cls._sensors: Dict[str, SensorDescriptor] = {}
-        cls._settings: Dict[str, SettingDescriptor] = {}
-
+        cls._properties: Dict[str, PropertyDescriptor] = {}
         cls._parent: Optional["DeviceStatus"] = None
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
-        descriptor_map = {
-            "sensor": cls._sensors,
-            "setting": cls._settings,
-        }
         for n in namespace:
             prop = getattr(namespace[n], "fget", None)
             if prop:
-                for type_, container in descriptor_map.items():
-                    item = getattr(prop, f"_{type_}", None)
-                    if item:
-                        _LOGGER.debug(f"Found {type_} for {name} {item}")
-                        container[n] = item
+                descriptor = getattr(prop, "_descriptor", None)
+                if descriptor:
+                    _LOGGER.debug(f"Found descriptor for {name} {descriptor}")
+                    if n in cls._properties:
+                        raise ValueError(f"Duplicate {n} for {name} {descriptor}")
+                    cls._properties[n] = descriptor
+                    _LOGGER.debug("Created %s.%s: %s", name, n, descriptor)
 
         return cls
 
@@ -93,19 +86,24 @@ class DeviceStatus(metaclass=_StatusMeta):
         s += ">"
         return s
 
-    def sensors(self) -> Dict[str, SensorDescriptor]:
+    def properties(self) -> Dict[str, PropertyDescriptor]:
         """Return the dict of sensors exposed by the status container.
 
-        You can use @sensor decorator to define sensors inside your status class.
+        Use @sensor and @setting decorators to define properties.
         """
-        return self._sensors  # type: ignore[attr-defined]
+        return self._properties  # type: ignore[attr-defined]
 
-    def settings(self) -> Dict[str, SettingDescriptor]:
+    def settings(self) -> Dict[str, PropertyDescriptor]:
         """Return the dict of settings exposed by the status container.
 
-        You can use @setting decorator to define settings inside your status class.
+        This is just a dict of writable properties, see :meth:`properties`.
         """
-        return self._settings  # type: ignore[attr-defined]
+        # TODO: this is not probably worth having, remove?
+        return {
+            prop.id: prop
+            for prop in self.properties().values()
+            if prop.access & AccessFlags.Write
+        }
 
     def embed(self, name: str, other: "DeviceStatus"):
         """Embed another status container to current one.
@@ -119,45 +117,33 @@ class DeviceStatus(metaclass=_StatusMeta):
         self._embedded[name] = other
         other._parent = self  # type: ignore[attr-defined]
 
-        for sensor_name, sensor in other.sensors().items():
-            final_name = f"{name}__{sensor_name}"
+        for property_name, prop in other.properties().items():
+            final_name = f"{name}__{property_name}"
 
-            self._sensors[final_name] = attr.evolve(sensor, property=final_name)
-
-        for setting_name, setting in other.settings().items():
-            final_name = f"{name}__{setting_name}"
-            self._settings[final_name] = attr.evolve(setting, property=final_name)
+            self._properties[final_name] = attr.evolve(prop, property=final_name)
 
     def __dir__(self) -> Iterable[str]:
         """Overridden to include properties from embedded containers."""
-        return (
-            list(super().__dir__())
-            + list(self._embedded)
-            + list(self._sensors)
-            + list(self._settings)
-        )
+        return list(super().__dir__()) + list(self._embedded) + list(self._properties)
 
     @property
     def __cli_output__(self) -> str:
         """Return a CLI formatted output of the status."""
         out = ""
-        for entry in list(self.sensors().values()) + list(self.settings().values()):
+        for descriptor in self.properties().values():
             try:
-                value = getattr(self, entry.property)
+                value = getattr(self, descriptor.property)
             except KeyError:
                 continue  # skip missing properties
 
             if value is None:  # skip none values
-                _LOGGER.debug("Skipping %s because it's None", entry.name)
+                _LOGGER.debug("Skipping %s because it's None", descriptor.name)
                 continue
 
-            if isinstance(entry, SettingDescriptor):
-                out += "[RW] "
+            out += f"{descriptor.access} {descriptor.name} ({descriptor.id}): {value}"
 
-            out += f"{entry.name} ({entry.id}): {value}"
-
-            if entry.unit is not None:
-                out += f" {entry.unit}"
+            if descriptor.unit is not None:
+                out += f" {descriptor.unit}"
 
             out += "\n"
 
@@ -188,6 +174,15 @@ def _get_qualified_name(func, id_: Optional[Union[str, StandardIdentifier]]):
     return id_ or str(func.__qualname__)
 
 
+def _sensor_type_for_return_type(func):
+    """Return the return type for a method from its type hint."""
+    rtype = get_type_hints(func).get("return")
+    if get_origin(rtype) is Union:  # Unwrap Optional[]
+        rtype, _ = get_args(rtype)
+
+    return rtype
+
+
 def sensor(
     name: str,
     *,
@@ -209,15 +204,8 @@ def sensor(
         property_name = str(func.__name__)
         qualified_name = _get_qualified_name(func, id)
 
-        def _sensor_type_for_return_type(func):
-            rtype = get_type_hints(func).get("return")
-            if get_origin(rtype) is Union:  # Unwrap Optional[]
-                rtype, _ = get_args(rtype)
-
-            return rtype
-
         sensor_type = _sensor_type_for_return_type(func)
-        descriptor = SensorDescriptor(
+        descriptor = PropertyDescriptor(
             id=qualified_name,
             property=property_name,
             name=name,
@@ -225,7 +213,7 @@ def sensor(
             type=sensor_type,
             extras=kwargs,
         )
-        func._sensor = descriptor
+        func._descriptor = descriptor
 
         return func
 
@@ -245,7 +233,6 @@ def setting(
     range_attribute: Optional[str] = None,
     choices: Optional[Type[Enum]] = None,
     choices_attribute: Optional[str] = None,
-    type: Optional[SettingType] = None,
     **kwargs,
 ):
     """Syntactic sugar to create SettingDescriptor objects.
@@ -279,10 +266,12 @@ def setting(
             "setter": setter,
             "setter_name": setter_name,
             "extras": kwargs,
+            "type": _sensor_type_for_return_type(func),
+            "access": AccessFlags.Read | AccessFlags.Write,
         }
 
         if min_value or max_value or range_attribute:
-            descriptor = NumberSettingDescriptor(
+            descriptor = RangeDescriptor(
                 **common_values,
                 min_value=min_value or 0,
                 max_value=max_value,
@@ -290,15 +279,15 @@ def setting(
                 range_attribute=range_attribute,
             )
         elif choices or choices_attribute:
-            descriptor = EnumSettingDescriptor(
+            descriptor = EnumDescriptor(
                 **common_values,
                 choices=choices,
                 choices_attribute=choices_attribute,
             )
         else:
-            descriptor = BooleanSettingDescriptor(**common_values)
+            descriptor = PropertyDescriptor(**common_values)
 
-        func._setting = descriptor
+        func._descriptor = descriptor
 
         return func
 

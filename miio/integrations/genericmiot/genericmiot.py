@@ -6,7 +6,7 @@ import click
 
 from miio import DeviceInfo, MiotDevice
 from miio.click_common import LiteralParamType, command, format_output
-from miio.descriptors import ActionDescriptor, SensorDescriptor, SettingDescriptor
+from miio.descriptors import AccessFlags, ActionDescriptor, PropertyDescriptor
 from miio.miot_cloud import MiotCloud
 from miio.miot_device import MiotMapping
 from miio.miot_models import (
@@ -17,7 +17,7 @@ from miio.miot_models import (
     MiotService,
 )
 
-from .cli_helpers import pretty_actions, pretty_settings
+from .cli_helpers import pretty_actions, pretty_properties
 from .status import GenericMiotStatus
 
 _LOGGER = logging.getLogger(__name__)
@@ -53,9 +53,8 @@ class GenericMiot(MiotDevice):
         self._miot_model: Optional[DeviceModel] = None
 
         self._actions: Dict[str, ActionDescriptor] = {}
-        self._sensors: Dict[str, SensorDescriptor] = {}
-        self._settings: Dict[str, SettingDescriptor] = {}
-        self._properties: List[MiotProperty] = []
+        self._properties: Dict[str, PropertyDescriptor] = {}
+        self._all_properties: List[MiotProperty] = []
 
     def initialize_model(self):
         """Initialize the miot model and create descriptions."""
@@ -71,7 +70,7 @@ class GenericMiot(MiotDevice):
     def status(self) -> GenericMiotStatus:
         """Return status based on the miot model."""
         properties = []
-        for prop in self._properties:
+        for prop in self._all_properties:
             if MiotAccess.Read not in prop.access:
                 continue
 
@@ -113,14 +112,14 @@ class GenericMiot(MiotDevice):
 
             self._actions[act_desc.name] = act_desc
 
-    def _create_sensors_and_settings(self, serv: MiotService):
+    def _create_properties(self, serv: MiotService):
         """Create sensor and setting descriptors for a service."""
         for prop in serv.properties:
             if prop.access == [MiotAccess.Notify]:
                 _LOGGER.debug("Skipping notify-only property: %s", prop)
                 continue
             if not prop.access:
-                # some properties are defined only to be used as inputs for actions
+                # some properties are defined only to be used as inputs or outputs for actions
                 _LOGGER.debug(
                     "%s (%s) reported no access information",
                     prop.name,
@@ -130,17 +129,14 @@ class GenericMiot(MiotDevice):
 
             desc = prop.get_descriptor()
 
-            if isinstance(desc, SensorDescriptor):
-                self._sensors[prop.name] = desc
-            elif isinstance(desc, SettingDescriptor):
+            if desc.access & AccessFlags.Write:
                 desc.setter = partial(
                     self.set_property_by, prop.siid, prop.piid, name=prop.name
                 )
-                self._settings[prop.name] = desc
-            else:
-                raise Exception("unknown descriptor type")
 
-            self._properties.append(prop)
+            self._properties[prop.name] = desc
+            # TODO: all properties is only used as the descriptors (stored in _properties) do not have siid/piid
+            self._all_properties.append(prop)
 
     def _create_descriptors(self):
         """Create descriptors based on the miot model."""
@@ -149,17 +145,14 @@ class GenericMiot(MiotDevice):
                 continue  # Skip device details
 
             self._create_actions(serv)
-            self._create_sensors_and_settings(serv)
+            self._create_properties(serv)
 
         _LOGGER.debug("Created %s actions", len(self._actions))
         for act in self._actions.values():
             _LOGGER.debug(f"\t{act}")
-        _LOGGER.debug("Created %s sensors", len(self._sensors))
-        for sensor in self._sensors.values():
+        _LOGGER.debug("Created %s properties", len(self._properties))
+        for sensor in self._properties.values():
             _LOGGER.debug(f"\t{sensor}")
-        _LOGGER.debug("Created %s settings", len(self._settings))
-        for setting in self._settings.values():
-            _LOGGER.debug(f"\t{setting}")
 
     def _get_action_by_name(self, name: str):
         """Return action by name."""
@@ -192,11 +185,13 @@ class GenericMiot(MiotDevice):
     def change_setting(self, name: str, params=None):
         """Change setting value."""
         params = params if params is not None else []
-        setting = self._settings.get(name, None)
+        setting = self._properties.get(name, None)
         if setting is None:
-            raise ValueError("No setting found for name %s" % name)
+            raise ValueError("No property found for name %s" % name)
+        if setting.access ^ AccessFlags.Write:
+            raise ValueError("Property %s is not writable" % name)
 
-        return setting.setter(value=setting.cast_value(params))
+        return setting.setter(value=params)
 
     def _fetch_info(self) -> DeviceInfo:
         """Hook to perform the model initialization."""
@@ -210,15 +205,11 @@ class GenericMiot(MiotDevice):
         """Return available actions."""
         return self._actions
 
-    @command()
-    def sensors(self) -> Dict[str, SensorDescriptor]:
+    @command(default_output=format_output(result_msg_fmt=pretty_properties))
+    def properties(self) -> Dict[str, PropertyDescriptor]:
         """Return available sensors."""
-        return self._sensors
-
-    @command(default_output=format_output(result_msg_fmt=pretty_settings))
-    def settings(self) -> Dict[str, SettingDescriptor]:
-        """Return available settings."""
-        return self._settings
+        # TODO: move pretty-properties to be generic for all devices
+        return self._properties
 
     @property
     def device_type(self) -> Optional[str]:

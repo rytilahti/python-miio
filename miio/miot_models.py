@@ -1,17 +1,16 @@
 import logging
 from datetime import timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, PrivateAttr, root_validator
 
 from .descriptors import (
+    AccessFlags,
     ActionDescriptor,
-    BooleanSettingDescriptor,
-    EnumSettingDescriptor,
-    NumberSettingDescriptor,
-    SensorDescriptor,
-    SettingDescriptor,
+    EnumDescriptor,
+    PropertyDescriptor,
+    RangeDescriptor,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -270,7 +269,7 @@ class MiotProperty(MiotBaseModel):
 
         return out
 
-    def get_descriptor(self) -> Union[SensorDescriptor, SettingDescriptor]:
+    def get_descriptor(self) -> PropertyDescriptor:
         """Create a descriptor based on the property information."""
         # TODO: initialize inside __init__?
         extras = self.extras
@@ -279,24 +278,33 @@ class MiotProperty(MiotBaseModel):
         extras["piid"] = self.piid
         extras["miot_property"] = self
 
-        # Handle settable ranged properties
+        desc: PropertyDescriptor
+
+        # Handle ranged properties
         if self.range is not None:
-            return self._descriptor_for_ranged()
+            desc = self._create_range_descriptor()
 
-        # Handle settable enums
+        # Handle enums
         elif self.choices is not None:
-            # TODO: handle two-value enums as booleans?
-            return self._descriptor_for_choices()
+            desc = self._create_enum_descriptor()
 
-        # Handle settable booleans
-        elif MiotAccess.Write in self.access and self.format == bool:
-            return self._create_boolean_setting()
+        else:
+            desc = self._create_regular_descriptor()
 
-        # Fallback to sensors
-        return self._create_sensor()
+        return desc
 
-    def _descriptor_for_choices(self) -> Union[SensorDescriptor, EnumSettingDescriptor]:
-        """Create a descriptor for enum-based setting."""
+    def _miot_access_list_to_access(self, access_list: List[MiotAccess]) -> AccessFlags:
+        """Convert miot access list to property access list."""
+        access = AccessFlags(0)
+        if MiotAccess.Read in access_list:
+            access |= AccessFlags.Read
+        if MiotAccess.Write in access_list:
+            access |= AccessFlags.Write
+
+        return access
+
+    def _create_enum_descriptor(self) -> EnumDescriptor:
+        """Create a descriptor for enum-based property."""
         try:
             choices = Enum(
                 self.description, {c.description: c.value for c in self.choices}
@@ -306,59 +314,49 @@ class MiotProperty(MiotBaseModel):
             _LOGGER.error("Unable to create enum for %s: %s", self, ex)
             raise
 
-        if MiotAccess.Write in self.access:
-            desc = EnumSettingDescriptor(
-                id=self.name,
-                name=self.description,
-                property=self.normalized_name,
-                unit=self.unit,
-                choices=choices,
-                extras=self.extras,
-                type=self.format,
-            )
-            return desc
-        else:
-            return self._create_sensor()
-
-    def _descriptor_for_ranged(
-        self,
-    ) -> Union[NumberSettingDescriptor, SensorDescriptor]:
-        """Create a descriptor for range-based setting."""
-        if MiotAccess.Write in self.access and self.range:
-            desc = NumberSettingDescriptor(
-                id=self.name,
-                name=self.description,
-                property=self.normalized_name,
-                min_value=self.range[0],
-                max_value=self.range[1],
-                step=self.range[2],
-                unit=self.unit,
-                extras=self.extras,
-                type=self.format,
-            )
-            return desc
-        else:
-            return self._create_sensor()
-
-    def _create_boolean_setting(self) -> BooleanSettingDescriptor:
-        """Create boolean setting descriptor."""
-        return BooleanSettingDescriptor(
+        desc = EnumDescriptor(
             id=self.name,
             name=self.description,
             property=self.normalized_name,
             unit=self.unit,
+            choices=choices,
             extras=self.extras,
-            type=bool,
+            type=self.format,
+            access=self._miot_access_list_to_access(self.access),
         )
 
-    def _create_sensor(self) -> SensorDescriptor:
-        """Create sensor descriptor for a property."""
-        return SensorDescriptor(
+        return desc
+
+    def _create_range_descriptor(
+        self,
+    ) -> RangeDescriptor:
+        """Create a descriptor for range-based property."""
+        if self.range is None:
+            raise ValueError("Range is None")
+        desc = RangeDescriptor(
+            id=self.name,
+            name=self.description,
+            property=self.normalized_name,
+            min_value=self.range[0],
+            max_value=self.range[1],
+            step=self.range[2],
+            unit=self.unit,
+            extras=self.extras,
+            type=self.format,
+            access=self._miot_access_list_to_access(self.access),
+        )
+
+        return desc
+
+    def _create_regular_descriptor(self) -> PropertyDescriptor:
+        """Create boolean setting descriptor."""
+        return PropertyDescriptor(
             id=self.name,
             name=self.description,
             property=self.normalized_name,
             type=self.format,
             extras=self.extras,
+            access=self._miot_access_list_to_access(self.access),
         )
 
     class Config:
