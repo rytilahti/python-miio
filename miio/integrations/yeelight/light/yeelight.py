@@ -5,11 +5,7 @@ from typing import Dict, List, Optional, Tuple
 import click
 
 from miio.click_common import command, format_output
-from miio.descriptors import (
-    NumberSettingDescriptor,
-    SettingDescriptor,
-    ValidSettingRange,
-)
+from miio.descriptors import PropertyDescriptor, RangeDescriptor, ValidSettingRange
 from miio.device import Device, DeviceStatus
 from miio.devicestatus import sensor, setting
 from miio.identifiers import LightId
@@ -354,18 +350,18 @@ class Yeelight(Device):
 
         return YeelightStatus(dict(zip(properties, values)))
 
-    def settings(self) -> Dict[str, SettingDescriptor]:
-        """Return settings based on supported features.
+    def properties(self) -> Dict[str, PropertyDescriptor]:
+        """Return properties.
 
-        This extends the decorated settings with color temperature and color, if
-        supported by the device.
+        This is overridden to inject the color temperature and color settings,  if they
+        are supported by the device.
         """
         # TODO: unclear semantics on settings, as making changes here will affect other instances of the class...
-        settings = super().settings().copy()
+        settings = super().properties().copy()
         ct = self._light_info.color_temp
         if ct.min_value != ct.max_value:
             _LOGGER.debug("Got ct for %s: %s", self.model, ct)
-            settings[LightId.ColorTemperature.value] = NumberSettingDescriptor(
+            settings[LightId.ColorTemperature.value] = RangeDescriptor(
                 name="Color temperature",
                 id=LightId.ColorTemperature.value,
                 property="color_temp",
@@ -377,7 +373,7 @@ class Yeelight(Device):
             )
         if self._light_info.supports_color:
             _LOGGER.debug("Got color for %s", self.model)
-            settings[LightId.Color.value] = NumberSettingDescriptor(
+            settings[LightId.Color.value] = RangeDescriptor(
                 name="Color",
                 id=LightId.Color.value,
                 property="rgb_int",

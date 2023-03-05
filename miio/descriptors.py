@@ -2,15 +2,13 @@
 
 The descriptors contain information that can be used to provide generic, dynamic user-interfaces.
 
-If you are a downstream developer, use :func:`~miio.device.Device.sensors()`,
-:func:`~miio.device.Device.settings()`, and
+If you are a downstream developer, use :func:`~miio.device.Device.properties()`,
 :func:`~miio.device.Device.actions()` to access the functionality exposed by the integration developer.
 
 If you are developing an integration, prefer :func:`~miio.devicestatus.sensor`, :func:`~miio.devicestatus.setting`, and
 :func:`~miio.devicestatus.action` decorators over creating the descriptors manually.
-If needed, you can override the methods listed to add more descriptors to your integration.
 """
-from enum import Enum, auto
+from enum import Enum, Flag, auto
 from typing import Any, Callable, Dict, List, Optional, Type
 
 import attr
@@ -18,11 +16,28 @@ import attr
 
 @attr.s(auto_attribs=True)
 class ValidSettingRange:
-    """Describes a valid input range for a setting."""
+    """Describes a valid input range for a property."""
 
     min_value: int
     max_value: int
     step: int = 1
+
+
+class AccessFlags(Flag):
+    """Defines the access rights for the property behind the descriptor."""
+
+    Read = auto()
+    Write = auto()
+    Execute = auto()
+
+    def __str__(self):
+        """Return pretty printable string representation."""
+        s = ""
+        s += "r" if self & AccessFlags.Read else "-"
+        s += "w" if self & AccessFlags.Write else "-"
+        s += "x" if self & AccessFlags.Execute else "-"
+        s += ""
+        return s
 
 
 @attr.s(auto_attribs=True)
@@ -32,7 +47,9 @@ class Descriptor:
     id: str
     name: str
     type: Optional[type] = None
+    property: Optional[str] = None
     extras: Dict = attr.ib(factory=dict, repr=False)
+    access: AccessFlags = attr.ib(default=AccessFlags.Read | AccessFlags.Write)
 
 
 @attr.s(auto_attribs=True)
@@ -43,68 +60,55 @@ class ActionDescriptor(Descriptor):
     method: Optional[Callable] = attr.ib(default=None, repr=False)
     inputs: Optional[List[Any]] = attr.ib(default=None, repr=True)
 
+    access: AccessFlags = attr.ib(default=AccessFlags.Execute)
+
+
+class PropertyConstraint(Enum):
+    """Defines constraints for integer based properties."""
+
+    Unset = auto()
+    Range = auto()
+    Choice = auto()
+
 
 @attr.s(auto_attribs=True, kw_only=True)
-class SensorDescriptor(Descriptor):
-    """Describes a sensor exposed by the device.
+class PropertyDescriptor(Descriptor):
+    """Describes a property exposed by the device.
 
-    This information can be used by library users to programatically
+    This information can be used by library users to programmatically
     access information what types of data is available to display to users.
 
-    Prefer :meth:`@sensor <miio.devicestatus.sensor>` for constructing these.
+    Prefer :meth:`@sensor <miio.devicestatus.sensor>` or
+     :meth:`@setting <miio.devicestatus.setting>`for constructing these.
     """
 
+    #: The name of the property to use to access the value from a status container.
     property: str
+    #: Sensors are read-only and settings are (usually) read-write.
+    access: AccessFlags = attr.ib(default=AccessFlags.Read)
     unit: Optional[str] = None
 
-
-class SettingType(Enum):
-    Undefined = auto()
-    Number = auto()
-    Boolean = auto()
-    Enum = auto()
-
-
-@attr.s(auto_attribs=True, kw_only=True)
-class SettingDescriptor(Descriptor):
-    """Presents a settable value."""
-
-    property: str
-    unit: Optional[str] = None
-    setting_type = SettingType.Undefined
+    #: Constraint type defining the allowed values for an integer property.
+    constraint: PropertyConstraint = attr.ib(default=PropertyConstraint.Unset)
+    #: Callable to set the value of the property.
     setter: Optional[Callable] = attr.ib(default=None, repr=False)
+    #: Name of the method in the device class that can be used to set the value.
+    #: This will be used to bind the setter callable.
     setter_name: Optional[str] = attr.ib(default=None, repr=False)
 
-    def cast_value(self, value: int):
-        """Casts value to the expected type."""
-        cast_map = {
-            SettingType.Boolean: bool,
-            SettingType.Enum: int,
-            SettingType.Number: int,
-        }
-        return cast_map[self.setting_type](int(value))
-
 
 @attr.s(auto_attribs=True, kw_only=True)
-class BooleanSettingDescriptor(SettingDescriptor):
-    """Presents a settable boolean value."""
-
-    type: type = bool
-    setting_type: SettingType = SettingType.Boolean
-
-
-@attr.s(auto_attribs=True, kw_only=True)
-class EnumSettingDescriptor(SettingDescriptor):
+class EnumDescriptor(PropertyDescriptor):
     """Presents a settable, enum-based value."""
 
-    setting_type: SettingType = SettingType.Enum
+    constraint: PropertyConstraint = PropertyConstraint.Choice
     choices_attribute: Optional[str] = attr.ib(default=None, repr=False)
     choices: Optional[Type[Enum]] = attr.ib(default=None, repr=False)
 
 
 @attr.s(auto_attribs=True, kw_only=True)
-class NumberSettingDescriptor(SettingDescriptor):
-    """Presents a settable, numerical value.
+class RangeDescriptor(PropertyDescriptor):
+    """Presents a settable, numerical value constrained by min, max, and step.
 
     If `range_attribute` is set, the named property that should return
     :class:ValidSettingRange will be used to obtain {min,max}_value and step.
@@ -115,4 +119,4 @@ class NumberSettingDescriptor(SettingDescriptor):
     step: int
     range_attribute: Optional[str] = attr.ib(default=None)
     type: type = int
-    setting_type: SettingType = SettingType.Number
+    constraint: PropertyConstraint = PropertyConstraint.Range

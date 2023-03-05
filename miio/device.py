@@ -1,18 +1,18 @@
 import logging
 from enum import Enum
 from inspect import getmembers
-from typing import Any, Dict, List, Optional, Union, cast  # noqa: F401
+from typing import Any, Dict, List, Optional, Union, cast, final  # noqa: F401
 
 import click
 
 from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
 from .descriptors import (
+    AccessFlags,
     ActionDescriptor,
-    EnumSettingDescriptor,
-    NumberSettingDescriptor,
-    SensorDescriptor,
-    SettingDescriptor,
-    SettingType,
+    EnumDescriptor,
+    PropertyConstraint,
+    PropertyDescriptor,
+    RangeDescriptor,
 )
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
@@ -88,8 +88,7 @@ class Device(metaclass=DeviceGroupMeta):
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
         self._actions: Optional[Dict[str, ActionDescriptor]] = None
-        self._settings: Optional[Dict[str, SettingDescriptor]] = None
-        self._sensors: Optional[Dict[str, SensorDescriptor]] = None
+        self._properties: Optional[Dict[str, PropertyDescriptor]] = None
         timeout = timeout if timeout is not None else self.timeout
         self._debug = debug
         self._protocol = MiIOProtocol(
@@ -180,56 +179,44 @@ class Device(metaclass=DeviceGroupMeta):
                 "Unable to request miIO.info from the device"
             ) from ex
 
-    def _setting_descriptors_from_status(
+    def _set_constraints_from_attributes(
         self, status: DeviceStatus
-    ) -> Dict[str, SettingDescriptor]:
+    ) -> Dict[str, PropertyDescriptor]:
         """Get the setting descriptors from a DeviceStatus."""
-        settings = status.settings()
+        properties = status.properties()
         unsupported_settings = []
-        for key, setting in settings.items():
-            if setting.setter_name is not None:
-                setting.setter = getattr(self, setting.setter_name)
-            if setting.setter is None:
-                raise Exception(
-                    f"Neither setter or setter_name was defined for {setting}"
-                )
+        for key, prop in properties.items():
+            if prop.setter_name is not None:
+                prop.setter = getattr(self, prop.setter_name)
+            if prop.setter is None:
+                raise Exception(f"Neither setter or setter_name was defined for {prop}")
 
-            if setting.setting_type == SettingType.Enum:
-                setting = cast(EnumSettingDescriptor, setting)
-                if setting.choices_attribute is not None:
-                    retrieve_choices_function = getattr(self, setting.choices_attribute)
+            if prop.constraint == PropertyConstraint.Choice:
+                prop = cast(EnumDescriptor, prop)
+                if prop.choices_attribute is not None:
+                    retrieve_choices_function = getattr(self, prop.choices_attribute)
                     try:
-                        setting.choices = retrieve_choices_function()
+                        prop.choices = retrieve_choices_function()
                     except UnsupportedFeatureException:
+                        # TODO: this should not be done here
                         unsupported_settings.append(key)
                         continue
 
-            elif setting.setting_type == SettingType.Number:
-                setting = cast(NumberSettingDescriptor, setting)
-                if setting.range_attribute is not None:
-                    range_def = getattr(self, setting.range_attribute)
-                    setting.min_value = range_def.min_value
-                    setting.max_value = range_def.max_value
-                    setting.step = range_def.step
-
-            elif setting.setting_type == SettingType.Boolean:
-                pass  # just to exhaust known types
+            elif prop.constraint == PropertyConstraint.Range:
+                prop = cast(RangeDescriptor, prop)
+                if prop.range_attribute is not None:
+                    range_def = getattr(self, prop.range_attribute)
+                    prop.min_value = range_def.min_value
+                    prop.max_value = range_def.max_value
+                    prop.step = range_def.step
 
             else:
-                raise NotImplementedError(
-                    "Unknown setting type: %s" % setting.setting_type
-                )
+                _LOGGER.debug("Got a regular setting without constraints: %s", prop)
 
         for unsupp_key in unsupported_settings:
-            settings.pop(unsupp_key)
+            properties.pop(unsupp_key)
 
-        return settings
-
-    def _sensor_descriptors_from_status(
-        self, status: DeviceStatus
-    ) -> Dict[str, SensorDescriptor]:
-        """Get the sensor descriptors from a DeviceStatus."""
-        return status.sensors()
+        return properties
 
     def _action_descriptors(self) -> Dict[str, ActionDescriptor]:
         """Get the action descriptors from a DeviceStatus."""
@@ -238,22 +225,20 @@ class Device(metaclass=DeviceGroupMeta):
             method_name, method = action_tuple
             action = method._action
             action.method = method  # bind the method
-            actions[method_name] = action
+            actions[action.id] = action
 
         return actions
 
     def _initialize_descriptors(self) -> None:
         """Cache all the descriptors once on the first call."""
-
         status = self.status()
 
-        self._sensors = self._sensor_descriptors_from_status(status)
-        self._settings = self._setting_descriptors_from_status(status)
+        self._properties = self._set_constraints_from_attributes(status)
         self._actions = self._action_descriptors()
 
     @property
     def device_id(self) -> int:
-        """Return device id (did), if available."""
+        """Return the device id (did)."""
         if not self._protocol._device_id:
             self.send_handshake()
         return int.from_bytes(self._protocol._device_id, byteorder="big")
@@ -346,25 +331,41 @@ class Device(metaclass=DeviceGroupMeta):
         """Return device actions."""
         if self._actions is None:
             self._initialize_descriptors()
-            self._actions = cast(Dict[str, ActionDescriptor], self._actions)
 
-        return self._actions
+        # TODO: we ignore the return value for now as these should always be initialized
+        return self._actions  # type: ignore[return-value]
 
-    def settings(self) -> Dict[str, SettingDescriptor]:
-        """Return device settings."""
-        if self._settings is None:
+    def properties(self) -> Dict[str, PropertyDescriptor]:
+        """Return all device properties."""
+        if self._properties is None:
             self._initialize_descriptors()
-            self._settings = cast(Dict[str, SettingDescriptor], self._settings)
 
-        return self._settings
+        # TODO: we ignore the return value for now as these should always be initialized
+        return self._properties  # type: ignore[return-value]
 
-    def sensors(self) -> Dict[str, SensorDescriptor]:
-        """Return device sensors."""
-        if self._sensors is None:
+    @final
+    def settings(self) -> Dict[str, PropertyDescriptor]:
+        """Return settable properties."""
+        if self._properties is None:
             self._initialize_descriptors()
-            self._sensors = cast(Dict[str, SensorDescriptor], self._sensors)
 
-        return self._sensors
+        return {
+            prop.id: prop
+            for prop in self.properties().values()
+            if prop.access & AccessFlags.Write
+        }
+
+    @final
+    def sensors(self) -> Dict[str, PropertyDescriptor]:
+        """Return read-only properties."""
+        if self._properties is None:
+            self._initialize_descriptors()
+
+        return {
+            prop.id: prop
+            for prop in self.properties().values()
+            if prop.access ^ AccessFlags.Write
+        }
 
     def supports_miot(self) -> bool:
         """Return True if the device supports miot commands.
