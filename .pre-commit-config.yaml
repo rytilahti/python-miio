@@ -27,6 +27,7 @@ repos:
   rev: v1.1.1
   hooks:
   - id: doc8
+    additional_dependencies: [myst-parser]
 
 - repo: https://github.com/myint/docformatter
   rev: v1.5.1
