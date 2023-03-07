@@ -220,7 +220,6 @@ class Huizuo(MiotDevice):
         timeout: Optional[int] = None,
         model: str = MODEL_HUIZUO_PIS123,
     ) -> None:
-
         if model in MODELS_WITH_FAN_WY:
             self.mapping.update(_ADDITIONAL_MAPPING_FAN_WY)
         if model in MODELS_WITH_FAN_WY2:

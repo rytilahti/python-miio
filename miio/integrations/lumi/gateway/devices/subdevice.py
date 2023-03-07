@@ -38,7 +38,6 @@ class SubDevice:
         dev_info: SubDeviceInfo,
         model_info: Optional[Dict] = None,
     ) -> None:
-
         self._gw = gw
         self.sid = dev_info.sid
         if model_info is None:
