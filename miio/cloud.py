@@ -155,7 +155,7 @@ class CloudInterface:
 
 @click.group(invoke_without_command=True)
 @click.option("--username", prompt=True)
-@click.option("--password", prompt=True)
+@click.option("--password", prompt=True, hide_input=True)
 @click.pass_context
 def cloud(ctx: click.Context, username, password):
     """Cloud commands."""

@@ -1,5 +1,6 @@
 :orphan:
 
+
 .. _legacy_token_extraction:
 
 Legacy methods for obtaining tokens
@@ -8,15 +9,10 @@ Legacy methods for obtaining tokens
 This page describes several ways to extract device tokens,
 both with and without cloud access.
 
-.. _cloud_tokens:
+.. note::
 
-Tokens from Mi Home Cloud
-=========================
-
-The fastest way to obtain tokens is to use the
-[cloud tokens extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) by Piotr Machowski.
-Check out his repository for detailed instructions on installation and execution.
-
+    You generally want to use the :ref:`miiocli cloud command <obtaining_tokens>` to obtain tokens.
+    These methods are listed here just for historical reference and may not work anymore.
 
 .. _logged_tokens:
 
@@ -50,8 +46,8 @@ or database from the Mi Home app.
 The procedure is briefly described below,
 but you may find the following links also useful:
 
-- https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token.md
-- https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md
+* https://github.com/jghaanstra/com.xiaomi-miio/blob/master/docs/obtain_token.md
+* https://github.com/homeassistantchina/custom_components/blob/master/doc/chuang_mi_ir_remote.md
 
 Android
 ~~~~~~~
@@ -109,24 +105,24 @@ Apple
 Create a new unencrypted iOS backup to your computer.
 To do that you've to follow these steps:
 
-- Connect your iOS device to the computer
-- Open iTunes
-- Click on your iOS device (sidebar left or icon on top navigation bar)
-- In the Summary view check the following settings
-    - Automatically Back Up: ``This Computer``
-    - **Disable** ``Encrypt iPhone backup``
-- Click ``Back Up Now``
+#. Connect your iOS device to the computer
+#. Open iTunes
+#. Click on your iOS device (sidebar left or icon on top navigation bar)
+#. In the Summary view check the following settings
+    * Automatically Back Up: ``This Computer``
+    * **Disable** ``Encrypt iPhone backup``
+#. Click ``Back Up Now``
 
 When the backup is finished, download `iBackup Viewer <https://www.imactools.com/iphonebackupviewer/>`_ and follow these steps:
 
-- Open iBackup Viewer
-- Click on your newly created backup
-- Click on the ``Raw Files`` icon (looks like a file tree)
-- On the left column, search for ``AppDomain-com.xiaomi.mihome`` and select it
-- Click on the search icon in the header
-- Enter ``_mihome`` in the search field
-- Select the ``Documents/0123456789_mihome.sqlite`` file (the one with the number prefixed)
-- Click ``Export -> Selected…`` in the header and store the file
+#. Open iBackup Viewer
+#. Click on your newly created backup
+#. Click on the ``Raw Files`` icon (looks like a file tree)
+#. On the left column, search for ``AppDomain-com.xiaomi.mihome`` and select it
+#. Click on the search icon in the header
+#. Enter ``_mihome`` in the search field
+#. Select the ``Documents/0123456789_mihome.sqlite`` file (the one with the number prefixed)
+#. Click ``Export -> Selected…`` in the header and store the file
 
 Now you've exported the SQLite database to your Mac and you can extract the tokens.
 
@@ -149,34 +145,17 @@ Encrypted tokens as `recently introduced on iOS devices <https://github.com/ryti
 For decrypting Android backups the password has to be provided
 to the tool with ``--password <password>``.
 
-*Please feel free to submit pull requests to simplify this procedure!*
-
 .. code-block:: bash
 
     $ miio-extract-tokens backup.ab
     Opened backup/backup.ab
     Extracting to /tmp/tmpvbregact
     Reading tokens from Android DB
-    Gateway
-            Model: lumi.gateway.v3
-            IP address: 192.168.XXX.XXX
-            Token: 91c52a27eff00b954XXX
-            MAC: 28:6C:07:XX:XX:XX
     room1
             Model: yeelink.light.color1
             IP address: 192.168.XXX.XXX
             Token: 4679442a069f09883XXX
             MAC: F0:B4:29:XX:XX:XX
-    room2
-            Model: yeelink.light.color1
-            IP address: 192.168.XXX.XXX
-            Token: 7433ab14222af5792XXX
-            MAC: 28:6C:07:XX:XX:XX
-    Flower Care
-            Model: hhcc.plantmonitor.v1
-            IP address: 134.XXX.XXX.XXX
-            Token: 124f90d87b4b90673XXX
-            MAC: C4:7C:8D:XX:XX:XX
     Mi Robot Vacuum
             Model: rockrobo.vacuum.v1
             IP address: 192.168.XXX.XXX
@@ -213,5 +192,3 @@ Tokens from rooted device
 =========================
 
 If a device is rooted via `dustcloud <https://github.com/dgiese/dustcloud>`_ (e.g. for running the cloud-free control webinterface `Valetudo <https://valetudo.cloud/>`_), the token can be extracted by connecting to the device via SSH and reading the file: :code:`printf $(cat /mnt/data/miio/device.token) | xxd -p`
-
-See also `"How can I get the token from the robots FileSystem?" in the FAQ for Valetudo <https://valetudo.cloud/pages/faq.html#how-can-i-get-the-token-from-the-robots-filesystem>`_.
