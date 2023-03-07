@@ -188,7 +188,7 @@ class GenericMiot(MiotDevice):
         setting = self._properties.get(name, None)
         if setting is None:
             raise ValueError("No property found for name %s" % name)
-        if setting.access ^ AccessFlags.Write:
+        if setting.access & AccessFlags.Write == 0:
             raise ValueError("Property %s is not writable" % name)
 
         return setting.setter(value=params)
