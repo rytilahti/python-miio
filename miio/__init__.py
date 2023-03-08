@@ -27,7 +27,7 @@ from miio.integrations.deerma.humidifier import AirHumidifierJsqs, AirHumidifier
 from miio.integrations.dmaker.airfresh import AirFreshA1, AirFreshT2017
 from miio.integrations.dmaker.fan import Fan1C, FanMiot, FanP5
 from miio.integrations.dreame.vacuum import DreameVacuum
-from miio.integrations.genericmiot import GenericMiot
+from miio.integrations.genericmiot.genericmiot import GenericMiot
 from miio.integrations.huayi.light import (
     Huizuo,
     HuizuoLampFan,

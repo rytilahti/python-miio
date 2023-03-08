@@ -3,7 +3,7 @@ from unittest.mock import ANY
 import pytest
 
 from miio import Huizuo, MiotDevice
-from miio.integrations.genericmiot import GenericMiot
+from miio.integrations.genericmiot.genericmiot import GenericMiot
 from miio.miot_device import MiotValueType, _filter_request_fields
 
 MIOT_DEVICES = MiotDevice.__subclasses__()

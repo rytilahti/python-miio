@@ -310,4 +310,4 @@ so it is also possible to pass dicts.
    :prog: mirobo
    :show-nested:
 
-:py:class:`API <miio.integrations.roborocok.vacuum>`
+:py:class:`API <miio.integrations.roborock.vacuum>`
