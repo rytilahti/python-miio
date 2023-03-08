@@ -36,7 +36,6 @@ class AccessFlags(Flag):
         s += "r" if self & AccessFlags.Read else "-"
         s += "w" if self & AccessFlags.Write else "-"
         s += "x" if self & AccessFlags.Execute else "-"
-        s += ""
         return s
 
 
@@ -50,12 +49,14 @@ class Descriptor:
     name: str
     #: Type of the property, if applicable.
     type: Optional[type] = None
+    #: Unit of the property, if applicable.
+    unit: Optional[str] = None
     #: Name of the attribute in the status container that contains the value, if applicable.
     status_attribute: Optional[str] = None
     #: Additional data related to this descriptor.
     extras: Dict = attr.ib(factory=dict, repr=False)
     #: Access flags (read, write, execute) for the described item.
-    access: AccessFlags = attr.ib(default=AccessFlags.Read | AccessFlags.Write)
+    access: AccessFlags = attr.ib(default=AccessFlags(0))
 
 
 @attr.s(auto_attribs=True)
@@ -94,8 +95,6 @@ class PropertyDescriptor(Descriptor):
     status_attribute: str
     #: Sensors are read-only and settings are (usually) read-write.
     access: AccessFlags = attr.ib(default=AccessFlags.Read)
-    #: Optional human-readable unit of the property.
-    unit: Optional[str] = None
 
     #: Constraint type defining the allowed values for an integer property.
     constraint: PropertyConstraint = attr.ib(default=PropertyConstraint.Unset)
