@@ -317,7 +317,7 @@ class MiotProperty(MiotBaseModel):
         desc = EnumDescriptor(
             id=self.name,
             name=self.description,
-            property=self.normalized_name,
+            status_attribute=self.normalized_name,
             unit=self.unit,
             choices=choices,
             extras=self.extras,
@@ -336,7 +336,7 @@ class MiotProperty(MiotBaseModel):
         desc = RangeDescriptor(
             id=self.name,
             name=self.description,
-            property=self.normalized_name,
+            status_attribute=self.normalized_name,
             min_value=self.range[0],
             max_value=self.range[1],
             step=self.range[2],
@@ -353,7 +353,7 @@ class MiotProperty(MiotBaseModel):
         return PropertyDescriptor(
             id=self.name,
             name=self.description,
-            property=self.normalized_name,
+            status_attribute=self.normalized_name,
             type=self.format,
             extras=self.extras,
             access=self._miot_access_list_to_access(self.access),

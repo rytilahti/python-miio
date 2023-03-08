@@ -364,7 +364,7 @@ class Yeelight(Device):
             settings[LightId.ColorTemperature.value] = RangeDescriptor(
                 name="Color temperature",
                 id=LightId.ColorTemperature.value,
-                property="color_temp",
+                status_attribute="color_temp",
                 setter=self.set_color_temperature,
                 min_value=self.color_temperature_range.min_value,
                 max_value=self.color_temperature_range.max_value,
@@ -376,7 +376,7 @@ class Yeelight(Device):
             settings[LightId.Color.value] = RangeDescriptor(
                 name="Color",
                 id=LightId.Color.value,
-                property="rgb_int",
+                status_attribute="rgb_int",
                 setter=self.set_rgb_int,
                 min_value=1,
                 max_value=0xFFFFFF,

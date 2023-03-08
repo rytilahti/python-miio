@@ -152,7 +152,7 @@ def test_setting_decorator_number(mocker):
     desc = settings["level"]
     assert isinstance(desc, RangeDescriptor)
 
-    assert getattr(d.status(), desc.property) == 1
+    assert getattr(d.status(), desc.status_attribute) == 1
 
     assert desc.name == "Level"
     assert desc.min_value == 0
@@ -200,7 +200,7 @@ def test_setting_decorator_number_range_attribute(mocker):
     desc = settings["level"]
     assert isinstance(desc, RangeDescriptor)
 
-    assert getattr(d.status(), desc.property) == 1
+    assert getattr(d.status(), desc.status_attribute) == 1
 
     assert desc.name == "Level"
     assert desc.min_value == 1
@@ -244,7 +244,7 @@ def test_setting_decorator_enum(mocker):
 
     desc = settings["level"]
     assert isinstance(desc, EnumDescriptor)
-    assert getattr(d.status(), desc.property) == TestEnum.First
+    assert getattr(d.status(), desc.status_attribute) == TestEnum.First
 
     assert desc.name == "Level"
     assert len(desc.choices) == 2
@@ -275,8 +275,8 @@ def test_embed():
     assert len(sensors) == 2
     assert sub._parent == main
 
-    assert getattr(main, sensors["main_sensor"].property) == "main"
-    assert getattr(main, sensors["SubStatus__sub_sensor"].property) == "sub"
+    assert getattr(main, sensors["main_sensor"].status_attribute) == "main"
+    assert getattr(main, sensors["SubStatus__sub_sensor"].status_attribute) == "sub"
 
     with pytest.raises(KeyError):
         main.properties()["nonexisting_sensor"]
