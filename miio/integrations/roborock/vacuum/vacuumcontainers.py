@@ -331,12 +331,15 @@ class VacuumStatus(DeviceStatus):
         setter_name="load_map",
         icon="mdi:floor-plan",
     )
-    def current_map_id(self) -> int:
+    def current_map_id(self) -> Optional[int]:
         """The id of the current map with regards to the multi map feature,
 
         [3,7,11,15] -> [0,1,2,3].
         """
-        return int((self.data["map_status"] + 1) / 4 - 1)
+        try:
+            return int((self.data["map_status"] + 1) / 4 - 1)
+        except KeyError:
+            return None
 
     @property
     def in_zone_cleaning(self) -> bool:
