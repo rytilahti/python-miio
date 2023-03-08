@@ -44,11 +44,17 @@ class AccessFlags(Flag):
 class Descriptor:
     """Base class for all descriptors."""
 
+    #: Unique identifier.
     id: str
+    #: Human readable name.
     name: str
+    #: Type of the property, if applicable.
     type: Optional[type] = None
-    property: Optional[str] = None
+    #: Name of the attribute in the status container that contains the value, if applicable.
+    status_attribute: Optional[str] = None
+    #: Additional data related to this descriptor.
     extras: Dict = attr.ib(factory=dict, repr=False)
+    #: Access flags (read, write, execute) for the described item.
     access: AccessFlags = attr.ib(default=AccessFlags.Read | AccessFlags.Write)
 
 
@@ -56,8 +62,10 @@ class Descriptor:
 class ActionDescriptor(Descriptor):
     """Describes a button exposed by the device."""
 
-    method_name: Optional[str] = attr.ib(default=None, repr=False)
+    # Callable to execute the action.
     method: Optional[Callable] = attr.ib(default=None, repr=False)
+    #: Name of the method in the device class that can be used to execute the action.
+    method_name: Optional[str] = attr.ib(default=None, repr=False)
     inputs: Optional[List[Any]] = attr.ib(default=None, repr=True)
 
     access: AccessFlags = attr.ib(default=AccessFlags.Execute)
@@ -82,10 +90,11 @@ class PropertyDescriptor(Descriptor):
      :meth:`@setting <miio.devicestatus.setting>`for constructing these.
     """
 
-    #: The name of the property to use to access the value from a status container.
-    property: str
+    #: Name of the attribute in the status container that contains the value.
+    status_attribute: str
     #: Sensors are read-only and settings are (usually) read-write.
     access: AccessFlags = attr.ib(default=AccessFlags.Read)
+    #: Optional human-readable unit of the property.
     unit: Optional[str] = None
 
     #: Constraint type defining the allowed values for an integer property.
@@ -93,7 +102,7 @@ class PropertyDescriptor(Descriptor):
     #: Callable to set the value of the property.
     setter: Optional[Callable] = attr.ib(default=None, repr=False)
     #: Name of the method in the device class that can be used to set the value.
-    #: This will be used to bind the setter callable.
+    #: If set, the callable with this name will override the `setter` attribute.
     setter_name: Optional[str] = attr.ib(default=None, repr=False)
 
 
@@ -102,7 +111,9 @@ class EnumDescriptor(PropertyDescriptor):
     """Presents a settable, enum-based value."""
 
     constraint: PropertyConstraint = PropertyConstraint.Choice
+    #: Name of the attribute in the device class that returns the choices.
     choices_attribute: Optional[str] = attr.ib(default=None, repr=False)
+    #: Enum class containing the available choices.
     choices: Optional[Type[Enum]] = attr.ib(default=None, repr=False)
 
 
@@ -110,13 +121,18 @@ class EnumDescriptor(PropertyDescriptor):
 class RangeDescriptor(PropertyDescriptor):
     """Presents a settable, numerical value constrained by min, max, and step.
 
-    If `range_attribute` is set, the named property that should return
-    :class:ValidSettingRange will be used to obtain {min,max}_value and step.
+    If `range_attribute` is set, the named property that should return a
+    :class:`ValidSettingRange` object to override the {min,max}_value and step values.
     """
 
+    #: Minimum value for the property.
     min_value: int
+    #: Maximum value for the property.
     max_value: int
+    #: Step size for the property.
     step: int
+    #: Name of the attribute in the device class that returns the range.
+    #: If set, this will override the individual min/max/step values.
     range_attribute: Optional[str] = attr.ib(default=None)
     type: type = int
     constraint: PropertyConstraint = PropertyConstraint.Range

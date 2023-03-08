@@ -111,16 +111,18 @@ class DeviceStatus(metaclass=_StatusMeta):
         This makes it easy to provide a single status response for cases where responses
         from multiple I/O calls is wanted to provide a simple interface for downstreams.
 
-        Internally, this will prepend the name of the other class to the property names,
+        Internally, this will prepend the name of the other class to the attribute names,
         and override the __getattribute__ to lookup attributes in the embedded containers.
         """
         self._embedded[name] = other
         other._parent = self  # type: ignore[attr-defined]
 
-        for property_name, prop in other.properties().items():
-            final_name = f"{name}__{property_name}"
+        for prop_id, prop in other.properties().items():
+            final_name = f"{name}__{prop_id}"
 
-            self._properties[final_name] = attr.evolve(prop, property=final_name)
+            self._properties[final_name] = attr.evolve(
+                prop, status_attribute=final_name
+            )
 
     def __dir__(self) -> Iterable[str]:
         """Overridden to include properties from embedded containers."""
@@ -132,7 +134,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         out = ""
         for descriptor in self.properties().values():
             try:
-                value = getattr(self, descriptor.property)
+                value = getattr(self, descriptor.status_attribute)
             except KeyError:
                 continue  # skip missing properties
 
@@ -201,13 +203,13 @@ def sensor(
     """
 
     def decorator_sensor(func):
-        property_name = str(func.__name__)
+        func_name = str(func.__name__)
         qualified_name = _get_qualified_name(func, id)
 
         sensor_type = _sensor_type_for_return_type(func)
         descriptor = PropertyDescriptor(
             id=qualified_name,
-            property=property_name,
+            status_attribute=func_name,
             name=name,
             unit=unit,
             type=sensor_type,
@@ -248,7 +250,7 @@ def setting(
     """
 
     def decorator_setting(func):
-        property_name = str(func.__name__)
+        func_name = str(func.__name__)
         qualified_name = _get_qualified_name(func, id)
 
         if setter is None and setter_name is None:
@@ -260,7 +262,7 @@ def setting(
 
         common_values = {
             "id": qualified_name,
-            "property": property_name,
+            "status_attribute": func_name,
             "name": name,
             "unit": unit,
             "setter": setter,
@@ -306,13 +308,13 @@ def action(name: str, *, id: Optional[Union[str, StandardIdentifier]] = None, **
     """
 
     def decorator_action(func):
-        property_name = str(func.__name__)
+        func_name = str(func.__name__)
         qualified_name = _get_qualified_name(func, id)
 
         descriptor = ActionDescriptor(
             id=qualified_name,
             name=name,
-            method_name=property_name,
+            method_name=func_name,
             method=None,
             extras=kwargs,
         )
