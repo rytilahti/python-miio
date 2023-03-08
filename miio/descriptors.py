@@ -113,7 +113,7 @@ class PropertyDescriptor(Descriptor):
     access information what types of data is available to display to users.
 
     Prefer :meth:`@sensor <miio.devicestatus.sensor>` or
-     :meth:`@setting <miio.devicestatus.setting>`for constructing these.
+     :meth:`@setting <miio.devicestatus.setting>` for constructing these.
     """
 
     #: Name of the attribute in the status container that contains the value.

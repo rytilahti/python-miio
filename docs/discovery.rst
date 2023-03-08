@@ -71,7 +71,12 @@ as well as the server locale to use for fetching the tokens.
 
     miiocli cloud list
 
-:ref:`Alternatively, see our documentation for other ways to obtain the tokens<legacy_token_extraction>`.
+    Username: example@example.com
+    Password:
+    Locale (all, cn, de, i2, ru, sg, us): all
+
+
+Alternatively, you can try one of the :ref:`legacy ways to obtain the tokens<legacy_token_extraction>`.
 
 You can also access this functionality programatically using :class:`miio.cloud.CloudInterface`.
 

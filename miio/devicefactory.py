@@ -95,7 +95,7 @@ class DeviceFactory:
         """
         dev: Device
         if force_generic_miot:  # TODO: find a better way to handle this.
-            from .integrations.genericmiot import GenericMiot
+            from .integrations.genericmiot.genericmiot import GenericMiot
 
             dev = GenericMiot(host, token, model=model)
             dev.info()

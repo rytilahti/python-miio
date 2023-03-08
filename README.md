@@ -58,8 +58,20 @@ The `miiocli` command allows controlling supported devices from the
 command line, given that you know their IP addresses and tokens.
 
 The simplest way to acquire the tokens is by using the `miiocli cloud` command,
-which fetches them for you from your cloud account using [micloud](https://github.com/Squachen/micloud/).
-Alternatively, see [the docs](https://python-miio.readthedocs.io/en/latest/legacy_token_extraction.html#legacy-token-extraction)
+which fetches them for you from your cloud account using [micloud](https://github.com/Squachen/micloud/):
+
+    miiocli cloud
+    Username: example@example.com
+    Password:
+
+    == name of the device (Device offline ) ==
+        Model: example.device.v1
+        Token: b1946ac92492d2347c6235b4d2611184
+        IP: 192.168.xx.xx (mac: ab:cd:ef:12:34:56)
+        DID: 123456789
+        Locale: cn
+
+Alternatively, [see the docs](https://python-miio.readthedocs.io/en/latest/discovery.html#obtaining-tokens)
 for other ways to obtain them.
 
 After you have your token, you can start controlling the device.
@@ -325,4 +337,5 @@ can find interesting. Feel free to submit more related projects.
 * [Valetudo](https://github.com/Hypfer/Valetudo) (cloud free vacuum firmware)
 * [micloud](https://github.com/Squachen/micloud) (library to access xiaomi cloud services, can be used to obtain device tokens)
 * [micloudfaker](https://github.com/unrelentingtech/micloudfaker) (dummy cloud server, can be used to fix powerstrip status requests when without internet access)
+* [Xiaomi Cloud Tokens Extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) (an alternative way to fetch tokens from the cloud)
 * [Your project here? Feel free to open a PR!](https://github.com/rytilahti/python-miio/pulls)
