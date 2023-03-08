@@ -58,6 +58,22 @@ class Descriptor:
     #: Access flags (read, write, execute) for the described item.
     access: AccessFlags = attr.ib(default=AccessFlags(0))
 
+    @property
+    def __cli_output__(self) -> str:
+        """Return a string presentation for the cli."""
+        s = f"{self.name} ({self.id})\n"
+        if self.type:
+            s += f"\tType: {self.type}\n"
+        if self.unit:
+            s += f"\tUnit: {self.unit}\n"
+        if self.status_attribute:
+            s += f"\tAttribute: {self.status_attribute}\n"
+        s += f"\tAccess: {self.access}\n"
+        if self.extras:
+            s += f"\tExtras: {self.extras}\n"
+
+        return s
+
 
 @attr.s(auto_attribs=True)
 class ActionDescriptor(Descriptor):
@@ -70,6 +86,15 @@ class ActionDescriptor(Descriptor):
     inputs: Optional[List[Any]] = attr.ib(default=None, repr=True)
 
     access: AccessFlags = attr.ib(default=AccessFlags.Execute)
+
+    @property
+    def __cli_output__(self) -> str:
+        """Return a string presentation for the cli."""
+        s = super().__cli_output__
+        if self.inputs:
+            s += f"\tInputs: {self.inputs}\n"
+
+        return s
 
 
 class PropertyConstraint(Enum):
@@ -104,6 +129,20 @@ class PropertyDescriptor(Descriptor):
     #: If set, the callable with this name will override the `setter` attribute.
     setter_name: Optional[str] = attr.ib(default=None, repr=False)
 
+    @property
+    def __cli_output__(self) -> str:
+        """Return a string presentation for the cli."""
+        s = super().__cli_output__
+
+        if self.setter:
+            s += f"\tSetter: {self.setter}\n"
+        if self.setter_name:
+            s += f"\tSetter Name: {self.setter_name}\n"
+        if self.constraint:
+            s += f"\tConstraint: {self.constraint}\n"
+
+        return s
+
 
 @attr.s(auto_attribs=True, kw_only=True)
 class EnumDescriptor(PropertyDescriptor):
@@ -114,6 +153,15 @@ class EnumDescriptor(PropertyDescriptor):
     choices_attribute: Optional[str] = attr.ib(default=None, repr=False)
     #: Enum class containing the available choices.
     choices: Optional[Type[Enum]] = attr.ib(default=None, repr=False)
+
+    @property
+    def __cli_output__(self) -> str:
+        """Return a string presentation for the cli."""
+        s = super().__cli_output__
+        if self.choices:
+            s += f"\tChoices: {self.choices}\n"
+
+        return s
 
 
 @attr.s(auto_attribs=True, kw_only=True)
@@ -135,3 +183,10 @@ class RangeDescriptor(PropertyDescriptor):
     range_attribute: Optional[str] = attr.ib(default=None)
     type: type = int
     constraint: PropertyConstraint = PropertyConstraint.Range
+
+    @property
+    def __cli_output__(self) -> str:
+        """Return a string presentation for the cli."""
+        s = super().__cli_output__
+        s += f"\tRange: {self.min_value} - {self.max_value} (step {self.step})\n"
+        return s

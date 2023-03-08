@@ -49,6 +49,9 @@ def test_descriptor(class_, access):
     assert desc.extras == {"test": "test"}
     assert desc.access == access
 
+    # TODO: test for cli output in the derived classes
+    assert hasattr(desc, "__cli_output__")
+
 
 def test_actiondescriptor():
     """Test that an action descriptor has the expected API."""
