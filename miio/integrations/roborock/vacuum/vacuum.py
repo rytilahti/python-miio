@@ -891,12 +891,16 @@ class RoborockVacuum(Device):
         return self.send("resume_segment_clean")
 
     @command(click.argument("segments", type=LiteralParamType(), required=True))
-    def segment_clean(self, segments: List):
+    @command(click.argument("repeat", type=int, required=False, default=1))
+    def segment_clean(self, segments: List, repeat: int = 1):
         """Clean segments.
 
         :param List segments: List of segments to clean: [16,17,18]
+        :param int repeat: Count of iterations
         """
-        return self.send("app_segment_clean", segments)
+        return self.send(
+            "app_segment_clean", [{"segments": segments, "repeat": repeat}]
+        )
 
     @command()
     def get_room_mapping(self):
