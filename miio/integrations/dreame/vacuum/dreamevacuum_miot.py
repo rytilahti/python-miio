@@ -16,6 +16,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 DREAME_1C = "dreame.vacuum.mc1808"
+DREAME_1C_A = "dreame.vacuum.ma1808"
+DREAME_1C_B = "dreame.vacuum.mb1808"
 DREAME_F9 = "dreame.vacuum.p2008"
 DREAME_D9 = "dreame.vacuum.p2009"
 DREAME_Z10_PRO = "dreame.vacuum.p2028"
@@ -165,6 +167,8 @@ _DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
 
 MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_1C: _DREAME_1C_MAPPING,
+    DREAME_1C_A: _DREAME_1C_MAPPING,
+    DREAME_1C_B: _DREAME_1C_MAPPING,
     DREAME_F9: _DREAME_F9_MAPPING,
     DREAME_D9: _DREAME_F9_MAPPING,
     DREAME_Z10_PRO: _DREAME_F9_MAPPING,
