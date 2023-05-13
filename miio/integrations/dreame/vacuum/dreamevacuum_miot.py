@@ -49,6 +49,7 @@ _DREAME_1C_MAPPING: MiotMapping = {
     "total_clean_time": {"siid": 18, "piid": 13},
     "total_clean_times": {"siid": 18, "piid": 14},
     "total_clean_area": {"siid": 18, "piid": 15},
+    "water_flow": {"siid": 18, "piid": 20},
     "life_sieve": {"siid": 19, "piid": 1},
     "life_brush_side": {"siid": 19, "piid": 2},
     "life_brush_main": {"siid": 19, "piid": 3},
