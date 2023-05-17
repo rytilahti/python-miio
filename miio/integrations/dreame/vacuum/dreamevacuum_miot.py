@@ -527,6 +527,9 @@ class DreameVacuum(MiotDevice):
     MANUAL_DISTANCE_MAX = 300
     MANUAL_DISTANCE_MIN = -300
 
+    VOLUME_MIN = 0
+    VOLUME_MAX = 100
+
     @command()
     def start(self) -> None:
         """Start cleaning."""
@@ -594,6 +597,20 @@ class DreameVacuum(MiotDevice):
             return None
         click.echo(f"Setting fanspeed to {fanspeed.name}")
         return self.set_property("cleaning_mode", fanspeed.value)
+
+    @command(click.argument("volume", type=int))
+    def set_volume(self, volume: int):
+        """Set volume.
+
+        :param int volume: Volume to set
+        """
+        if volume < self.VOLUME_MIN or volume > self.VOLUME_MAX:
+            raise ValueError(
+                "Given volume is invalid, should be [%s, %s], was: %s"
+                % (self.VOLUME_MIN, self.VOLUME_MAX, volume)
+            )
+        click.echo(f"Setting volume to {volume}")
+        return self.set_property("volume", volume)
 
     @command()
     def fan_speed_presets(self) -> Dict[str, int]:
