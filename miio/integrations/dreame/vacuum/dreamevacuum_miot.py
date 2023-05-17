@@ -252,11 +252,7 @@ def _enum_as_dict(cls):
 
 def _get_cleaning_mode_enum_class(model):
     """Return cleaning mode enum class for model if found or None."""
-    if model in (
-        DREAME_1C,
-        DREAME_1C_A,
-        DREAME_1C_B
-    ):
+    if model in (DREAME_1C, DREAME_1C_A, DREAME_1C_B):
         return CleaningModeDreame1C
     elif model in (
         DREAME_F9,
