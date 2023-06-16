@@ -23,6 +23,7 @@ MODEL_FAN_P11 = "dmaker.fan.p11"
 MODEL_FAN_P15 = "dmaker.fan.p15"
 MODEL_FAN_P18 = "dmaker.fan.p18"
 MODEL_FAN_P33 = "dmaker.fan.p33"
+MODEL_FAN_P39 = "dmaker.fan.p39"
 MODEL_FAN_1C = "dmaker.fan.1c"
 
 
@@ -85,8 +86,22 @@ MIOT_MAPPING = {
         "power_off_time": {"siid": 3, "piid": 1},
         "set_move": {"siid": 6, "piid": 1},
     },
+    MODEL_FAN_P39: {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p39:1
+        "power": {"siid": 2, "piid": 1},
+        "fan_level": {"siid": 2, "piid": 2},
+        "mode": {"siid": 2, "piid": 4},
+        "swing_mode": {"siid": 2, "piid": 5},
+        "swing_mode_angle": {"siid": 2, "piid": 6},
+        "fan_speed": {"siid": 2, "piid": 11},
+        "light": {"siid": 2, "piid": 9},
+        "buzzer": {"siid": 7, "piid": 2},
+        # "device_fault": {"siid": 6, "piid": 2},
+        "child_lock": {"siid": 3, "piid": 1},
+        "power_off_time": {"siid": 2, "piid": 8},
+        "set_move": {"siid": 2, "piid": 10},
+    },
 }
-
 
 # These mappings are based on user reports and may not cover all features
 MIOT_MAPPING[MODEL_FAN_P15] = MIOT_MAPPING[MODEL_FAN_P11]  # see #1354
