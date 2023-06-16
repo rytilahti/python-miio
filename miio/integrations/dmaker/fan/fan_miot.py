@@ -98,7 +98,7 @@ MIOT_MAPPING = {
         "buzzer": {"siid": 2, "piid": 7},
         # "device_fault": {"siid": 6, "piid": 2},
         "child_lock": {"siid": 3, "piid": 1},
-        "power_off_time": {"siid": 2, "piid": 8},
+        "power_off_time": {"siid": 2, "pi q id": 8},
         "set_move": {"siid": 2, "piid": 10},
     },
 }
