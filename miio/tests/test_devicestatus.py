@@ -142,11 +142,12 @@ def test_setting_decorator_number(mocker):
     d._protocol._device_id = b"12345678"
 
     # Patch status to return our class
-    mocker.patch.object(d, "status", return_value=Settings())
+    status = mocker.patch.object(d, "status", return_value=Settings())
     # Patch to create a new setter as defined in the status class
     setter = mocker.patch.object(d, "set_level", create=True)
 
     settings = d.settings()
+    assert status.called
     assert len(settings) == 1
 
     desc = settings["level"]

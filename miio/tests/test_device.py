@@ -191,8 +191,7 @@ def test_cached_descriptors(getter_name, mocker):
     initialize_descriptors = mocker.spy(d, "_initialize_descriptors")
     mocker.patch("miio.Device.send")
     mocker.patch("miio.Device.status")
-    mocker.patch("miio.Device._set_constraints_from_attributes", return_value={})
-    mocker.patch("miio.Device._action_descriptors", return_value={})
+    mocker.patch.object(d._descriptors, "descriptors_from_object", return_value={})
     for _i in range(5):
         getter()
     initialize_descriptors.assert_called_once()

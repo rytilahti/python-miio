@@ -99,7 +99,7 @@ class MiotDevice(Device):
         click.argument("name", type=str),
         click.argument("params", type=LiteralParamType(), required=False),
     )
-    def call_action(self, name: str, params=None):
+    def call_action_from_mapping(self, name: str, params=None):
         """Call an action by a name in the mapping."""
         mapping = self._get_mapping()
         if name not in mapping:

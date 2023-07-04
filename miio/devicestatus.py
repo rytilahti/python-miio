@@ -34,7 +34,7 @@ class _StatusMeta(type):
     def __new__(metacls, name, bases, namespace, **kwargs):
         cls = super().__new__(metacls, name, bases, namespace)
 
-        cls._properties: Dict[str, PropertyDescriptor] = {}
+        cls._descriptors: Dict[str, PropertyDescriptor] = {}
         cls._parent: Optional["DeviceStatus"] = None
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
@@ -44,9 +44,9 @@ class _StatusMeta(type):
                 descriptor = getattr(prop, "_descriptor", None)
                 if descriptor:
                     _LOGGER.debug(f"Found descriptor for {name} {descriptor}")
-                    if n in cls._properties:
+                    if n in cls._descriptors:
                         raise ValueError(f"Duplicate {n} for {name} {descriptor}")
-                    cls._properties[n] = descriptor
+                    cls._descriptors[n] = descriptor
                     _LOGGER.debug("Created %s.%s: %s", name, n, descriptor)
 
         return cls
@@ -91,7 +91,7 @@ class DeviceStatus(metaclass=_StatusMeta):
 
         Use @sensor and @setting decorators to define properties.
         """
-        return self._properties  # type: ignore[attr-defined]
+        return self._descriptors  # type: ignore[attr-defined]
 
     def settings(self) -> Dict[str, PropertyDescriptor]:
         """Return the dict of settings exposed by the status container.
@@ -117,16 +117,16 @@ class DeviceStatus(metaclass=_StatusMeta):
         self._embedded[name] = other
         other._parent = self  # type: ignore[attr-defined]
 
-        for prop_id, prop in other.properties().items():
-            final_name = f"{name}__{prop_id}"
+        for property_name, prop in other.properties().items():
+            final_name = f"{name}__{property_name}"
 
-            self._properties[final_name] = attr.evolve(
+            self._descriptors[final_name] = attr.evolve(
                 prop, status_attribute=final_name
             )
 
     def __dir__(self) -> Iterable[str]:
         """Overridden to include properties from embedded containers."""
-        return list(super().__dir__()) + list(self._embedded) + list(self._properties)
+        return list(super().__dir__()) + list(self._embedded) + list(self._descriptors)
 
     @property
     def __cli_output__(self) -> str:
@@ -318,7 +318,7 @@ def action(name: str, *, id: Optional[Union[str, StandardIdentifier]] = None, **
             method=None,
             extras=kwargs,
         )
-        func._action = descriptor
+        func._descriptor = descriptor
 
         return func
 
