@@ -317,8 +317,10 @@ class Gateway(Device):
             return
 
         # Obtain the correct subdevice class
+        # TODO: is there a better way to obtain this information?
         subdevice_cls = getattr(
-            sys.modules["miio.gateway.devices"], model_info.get("class")
+            sys.modules["miio.integrations.lumi.gateway.devices"],
+            model_info.get("class"),
         )
         if subdevice_cls is None:
             subdevice_cls = SubDevice
