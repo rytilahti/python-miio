@@ -933,7 +933,7 @@ class SoundInstallStatus(DeviceStatus):
     def sid(self) -> int:
         """Sound ID for the sound being installed."""
         # this is missing on install confirmation, so let's use get
-        return self.data.get("sid_in_progress", None)
+        return self.data.get("sid_in_progress")
 
     @property
     def error(self) -> int:
