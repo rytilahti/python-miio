@@ -185,7 +185,7 @@ class GenericMiot(MiotDevice):
     def change_setting(self, name: str, params=None):
         """Change setting value."""
         params = params if params is not None else []
-        setting = self._properties.get(name, None)
+        setting = self._properties.get(name)
         if setting is None:
             raise ValueError("No property found for name %s" % name)
         if setting.access & AccessFlags.Write == 0:
