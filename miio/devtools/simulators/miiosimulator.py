@@ -90,10 +90,6 @@ class MiioSimulator:
         self._setters = {}
         self._server = server
 
-        # If no model is given, use one from the supported ones
-        if self._dev._model is None:
-            self._dev._model = next(iter(self._dev.models)).model
-
         # Add get_prop if device has properties defined
         if self._dev.properties:
             server.add_method("get_prop", self.get_prop)
@@ -135,7 +131,13 @@ class MiioSimulator:
 
 
 async def main(dev):
-    did, mac = did_and_mac_for_model(dev)
+    if dev._model is None:
+        dev._model = next(iter(dev.models)).model
+        _LOGGER.warning(
+            "No --model defined, using the first supported one: %s", dev._model
+        )
+
+    did, mac = did_and_mac_for_model(dev._model)
     server = PushServer(device_id=did)
 
     _ = MiioSimulator(dev=dev, server=server)
