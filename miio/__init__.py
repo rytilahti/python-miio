@@ -9,7 +9,12 @@ from importlib.metadata import version  # type: ignore
 
 from miio.device import Device
 from miio.devicestatus import DeviceStatus
-from miio.exceptions import DeviceError, DeviceException, UnsupportedFeatureException
+from miio.exceptions import (
+    DeviceError,
+    DeviceException,
+    UnsupportedFeatureException,
+    DeviceInfoUnavailableException,
+)
 from miio.miot_device import MiotDevice
 from miio.deviceinfo import DeviceInfo
 
