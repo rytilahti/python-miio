@@ -31,7 +31,7 @@ def test_releaselist_single_release(miotspec_releases: ReleaseList):
     info: ReleaseInfo = miotspec_releases.info_for_model(wanted_model)
     assert info.model == wanted_model
     assert (
-        info.type == "urn:miot-spec-v2:device:outlet:0000A002:vendor-single-release:1"
+        info.type == "urn:miot-spec-v2:device:outlet:0000xxxx:vendor-single-release:1"
     )
 
 
@@ -39,6 +39,10 @@ def test_releaselist_multiple_releases(miotspec_releases: ReleaseList):
     """Test that the newest version gets picked."""
     two_releases = miotspec_releases.info_for_model("vendor.plug.two_releases")
     assert two_releases.version == 2
+    assert (
+        two_releases.type
+        == "urn:miot-spec-v2:device:outlet:0000xxxx:vendor-two-releases:2"
+    )
 
 
 def test_releaselist_missing_model(miotspec_releases: ReleaseList):
