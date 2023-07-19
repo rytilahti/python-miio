@@ -10,6 +10,7 @@ import appdirs
 from micloud.miotspec import MiotSpec
 from pydantic import BaseModel, Field
 
+from miio import CloudException
 from miio.miot_models import DeviceModel
 
 _LOGGER = logging.getLogger(__name__)
@@ -37,7 +38,9 @@ class ReleaseList(BaseModel):
         releases = [inst for inst in self.releases if inst.model == model]
 
         if not releases:
-            raise Exception(f"No releases found for {model=} with {status_filter=}")
+            raise CloudException(
+                f"No releases found for {model=} with {status_filter=}"
+            )
         elif len(releases) > 1:
             _LOGGER.warning(
                 "%s versions found for model %s: %s, using the newest one",
@@ -55,8 +58,24 @@ class ReleaseList(BaseModel):
 class MiotCloud:
     """Interface for miotspec data."""
 
+    MODEL_MAPPING_FILE = "model-to-urn.json"
+
     def __init__(self):
         self._cache_dir = Path(appdirs.user_cache_dir("python-miio"))
+
+    def get_release_list(self) -> ReleaseList:
+        """Fetch a list of available releases."""
+        cache_file = self._cache_dir / MiotCloud.MODEL_MAPPING_FILE
+        try:
+            mapping = self._file_from_cache(cache_file)
+            return ReleaseList.parse_obj(mapping)
+        except FileNotFoundError:
+            _LOGGER.debug("Did not found non-stale %s, trying to fetch", cache_file)
+
+        specs = MiotSpec.get_specs()
+        self._write_to_cache(cache_file, specs)
+
+        return ReleaseList.parse_obj(specs)
 
     def get_device_model(self, model: str) -> DeviceModel:
         """Get device model for model name."""
@@ -84,11 +103,11 @@ class MiotCloud:
 
     def _write_to_cache(self, file: Path, data: Dict):
         """Write given *data* to cache file *file*."""
-        file.parent.mkdir(exist_ok=True)
+        file.parent.mkdir(parents=True, exist_ok=True)
         written = file.write_text(json.dumps(data))
         _LOGGER.debug("Written %s bytes to %s", written, file)
 
-    def _file_from_cache(self, file, cache_hours=6) -> Optional[Dict]:
+    def _file_from_cache(self, file, cache_hours=6) -> Dict:
         def _valid_cache():
             expiration = timedelta(hours=cache_hours)
             if (
@@ -100,22 +119,7 @@ class MiotCloud:
             return False
 
         if file.exists() and _valid_cache():
-            _LOGGER.debug("Returning data from cache file %s", file)
+            _LOGGER.debug("Cache hit, returning contents of %s", file)
             return json.loads(file.read_text())
 
-        _LOGGER.debug("Cache file %s not found or it is stale", file)
-        return None
-
-    def get_release_list(self) -> ReleaseList:
-        """Fetch a list of available releases."""
-        mapping_file = "model-to-urn.json"
-
-        cache_file = self._cache_dir / mapping_file
-        mapping = self._file_from_cache(cache_file)
-        if mapping is not None:
-            return ReleaseList.parse_obj(mapping)
-
-        specs = MiotSpec.get_specs()
-        self._write_to_cache(cache_file, specs)
-
-        return ReleaseList.parse_obj(specs)
+        raise FileNotFoundError("Cache file %s not found or it is stale" % file)
