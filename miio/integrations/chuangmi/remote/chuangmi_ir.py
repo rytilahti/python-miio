@@ -30,6 +30,7 @@ class ChuangmiIr(Device):
         "chuangmi.ir.v2",
         "chuangmi.remote.v2",
         "chuangmi.remote.h102a03",
+        "xiaomi.wifispeaker.l05g",
     ]
 
     PRONTO_RE = re.compile(r"^([\da-f]{4}\s?){3,}([\da-f]{4})$", re.IGNORECASE)
