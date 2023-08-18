@@ -1,0 +1,24 @@
+{
+  "instances": [
+    {
+      "model": "vendor.plug.single_release",
+      "version": 1,
+      "type": "urn:miot-spec-v2:device:outlet:0000xxxx:vendor-single-release:1",
+      "status": "released",
+      "ts": 1234
+    },
+    {
+      "model": "vendor.plug.two_releases",
+      "version": 1,
+      "type": "urn:miot-spec-v2:device:outlet:0000xxxx:vendor-two-releases:1",
+      "ts": 12345
+    }
+    ,
+    {
+      "model": "vendor.plug.two_releases",
+      "version": 2,
+      "type": "urn:miot-spec-v2:device:outlet:0000xxxx:vendor-two-releases:2",
+      "ts": 123456
+    }
+  ]
+}
