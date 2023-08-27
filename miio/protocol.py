@@ -143,9 +143,7 @@ class TimeAdapter(Adapter):
         return calendar.timegm(obj.timetuple())
 
     def _decode(self, obj, context, path):
-        return datetime.datetime.fromtimestamp(obj, tz=datetime.timezone.utc).replace(
-            tzinfo=None
-        )
+        return datetime.datetime.fromtimestamp(obj, tz=datetime.timezone.utc)
 
 
 class EncryptionAdapter(Adapter):
@@ -220,9 +218,7 @@ Message = Struct(
             / TimeAdapter(
                 Default(
                     Int32ub,
-                    datetime.datetime.now(tz=datetime.timezone.utc).replace(
-                        tzinfo=None
-                    ),
+                    datetime.datetime.now(tz=datetime.timezone.utc),
                 )
             ),
         )

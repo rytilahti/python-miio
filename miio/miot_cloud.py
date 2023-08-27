@@ -110,9 +110,9 @@ class MiotCloud:
     def _file_from_cache(self, file, cache_hours=6) -> Dict:
         def _valid_cache():
             expiration = timedelta(hours=cache_hours)
-            if datetime.fromtimestamp(file.stat().st_mtime) + expiration > datetime.now(
-                tz=timezone.utc
-            ).replace(tzinfo=None):
+            if datetime.fromtimestamp(
+                file.stat().st_mtime, tz=timezone.utc
+            ) + expiration > datetime.now(tz=timezone.utc):
                 return True
 
             return False
