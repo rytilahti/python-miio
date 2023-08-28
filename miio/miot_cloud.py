@@ -8,7 +8,11 @@ from typing import Dict, List, Optional
 
 import appdirs
 from micloud.miotspec import MiotSpec
-from pydantic import BaseModel, Field
+
+try:
+    from pydantic.v1 import BaseModel, Field
+except ImportError:
+    from pydantic import BaseModel, Field
 
 from miio import CloudException
 from miio.miot_models import DeviceModel

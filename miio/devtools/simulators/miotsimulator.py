@@ -6,8 +6,11 @@ from collections import defaultdict
 from typing import List, Union
 
 import click
-from pydantic import Field, validator
 
+try:
+    from pydantic.v1 import Field, validator
+except ImportError:
+    from pydantic import Field, validator
 from miio import PushServer
 from miio.miot_cloud import MiotCloud
 from miio.miot_models import DeviceModel, MiotAccess, MiotProperty, MiotService
