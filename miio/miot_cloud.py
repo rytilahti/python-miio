@@ -84,9 +84,11 @@ class MiotCloud:
     def get_device_model(self, model: str) -> DeviceModel:
         """Get device model for model name."""
         file = self._cache_dir / f"{model}.json"
-        spec = self._file_from_cache(file)
-        if spec is not None:
+        try:
+            spec = self._file_from_cache(file)
             return DeviceModel.parse_obj(spec)
+        except FileNotFoundError:
+            _LOGGER.debug("Unable to find schema file %s, going to fetch" % file)
 
         return DeviceModel.parse_obj(self.get_model_schema(model))
 
@@ -96,9 +98,11 @@ class MiotCloud:
         release_info = specs.info_for_model(model)
 
         model_file = self._cache_dir / f"{release_info.model}.json"
-        spec = self._file_from_cache(model_file)
-        if spec is not None:
+        try:
+            spec = self._file_from_cache(model_file)
             return spec
+        except FileNotFoundError:
+            _LOGGER.debug(f"Cached schema not found for {model}, going to fetch it")
 
         spec = MiotSpec.get_spec_for_urn(device_urn=release_info.type)
         self._write_to_cache(model_file, spec)
