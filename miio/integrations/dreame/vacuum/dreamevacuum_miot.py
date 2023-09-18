@@ -25,6 +25,7 @@ DREAME_MOP_2_PRO_PLUS = "dreame.vacuum.p2041o"
 DREAME_MOP_2_ULTRA = "dreame.vacuum.p2150a"
 DREAME_MOP_2 = "dreame.vacuum.p2150o"
 DREAME_TROUVER_FINDER = "dreame.vacuum.p2036"
+DREAME_D10_PLUS = "dreame.vacuum.r2205"
 
 _DREAME_1C_MAPPING: MiotMapping = {
     # https://home.miot-spec.com/spec/dreame.vacuum.mc1808
@@ -174,6 +175,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_MOP_2_ULTRA: _DREAME_F9_MAPPING,
     DREAME_MOP_2: _DREAME_F9_MAPPING,
     DREAME_TROUVER_FINDER: _DREAME_TROUVER_FINDER_MAPPING,
+    DREAME_D10_PLUS: _DREAME_TROUVER_FINDER_MAPPING,
 }
 
 
