@@ -17,16 +17,44 @@ class GenericMiotStatus(DeviceStatus):
     def __init__(self, response, dev):
         self._model: DeviceModel = dev._miot_model
         self._dev = dev
-        self._data = {elem["did"]: elem["value"] for elem in response}
-        # for hardcoded json output.. see click_common.json_output
-        self.data = self._data
+        self._data = {}
+        self._data_by_siid_piid = {}
+        self._data_by_normalized_name = {}
+        self._initialize_data(response)
 
-        self._data_by_siid_piid = {
-            (elem["siid"], elem["piid"]): elem["value"] for elem in response
-        }
-        self._data_by_normalized_name = {
-            self._normalize_name(elem["did"]): elem["value"] for elem in response
-        }
+    def _initialize_data(self, response):
+        def _is_valid_property_response(elem):
+            code = elem.get("code")
+            if code is None:
+                _LOGGER.debug("Ignoring due to missing 'code': %s", elem)
+                return False
+
+            if code != 0:
+                _LOGGER.warning("Ignoring due to error code '%s': %s", code, elem)
+                return False
+
+            needed_keys = ("did", "piid", "siid", "value")
+            for key in needed_keys:
+                if key not in elem:
+                    _LOGGER.debug("Ignoring due to missing '%s': %s", key, elem)
+                    return False
+
+            return True
+
+        for prop in response:
+            if not _is_valid_property_response(prop):
+                continue
+
+            self._data[prop["did"]] = prop["value"]
+            self._data_by_siid_piid[(prop["siid"], prop["piid"])] = prop["value"]
+            self._data_by_normalized_name[self._normalize_name(prop["did"])] = prop[
+                "value"
+            ]
+
+    @property
+    def data(self):
+        """Implemented to support json output."""
+        return self._data
 
     def _normalize_name(self, id_: str) -> str:
         """Return a cleaned id for dict searches."""
