@@ -56,7 +56,7 @@ class SubDevice:
         self.get_prop_exp_dict = {}
         for prop in model_info.get("properties", []):
             prop_name = prop.get("name", prop["property"])
-            self._props[prop_name] = prop.get("default", None)
+            self._props[prop_name] = prop.get("default")
             if prop.get("get") == "get_property_exp":
                 self.get_prop_exp_dict[prop["property"]] = prop
 
@@ -313,7 +313,7 @@ class SubDevice:
                 extra=self.push_events[action]["extra"],
                 source_sid=self.sid,
                 source_model=self.zigbee_model,
-                event=self.push_events[action].get("event", None),
+                event=self.push_events[action].get("event"),
                 command_extra=self.push_events[action].get("command_extra", ""),
                 trigger_value=self.push_events[action].get("trigger_value"),
             )

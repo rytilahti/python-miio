@@ -3,7 +3,11 @@ import logging
 from typing import TYPE_CHECKING, Dict, Optional
 
 import click
-from pydantic import BaseModel, Field
+
+try:
+    from pydantic.v1 import BaseModel, Field
+except ImportError:
+    from pydantic import BaseModel, Field
 
 try:
     from rich import print as echo
