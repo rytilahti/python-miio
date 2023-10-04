@@ -116,7 +116,7 @@ class WifiRepeater(Device):
                 "ssid": ssid,
                 "passwd": password,
                 "uid": 0,
-            }
+            },
         )
 
     @command(
