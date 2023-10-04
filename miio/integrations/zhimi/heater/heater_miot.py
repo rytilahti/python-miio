@@ -88,12 +88,24 @@ HEATER_PROPERTIES = {
         "temperature_range": (16, 28),
         "delay_off_range": (0, 8 * 3600),
     },
+    "leshow.heater.nfj3lx": {
+        "temperature_range": (22, 28),
+        "delay_off_range": (0, 8 * 3600),
+    },
 }
 
 
-class LedBrightness(enum.Enum):
-    """Note that only Xiaomi Smart Space Heater 1S (zhimi.heater.za2) supports `Dim`."""
+class Buzzer(enum.Enum):
+    Off = 0
+    On = 1
 
+
+class Sway(enum.Enum):
+    Off = 0
+    On = 1
+
+
+class LedBrightness(enum.Enum):
     On = 0
     Off = 1
     Dim = 2
@@ -170,11 +182,6 @@ class HeaterMiotStatus(DeviceStatus):
         return self.data["child_lock"] is True
 
     @property
-    def buzzer(self) -> bool:
-        """True if buzzer is turned on, False otherwise."""
-        return self.data["buzzer"] is True or self.data["buzzer"] is 1
-
-    @property
     def led_brightness(self) -> LedBrightness:
         """LED indicator brightness."""
         value = self.data["led_brightness"]
@@ -193,8 +200,14 @@ class HeaterMiotStatus(DeviceStatus):
         return DeviceFault(value)
 
     @property
-    def is_sway(self) -> bool:
-        return self.data["sway"] is True or self.data["sway"] is 1
+    def buzzer(self) -> Buzzer:
+        value = self.data["buzzer"]
+        return Buzzer(value)
+
+    @property
+    def sway(self) -> Sway:
+        value = self.data["sway"]
+        return Sway(value)
 
 
 class HeaterMiot(MiotDevice):
@@ -265,14 +278,14 @@ class HeaterMiot(MiotDevice):
         return self.set_property("child_lock", lock)
 
     @command(
-        click.argument("buzzer", type=bool),
+        click.argument("buzzer", type=EnumType(Buzzer)),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+            "Setting buzzer to {buzzer}"
         ),
     )
-    def set_buzzer(self, buzzer: bool):
-        """Set buzzer on/off."""
-        return self.set_property("buzzer", buzzer)
+    def set_buzzer(self, buzzer: Buzzer):
+        value = buzzer.value
+        return self.set_property("buzzer", value)
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness)),
@@ -300,13 +313,14 @@ class HeaterMiot(MiotDevice):
         return self.set_property("mode", value)
 
     @command(
-        click.argument("sway", type=bool),
+        click.argument("sway", type=EnumType(Sway)),
         default_output=format_output(
-            lambda buzzer: "Turning on sway" if buzzer else "Turning off sway"
+            "Setting sway to {sway}"
         ),
     )
-    def set_sway(self, sway: bool):
-        return self.set_property("sway", sway)
+    def set_sway(self, sway: Sway):
+        value = sway.value
+        return self.set_property("sway", value)
 
     @command(
         click.argument("seconds", type=int),
