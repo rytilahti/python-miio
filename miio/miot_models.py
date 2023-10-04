@@ -3,10 +3,7 @@ from datetime import timedelta
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-try:
-    from pydantic.v1 import BaseModel, Field, PrivateAttr, root_validator
-except ImportError:
-    from pydantic import BaseModel, Field, PrivateAttr, root_validator
+from pydantic import BaseModel, Field, PrivateAttr, root_validator
 
 from .descriptors import (
     AccessFlags,

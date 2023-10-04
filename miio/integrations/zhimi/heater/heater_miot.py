@@ -58,6 +58,25 @@ _MAPPINGS = {
         # Indicator light (siid=7)
         "led_brightness": {"siid": 7, "piid": 1},
     },
+    "leshow.heater.nfj3lx": {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:heater:0000A01A:leshow-nfj3lx:1
+        # Heater (siid=2)
+        "power": {"siid": 2, "piid": 1},
+        "fault": {"siid": 2, "piid": 2},
+        "mode": {"siid": 2, "piid": 5},
+        "target_temperature": {"siid": 2, "piid": 3},
+        # Countdown (siid=3)
+        "countdown_time": {"siid": 3, "piid": 1},
+        # Environment (siid=4)
+        "temperature": {"siid": 4, "piid": 7},
+        # Physical Control Locked (siid=5)
+        "child_lock": {"siid": 5, "piid": 1},
+        # Alarm (siid=6)
+        "buzzer": {"siid": 6, "piid": 1},
+        # Indicator light (siid=7)
+        "led_brightness": {"siid": 7, "piid": 1},
+        "sway": {"siid": 8, "piid": 1}
+    },
 }
 
 HEATER_PROPERTIES = {
@@ -69,15 +88,42 @@ HEATER_PROPERTIES = {
         "temperature_range": (16, 28),
         "delay_off_range": (0, 8 * 3600),
     },
+    "leshow.heater.nfj3lx": {
+        "temperature_range": (22, 28),
+        "delay_off_range": (0, 8 * 3600),
+    },
 }
 
 
-class LedBrightness(enum.Enum):
-    """Note that only Xiaomi Smart Space Heater 1S (zhimi.heater.za2) supports `Dim`."""
+class Buzzer(enum.Enum):
+    Off = 0
+    On = 1
 
+
+class Sway(enum.Enum):
+    Off = 0
+    On = 1
+
+
+class LedBrightness(enum.Enum):
     On = 0
     Off = 1
     Dim = 2
+
+
+class Mode(enum.Enum):
+    ConstantTemperature = 0
+    Heat = 1
+    Warm = 2
+    NaturalWind = 3
+
+
+class DeviceFault(enum.Enum):
+    NoFaults = 0
+    EnvTempIsTooLow = 1
+    EnvTempIsTooHigh = 2
+    PlugTempIsTooLow = 3
+    PlugTempIsTooHigh = 4
 
 
 class HeaterMiotStatus(DeviceStatus):
@@ -136,17 +182,32 @@ class HeaterMiotStatus(DeviceStatus):
         return self.data["child_lock"] is True
 
     @property
-    def buzzer(self) -> bool:
-        """True if buzzer is turned on, False otherwise."""
-        return self.data["buzzer"] is True
-
-    @property
     def led_brightness(self) -> LedBrightness:
         """LED indicator brightness."""
         value = self.data["led_brightness"]
         if self.model == "zhimi.heater.za2" and value:
             value = 3 - value
         return LedBrightness(value)
+
+    @property
+    def mode(self) -> Mode:
+        value = self.data["mode"]
+        return Mode(value)
+
+    @property
+    def fault(self) -> DeviceFault:
+        value = self.data["fault"]
+        return DeviceFault(value)
+
+    @property
+    def buzzer(self) -> Buzzer:
+        value = self.data["buzzer"]
+        return Buzzer(value)
+
+    @property
+    def sway(self) -> Sway:
+        value = self.data["sway"]
+        return Sway(value)
 
 
 class HeaterMiot(MiotDevice):
@@ -217,14 +278,14 @@ class HeaterMiot(MiotDevice):
         return self.set_property("child_lock", lock)
 
     @command(
-        click.argument("buzzer", type=bool),
+        click.argument("buzzer", type=EnumType(Buzzer)),
         default_output=format_output(
-            lambda buzzer: "Turning on buzzer" if buzzer else "Turning off buzzer"
+            "Setting buzzer to {buzzer}"
         ),
     )
-    def set_buzzer(self, buzzer: bool):
-        """Set buzzer on/off."""
-        return self.set_property("buzzer", buzzer)
+    def set_buzzer(self, buzzer: Buzzer):
+        value = buzzer.value
+        return self.set_property("buzzer", value)
 
     @command(
         click.argument("brightness", type=EnumType(LedBrightness)),
@@ -240,6 +301,26 @@ class HeaterMiot(MiotDevice):
         elif value == 2:
             raise ValueError("Unsupported brightness Dim for model '%s'.", self.model)
         return self.set_property("led_brightness", value)
+
+    @command(
+        click.argument("mode", type=EnumType(Mode)),
+        default_output=format_output(
+            "Setting Mode to {mode}"
+        ),
+    )
+    def set_mode(self, mode: Mode):
+        value = mode.value
+        return self.set_property("mode", value)
+
+    @command(
+        click.argument("sway", type=EnumType(Sway)),
+        default_output=format_output(
+            "Setting sway to {sway}"
+        ),
+    )
+    def set_sway(self, sway: Sway):
+        value = sway.value
+        return self.set_property("sway", value)
 
     @command(
         click.argument("seconds", type=int),

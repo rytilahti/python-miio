@@ -16,6 +16,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 DREAME_1C = "dreame.vacuum.mc1808"
+DREAME_1C_A = "dreame.vacuum.ma1808"
+DREAME_1C_B = "dreame.vacuum.mb1808"
 DREAME_F9 = "dreame.vacuum.p2008"
 DREAME_D9 = "dreame.vacuum.p2009"
 DREAME_Z10_PRO = "dreame.vacuum.p2028"
@@ -48,6 +50,7 @@ _DREAME_1C_MAPPING: MiotMapping = {
     "total_clean_time": {"siid": 18, "piid": 13},
     "total_clean_times": {"siid": 18, "piid": 14},
     "total_clean_area": {"siid": 18, "piid": 15},
+    "water_flow": {"siid": 18, "piid": 20},
     "life_sieve": {"siid": 19, "piid": 1},
     "life_brush_side": {"siid": 19, "piid": 2},
     "life_brush_main": {"siid": 19, "piid": 3},
@@ -166,6 +169,8 @@ _DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
 
 MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_1C: _DREAME_1C_MAPPING,
+    DREAME_1C_A: _DREAME_1C_MAPPING,
+    DREAME_1C_B: _DREAME_1C_MAPPING,
     DREAME_F9: _DREAME_F9_MAPPING,
     DREAME_D9: _DREAME_F9_MAPPING,
     DREAME_Z10_PRO: _DREAME_F9_MAPPING,
@@ -249,7 +254,7 @@ def _enum_as_dict(cls):
 
 def _get_cleaning_mode_enum_class(model):
     """Return cleaning mode enum class for model if found or None."""
-    if model == DREAME_1C:
+    if model in (DREAME_1C, DREAME_1C_A, DREAME_1C_B):
         return CleaningModeDreame1C
     elif model in (
         DREAME_F9,
@@ -508,7 +513,9 @@ class DreameVacuum(MiotDevice):
 
         return DreameVacuumStatus(
             {
-                prop["did"]: prop["value"] if prop["code"] == 0 else None
+                prop["did"]: prop["value"]
+                if prop["code"] == 0 and "value" in prop
+                else None
                 for prop in self.get_properties_for_mapping(max_properties=10)
             },
             self.model,
@@ -519,6 +526,9 @@ class DreameVacuum(MiotDevice):
     MANUAL_ROTATION_MIN = -MANUAL_ROTATION_MAX
     MANUAL_DISTANCE_MAX = 300
     MANUAL_DISTANCE_MIN = -300
+
+    VOLUME_MIN = 0
+    VOLUME_MAX = 100
 
     @command()
     def start(self) -> None:
@@ -587,6 +597,20 @@ class DreameVacuum(MiotDevice):
             return None
         click.echo(f"Setting fanspeed to {fanspeed.name}")
         return self.set_property("cleaning_mode", fanspeed.value)
+
+    @command(click.argument("volume", type=int))
+    def set_volume(self, volume: int):
+        """Set volume.
+
+        :param int volume: Volume to set
+        """
+        if volume < self.VOLUME_MIN or volume > self.VOLUME_MAX:
+            raise ValueError(
+                "Given volume is invalid, should be [%s, %s], was: %s"
+                % (self.VOLUME_MIN, self.VOLUME_MAX, volume)
+            )
+        click.echo(f"Setting volume to {volume}")
+        return self.set_property("volume", volume)
 
     @command()
     def fan_speed_presets(self) -> Dict[str, int]:

@@ -5,11 +5,7 @@ import logging
 from typing import List, Optional, Union
 
 import click
-
-try:
-    from pydantic.v1 import BaseModel, Field, PrivateAttr
-except ImportError:
-    from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr
 from yaml import safe_load
 
 from miio import PushServer

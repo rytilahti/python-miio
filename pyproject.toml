@@ -39,7 +39,7 @@ tqdm = "^4"
 micloud = { version = ">=0.6" }
 croniter = ">=1"
 defusedxml = "^0"
-pydantic = ">=1,<3"
+pydantic = "^1"
 PyYAML = ">=5,<7"
 
 # doc dependencies
