@@ -189,6 +189,8 @@ class EncryptionAdapter(Adapter):
             lambda decrypted_bytes: decrypted_bytes.replace(
                 b'"value":00', b'"value":0'
             ),
+            # fix double commas for xiaomi.vacuum.b112, fw: 2.2.4_0049
+            lambda decrypted_bytes: decrypted_bytes.replace(b",,", b","),
         ]
 
         for i, quirk in enumerate(decrypted_quirks):
