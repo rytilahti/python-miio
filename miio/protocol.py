@@ -161,6 +161,9 @@ class EncryptionAdapter(Adapter):
 
     def _decode(self, obj, context, path) -> Union[Dict, bytes]:
         """Decrypts the payload using the token stored in the context."""
+        # Missing payload is expected for discovery messages.
+        if not obj:
+            return obj
         try:
             decrypted = Utils.decrypt(obj, context["_"]["token"])
             decrypted = decrypted.rstrip(b"\x00")
