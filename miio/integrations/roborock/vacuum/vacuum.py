@@ -77,6 +77,7 @@ ROCKROBO_S7_PRO_ULTRA = "roborock.vacuum.a62"
 ROCKROBO_Q5 = "roborock.vacuum.a34"
 ROCKROBO_Q7_MAX = "roborock.vacuum.a38"
 ROCKROBO_Q7PLUS = "roborock.vacuum.a40"
+ROCKROBO_Q_REVO = "roborock.vacuum.a75"
 ROCKROBO_G10S = "roborock.vacuum.a46"
 ROCKROBO_G10 = "roborock.vacuum.a29"
 
@@ -106,6 +107,7 @@ SUPPORTED_MODELS = [
     ROCKROBO_Q5,
     ROCKROBO_Q7_MAX,
     ROCKROBO_Q7PLUS,
+    ROCKROBO_Q_REVO,
     ROCKROBO_G10,
     ROCKROBO_G10S,
     ROCKROBO_S6_MAXV,
