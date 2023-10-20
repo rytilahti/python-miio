@@ -210,7 +210,7 @@ class FanZA5(MiotDevice):
             "Temperature: {result.temperature}\n",
         )
     )
-    def status(self):
+    def status(self) -> FanStatusZA5:
         """Retrieve properties."""
         return FanStatusZA5(
             {

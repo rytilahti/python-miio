@@ -2,7 +2,16 @@ import math
 
 import pytest
 
-from miio import Device, MiotDevice, RoborockVacuum
+from miio import (
+    AccessFlags,
+    ActionDescriptor,
+    DescriptorCollection,
+    Device,
+    DeviceStatus,
+    MiotDevice,
+    PropertyDescriptor,
+    RoborockVacuum,
+)
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 
 DEVICE_CLASSES = Device.__subclasses__() + MiotDevice.__subclasses__()  # type: ignore
@@ -171,6 +180,13 @@ def test_init_signature(cls, mocker):
     assert total_args == 8
 
 
+@pytest.mark.parametrize("cls", DEVICE_CLASSES)
+def test_status_return_type(cls):
+    """Make sure that all status methods have a type hint."""
+    assert "return" in cls.status.__annotations__
+    assert issubclass(cls.status.__annotations__["return"], DeviceStatus)
+
+
 def test_supports_miot(mocker):
     from miio.exceptions import DeviceError
 
@@ -185,14 +201,90 @@ def test_supports_miot(mocker):
 
 
 @pytest.mark.parametrize("getter_name", ["actions", "settings", "sensors"])
-def test_cached_descriptors(getter_name, mocker):
+def test_cached_descriptors(getter_name, mocker, caplog):
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
     getter = getattr(d, getter_name)
     initialize_descriptors = mocker.spy(d, "_initialize_descriptors")
     mocker.patch("miio.Device.send")
-    mocker.patch("miio.Device.status")
-    mocker.patch("miio.Device._set_constraints_from_attributes", return_value={})
-    mocker.patch("miio.Device._action_descriptors", return_value={})
+    patched_status = mocker.patch("miio.Device.status")
+    patched_status.__annotations__ = {}
+    patched_status.__annotations__["return"] = DeviceStatus
+    mocker.patch.object(d._descriptors, "descriptors_from_object", return_value={})
     for _i in range(5):
         getter()
     initialize_descriptors.assert_called_once()
+    assert (
+        "'Device' does not specify any descriptors, please considering creating a PR"
+        in caplog.text
+    )
+
+
+def test_change_setting(mocker):
+    """Test setting changing."""
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
+
+    descs = {
+        "read-only": PropertyDescriptor(
+            id="ro", name="ro", status_attribute="ro", access=AccessFlags.Read
+        ),
+        "write-only": PropertyDescriptor(
+            id="wo", name="wo", status_attribute="wo", access=AccessFlags.Write
+        ),
+    }
+    writable = descs["write-only"]
+    coll = DescriptorCollection(descs, device=d)
+
+    mocker.patch.object(d, "descriptors", return_value=coll)
+
+    # read-only descriptors should not appear in settings
+    assert len(d.settings()) == 1
+
+    # trying to change non-existing setting should raise an error
+    with pytest.raises(
+        ValueError, match="Unable to find setting 'non-existing-setting'"
+    ):
+        d.change_setting("non-existing-setting")
+
+    # calling change setting should call the setter of the descriptor
+    setter = mocker.patch.object(writable, "setter")
+    d.change_setting("write-only", "new value")
+    setter.assert_called_with("new value")
+
+
+def test_call_action(mocker):
+    """Test action calling."""
+    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
+    mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
+
+    descs = {
+        "read-only": PropertyDescriptor(
+            id="ro", name="ro", status_attribute="ro", access=AccessFlags.Read
+        ),
+        "write-only": PropertyDescriptor(
+            id="wo", name="wo", status_attribute="wo", access=AccessFlags.Write
+        ),
+        "action": ActionDescriptor(id="foo", name="action"),
+    }
+    act = descs["action"]
+    coll = DescriptorCollection(descs, device=d)
+
+    mocker.patch.object(d, "descriptors", return_value=coll)
+
+    # property descriptors should not appear in actions
+    assert len(d.actions()) == 1
+
+    # trying to execute non-existing action should raise an error
+    with pytest.raises(ValueError, match="Unable to find action 'non-existing-action'"):
+        d.call_action("non-existing-action")
+
+    method = mocker.patch.object(act, "method")
+    d.call_action("action", "testinput")
+    method.assert_called_with("testinput")
+    method.reset_mock()
+
+    # Calling without parameters executes a different code path
+    d.call_action("action")
+    method.assert_called_once()
