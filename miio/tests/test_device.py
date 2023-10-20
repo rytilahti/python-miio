@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-from miio import Device, MiotDevice, RoborockVacuum
+from miio import Device, DeviceStatus, MiotDevice, RoborockVacuum
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 
 DEVICE_CLASSES = Device.__subclasses__() + MiotDevice.__subclasses__()  # type: ignore
@@ -171,6 +171,13 @@ def test_init_signature(cls, mocker):
     assert total_args == 8
 
 
+@pytest.mark.parametrize("cls", DEVICE_CLASSES)
+def test_status_return_type(cls):
+    """Make sure that all status methods have a type hint."""
+    assert "return" in cls.status.__annotations__
+    assert issubclass(cls.status.__annotations__["return"], DeviceStatus)
+
+
 def test_supports_miot(mocker):
     from miio.exceptions import DeviceError
 
@@ -190,7 +197,9 @@ def test_cached_descriptors(getter_name, mocker):
     getter = getattr(d, getter_name)
     initialize_descriptors = mocker.spy(d, "_initialize_descriptors")
     mocker.patch("miio.Device.send")
-    mocker.patch("miio.Device.status")
+    patched_status = mocker.patch("miio.Device.status")
+    patched_status.__annotations__ = {}
+    patched_status.__annotations__["return"] = DeviceStatus
     mocker.patch.object(d._descriptors, "descriptors_from_object", return_value={})
     for _i in range(5):
         getter()

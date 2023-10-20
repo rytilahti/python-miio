@@ -3,8 +3,9 @@ from enum import IntEnum
 
 import click
 
-from miio import Device
+from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,15 +27,13 @@ class Status(IntEnum):
     NoWater = 203
 
 
-class ScishareCoffee(Device):
-    """Main class for Scishare coffee maker (scishare.coffee.s1102)."""
+class ScishareCoffeeStatus(DeviceStatus):
+    def __init__(self, data):
+        self.data = data
 
-    _supported_models = ["scishare.coffee.s1102"]
-
-    @command()
-    def status(self) -> int:
-        """Device status."""
-        status_code = self.send("Query_Machine_Status")[1]
+    @sensor("Status")
+    def state(self) -> Status:
+        status_code = self.data[1]
         try:
             return Status(status_code)
         except ValueError:
@@ -43,6 +42,17 @@ class ScishareCoffee(Device):
                 status_code,
             )
             return Status.Unknown
+
+
+class ScishareCoffee(Device):
+    """Main class for Scishare coffee maker (scishare.coffee.s1102)."""
+
+    _supported_models = ["scishare.coffee.s1102"]
+
+    @command()
+    def status(self) -> ScishareCoffeeStatus:
+        """Device status."""
+        return ScishareCoffeeStatus(self.send("Query_Machine_Status"))
 
     @command(
         click.argument("temperature", type=int),

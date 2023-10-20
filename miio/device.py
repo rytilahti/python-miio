@@ -182,8 +182,9 @@ class Device(metaclass=DeviceGroupMeta):
         """
         self._descriptors.descriptors_from_object(self)
 
-        #
+        # Read descriptors from the status class
         self._descriptors.descriptors_from_object(self.status.__annotations__["return"])
+
         self._initialized = True
 
     @property
