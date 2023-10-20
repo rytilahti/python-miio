@@ -60,10 +60,7 @@ class GenericMiot(MiotDevice):
     def status(self) -> GenericMiotStatus:
         """Return status based on the miot model."""
         properties = []
-        for _, prop in self.descriptors().sensors().items():
-            if prop.access & AccessFlags.Read == 0:
-                continue
-
+        for _, prop in self.sensors().items():
             extras = prop.extras
             prop = extras["miot_property"]
             q = {"siid": prop.siid, "piid": prop.piid, "did": prop.name}
