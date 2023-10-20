@@ -355,7 +355,8 @@ class Device(metaclass=DeviceGroupMeta):
         except KeyError:
             raise ValueError("Unable to find action '%s'" % name)
 
-        params = params or []
+        if params is None:
+            return act.method()
 
         return act.method(params)
 

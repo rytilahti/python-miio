@@ -283,6 +283,8 @@ def test_call_action(mocker):
     method = mocker.patch.object(act, "method")
     d.call_action("action", "testinput")
     method.assert_called_with("testinput")
+    method.reset_mock()
 
+    # Calling without parameters executes a different code path
     d.call_action("action")
-    method.assert_called_with([])
+    method.assert_called_once()
