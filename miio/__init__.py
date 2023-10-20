@@ -21,6 +21,15 @@ from miio.deviceinfo import DeviceInfo
 # isort: on
 
 from miio.cloud import CloudDeviceInfo, CloudException, CloudInterface
+from miio.descriptorcollection import DescriptorCollection
+from miio.descriptors import (
+    AccessFlags,
+    ActionDescriptor,
+    Descriptor,
+    EnumDescriptor,
+    PropertyDescriptor,
+    RangeDescriptor,
+)
 from miio.devicefactory import DeviceFactory
 from miio.integrations.airdog.airpurifier import AirDogX3
 from miio.integrations.cgllc.airmonitor import AirQualityMonitor, AirQualityMonitorCGDN1

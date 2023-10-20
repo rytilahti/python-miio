@@ -185,6 +185,12 @@ class Device(metaclass=DeviceGroupMeta):
         # Read descriptors from the status class
         self._descriptors.descriptors_from_object(self.status.__annotations__["return"])
 
+        if not self._descriptors:
+            _LOGGER.warning(
+                "'%s' does not specify any descriptors, please considering creating a PR.",
+                self.__class__.__name__,
+            )
+
         self._initialized = True
 
     @property
@@ -344,7 +350,11 @@ class Device(metaclass=DeviceGroupMeta):
     )
     def call_action(self, name: str, params=None):
         """Call action by name."""
-        act = self.actions()[name]
+        try:
+            act = self.actions()[name]
+        except KeyError:
+            raise ValueError("Unable to find action '%s'" % name)
+
         params = params or []
 
         return act.method(params)
@@ -356,11 +366,12 @@ class Device(metaclass=DeviceGroupMeta):
     )
     def change_setting(self, name: str, params=None):
         """Change setting value."""
-        setting = self.settings()[name]
-        params = params if params is not None else []
+        try:
+            setting = self.settings()[name]
+        except KeyError:
+            raise ValueError("Unable to find setting '%s'" % name)
 
-        if setting.access & AccessFlags.Write == 0:
-            raise ValueError("Property %s is not writable" % name)
+        params = params if params is not None else []
 
         return setting.setter(params)
 
