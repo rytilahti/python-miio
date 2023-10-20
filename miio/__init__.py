@@ -29,6 +29,7 @@ from miio.descriptors import (
     EnumDescriptor,
     PropertyDescriptor,
     RangeDescriptor,
+    ValidSettingRange,
 )
 from miio.devicefactory import DeviceFactory
 from miio.integrations.airdog.airpurifier import AirDogX3

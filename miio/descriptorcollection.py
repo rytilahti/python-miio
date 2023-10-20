@@ -23,7 +23,12 @@ T = TypeVar("T")
 
 
 class DescriptorCollection(UserDict, Generic[T]):
-    """A container of descriptors."""
+    """A container of descriptors.
+
+    This is a glorified dictionary that provides several useful features for handling
+    descriptors like binding names (method_name, setter_name) to *device* callables,
+    setting property constraints, and handling duplicate identifiers.
+    """
 
     def __init__(self, *args, device: "Device"):
         self._device = device
@@ -60,11 +65,16 @@ class DescriptorCollection(UserDict, Generic[T]):
         if not isinstance(descriptor, Descriptor):
             raise TypeError("Tried to add non-descriptor descriptor: %s", descriptor)
 
-        if descriptor.id in self.data:
-            descriptor.id = descriptor.id + "-2"
-            _LOGGER.warning("Appended '-2' to the id of %s", descriptor)
-            # TODO: append suffix to dupe ids
-            raise ValueError(f"Duplicate descriptor id: {descriptor.id}")
+        def _get_free_id(id_, suffix=2):
+            if id_ not in self.data:
+                return id_
+
+            while f"{id_}-{suffix}" in self.data:
+                suffix += 1
+
+            return f"{id_}-{suffix}"
+
+        descriptor.id = _get_free_id(descriptor.id)
 
         if isinstance(descriptor, PropertyDescriptor):
             self._handle_property_descriptor(descriptor)
@@ -82,7 +92,7 @@ class DescriptorCollection(UserDict, Generic[T]):
             prop.method = getattr(self._device, prop.method_name)
 
         if prop.method is None:
-            raise Exception(f"Neither method or method_name was defined for {prop}")
+            raise ValueError(f"Neither method or method_name was defined for {prop}")
 
     def _handle_property_descriptor(self, prop: PropertyDescriptor) -> None:
         """Bind the setter method to the property."""
@@ -90,7 +100,7 @@ class DescriptorCollection(UserDict, Generic[T]):
             prop.setter = getattr(self._device, prop.setter_name)
 
         if prop.access & AccessFlags.Write and prop.setter is None:
-            raise Exception(f"Neither setter or setter_name was defined for {prop}")
+            raise ValueError(f"Neither setter or setter_name was defined for {prop}")
 
         self._handle_constraints(prop)
 
@@ -103,6 +113,11 @@ class DescriptorCollection(UserDict, Generic[T]):
                     self._device, prop.choices_attribute
                 )
                 prop.choices = retrieve_choices_function()
+
+            if prop.choices is None:
+                raise ValueError(
+                    f"Neither choices nor choices_attribute was defined for {prop}"
+                )
 
         elif prop.constraint == PropertyConstraint.Range:
             prop = cast(RangeDescriptor, prop)
