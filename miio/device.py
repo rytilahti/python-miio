@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union, cast, final  # noqa: F401
 
 import click
 
-from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
+from .click_common import DeviceGroupMeta, LiteralParamType, command
 from .descriptorcollection import DescriptorCollection
 from .descriptors import AccessFlags, ActionDescriptor, Descriptor, PropertyDescriptor
 from .deviceinfo import DeviceInfo
@@ -24,23 +24,6 @@ class UpdateState(Enum):
     Installing = "installing"
     Failed = "failed"
     Idle = "idle"
-
-
-def _info_output(result):
-    """Format the output for info command."""
-    s = f"Model: {result.model}\n"
-    s += f"Hardware version: {result.hardware_version}\n"
-    s += f"Firmware version: {result.firmware_version}\n"
-
-    from .devicefactory import DeviceFactory
-
-    cls = DeviceFactory.class_for_model(result.model)
-    dev = DeviceFactory.create(result.ip_address, result.token, force_generic_miot=True)
-    s += f"Supported using: {cls.__name__}\n"
-    s += f"Command: miiocli {cls.__name__.lower()} --ip {result.ip_address} --token {result.token}\n"
-    s += f"Supported by genericmiot: {dev.supports_miot()}"
-
-    return s
 
 
 class Device(metaclass=DeviceGroupMeta):
@@ -134,7 +117,6 @@ class Device(metaclass=DeviceGroupMeta):
         return self.send(command, parameters)
 
     @command(
-        default_output=format_output(result_msg_fmt=_info_output),
         skip_autodetect=True,
     )
     def info(self, *, skip_cache=False) -> DeviceInfo:
