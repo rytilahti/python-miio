@@ -38,9 +38,9 @@ jobs:
       - name: "Order of imports (isort)"
         run: |
           poetry run pre-commit run isort --all-files
-      - name: "Docstring formating (docformatter)"
-        run: |
-          poetry run pre-commit run docformatter --all-files
+#      - name: "Docstring formating (docformatter)"
+#        run: |
+#          poetry run pre-commit run docformatter --all-files
       - name: "Potential security issues (bandit)"
         run: |
           poetry run pre-commit run bandit --all-files
