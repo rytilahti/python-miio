@@ -89,3 +89,20 @@ class DeviceInfo:
     def raw(self):
         """Raw data as returned by the device."""
         return self.data
+
+    @property
+    def __cli_output__(self):
+        """Format the output for info command."""
+        s = f"Model: {self.model}\n"
+        s += f"Hardware version: {self.hardware_version}\n"
+        s += f"Firmware version: {self.firmware_version}\n"
+
+        from .devicefactory import DeviceFactory
+
+        cls = DeviceFactory.class_for_model(self.model)
+        dev = DeviceFactory.create(self.ip_address, self.token, force_generic_miot=True)
+        s += f"Supported using: {cls.__name__}\n"
+        s += f"Command: miiocli {cls.__name__.lower()} --ip {self.ip_address} --token {self.token}\n"
+        s += f"Supported by genericmiot: {dev.supports_miot()}"
+
+        return s
