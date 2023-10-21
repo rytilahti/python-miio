@@ -7,13 +7,17 @@ jobs:
   build-n-publish:
     name: Build release packages
     runs-on: ubuntu-latest
+    environment: publish
+    permissions:  # for trusted publishing
+      id-token: write
 
     steps:
     - uses: actions/checkout@master
+
     - name: Setup python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: "3.x"
 
     - name: Install pypa/build
       run: >-
@@ -32,6 +36,4 @@ jobs:
         .
 
     - name: Publish release on pypi
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
+      uses: pypa/gh-action-pypi-publish@release/v1
