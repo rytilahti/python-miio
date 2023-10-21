@@ -36,4 +36,4 @@ jobs:
         .
 
     - name: Publish release on pypi
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@release/v1
