@@ -98,7 +98,7 @@ def download_mapping():
         "Downloading and saving model<->urn mapping to %s" % MIOTSPEC_MAPPING.name
     )
     url = "http://miot-spec.org/miot-spec-v2/instances?status=all"
-    res = requests.get(url)
+    res = requests.get(url, timeout=5)
 
     with MIOTSPEC_MAPPING.open("w") as f:
         f.write(res.text)
@@ -142,7 +142,7 @@ def download(ctx, urn, model):
 
     url = f"https://miot-spec.org/miot-spec-v2/instance?type={model.type}"
     click.echo("Going to download %s" % url)
-    content = requests.get(url)
+    content = requests.get(url, timeout=5)
     save_to = model.filename
     click.echo(f"Saving data to {save_to}")
     with open(save_to, "w") as f:
