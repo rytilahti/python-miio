@@ -359,4 +359,4 @@ class Device(metaclass=DeviceGroupMeta):
         return setting.setter(params)
 
     def __repr__(self):
-        return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
+        return f"<{self.__class__.__name__}: {self.ip} (token: {self.token})>"
