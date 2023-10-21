@@ -61,14 +61,11 @@ jobs:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "pypy3.8"]
         os: [ubuntu-latest, macos-latest, windows-latest]
-        # test pypy3 only on ubuntu as cryptography requires rust compilation
-        # which slows the pipeline and was not currently working on macos
-# commented out for testing if these are still necessary
+# Exclude example, in case needed again in the future:
 #        exclude:
 #          - python-version: pypy3.8
 #            os: macos-latest
-#          - python-version: pypy3.8
-#            os: windows-latest
+
 
     steps:
       - uses: "actions/checkout@v3"
