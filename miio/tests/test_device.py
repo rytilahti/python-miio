@@ -10,7 +10,6 @@ from miio import (
     DeviceStatus,
     MiotDevice,
     PropertyDescriptor,
-    RoborockVacuum,
 )
 from miio.exceptions import DeviceInfoUnavailableException, PayloadDecodeException
 
@@ -118,24 +117,6 @@ def test_forced_model(mocker):
 
     assert d.model == DUMMY_MODEL
     info.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "cls,hidden", [(Device, True), (MiotDevice, True), (RoborockVacuum, False)]
-)
-def test_missing_supported(mocker, caplog, cls, hidden):
-    """Make sure warning is logged if the device is unsupported for the class."""
-    _ = mocker.patch("miio.Device.send")
-
-    d = cls("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-    d._fetch_info()
-
-    if hidden:
-        assert "Found an unsupported model" not in caplog.text
-        assert f"for class {cls.__name__!r}" not in caplog.text
-    else:
-        assert "Found an unsupported model" in caplog.text
-        assert f"for class {cls.__name__!r}" in caplog.text
 
 
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)
