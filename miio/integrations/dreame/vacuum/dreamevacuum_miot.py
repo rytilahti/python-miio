@@ -523,42 +523,42 @@ class DreameVacuum(MiotDevice):
     @command()
     def start(self) -> None:
         """Start cleaning."""
-        return self.call_action("start_clean")
+        return self.call_action_from_mapping("start_clean")
 
     @command()
     def stop(self) -> None:
         """Stop cleaning."""
-        return self.call_action("stop_clean")
+        return self.call_action_from_mapping("stop_clean")
 
     @command()
     def home(self) -> None:
         """Return to home."""
-        return self.call_action("home")
+        return self.call_action_from_mapping("home")
 
     @command()
     def identify(self) -> None:
         """Locate the device (i am here)."""
-        return self.call_action("locate")
+        return self.call_action_from_mapping("locate")
 
     @command()
     def reset_mainbrush_life(self) -> None:
         """Reset main brush life."""
-        return self.call_action("reset_mainbrush_life")
+        return self.call_action_from_mapping("reset_mainbrush_life")
 
     @command()
     def reset_filter_life(self) -> None:
         """Reset filter life."""
-        return self.call_action("reset_filter_life")
+        return self.call_action_from_mapping("reset_filter_life")
 
     @command()
     def reset_sidebrush_life(self) -> None:
         """Reset side brush life."""
-        return self.call_action("reset_sidebrush_life")
+        return self.call_action_from_mapping("reset_sidebrush_life")
 
     @command()
     def play_sound(self) -> None:
         """Play sound."""
-        return self.call_action("play_sound")
+        return self.call_action_from_mapping("play_sound")
 
     @command()
     def fan_speed(self):
@@ -651,7 +651,7 @@ class DreameVacuum(MiotDevice):
                 "Given distance is invalid, should be [%s, %s], was: %s"
                 % (self.MANUAL_DISTANCE_MIN, self.MANUAL_DISTANCE_MAX, distance)
             )
-        self.call_action(
+        self.call_action_from_mapping(
             "move",
             [
                 {
@@ -678,7 +678,7 @@ class DreameVacuum(MiotDevice):
                 "Given rotation is invalid, should be [%s, %s], was %s"
                 % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotatation)
             )
-        self.call_action(
+        self.call_action_from_mapping(
             "move",
             [
                 {
@@ -731,7 +731,7 @@ class DreameVacuum(MiotDevice):
             {"piid": 5, "value": md5sum},
             {"piid": 6, "value": size},
         ]
-        result_status = self.call_action("set_voice", params=params)
+        result_status = self.call_action_from_mapping("set_voice", params=params)
         if result_status["code"] == 0:
             click.echo("Installation complete!")
 
