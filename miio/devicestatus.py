@@ -86,7 +86,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         s += ">"
         return s
 
-    def properties(self) -> Dict[str, PropertyDescriptor]:
+    def descriptors(self) -> Dict[str, PropertyDescriptor]:
         """Return the dict of sensors exposed by the status container.
 
         Use @sensor and @setting decorators to define properties.
@@ -101,7 +101,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         # TODO: this is not probably worth having, remove?
         return {
             prop.id: prop
-            for prop in self.properties().values()
+            for prop in self.descriptors().values()
             if prop.access & AccessFlags.Write
         }
 
@@ -117,7 +117,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         self._embedded[name] = other
         other._parent = self  # type: ignore[attr-defined]
 
-        for property_name, prop in other.properties().items():
+        for property_name, prop in other.descriptors().items():
             final_name = f"{name}__{property_name}"
 
             self._descriptors[final_name] = attr.evolve(
@@ -132,7 +132,7 @@ class DeviceStatus(metaclass=_StatusMeta):
     def __cli_output__(self) -> str:
         """Return a CLI formatted output of the status."""
         out = ""
-        for descriptor in self.properties().values():
+        for descriptor in self.descriptors().values():
             try:
                 value = getattr(self, descriptor.status_attribute)
             except KeyError:

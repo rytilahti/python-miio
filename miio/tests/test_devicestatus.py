@@ -109,7 +109,7 @@ def test_sensor_decorator():
             pass
 
     status = DecoratedProps()
-    sensors = status.properties()
+    sensors = status.descriptors()
     assert len(sensors) == 3
 
     all_kwargs = sensors["all_kwargs"]
@@ -274,11 +274,11 @@ def test_embed():
             return "sub"
 
     main = MainStatus()
-    assert len(main.properties()) == 1
+    assert len(main.descriptors()) == 1
 
     sub = SubStatus()
     main.embed("SubStatus", sub)
-    sensors = main.properties()
+    sensors = main.descriptors()
     assert len(sensors) == 2
     assert sub._parent == main
 
@@ -286,7 +286,7 @@ def test_embed():
     assert getattr(main, sensors["SubStatus__sub_sensor"].status_attribute) == "sub"
 
     with pytest.raises(KeyError):
-        main.properties()["nonexisting_sensor"]
+        main.descriptors()["nonexisting_sensor"]
 
     assert (
         repr(main)
