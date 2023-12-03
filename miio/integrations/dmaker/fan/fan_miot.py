@@ -96,7 +96,7 @@ MIOT_MAPPING = {
         "swing_mode": {"siid": 2, "piid": 5},
         "swing_mode_angle": {"siid": 2, "piid": 6},
         "power_off_time": {"siid": 2, "piid": 8},
-        "set_move": {"siid": 2, "piid": 10, "access": ["write"]},
+        "set_move": {"siid": 2, "piid": 10},
         "fan_speed": {"siid": 2, "piid": 11},
         "child_lock": {"siid": 3, "piid": 1},
         "buzzer": {"siid": 2, "piid": 7},
