@@ -2,6 +2,10 @@ class DeviceException(Exception):
     """Exception wrapping any communication errors with the device."""
 
 
+class InvalidTokenException(DeviceException):
+    """Exception raised when invalid token is detected."""
+
+
 class PayloadDecodeException(DeviceException):
     """Exception for failures in payload decoding.
 

@@ -13,7 +13,12 @@ from typing import Any, Dict, List, Optional
 
 import construct
 
-from .exceptions import DeviceError, DeviceException, RecoverableError
+from .exceptions import (
+    DeviceError,
+    DeviceException,
+    InvalidTokenException,
+    RecoverableError,
+)
 from .protocol import Message
 
 _LOGGER = logging.getLogger(__name__)
@@ -219,7 +224,7 @@ class MiIOProtocol:
             except KeyError:
                 return payload
         except construct.core.ChecksumError as ex:
-            raise DeviceException(
+            raise InvalidTokenException(
                 "Got checksum error which indicates use "
                 "of an invalid token. "
                 "Please check your token!"
