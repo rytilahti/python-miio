@@ -138,6 +138,10 @@ yeelink.light.lamp1:
   night_light: False
   color_temp: [2700, 5000]
   supports_color: False
+yeelink.light.lamp2:
+  night_light: False
+  color_temp: [2500, 4800]
+  supports_color: False
 yeelink.light.lamp4:
   night_light: False
   color_temp: [2600, 5000]
