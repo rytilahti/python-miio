@@ -16,6 +16,7 @@ from typing import (
 
 import attr
 
+from .descriptorcollection import DescriptorCollection
 from .descriptors import (
     AccessFlags,
     ActionDescriptor,
@@ -34,7 +35,7 @@ class _StatusMeta(type):
     def __new__(metacls, name, bases, namespace, **kwargs):
         cls = super().__new__(metacls, name, bases, namespace)
 
-        cls._descriptors: Dict[str, PropertyDescriptor] = {}
+        cls._descriptors: DescriptorCollection[PropertyDescriptor] = {}
         cls._parent: Optional["DeviceStatus"] = None
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
@@ -86,7 +87,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         s += ">"
         return s
 
-    def descriptors(self) -> Dict[str, PropertyDescriptor]:
+    def descriptors(self) -> DescriptorCollection[PropertyDescriptor]:
         """Return the dict of sensors exposed by the status container.
 
         Use @sensor and @setting decorators to define properties.
@@ -105,8 +106,8 @@ class DeviceStatus(metaclass=_StatusMeta):
         self._embedded[name] = other
         other._parent = self  # type: ignore[attr-defined]
 
-        for property_name, prop in other.descriptors().items():
-            final_name = f"{name}__{property_name}"
+        for descriptor_name, prop in other.descriptors().items():
+            final_name = f"{name}__{descriptor_name}"
 
             self._descriptors[final_name] = attr.evolve(
                 prop, status_attribute=final_name
