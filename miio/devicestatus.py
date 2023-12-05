@@ -93,18 +93,6 @@ class DeviceStatus(metaclass=_StatusMeta):
         """
         return self._descriptors  # type: ignore[attr-defined]
 
-    def settings(self) -> Dict[str, PropertyDescriptor]:
-        """Return the dict of settings exposed by the status container.
-
-        This is just a dict of writable properties, see :meth:`properties`.
-        """
-        # TODO: this is not probably worth having, remove?
-        return {
-            prop.id: prop
-            for prop in self.descriptors().values()
-            if prop.access & AccessFlags.Write
-        }
-
     def embed(self, name: str, other: "DeviceStatus"):
         """Embed another status container to current one.
 
