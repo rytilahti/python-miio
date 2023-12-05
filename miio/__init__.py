@@ -11,6 +11,7 @@ from miio.device import Device
 from miio.devicestatus import DeviceStatus
 from miio.exceptions import (
     DeviceError,
+    InvalidTokenException,
     DeviceException,
     UnsupportedFeatureException,
     DeviceInfoUnavailableException,
