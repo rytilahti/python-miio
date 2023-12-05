@@ -11,37 +11,20 @@ from miio import (
     RangeDescriptor,
     ValidSettingRange,
 )
-from miio.devicestatus import action, sensor, setting
+from miio.devicestatus import sensor, setting
 
 
-@pytest.fixture
-def dev(mocker):
-    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-    mocker.patch("miio.Device.send")
-    mocker.patch("miio.Device.send_handshake")
-    yield d
-
-
-def test_descriptors_from_device_object(mocker):
+def test_descriptors_from_device_object(dummy_device):
     """Test descriptor collection from device class."""
 
-    class DummyDevice(Device):
-        @action(id="test", name="test")
-        def test_action(self):
-            pass
-
-    dev = DummyDevice("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-    mocker.patch("miio.Device.send")
-    mocker.patch("miio.Device.send_handshake")
-
-    coll = DescriptorCollection(device=dev)
-    coll.descriptors_from_object(DummyDevice())
+    coll = DescriptorCollection(device=dummy_device)
+    coll.descriptors_from_object(dummy_device)
     assert len(coll) == 1
     assert isinstance(coll["test"], ActionDescriptor)
 
 
-def test_descriptors_from_status_object(dev):
-    coll = DescriptorCollection(device=dev)
+def test_descriptors_from_status_object(dummy_device):
+    coll = DescriptorCollection(device=dummy_device)
 
     class TestStatus(DeviceStatus):
         @sensor(id="test", name="test sensor")
@@ -67,21 +50,21 @@ def test_descriptors_from_status_object(dev):
         pytest.param(PropertyDescriptor, {"status_attribute": "foo"}),
     ],
 )
-def test_add_descriptor(dev: Device, cls, params):
+def test_add_descriptor(dummy_device: Device, cls, params):
     """Test that adding a descriptor works."""
-    coll: DescriptorCollection = DescriptorCollection(device=dev)
+    coll: DescriptorCollection = DescriptorCollection(device=dummy_device)
     coll.add_descriptor(cls(id="id", name="test name", **params))
     assert len(coll) == 1
     assert coll["id"] is not None
 
 
-def test_handle_action_descriptor(mocker, dev):
-    coll = DescriptorCollection(device=dev)
+def test_handle_action_descriptor(mocker, dummy_device):
+    coll = DescriptorCollection(device=dummy_device)
     invalid_desc = ActionDescriptor(id="action", name="test name")
     with pytest.raises(ValueError, match="Neither method or method_name was defined"):
         coll.add_descriptor(invalid_desc)
 
-    mocker.patch.object(dev, "existing_method", create=True)
+    mocker.patch.object(dummy_device, "existing_method", create=True)
 
     # Test method name binding
     act_with_method_name = ActionDescriptor(
@@ -100,8 +83,8 @@ def test_handle_action_descriptor(mocker, dev):
         coll.add_descriptor(act_with_method_name_missing)
 
 
-def test_handle_writable_property_descriptor(mocker, dev):
-    coll = DescriptorCollection(device=dev)
+def test_handle_writable_property_descriptor(mocker, dummy_device):
+    coll = DescriptorCollection(device=dummy_device)
     data = {
         "name": "",
         "status_attribute": "",
@@ -111,7 +94,7 @@ def test_handle_writable_property_descriptor(mocker, dev):
     with pytest.raises(ValueError, match="Neither setter or setter_name was defined"):
         coll.add_descriptor(invalid)
 
-    mocker.patch.object(dev, "existing_method", create=True)
+    mocker.patch.object(dummy_device, "existing_method", create=True)
 
     # Test name binding
     setter_name_desc = PropertyDescriptor(
@@ -128,15 +111,15 @@ def test_handle_writable_property_descriptor(mocker, dev):
         )
 
 
-def test_handle_enum_constraints(dev, mocker):
-    coll = DescriptorCollection(device=dev)
+def test_handle_enum_constraints(dummy_device, mocker):
+    coll = DescriptorCollection(device=dummy_device)
 
     data = {
         "name": "enum",
         "status_attribute": "attr",
     }
 
-    mocker.patch.object(dev, "choices_attr", create=True)
+    mocker.patch.object(dummy_device, "choices_attr", create=True)
 
     # Check that error is raised if choices are missing
     invalid = EnumDescriptor(id="missing", **data)
@@ -154,8 +137,8 @@ def test_handle_enum_constraints(dev, mocker):
     assert coll["with_choices_attr"].choices is not None
 
 
-def test_handle_range_constraints(dev, mocker):
-    coll = DescriptorCollection(device=dev)
+def test_handle_range_constraints(dummy_device, mocker):
+    coll = DescriptorCollection(device=dummy_device)
 
     data = {
         "name": "name",
@@ -170,7 +153,9 @@ def test_handle_range_constraints(dev, mocker):
     coll.add_descriptor(desc)
     assert coll["regular"].max_value == 100
 
-    mocker.patch.object(dev, "range", create=True, new=ValidSettingRange(-1, 1000, 10))
+    mocker.patch.object(
+        dummy_device, "range", create=True, new=ValidSettingRange(-1, 1000, 10)
+    )
     range_attr = RangeDescriptor(id="range_attribute", range_attribute="range", **data)
     coll.add_descriptor(range_attr)
 
@@ -179,8 +164,8 @@ def test_handle_range_constraints(dev, mocker):
     assert coll["range_attribute"].step == 10
 
 
-def test_duplicate_identifiers(dev):
-    coll = DescriptorCollection(device=dev)
+def test_duplicate_identifiers(dummy_device):
+    coll = DescriptorCollection(device=dummy_device)
     for i in range(3):
         coll.add_descriptor(
             ActionDescriptor(id="action", name=f"action {i}", method=lambda _: _)
