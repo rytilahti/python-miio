@@ -299,7 +299,7 @@ class Device(metaclass=DeviceGroupMeta):
             {
                 k: v
                 for k, v in self.descriptors().items()
-                if isinstance(v, PropertyDescriptor) and v.access & AccessFlags.Read
+                if v.access == AccessFlags.Read
             },
             device=self,
         )

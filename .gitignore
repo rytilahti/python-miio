@@ -9,5 +9,15 @@ __pycache__
 
 .coverage
 
+# generated apidocs
 docs/_build/
+docs/api/
+
 .vscode/settings.json
+
+# pycharm shenanigans
+*.orig
+*_BACKUP_*
+*_BASE_*
+*_LOCAL_*
+*_REMOTE_*
