@@ -89,7 +89,7 @@ from miio.integrations.yunmi.waterpurifier import WaterPurifier, WaterPurifierYu
 from miio.integrations.zhimi.airpurifier import AirFresh, AirPurifier, AirPurifierMiot
 from miio.integrations.zhimi.fan import Fan, FanZA5
 from miio.integrations.zhimi.heater import Heater, HeaterMiot
-from miio.integrations.zhimi.humidifier import AirHumidifier, AirHumidifierMiot
+from miio.integrations.zhimi.humidifier import AirHumidifier, AirHumidifierMiot, AirHumidifierMiotCA6
 from miio.integrations.zimi.powerstrip import PowerStrip
 from miio.protocol import Message, Utils
 from miio.push_server import EventInfo, PushServer
