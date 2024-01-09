@@ -143,7 +143,7 @@ class AirHumidifierMiotStatus(DeviceStatus):
         0 - empty/min,  1 - normal, 2 - full/max
         """
         water_level = self.data["water_level"]
-        return {0: "0", 1: "50", 2: "100"}.get(water_level)
+        return {0: 0, 1: 50, 2: 100}.get(water_level)
 
     @property
     def dry(self) -> Optional[bool]:
