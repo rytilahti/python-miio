@@ -19,11 +19,20 @@ _MAPPINGS = {
         # Air Humidifier (siid=2)
         "power": {"siid": 2, "piid": 1},  # bool
         "fault": {"siid": 2, "piid": 2},  # [0, 15] step 1
-        "mode": {"siid": 2, "piid": 5},  # 0 - Fav, 1 - Auto, 2 - Sleep : TODO: Update OperationMode
-        "target_humidity": {"siid": 2, "piid": 6},  # [30, 60] step 1 : TODO: Default max in HA is 80%, update to 60%
-        "water_level": {"siid": 2, "piid": 7},  # 0 - empty/min,  1 - normal, 2 - full/max: TODO: Override water_level
+        "mode": {
+            "siid": 2,
+            "piid": 5,
+        },  # 0 - Fav, 1 - Auto, 2 - Sleep : TODO: Update OperationMode
+        "target_humidity": {
+            "siid": 2,
+            "piid": 6,
+        },  # [30, 60] step 1 : TODO: Default max in HA is 80%, update to 60%
+        "water_level": {
+            "siid": 2,
+            "piid": 7,
+        },  # 0 - empty/min,  1 - normal, 2 - full/max: TODO: Override water_level
         "dry": {"siid": 2, "piid": 8},  # Automatic Air Drying, bool
-        "status": {"siid": 2, "piid": 9}, # 1 - Close, 2 - Work, 3 - Dry, 4 - Clean
+        "status": {"siid": 2, "piid": 9},  # 1 - Close, 2 - Work, 3 - Dry, 4 - Clean
         # Environment (siid=3)
         "temperature": {"siid": 3, "piid": 7},  # [-40, 125] step 0.1
         "humidity": {"siid": 3, "piid": 9},  # [0, 100] step 1
@@ -35,11 +44,14 @@ _MAPPINGS = {
         "child_lock": {"siid": 6, "piid": 1},  # bool
         # Other (siid=7)
         "actual_speed": {"siid": 7, "piid": 1},  # [0, 2000] step 1
-        "coutry_code": {"siid": 7, "piid": 2},  # 82 - KR, 44 - EU, 81 - JP, 86 - CN, 886 - TW
+        "coutry_code": {
+            "siid": 7,
+            "piid": 2,
+        },  # 82 - KR, 44 - EU, 81 - JP, 86 - CN, 886 - TW
         "clean_mode": {"siid": 7, "piid": 5},  # bool
-        "self_clean_percent": {"siid": 7, "piid": 6}, # minutes, [0, 30] step 1
-        "pump_state": {"siid": 7, "piid": 7}, # bool
-        "pump_cnt": {"siid": 7, "piid": 8}, # [0, 4000] step 1
+        "self_clean_percent": {"siid": 7, "piid": 6},  # minutes, [0, 30] step 1
+        "pump_state": {"siid": 7, "piid": 7},  # bool
+        "pump_cnt": {"siid": 7, "piid": 8},  # [0, 4000] step 1
     }
 }
 
@@ -49,11 +61,13 @@ class OperationMode(enum.Enum):
     Auto = 1
     Sleep = 2
 
+
 class OperationStatus(enum.Enum):
     Close = 1
     Work = 2
     Dry = 3
     Clean = 4
+
 
 class LedBrightness(enum.Enum):
     Off = 0
@@ -143,7 +157,7 @@ class AirHumidifierMiotStatus(DeviceStatus):
         if self.data["dry"] is not None:
             return self.data["dry"]
         return None
-    
+
     @property
     def status(self) -> OperationStatus:
         """Return current status."""
@@ -155,7 +169,7 @@ class AirHumidifierMiotStatus(DeviceStatus):
             return OperationStatus.Close
 
         return status
-    
+
     # Environment
 
     @property
@@ -212,7 +226,7 @@ class AirHumidifierMiotStatus(DeviceStatus):
     def clean_mode(self) -> bool:
         """Return True if clean mode is active."""
         return self.data["clean_mode"]
-    
+
     @property
     def clean_percent(self) -> int:
         """Return time in minutes (from 0 to 30) of self-cleaning procedure."""
@@ -227,6 +241,7 @@ class AirHumidifierMiotStatus(DeviceStatus):
     def pump_cnt(self) -> int:
         """Return pump-cnt."""
         return self.data["pump_cnt"]
+
 
 class AirHumidifierMiotCA6(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
