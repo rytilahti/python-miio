@@ -22,15 +22,15 @@ _MAPPINGS = {
         "mode": {
             "siid": 2,
             "piid": 5,
-        },  # 0 - Fav, 1 - Auto, 2 - Sleep : TODO: Update OperationMode
+        },  # 0 - Fav, 1 - Auto, 2 - Sleep
         "target_humidity": {
             "siid": 2,
             "piid": 6,
-        },  # [30, 60] step 1 : TODO: Default max in HA is 80%, update to 60%
+        },  # [30, 60] step 1
         "water_level": {
             "siid": 2,
             "piid": 7,
-        },  # 0 - empty/min,  1 - normal, 2 - full/max: TODO: Override water_level
+        },  # 0 - empty/min,  1 - normal, 2 - full/max
         "dry": {"siid": 2, "piid": 8},  # Automatic Air Drying, bool
         "status": {"siid": 2, "piid": 9},  # 1 - Close, 2 - Work, 3 - Dry, 4 - Clean
         # Environment (siid=3)
@@ -75,7 +75,7 @@ class LedBrightness(enum.Enum):
     Bright = 2
 
 
-class AirHumidifierMiotStatus(DeviceStatus):
+class AirHumidifierMiotCA6Status(DeviceStatus):
     """Container for status reports from the air humidifier.
 
     Xiaomi Smartmi Evaporation Air Humidifier 3 (zhimi.humidifier.ca6) respone (MIoT format)::
@@ -95,6 +95,9 @@ class AirHumidifierMiotStatus(DeviceStatus):
             {'did': 'child_lock', 'siid': 6, 'piid': 1, 'code': 0, 'value': False},
             {'did': 'actual_speed', 'siid': 7, 'piid': 1, 'code': 0, 'value': 1100},
             {'did': 'clean_mode', 'siid': 7, 'piid': 5, 'code': 0, 'value': False}
+            {'did': 'self_clean_percent, 'siid': 7, 'piid': 6, 'code': 0, 'value': 0},
+            {'did': 'pump_state, 'siid': 7, 'piid': 7, 'code': 0, 'value': False},
+            {'did': 'pump_cnt', 'siid': 7, 'piid': 8, 'code': 0, 'value': 1000},
         ]
     """
 
@@ -238,7 +241,7 @@ class AirHumidifierMiotStatus(DeviceStatus):
 
 
 class AirHumidifierMiotCA6(MiotDevice):
-    """Main class representing the air humidifier which uses MIoT protocol."""
+    """Main class representing zhimi.humidifier.ca6 air humidifier which uses MIoT protocol."""
 
     _mappings = _MAPPINGS
 
@@ -264,10 +267,10 @@ class AirHumidifierMiotCA6(MiotDevice):
             "Pump cnt: {result.pump_cnt}\n",
         )
     )
-    def status(self) -> AirHumidifierMiotStatus:
+    def status(self) -> AirHumidifierMiotCA6Status:
         """Retrieve properties."""
 
-        return AirHumidifierMiotStatus(
+        return AirHumidifierMiotCA6Status(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping()
@@ -294,7 +297,9 @@ class AirHumidifierMiotCA6(MiotDevice):
             raise ValueError(
                 "Invalid target humidity: %s. Must be between 30 and 60" % humidity
             )
-        return self.set_property("target_humidity", humidity)
+        # HA sends humidity in float, e.g. 45.0
+        # ca6 does accept only int values, e.g. 45
+        return self.set_property("target_humidity", int(humidity))
 
     @command(
         click.argument("mode", type=EnumType(OperationMode)),
