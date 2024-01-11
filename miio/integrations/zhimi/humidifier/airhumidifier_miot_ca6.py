@@ -225,7 +225,7 @@ class AirHumidifierMiotCA6Status(DeviceStatus):
         return self.data["clean_mode"]
 
     @property
-    def clean_percent(self) -> int:
+    def self_clean_percent(self) -> int:
         """Return time in minutes (from 0 to 30) of self-cleaning procedure."""
         return self.data["self_clean_percent"]
 
@@ -262,7 +262,7 @@ class AirHumidifierMiotCA6(MiotDevice):
             "Dry mode: {result.dry}\n"
             "Actual motor speed: {result.actual_speed} rpm\n"
             "Clean mode: {result.clean_mode}\n"
-            "Clean percent: {result.clean_percent} minutes\n"
+            "Self clean percent: {result.self_clean_percent} minutes\n"
             "Pump state: {result.pump_state}\n"
             "Pump cnt: {result.pump_cnt}\n",
         )
