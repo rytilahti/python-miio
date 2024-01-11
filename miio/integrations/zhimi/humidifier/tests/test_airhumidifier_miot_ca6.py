@@ -25,6 +25,7 @@ _INITIAL_STATE = {
     "pump_cnt": 1000,
 }
 
+
 class DummyAirHumidifierMiotCA6(DummyMiotDevice, AirHumidifierMiotCA6):
     def __init__(self, *args, **kwargs):
         self.state = _INITIAL_STATE
@@ -70,9 +71,9 @@ def test_status(dev):
     assert status.error == _INITIAL_STATE["fault"]
     assert status.mode == OperationMode(_INITIAL_STATE["mode"])
     assert status.target_humidity == _INITIAL_STATE["target_humidity"]
-    print("status = ", status)
-    print("water level %s == %s", status.water_level, _INITIAL_STATE["water_level"])
-    assert status.water_level == {0: 0, 1: 50, 2: 100}.get(int(_INITIAL_STATE["water_level"]))
+    assert status.water_level == {0: 0, 1: 50, 2: 100}.get(
+        int(_INITIAL_STATE["water_level"])
+    )
     assert status.dry == _INITIAL_STATE["dry"]
     assert status.temperature == _INITIAL_STATE["temperature"]
     assert status.humidity == _INITIAL_STATE["humidity"]
@@ -80,7 +81,11 @@ def test_status(dev):
     assert status.led_brightness == LedBrightness(_INITIAL_STATE["led_brightness"])
     assert status.child_lock == _INITIAL_STATE["child_lock"]
     assert status.actual_speed == _INITIAL_STATE["actual_speed"]
-    # TODO : add other props
+    assert status.actual_speed == _INITIAL_STATE["actual_speed"]
+    assert status.clean_mode == _INITIAL_STATE["clean_mode"]
+    assert status.self_clean_percent == _INITIAL_STATE["self_clean_percent"]
+    assert status.pump_state == _INITIAL_STATE["pump_state"]
+    assert status.pump_cnt == _INITIAL_STATE["pump_cnt"]
 
 
 def test_set_target_humidity(dev):
@@ -171,27 +176,24 @@ def test_set_clean_mode(dev):
     assert clean_mode() is False
 
 
-@pytest.mark.parametrize(
-    "given,expected", [(0, 0), (1, 50), (2, 100)]
-)
+@pytest.mark.parametrize("given,expected", [(0, 0), (1, 50), (2, 100)])
 def test_water_level(dev, given, expected):
     dev.set_property("water_level", given)
     assert dev.status().water_level == expected
 
 
-
-def test_status(dev):
-    def status():
+def test_op_status(dev):
+    def op_status():
         return dev.status().status
 
     dev.set_property("status", OperationStatus.Close)
-    assert status() == OperationStatus.Close
+    assert op_status() == OperationStatus.Close
 
     dev.set_property("status", OperationStatus.Work)
-    assert status() == OperationStatus.Work
+    assert op_status() == OperationStatus.Work
 
     dev.set_property("status", OperationStatus.Dry)
-    assert status() == OperationStatus.Dry
-    
+    assert op_status() == OperationStatus.Dry
+
     dev.set_property("status", OperationStatus.Clean)
-    assert status() == OperationStatus.Clean
+    assert op_status() == OperationStatus.Clean
