@@ -46,7 +46,7 @@ _MAPPINGS = {
         "actual_speed": {"siid": 7, "piid": 1},  # [0, 2000] step 1
         "coutry_code": {
             "siid": 7,
-            "piid": 2,
+            "piid": 4,
         },  # 82 - KR, 44 - EU, 81 - JP, 86 - CN, 886 - TW
         "clean_mode": {"siid": 7, "piid": 5},  # bool
         "self_clean_percent": {"siid": 7, "piid": 6},  # minutes, [0, 30] step 1
