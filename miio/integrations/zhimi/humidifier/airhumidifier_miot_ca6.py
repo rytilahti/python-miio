@@ -44,7 +44,7 @@ _MAPPINGS = {
         "child_lock": {"siid": 6, "piid": 1},  # bool
         # Other (siid=7)
         "actual_speed": {"siid": 7, "piid": 1},  # [0, 2000] step 1
-        "coutry_code": {
+        "country_code": {
             "siid": 7,
             "piid": 4,
         },  # 82 - KR, 44 - EU, 81 - JP, 86 - CN, 886 - TW
