@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from miio import MiotDevice
 from miio.click_common import command
@@ -45,6 +45,7 @@ class GenericMiot(MiotDevice):
 
         self._actions: Dict[str, ActionDescriptor] = {}
         self._properties: Dict[str, PropertyDescriptor] = {}
+        self._status_query: List[Dict] = []
 
     def initialize_model(self):
         """Initialize the miot model and create descriptions."""
@@ -59,17 +60,13 @@ class GenericMiot(MiotDevice):
     @command()
     def status(self) -> GenericMiotStatus:
         """Return status based on the miot model."""
-        properties = []
-        for _, prop in self.sensors().items():
-            extras = prop.extras
-            prop = extras["miot_property"]
-            q = {"siid": prop.siid, "piid": prop.piid, "did": prop.name}
-            properties.append(q)
+        if not self._initialized:
+            self._initialize_descriptors()
 
         # TODO: max properties needs to be made configurable (or at least splitted to avoid too large udp datagrams
         #       some devices are stricter: https://github.com/rytilahti/python-miio/issues/1550#issuecomment-1303046286
         response = self.get_properties(
-            properties, property_getter="get_properties", max_properties=10
+            self._status_query, property_getter="get_properties", max_properties=10
         )
 
         return GenericMiotStatus(response, self)
@@ -105,7 +102,15 @@ class GenericMiot(MiotDevice):
 
             desc = prop.get_descriptor()
 
-            if desc.access & AccessFlags.Write:
+            # Add readable properties to the status query
+            if AccessFlags.Read in desc.access:
+                extras = prop.extras
+                prop = extras["miot_property"]
+                q = {"siid": prop.siid, "piid": prop.piid, "did": prop.name}
+                self._status_query.append(q)
+
+            # Bind setter to the descriptor
+            if AccessFlags.Write in desc.access:
                 desc.setter = partial(
                     self.set_property_by, prop.siid, prop.piid, name=prop.name
                 )
