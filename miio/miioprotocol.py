@@ -3,6 +3,7 @@
 This module contains the implementation of routines to send handshakes, send commands
 and discover devices (MiIOProtocol).
 """
+
 import binascii
 import codecs
 import logging

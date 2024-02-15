@@ -11,6 +11,7 @@ If the decryption fails, raw bytes as returned by the device are returned.
 An usage example can be seen in the source of :func:`miio.Device.send`.
 If the decryption fails, raw bytes as returned by the device are returned.
 """
+
 import calendar
 import datetime
 import hashlib
@@ -182,9 +183,11 @@ class EncryptionAdapter(Adapter):
             ),
             # xiaomi cloud returns malformed json when answering _sync.batch_gen_room_up_url
             # command so try to sanitize it
-            lambda decrypted_bytes: decrypted_bytes[: decrypted_bytes.rfind(b"\x00")]
-            if b"\x00" in decrypted_bytes
-            else decrypted_bytes,
+            lambda decrypted_bytes: (
+                decrypted_bytes[: decrypted_bytes.rfind(b"\x00")]
+                if b"\x00" in decrypted_bytes
+                else decrypted_bytes
+            ),
             # fix double-oh values for 090615.curtain.jldj03, ##1411
             lambda decrypted_bytes: decrypted_bytes.replace(
                 b'"value":00', b'"value":0'

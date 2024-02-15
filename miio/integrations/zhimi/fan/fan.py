@@ -312,9 +312,9 @@ class Fan(Device):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda oscillate: "Turning on oscillate"
-            if oscillate
-            else "Turning off oscillate"
+            lambda oscillate: (
+                "Turning on oscillate" if oscillate else "Turning off oscillate"
+            )
         ),
     )
     def set_oscillate(self, oscillate: bool):

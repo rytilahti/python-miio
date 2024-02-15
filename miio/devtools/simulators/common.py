@@ -1,4 +1,5 @@
 """Common functionalities for miio and miot simulators."""
+
 from hashlib import md5
 
 

@@ -179,9 +179,11 @@ class ChuangmiIr(Device):
     @command(
         click.argument("indicator_led", type=bool),
         default_output=format_output(
-            lambda indicator_led: "Turning on indicator LED"
-            if indicator_led
-            else "Turning off indicator LED"
+            lambda indicator_led: (
+                "Turning on indicator LED"
+                if indicator_led
+                else "Turning off indicator LED"
+            )
         ),
     )
     def set_indicator_led(self, indicator_led: bool):
