@@ -1,4 +1,5 @@
 """Compat layer for homeassistant."""
+
 from enum import Enum, auto
 
 

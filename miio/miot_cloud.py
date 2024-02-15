@@ -1,4 +1,5 @@
 """Module implementing handling of miot schema files."""
+
 import json
 import logging
 from datetime import datetime, timedelta, timezone

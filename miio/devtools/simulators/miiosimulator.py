@@ -1,4 +1,5 @@
 """Implementation of miio simulator."""
+
 import asyncio
 import json
 import logging
