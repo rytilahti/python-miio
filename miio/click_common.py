@@ -2,6 +2,7 @@
 
 This file contains common functions for cli tools.
 """
+
 import ast
 import ipaddress
 import json

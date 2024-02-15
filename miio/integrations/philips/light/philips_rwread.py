@@ -148,9 +148,11 @@ class PhilipsRwread(Device):
     @command(
         click.argument("motion_detection", type=bool),
         default_output=format_output(
-            lambda motion_detection: "Turning on motion detection"
-            if motion_detection
-            else "Turning off motion detection"
+            lambda motion_detection: (
+                "Turning on motion detection"
+                if motion_detection
+                else "Turning off motion detection"
+            )
         ),
     )
     def set_motion_detection(self, motion_detection: bool):

@@ -1,6 +1,5 @@
 """Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
-
 import json
 import logging
 import math

@@ -373,9 +373,9 @@ class AirHumidifierMiot(MiotDevice):
     @command(
         click.argument("clean_mode", type=bool),
         default_output=format_output(
-            lambda clean_mode: "Turning on clean mode"
-            if clean_mode
-            else "Turning off clean mode"
+            lambda clean_mode: (
+                "Turning on clean mode" if clean_mode else "Turning off clean mode"
+            )
         ),
     )
     def set_clean_mode(self, clean_mode: bool):

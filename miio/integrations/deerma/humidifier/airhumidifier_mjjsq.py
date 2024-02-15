@@ -206,9 +206,11 @@ class AirHumidifierMjjsq(Device):
     @command(
         click.argument("protection", type=bool),
         default_output=format_output(
-            lambda protection: "Turning on wet protection"
-            if protection
-            else "Turning off wet protection"
+            lambda protection: (
+                "Turning on wet protection"
+                if protection
+                else "Turning off wet protection"
+            )
         ),
     )
     def set_wet_protection(self, protection: bool):

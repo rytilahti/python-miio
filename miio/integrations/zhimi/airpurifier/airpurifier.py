@@ -482,9 +482,9 @@ class AirPurifier(Device):
     @command(
         click.argument("learn_mode", type=bool),
         default_output=format_output(
-            lambda learn_mode: "Turning on learn mode"
-            if learn_mode
-            else "Turning off learn mode"
+            lambda learn_mode: (
+                "Turning on learn mode" if learn_mode else "Turning off learn mode"
+            )
         ),
     )
     def set_learn_mode(self, learn_mode: bool):
@@ -497,9 +497,9 @@ class AirPurifier(Device):
     @command(
         click.argument("auto_detect", type=bool),
         default_output=format_output(
-            lambda auto_detect: "Turning on auto detect"
-            if auto_detect
-            else "Turning off auto detect"
+            lambda auto_detect: (
+                "Turning on auto detect" if auto_detect else "Turning off auto detect"
+            )
         ),
     )
     def set_auto_detect(self, auto_detect: bool):
