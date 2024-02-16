@@ -10,6 +10,7 @@ from miio.click_common import EnumType, command, format_output
 class OperationMode(enum.Enum):
     Normal = "normal"
     Nature = "nature"
+    Sleep = "sleep"
 
 
 class MoveDirection(enum.Enum):
@@ -23,6 +24,8 @@ MODEL_FAN_P11 = "dmaker.fan.p11"
 MODEL_FAN_P15 = "dmaker.fan.p15"
 MODEL_FAN_P18 = "dmaker.fan.p18"
 MODEL_FAN_P33 = "dmaker.fan.p33"
+MODEL_FAN_P39 = "dmaker.fan.p39"
+MODEL_FAN_P45 = "dmaker.fan.p45"
 MODEL_FAN_1C = "dmaker.fan.1c"
 
 
@@ -85,6 +88,33 @@ MIOT_MAPPING = {
         "power_off_time": {"siid": 3, "piid": 1},
         "set_move": {"siid": 6, "piid": 1},
     },
+    MODEL_FAN_P39: {
+        # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p39:1
+        "power": {"siid": 2, "piid": 1},
+        "fan_level": {"siid": 2, "piid": 2},
+        "mode": {"siid": 2, "piid": 4},
+        "swing_mode": {"siid": 2, "piid": 5},
+        "swing_mode_angle": {"siid": 2, "piid": 6},
+        "power_off_time": {"siid": 2, "piid": 8},
+        "set_move": {"siid": 2, "piid": 10},
+        "fan_speed": {"siid": 2, "piid": 11},
+        "child_lock": {"siid": 3, "piid": 1},
+        "buzzer": {"siid": 2, "piid": 7},
+        "light": {"siid": 2, "piid": 9},
+    },
+    MODEL_FAN_P45: {
+        # Source https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:fan:0000A005:dmaker-p45:1
+        "power": {"siid": 2, "piid": 1},
+        "fan_level": {"siid": 2, "piid": 2},
+        "mode": {"siid": 2, "piid": 3},
+        "swing_mode": {"siid": 2, "piid": 4},
+        "swing_mode_angle": {"siid": 2, "piid": 5},
+        "power_off_time": {"siid": 3, "piid": 1},
+        "light": {"siid": 4, "piid": 1},
+        "buzzer": {"siid": 5, "piid": 1},
+        "child_lock": {"siid": 7, "piid": 1},
+        "fan_speed": {"siid": 8, "piid": 1},
+    },
 }
 
 
@@ -114,6 +144,8 @@ SUPPORTED_ANGLES = {
     MODEL_FAN_P15: [30, 60, 90, 120, 140],  # mapped to P11
     MODEL_FAN_P18: [30, 60, 90, 120, 140],  # mapped to P10
     MODEL_FAN_P33: [30, 60, 90, 120, 140],
+    MODEL_FAN_P39: [30, 60, 90, 120, 140],
+    MODEL_FAN_P45: [30, 60, 90, 120, 150],
 }
 
 
@@ -122,10 +154,16 @@ class OperationModeMiot(enum.Enum):
     Nature = 1
 
 
+class OperationModeMiotP45(enum.Enum):
+    Normal = 0
+    Nature = 1
+    Sleep = 2
+
+
 class FanStatusMiot(DeviceStatus):
     """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker P9/P10."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: Dict[str, Any], model: str) -> None:
         """
         Response of a FanMiot (dmaker.fan.p10):
 
@@ -148,6 +186,7 @@ class FanStatusMiot(DeviceStatus):
         }
         """
         self.data = data
+        self.model = model
 
     @property
     def power(self) -> str:
@@ -162,6 +201,8 @@ class FanStatusMiot(DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Operation mode."""
+        if self.model == MODEL_FAN_P45:
+            return OperationMode[OperationModeMiotP45(self.data["mode"]).name]
         return OperationMode[OperationModeMiot(self.data["mode"]).name]
 
     @property
@@ -292,7 +333,8 @@ class FanMiot(MiotDevice):
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping()
-            }
+            },
+            self.model,
         )
 
     @command(default_output=format_output("Powering on"))
@@ -311,6 +353,9 @@ class FanMiot(MiotDevice):
     )
     def set_mode(self, mode: OperationMode):
         """Set mode."""
+        if self.model == MODEL_FAN_P45:
+            return self.set_property("mode", OperationModeMiotP45[mode.name].value)
+
         return self.set_property("mode", OperationModeMiot[mode.name].value)
 
     @command(
@@ -341,9 +386,9 @@ class FanMiot(MiotDevice):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda oscillate: "Turning on oscillate"
-            if oscillate
-            else "Turning off oscillate"
+            lambda oscillate: (
+                "Turning on oscillate" if oscillate else "Turning off oscillate"
+            )
         ),
     )
     def set_oscillate(self, oscillate: bool):
@@ -482,9 +527,9 @@ class Fan1C(MiotDevice):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda oscillate: "Turning on oscillate"
-            if oscillate
-            else "Turning off oscillate"
+            lambda oscillate: (
+                "Turning on oscillate" if oscillate else "Turning off oscillate"
+            )
         ),
     )
     def set_oscillate(self, oscillate: bool):

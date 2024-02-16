@@ -2,22 +2,13 @@ import logging
 from functools import partial
 from typing import Dict, List, Optional
 
-import click
-
-from miio import DeviceInfo, MiotDevice
-from miio.click_common import LiteralParamType, command, format_output
+from miio import MiotDevice
+from miio.click_common import command
 from miio.descriptors import AccessFlags, ActionDescriptor, PropertyDescriptor
 from miio.miot_cloud import MiotCloud
 from miio.miot_device import MiotMapping
-from miio.miot_models import (
-    DeviceModel,
-    MiotAccess,
-    MiotAction,
-    MiotProperty,
-    MiotService,
-)
+from miio.miot_models import DeviceModel, MiotAccess, MiotAction, MiotService
 
-from .cli_helpers import pretty_actions, pretty_properties
 from .status import GenericMiotStatus
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,7 +45,7 @@ class GenericMiot(MiotDevice):
 
         self._actions: Dict[str, ActionDescriptor] = {}
         self._properties: Dict[str, PropertyDescriptor] = {}
-        self._all_properties: List[MiotProperty] = []
+        self._status_query: List[Dict] = []
 
     def initialize_model(self):
         """Initialize the miot model and create descriptions."""
@@ -69,19 +60,13 @@ class GenericMiot(MiotDevice):
     @command()
     def status(self) -> GenericMiotStatus:
         """Return status based on the miot model."""
-        properties = []
-        for prop in self._all_properties:
-            if MiotAccess.Read not in prop.access:
-                continue
-
-            name = prop.name
-            q = {"siid": prop.siid, "piid": prop.piid, "did": name}
-            properties.append(q)
+        if not self._initialized:
+            self._initialize_descriptors()
 
         # TODO: max properties needs to be made configurable (or at least splitted to avoid too large udp datagrams
         #       some devices are stricter: https://github.com/rytilahti/python-miio/issues/1550#issuecomment-1303046286
         response = self.get_properties(
-            properties, property_getter="get_properties", max_properties=10
+            self._status_query, property_getter="get_properties", max_properties=10
         )
 
         return GenericMiotStatus(response, self)
@@ -89,9 +74,6 @@ class GenericMiot(MiotDevice):
     def _create_action(self, act: MiotAction) -> Optional[ActionDescriptor]:
         """Create action descriptor for miot action."""
         desc = act.get_descriptor()
-        if not desc:
-            return None
-
         call_action = partial(self.call_action_by, act.siid, act.aiid)
         desc.method = call_action
 
@@ -101,16 +83,7 @@ class GenericMiot(MiotDevice):
         """Create action descriptors."""
         for act in serv.actions:
             act_desc = self._create_action(act)
-            if act_desc is None:  # skip actions we cannot handle for now..
-                continue
-
-            if (
-                act_desc.name in self._actions
-            ):  # TODO: find a way to handle duplicates, suffix maybe?
-                _LOGGER.warning("Got used name name, ignoring '%s': %s", act.name, act)
-                continue
-
-            self._actions[act_desc.name] = act_desc
+            self.descriptors().add_descriptor(act_desc)
 
     def _create_properties(self, serv: MiotService):
         """Create sensor and setting descriptors for a service."""
@@ -129,14 +102,20 @@ class GenericMiot(MiotDevice):
 
             desc = prop.get_descriptor()
 
-            if desc.access & AccessFlags.Write:
+            # Add readable properties to the status query
+            if AccessFlags.Read in desc.access:
+                extras = prop.extras
+                prop = extras["miot_property"]
+                q = {"siid": prop.siid, "piid": prop.piid, "did": prop.name}
+                self._status_query.append(q)
+
+            # Bind setter to the descriptor
+            if AccessFlags.Write in desc.access:
                 desc.setter = partial(
                     self.set_property_by, prop.siid, prop.piid, name=prop.name
                 )
 
-            self._properties[prop.name] = desc
-            # TODO: all properties is only used as the descriptors (stored in _properties) do not have siid/piid
-            self._all_properties.append(prop)
+            self.descriptors().add_descriptor(desc)
 
     def _create_descriptors(self):
         """Create descriptors based on the miot model."""
@@ -154,62 +133,15 @@ class GenericMiot(MiotDevice):
         for sensor in self._properties.values():
             _LOGGER.debug(f"\t{sensor}")
 
-    def _get_action_by_name(self, name: str):
-        """Return action by name."""
-        # TODO: cache service:action?
-        for act in self._actions.values():
-            if act.id == name:
-                if act.method_name is not None:
-                    act.method = getattr(self, act.method_name)
+    def _initialize_descriptors(self) -> None:
+        """Initialize descriptors.
 
-                return act
-
-        raise ValueError("No action with name/id %s" % name)
-
-    @command(
-        click.argument("name"),
-        click.argument("params", type=LiteralParamType(), required=False),
-        name="call",
-    )
-    def call_action(self, name: str, params=None):
-        """Call action by name."""
-        params = params or []
-        act = self._get_action_by_name(name)
-        return act.method(params)
-
-    @command(
-        click.argument("name"),
-        click.argument("params", type=LiteralParamType(), required=True),
-        name="set",
-    )
-    def change_setting(self, name: str, params=None):
-        """Change setting value."""
-        params = params if params is not None else []
-        setting = self._properties.get(name)
-        if setting is None:
-            raise ValueError("No property found for name %s" % name)
-        if setting.access & AccessFlags.Write == 0:
-            raise ValueError("Property %s is not writable" % name)
-
-        return setting.setter(value=params)
-
-    def _fetch_info(self) -> DeviceInfo:
-        """Hook to perform the model initialization."""
-        info = super()._fetch_info()
+        This will be called by the base class to initialize the descriptors. We override
+        it here to construct our model instead of trying to request  the status and use
+        that to find out the available features.
+        """
         self.initialize_model()
-
-        return info
-
-    @command(default_output=format_output(result_msg_fmt=pretty_actions))
-    def actions(self) -> Dict[str, ActionDescriptor]:
-        """Return available actions."""
-        return self._actions
-
-    @command(default_output=format_output(result_msg_fmt=pretty_properties))
-    def properties(self) -> Dict[str, PropertyDescriptor]:
-        """Return available sensors."""
-        # TODO: move pretty-properties to be generic for all devices
-        return self._properties
+        self._initialized = True
 
     @property
     def device_type(self) -> Optional[str]:

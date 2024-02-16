@@ -141,9 +141,9 @@ class WifiRepeater(Device):
 
     @command(
         default_output=format_output(
-            lambda result: "WiFi roaming is enabled"
-            if result
-            else "WiFi roaming is disabled"
+            lambda result: (
+                "WiFi roaming is enabled" if result else "WiFi roaming is disabled"
+            )
         )
     )
     def wifi_roaming(self) -> bool:

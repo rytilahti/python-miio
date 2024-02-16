@@ -62,3 +62,16 @@ def test_missing_fields(info):
     assert info.hardware_version is None
     assert info.mac_address is None
     assert info.token is None
+
+
+def test_cli_output(info, mocker):
+    mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.supports_miot", return_value=False)
+
+    output = info.__cli_output__
+    assert "Model: chuangmi.plug.m1" in output
+    assert "Hardware version: MW300" in output
+    assert "Firmware version: 1.2.4_16" in output
+    assert "Supported using: ChuangmiPlug" in output
+    assert "Command: miiocli chuangmiplug" in output
+    assert "Supported by genericmiot: False" in output

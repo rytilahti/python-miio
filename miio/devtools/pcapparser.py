@@ -1,4 +1,5 @@
 """Parse PCAP files for miio traffic."""
+
 from collections import Counter, defaultdict
 from ipaddress import ip_address
 from pprint import pformat as pf
@@ -51,7 +52,7 @@ def read_payloads_from_file(file, tokens: List[str]):
             try:
                 decrypted = Message.parse(data, token=bytes.fromhex(token))
                 break
-            except BaseException:
+            except BaseException:  # noqa: B036
                 continue
 
         if decrypted is None:

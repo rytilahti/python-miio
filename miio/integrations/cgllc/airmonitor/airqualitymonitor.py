@@ -216,9 +216,9 @@ class AirQualityMonitor(Device):
     @command(
         click.argument("display_clock", type=bool),
         default_output=format_output(
-            lambda led: "Turning on display clock"
-            if led
-            else "Turning off display clock"
+            lambda led: (
+                "Turning on display clock" if led else "Turning off display clock"
+            )
         ),
     )
     def set_display_clock(self, display_clock: bool):

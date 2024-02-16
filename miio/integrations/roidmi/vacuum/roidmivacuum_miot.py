@@ -1,6 +1,5 @@
 """Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
-
 import json
 import logging
 import math
@@ -589,7 +588,7 @@ class RoidmiVacuumMiot(MiotDevice):
     @command()
     def start(self) -> None:
         """Start cleaning."""
-        return self.call_action("start")
+        return self.call_action_from_mapping("start")
 
     # @command(click.argument("roomstr", type=str, required=False))
     # def start_room_sweep_unknown(self, roomstr: str=None) -> None:
@@ -613,17 +612,17 @@ class RoidmiVacuumMiot(MiotDevice):
     @command()
     def stop(self) -> None:
         """Stop cleaning."""
-        return self.call_action("stop")
+        return self.call_action_from_mapping("stop")
 
     @command()
     def home(self) -> None:
         """Return to home."""
-        return self.call_action("home")
+        return self.call_action_from_mapping("home")
 
     @command()
     def identify(self) -> None:
         """Locate the device (i am here)."""
-        return self.call_action("identify")
+        return self.call_action_from_mapping("identify")
 
     @command(click.argument("on", type=bool))
     def set_station_led(self, on: bool):
@@ -757,7 +756,7 @@ class RoidmiVacuumMiot(MiotDevice):
     @command()
     def start_dust(self) -> None:
         """Start base dust collection."""
-        return self.call_action("start_station_dust_collection")
+        return self.call_action_from_mapping("start_station_dust_collection")
 
     # @command(click.argument("voice", type=str))
     #     def set_voice_unknown(self, voice: str) -> None:
@@ -770,19 +769,19 @@ class RoidmiVacuumMiot(MiotDevice):
     @command()
     def reset_filter_life(self) -> None:
         """Reset filter life."""
-        return self.call_action("reset_filter_life")
+        return self.call_action_from_mapping("reset_filter_life")
 
     @command()
     def reset_mainbrush_life(self) -> None:
         """Reset main brush life."""
-        return self.call_action("reset_main_brush_life")
+        return self.call_action_from_mapping("reset_main_brush_life")
 
     @command()
     def reset_sidebrush_life(self) -> None:
         """Reset side brushes life."""
-        return self.call_action("reset_side_brushes_life")
+        return self.call_action_from_mapping("reset_side_brushes_life")
 
     @command()
     def reset_sensor_dirty_life(self) -> None:
         """Reset sensor dirty life."""
-        return self.call_action("reset_sensor_dirty_life")
+        return self.call_action_from_mapping("reset_sensor_dirty_life")

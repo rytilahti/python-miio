@@ -33,7 +33,7 @@ def test_properties(host: str, token: str, properties):
     max_property_len = max(len(p) for p in properties)
     for property in properties:
         try:
-            click.echo(f"Testing {property:{max_property_len+2}} ", nl=False)
+            click.echo(f"Testing {property:{max_property_len + 2}} ", nl=False)
             value = dev.get_properties([property])
             # Handle list responses
             if isinstance(value, list):

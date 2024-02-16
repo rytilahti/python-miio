@@ -8,6 +8,7 @@ If you are a downstream developer, use :func:`~miio.device.Device.properties()`,
 If you are developing an integration, prefer :func:`~miio.devicestatus.sensor`, :func:`~miio.devicestatus.setting`, and
 :func:`~miio.devicestatus.action` decorators over creating the descriptors manually.
 """
+
 from enum import Enum, Flag, auto
 from typing import Any, Callable, Dict, List, Optional, Type
 

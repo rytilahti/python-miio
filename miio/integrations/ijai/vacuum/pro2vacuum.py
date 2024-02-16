@@ -286,17 +286,17 @@ class Pro2Vacuum(MiotDevice):
     @command()
     def home(self):
         """Go Home."""
-        return self.call_action("home")
+        return self.call_action_from_mapping("home")
 
     @command()
     def start(self) -> None:
         """Start Cleaning."""
-        return self.call_action("start")
+        return self.call_action_from_mapping("start")
 
     @command()
     def stop(self):
         """Stop Cleaning."""
-        return self.call_action("stop")
+        return self.call_action_from_mapping("stop")
 
     @command(
         click.argument("fan_speed", type=EnumType(FanSpeedMode)),
