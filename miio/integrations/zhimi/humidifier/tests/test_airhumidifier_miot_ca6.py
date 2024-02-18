@@ -3,7 +3,7 @@ import pytest
 from miio.tests.dummies import DummyMiotDevice
 
 from .. import AirHumidifierMiotCA6
-from ..airhumidifier_miot_ca6 import LedBrightness, OperationMode, OperationStatus
+from ..airhumidifier_miot import LedBrightness, OperationModeCA6, OperationStatusCA6
 
 _INITIAL_STATE = {
     "power": True,
@@ -69,7 +69,7 @@ def test_status(dev):
     status = dev.status()
     assert status.is_on is _INITIAL_STATE["power"]
     assert status.error == _INITIAL_STATE["fault"]
-    assert status.mode == OperationMode(_INITIAL_STATE["mode"])
+    assert status.mode == OperationModeCA6(_INITIAL_STATE["mode"])
     assert status.target_humidity == _INITIAL_STATE["target_humidity"]
     assert status.water_level == {0: 0, 1: 50, 2: 100}.get(
         int(_INITIAL_STATE["water_level"])
@@ -108,14 +108,14 @@ def test_set_mode(dev):
     def mode():
         return dev.status().mode
 
-    dev.set_mode(OperationMode.Auto)
-    assert mode() == OperationMode.Auto
+    dev.set_mode(OperationModeCA6.Auto)
+    assert mode() == OperationModeCA6.Auto
 
-    dev.set_mode(OperationMode.Fav)
-    assert mode() == OperationMode.Fav
+    dev.set_mode(OperationModeCA6.Fav)
+    assert mode() == OperationModeCA6.Fav
 
-    dev.set_mode(OperationMode.Sleep)
-    assert mode() == OperationMode.Sleep
+    dev.set_mode(OperationModeCA6.Sleep)
+    assert mode() == OperationModeCA6.Sleep
 
 
 def test_set_led_brightness(dev):
@@ -186,14 +186,14 @@ def test_op_status(dev):
     def op_status():
         return dev.status().status
 
-    dev.set_property("status", OperationStatus.Close)
-    assert op_status() == OperationStatus.Close
+    dev.set_property("status", OperationStatusCA6.Close)
+    assert op_status() == OperationStatusCA6.Close
 
-    dev.set_property("status", OperationStatus.Work)
-    assert op_status() == OperationStatus.Work
+    dev.set_property("status", OperationStatusCA6.Work)
+    assert op_status() == OperationStatusCA6.Work
 
-    dev.set_property("status", OperationStatus.Dry)
-    assert op_status() == OperationStatus.Dry
+    dev.set_property("status", OperationStatusCA6.Dry)
+    assert op_status() == OperationStatusCA6.Dry
 
-    dev.set_property("status", OperationStatus.Clean)
-    assert op_status() == OperationStatus.Clean
+    dev.set_property("status", OperationStatusCA6.Clean)
+    assert op_status() == OperationStatusCA6.Clean
