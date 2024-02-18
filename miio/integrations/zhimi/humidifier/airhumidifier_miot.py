@@ -6,6 +6,7 @@ import click
 
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ SMARTMI_EVAPORATIVE_HUMIDIFIER_2 = "zhimi.humidifier.ca4"
 SMARTMI_EVAPORATIVE_HUMIDIFIER_3 = "zhimi.humidifier.ca6"
 
 
-_MAPPINGS = {
+_MAPPINGS_CA4 = {
     SMARTMI_EVAPORATIVE_HUMIDIFIER_2: {
         # Source http://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:humidifier:0000A00E:zhimi-ca4:2
         # Air Humidifier (siid=2)
@@ -120,7 +121,147 @@ class PressedButton(enum.Enum):
     Power = 2
 
 
-class AirHumidifierMiotStatus(DeviceStatus):
+class AirHumidifierMiotCommonStatus(DeviceStatus):
+    """Container for status reports from the air humidifier. Common features for CA4 and CA6 models."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.data = data
+        _LOGGER.debug(
+            "Status Common: %s, __cli_output__ %s", repr(self), self.__cli_output__
+        )
+
+    # Air Humidifier
+
+    @property
+    def is_on(self) -> bool:
+        """Return True if device is on."""
+        return self.data["power"]
+
+    @property
+    def power(self) -> str:
+        """Return power state."""
+        return "on" if self.is_on else "off"
+
+    @property
+    def error(self) -> int:
+        """Return error state."""
+        return self.data["fault"]
+
+    @property
+    def target_humidity(self) -> int:
+        """Return target humidity."""
+        return self.data["target_humidity"]
+
+    @property
+    @setting(
+        name="Dry Mode",
+        icon="mdi:hair-dryer",
+        setter_name="set_dry",
+        device_class="switch",
+        entity_category="config",
+    )
+    def dry(self) -> Optional[bool]:
+        """Return True if dry mode is on."""
+        if self.data["dry"] is not None:
+            return self.data["dry"]
+        return None
+
+    @property
+    @setting(
+        name="Clean Mode",
+        icon="mdi:shimmer",
+        setter_name="set_clean_mode",
+        device_class="switch",
+        entity_category="config",
+    )
+    def clean_mode(self) -> bool:
+        """Return True if clean mode is active."""
+        return self.data["clean_mode"]
+
+    # Environment
+
+    @property
+    @sensor("Humidity", unit="%", device_class="humidity")
+    def humidity(self) -> int:
+        """Return current humidity."""
+        return self.data["humidity"]
+
+    @property
+    @sensor("Temperature", unit="°C", device_class="temperature")
+    def temperature(self) -> Optional[float]:
+        """Return current temperature, if available."""
+        if self.data["temperature"] is not None:
+            return round(self.data["temperature"], 1)
+        return None
+
+    # Alarm
+
+    @property
+    @setting(
+        name="Buzzer",
+        icon="mdi:volume-high",
+        setter_name="set_buzzer",
+        device_class="switch",
+        entity_category="config",
+    )
+    def buzzer(self) -> Optional[bool]:
+        """Return True if buzzer is on."""
+        if self.data["buzzer"] is not None:
+            return self.data["buzzer"]
+        return None
+
+    # Indicator Light
+
+    @property
+    @setting(
+        name="Led Brightness",
+        icon="mdi:brightness-6",
+        setter_name="set_led_brightness",
+        choices=LedBrightness,
+        entity_category="config",
+    )
+    def led_brightness(self) -> Optional[LedBrightness]:
+        """Return brightness of the LED."""
+
+        if self.data["led_brightness"] is not None:
+            try:
+                return LedBrightness(self.data["led_brightness"])
+            except ValueError as e:
+                _LOGGER.exception("Cannot parse led_brightness: %s", e)
+                return None
+
+        return None
+
+    # Physical Control Locked
+
+    @property
+    @setting(
+        name="Child Lock",
+        icon="mdi:lock",
+        setter_name="set_child_lock",
+        device_class="switch",
+        entity_category="config",
+    )
+    def child_lock(self) -> bool:
+        """Return True if child lock is on."""
+        return self.data["child_lock"]
+
+    # Other
+
+    @property
+    @sensor(
+        "Actual Motor Speed",
+        unit="rpm",
+        device_class="measurement",
+        icon="mdi:fast-forward",
+        entity_category="diagnostic",
+    )
+    def actual_speed(self) -> int:
+        """Return real speed of the motor."""
+        return self.data["actual_speed"]
+
+
+class AirHumidifierMiotStatus(AirHumidifierMiotCommonStatus):
     """Container for status reports from the air humidifier.
 
     Xiaomi Smartmi Evaporation Air Humidifier 2 (zhimi.humidifier.ca4) respone (MIoT format)::
@@ -149,25 +290,16 @@ class AirHumidifierMiotStatus(DeviceStatus):
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
+        super().__init__(self.data)
+        self.embed("common", AirHumidifierMiotCommonStatus(self.data))
 
     # Air Humidifier
 
     @property
-    def is_on(self) -> bool:
-        """Return True if device is on."""
-        return self.data["power"]
-
-    @property
-    def power(self) -> str:
-        """Return power state."""
-        return "on" if self.is_on else "off"
-
-    @property
-    def error(self) -> int:
-        """Return error state."""
-        return self.data["fault"]
-
-    @property
+    @setting(
+        name="Operation Mode",
+        setter_name="set_mode",
+    )
     def mode(self) -> OperationMode:
         """Return current operation mode."""
 
@@ -180,11 +312,13 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return mode
 
     @property
-    def target_humidity(self) -> int:
-        """Return target humidity."""
-        return self.data["target_humidity"]
-
-    @property
+    @sensor(
+        "Water Level",
+        unit="%",
+        device_class="measurement",
+        icon="mdi:water-check",
+        entity_category="diagnostic",
+    )
     def water_level(self) -> Optional[int]:
         """Return current water level in percent.
 
@@ -201,6 +335,12 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return int(min(water_level / 1.2, 100))
 
     @property
+    @sensor(
+        "Water Tank Attached",
+        device_class="connectivity",
+        icon="mdi:car-coolant-level",
+        entity_category="diagnostic",
+    )
     def water_tank_detached(self) -> bool:
         """True if the water tank is detached.
 
@@ -209,13 +349,13 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return self.data["water_level"] == 127
 
     @property
-    def dry(self) -> Optional[bool]:
-        """Return True if dry mode is on."""
-        if self.data["dry"] is not None:
-            return self.data["dry"]
-        return None
-
-    @property
+    @sensor(
+        "Use Time",
+        unit="s",
+        device_class="total_increasing",
+        icon="mdi:progress-clock",
+        entity_category="diagnostic",
+    )
     def use_time(self) -> int:
         """Return how long the device has been active in seconds."""
         return self.data["use_time"]
@@ -233,6 +373,13 @@ class AirHumidifierMiotStatus(DeviceStatus):
         return button
 
     @property
+    @sensor(
+        "Target Motor Speed",
+        unit="rpm",
+        device_class="measurement",
+        icon="mdi:fast-forward",
+        entity_category="diagnostic",
+    )
     def motor_speed(self) -> int:
         """Return target speed of the motor."""
         return self.data["speed_level"]
@@ -240,77 +387,32 @@ class AirHumidifierMiotStatus(DeviceStatus):
     # Environment
 
     @property
-    def humidity(self) -> int:
-        """Return current humidity."""
-        return self.data["humidity"]
-
-    @property
-    def temperature(self) -> Optional[float]:
-        """Return current temperature, if available."""
-        if self.data["temperature"] is not None:
-            return round(self.data["temperature"], 1)
-        return None
-
-    @property
+    @sensor("Temperature", unit="°F", device_class="temperature")
     def fahrenheit(self) -> Optional[float]:
         """Return current temperature in fahrenheit, if available."""
         if self.data["fahrenheit"] is not None:
             return round(self.data["fahrenheit"], 1)
         return None
 
-    # Alarm
-
-    @property
-    def buzzer(self) -> Optional[bool]:
-        """Return True if buzzer is on."""
-        if self.data["buzzer"] is not None:
-            return self.data["buzzer"]
-        return None
-
-    # Indicator Light
-
-    @property
-    def led_brightness(self) -> Optional[LedBrightness]:
-        """Return brightness of the LED."""
-
-        if self.data["led_brightness"] is not None:
-            try:
-                return LedBrightness(self.data["led_brightness"])
-            except ValueError as e:
-                _LOGGER.exception("Cannot parse led_brightness: %s", e)
-                return None
-
-        return None
-
-    # Physical Control Locked
-
-    @property
-    def child_lock(self) -> bool:
-        """Return True if child lock is on."""
-        return self.data["child_lock"]
-
     # Other
 
     @property
-    def actual_speed(self) -> int:
-        """Return real speed of the motor."""
-        return self.data["actual_speed"]
-
-    @property
+    @sensor(
+        "Power On Time",
+        unit="s",
+        device_class="total_increasing",
+        icon="mdi:progress-clock",
+        entity_category="diagnostic",
+    )
     def power_time(self) -> int:
         """Return how long the device has been powered in seconds."""
         return self.data["power_time"]
-
-    @property
-    def clean_mode(self) -> bool:
-        """Return True if clean mode is active."""
-        return self.data["clean_mode"]
 
 
 class AirHumidifierMiot(MiotDevice):
     """Main class representing the air humidifier which uses MIoT protocol."""
 
-    _mappings = _MAPPINGS
+    _mappings = _MAPPINGS_CA4
 
     @command(
         default_output=format_output(
@@ -440,7 +542,7 @@ class AirHumidifierMiot(MiotDevice):
         return self.set_property("clean_mode", clean_mode)
 
 
-class AirHumidifierMiotCA6Status(DeviceStatus):
+class AirHumidifierMiotCA6Status(AirHumidifierMiotCommonStatus):
     """Container for status reports from the air humidifier.
 
     Xiaomi Smartmi Evaporation Air Humidifier 3 (zhimi.humidifier.ca6) respone (MIoT format)::
@@ -468,26 +570,16 @@ class AirHumidifierMiotCA6Status(DeviceStatus):
 
     def __init__(self, data: Dict[str, Any]) -> None:
         self.data = data
-        _LOGGER.debug("Status CA6: %s", repr(data))
+        super().__init__(self.data)
+        self.embed("common", AirHumidifierMiotCommonStatus(self.data))
 
     # Air Humidifier 3
 
     @property
-    def is_on(self) -> bool:
-        """Return True if device is on."""
-        return self.data["power"]
-
-    @property
-    def power(self) -> str:
-        """Return power state."""
-        return "on" if self.is_on else "off"
-
-    @property
-    def error(self) -> int:
-        """Return error state."""
-        return self.data["fault"]
-
-    @property
+    @setting(
+        name="Operation Mode",
+        setter_name="set_mode",
+    )
     def mode(self) -> OperationModeCA6:
         """Return current operation mode."""
 
@@ -500,11 +592,13 @@ class AirHumidifierMiotCA6Status(DeviceStatus):
         return mode
 
     @property
-    def target_humidity(self) -> int:
-        """Return target humidity."""
-        return self.data["target_humidity"]
-
-    @property
+    @sensor(
+        "Water Level",
+        unit="%",
+        device_class="measurement",
+        icon="mdi:water-check",
+        entity_category="diagnostic",
+    )
     def water_level(self) -> Optional[int]:
         """Return current water level (empty/min, normal, full/max).
 
@@ -514,13 +608,11 @@ class AirHumidifierMiotCA6Status(DeviceStatus):
         return {0: 0, 1: 50, 2: 100}.get(water_level)
 
     @property
-    def dry(self) -> Optional[bool]:
-        """Return True if dry mode is on."""
-        if self.data["dry"] is not None:
-            return self.data["dry"]
-        return None
-
-    @property
+    @sensor(
+        "Operation status",
+        device_class="measurement",
+        entity_category="diagnostic",
+    )
     def status(self) -> OperationStatusCA6:
         """Return current status."""
 
@@ -532,74 +624,34 @@ class AirHumidifierMiotCA6Status(DeviceStatus):
 
         return status
 
-    # Environment
-
-    @property
-    def humidity(self) -> int:
-        """Return current humidity."""
-        return self.data["humidity"]
-
-    @property
-    def temperature(self) -> Optional[float]:
-        """Return current temperature, if available."""
-        if self.data["temperature"] is not None:
-            return round(self.data["temperature"], 1)
-        return None
-
-    # Alarm
-
-    @property
-    def buzzer(self) -> Optional[bool]:
-        """Return True if buzzer is on."""
-        if self.data["buzzer"] is not None:
-            return self.data["buzzer"]
-        return None
-
-    # Indicator Light
-
-    @property
-    def led_brightness(self) -> Optional[LedBrightness]:
-        """Return brightness of the LED."""
-
-        if self.data["led_brightness"] is not None:
-            try:
-                return LedBrightness(self.data["led_brightness"])
-            except ValueError as e:
-                _LOGGER.exception("Cannot parse led_brightness: %s", e)
-                return None
-
-        return None
-
-    # Physical Control Locked
-
-    @property
-    def child_lock(self) -> bool:
-        """Return True if child lock is on."""
-        return self.data["child_lock"]
-
     # Other
 
     @property
-    def actual_speed(self) -> int:
-        """Return real speed of the motor."""
-        return self.data["actual_speed"]
-
-    @property
-    def clean_mode(self) -> bool:
-        """Return True if clean mode is active."""
-        return self.data["clean_mode"]
-
-    @property
+    @sensor(
+        "Self-clean Percent",
+        unit="s",
+        device_class="total_increasing",
+        icon="mdi:progress-clock",
+        entity_category="diagnostic",
+    )
     def self_clean_percent(self) -> int:
         """Return time in minutes (from 0 to 30) of self-cleaning procedure."""
         return self.data["self_clean_percent"]
 
     @property
+    @sensor(
+        "Pump State",
+        entity_category="diagnostic",
+    )
     def pump_state(self) -> bool:
-        """Return pump statue."""
+        """Return pump state."""
         return self.data["pump_state"]
 
     @property
+    @sensor(
+        "Pump Cnt",
+        entity_category="diagnostic",
+    )
     def pump_cnt(self) -> int:
         """Return pump-cnt."""
         return self.data["pump_cnt"]
