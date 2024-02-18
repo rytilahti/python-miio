@@ -7,6 +7,7 @@ Support for lumi.camera.aq1
 .. todo:: add sdcard status & fix all TODOS
 .. todo:: add tests
 """
+
 import logging
 from enum import IntEnum
 from typing import Any, Dict

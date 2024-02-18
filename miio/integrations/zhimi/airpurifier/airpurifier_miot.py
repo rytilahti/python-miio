@@ -600,9 +600,9 @@ class AirPurifierMiot(MiotDevice):
     @command(
         click.argument("gestures", type=bool),
         default_output=format_output(
-            lambda gestures: "Turning on gestures"
-            if gestures
-            else "Turning off gestures"
+            lambda gestures: (
+                "Turning on gestures" if gestures else "Turning off gestures"
+            )
         ),
     )
     def set_gestures(self, gestures: bool):
