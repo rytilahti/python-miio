@@ -370,7 +370,6 @@ class AirConditioningCompanion(Device):
         swing_mode: SwingMode,
         led: Led,
     ):
-
         prefix = str(model[0:2] + model[8:16])
         suffix = model[-1:]
 

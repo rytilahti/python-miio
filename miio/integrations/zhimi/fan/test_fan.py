@@ -8,6 +8,7 @@ from .fan import (
     MODEL_FAN_SA1,
     MODEL_FAN_V2,
     MODEL_FAN_V3,
+    MODEL_FAN_ZA4,
     Fan,
     FanStatus,
     LedBrightness,
@@ -723,6 +724,69 @@ class TestFanSA1(TestCase):
 
         self.device.set_child_lock(False)
         assert child_lock() is False
+
+    def test_delay_off(self):
+        def delay_off_countdown():
+            return self.device.status().delay_off_countdown
+
+        self.device.delay_off(100)
+        assert delay_off_countdown() == 100
+        self.device.delay_off(200)
+        assert delay_off_countdown() == 200
+        self.device.delay_off(0)
+        assert delay_off_countdown() == 0
+
+        with pytest.raises(ValueError):
+            self.device.delay_off(-1)
+
+
+class DummyFanZA4(DummyDevice, Fan):
+    def __init__(self, *args, **kwargs):
+        self._model = MODEL_FAN_ZA4
+        self.state = {
+            "angle": 120,
+            "speed": 277,
+            "poweroff_time": 0,
+            "power": "on",
+            "ac_power": "on",
+            "angle_enable": "off",
+            "speed_level": 1,
+            "natural_level": 2,
+            "child_lock": "off",
+            "buzzer": 0,
+            "led_b": 0,
+            "use_time": 2318,
+        }
+
+        self.return_values = {
+            "get_prop": self._get_state,
+            "set_power": lambda x: self._set_state("power", x),
+            "set_speed_level": lambda x: self._set_state("speed_level", x),
+            "set_natural_level": lambda x: self._set_state("natural_level", x),
+            "set_move": lambda x: True,
+            "set_angle": lambda x: self._set_state("angle", x),
+            "set_angle_enable": lambda x: self._set_state("angle_enable", x),
+            "set_led_b": lambda x: self._set_state("led_b", x),
+            "set_buzzer": lambda x: self._set_state("buzzer", x),
+            "set_child_lock": lambda x: self._set_state("child_lock", x),
+            "set_poweroff_time": lambda x: self._set_state("poweroff_time", x),
+        }
+        super().__init__(args, kwargs)
+
+
+@pytest.fixture(scope="class")
+def fanza4(request):
+    request.cls.device = DummyFanZA4()
+    # TODO add ability to test on a real device
+
+
+@pytest.mark.usefixtures("fanza4")
+class TestFanZA4(TestCase):
+    def is_on(self):
+        return self.device.status().is_on
+
+    def state(self):
+        return self.device.status()
 
     def test_delay_off(self):
         def delay_off_countdown():

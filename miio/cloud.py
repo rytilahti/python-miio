@@ -3,7 +3,11 @@ import logging
 from typing import TYPE_CHECKING, Dict, Optional
 
 import click
-from pydantic import BaseModel, Field
+
+try:
+    from pydantic.v1 import BaseModel, Field
+except ImportError:
+    from pydantic import BaseModel, Field
 
 try:
     from rich import print as echo
@@ -55,7 +59,7 @@ class CloudDeviceInfo(BaseModel):
     is_online: bool = Field(alias="isOnline")
     rssi: int
 
-    _raw_data: dict
+    _raw_data: dict = Field(repr=False)
 
     @property
     def is_child(self):
@@ -155,7 +159,7 @@ class CloudInterface:
 
 @click.group(invoke_without_command=True)
 @click.option("--username", prompt=True)
-@click.option("--password", prompt=True)
+@click.option("--password", prompt=True, hide_input=True)
 @click.pass_context
 def cloud(ctx: click.Context, username, password):
     """Cloud commands."""

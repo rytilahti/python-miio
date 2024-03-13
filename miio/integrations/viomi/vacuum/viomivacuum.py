@@ -41,6 +41,7 @@ Misc:
 - Clean History Path - MISSING (historyPath)
 - Map plan - MISSING (map_plan)
 """
+
 import itertools
 import logging
 import time
@@ -53,14 +54,13 @@ import click
 
 from miio.click_common import EnumType, command
 from miio.device import Device
-from miio.devicestatus import action, sensor, setting
+from miio.devicestatus import DeviceStatus, action, sensor, setting
 from miio.exceptions import DeviceException
+from miio.identifiers import VacuumId, VacuumState
 from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
     ConsumableStatus,
     DNDStatus,
 )
-from miio.interfaces import FanspeedPresets, VacuumInterface
-from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
 from miio.utils import pretty_seconds
 
 _LOGGER = logging.getLogger(__name__)
@@ -269,7 +269,7 @@ class ViomiEdgeState(Enum):
     Unknown2 = 5
 
 
-class ViomiVacuumStatus(VacuumDeviceStatus):
+class ViomiVacuumStatus(DeviceStatus):
     def __init__(self, data):
         """Vacuum status container.
 
@@ -303,7 +303,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         self.data = data
 
     @property
-    @sensor("Vacuum state")
+    @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return simplified vacuum state."""
 
@@ -373,7 +373,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return ERROR_CODES.get(self.error_code, f"Unknown error {self.error_code}")
 
     @property
-    @sensor("Battery", unit="%", device_class="battery")
+    @sensor("Battery", unit="%", device_class="battery", id=VacuumId.Battery)
     def battery(self) -> int:
         """Battery in percentage."""
         return self.data["battary_life"]
@@ -402,6 +402,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         choices=ViomiVacuumSpeed,
         setter_name="set_fan_speed",
         icon="mdi:fan",
+        id=VacuumId.FanSpeedPreset,
     )
     def fanspeed(self) -> ViomiVacuumSpeed:
         """Current fan speed."""
@@ -469,7 +470,7 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return not bool(self.data["is_work"])
 
     @property
-    @setting("LED state", setter_name="led", icon="mdi:led-outline")
+    @setting("LED", setter_name="led", icon="mdi:led-outline")
     def led_state(self) -> bool:
         """Led state.
 
@@ -499,25 +500,23 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return ViomiRoutePattern(route)
 
     @property
-    @sensor("Order time?")
     def order_time(self) -> int:
-        """FIXME: ??? int or bool."""
+        """Unknown."""
         return self.data["order_time"]
 
     @property
-    @setting("Repeat cleaning active", setter_name="set_repeat_cleaning")
+    def start_time(self) -> int:
+        """Unknown."""
+        return self.data["start_time"]
+
+    @property
+    @setting("Clean twice", setter_name="set_repeat_cleaning")
     def repeat_cleaning(self) -> bool:
         """Secondary clean up state.
 
         True if the cleaning is performed twice
         """
         return bool(self.data["repeat_state"])
-
-    @property
-    @sensor("Start time")
-    def start_time(self) -> int:
-        """FIXME: ??? int or bool."""
-        return self.data["start_time"]
 
     @property
     @setting(
@@ -537,9 +536,8 @@ class ViomiVacuumStatus(VacuumDeviceStatus):
         return self.data.get("water_percent")
 
     @property
-    @sensor("Zone data")
     def zone_data(self) -> int:
-        """FIXME: ??? int or bool."""
+        """Unknown."""
         return self.data["zone_data"]
 
 
@@ -583,7 +581,7 @@ def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
     return scheduled_found, rooms
 
 
-class ViomiVacuum(Device, VacuumInterface):
+class ViomiVacuum(Device):
     """Interface for Viomi vacuums (viomi.vacuum.v7)."""
 
     _supported_models = SUPPORTED_MODELS
@@ -692,12 +690,13 @@ class ViomiVacuum(Device, VacuumInterface):
         values = self.get_properties(properties)
 
         status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
-        status.embed(self.consumable_status())
-        status.embed(self.dnd_status())
+        status.embed("consumables", self.consumable_status())
+        status.embed("dnd", self.dnd_status())
 
         return status
 
     @command()
+    @action("Return home", id=VacuumId.ReturnHome)
     def home(self):
         """Return to home."""
         self.send("set_charge", [1])
@@ -710,7 +709,7 @@ class ViomiVacuum(Device, VacuumInterface):
             return self.stop()
 
     @command()
-    @action("Start cleaning")
+    @action("Start cleaning", id=VacuumId.Start)
     def start(self):
         """Start cleaning."""
         # params: [edge, 1, roomIds.length, *list_of_room_ids]
@@ -759,7 +758,7 @@ class ViomiVacuum(Device, VacuumInterface):
         )
 
     @command()
-    @action("Pause cleaning")
+    @action("Pause cleaning", id=VacuumId.Pause)
     def pause(self):
         """Pause cleaning."""
         # params: [edge_state, 0]
@@ -770,7 +769,7 @@ class ViomiVacuum(Device, VacuumInterface):
         self.send("set_mode", self._cache["edge_state"] + [2])
 
     @command()
-    @action("Stop cleaning")
+    @action("Stop cleaning", id=VacuumId.Stop)
     def stop(self):
         """Validate that Stop cleaning."""
         # params: [edge_state, 0]
@@ -794,7 +793,7 @@ class ViomiVacuum(Device, VacuumInterface):
         self.send("set_suction", [speed.value])
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
         return {x.name: x.value for x in list(ViomiVacuumSpeed)}
 
@@ -1078,7 +1077,7 @@ class ViomiVacuum(Device, VacuumInterface):
         return self.send("set_carpetturbo", [mode.value])
 
     @command()
-    @action("Find robot")
+    @action("Find robot", id=VacuumId.Locate)
     def find(self):
         """Find the robot."""
         return self.send("set_resetpos", [1])

@@ -60,7 +60,7 @@ class AirQualityMonitorStatus(DeviceStatus):
     @property
     def power(self) -> Optional[str]:
         """Current power state."""
-        return self.data.get("power", None)
+        return self.data.get("power")
 
     @property
     def is_on(self) -> bool:
@@ -77,12 +77,12 @@ class AirQualityMonitorStatus(DeviceStatus):
     @property
     def aqi(self) -> Optional[int]:
         """Air quality index value (0..600)."""
-        return self.data.get("aqi", None)
+        return self.data.get("aqi")
 
     @property
     def battery(self) -> Optional[int]:
         """Current battery level (0..100)."""
-        return self.data.get("battery", None)
+        return self.data.get("battery")
 
     @property
     def display_clock(self) -> Optional[bool]:
@@ -101,47 +101,47 @@ class AirQualityMonitorStatus(DeviceStatus):
     @property
     def night_time_begin(self) -> Optional[str]:
         """Return the begin of the night time."""
-        return self.data.get("night_beg_time", None)
+        return self.data.get("night_beg_time")
 
     @property
     def night_time_end(self) -> Optional[str]:
         """Return the end of the night time."""
-        return self.data.get("night_end_time", None)
+        return self.data.get("night_end_time")
 
     @property
     def sensor_state(self) -> Optional[str]:
         """Sensor state."""
-        return self.data.get("sensor_state", None)
+        return self.data.get("sensor_state")
 
     @property
     def co2(self) -> Optional[int]:
         """Return co2 value (400...9999ppm)."""
-        return self.data.get("co2", None)
+        return self.data.get("co2")
 
     @property
     def co2e(self) -> Optional[int]:
         """Return co2e value (400...9999ppm)."""
-        return self.data.get("co2e", None)
+        return self.data.get("co2e")
 
     @property
     def humidity(self) -> Optional[float]:
         """Return humidity value (0...100%)."""
-        return self.data.get("humidity", None)
+        return self.data.get("humidity")
 
     @property
     def pm25(self) -> Optional[float]:
         """Return pm2.5 value (0...999μg/m³)."""
-        return self.data.get("pm25", None)
+        return self.data.get("pm25")
 
     @property
     def temperature(self) -> Optional[float]:
         """Return temperature value (-10...50°C)."""
-        return self.data.get("temperature", None)
+        return self.data.get("temperature")
 
     @property
     def tvoc(self) -> Optional[int]:
         """Return tvoc value."""
-        return self.data.get("tvoc", None)
+        return self.data.get("tvoc")
 
 
 class AirQualityMonitor(Device):
@@ -216,9 +216,9 @@ class AirQualityMonitor(Device):
     @command(
         click.argument("display_clock", type=bool),
         default_output=format_output(
-            lambda led: "Turning on display clock"
-            if led
-            else "Turning off display clock"
+            lambda led: (
+                "Turning on display clock" if led else "Turning off display clock"
+            )
         ),
     )
     def set_display_clock(self, display_clock: bool):

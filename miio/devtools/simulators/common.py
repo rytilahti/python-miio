@@ -1,4 +1,5 @@
 """Common functionalities for miio and miot simulators."""
+
 from hashlib import md5
 
 
@@ -27,14 +28,14 @@ def create_info_response(model, addr, mac):
     return INFO_RESPONSE
 
 
-def mac_from_model(model):
-    """Creates a mac address based on the model name.
+def did_and_mac_for_model(model):
+    """Creates a device id and a mac address based on the model name.
 
-    This allows simulating multiple different devices separately as the homeassistant
-    unique_id is based on the mac address.
+    These identifiers allow making a simulated device unique for testing.
     """
     m = md5()  # nosec
     m.update(model.encode())
     digest = m.hexdigest()[:12]
+    did = int(digest[:8], base=16)
     mac = ":".join([digest[i : i + 2] for i in range(0, len(digest), 2)])
-    return mac
+    return did, mac

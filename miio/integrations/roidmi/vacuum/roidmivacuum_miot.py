@@ -1,11 +1,11 @@
 """Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
-
 import json
 import logging
 import math
 from datetime import timedelta
 from enum import Enum
+from typing import Dict
 
 import click
 
@@ -13,7 +13,6 @@ from miio.click_common import EnumType, command
 from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
     DNDStatus,
 )
-from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice, MiotMapping
 
 _LOGGER = logging.getLogger(__name__)
@@ -548,7 +547,7 @@ class RoidmiConsumableStatus(DeviceStatus):
         return timedelta(minutes=self.data["sensor_dirty_time_left_minutes"])
 
 
-class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
+class RoidmiVacuumMiot(MiotDevice):
     """Interface for Vacuum Eve Plus (roidmi.vacuum.v60)"""
 
     _mappings = _MAPPINGS
@@ -589,7 +588,7 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     @command()
     def start(self) -> None:
         """Start cleaning."""
-        return self.call_action("start")
+        return self.call_action_from_mapping("start")
 
     # @command(click.argument("roomstr", type=str, required=False))
     # def start_room_sweep_unknown(self, roomstr: str=None) -> None:
@@ -613,17 +612,17 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     @command()
     def stop(self) -> None:
         """Stop cleaning."""
-        return self.call_action("stop")
+        return self.call_action_from_mapping("stop")
 
     @command()
     def home(self) -> None:
         """Return to home."""
-        return self.call_action("home")
+        return self.call_action_from_mapping("home")
 
     @command()
     def identify(self) -> None:
         """Locate the device (i am here)."""
-        return self.call_action("identify")
+        return self.call_action_from_mapping("identify")
 
     @command(click.argument("on", type=bool))
     def set_station_led(self, on: bool):
@@ -651,7 +650,7 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
         return self.set_property("fanspeed_mode", fanspeed_mode.value)
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
         return {"Sweep": 0, "Silent": 1, "Basic": 2, "Strong": 3, "FullSpeed": 4}
 
@@ -757,7 +756,7 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     @command()
     def start_dust(self) -> None:
         """Start base dust collection."""
-        return self.call_action("start_station_dust_collection")
+        return self.call_action_from_mapping("start_station_dust_collection")
 
     # @command(click.argument("voice", type=str))
     #     def set_voice_unknown(self, voice: str) -> None:
@@ -770,19 +769,19 @@ class RoidmiVacuumMiot(MiotDevice, VacuumInterface):
     @command()
     def reset_filter_life(self) -> None:
         """Reset filter life."""
-        return self.call_action("reset_filter_life")
+        return self.call_action_from_mapping("reset_filter_life")
 
     @command()
     def reset_mainbrush_life(self) -> None:
         """Reset main brush life."""
-        return self.call_action("reset_main_brush_life")
+        return self.call_action_from_mapping("reset_main_brush_life")
 
     @command()
     def reset_sidebrush_life(self) -> None:
         """Reset side brushes life."""
-        return self.call_action("reset_side_brushes_life")
+        return self.call_action_from_mapping("reset_side_brushes_life")
 
     @command()
     def reset_sensor_dirty_life(self) -> None:
         """Reset sensor dirty life."""
-        return self.call_action("reset_sensor_dirty_life")
+        return self.call_action_from_mapping("reset_sensor_dirty_life")

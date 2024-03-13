@@ -1,4 +1,5 @@
 """Command-line interface for devtools."""
+
 import logging
 
 import click

@@ -1,10 +1,21 @@
+import enum
 from typing import Any, Dict, Optional
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
-from miio.fan_common import MoveDirection, OperationMode
+
+
+class MoveDirection(enum.Enum):
+    Left = "left"
+    Right = "right"
+
+
+class OperationMode(enum.Enum):
+    Normal = "normal"
+    Nature = "nature"
+
 
 MODEL_FAN_P5 = "dmaker.fan.p5"
 
@@ -173,9 +184,9 @@ class FanP5(Device):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda oscillate: "Turning on oscillate"
-            if oscillate
-            else "Turning off oscillate"
+            lambda oscillate: (
+                "Turning on oscillate" if oscillate else "Turning off oscillate"
+            )
         ),
     )
     def set_oscillate(self, oscillate: bool):

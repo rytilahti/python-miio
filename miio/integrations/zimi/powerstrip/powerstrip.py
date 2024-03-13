@@ -240,9 +240,11 @@ class PowerStrip(Device):
     @command(
         click.argument("power", type=bool),
         default_output=format_output(
-            lambda led: "Turning on real-time power measurement"
-            if led
-            else "Turning off real-time power measurement"
+            lambda led: (
+                "Turning on real-time power measurement"
+                if led
+                else "Turning off real-time power measurement"
+            )
         ),
     )
     def set_realtime_power(self, power: bool):

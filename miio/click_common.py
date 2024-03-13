@@ -2,6 +2,7 @@
 
 This file contains common functions for cli tools.
 """
+
 import ast
 import ipaddress
 import json
@@ -235,7 +236,6 @@ class DeviceGroup(click.MultiCommand):
         result_callback_pass_device=True,
         **attrs,
     ):
-
         self.commands = getattr(device_class, "_device_group_commands", None)
         if self.commands is None:
             raise RuntimeError(

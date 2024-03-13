@@ -3,7 +3,7 @@ from unittest.mock import ANY
 import pytest
 
 from miio import Huizuo, MiotDevice
-from miio.integrations.genericmiot import GenericMiot
+from miio.integrations.genericmiot.genericmiot import GenericMiot
 from miio.miot_device import MiotValueType, _filter_request_fields
 
 MIOT_DEVICES = MiotDevice.__subclasses__()
@@ -167,10 +167,10 @@ def test_supported_models(cls):
     assert not cls._supported_models
 
 
-def test_call_action(dev):
+def test_call_action_from_mapping(dev):
     dev._mappings["test.model"] = {"test_action": {"siid": 1, "aiid": 1}}
 
-    dev.call_action("test_action")
+    dev.call_action_from_mapping("test_action")
 
 
 @pytest.mark.parametrize(
@@ -199,7 +199,6 @@ def test_get_properties_for_mapping_readables(mocker, dev, props, included_in_re
     dev.get_properties_for_mapping()
 
     try:
-
         req.assert_called_with(
             expected_request, property_getter=ANY, max_properties=ANY
         )

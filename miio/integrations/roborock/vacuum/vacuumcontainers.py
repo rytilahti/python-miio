@@ -8,7 +8,7 @@ from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
-from miio.interfaces.vacuuminterface import VacuumDeviceStatus, VacuumState
+from miio.identifiers import VacuumId, VacuumState
 from miio.utils import pretty_seconds, pretty_time
 
 from .vacuum_enums import MopIntensity, MopMode
@@ -133,7 +133,7 @@ class MapList(DeviceStatus):
         return self._map_name_dict
 
 
-class VacuumStatus(VacuumDeviceStatus):
+class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
@@ -192,7 +192,7 @@ class VacuumStatus(VacuumDeviceStatus):
             self.state_code, f"Unknown state (code: {self.state_code})"
         )
 
-    @sensor("Vacuum state")
+    @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return vacuum state."""
         return STATE_CODE_TO_VACUUMSTATE.get(self.state_code, VacuumState.Unknown)
@@ -211,6 +211,7 @@ class VacuumStatus(VacuumDeviceStatus):
     @property
     @sensor(
         "Error string",
+        id=VacuumId.ErrorMessage,
         icon="mdi:alert",
         entity_category="diagnostic",
         enabled_default=False,
@@ -252,7 +253,7 @@ class VacuumStatus(VacuumDeviceStatus):
             return "Definition missing for dock error %s" % self.dock_error_code
 
     @property
-    @sensor("Battery", unit="%", device_class="battery", enabled_default=False)
+    @sensor("Battery", unit="%", id=VacuumId.Battery)
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return int(self.data["battery"])
@@ -330,12 +331,15 @@ class VacuumStatus(VacuumDeviceStatus):
         setter_name="load_map",
         icon="mdi:floor-plan",
     )
-    def current_map_id(self) -> int:
+    def current_map_id(self) -> Optional[int]:
         """The id of the current map with regards to the multi map feature,
 
         [3,7,11,15] -> [0,1,2,3].
         """
-        return int((self.data["map_status"] + 1) / 4 - 1)
+        try:
+            return int((self.data["map_status"] + 1) / 4 - 1)
+        except KeyError:
+            return None
 
     @property
     def in_zone_cleaning(self) -> bool:
@@ -929,7 +933,7 @@ class SoundInstallStatus(DeviceStatus):
     def sid(self) -> int:
         """Sound ID for the sound being installed."""
         # this is missing on install confirmation, so let's use get
-        return self.data.get("sid_in_progress", None)
+        return self.data.get("sid_in_progress")
 
     @property
     def error(self) -> int:

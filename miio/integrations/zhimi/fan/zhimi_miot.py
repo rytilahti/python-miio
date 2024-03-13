@@ -5,8 +5,18 @@ import click
 
 from miio import DeviceException, DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
-from miio.fan_common import MoveDirection, OperationMode
 from miio.utils import deprecated
+
+
+class OperationMode(enum.Enum):
+    Normal = "normal"
+    Nature = "nature"
+
+
+class MoveDirection(enum.Enum):
+    Left = "left"
+    Right = "right"
+
 
 MODEL_FAN_ZA5 = "zhimi.fan.za5"
 
@@ -200,7 +210,7 @@ class FanZA5(MiotDevice):
             "Temperature: {result.temperature}\n",
         )
     )
-    def status(self):
+    def status(self) -> FanStatusZA5:
         """Retrieve properties."""
         return FanStatusZA5(
             {
@@ -257,9 +267,9 @@ class FanZA5(MiotDevice):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda oscillate: "Turning on oscillate"
-            if oscillate
-            else "Turning off oscillate"
+            lambda oscillate: (
+                "Turning on oscillate" if oscillate else "Turning off oscillate"
+            )
         ),
     )
     def set_oscillate(self, oscillate: bool):

@@ -1,11 +1,11 @@
 import logging
 from datetime import timedelta
 from enum import Enum
+from typing import Dict
 
 import click
 
 from miio.click_common import EnumType, command, format_output
-from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -279,7 +279,7 @@ class G1CleaningSummary(DeviceStatus):
         return timedelta(hours=self.data["total_clean_area"])
 
 
-class G1Vacuum(MiotDevice, VacuumInterface):
+class G1Vacuum(MiotDevice):
     """Support for G1 vacuum (G1, mijia.vacuum.v2)."""
 
     _mappings = MIOT_MAPPING
@@ -340,22 +340,22 @@ class G1Vacuum(MiotDevice, VacuumInterface):
     @command()
     def home(self):
         """Home."""
-        return self.call_action("home")
+        return self.call_action_from_mapping("home")
 
     @command()
     def start(self) -> None:
         """Start Cleaning."""
-        return self.call_action("start")
+        return self.call_action_from_mapping("start")
 
     @command()
     def stop(self):
         """Stop Cleaning."""
-        return self.call_action("stop")
+        return self.call_action_from_mapping("stop")
 
     @command()
     def find(self) -> None:
         """Find the robot."""
-        return self.call_action("find")
+        return self.call_action_from_mapping("find")
 
     @command(click.argument("consumable", type=G1Consumable))
     def consumable_reset(self, consumable: G1Consumable):
@@ -364,11 +364,11 @@ class G1Vacuum(MiotDevice, VacuumInterface):
         CONSUMABLE=main_brush_life_level|side_brush_life_level|filter_life_level
         """
         if consumable.name == G1Consumable.MainBrush:
-            return self.call_action("reset_main_brush_life_level")
+            return self.call_action_from_mapping("reset_main_brush_life_level")
         elif consumable.name == G1Consumable.SideBrush:
-            return self.call_action("reset_side_brush_life_level")
+            return self.call_action_from_mapping("reset_side_brush_life_level")
         elif consumable.name == G1Consumable.Filter:
-            return self.call_action("reset_filter_life_level")
+            return self.call_action_from_mapping("reset_filter_life_level")
 
     @command(
         click.argument("fan_speed", type=EnumType(G1FanSpeed)),
@@ -379,7 +379,7 @@ class G1Vacuum(MiotDevice, VacuumInterface):
         return self.set_property("fan_speed", fan_speed.value)
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
         return {x.name: x.value for x in G1FanSpeed}
 

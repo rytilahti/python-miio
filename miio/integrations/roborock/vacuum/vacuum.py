@@ -7,7 +7,8 @@ import math
 import os
 import pathlib
 import time
-from typing import List, Optional, Type, Union
+from enum import Enum
+from typing import Any, Dict, List, Optional, Type
 
 import click
 import pytz
@@ -21,10 +22,11 @@ from miio.click_common import (
     command,
 )
 from miio.device import Device, DeviceInfo
-from miio.devicestatus import action
+from miio.devicestatus import DeviceStatus, action
 from miio.exceptions import DeviceInfoUnavailableException, UnsupportedFeatureException
-from miio.interfaces import FanspeedPresets, VacuumInterface
+from miio.identifiers import VacuumId
 
+from .updatehelper import UpdateHelper
 from .vacuum_enums import (
     CarpetCleaningMode,
     Consumable,
@@ -72,8 +74,11 @@ ROCKROBO_T7S = "roborock.vacuum.a14"
 ROCKROBO_T7SPLUS = "roborock.vacuum.a23"
 ROCKROBO_S7_MAXV = "roborock.vacuum.a27"
 ROCKROBO_S7_PRO_ULTRA = "roborock.vacuum.a62"
+ROCKROBO_S8_PRO_ULTRA = "roborock.vacuum.a70"
 ROCKROBO_Q5 = "roborock.vacuum.a34"
 ROCKROBO_Q7_MAX = "roborock.vacuum.a38"
+ROCKROBO_Q7PLUS = "roborock.vacuum.a40"
+ROCKROBO_Q_REVO = "roborock.vacuum.a75"
 ROCKROBO_G10S = "roborock.vacuum.a46"
 ROCKROBO_G10 = "roborock.vacuum.a29"
 
@@ -100,8 +105,11 @@ SUPPORTED_MODELS = [
     ROCKROBO_S7,
     ROCKROBO_S7_MAXV,
     ROCKROBO_S7_PRO_ULTRA,
+    ROCKROBO_S8_PRO_ULTRA,
     ROCKROBO_Q5,
     ROCKROBO_Q7_MAX,
+    ROCKROBO_Q7PLUS,
+    ROCKROBO_Q_REVO,
     ROCKROBO_G10,
     ROCKROBO_G10S,
     ROCKROBO_S6_MAXV,
@@ -114,11 +122,13 @@ SUPPORTED_MODELS = [
 AUTO_EMPTY_MODELS = [
     ROCKROBO_S7,
     ROCKROBO_S7_MAXV,
+    ROCKROBO_S8_PRO_ULTRA,
     ROCKROBO_Q7_MAX,
+    ROCKROBO_Q_REVO,
 ]
 
 
-class RoborockVacuum(Device, VacuumInterface):
+class RoborockVacuum(Device):
     """Main class for roborock vacuums (roborock.vacuum.*)."""
 
     _supported_models = SUPPORTED_MODELS
@@ -141,6 +151,33 @@ class RoborockVacuum(Device, VacuumInterface):
         self.manual_seqnum = -1
         self._maps: Optional[MapList] = None
         self._map_enum_cache = None
+        self._status_helper = UpdateHelper(self.vacuum_status)
+        self._status_helper.add_update_method("consumables", self.consumable_status)
+        self._status_helper.add_update_method("dnd_status", self.dnd_status)
+        self._status_helper.add_update_method("clean_history", self.clean_history)
+        self._status_helper.add_update_method("last_clean", self.last_clean_details)
+        self._status_helper.add_update_method("mop_dryer", self.mop_dryer_settings)
+
+    def send(
+        self,
+        command: str,
+        parameters: Optional[Any] = None,
+        retry_count: Optional[int] = None,
+        *,
+        extra_parameters=None,
+    ) -> Any:
+        """Send command to the device.
+
+        This is overridden to raise an exception on unknown methods.
+        """
+        res = super().send(
+            command, parameters, retry_count, extra_parameters=extra_parameters
+        )
+        if res == "unknown_method":
+            raise UnsupportedFeatureException(
+                f"Command {command} is not supported by the device"
+            )
+        return res
 
     @command()
     def start(self):
@@ -148,7 +185,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_start")
 
     @command()
-    @action(name="Stop cleaning", type="vacuum")
+    @action(name="Stop cleaning", id=VacuumId.Stop)
     def stop(self):
         """Stop cleaning.
 
@@ -158,19 +195,19 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("app_stop")
 
     @command()
-    @action(name="Spot cleaning", type="vacuum")
+    @action(name="Spot cleaning", id=VacuumId.Spot)
     def spot(self):
         """Start spot cleaning."""
         return self.send("app_spot")
 
     @command()
-    @action(name="Pause cleaning", type="vacuum")
+    @action(name="Pause cleaning", id=VacuumId.Pause)
     def pause(self):
         """Pause cleaning."""
         return self.send("app_pause")
 
     @command()
-    @action(name="Start cleaning", type="vacuum")
+    @action(name="Start cleaning", id=VacuumId.Start)
     def resume_or_start(self):
         """A shortcut for resuming or starting cleaning."""
         status = self.status()
@@ -223,7 +260,7 @@ class RoborockVacuum(Device, VacuumInterface):
             return self._info
 
     @command()
-    @action(name="Home", type="vacuum")
+    @action(name="Home", id=VacuumId.ReturnHome)
     def home(self):
         """Stop cleaning and return home."""
 
@@ -333,13 +370,9 @@ class RoborockVacuum(Device, VacuumInterface):
         self.send("app_rc_move", [params])
 
     @command()
-    def status(self) -> VacuumStatus:
+    def status(self) -> DeviceStatus:
         """Return status of the vacuum."""
-        status = self.vacuum_status()
-        status.embed(self.consumable_status())
-        status.embed(self.clean_history())
-        status.embed(self.dnd_status())
-        return status
+        return self._status_helper.status()
 
     @command()
     def vacuum_status(self) -> VacuumStatus:
@@ -380,7 +413,7 @@ class RoborockVacuum(Device, VacuumInterface):
         self._maps = MapList(self.send("get_multi_maps_list")[0])
         return self._maps
 
-    def _map_enum(self) -> Optional[enum.Enum]:
+    def _map_enum(self) -> Optional[Type[Enum]]:
         """Enum of the available map names."""
         if self._map_enum_cache is not None:
             return self._map_enum_cache
@@ -506,9 +539,7 @@ class RoborockVacuum(Device, VacuumInterface):
     @command(
         click.argument("id_", type=int, metavar="ID"),
     )
-    def clean_details(
-        self, id_: int
-    ) -> Union[List[CleaningDetails], Optional[CleaningDetails]]:
+    def clean_details(self, id_: int) -> Optional[CleaningDetails]:
         """Return details about specific cleaning."""
         details = self.send("get_clean_record", [id_])
 
@@ -520,7 +551,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return res
 
     @command()
-    @action(name="Find robot", type="vacuum")
+    @action(name="Find robot", id=VacuumId.Locate)
     def find(self):
         """Find the robot."""
         return self.send("find_me", [""])
@@ -581,7 +612,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("upd_timer", [timer_id, mode.value])
 
     @command()
-    def dnd_status(self):
+    def dnd_status(self) -> DNDStatus:
         """Returns do-not-disturb status."""
         # {'result': [{'enabled': 1, 'start_minute': 0, 'end_minute': 0,
         #  'start_hour': 22, 'end_hour': 8}], 'id': 1}
@@ -623,7 +654,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("get_custom_mode")[0]
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
 
         def _enum_as_dict(cls):
@@ -698,7 +729,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("change_sound_volume", [vol])
 
     @command()
-    @action(name="Test sound volume", type="vacuum")
+    @action(name="Test sound volume")
     def test_sound_volume(self):
         """Test current sound volume."""
         return self.send("test_sound_volume")
@@ -758,7 +789,7 @@ class RoborockVacuum(Device, VacuumInterface):
         return super().configure_wifi(ssid, password, uid, extra_params)
 
     @command()
-    def carpet_mode(self):
+    def carpet_mode(self) -> CarpetModeStatus:
         """Get carpet mode settings."""
         return CarpetModeStatus(self.send("get_carpet_mode")[0])
 
@@ -866,12 +897,16 @@ class RoborockVacuum(Device, VacuumInterface):
         return self.send("resume_segment_clean")
 
     @command(click.argument("segments", type=LiteralParamType(), required=True))
-    def segment_clean(self, segments: List):
+    @command(click.argument("repeat", type=int, required=False, default=1))
+    def segment_clean(self, segments: List, repeat: int = 1):
         """Clean segments.
 
         :param List segments: List of segments to clean: [16,17,18]
+        :param int repeat: Count of iterations
         """
-        return self.send("app_segment_clean", segments)
+        return self.send(
+            "app_segment_clean", [{"segments": segments, "repeat": repeat}]
+        )
 
     @command()
     def get_room_mapping(self):
@@ -973,28 +1008,19 @@ class RoborockVacuum(Device, VacuumInterface):
         """Set child lock setting."""
         return self.send("set_child_lock_status", {"lock_status": int(lock)})[0] == "ok"
 
-    def _verify_mop_dryer_supported(self) -> None:
-        """Checks if model supports mop dryer add-on."""
-        # dryer add-on is only supported by following models
-        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
-            raise UnsupportedFeatureException("Dryer not supported by %s", self.model)
-
     @command()
     def mop_dryer_settings(self) -> MopDryerSettings:
         """Get mop dryer settings."""
-        self._verify_mop_dryer_supported()
         return MopDryerSettings(self.send("app_get_dryer_setting"))
 
     @command(click.argument("enabled", type=bool))
     def set_mop_dryer_enabled(self, enabled: bool) -> bool:
         """Set mop dryer add-on enabled."""
-        self._verify_mop_dryer_supported()
         return self.send("app_set_dryer_setting", {"status": int(enabled)})[0] == "ok"
 
     @command(click.argument("dry_time", type=int))
     def set_mop_dryer_dry_time(self, dry_time_seconds: int) -> bool:
         """Set mop dryer add-on dry time."""
-        self._verify_mop_dryer_supported()
         return (
             self.send("app_set_dryer_setting", {"on": {"dry_time": dry_time_seconds}})[
                 0
@@ -1003,17 +1029,27 @@ class RoborockVacuum(Device, VacuumInterface):
         )
 
     @command()
+    @action(name="Start mop washing", icon="mdi:wiper-wash")
+    def start_mop_washing(self) -> bool:
+        """Start mop washing."""
+        return self.send("app_start_wash")[0] == "ok"
+
+    @command()
+    @action(name="Stop mop washing", icon="mdi:wiper-wash")
+    def stop_mop_washing(self) -> bool:
+        """Start mop washing."""
+        return self.send("app_stop_wash")[0] == "ok"
+
+    @command()
     @action(name="Start mop drying", icon="mdi:tumble-dryer")
     def start_mop_drying(self) -> bool:
         """Start mop drying."""
-        self._verify_mop_dryer_supported()
         return self.send("app_set_dryer_status", {"status": 1})[0] == "ok"
 
     @command()
     @action(name="Stop mop drying", icon="mdi:tumble-dryer")
     def stop_mop_drying(self) -> bool:
         """Stop mop drying."""
-        self._verify_mop_dryer_supported()
         return self.send("app_set_dryer_status", {"status": 0})[0] == "ok"
 
     @command()

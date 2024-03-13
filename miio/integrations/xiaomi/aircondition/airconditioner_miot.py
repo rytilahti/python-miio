@@ -380,9 +380,9 @@ class AirConditionerMiot(MiotDevice):
     @command(
         click.argument("sleep_mode", type=bool),
         default_output=format_output(
-            lambda sleep_mode: "Turning on sleep mode"
-            if sleep_mode
-            else "Turning off sleep mode"
+            lambda sleep_mode: (
+                "Turning on sleep mode" if sleep_mode else "Turning off sleep mode"
+            )
         ),
     )
     def set_sleep_mode(self, sleep_mode: bool):
@@ -400,9 +400,11 @@ class AirConditionerMiot(MiotDevice):
     @command(
         click.argument("vertical_swing", type=bool),
         default_output=format_output(
-            lambda vertical_swing: "Turning on vertical swing"
-            if vertical_swing
-            else "Turning off vertical swing"
+            lambda vertical_swing: (
+                "Turning on vertical swing"
+                if vertical_swing
+                else "Turning off vertical swing"
+            )
         ),
     )
     def set_vertical_swing(self, vertical_swing: bool):
@@ -443,11 +445,11 @@ class AirConditionerMiot(MiotDevice):
         click.argument("minutes", type=int),
         click.argument("delay_on", type=bool),
         default_output=format_output(
-            lambda minutes, delay_on: "Setting timer to delay on after "
-            + str(minutes)
-            + " minutes"
-            if delay_on
-            else "Setting timer to delay off after " + str(minutes) + " minutes"
+            lambda minutes, delay_on: (
+                "Setting timer to delay on after " + str(minutes) + " minutes"
+                if delay_on
+                else "Setting timer to delay off after " + str(minutes) + " minutes"
+            )
         ),
     )
     def set_timer(self, minutes, delay_on):

@@ -151,9 +151,9 @@ class ChuangmiPlug(Device):
     @command(
         click.argument("wifi_led", type=bool),
         default_output=format_output(
-            lambda wifi_led: "Turning on WiFi LED"
-            if wifi_led
-            else "Turning off WiFi LED"
+            lambda wifi_led: (
+                "Turning on WiFi LED" if wifi_led else "Turning off WiFi LED"
+            )
         ),
     )
     def set_wifi_led(self, wifi_led: bool):

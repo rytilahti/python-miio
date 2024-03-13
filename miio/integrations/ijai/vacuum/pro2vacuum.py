@@ -7,7 +7,6 @@ import click
 
 from miio.click_common import EnumType, command, format_output
 from miio.devicestatus import sensor, setting
-from miio.interfaces import FanspeedPresets, VacuumInterface
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -267,7 +266,7 @@ class Pro2Status(DeviceStatus):
         return self.data["current_language"]
 
 
-class Pro2Vacuum(MiotDevice, VacuumInterface):
+class Pro2Vacuum(MiotDevice):
     """Support for Mi Robot Vacuum-Mop 2 Pro (ijai.vacuum.v3)."""
 
     _mappings = _MAPPINGS
@@ -287,17 +286,17 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
     @command()
     def home(self):
         """Go Home."""
-        return self.call_action("home")
+        return self.call_action_from_mapping("home")
 
     @command()
     def start(self) -> None:
         """Start Cleaning."""
-        return self.call_action("start")
+        return self.call_action_from_mapping("start")
 
     @command()
     def stop(self):
         """Stop Cleaning."""
-        return self.call_action("stop")
+        return self.call_action_from_mapping("stop")
 
     @command(
         click.argument("fan_speed", type=EnumType(FanSpeedMode)),
@@ -308,7 +307,7 @@ class Pro2Vacuum(MiotDevice, VacuumInterface):
         return self.set_property("fan_speed", fan_speed)
 
     @command()
-    def fan_speed_presets(self) -> FanspeedPresets:
+    def fan_speed_presets(self) -> Dict[str, int]:
         """Return available fan speed presets."""
         return _enum_as_dict(FanSpeedMode)
 

@@ -66,7 +66,7 @@ class WifiRepeaterConfiguration(DeviceStatus):
 class WifiRepeater(Device):
     """Device class for Xiaomi Mi WiFi Repeater 2."""
 
-    _supported_models = ["xiaomi.repeater.v2"]
+    _supported_models = ["xiaomi.repeater.v2", "xiaomi.repeater.v3"]
 
     @command(
         default_output=format_output(
@@ -106,6 +106,22 @@ class WifiRepeater(Device):
     @command(
         click.argument("ssid", type=str),
         click.argument("password", type=str),
+        default_output=format_output("Updating the accespoint configuration"),
+    )
+    def config_router(self, ssid: str, password: str):
+        """Update the configuration of the accesspoint."""
+        return self.send(
+            "miIO.config_router",
+            {
+                "ssid": ssid,
+                "passwd": password,
+                "uid": 0,
+            },
+        )
+
+    @command(
+        click.argument("ssid", type=str),
+        click.argument("password", type=str),
         click.argument("ssid_hidden", type=bool),
         default_output=format_output("Setting accesspoint configuration"),
     )
@@ -125,9 +141,9 @@ class WifiRepeater(Device):
 
     @command(
         default_output=format_output(
-            lambda result: "WiFi roaming is enabled"
-            if result
-            else "WiFi roaming is disabled"
+            lambda result: (
+                "WiFi roaming is enabled" if result else "WiFi roaming is disabled"
+            )
         )
     )
     def wifi_roaming(self) -> bool:

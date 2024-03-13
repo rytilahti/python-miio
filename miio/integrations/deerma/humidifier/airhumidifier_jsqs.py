@@ -28,7 +28,11 @@ _MAPPING = {
     "overwet_protect": {"siid": 7, "piid": 3},  # bool
 }
 
-SUPPORTED_MODELS = ["deerma.humidifier.jsqs", "deerma.humidifier.jsq5"]
+SUPPORTED_MODELS = [
+    "deerma.humidifier.jsqs",
+    "deerma.humidifier.jsq5",
+    "deerma.humidifier.jsq2w",
+]
 MIOT_MAPPING = {model: _MAPPING for model in SUPPORTED_MODELS}
 
 
@@ -42,7 +46,7 @@ class OperationMode(enum.Enum):
 class AirHumidifierJsqsStatus(DeviceStatus):
     """Container for status reports from the air humidifier.
 
-    Xiaomi Mi Smart Humidifer S (deerma.humidifier.[jsqs, jsq5]) response (MIoT format)::
+    Xiaomi Mi Smart Humidifer S (deerma.humidifier.[jsqs, jsq5, jsq2w]) response (MIoT format)::
 
         [
             {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': True},

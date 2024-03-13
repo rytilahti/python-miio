@@ -2,10 +2,9 @@ from unittest import TestCase
 
 import pytest
 
-from miio.fan_common import OperationMode
 from miio.tests.dummies import DummyDevice
 
-from .fan import MODEL_FAN_P5, FanP5, FanStatusP5
+from .fan import MODEL_FAN_P5, FanP5, FanStatusP5, OperationMode
 
 
 class DummyFanP5(DummyDevice, FanP5):

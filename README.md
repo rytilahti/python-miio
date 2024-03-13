@@ -47,13 +47,10 @@ The most recent release can be installed using `pip`:
 
 Alternatively, you can install the latest development version from GitHub:
 
-    git clone https://github.com/rytilahti/python-miio.git
-    cd python-miio
-    poetry install
-    poetry run miiocli  # or use `poetry shell` to enter the virtualenv
+    pip install git+https://github.com/rytilahti/python-miio.git
 
 **This project is currently ongoing [a major refactoring effort](https://github.com/rytilahti/python-miio/issues/1114).
-If you are interested in controlling modern (MIoT) devices, you want to use the git master until version 0.6.0 is released.**
+If you are interested in controlling modern (MIoT) devices, you want to use the git version until version 0.6.0 is released.**
 
 ## Getting started
 
@@ -61,8 +58,20 @@ The `miiocli` command allows controlling supported devices from the
 command line, given that you know their IP addresses and tokens.
 
 The simplest way to acquire the tokens is by using the `miiocli cloud` command,
-which fetches them for you from your cloud account using [micloud](https://github.com/Squachen/micloud/).
-Alternatively, see [the docs](https://python-miio.readthedocs.io/en/latest/legacy_token_extraction.html#legacy-token-extraction)
+which fetches them for you from your cloud account using [micloud](https://github.com/Squachen/micloud/):
+
+    miiocli cloud
+    Username: example@example.com
+    Password:
+
+    == name of the device (Device offline ) ==
+        Model: example.device.v1
+        Token: b1946ac92492d2347c6235b4d2611184
+        IP: 192.168.xx.xx (mac: ab:cd:ef:12:34:56)
+        DID: 123456789
+        Locale: cn
+
+Alternatively, [see the docs](https://python-miio.readthedocs.io/en/latest/discovery.html#obtaining-tokens)
 for other ways to obtain them.
 
 After you have your token, you can start controlling the device.
@@ -258,7 +267,7 @@ integration, this library supports also the following devices:
 * Xiaomi Philips Zhirui Bedroom Smart Lamp
 * Huayi Huizuo Lamps
 * Xiaomi Universal IR Remote Controller (Chuangmi IR)
-* Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, ZA5 1C, P5, P9, P10, P11, P15, P18, P33
+* Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, ZA5 1C, P5, P9, P10, P11, P15, P18, P33, P39, P45
 * Xiaomi Rosou SS4 Ventilator (leshow.fan.ss4)
 * Xiaomi Mi Air Humidifier V1, CA1, CA4, CB1, MJJSQ, JSQ, JSQ1, JSQ001
 * Xiaomi Mi Water Purifier (Basic support: Turn on & off)
@@ -328,4 +337,5 @@ can find interesting. Feel free to submit more related projects.
 * [Valetudo](https://github.com/Hypfer/Valetudo) (cloud free vacuum firmware)
 * [micloud](https://github.com/Squachen/micloud) (library to access xiaomi cloud services, can be used to obtain device tokens)
 * [micloudfaker](https://github.com/unrelentingtech/micloudfaker) (dummy cloud server, can be used to fix powerstrip status requests when without internet access)
+* [Xiaomi Cloud Tokens Extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) (an alternative way to fetch tokens from the cloud)
 * [Your project here? Feel free to open a PR!](https://github.com/rytilahti/python-miio/pulls)

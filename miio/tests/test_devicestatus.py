@@ -1,13 +1,10 @@
+import re
 from enum import Enum
 
 import pytest
 
-from miio import Device, DeviceStatus
-from miio.descriptors import (
-    EnumSettingDescriptor,
-    NumberSettingDescriptor,
-    ValidSettingRange,
-)
+from miio import DeviceStatus
+from miio.descriptors import EnumDescriptor, RangeDescriptor, ValidSettingRange
 from miio.devicestatus import sensor, setting
 
 
@@ -112,24 +109,25 @@ def test_sensor_decorator():
             pass
 
     status = DecoratedProps()
-    sensors = status.sensors()
-    assert len(sensors) == 3
+    descs = status.descriptors()
+    assert len(descs) == 3
 
-    all_kwargs = sensors["all_kwargs"]
+    all_kwargs = descs["all_kwargs"]
     assert all_kwargs.name == "Voltage"
     assert all_kwargs.unit == "V"
 
-    assert sensors["only_name"].name == "Only name"
+    assert descs["only_name"].name == "Only name"
 
-    assert "unknown_kwarg" in sensors["unknown"].extras
+    assert "unknown_kwarg" in descs["unknown"].extras
 
 
-def test_setting_decorator_number(mocker):
+def test_setting_decorator_number(dummy_device, mocker):
     """Tests for setting decorator with numbers."""
 
     class Settings(DeviceStatus):
         @property
         @setting(
+            id="level",
             name="Level",
             unit="something",
             setter_name="set_level",
@@ -139,21 +137,20 @@ def test_setting_decorator_number(mocker):
         def level(self) -> int:
             return 1
 
-    mocker.patch("miio.Device.send")
-    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-
     # Patch status to return our class
-    mocker.patch.object(d, "status", return_value=Settings())
+    status = mocker.patch.object(dummy_device, "status", return_value=Settings())
+    status.__annotations__ = {}
+    status.__annotations__["return"] = Settings
     # Patch to create a new setter as defined in the status class
-    setter = mocker.patch.object(d, "set_level", create=True)
+    setter = mocker.patch.object(dummy_device, "set_level", create=True)
 
-    settings = d.settings()
+    settings = dummy_device.settings()
     assert len(settings) == 1
 
     desc = settings["level"]
-    assert isinstance(desc, NumberSettingDescriptor)
+    assert isinstance(desc, RangeDescriptor)
 
-    assert getattr(d.status(), desc.property) == 1
+    assert getattr(dummy_device.status(), desc.status_attribute) == 1
 
     assert desc.name == "Level"
     assert desc.min_value == 0
@@ -164,7 +161,7 @@ def test_setting_decorator_number(mocker):
     setter.assert_called_with(1)
 
 
-def test_setting_decorator_number_range_attribute(mocker):
+def test_setting_decorator_number_range_attribute(mocker, dummy_device):
     """Tests for setting decorator with range_attribute.
 
     This makes sure the range_attribute overrides {min,max}_value and step.
@@ -173,6 +170,7 @@ def test_setting_decorator_number_range_attribute(mocker):
     class Settings(DeviceStatus):
         @property
         @setting(
+            id="level",
             name="Level",
             unit="something",
             setter_name="set_level",
@@ -184,22 +182,24 @@ def test_setting_decorator_number_range_attribute(mocker):
         def level(self) -> int:
             return 1
 
-    mocker.patch("miio.Device.send")
-    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-
     # Patch status to return our class
-    mocker.patch.object(d, "status", return_value=Settings())
-    mocker.patch.object(d, "valid_range", create=True, new=ValidSettingRange(1, 100, 2))
-    # Patch to create a new setter as defined in the status class
-    setter = mocker.patch.object(d, "set_level", create=True)
+    status = mocker.patch.object(dummy_device, "status", return_value=Settings())
+    status.__annotations__ = {}
+    status.__annotations__["return"] = Settings
 
-    settings = d.settings()
+    mocker.patch.object(
+        dummy_device, "valid_range", create=True, new=ValidSettingRange(1, 100, 2)
+    )
+    # Patch to create a new setter as defined in the status class
+    setter = mocker.patch.object(dummy_device, "set_level", create=True)
+
+    settings = dummy_device.settings()
     assert len(settings) == 1
 
     desc = settings["level"]
-    assert isinstance(desc, NumberSettingDescriptor)
+    assert isinstance(desc, RangeDescriptor)
 
-    assert getattr(d.status(), desc.property) == 1
+    assert getattr(dummy_device.status(), desc.status_attribute) == 1
 
     assert desc.name == "Level"
     assert desc.min_value == 1
@@ -210,7 +210,7 @@ def test_setting_decorator_number_range_attribute(mocker):
     setter.assert_called_with(50)
 
 
-def test_setting_decorator_enum(mocker):
+def test_setting_decorator_enum(dummy_device, mocker):
     """Tests for setting decorator with enums."""
 
     class TestEnum(Enum):
@@ -220,25 +220,28 @@ def test_setting_decorator_enum(mocker):
     class Settings(DeviceStatus):
         @property
         @setting(
-            name="Level", unit="something", setter_name="set_level", choices=TestEnum
+            id="level",
+            name="Level",
+            unit="something",
+            setter_name="set_level",
+            choices=TestEnum,
         )
         def level(self) -> TestEnum:
             return TestEnum.First
 
-    mocker.patch("miio.Device.send")
-    d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
-
     # Patch status to return our class
-    mocker.patch.object(d, "status", return_value=Settings())
+    status = mocker.patch.object(dummy_device, "status", return_value=Settings())
+    status.__annotations__ = {}
+    status.__annotations__["return"] = Settings
     # Patch to create a new setter as defined in the status class
-    setter = mocker.patch.object(d, "set_level", create=True)
+    setter = mocker.patch.object(dummy_device, "set_level", create=True)
 
-    settings = d.settings()
+    settings = dummy_device.settings()
     assert len(settings) == 1
 
     desc = settings["level"]
-    assert isinstance(desc, EnumSettingDescriptor)
-    assert getattr(d.status(), desc.property) == TestEnum.First
+    assert isinstance(desc, EnumDescriptor)
+    assert getattr(dummy_device.status(), desc.status_attribute) == TestEnum.First
 
     assert desc.name == "Level"
     assert len(desc.choices) == 2
@@ -261,18 +264,19 @@ def test_embed():
             return "sub"
 
     main = MainStatus()
-    assert len(main.sensors()) == 1
+    assert len(main.descriptors()) == 1
 
     sub = SubStatus()
-    main.embed(sub)
-    sensors = main.sensors()
+    main.embed("SubStatus", sub)
+    sensors = main.descriptors()
     assert len(sensors) == 2
+    assert sub._parent == main
 
-    assert getattr(main, sensors["main_sensor"].property) == "main"
-    assert getattr(main, sensors["SubStatus__sub_sensor"].property) == "sub"
+    assert getattr(main, sensors["main_sensor"].status_attribute) == "main"
+    assert getattr(main, sensors["SubStatus__sub_sensor"].status_attribute) == "sub"
 
     with pytest.raises(KeyError):
-        main.sensors()["nonexisting_sensor"]
+        main.descriptors()["nonexisting_sensor"]
 
     assert (
         repr(main)
@@ -287,37 +291,15 @@ def test_embed():
     assert "SubStatus__sub_sensor" in dir(main)
 
 
-def test_cli_output():
+def test_cli_output(dummy_status):
     """Test the cli output string."""
 
-    class Status(DeviceStatus):
-        @property
-        @sensor("sensor_without_unit")
-        def sensor_without_unit(self) -> int:
-            return 1
+    expected_regex = [
+        "r-- sensor_without_unit (.+?): 1",
+        "r-- sensor_with_unit (.+?): 2 V",
+        r"rw- setting_without_unit (.+?): 3",
+        r"rw- setting_with_unit (.+?): 4 V",
+    ]
 
-        @property
-        @sensor("sensor_with_unit", unit="V")
-        def sensor_with_unit(self) -> int:
-            return 2
-
-        @property
-        @setting("setting_without_unit", setter_name="dummy")
-        def setting_without_unit(self):
-            return 3
-
-        @property
-        @setting("setting_with_unit", unit="V", setter_name="dummy")
-        def setting_with_unit(self):
-            return 4
-
-        @property
-        @sensor("none_sensor")
-        def sensor_returning_none(self):
-            return None
-
-    status = Status()
-    assert (
-        status.__cli_output__
-        == "sensor_without_unit: 1\nsensor_with_unit: 2 V\n[RW] setting_without_unit: 3\n[RW] setting_with_unit: 4 V\n"
-    )
+    for idx, line in enumerate(dummy_status.__cli_output__.splitlines()):
+        assert re.match(expected_regex[idx], line) is not None

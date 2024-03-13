@@ -1,3 +1,4 @@
+import enum
 import logging
 from typing import Any, Dict, Optional
 
@@ -6,7 +7,18 @@ import click
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
 from miio.devicestatus import sensor, setting
-from miio.fan_common import LedBrightness, MoveDirection
+
+
+class MoveDirection(enum.Enum):
+    Left = "left"
+    Right = "right"
+
+
+class LedBrightness(enum.Enum):
+    Bright = 0
+    Dim = 1
+    Off = 2
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -214,6 +226,18 @@ class FanStatus(DeviceStatus):
         return None
 
 
+class FanStatusZA4(FanStatus):
+    """Container for status reports from the Xiaomi Mi Smart Pedestal Fan Zhimi ZA4."""
+
+    def __init__(self, data: Dict[str, Any]) -> None:
+        self.data = data
+
+    @property
+    def delay_off_countdown(self) -> int:
+        """Countdown until turning off in minutes."""
+        return self.data["poweroff_time"] / 60
+
+
 class Fan(Device):
     """Main class representing the Xiaomi Mi Smart Pedestal Fan."""
 
@@ -233,6 +257,10 @@ class Fan(Device):
             _props_per_request = 1
 
         values = self.get_properties(properties, max_properties=_props_per_request)
+
+        # The ZA4 has a countdown timer in minutes
+        if self.model in [MODEL_FAN_ZA4]:
+            return FanStatusZA4(dict(zip(properties, values)))
 
         return FanStatus(dict(zip(properties, values)))
 
@@ -300,9 +328,9 @@ class Fan(Device):
     @command(
         click.argument("oscillate", type=bool),
         default_output=format_output(
-            lambda oscillate: "Turning on oscillate"
-            if oscillate
-            else "Turning off oscillate"
+            lambda oscillate: (
+                "Turning on oscillate" if oscillate else "Turning off oscillate"
+            )
         ),
     )
     def set_oscillate(self, oscillate: bool):
@@ -377,5 +405,9 @@ class Fan(Device):
 
         if seconds < 0:
             raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
+
+        # Set delay countdown in minutes for model ZA4
+        if self.model in [MODEL_FAN_ZA4]:
+            return self.send("set_poweroff_time", [seconds * 60])
 
         return self.send("set_poweroff_time", [seconds])

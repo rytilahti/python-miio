@@ -323,9 +323,11 @@ class ChuangmiCamera(Device):
         """Set motion sensitivity (high, low)."""
         return self.send(
             "set_motion_region",
-            CONST_HIGH_SENSITIVITY
-            if sensitivity == MotionDetectionSensitivity.High
-            else CONST_LOW_SENSITIVITY,
+            (
+                CONST_HIGH_SENSITIVITY
+                if sensitivity == MotionDetectionSensitivity.High
+                else CONST_LOW_SENSITIVITY
+            ),
         )
 
     @command(

@@ -30,6 +30,7 @@ class ChuangmiIr(Device):
         "chuangmi.ir.v2",
         "chuangmi.remote.v2",
         "chuangmi.remote.h102a03",
+        "xiaomi.wifispeaker.l05g",
     ]
 
     PRONTO_RE = re.compile(r"^([\da-f]{4}\s?){3,}([\da-f]{4})$", re.IGNORECASE)
@@ -178,9 +179,11 @@ class ChuangmiIr(Device):
     @command(
         click.argument("indicator_led", type=bool),
         default_output=format_output(
-            lambda indicator_led: "Turning on indicator LED"
-            if indicator_led
-            else "Turning off indicator LED"
+            lambda indicator_led: (
+                "Turning on indicator LED"
+                if indicator_led
+                else "Turning off indicator LED"
+            )
         ),
     )
     def set_indicator_led(self, indicator_led: bool):
