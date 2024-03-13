@@ -44,7 +44,6 @@ class AirDogStatus(DeviceStatus):
         {'power: 'on', 'mode': 'sleep', 'speed': 1, 'lock': 'unlock',
          'clean': 'n', 'pm': 11, 'hcho': 0}
         """
-
         self.data = data
 
     @property
@@ -113,7 +112,6 @@ class AirDogX3(Device):
     )
     def status(self) -> AirDogStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_AIRDOG_X3]
         )

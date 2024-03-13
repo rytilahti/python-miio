@@ -34,7 +34,9 @@ class Light(GatewayDevice):
         light as opposed to 'night_light_status'.
 
         Example:
+        -------
            {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
+
         """
         # Returns {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)} when light is off
         state_int = self._gateway.send("get_rgb").pop()
@@ -50,7 +52,9 @@ class Light(GatewayDevice):
         command, otherwise it gives the stored values of the 'night_light'.
 
         Example:
+        -------
            {"is_on": false, "brightness": 0, "rgb": (0, 0, 0)}
+
         """
         state_int = self._gateway.send("get_night_light_rgb").pop()
         brightness = int_to_brightness(state_int)
@@ -89,54 +93,42 @@ class Light(GatewayDevice):
 
     def set_rgb_color(self, color_name: str):
         """Set gateway light color using color name ('color_map' variable in the source
-        holds the valid values)."""
-        if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+        holds the valid values).
+        """
+        if color_name not in color_map:
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
         current_brightness = self.rgb_status()["brightness"]
 
         return self.set_rgb(current_brightness, color_map[color_name])
 
     def set_night_light_color(self, color_name: str):
         """Set night light color using color name ('color_map' variable in the source
-        holds the valid values)."""
-        if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+        holds the valid values).
+        """
+        if color_name not in color_map:
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
         current_brightness = self.night_light_status()["brightness"]
 
         return self.set_night_light(current_brightness, color_map[color_name])
 
     def set_rgb_using_name(self, color_name: str, brightness: int):
         """Set gateway light color (using color name, 'color_map' variable in the source
-        holds the valid values) and brightness (0-100)."""
+        holds the valid values) and brightness (0-100).
+        """
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+        if color_name not in color_map:
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
 
         return self.set_rgb(brightness, color_map[color_name])
 
     def set_night_light_using_name(self, color_name: str, brightness: int):
         """Set night light color (using color name, 'color_map' variable in the source
-        holds the valid values) and brightness (0-100)."""
+        holds the valid values) and brightness (0-100).
+        """
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
-        if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+        if color_name not in color_map:
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
 
         return self.set_night_light(brightness, color_map[color_name])

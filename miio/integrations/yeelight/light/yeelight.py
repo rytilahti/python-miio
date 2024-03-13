@@ -477,9 +477,10 @@ class Yeelight(Device):
         that can be used to decrypt the beacon payloads from these devices.
 
         Example:
-
+        -------
         [{'mac': 'xxx', 'evtid': 4097, 'pid': 950, 'beaconkey': 'xxx'},
          {'mac': 'xxx', 'evtid': 4097, 'pid': 339, 'beaconkey': 'xxx'}]
+
         """
         return self.send("ble_dbg_tbl_dump", {"table": table})
 

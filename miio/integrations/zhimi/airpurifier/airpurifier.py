@@ -125,7 +125,6 @@ class AirPurifierStatus(DeviceStatus):
 
         A request is limited to 16 properties.
         """
-
         self.filter_type_util = FilterTypeUtil()
         self.data = data
 
@@ -350,7 +349,6 @@ class AirPurifier(Device):
     )
     def status(self) -> AirPurifierStatus:
         """Retrieve properties."""
-
         properties = [
             "power",
             "aqi",

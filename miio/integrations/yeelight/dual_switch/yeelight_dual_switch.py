@@ -41,8 +41,7 @@ _MAPPINGS: MiotMapping = {
 
 class DualControlModuleStatus(DeviceStatus):
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of Yeelight Dual Control Module
+        """Response of Yeelight Dual Control Module
         {
             'id': 1,
             'result': [
@@ -108,7 +107,8 @@ class DualControlModuleStatus(DeviceStatus):
 
 class YeelightDualControlModule(MiotDevice):
     """Main class representing the Yeelight Dual Control Module (yeelink.switch.sw1)
-    which uses MIoT protocol."""
+    which uses MIoT protocol.
+    """
 
     _mappings = _MAPPINGS
 

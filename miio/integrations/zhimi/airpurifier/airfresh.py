@@ -61,8 +61,7 @@ class AirFreshStatus(DeviceStatus):
     """Container for status reports from the air fresh."""
 
     def __init__(self, data: Dict[str, Any], model: str) -> None:
-        """
-        Response of a Air Fresh VA4 (zhimi.airfresh.va4):
+        """Response of a Air Fresh VA4 (zhimi.airfresh.va4):
 
         {
             'power': 'on',
@@ -87,7 +86,6 @@ class AirFreshStatus(DeviceStatus):
             'ptc_state': 'off',
         }
         """
-
         self.data = data
         self.model = model
 
@@ -239,7 +237,6 @@ class AirFresh(Device):
     )
     def status(self) -> AirFreshStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_AIRFRESH_VA2]
         )

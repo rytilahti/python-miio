@@ -79,7 +79,7 @@ class PwznRelayStatus(DeviceStatus):
     @property
     def relay_names(self) -> Dict[int, str]:
         def _extract_index_from_key(name) -> int:
-            """extract the index from the variable."""
+            """Extract the index from the variable."""
             return int(name[4:])
 
         return {
@@ -104,7 +104,6 @@ class PwznRelay(Device):
     @command(default_output=format_output("", "on_count: {result.on_count}\n"))
     def status(self) -> PwznRelayStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_PWZN_RELAY_APPLE]
         ).copy()

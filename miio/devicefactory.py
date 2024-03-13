@@ -46,7 +46,8 @@ class DeviceFactory:
     @classmethod
     def supported_models(cls) -> Dict[str, Type[Device]]:
         """Return a dictionary of models and their corresponding implementation
-        classes."""
+        classes.
+        """
         return cls._supported_models
 
     @classmethod

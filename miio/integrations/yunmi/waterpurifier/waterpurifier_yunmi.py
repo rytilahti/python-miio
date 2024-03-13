@@ -90,7 +90,7 @@ class OperationStatus(DeviceStatus):
         """
         self.err_list = [
             ERROR_DESCRIPTION[i]
-            for i in range(0, len(ERROR_DESCRIPTION))
+            for i in range(len(ERROR_DESCRIPTION))
             if (1 << i) & operation_status
         ]
 
@@ -275,7 +275,6 @@ class WaterPurifierYunmi(Device):
     )
     def status(self) -> WaterPurifierYunmiStatus:
         """Retrieve properties."""
-
         properties = [
             "run_status",
             "f1_totalflow",
@@ -303,7 +302,7 @@ class WaterPurifierYunmi(Device):
         time.
         Key "mode" (always 'purifying') and key "tds_out_avg" (always 0) are not
         included in return values.
-        """  # noqa: B018
+        """
         values = self.send("get_prop", ["all"])
 
         prop_count = len(properties)

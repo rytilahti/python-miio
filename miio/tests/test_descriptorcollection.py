@@ -16,7 +16,6 @@ from miio.devicestatus import sensor, setting
 
 def test_descriptors_from_device_object(dummy_device):
     """Test descriptor collection from device class."""
-
     coll = DescriptorCollection(device=dummy_device)
     coll.descriptors_from_object(dummy_device)
     assert len(coll) == 1

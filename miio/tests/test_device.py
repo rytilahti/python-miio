@@ -141,7 +141,8 @@ def test_device_supported_models(cls):
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)
 def test_init_signature(cls, mocker):
     """Make sure that __init__ of every device-inheriting class accepts the expected
-    parameters."""
+    parameters.
+    """
     mocker.patch("miio.Device.send")
     parent_init = mocker.spy(Device, "__init__")
     kwargs = {

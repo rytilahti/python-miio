@@ -76,7 +76,7 @@ class PushServer:
         """Start Miio push server."""
         if self._listen_couroutine is not None:
             _LOGGER.error("Miio push server already started, not starting another one.")
-            return
+            return None
 
         self._loop = asyncio.get_event_loop()
 
@@ -147,7 +147,8 @@ class PushServer:
         self, device: Device, event_info: EventInfo
     ) -> Optional[str]:
         """Subscribe to a event such that the device will start pushing data for that
-        event."""
+        event.
+        """
         if device.ip not in self._registered_devices:
             _LOGGER.error("Can not subscribe event, miio device not yet registered")
             return None
@@ -253,9 +254,7 @@ class PushServer:
         command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"
         message_id = 0
-        magic_number = randint(
-            1590161094, 1642025774
-        )  # nosec, min/max taken from packet captures, unknown use
+        magic_number = randint(1590161094, 1642025774)  # nosec, min/max taken from packet captures, unknown use
 
         if len(command) > 49:
             _LOGGER.error(

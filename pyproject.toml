@@ -75,8 +75,9 @@ coverage = {extras = ["toml"], version = "*"}
 [tool.ruff]
 target-version = "py38"
 line-length = 88
-format = "grouped"
 # show-source = true
+
+[tool.ruff.lint]
 select = [
   # pycodestyle
   "E", "W",
@@ -126,13 +127,13 @@ ignore = [
   "D203",
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # S101: assert detected
 # D1: docstyle
 # PLR2004: magic constant
 "**/test_*.py" = ["S101", "D1", "PLR2004"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["miio"]
 # check if this is necessary
 known-third-party = ["appdirs", "attr", "click", "construct", "croniter", "cryptography", "netifaces", "pytest", "pytz", "setuptools", "tqdm", "zeroconf"]

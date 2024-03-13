@@ -402,7 +402,6 @@ class Fan(Device):
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
-
         if seconds < 0:
             raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 

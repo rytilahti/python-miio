@@ -17,7 +17,8 @@ class SingleFileHandler(BaseHTTPRequestHandler):
 
     def send_error(self, *args, **kwargs):
         """Dummy override to avoid crashing sphinx builds on invalid upstream
-        docstring."""
+        docstring.
+        """
         return super().send_error(*args, **kwargs)
 
     def handle_one_request(self):

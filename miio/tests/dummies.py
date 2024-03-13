@@ -58,7 +58,8 @@ class DummyDevice:
 
     def _set_state(self, var, value):
         """Set a state of a variable, the value is expected to be an array with length
-        of 1."""
+        of 1.
+        """
         # print("setting %s = %s" % (var, value))
         self.state[var] = value.pop(0)
 
@@ -94,4 +95,3 @@ class DummyMiotDevice(DummyDevice):
         for prop in self.state:
             if prop["did"] == property_key:
                 prop["value"] = value
-        return None

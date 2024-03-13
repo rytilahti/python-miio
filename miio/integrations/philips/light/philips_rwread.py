@@ -139,7 +139,6 @@ class PhilipsRwread(Device):
     )
     def delay_off(self, seconds: int):
         """Set delay off in seconds."""
-
         if seconds < 0:
             raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 

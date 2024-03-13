@@ -263,7 +263,6 @@ class RoborockVacuum(Device):
     @action(name="Home", id=VacuumId.ReturnHome)
     def home(self):
         """Stop cleaning and return home."""
-
         PAUSE_BEFORE_HOME = [
             ROCKROBO_V1,
         ]
@@ -324,7 +323,8 @@ class RoborockVacuum(Device):
         self, rotation: int, velocity: float, duration: int = MANUAL_DURATION_DEFAULT
     ):
         """Starts the remote control mode and executes the action once before
-        deactivating the mode."""
+        deactivating the mode.
+        """
         number_of_tries = 3
         self.manual_start()
         while number_of_tries > 0:

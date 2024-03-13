@@ -198,7 +198,6 @@ class PowerStrip(Device):
     )
     def set_power_mode(self, mode: PowerMode):
         """Set the power mode."""
-
         # green, normal
         return self.send("set_power_mode", [mode.value])
 

@@ -53,7 +53,8 @@ MIOT_MAPPING = {
 
 class PetWaterDispenser(MiotDevice):
     """Main class representing the Pet Waterer / Pet Drinking Fountain / Smart Pet Water
-    Dispenser."""
+    Dispenser.
+    """
 
     _mappings = MIOT_MAPPING
 

@@ -379,7 +379,8 @@ class VacuumStatus(DeviceStatus):
     @sensor("Mop attached")
     def is_water_box_carriage_attached(self) -> Optional[bool]:
         """Return True if water box carriage (mop) is installed, None if sensor not
-        present."""
+        present.
+        """
         if "water_box_carriage_status" in self.data:
             return self.data["water_box_carriage_status"] == 1
         return None
@@ -401,7 +402,8 @@ class VacuumStatus(DeviceStatus):
     )
     def auto_dust_collection(self) -> Optional[bool]:
         """Returns True if auto dust collection is enabled, None if sensor not
-        present."""
+        present.
+        """
         if "auto_dust_collection" in self.data:
             return self.data["auto_dust_collection"] == 1
         return None
@@ -503,7 +505,8 @@ class CleaningSummary(DeviceStatus):
     @property
     def ids(self) -> List[int]:
         """A list of available cleaning IDs, see also
-        :class:`CleaningDetails`."""
+        :class:`CleaningDetails`.
+        """
         return list(self.data["records"])
 
     @property

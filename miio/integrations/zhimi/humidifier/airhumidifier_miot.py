@@ -113,7 +113,6 @@ class AirHumidifierMiotStatus(DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Return current operation mode."""
-
         try:
             mode = OperationMode(self.data["mode"])
         except ValueError as e:
@@ -166,7 +165,6 @@ class AirHumidifierMiotStatus(DeviceStatus):
     @property
     def button_pressed(self) -> PressedButton:
         """Return last pressed button."""
-
         try:
             button = PressedButton(self.data["button_pressed"])
         except ValueError as e:
@@ -215,7 +213,6 @@ class AirHumidifierMiotStatus(DeviceStatus):
     @property
     def led_brightness(self) -> Optional[LedBrightness]:
         """Return brightness of the LED."""
-
         if self.data["led_brightness"] is not None:
             try:
                 return LedBrightness(self.data["led_brightness"])
@@ -281,7 +278,6 @@ class AirHumidifierMiot(MiotDevice):
     )
     def status(self) -> AirHumidifierMiotStatus:
         """Retrieve properties."""
-
         return AirHumidifierMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None

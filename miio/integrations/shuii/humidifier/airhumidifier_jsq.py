@@ -74,7 +74,6 @@ class AirHumidifierStatus(DeviceStatus):
 
         Can be either low, medium, high or humidity.
         """
-
         try:
             mode = OperationMode(self.data["mode"])
         except ValueError as e:
@@ -159,7 +158,6 @@ class AirHumidifierJsq(Device):
     )
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
-
         values = self.send("get_props")
 
         # Response of an Air Humidifier (shuii.humidifier.jsq001):

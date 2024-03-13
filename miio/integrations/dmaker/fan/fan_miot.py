@@ -164,8 +164,7 @@ class FanStatusMiot(DeviceStatus):
     """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker P9/P10."""
 
     def __init__(self, data: Dict[str, Any], model: str) -> None:
-        """
-        Response of a FanMiot (dmaker.fan.p10):
+        """Response of a FanMiot (dmaker.fan.p10):
 
         {
           'id': 1,
@@ -431,7 +430,6 @@ class FanMiot(MiotDevice):
     )
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
-
         if minutes < 0 or minutes > 480:
             raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 
@@ -572,7 +570,6 @@ class Fan1C(MiotDevice):
     )
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
-
         if minutes < 0 or minutes > 480:
             raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 

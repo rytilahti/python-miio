@@ -115,7 +115,7 @@ def list():
     mapping = get_mapping()
 
     for inst in mapping.instances:
-        click.echo(f"* {repr(inst)}")
+        click.echo(f"* {inst!r}")
 
 
 @cli.command()
@@ -124,7 +124,6 @@ def list():
 @click.pass_context
 def download(ctx, urn, model):
     """Download description file for model."""
-
     if urn is None:
         if model is None:
             click.echo("You need to specify either the model or --urn")

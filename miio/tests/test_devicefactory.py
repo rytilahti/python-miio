@@ -16,7 +16,6 @@ def test_device_all_supported_models():
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)
 def test_device_class_for_model(cls):
     """Test that all supported models can be initialized using class_for_model."""
-
     if cls == Gateway:
         pytest.skip(
             "Skipping Gateway as AirConditioningCompanion already implements lumi.acpartner.*"

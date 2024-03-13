@@ -44,7 +44,6 @@ class ChuangmiIr(Device):
 
         :param int key: Storage slot, must be between 1 and 1000000
         """
-
         if key < 1 or key > 1000000:
             raise ValueError("Invalid storage slot.")
         return self.send("miIO.ir_learn", {"key": str(key)})
@@ -67,7 +66,6 @@ class ChuangmiIr(Device):
 
         :param int key: Slot to read from
         """
-
         if key < 1 or key > 1000000:
             raise ValueError("Invalid storage slot.")
         return self.send("miIO.ir_read", {"key": str(key)})

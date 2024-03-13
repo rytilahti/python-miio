@@ -241,7 +241,6 @@ class FanP5(Device):
     )
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
-
         if minutes < 0:
             raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 

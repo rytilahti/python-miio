@@ -104,8 +104,7 @@ class HeaterMiotStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Smart Space Heater S and 1S."""
 
     def __init__(self, data: Dict[str, Any], model: str) -> None:
-        """
-        Response (MIoT format) of Xiaomi Smart Space Heater S (zhimi.heater.mc2):
+        """Response (MIoT format) of Xiaomi Smart Space Heater S (zhimi.heater.mc2):
 
         [
           { "did": "power", "siid": 2, "piid": 1, "code": 0, "value": False },
@@ -171,7 +170,8 @@ class HeaterMiotStatus(DeviceStatus):
 
 class HeaterMiot(MiotDevice):
     """Main class representing the Xiaomi Smart Space Heater S (zhimi.heater.mc2) & 1S
-    (zhimi.heater.za2)."""
+    (zhimi.heater.za2).
+    """
 
     _mappings = _MAPPINGS
 
@@ -189,7 +189,6 @@ class HeaterMiot(MiotDevice):
     )
     def status(self) -> HeaterMiotStatus:
         """Retrieve properties."""
-
         return HeaterMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None

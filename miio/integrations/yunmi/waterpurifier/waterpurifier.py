@@ -121,7 +121,6 @@ class WaterPurifier(Device):
     )
     def status(self) -> WaterPurifierStatus:
         """Retrieve properties."""
-
         properties = [
             "power",
             "mode",

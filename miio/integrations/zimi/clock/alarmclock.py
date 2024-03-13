@@ -67,8 +67,7 @@ class AlarmClock(Device):
 
     @command()
     def get_config_version(self):
-        """
-        # values unknown {'result': [4], 'id': 203}
+        """# values unknown {'result': [4], 'id': 203}
         :return:
         """
         return self.send("get_config_version", ["audio"])
@@ -177,9 +176,7 @@ class AlarmClock(Device):
 
     @command()
     def countdown(self):
-        """
-        ->  192.168.0.128 data= {"id":258,"method":"get_count_down_v2","params":[]}
-        """
+        """->  192.168.0.128 data= {"id":258,"method":"get_count_down_v2","params":[]}"""
         return self.send("get_count_down_v2")
 
     def alarmops(self):

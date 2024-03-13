@@ -86,7 +86,6 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     @property
     def mode(self) -> OperationMode:
         """Return current operation mode."""
-
         try:
             mode = OperationMode(self.data["mode"])
         except ValueError as e:
@@ -166,7 +165,6 @@ class AirHumidifierJsqs(MiotDevice):
     )
     def status(self) -> AirHumidifierJsqsStatus:
         """Retrieve properties."""
-
         return AirHumidifierJsqsStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None

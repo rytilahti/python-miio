@@ -185,7 +185,6 @@ class AirQualityMonitorCGDN1(MiotDevice):
     )
     def status(self) -> AirQualityMonitorCGDN1Status:
         """Retrieve properties."""
-
         return AirQualityMonitorCGDN1Status(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None

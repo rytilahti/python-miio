@@ -14,7 +14,8 @@ if TYPE_CHECKING:
 
 class GatewayDevice:
     """GatewayDevice class Specifies the init method for all gateway device
-    functionalities."""
+    functionalities.
+    """
 
     _supported_models = ["dummy.device"]
 

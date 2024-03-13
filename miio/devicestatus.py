@@ -82,7 +82,7 @@ class DeviceStatus(metaclass=_StatusMeta):
             s += f" {name}={prop_value}"
 
         for name, embedded in self._embedded.items():
-            s += f" {name}={repr(embedded)}"
+            s += f" {name}={embedded!r}"
 
         s += ">"
         return s

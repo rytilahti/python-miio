@@ -86,6 +86,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         device.
 
         Example:
+        -------
             {
                 "child_lock": 0,
                 "program": 2,
@@ -98,8 +99,8 @@ class ViomiDishwasherStatus(DeviceStatus):
                 "freshdry_interval": 0,
                 "wash_process": 0
             }
-        """
 
+        """
         self.data = data
 
     @property
@@ -124,7 +125,6 @@ class ViomiDishwasherStatus(DeviceStatus):
     @property
     def door_open(self) -> bool:
         """Returns True if the door is open."""
-
         return bool(self.data["run_status"] & (1 << 7))
 
     @property
@@ -135,26 +135,23 @@ class ViomiDishwasherStatus(DeviceStatus):
             - Errors in the system.
             - If the door is open or not.
         """
-
         return self.data["run_status"]
 
     @property
     def status(self) -> MachineStatus:
         """Returns the machine status of the device."""
-
         return MachineStatus(self.data["wash_status"])
 
     @property
     def temperature(self) -> int:
         """Returns the temperature in degree Celsius as determined by the NTC
-        thermistor."""
-
+        thermistor.
+        """
         return self.data["wash_temp"]
 
     @property
     def power(self) -> bool:
         """Returns the power status of the device."""
-
         value = self.data["power"]
         if value in [0, 1]:
             return bool(value)
@@ -179,7 +176,6 @@ class ViomiDishwasherStatus(DeviceStatus):
 
         Will always be 0 if nothing is scheduled.
         """
-
         value = self.data["wash_done_appointment"]
         if isinstance(value, int):
             return datetime.fromtimestamp(value) if value else None
@@ -193,9 +189,10 @@ class ViomiDishwasherStatus(DeviceStatus):
         """Returns an integer on how often the air in the device should be refreshed.
 
         Todo:
+        ----
             * It's unknown what the value means. It seems not to be minutes. The default set by the Xiaomi Home app is 8.
-        """
 
+        """
         value = self.data["freshdry_interval"]
         if isinstance(value, int):
             return value
@@ -215,7 +212,6 @@ class ViomiDishwasherStatus(DeviceStatus):
     @property
     def errors(self) -> List[SystemStatus]:
         """Returns list of errors if detected in the system."""
-
         errors = []
         if self.data["run_status"] & (1 << 0):
             errors.append(SystemStatus.WaterLeak)
@@ -257,7 +253,6 @@ class ViomiDishwasher(Device):
     )
     def status(self) -> ViomiDishwasherStatus:
         """Retrieve properties."""
-
         properties = [
             "child_lock",
             "program",
@@ -302,7 +297,6 @@ class ViomiDishwasher(Device):
     )
     def child_lock(self, status: ChildLockStatus):
         """Set child lock."""
-
         if not self._is_on():
             self.on()
             output = self.send("set_child_lock", [status.value])
@@ -321,7 +315,6 @@ class ViomiDishwasher(Device):
 
         *time* defines the time when the program should finish.
         """
-
         if program == Program.Unknown:
             ValueError(f"Program {program.name} is not valid for this function.")
 
@@ -360,7 +353,6 @@ class ViomiDishwasher(Device):
     @command()
     def cancel_schedule(self, check_if_on=True) -> str:
         """Cancel an existing schedule."""
-
         if not self._is_on() and check_if_on:
             return "Dishwasher is not turned on. Nothing scheduled."
 
@@ -373,7 +365,6 @@ class ViomiDishwasher(Device):
     )
     def start(self, program: Optional[Program]) -> str:
         """Start a program (with optional program or current)."""
-
         if program:
             value = self.send("set_program", [program.value])
             _LOGGER.debug("Started program %s.", program.name)
@@ -390,7 +381,6 @@ class ViomiDishwasher(Device):
     @command()
     def stop(self) -> str:
         """Stop a program."""
-
         if not self._is_running():
             raise DeviceException("No program running.")
 
@@ -401,7 +391,6 @@ class ViomiDishwasher(Device):
     @command()
     def pause(self) -> str:
         """Pause a program."""
-
         if not self._is_running():
             raise DeviceException("No program running.")
 
@@ -412,7 +401,6 @@ class ViomiDishwasher(Device):
     @command(name="continue")
     def continue_program(self) -> str:
         """Continue a program."""
-
         if not self._is_running():
             raise DeviceException("No program running.")
 
@@ -426,5 +414,4 @@ class ViomiDishwasher(Device):
     )
     def airrefresh(self, time: int) -> List[str]:
         """Set air refresh interval."""
-
         return self.send("set_freshdry_interval_t", [time])

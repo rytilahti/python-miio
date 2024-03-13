@@ -51,7 +51,7 @@ def test_properties(host: str, token: str, properties):
                 fail("None")
             else:
                 valid_properties[property] = value
-                ok(f"{repr(value)} {type(value)}")
+                ok(f"{value!r} {type(value)}")
         except Exception as ex:
             _LOGGER.warning("Unable to request %s: %s", property, ex)
 

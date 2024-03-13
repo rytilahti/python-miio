@@ -516,28 +516,24 @@ class DummyVacuumS7(DummyVacuum):
         self._model = ROCKROBO_S7
         self.state = {
             **self.state,
-            **{
-                "dry_status": 1,
-                "rdt": 3600,
-            },
+            "dry_status": 1,
+            "rdt": 3600,
         }
         self.dummies["water_box_custom_mode"] = [203]
         self.return_values = {
             **self.return_values,
-            **{
-                "app_get_dryer_setting": lambda x: {
-                    "status": 1,
-                    "on": {
-                        "cliff_on": 1,
-                        "cliff_off": 1,
-                        "count": 10,
-                        "dry_time": 10800,
-                    },
-                    "off": {"cliff_on": 2, "cliff_off": 1, "count": 10},
+            "app_get_dryer_setting": lambda x: {
+                "status": 1,
+                "on": {
+                    "cliff_on": 1,
+                    "cliff_off": 1,
+                    "count": 10,
+                    "dry_time": 10800,
                 },
-                "app_set_dryer_setting": lambda x: ["ok"],
-                "app_set_dryer_status": lambda x: ["ok"],
+                "off": {"cliff_on": 2, "cliff_off": 1, "count": 10},
             },
+            "app_set_dryer_setting": lambda x: ["ok"],
+            "app_set_dryer_status": lambda x: ["ok"],
         }
 
 

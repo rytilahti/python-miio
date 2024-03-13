@@ -136,9 +136,7 @@ class ViomiPositionPoint:
         return self.pos_y - offset + img_center
 
     def __repr__(self) -> str:
-        return "<ViomiPositionPoint x: {}, y: {}, phi: {}, update {}>".format(
-            self.pos_x, self.pos_y, self.phi, self.update
-        )
+        return f"<ViomiPositionPoint x: {self.pos_x}, y: {self.pos_y}, phi: {self.phi}, update {self.update}>"
 
     def __eq__(self, value) -> bool:
         return (
@@ -306,7 +304,6 @@ class ViomiVacuumStatus(DeviceStatus):
     @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return simplified vacuum state."""
-
         # consider error_code >= 2000 as non-errors as they require no action
         if 0 < self.error_code < 2000:
             return VacuumState.Error
@@ -615,7 +612,6 @@ class ViomiVacuum(Device):
     @command()
     def status(self) -> ViomiVacuumStatus:
         """Retrieve properties."""
-
         device_props = {
             "viomi.vacuum.v8": [
                 "battary_life",

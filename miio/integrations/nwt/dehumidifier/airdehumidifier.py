@@ -58,7 +58,6 @@ class AirDehumidifierStatus(DeviceStatus):
          'fan_speed': 0, 'tank_full': 'off', 'defrost_status': 'off,
          'alarm': 'ok','auto': 50}
         """
-
         self.data = data
         self.device_info = device_info
 
@@ -176,7 +175,6 @@ class AirDehumidifier(Device):
     )
     def status(self) -> AirDehumidifierStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_DEHUMIDIFIER_V1]
         )

@@ -11,7 +11,6 @@ def deprecated(reason):
 
     From https://stackoverflow.com/a/40301488
     """
-
     string_types = (bytes, str)
     if isinstance(reason, string_types):
         # The @deprecated is used with a 'reason'.
@@ -43,7 +42,7 @@ def deprecated(reason):
 
         return decorator
 
-    elif inspect.isclass(reason) or inspect.isfunction(reason):  # noqa: SIM106
+    elif inspect.isclass(reason) or inspect.isfunction(reason):
         # The @deprecated is used without any 'reason'.
         #
         # .. code-block:: python
