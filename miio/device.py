@@ -1,26 +1,18 @@
 import logging
 from enum import Enum
-from inspect import getmembers
 from typing import Any, Dict, List, Optional, Union, cast, final  # noqa: F401
 
 import click
 
-from .click_common import DeviceGroupMeta, LiteralParamType, command, format_output
-from .descriptors import (
-    AccessFlags,
-    ActionDescriptor,
-    EnumDescriptor,
-    PropertyConstraint,
-    PropertyDescriptor,
-    RangeDescriptor,
-)
+from .click_common import DeviceGroupMeta, LiteralParamType, command
+from .descriptorcollection import DescriptorCollection
+from .descriptors import AccessFlags, ActionDescriptor, Descriptor, PropertyDescriptor
 from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
 from .exceptions import (
     DeviceError,
     DeviceInfoUnavailableException,
     PayloadDecodeException,
-    UnsupportedFeatureException,
 )
 from .miioprotocol import MiIOProtocol
 
@@ -32,23 +24,6 @@ class UpdateState(Enum):
     Installing = "installing"
     Failed = "failed"
     Idle = "idle"
-
-
-def _info_output(result):
-    """Format the output for info command."""
-    s = f"Model: {result.model}\n"
-    s += f"Hardware version: {result.hardware_version}\n"
-    s += f"Firmware version: {result.firmware_version}\n"
-
-    from .devicefactory import DeviceFactory
-
-    cls = DeviceFactory.class_for_model(result.model)
-    dev = DeviceFactory.create(result.ip_address, result.token, force_generic_miot=True)
-    s += f"Supported using: {cls.__name__}\n"
-    s += f"Command: miiocli {cls.__name__.lower()} --ip {result.ip_address} --token {result.token}\n"
-    s += f"Supported by genericmiot: {dev.supports_miot()}"
-
-    return s
 
 
 class Device(metaclass=DeviceGroupMeta):
@@ -87,8 +62,9 @@ class Device(metaclass=DeviceGroupMeta):
         self.token: Optional[str] = token
         self._model: Optional[str] = model
         self._info: Optional[DeviceInfo] = None
-        self._actions: Optional[Dict[str, ActionDescriptor]] = None
-        self._properties: Optional[Dict[str, PropertyDescriptor]] = None
+        # TODO: use _info's noneness instead?
+        self._initialized: bool = False
+        self._descriptors: DescriptorCollection = DescriptorCollection(device=self)
         timeout = timeout if timeout is not None else self.timeout
         self._debug = debug
         self._protocol = MiIOProtocol(
@@ -141,7 +117,6 @@ class Device(metaclass=DeviceGroupMeta):
         return self.send(command, parameters)
 
     @command(
-        default_output=format_output(result_msg_fmt=_info_output),
         skip_autodetect=True,
     )
     def info(self, *, skip_cache=False) -> DeviceInfo:
@@ -163,15 +138,6 @@ class Device(metaclass=DeviceGroupMeta):
             devinfo = DeviceInfo(self.send("miIO.info"))
             self._info = devinfo
             _LOGGER.debug("Detected model %s", devinfo.model)
-            cls = self.__class__.__name__
-            # Ignore bases and generic classes
-            bases = ["Device", "MiotDevice", "GenericMiot"]
-            if devinfo.model not in self.supported_models and cls not in bases:
-                _LOGGER.warning(
-                    "Found an unsupported model '%s' for class '%s'. If this is working for you, please open an issue at https://github.com/rytilahti/python-miio/",
-                    devinfo.model,
-                    cls,
-                )
 
             return devinfo
         except PayloadDecodeException as ex:
@@ -179,62 +145,26 @@ class Device(metaclass=DeviceGroupMeta):
                 "Unable to request miIO.info from the device"
             ) from ex
 
-    def _set_constraints_from_attributes(
-        self, status: DeviceStatus
-    ) -> Dict[str, PropertyDescriptor]:
-        """Get the setting descriptors from a DeviceStatus."""
-        properties = status.properties()
-        unsupported_settings = []
-        for key, prop in properties.items():
-            if prop.setter_name is not None:
-                prop.setter = getattr(self, prop.setter_name)
-            if prop.setter is None:
-                raise Exception(f"Neither setter or setter_name was defined for {prop}")
-
-            if prop.constraint == PropertyConstraint.Choice:
-                prop = cast(EnumDescriptor, prop)
-                if prop.choices_attribute is not None:
-                    retrieve_choices_function = getattr(self, prop.choices_attribute)
-                    try:
-                        prop.choices = retrieve_choices_function()
-                    except UnsupportedFeatureException:
-                        # TODO: this should not be done here
-                        unsupported_settings.append(key)
-                        continue
-
-            elif prop.constraint == PropertyConstraint.Range:
-                prop = cast(RangeDescriptor, prop)
-                if prop.range_attribute is not None:
-                    range_def = getattr(self, prop.range_attribute)
-                    prop.min_value = range_def.min_value
-                    prop.max_value = range_def.max_value
-                    prop.step = range_def.step
-
-            else:
-                _LOGGER.debug("Got a regular setting without constraints: %s", prop)
-
-        for unsupp_key in unsupported_settings:
-            properties.pop(unsupp_key)
-
-        return properties
-
-    def _action_descriptors(self) -> Dict[str, ActionDescriptor]:
-        """Get the action descriptors from a DeviceStatus."""
-        actions = {}
-        for action_tuple in getmembers(self, lambda o: hasattr(o, "_action")):
-            method_name, method = action_tuple
-            action = method._action
-            action.method = method  # bind the method
-            actions[action.id] = action
-
-        return actions
-
     def _initialize_descriptors(self) -> None:
-        """Cache all the descriptors once on the first call."""
-        status = self.status()
+        """Initialize the device descriptors.
 
-        self._properties = self._set_constraints_from_attributes(status)
-        self._actions = self._action_descriptors()
+        This will add descriptors defined in the implementation class and the status class.
+
+        This can be overridden to add additional descriptors to the device.
+        If you do so, do not forget to call this method.
+        """
+        self._descriptors.descriptors_from_object(self)
+
+        # Read descriptors from the status class
+        self._descriptors.descriptors_from_object(self.status.__annotations__["return"])
+
+        if not self._descriptors:
+            _LOGGER.warning(
+                "'%s' does not specify any descriptors, please considering creating a PR.",
+                self.__class__.__name__,
+            )
+
+        self._initialized = True
 
     @property
     def device_id(self) -> int:
@@ -323,49 +253,56 @@ class Device(metaclass=DeviceGroupMeta):
 
         return values
 
+    @command()
     def status(self) -> DeviceStatus:
         """Return device status."""
         raise NotImplementedError()
 
-    def actions(self) -> Dict[str, ActionDescriptor]:
+    @command()
+    def descriptors(self) -> DescriptorCollection[Descriptor]:
+        """Return a collection containing all descriptors for the device."""
+        if not self._initialized:
+            self._initialize_descriptors()
+
+        return self._descriptors
+
+    @command()
+    def actions(self) -> DescriptorCollection[ActionDescriptor]:
         """Return device actions."""
-        if self._actions is None:
-            self._initialize_descriptors()
-
-        # TODO: we ignore the return value for now as these should always be initialized
-        return self._actions  # type: ignore[return-value]
-
-    def properties(self) -> Dict[str, PropertyDescriptor]:
-        """Return all device properties."""
-        if self._properties is None:
-            self._initialize_descriptors()
-
-        # TODO: we ignore the return value for now as these should always be initialized
-        return self._properties  # type: ignore[return-value]
+        return DescriptorCollection(
+            {
+                k: v
+                for k, v in self.descriptors().items()
+                if isinstance(v, ActionDescriptor)
+            },
+            device=self,
+        )
 
     @final
-    def settings(self) -> Dict[str, PropertyDescriptor]:
+    @command()
+    def settings(self) -> DescriptorCollection[PropertyDescriptor]:
         """Return settable properties."""
-        if self._properties is None:
-            self._initialize_descriptors()
-
-        return {
-            prop.id: prop
-            for prop in self.properties().values()
-            if prop.access & AccessFlags.Write
-        }
+        return DescriptorCollection(
+            {
+                k: v
+                for k, v in self.descriptors().items()
+                if isinstance(v, PropertyDescriptor) and v.access & AccessFlags.Write
+            },
+            device=self,
+        )
 
     @final
-    def sensors(self) -> Dict[str, PropertyDescriptor]:
+    @command()
+    def sensors(self) -> DescriptorCollection[PropertyDescriptor]:
         """Return read-only properties."""
-        if self._properties is None:
-            self._initialize_descriptors()
-
-        return {
-            prop.id: prop
-            for prop in self.properties().values()
-            if prop.access ^ AccessFlags.Write
-        }
+        return DescriptorCollection(
+            {
+                k: v
+                for k, v in self.descriptors().items()
+                if v.access == AccessFlags.Read
+            },
+            device=self,
+        )
 
     def supports_miot(self) -> bool:
         """Return True if the device supports miot commands.
@@ -379,5 +316,38 @@ class Device(metaclass=DeviceGroupMeta):
             return False
         return True
 
+    @command(
+        click.argument("name"),
+        click.argument("params", type=LiteralParamType(), required=False),
+        name="call",
+    )
+    def call_action(self, name: str, params=None):
+        """Call action by name."""
+        try:
+            act = self.actions()[name]
+        except KeyError:
+            raise ValueError("Unable to find action '%s'" % name)
+
+        if params is None:
+            return act.method()
+
+        return act.method(params)
+
+    @command(
+        click.argument("name"),
+        click.argument("params", type=LiteralParamType(), required=True),
+        name="set",
+    )
+    def change_setting(self, name: str, params=None):
+        """Change setting value."""
+        try:
+            setting = self.settings()[name]
+        except KeyError:
+            raise ValueError("Unable to find setting '%s'" % name)
+
+        params = params if params is not None else []
+
+        return setting.setter(params)
+
     def __repr__(self):
-        return f"<{self.__class__.__name__ }: {self.ip} (token: {self.token})>"
+        return f"<{self.__class__.__name__}: {self.ip} (token: {self.token})>"

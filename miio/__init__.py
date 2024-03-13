@@ -9,13 +9,29 @@ from importlib.metadata import version  # type: ignore
 
 from miio.device import Device
 from miio.devicestatus import DeviceStatus
-from miio.exceptions import DeviceError, DeviceException, UnsupportedFeatureException
+from miio.exceptions import (
+    DeviceError,
+    InvalidTokenException,
+    DeviceException,
+    UnsupportedFeatureException,
+    DeviceInfoUnavailableException,
+)
 from miio.miot_device import MiotDevice
 from miio.deviceinfo import DeviceInfo
 
 # isort: on
 
 from miio.cloud import CloudDeviceInfo, CloudException, CloudInterface
+from miio.descriptorcollection import DescriptorCollection
+from miio.descriptors import (
+    AccessFlags,
+    ActionDescriptor,
+    Descriptor,
+    EnumDescriptor,
+    PropertyDescriptor,
+    RangeDescriptor,
+    ValidSettingRange,
+)
 from miio.devicefactory import DeviceFactory
 from miio.integrations.airdog.airpurifier import AirDogX3
 from miio.integrations.cgllc.airmonitor import AirQualityMonitor, AirQualityMonitorCGDN1
@@ -79,5 +95,33 @@ from miio.protocol import Message, Utils
 from miio.push_server import EventInfo, PushServer
 
 from miio.discovery import Discovery
+
+
+def __getattr__(name):
+    """Create deprecation warnings on classes that are going away."""
+    from warnings import warn
+
+    current_globals = globals()
+
+    def _is_miio_integration(x):
+        """Return True if miio.integrations is in the module 'path'."""
+        module_ = current_globals[x]
+        if "miio.integrations" in str(module_):
+            return True
+
+        return False
+
+    deprecated_module_mapping = {
+        str(x): current_globals[x] for x in current_globals if _is_miio_integration(x)
+    }
+    if new_module := deprecated_module_mapping.get(name):
+        warn(
+            f"Importing {name} directly from 'miio' is deprecated, import {new_module} or use DeviceFactory.create() instead",
+            DeprecationWarning,
+        )
+        return globals()[new_module.__name__]
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __version__ = version("python-miio")

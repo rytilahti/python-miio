@@ -7,13 +7,18 @@ import binascii
 import codecs
 import logging
 import socket
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pprint import pformat as pf
 from typing import Any, Dict, List, Optional
 
 import construct
 
-from .exceptions import DeviceError, DeviceException, RecoverableError
+from .exceptions import (
+    DeviceError,
+    DeviceException,
+    InvalidTokenException,
+    RecoverableError,
+)
 from .protocol import Message
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,7 +53,7 @@ class MiIOProtocol:
 
         self._discovered = False
         # these come from the device, but we initialize them here to make mypy happy
-        self._device_ts: datetime = datetime.utcnow()
+        self._device_ts: datetime = datetime.now(tz=timezone.utc)
         self._device_id = b""
 
     def send_handshake(self, *, retry_count=3) -> Message:
@@ -219,7 +224,7 @@ class MiIOProtocol:
             except KeyError:
                 return payload
         except construct.core.ChecksumError as ex:
-            raise DeviceException(
+            raise InvalidTokenException(
                 "Got checksum error which indicates use "
                 "of an invalid token. "
                 "Please check your token!"

@@ -16,6 +16,7 @@ from typing import (
 
 import attr
 
+from .descriptorcollection import DescriptorCollection
 from .descriptors import (
     AccessFlags,
     ActionDescriptor,
@@ -34,7 +35,7 @@ class _StatusMeta(type):
     def __new__(metacls, name, bases, namespace, **kwargs):
         cls = super().__new__(metacls, name, bases, namespace)
 
-        cls._properties: Dict[str, PropertyDescriptor] = {}
+        cls._descriptors: DescriptorCollection[PropertyDescriptor] = {}
         cls._parent: Optional["DeviceStatus"] = None
         cls._embedded: Dict[str, "DeviceStatus"] = {}
 
@@ -44,9 +45,9 @@ class _StatusMeta(type):
                 descriptor = getattr(prop, "_descriptor", None)
                 if descriptor:
                     _LOGGER.debug(f"Found descriptor for {name} {descriptor}")
-                    if n in cls._properties:
+                    if n in cls._descriptors:
                         raise ValueError(f"Duplicate {n} for {name} {descriptor}")
-                    cls._properties[n] = descriptor
+                    cls._descriptors[n] = descriptor
                     _LOGGER.debug("Created %s.%s: %s", name, n, descriptor)
 
         return cls
@@ -86,24 +87,12 @@ class DeviceStatus(metaclass=_StatusMeta):
         s += ">"
         return s
 
-    def properties(self) -> Dict[str, PropertyDescriptor]:
+    def descriptors(self) -> DescriptorCollection[PropertyDescriptor]:
         """Return the dict of sensors exposed by the status container.
 
         Use @sensor and @setting decorators to define properties.
         """
-        return self._properties  # type: ignore[attr-defined]
-
-    def settings(self) -> Dict[str, PropertyDescriptor]:
-        """Return the dict of settings exposed by the status container.
-
-        This is just a dict of writable properties, see :meth:`properties`.
-        """
-        # TODO: this is not probably worth having, remove?
-        return {
-            prop.id: prop
-            for prop in self.properties().values()
-            if prop.access & AccessFlags.Write
-        }
+        return self._descriptors  # type: ignore[attr-defined]
 
     def embed(self, name: str, other: "DeviceStatus"):
         """Embed another status container to current one.
@@ -117,22 +106,22 @@ class DeviceStatus(metaclass=_StatusMeta):
         self._embedded[name] = other
         other._parent = self  # type: ignore[attr-defined]
 
-        for prop_id, prop in other.properties().items():
-            final_name = f"{name}__{prop_id}"
+        for descriptor_name, prop in other.descriptors().items():
+            final_name = f"{name}__{descriptor_name}"
 
-            self._properties[final_name] = attr.evolve(
+            self._descriptors[final_name] = attr.evolve(
                 prop, status_attribute=final_name
             )
 
     def __dir__(self) -> Iterable[str]:
         """Overridden to include properties from embedded containers."""
-        return list(super().__dir__()) + list(self._embedded) + list(self._properties)
+        return list(super().__dir__()) + list(self._embedded) + list(self._descriptors)
 
     @property
     def __cli_output__(self) -> str:
         """Return a CLI formatted output of the status."""
         out = ""
-        for descriptor in self.properties().values():
+        for descriptor in self.descriptors().values():
             try:
                 value = getattr(self, descriptor.status_attribute)
             except KeyError:
@@ -255,10 +244,6 @@ def setting(
 
         if setter is None and setter_name is None:
             raise Exception("setter_name needs to be defined")
-        if setter_name is None:
-            raise NotImplementedError(
-                "setter not yet implemented, use setter_name instead"
-            )
 
         common_values = {
             "id": qualified_name,
@@ -318,7 +303,7 @@ def action(name: str, *, id: Optional[Union[str, StandardIdentifier]] = None, **
             method=None,
             extras=kwargs,
         )
-        func._action = descriptor
+        func._descriptor = descriptor
 
         return func
 

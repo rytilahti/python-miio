@@ -185,7 +185,7 @@ class Gateway(Device):
             # self.send("get_device_list") does work for the GATEWAY_MODEL_ZIG3 but gives slightly diffrent return values
             devices_raw = self.send("get_device_list")
 
-            if type(devices_raw) != list:
+            if not isinstance(devices_raw, list):
                 _LOGGER.debug(
                     "Gateway response to 'get_device_list' not a list type, no zigbee devices connected."
                 )
@@ -317,8 +317,10 @@ class Gateway(Device):
             return
 
         # Obtain the correct subdevice class
+        # TODO: is there a better way to obtain this information?
         subdevice_cls = getattr(
-            sys.modules["miio.gateway.devices"], model_info.get("class")
+            sys.modules["miio.integrations.lumi.gateway.devices"],
+            model_info.get("class"),
         )
         if subdevice_cls is None:
             subdevice_cls = SubDevice

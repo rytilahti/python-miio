@@ -267,7 +267,7 @@ integration, this library supports also the following devices:
 * Xiaomi Philips Zhirui Bedroom Smart Lamp
 * Huayi Huizuo Lamps
 * Xiaomi Universal IR Remote Controller (Chuangmi IR)
-* Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, ZA5 1C, P5, P9, P10, P11, P15, P18, P33
+* Xiaomi Mi Smart Pedestal Fan V2, V3, SA1, ZA1, ZA3, ZA4, ZA5 1C, P5, P9, P10, P11, P15, P18, P33, P39, P45
 * Xiaomi Rosou SS4 Ventilator (leshow.fan.ss4)
 * Xiaomi Mi Air Humidifier V1, CA1, CA4, CB1, MJJSQ, JSQ, JSQ1, JSQ001
 * Xiaomi Mi Water Purifier (Basic support: Turn on & off)

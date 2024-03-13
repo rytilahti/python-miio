@@ -143,7 +143,7 @@ class TimeAdapter(Adapter):
         return calendar.timegm(obj.timetuple())
 
     def _decode(self, obj, context, path):
-        return datetime.datetime.utcfromtimestamp(obj)
+        return datetime.datetime.fromtimestamp(obj, tz=datetime.timezone.utc)
 
 
 class EncryptionAdapter(Adapter):
@@ -161,6 +161,9 @@ class EncryptionAdapter(Adapter):
 
     def _decode(self, obj, context, path) -> Union[Dict, bytes]:
         """Decrypts the payload using the token stored in the context."""
+        # Missing payload is expected for discovery messages.
+        if not obj:
+            return obj
         try:
             decrypted = Utils.decrypt(obj, context["_"]["token"])
             decrypted = decrypted.rstrip(b"\x00")
@@ -186,6 +189,8 @@ class EncryptionAdapter(Adapter):
             lambda decrypted_bytes: decrypted_bytes.replace(
                 b'"value":00', b'"value":0'
             ),
+            # fix double commas for xiaomi.vacuum.b112, fw: 2.2.4_0049
+            lambda decrypted_bytes: decrypted_bytes.replace(b",,", b","),
         ]
 
         for i, quirk in enumerate(decrypted_quirks):
@@ -214,7 +219,13 @@ Message = Struct(
             "length" / Rebuild(Int16ub, Utils.get_length),
             "unknown" / Default(Int32ub, 0x00000000),
             "device_id" / Hex(Bytes(4)),
-            "ts" / TimeAdapter(Default(Int32ub, datetime.datetime.utcnow())),
+            "ts"
+            / TimeAdapter(
+                Default(
+                    Int32ub,
+                    datetime.datetime.now(tz=datetime.timezone.utc),
+                )
+            ),
         )
     ),
     "checksum"
