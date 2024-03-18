@@ -139,6 +139,8 @@ class Device(metaclass=DeviceGroupMeta):
             self._info = devinfo
             _LOGGER.debug("Detected model %s", devinfo.model)
 
+            self._initialize_descriptors()
+
             return devinfo
         except PayloadDecodeException as ex:
             raise DeviceInfoUnavailableException(
@@ -153,6 +155,9 @@ class Device(metaclass=DeviceGroupMeta):
         This can be overridden to add additional descriptors to the device.
         If you do so, do not forget to call this method.
         """
+        if self._initialized:
+            return
+
         self._descriptors.descriptors_from_object(self)
 
         # Read descriptors from the status class
