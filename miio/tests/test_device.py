@@ -143,9 +143,10 @@ def test_init_signature(cls, mocker):
     """Make sure that __init__ of every device-inheriting class accepts the expected
     parameters."""
     mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
     parent_init = mocker.spy(Device, "__init__")
     kwargs = {
-        "ip": "IP",
+        "ip": "127.123.123.123",
         "token": None,
         "start_id": 0,
         "debug": False,

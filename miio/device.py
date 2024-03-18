@@ -139,8 +139,6 @@ class Device(metaclass=DeviceGroupMeta):
             self._info = devinfo
             _LOGGER.debug("Detected model %s", devinfo.model)
 
-            self._initialize_descriptors()
-
             return devinfo
         except PayloadDecodeException as ex:
             raise DeviceInfoUnavailableException(

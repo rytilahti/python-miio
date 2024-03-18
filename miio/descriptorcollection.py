@@ -13,6 +13,7 @@ from .descriptors import (
     PropertyDescriptor,
     RangeDescriptor,
 )
+from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -107,11 +108,10 @@ class DescriptorCollection(UserDict, Generic[T]):
         if prop.access & AccessFlags.Write and prop.setter is None:
             raise ValueError(f"Neither setter or setter_name was defined for {prop}")
 
+        # TODO: temporary hack as this should not cause I/O nor fail
         try:
             self._handle_constraints(prop)
-        except (
-            Exception
-        ) as ex:  # TODO: temporary hack as this should not cause I/O nor fail
+        except DeviceException as ex:
             _LOGGER.error("Adding constraints failed: %s", ex)
 
     def _handle_constraints(self, prop: PropertyDescriptor) -> None:
