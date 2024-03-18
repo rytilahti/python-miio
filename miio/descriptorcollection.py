@@ -42,10 +42,11 @@ class DescriptorCollection(UserDict, Generic[T]):
         2. Going through all members and looking if they have a '_descriptor' attribute set by a decorator
         """
         _LOGGER.debug("Adding descriptors from %s", obj)
+        descriptors_to_add = []
         # 1. Check for existence of _descriptors as DeviceStatus' metaclass collects them already
         if descriptors := getattr(obj, "_descriptors"):  # noqa: B009
             for _name, desc in descriptors.items():
-                self.add_descriptor(desc)
+                descriptors_to_add.append(desc)
 
         # 2. Check if object members have descriptors
         for _name, method in getmembers(obj, lambda o: hasattr(o, "_descriptor")):
@@ -55,7 +56,10 @@ class DescriptorCollection(UserDict, Generic[T]):
                 continue
 
             prop_desc.method = method
-            self.add_descriptor(prop_desc)
+            descriptors_to_add.append(prop_desc)
+
+        for desc in descriptors_to_add:
+            self.add_descriptor(desc)
 
     def add_descriptor(self, descriptor: Descriptor):
         """Add a descriptor to the collection.
