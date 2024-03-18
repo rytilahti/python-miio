@@ -1,5 +1,6 @@
 import logging
 from collections import UserDict
+from enum import Enum
 from inspect import getmembers
 from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
@@ -121,7 +122,11 @@ class DescriptorCollection(UserDict, Generic[T]):
                 retrieve_choices_function = getattr(
                     self._device, prop.choices_attribute
                 )
-                prop.choices = retrieve_choices_function()
+                choices = retrieve_choices_function()
+                if isinstance(choices, dict):
+                    prop.choices = Enum(f"GENERATED_ENUM_{prop.name}", choices)
+                else:
+                    prop.choices = choices
 
             if prop.choices is None:
                 raise ValueError(
