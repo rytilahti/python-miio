@@ -279,6 +279,17 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @setting(
+        "Fanspeed preset",
+        choices_attribute="fan_speed_presets",
+        setter_name="set_fan_speed_preset",
+        icon="mdi:fan",
+        id=VacuumId.FanSpeedPreset,
+    )
+    def fan_speed_preset(self):
+        return self.data["fan_power"]
+
+    @property
+    @setting(
         "Mop scrub intensity",
         choices=MopIntensity,
         setter_name="set_mop_intensity",
