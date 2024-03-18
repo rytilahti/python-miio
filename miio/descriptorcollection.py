@@ -106,7 +106,12 @@ class DescriptorCollection(UserDict, Generic[T]):
         if prop.access & AccessFlags.Write and prop.setter is None:
             raise ValueError(f"Neither setter or setter_name was defined for {prop}")
 
-        self._handle_constraints(prop)
+        try:
+            self._handle_constraints(prop)
+        except (
+            Exception
+        ) as ex:  # TODO: temporary hack as this should not cause I/O nor fail
+            _LOGGER.error("Adding constraints failed: %s", ex)
 
     def _handle_constraints(self, prop: PropertyDescriptor) -> None:
         """Set attribute-based constraints for the descriptor."""
