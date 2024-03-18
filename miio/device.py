@@ -153,6 +153,9 @@ class Device(metaclass=DeviceGroupMeta):
         This can be overridden to add additional descriptors to the device.
         If you do so, do not forget to call this method.
         """
+        if self._initialized:
+            return
+
         self._descriptors.descriptors_from_object(self)
 
         # Read descriptors from the status class

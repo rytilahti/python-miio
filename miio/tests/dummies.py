@@ -1,4 +1,4 @@
-from miio import DeviceError
+from miio import DescriptorCollection, DeviceError
 
 
 class DummyMiIOProtocol:
@@ -46,6 +46,8 @@ class DummyDevice:
         self._settings = {}
         self._sensors = {}
         self._actions = {}
+        self._initialized = False
+        self._descriptors = DescriptorCollection(device=self)
         # TODO: ugly hack to check for pre-existing _model
         if getattr(self, "_model", None) is None:
             self._model = "dummy.model"

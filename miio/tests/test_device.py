@@ -143,9 +143,10 @@ def test_init_signature(cls, mocker):
     """Make sure that __init__ of every device-inheriting class accepts the expected
     parameters."""
     mocker.patch("miio.Device.send")
+    mocker.patch("miio.Device.send_handshake")
     parent_init = mocker.spy(Device, "__init__")
     kwargs = {
-        "ip": "IP",
+        "ip": "127.123.123.123",
         "token": None,
         "start_id": 0,
         "debug": False,
@@ -181,7 +182,9 @@ def test_supports_miot(mocker):
     assert d.supports_miot() is True
 
 
-@pytest.mark.parametrize("getter_name", ["actions", "settings", "sensors"])
+@pytest.mark.parametrize(
+    "getter_name", ["actions", "settings", "sensors", "descriptors"]
+)
 def test_cached_descriptors(getter_name, mocker, caplog):
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
     getter = getattr(d, getter_name)

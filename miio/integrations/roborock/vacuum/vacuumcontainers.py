@@ -192,6 +192,7 @@ class VacuumStatus(DeviceStatus):
             self.state_code, f"Unknown state (code: {self.state_code})"
         )
 
+    @property
     @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return vacuum state."""
@@ -275,6 +276,17 @@ class VacuumStatus(DeviceStatus):
             # values 100+ are reserved for presets
             return None
         return fan_power
+
+    @property
+    @setting(
+        "Fanspeed preset",
+        choices_attribute="fan_speed_presets",
+        setter_name="set_fan_speed_preset",
+        icon="mdi:fan",
+        id=VacuumId.FanSpeedPreset,
+    )
+    def fan_speed_preset(self):
+        return self.data["fan_power"]
 
     @property
     @setting(
