@@ -1,3 +1,5 @@
+from enum import Enum
+
 import pytest
 
 from miio import (
@@ -119,8 +121,6 @@ def test_handle_enum_constraints(dummy_device, mocker):
         "status_attribute": "attr",
     }
 
-    mocker.patch.object(dummy_device, "choices_attr", create=True)
-
     # Check that error is raised if choices are missing
     invalid = EnumDescriptor(id="missing", **data)
     with pytest.raises(
@@ -128,13 +128,32 @@ def test_handle_enum_constraints(dummy_device, mocker):
     ):
         coll.add_descriptor(invalid)
 
-    # Check that binding works
+    # Check that enum binding works
+    mocker.patch.object(
+        dummy_device,
+        "choices_attr",
+        create=True,
+        return_value=Enum("test enum", {"foo": 1}),
+    )
     choices_attribute = EnumDescriptor(
         id="with_choices_attr", choices_attribute="choices_attr", **data
     )
     coll.add_descriptor(choices_attribute)
     assert len(coll) == 1
-    assert coll["with_choices_attr"].choices is not None
+
+    assert issubclass(coll["with_choices_attr"].choices, Enum)
+
+    # Check that dict binding works
+    mocker.patch.object(
+        dummy_device, "choices_attr_dict", create=True, return_value={"test": "dict"}
+    )
+    choices_attribute_dict = EnumDescriptor(
+        id="with_choices_attr_dict", choices_attribute="choices_attr_dict", **data
+    )
+    coll.add_descriptor(choices_attribute_dict)
+    assert len(coll) == 2
+
+    assert issubclass(coll["with_choices_attr_dict"].choices, Enum)
 
 
 def test_handle_range_constraints(dummy_device, mocker):
