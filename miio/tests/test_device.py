@@ -182,7 +182,9 @@ def test_supports_miot(mocker):
     assert d.supports_miot() is True
 
 
-@pytest.mark.parametrize("getter_name", ["actions", "settings", "sensors"])
+@pytest.mark.parametrize(
+    "getter_name", ["actions", "settings", "sensors", "descriptors"]
+)
 def test_cached_descriptors(getter_name, mocker, caplog):
     d = Device("127.0.0.1", "68ffffffffffffffffffffffffffffff")
     getter = getattr(d, getter_name)

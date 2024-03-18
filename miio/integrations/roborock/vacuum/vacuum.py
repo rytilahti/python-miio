@@ -1066,10 +1066,12 @@ class RoborockVacuum(Device):
 
         Overridden to collect descriptors also from the update helper.
         """
-        if not self._initialized:
-            super()._initialize_descriptors()
-            res = self.status()
-            self._descriptors.descriptors_from_object(res)
+        if self._initialized:
+            return
+
+        super()._initialize_descriptors()
+        res = self.status()
+        self._descriptors.descriptors_from_object(res)
 
     @classmethod
     def get_device_group(cls):
