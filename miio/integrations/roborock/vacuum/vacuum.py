@@ -1061,6 +1061,16 @@ class RoborockVacuum(Device):
         """
         return self.send("get_fw_features")
 
+    def _initialize_descriptors(self) -> None:
+        """Initialize device descriptors.
+
+        Overridden to collect descriptors also from the update helper.
+        """
+        if not self._initialized:
+            super()._initialize_descriptors()
+            res = self.status()
+            self._descriptors.descriptors_from_object(res)
+
     @classmethod
     def get_device_group(cls):
         @click.pass_context
