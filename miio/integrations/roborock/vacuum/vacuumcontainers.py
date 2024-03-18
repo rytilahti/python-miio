@@ -192,6 +192,7 @@ class VacuumStatus(DeviceStatus):
             self.state_code, f"Unknown state (code: {self.state_code})"
         )
 
+    @property
     @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return vacuum state."""
