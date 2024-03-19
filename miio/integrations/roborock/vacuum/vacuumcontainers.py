@@ -205,6 +205,14 @@ class VacuumStatus(DeviceStatus):
         return STATE_CODE_TO_VACUUMSTATE.get(self.state_code, VacuumState.Unknown)
 
     @property
+    @sensor("Cleaning Progress", icon="mdi:progress-check", unit="%")
+    def clean_percent(self) -> Optional[int]:
+        """Return progress of the current clean."""
+        if "clean_percent" in self.data:
+            return int(self.data["clean_percent"])
+        return None
+
+    @property
     @sensor(
         "Error code",
         icon="mdi:alert",
