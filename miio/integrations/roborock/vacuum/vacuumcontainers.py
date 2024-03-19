@@ -186,7 +186,12 @@ class VacuumStatus(DeviceStatus):
         return int(self.data["state"])
 
     @property
-    @sensor("State", entity_category="diagnostic")
+    @sensor(
+        "State",
+        device_class="enum",
+        entity_category="diagnostic",
+        options=list(STATE_CODE_TO_STRING.values()),
+    )
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
         return STATE_CODE_TO_STRING.get(
@@ -327,7 +332,12 @@ class VacuumStatus(DeviceStatus):
         return pretty_seconds(self.data["clean_time"])
 
     @property
-    @sensor("Current clean area", unit="m²", icon="mdi:texture-box")
+    @sensor(
+        "Current clean area",
+        unit="m²",
+        icon="mdi:texture-box",
+        suggested_display_precision=2,
+    )
     def clean_area(self) -> float:
         """Cleaned area in m2."""
         return pretty_area(self.data["clean_area"])
@@ -502,6 +512,7 @@ class CleaningSummary(DeviceStatus):
         unit="m²",
         icon="mdi:texture-box",
         entity_category="diagnostic",
+        suggested_display_precision=2,
     )
     def total_area(self) -> float:
         """Total cleaned area."""
@@ -598,6 +609,7 @@ class CleaningDetails(DeviceStatus):
         unit="m²",
         icon="mdi:texture-box",
         entity_category="diagnostic",
+        suggested_display_precision=2,
     )
     def area(self) -> float:
         """Total cleaned area."""
