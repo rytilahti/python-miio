@@ -254,7 +254,7 @@ class VacuumStatus(DeviceStatus):
             return "Definition missing for dock error %s" % self.dock_error_code
 
     @property
-    @sensor("Battery", unit="%", id=VacuumId.Battery)
+    @sensor("Battery", unit="%", device_class="battery", id=VacuumId.Battery)
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return int(self.data["battery"])
@@ -397,7 +397,7 @@ class VacuumStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Water level low", icon="mdi:water-alert-outline")
+    @sensor("Water level low", device_class="problem", icon="mdi:water-alert-outline")
     def is_water_shortage(self) -> Optional[bool]:
         """Returns True if water is low in the tank, None if sensor not present."""
         if "water_shortage_status" in self.data:
@@ -420,7 +420,10 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @sensor(
-        "Error", icon="mdi:alert", entity_category="diagnostic", enabled_default=False
+        "Error",
+        entity_category="diagnostic",
+        device_class="problem",
+        enabled_default=False,
     )
     def got_error(self) -> bool:
         """True if an error has occurred."""
@@ -432,6 +435,7 @@ class VacuumStatus(DeviceStatus):
         icon="mdi:tumble-dryer",
         entity_category="diagnostic",
         enabled_default=False,
+        device_class="heat",
     )
     def is_mop_drying(self) -> Optional[bool]:
         """Return if mop drying is running."""
@@ -444,6 +448,7 @@ class VacuumStatus(DeviceStatus):
         "Dryer remaining seconds",
         unit="s",
         entity_category="diagnostic",
+        device_class="duration",
         enabled_default=False,
     )
     def mop_dryer_remaining_seconds(self) -> Optional[timedelta]:
