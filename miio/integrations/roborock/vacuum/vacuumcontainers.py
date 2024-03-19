@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Union
+from urllib import parse
 
 from croniter import croniter
 from pytz import BaseTzInfo
@@ -110,7 +111,7 @@ class MapList(DeviceStatus):
 
         self._map_name_dict = {}
         for map in self.data["map_info"]:
-            self._map_name_dict[map["name"]] = map["mapFlag"]
+            self._map_name_dict[parse.unquote(map["name"])] = map["mapFlag"]
 
     @property
     def map_count(self) -> int:
