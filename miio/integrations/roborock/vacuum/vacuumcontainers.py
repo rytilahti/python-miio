@@ -262,7 +262,7 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @setting(
-        "Fanspeed",
+        "Fan speed",
         unit="%",
         setter_name="set_fan_speed",
         min_value=0,
@@ -798,7 +798,7 @@ class DNDStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Do not disturb", icon="mdi:minus-circle-off", entity_category="diagnostic")
+    @sensor("Do not disturb", icon="mdi:bell-cancel", entity_category="diagnostic")
     def enabled(self) -> bool:
         """True if DnD is enabled."""
         return bool(self.data["enabled"])
@@ -806,7 +806,7 @@ class DNDStatus(DeviceStatus):
     @property
     @sensor(
         "Do not disturb start",
-        icon="mdi:minus-circle-off",
+        icon="mdi:bell-cancel",
         device_class="timestamp",
         entity_category="diagnostic",
         enabled_default=False,
@@ -818,7 +818,7 @@ class DNDStatus(DeviceStatus):
     @property
     @sensor(
         "Do not disturb end",
-        icon="mdi:minus-circle-off",
+        icon="mdi:bell-ring",
         device_class="timestamp",
         entity_category="diagnostic",
         enabled_default=False,
