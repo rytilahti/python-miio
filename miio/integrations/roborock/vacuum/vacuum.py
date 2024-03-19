@@ -47,6 +47,7 @@ from .vacuumcontainers import (
     CarpetModeStatus,
     CleaningDetails,
     CleaningSummary,
+    ConnectivityStatus,
     ConsumableStatus,
     DNDStatus,
     MapList,
@@ -155,6 +156,7 @@ class RoborockVacuum(Device):
         self._map_enum_cache = None
         self._status_helper = UpdateHelper(self.vacuum_status)
         self._status_helper.add_update_method("consumables", self.consumable_status)
+        self._status_helper.add_update_method("connectivity", self.connectivity_status)
         self._status_helper.add_update_method("dnd_status", self.dnd_status)
         self._status_helper.add_update_method("clean_history", self.clean_history)
         self._status_helper.add_update_method("last_clean", self.last_clean_details)
@@ -619,6 +621,11 @@ class RoborockVacuum(Device):
         # {'result': [{'enabled': 1, 'start_minute': 0, 'end_minute': 0,
         #  'start_hour': 22, 'end_hour': 8}], 'id': 1}
         return DNDStatus(self.send("get_dnd_timer")[0])
+
+    @command()
+    def connectivity_status(self) -> ConnectivityStatus:
+        """Returns WiFi connectivity information."""
+        return ConnectivityStatus(self.info(skip_cache=True))
 
     @command(
         click.argument("start_hr", type=int),
