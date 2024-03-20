@@ -1,5 +1,6 @@
 import logging
 from collections import UserDict
+from enum import Enum
 from inspect import getmembers
 from typing import TYPE_CHECKING, Generic, TypeVar, cast
 
@@ -12,6 +13,7 @@ from .descriptors import (
     PropertyDescriptor,
     RangeDescriptor,
 )
+from .exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,10 +44,11 @@ class DescriptorCollection(UserDict, Generic[T]):
         2. Going through all members and looking if they have a '_descriptor' attribute set by a decorator
         """
         _LOGGER.debug("Adding descriptors from %s", obj)
+        descriptors_to_add = []
         # 1. Check for existence of _descriptors as DeviceStatus' metaclass collects them already
         if descriptors := getattr(obj, "_descriptors"):  # noqa: B009
             for _name, desc in descriptors.items():
-                self.add_descriptor(desc)
+                descriptors_to_add.append(desc)
 
         # 2. Check if object members have descriptors
         for _name, method in getmembers(obj, lambda o: hasattr(o, "_descriptor")):
@@ -55,7 +58,10 @@ class DescriptorCollection(UserDict, Generic[T]):
                 continue
 
             prop_desc.method = method
-            self.add_descriptor(prop_desc)
+            descriptors_to_add.append(prop_desc)
+
+        for desc in descriptors_to_add:
+            self.add_descriptor(desc)
 
     def add_descriptor(self, descriptor: Descriptor):
         """Add a descriptor to the collection.
@@ -102,7 +108,11 @@ class DescriptorCollection(UserDict, Generic[T]):
         if prop.access & AccessFlags.Write and prop.setter is None:
             raise ValueError(f"Neither setter or setter_name was defined for {prop}")
 
-        self._handle_constraints(prop)
+        # TODO: temporary hack as this should not cause I/O nor fail
+        try:
+            self._handle_constraints(prop)
+        except DeviceException as ex:
+            _LOGGER.error("Adding constraints failed: %s", ex)
 
     def _handle_constraints(self, prop: PropertyDescriptor) -> None:
         """Set attribute-based constraints for the descriptor."""
@@ -112,7 +122,11 @@ class DescriptorCollection(UserDict, Generic[T]):
                 retrieve_choices_function = getattr(
                     self._device, prop.choices_attribute
                 )
-                prop.choices = retrieve_choices_function()
+                choices = retrieve_choices_function()
+                if isinstance(choices, dict):
+                    prop.choices = Enum(f"GENERATED_ENUM_{prop.name}", choices)
+                else:
+                    prop.choices = choices
 
             if prop.choices is None:
                 raise ValueError(

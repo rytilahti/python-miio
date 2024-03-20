@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any, Dict, List, Optional, Union
+from urllib import parse
 
 from croniter import croniter
 from pytz import BaseTzInfo
@@ -110,7 +111,7 @@ class MapList(DeviceStatus):
 
         self._map_name_dict = {}
         for map in self.data["map_info"]:
-            self._map_name_dict[map["name"]] = map["mapFlag"]
+            self._map_name_dict[parse.unquote(map["name"])] = map["mapFlag"]
 
     @property
     def map_count(self) -> int:
@@ -185,17 +186,31 @@ class VacuumStatus(DeviceStatus):
         return int(self.data["state"])
 
     @property
-    @sensor("State", entity_category="diagnostic")
+    @sensor(
+        "State",
+        device_class="enum",
+        entity_category="diagnostic",
+        options=list(STATE_CODE_TO_STRING.values()),
+    )
     def state(self) -> str:
         """Human readable state description, see also :func:`state_code`."""
         return STATE_CODE_TO_STRING.get(
             self.state_code, f"Unknown state (code: {self.state_code})"
         )
 
+    @property
     @sensor("Vacuum state", id=VacuumId.State)
     def vacuum_state(self) -> VacuumState:
         """Return vacuum state."""
         return STATE_CODE_TO_VACUUMSTATE.get(self.state_code, VacuumState.Unknown)
+
+    @property
+    @sensor("Cleaning Progress", icon="mdi:progress-check", unit="%")
+    def clean_percent(self) -> Optional[int]:
+        """Return progress of the current clean."""
+        if "clean_percent" in self.data:
+            return int(self.data["clean_percent"])
+        return None
 
     @property
     @sensor(
@@ -213,6 +228,8 @@ class VacuumStatus(DeviceStatus):
         "Error string",
         id=VacuumId.ErrorMessage,
         icon="mdi:alert",
+        device_class="enum",
+        options=list(ERROR_CODES.values()),
         entity_category="diagnostic",
         enabled_default=False,
     )
@@ -240,6 +257,8 @@ class VacuumStatus(DeviceStatus):
     @sensor(
         "Dock error string",
         icon="mdi:alert",
+        device_class="enum",
+        options=list(dock_error_codes.values()),
         entity_category="diagnostic",
         enabled_default=False,
     )
@@ -253,14 +272,14 @@ class VacuumStatus(DeviceStatus):
             return "Definition missing for dock error %s" % self.dock_error_code
 
     @property
-    @sensor("Battery", unit="%", id=VacuumId.Battery)
+    @sensor("Battery", unit="%", device_class="battery", id=VacuumId.Battery)
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return int(self.data["battery"])
 
     @property
     @setting(
-        "Fanspeed",
+        "Fan speed",
         unit="%",
         setter_name="set_fan_speed",
         min_value=0,
@@ -275,6 +294,17 @@ class VacuumStatus(DeviceStatus):
             # values 100+ are reserved for presets
             return None
         return fan_power
+
+    @property
+    @setting(
+        "Fanspeed preset",
+        choices_attribute="fan_speed_presets",
+        setter_name="set_fan_speed_preset",
+        icon="mdi:fan",
+        id=VacuumId.FanSpeedPreset,
+    )
+    def fan_speed_preset(self):
+        return self.data["fan_power"]
 
     @property
     @setting(
@@ -314,7 +344,12 @@ class VacuumStatus(DeviceStatus):
         return pretty_seconds(self.data["clean_time"])
 
     @property
-    @sensor("Current clean area", unit="m²", icon="mdi:texture-box")
+    @sensor(
+        "Current clean area",
+        unit="m²",
+        icon="mdi:texture-box",
+        suggested_display_precision=2,
+    )
     def clean_area(self) -> float:
         """Cleaned area in m2."""
         return pretty_area(self.data["clean_area"])
@@ -385,7 +420,7 @@ class VacuumStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Water level low", icon="mdi:water-alert-outline")
+    @sensor("Water level low", device_class="problem", icon="mdi:water-alert-outline")
     def is_water_shortage(self) -> Optional[bool]:
         """Returns True if water is low in the tank, None if sensor not present."""
         if "water_shortage_status" in self.data:
@@ -408,7 +443,10 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @sensor(
-        "Error", icon="mdi:alert", entity_category="diagnostic", enabled_default=False
+        "Error",
+        entity_category="diagnostic",
+        device_class="problem",
+        enabled_default=False,
     )
     def got_error(self) -> bool:
         """True if an error has occurred."""
@@ -420,6 +458,7 @@ class VacuumStatus(DeviceStatus):
         icon="mdi:tumble-dryer",
         entity_category="diagnostic",
         enabled_default=False,
+        device_class="heat",
     )
     def is_mop_drying(self) -> Optional[bool]:
         """Return if mop drying is running."""
@@ -432,6 +471,7 @@ class VacuumStatus(DeviceStatus):
         "Dryer remaining seconds",
         unit="s",
         entity_category="diagnostic",
+        device_class="duration",
         enabled_default=False,
     )
     def mop_dryer_remaining_seconds(self) -> Optional[timedelta]:
@@ -484,6 +524,7 @@ class CleaningSummary(DeviceStatus):
         unit="m²",
         icon="mdi:texture-box",
         entity_category="diagnostic",
+        suggested_display_precision=2,
     )
     def total_area(self) -> float:
         """Total cleaned area."""
@@ -580,6 +621,7 @@ class CleaningDetails(DeviceStatus):
         unit="m²",
         icon="mdi:texture-box",
         entity_category="diagnostic",
+        suggested_display_precision=2,
     )
     def area(self) -> float:
         """Total cleaned area."""
@@ -780,7 +822,7 @@ class DNDStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Do not disturb", icon="mdi:minus-circle-off", entity_category="diagnostic")
+    @sensor("Do not disturb", icon="mdi:bell-cancel", entity_category="diagnostic")
     def enabled(self) -> bool:
         """True if DnD is enabled."""
         return bool(self.data["enabled"])
@@ -788,7 +830,7 @@ class DNDStatus(DeviceStatus):
     @property
     @sensor(
         "Do not disturb start",
-        icon="mdi:minus-circle-off",
+        icon="mdi:bell-cancel",
         device_class="timestamp",
         entity_category="diagnostic",
         enabled_default=False,
@@ -800,7 +842,7 @@ class DNDStatus(DeviceStatus):
     @property
     @sensor(
         "Do not disturb end",
-        icon="mdi:minus-circle-off",
+        icon="mdi:bell-ring",
         device_class="timestamp",
         entity_category="diagnostic",
         enabled_default=False,

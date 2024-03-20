@@ -14,7 +14,7 @@ You can install the most recent release using pip:
     pip install python-miio
 
 
-Alternatively, you can clone this repository and use poetry to install the current master:
+Alternatively, you can clone this repository and use `poetry <https://python-poetry.org>`_ to install the current master:
 
 .. code-block:: console
 
