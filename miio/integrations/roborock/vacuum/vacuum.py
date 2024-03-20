@@ -127,6 +127,8 @@ AUTO_EMPTY_MODELS = [
     ROCKROBO_Q_REVO,
 ]
 
+MODELS_WITH_MOP = [ROCKROBO_S7, ROCKROBO_S7_MAXV, ROCKROBO_Q_REVO]
+
 
 class RoborockVacuum(Device):
     """Main class for roborock vacuums (roborock.vacuum.*)."""
@@ -981,7 +983,7 @@ class RoborockVacuum(Device):
     @command()
     def mop_intensity(self) -> MopIntensity:
         """Get mop scrub intensity setting."""
-        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
+        if self.model not in MODELS_WITH_MOP:
             raise UnsupportedFeatureException(
                 "Mop scrub intensity not supported by %s", self.model
             )
@@ -991,7 +993,7 @@ class RoborockVacuum(Device):
     @command(click.argument("mop_intensity", type=EnumType(MopIntensity)))
     def set_mop_intensity(self, mop_intensity: MopIntensity):
         """Set mop scrub intensity setting."""
-        if self.model not in [ROCKROBO_S7, ROCKROBO_S7_MAXV]:
+        if self.model not in MODELS_WITH_MOP:
             raise UnsupportedFeatureException(
                 "Mop scrub intensity not supported by %s", self.model
             )
