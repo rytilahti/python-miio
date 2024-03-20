@@ -228,6 +228,8 @@ class VacuumStatus(DeviceStatus):
         "Error string",
         id=VacuumId.ErrorMessage,
         icon="mdi:alert",
+        device_class="enum",
+        options=list(ERROR_CODES.values()),
         entity_category="diagnostic",
         enabled_default=False,
     )
@@ -255,6 +257,8 @@ class VacuumStatus(DeviceStatus):
     @sensor(
         "Dock error string",
         icon="mdi:alert",
+        device_class="enum",
+        options=list(dock_error_codes.values()),
         entity_category="diagnostic",
         enabled_default=False,
     )
