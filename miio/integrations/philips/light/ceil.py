@@ -147,7 +147,6 @@ class Ceil(Device):
     )
     def delay_off(self, seconds: int):
         """Turn off delay in seconds."""
-
         if seconds < 1:
             raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 

@@ -140,7 +140,7 @@ class MiIOProtocol:
             except socket.timeout:
                 if is_broadcast:
                     _LOGGER.info("Discovery done")
-                return  # ignore timeouts on discover
+                return None  # ignore timeouts on discover
             except Exception as ex:
                 _LOGGER.warning("error while reading discover results: %s", ex)
                 break
@@ -151,7 +151,7 @@ class MiIOProtocol:
         parameters: Optional[Any] = None,
         retry_count: int = 3,
         *,
-        extra_parameters: Optional[Dict] = None
+        extra_parameters: Optional[Dict] = None,
     ) -> Any:
         """Build and send the given command. Note that this will implicitly call
         :func:`send_handshake` to do a handshake, and will re-try in case of errors
@@ -163,7 +163,6 @@ class MiIOProtocol:
         :param dict extra_parameters: Extra top-level parameters
         :raises DeviceException: if an error has occurred during communication.
         """
-
         if not self.lazy_discover or not self._discovered:
             self.send_handshake()
 

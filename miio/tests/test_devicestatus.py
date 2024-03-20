@@ -293,7 +293,6 @@ def test_embed():
 
 def test_cli_output(dummy_status):
     """Test the cli output string."""
-
     expected_regex = [
         "r-- sensor_without_unit (.+?): 1",
         "r-- sensor_with_unit (.+?): 2 V",

@@ -101,7 +101,7 @@ class CloudInterface:
             return
 
         try:
-            from micloud import MiCloud  # noqa: F811
+            from micloud import MiCloud
             from micloud.micloudexception import MiCloudAccessDenied
         except ImportError:
             raise CloudException(
@@ -180,14 +180,13 @@ def cloud(ctx: click.Context, username, password):
 @click.option("--raw", is_flag=True, default=False)
 def cloud_list(ctx: click.Context, locale: Optional[str], raw: bool):
     """List devices connected to the cloud account."""
-
     ci = ctx.obj
 
     devices = ci.get_devices(locale=locale)
 
     if raw:
         jsonified = json.dumps([dev.raw_data for dev in devices.values()], indent=4)
-        print(jsonified)  # noqa: T201
+        print(jsonified)
         return
 
     for dev in devices.values():

@@ -459,7 +459,8 @@ class DreameVacuumStatus(DeviceStatusContainer):
     @property
     def is_water_box_carriage_attached(self) -> Optional[bool]:
         """Return True if water box carriage (mop) is installed, None if sensor not
-        present."""
+        present.
+        """
         if "water_box_carriage_status" in self.data:
             return self.data["water_box_carriage_status"] == 1
         return None
@@ -505,7 +506,6 @@ class DreameVacuum(MiotDevice):
     )
     def status(self) -> DreameVacuumStatus:
         """State of the vacuum."""
-
         return DreameVacuumStatus(
             {
                 prop["did"]: prop.get("value") if prop.get("code") == 0 else None
@@ -567,7 +567,7 @@ class DreameVacuum(MiotDevice):
         fanspeed = dreame_vacuum_status.cleaning_mode
         if not fanspeed or fanspeed.value == -1:
             _LOGGER.warning("Unknown fanspeed value received")
-            return
+            return None
         return {fanspeed.name: fanspeed.value}
 
     @command(click.argument("speed", type=int))
@@ -579,7 +579,7 @@ class DreameVacuum(MiotDevice):
         fanspeeds_enum = _get_cleaning_mode_enum_class(self.model)
         fanspeed = None
         if not fanspeeds_enum:
-            return
+            return None
         try:
             fanspeed = fanspeeds_enum(speed)
         except ValueError:
@@ -612,7 +612,7 @@ class DreameVacuum(MiotDevice):
         waterflow = dreame_vacuum_status.water_flow
         if not waterflow or waterflow.value == -1:
             _LOGGER.warning("Unknown waterflow value received")
-            return
+            return None
         return {waterflow.name: waterflow.value}
 
     @command(click.argument("value", type=int))
@@ -713,7 +713,7 @@ class DreameVacuum(MiotDevice):
                 click.echo(
                     "You need to pass md5 and file size when using URL for updating."
                 )
-                return
+                return None
             local_url = url
         else:
             server = OneShotServer(file=url)

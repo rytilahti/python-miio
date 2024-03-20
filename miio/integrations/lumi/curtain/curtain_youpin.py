@@ -139,7 +139,6 @@ class CurtainMiot(MiotDevice):
     )
     def status(self) -> CurtainStatus:
         """Retrieve properties."""
-
         return CurtainStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None

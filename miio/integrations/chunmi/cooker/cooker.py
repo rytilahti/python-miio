@@ -209,9 +209,7 @@ class CookingStage(DeviceStatus):
 
     @property
     def state(self) -> int:
-        """
-
-        10: Cooking finished
+        """10: Cooking finished
         11: Cooking finished
         12: Cooking finished
         """
@@ -617,7 +615,7 @@ class Cooker(Device):
         Some cookers doesn't support a list of properties here. Therefore "all" properties
         are requested. If the property count or order changes the property list above must
         be updated.
-        """  # noqa: B018
+        """
         values = self.send("get_prop", ["all"])
 
         properties_count = len(properties)

@@ -180,47 +180,46 @@ class RoidmiVacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
     def __init__(self, data):
-        """
-        Response (MIoT format) of a Roidme Eve Plus (roidmi.vacuum.v60)::
+        """Response (MIoT format) of a Roidme Eve Plus (roidmi.vacuum.v60)::
 
-            [
-                 {'did': 'battery_level', 'siid': 3, 'piid': 1},
-                 {'did': 'charging_state', 'siid': 3, 'piid': 2},
-                 {'did': 'error_code', 'siid': 2, 'piid': 2},
-                 {'did': 'state', 'siid': 2, 'piid': 1},
-                 {'did': 'filter_life_level', 'siid': 10, 'piid': 1},
-                 {'did': 'filter_left_minutes', 'siid': 10, 'piid': 2},
-                 {'did': 'main_brush_left_minutes', 'siid': 11, 'piid': 1},
-                 {'did': 'main_brush_life_level', 'siid': 11, 'piid': 2},
-                 {'did': 'side_brushes_left_minutes', 'siid': 12, 'piid': 1},
-                 {'did': 'side_brushes_life_level', 'siid': 12, 'piid': 2},
-                 {'did': 'sensor_dirty_time_left_minutes', 'siid': 15, 'piid': 1},
-                 {'did': 'sensor_dirty_remaning_level', 'siid': 15, 'piid': 2},
-                 {'did': 'sweep_mode', 'siid': 14, 'piid': 1},
-                 {'did': 'fanspeed_mode', 'siid': 2, 'piid': 4},
-                 {'did': 'sweep_type', 'siid': 2, 'piid': 8}
-                 {'did': 'path_mode', 'siid': 13, 'piid': 8},
-                 {'did': 'mop_present', 'siid': 8, 'piid': 1},
-                 {'did': 'work_station_freq', 'siid': 8, 'piid': 2},
-                 {'did': 'timing', 'siid': 8, 'piid': 6},
-                 {'did': 'clean_area', 'siid': 8, 'piid': 7},
-                 {'did': 'auto_boost', 'siid': 8, 'piid': 9},
-                 {'did': 'forbid_mode', 'siid': 8, 'piid': 10},
-                 {'did': 'water_level', 'siid': 8, 'piid': 11},
-                 {'did': 'total_clean_time_sec', 'siid': 8, 'piid': 13},
-                 {'did': 'total_clean_areas', 'siid': 8, 'piid': 14},
-                 {'did': 'clean_counts', 'siid': 8, 'piid': 18},
-                 {'did': 'clean_time_sec', 'siid': 8, 'piid': 19},
-                 {'did': 'double_clean', 'siid': 8, 'piid': 20},
-                 {'did': 'led_switch', 'siid': 8, 'piid': 22}
-                 {'did': 'lidar_collision', 'siid': 8, 'piid': 23},
-                 {'did': 'station_key', 'siid': 8, 'piid': 24},
-                 {'did': 'station_led', 'siid': 8, 'piid': 25},
-                 {'did': 'current_audio', 'siid': 8, 'piid': 26},
-                 {'did': 'station_type', 'siid': 8, 'piid': 29},
-                 {'did': 'volume', 'siid': 9, 'piid': 1},
-                 {'did': 'mute', 'siid': 9, 'piid': 2}
-            ]
+        [
+             {'did': 'battery_level', 'siid': 3, 'piid': 1},
+             {'did': 'charging_state', 'siid': 3, 'piid': 2},
+             {'did': 'error_code', 'siid': 2, 'piid': 2},
+             {'did': 'state', 'siid': 2, 'piid': 1},
+             {'did': 'filter_life_level', 'siid': 10, 'piid': 1},
+             {'did': 'filter_left_minutes', 'siid': 10, 'piid': 2},
+             {'did': 'main_brush_left_minutes', 'siid': 11, 'piid': 1},
+             {'did': 'main_brush_life_level', 'siid': 11, 'piid': 2},
+             {'did': 'side_brushes_left_minutes', 'siid': 12, 'piid': 1},
+             {'did': 'side_brushes_life_level', 'siid': 12, 'piid': 2},
+             {'did': 'sensor_dirty_time_left_minutes', 'siid': 15, 'piid': 1},
+             {'did': 'sensor_dirty_remaning_level', 'siid': 15, 'piid': 2},
+             {'did': 'sweep_mode', 'siid': 14, 'piid': 1},
+             {'did': 'fanspeed_mode', 'siid': 2, 'piid': 4},
+             {'did': 'sweep_type', 'siid': 2, 'piid': 8}
+             {'did': 'path_mode', 'siid': 13, 'piid': 8},
+             {'did': 'mop_present', 'siid': 8, 'piid': 1},
+             {'did': 'work_station_freq', 'siid': 8, 'piid': 2},
+             {'did': 'timing', 'siid': 8, 'piid': 6},
+             {'did': 'clean_area', 'siid': 8, 'piid': 7},
+             {'did': 'auto_boost', 'siid': 8, 'piid': 9},
+             {'did': 'forbid_mode', 'siid': 8, 'piid': 10},
+             {'did': 'water_level', 'siid': 8, 'piid': 11},
+             {'did': 'total_clean_time_sec', 'siid': 8, 'piid': 13},
+             {'did': 'total_clean_areas', 'siid': 8, 'piid': 14},
+             {'did': 'clean_counts', 'siid': 8, 'piid': 18},
+             {'did': 'clean_time_sec', 'siid': 8, 'piid': 19},
+             {'did': 'double_clean', 'siid': 8, 'piid': 20},
+             {'did': 'led_switch', 'siid': 8, 'piid': 22}
+             {'did': 'lidar_collision', 'siid': 8, 'piid': 23},
+             {'did': 'station_key', 'siid': 8, 'piid': 24},
+             {'did': 'station_led', 'siid': 8, 'piid': 25},
+             {'did': 'current_audio', 'siid': 8, 'piid': 26},
+             {'did': 'station_type', 'siid': 8, 'piid': 29},
+             {'did': 'volume', 'siid': 9, 'piid': 1},
+             {'did': 'mute', 'siid': 9, 'piid': 2}
+        ]
         """
         self.data = data
 
@@ -390,7 +389,8 @@ class RoidmiVacuumStatus(DeviceStatus):
     @property
     def is_lidar_collision_sensor(self) -> bool:
         """When ON, the robot will use lidar as the main detection sensor to help reduce
-        collisions."""
+        collisions.
+        """
         return self.data["lidar_collision"]
 
     @property
@@ -750,7 +750,8 @@ class RoidmiVacuumMiot(MiotDevice):
     @command(click.argument("lidar_collision", type=bool))
     def set_lidar_collision_sensor(self, lidar_collision: bool):
         """When ON, the robot will use lidar as the main detection sensor to help reduce
-        collisions."""
+        collisions.
+        """
         return self.set_property("lidar_collision", lidar_collision)
 
     @command()

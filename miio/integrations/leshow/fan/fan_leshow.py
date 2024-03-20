@@ -168,7 +168,6 @@ class FanLeshow(Device):
     )
     def delay_off(self, minutes: int):
         """Set delay off minutes."""
-
         if minutes < 0 or minutes > 540:
             raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
 

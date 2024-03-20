@@ -168,7 +168,6 @@ class Gateway(Device):
     @command()
     def discover_devices(self):
         """Discovers SubDevices and returns a list of the discovered devices."""
-
         self._devices = {}
 
         # Skip the models which do not support getting the device list
@@ -233,7 +232,6 @@ class Gateway(Device):
         This dict can be obtained with the micloud package:
         https://github.com/squachen/micloud
         """
-
         self._devices = {}
 
         # find the gateway
@@ -277,7 +275,6 @@ class Gateway(Device):
     @command(click.argument("zigbee_model", "sid"))
     def match_zigbee_model(self, zigbee_model, sid):
         """Match the zigbee_model to obtain the model_info."""
-
         for model_info in self.subdevice_model_map:
             if model_info.get("zigbee_id") == zigbee_model:
                 return model_info
@@ -294,7 +291,6 @@ class Gateway(Device):
     @command(click.argument("type_id", "sid"))
     def match_type_id(self, type_id, sid):
         """Match the type_id to obtain the model_info."""
-
         for model_info in self.subdevice_model_map:
             if model_info.get("type_id") == type_id:
                 return model_info
@@ -311,10 +307,9 @@ class Gateway(Device):
     @command(click.argument("dev_info", "model_info"))
     def setup_device(self, dev_info, model_info):
         """Setup a device using the SubDeviceInfo and model_info."""
-
         if model_info.get("type") == "Gateway":
             # ignore the gateway itself
-            return
+            return None
 
         # Obtain the correct subdevice class
         # TODO: is there a better way to obtain this information?
@@ -383,7 +378,8 @@ class Gateway(Device):
     @command()
     def enable_telnet(self):
         """Enable root telnet acces to the operating system, use login "admin" or "app",
-        no password."""
+        no password.
+        """
         try:
             return self.send("enable_telnet_service")
         except DeviceError:

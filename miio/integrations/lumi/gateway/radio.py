@@ -25,7 +25,7 @@ class Radio(GatewayDevice):
         raise NotImplementedError()
 
     def play_specify_fm(self):
-        """play specific stream?"""
+        """Play specific stream?"""
         raise NotImplementedError()
         # {"from": "4", "id": 65055, "method": "play_specify_fm",
         # "params": {"id": 764, "type": 0,
@@ -33,7 +33,7 @@ class Radio(GatewayDevice):
         return self._gateway.send("play_specify_fm")
 
     def play_fm(self):
-        """radio on/off?"""
+        """Radio on/off?"""
         raise NotImplementedError()
         # play_fm","params":["off"]}
         return self._gateway.send("play_fm")
@@ -60,7 +60,7 @@ class Radio(GatewayDevice):
         return self._gateway.send("remove_channels")
 
     def get_default_music(self):
-        """seems to timeout (w/o internet)."""
+        """Seems to timeout (w/o internet)."""
         # params [0,1,2]
         raise NotImplementedError()
         return self._gateway.send("get_default_music")
@@ -73,7 +73,7 @@ class Radio(GatewayDevice):
         click.echo("free space: %s" % free_space)
 
     def get_mute(self):
-        """mute of what?"""
+        """Mute of what?"""
         return self._gateway.send("get_mute")
 
     def download_music(self):
@@ -82,7 +82,7 @@ class Radio(GatewayDevice):
         return self._gateway.send("download_music")
 
     def delete_music(self):
-        """delete music."""
+        """Delete music."""
         raise NotImplementedError()
         return self._gateway.send("delete_music")
 
@@ -92,13 +92,13 @@ class Radio(GatewayDevice):
         return self._gateway.send("download_user_music")
 
     def get_download_progress(self):
-        """progress for music downloads or updates?"""
+        """Progress for music downloads or updates?"""
         # returns [':0']
         raise NotImplementedError()
         return self._gateway.send("get_download_progress")
 
     def set_sound_playing(self):
-        """stop playing?"""
+        """Stop playing?"""
         return self._gateway.send("set_sound_playing", ["off"])
 
     def set_default_music(self):

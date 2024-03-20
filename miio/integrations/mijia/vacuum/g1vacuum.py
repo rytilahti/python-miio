@@ -307,7 +307,6 @@ class G1Vacuum(MiotDevice):
     )
     def status(self) -> G1Status:
         """Retrieve properties."""
-
         return G1Status(
             {
                 # max_properties limited to 10 to avoid "Checksum error"
@@ -327,7 +326,6 @@ class G1Vacuum(MiotDevice):
     )
     def cleaning_summary(self) -> G1CleaningSummary:
         """Retrieve properties."""
-
         return G1CleaningSummary(
             {
                 # max_properties limited to 10 to avoid "Checksum error"

@@ -86,7 +86,6 @@ class PhilipsWhiteBulb(Device):
     )
     def status(self) -> PhilipsBulbStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_PHILIPS_LIGHT_BULB]
         )
@@ -121,7 +120,6 @@ class PhilipsWhiteBulb(Device):
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
-
         if seconds < 1:
             raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 

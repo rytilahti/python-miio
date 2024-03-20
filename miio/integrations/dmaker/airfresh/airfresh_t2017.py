@@ -69,8 +69,7 @@ class AirFreshStatus(DeviceStatus):
     """Container for status reports from the air fresh t2017."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response of a Air Fresh A1 (dmaker.airfresh.a1):
+        """Response of a Air Fresh A1 (dmaker.airfresh.a1):
         {
             'power': True,
             'mode': 'auto',
@@ -111,7 +110,6 @@ class AirFreshStatus(DeviceStatus):
             'screen_direction': 'forward',
         }
         """
-
         self.data = data
 
     @property
@@ -242,7 +240,6 @@ class AirFreshA1(Device):
     )
     def status(self) -> AirFreshStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_AIRFRESH_A1]
         )

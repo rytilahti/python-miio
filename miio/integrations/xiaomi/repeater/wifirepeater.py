@@ -10,8 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class WifiRepeaterStatus(DeviceStatus):
     def __init__(self, data):
-        """
-        Response of a xiaomi.repeater.v2:
+        """Response of a xiaomi.repeater.v2:
 
         {
           'sta': {'count': 2, 'access_policy': 0},

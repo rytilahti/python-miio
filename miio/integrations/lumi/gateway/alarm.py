@@ -29,7 +29,8 @@ class Alarm(GatewayDevice):
 
     def arming_time(self) -> int:
         """Return time in seconds the alarm stays 'oning' before transitioning to
-        'on'."""
+        'on'.
+        """
         # Response: 5, 15, 30, 60
         return self._gateway.send("get_arm_wait_time").pop()
 
@@ -69,7 +70,7 @@ class Alarm(GatewayDevice):
         return datetime.fromtimestamp(self._gateway.send("get_arming_time").pop())
 
     async def subscribe_events(self):
-        """subscribe to the alarm events using the push server."""
+        """Subscribe to the alarm events using the push server."""
         if self._gateway._push_server is None:
             raise DeviceException(
                 "Can not install push callback without a PushServer instance"

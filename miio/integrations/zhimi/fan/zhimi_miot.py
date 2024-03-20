@@ -321,7 +321,6 @@ class FanZA5(MiotDevice):
     )
     def delay_off(self, seconds: int):
         """Set delay off seconds."""
-
         if seconds < 0 or seconds > 10 * 60 * 60:
             raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
 

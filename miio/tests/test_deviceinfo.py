@@ -32,7 +32,6 @@ def info():
 
 def test_properties(info):
     """Test that all deviceinfo properties are accessible."""
-
     assert info.raw == info.data
 
     assert isinstance(info.accesspoint, dict)

@@ -160,8 +160,7 @@ class AirConditionerMiotStatus(DeviceStatus):
     """Container for status reports from the air conditioner (MIoT)."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Response (MIoT format) of a Mi Smart Air Conditioner A (xiaomi.aircondition.mc4)
+        """Response (MIoT format) of a Mi Smart Air Conditioner A (xiaomi.aircondition.mc4)
         [
             {'did': 'power', 'siid': 2, 'piid': 1, 'code': 0, 'value': False},
             {'did': 'mode', 'siid': 2, 'piid': 2, 'code': 0, 'value': 2},
@@ -305,7 +304,6 @@ class AirConditionerMiot(MiotDevice):
     )
     def status(self) -> AirConditionerMiotStatus:
         """Retrieve properties."""
-
         return AirConditionerMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None

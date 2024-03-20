@@ -17,7 +17,6 @@ from .walkingpad import (
 class DummyWalkingpad(DummyDevice, Walkingpad):
     def _get_state(self, props):
         """Return wanted properties."""
-
         # Overriding here to deal with case of 'all' being requested
 
         if props[0] == "all":
@@ -27,8 +26,8 @@ class DummyWalkingpad(DummyDevice, Walkingpad):
 
     def _set_state(self, var, value):
         """Set a state of a variable, the value is expected to be an array with length
-        of 1."""
-
+        of 1.
+        """
         # Overriding here to deal with case of 'all' being set
 
         if var == "all":

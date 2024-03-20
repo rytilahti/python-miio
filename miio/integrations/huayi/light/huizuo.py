@@ -265,7 +265,6 @@ class Huizuo(MiotDevice):
     )
     def status(self) -> HuizuoStatus:
         """Retrieve properties."""
-
         return HuizuoStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
@@ -290,7 +289,6 @@ class Huizuo(MiotDevice):
     )
     def set_color_temp(self, color_temp):
         """Set color temp in kelvin."""
-
         # I don't know why only one lamp has smaller color temperature (based on specs),
         # but let's process it correctly
         if self.model == MODELS_WITH_FAN_WY2:
@@ -394,7 +392,6 @@ class HuizuoLampFan(Huizuo):
     )
     def status(self) -> HuizuoStatus:
         """Retrieve properties."""
-
         return HuizuoStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
@@ -492,7 +489,6 @@ class HuizuoLampHeater(Huizuo):
     )
     def status(self) -> HuizuoStatus:
         """Retrieve properties."""
-
         return HuizuoStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
@@ -574,7 +570,8 @@ class HuizuoLampScene(Huizuo):
     )
     def colortemp_switch(self):
         """Switch between the color temperatures (only for models with scenes
-        support)."""
+        support).
+        """
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("colortemp_switch", 0)
 
@@ -595,7 +592,8 @@ class HuizuoLampScene(Huizuo):
     )
     def on_or_increase_colortemp(self):
         """Switch on or increase color temperature (only for models with scenes
-        support)."""
+        support).
+        """
         if self.model in MODELS_WITH_SCENES:
             return self.set_property("on_or_increase_colortemp", 0)
 

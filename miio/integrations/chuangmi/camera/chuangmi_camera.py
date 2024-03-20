@@ -80,8 +80,7 @@ class CameraStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Chuangmi Camera."""
 
     def __init__(self, data: Dict[str, Any]) -> None:
-        """
-        Request:
+        """Request:
         ["power", "motion_record", "light", "full_color", "flip", "improve_program", "wdr",
         "track", "sdcard_status", "watermark", "max_client", "night_mode", "mini_level"]
 
@@ -381,7 +380,6 @@ class ChuangmiCamera(Device):
         video_retention_time: NASVideoRetentionTime = NASVideoRetentionTime.Week,
     ):
         """Set NAS configuration."""
-
         params: Dict[str, Any] = {
             "state": state,
             "sync_interval": sync_interval,

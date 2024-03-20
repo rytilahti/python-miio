@@ -51,7 +51,6 @@ class AirHumidifierStatus(DeviceStatus):
          'Led_State': 1, 'OnOff_State': 0, 'TemperatureValue': 21,
          'TipSound_State': 1, 'waterstatus': 1, 'watertankstatus': 1}
         """
-
         self.data = data
 
     @property
@@ -146,7 +145,6 @@ class AirHumidifierMjjsq(Device):
     )
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_MJJSQ]
         )

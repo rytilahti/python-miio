@@ -68,34 +68,77 @@ doc8 = "*"
 restructuredtext_lint = "*"
 tox = "*"
 isort = "*"
-cffi = "*"
 docformatter = "*"
 mypy = {version = "*", markers = "platform_python_implementation == 'CPython'"}
 coverage = {extras = ["toml"], version = "*"}
 
+[tool.ruff]
+target-version = "py38"
+line-length = 88
+# show-source = true
 
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 88
-forced_separate = "miio.discover"
-known_first_party = "miio"
-known_third_party = ["appdirs",
-  "attr",
-  "click",
-  "construct",
-  "croniter",
-  "cryptography",
-  "netifaces",
-  "pytest",
-  "pytz",
-  "setuptools",
-  "tqdm",
-  "zeroconf"
+[tool.ruff.lint]
+select = [
+  # pycodestyle
+  "E", "W",
+  # pyflakes
+  "F",
+  # isort
+  "I",
+  # pydocstyle
+  "D",
+  # pyupgrade
+  "UP",
+  # pep8-naming
+  "N",
+  # flake8-bandit
+  "S",
+  # flake8-builtins
+  "A",
+  # flake8-bugbear
+  "B",
+  # flake8-return
+  "RET",
+  # flake8-simplify
+  "SIM",
+  # pylint convention
+  "PLC",
+  # pylint error
+  "PLE",
+  # pylint refactor
+  "PLR",
+  # pylint warning
+  "PLW",
+  # flake8-pie
+  "PIE",
+  # flake8-quotes
+  "Q",
+  # tryceratops
+  "TRY",
+  # flake8-use-pathlib
+  "PTH",
+  # ruff specifics
+  "RUF",
+]
+ignore = [
+  # ignore all missing docstrings for now
+  "D1",
+  # 1 blank line required before class docstring
+  "D203",
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# S101: assert detected
+# D1: docstyle
+# PLR2004: magic constant
+"**/test_*.py" = ["S101", "D1", "PLR2004"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["miio"]
+# check if this is necessary
+known-third-party = ["appdirs", "attr", "click", "construct", "croniter", "cryptography", "netifaces", "pytest", "pytz", "setuptools", "tqdm", "zeroconf"]
+# enable later for pep604 comp
+# required-imports = ["from __future__ import annotations"]
 
 [tool.coverage.run]
 source = ["miio"]

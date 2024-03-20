@@ -73,7 +73,6 @@ class AirHumidifierStatus(DeviceStatus):
          'speed': None, 'depth': None, 'dry': None, 'use_time': 941100,
          'hw_version': 0, 'button_pressed': 'led'}
         """
-
         self.data = data
         self.device_info = device_info
 
@@ -270,7 +269,6 @@ class AirHumidifierStatus(DeviceStatus):
 
         If water tank is detached, depth is 127.
         """
-
         _LOGGER.warning(
             "The 'water_tank_detached' property is deprecated and will be removed in the future. Use 'water_tank_attached' properties instead."
         )
@@ -329,7 +327,6 @@ class AirHumidifier(Device):
     @command()
     def status(self) -> AirHumidifierStatus:
         """Retrieve properties."""
-
         properties = AVAILABLE_PROPERTIES.get(
             self.model, AVAILABLE_PROPERTIES[MODEL_HUMIDIFIER_V1]
         )

@@ -114,7 +114,6 @@ class Walkingpad(Device):
     )
     def status(self) -> WalkingpadStatus:
         """Retrieve properties."""
-
         data = self._get_quick_status()
 
         # The quick status only retrieves a subset of the properties. The rest of them are retrieved here.
@@ -146,7 +145,6 @@ class Walkingpad(Device):
         `status()` will do four more separate I/O requests for power, mode, start_speed, and sensitivity.
         If you don't need any of that, prefer this method for status updates.
         """
-
         data = self._get_quick_status()
 
         return WalkingpadStatus(data)
@@ -174,7 +172,6 @@ class Walkingpad(Device):
     @command(default_output=format_output("Starting the treadmill"))
     def start(self):
         """Start the treadmill."""
-
         # In case the treadmill is not already turned on, turn it on.
         if not self.status().is_on:
             self.on()
@@ -192,7 +189,6 @@ class Walkingpad(Device):
     )
     def set_mode(self, mode: OperationMode):
         """Set mode (auto/manual)."""
-
         if not isinstance(mode, OperationMode):
             raise ValueError("Invalid mode: %s" % mode)
 
@@ -204,7 +200,6 @@ class Walkingpad(Device):
     )
     def set_speed(self, speed: float):
         """Set speed."""
-
         # In case the treadmill is not already turned on, throw an exception.
         if not self.status().is_on:
             raise DeviceException("Cannot set the speed, device is turned off")
@@ -223,7 +218,6 @@ class Walkingpad(Device):
     )
     def set_start_speed(self, speed: float):
         """Set start speed."""
-
         # In case the treadmill is not already turned on, throw an exception.
         if not self.status().is_on:
             raise DeviceException("Cannot set the start speed, device is turned off")
@@ -242,7 +236,6 @@ class Walkingpad(Device):
     )
     def set_sensitivity(self, sensitivity: OperationSensitivity):
         """Set sensitivity."""
-
         if not isinstance(sensitivity, OperationSensitivity):
             raise TypeError("Invalid mode: %s" % sensitivity)
 
@@ -250,7 +243,6 @@ class Walkingpad(Device):
 
     def _get_quick_status(self):
         """Internal helper to get the quick status via the "all" property."""
-
         # Walkingpad A1 allows you to quickly retrieve a subset of values with "all"
         # all other properties need to be retrieved one by one and are therefore slower
         # eg ['mode:1', 'time:1387', 'sp:3.0', 'dist:1150', 'cal:71710', 'step:2117']

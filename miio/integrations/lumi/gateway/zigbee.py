@@ -7,7 +7,7 @@ class Zigbee(GatewayDevice):
     """Zigbee controls."""
 
     def get_zigbee_version(self):
-        """timeouts on device."""
+        """Timeouts on device."""
         return self._gateway.send("get_zigbee_device_version")
 
     def get_zigbee_channel(self):

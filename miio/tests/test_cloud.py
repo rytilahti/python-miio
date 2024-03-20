@@ -20,7 +20,6 @@ MICLOUD_DEVICES_RESPONSE = load_fixture("micloud_devices_response.json")
 @pytest.fixture
 def cloud() -> CloudInterface:
     """Cloud interface fixture."""
-
     return CloudInterface(username="foo", password="bar")
 
 

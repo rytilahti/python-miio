@@ -30,7 +30,8 @@ class SubDeviceInfo:
 
 class SubDevice:
     """Base class for all subdevices of the gateway these devices are connected through
-    zigbee."""
+    zigbee.
+    """
 
     def __init__(
         self,
@@ -67,16 +68,7 @@ class SubDevice:
         self._registered_callbacks: Dict[str, GatewayCallback] = {}
 
     def __repr__(self):
-        return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(
-            self.device_type,
-            self.sid,
-            self.model,
-            self.zigbee_model,
-            self.firmware_version,
-            self.get_battery(),
-            self.get_voltage(),
-            self.status,
-        )
+        return f"<Subdevice {self.device_type}: {self.sid}, model: {self.model}, zigbee: {self.zigbee_model}, fw: {self.firmware_version}, bat: {self.get_battery()}, vol: {self.get_voltage()}, props: {self.status}>"
 
     @property
     def status(self):
@@ -300,7 +292,7 @@ class SubDevice:
             callback(action, params)
 
     async def subscribe_events(self):
-        """subscribe to all subdevice events using the push server."""
+        """Subscribe to all subdevice events using the push server."""
         if self._gw._push_server is None:
             raise DeviceException(
                 "Can not install push callback without a PushServer instance"

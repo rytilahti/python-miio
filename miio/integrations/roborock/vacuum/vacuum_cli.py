@@ -20,14 +20,13 @@ from miio.click_common import (
     validate_token,
 )
 from miio.device import Device, UpdateState
+from miio.discovery import Discovery
 from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
 
 from .vacuum import CarpetCleaningMode, Consumable, RoborockVacuum, TimerState
 from .vacuum_tui import VacuumTUI
-
-from miio.discovery import Discovery
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(Device, ensure=True)
@@ -247,7 +246,7 @@ def tui(vac: RoborockVacuum):
 
 @manual.command(name="start")
 @pass_dev
-def manual_start(vac: RoborockVacuum):  # noqa: F811  # redef of start
+def manual_start(vac: RoborockVacuum):  # redef of start
     """Activate the manual mode."""
     click.echo("Activating manual controls")
     return vac.manual_start()
@@ -255,7 +254,7 @@ def manual_start(vac: RoborockVacuum):  # noqa: F811  # redef of start
 
 @manual.command(name="stop")
 @pass_dev
-def manual_stop(vac: RoborockVacuum):  # noqa: F811  # redef of stop
+def manual_stop(vac: RoborockVacuum):  # redef of stop
     """Deactivate the manual mode."""
     click.echo("Deactivating manual controls")
     return vac.manual_stop()
@@ -573,7 +572,6 @@ def carpet_cleaning_mode(vac: RoborockVacuum, mode=None):
 
     Allowed values: Avoid, Rise, Ignore
     """
-
     if mode is None:
         click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode())
     else:
@@ -626,7 +624,6 @@ def update_firmware(vac: RoborockVacuum, url: str, md5: str, ip: str):
     `--ip` can be used to override automatically detected IP address for
      the device to contact for the update.
     """
-
     # TODO Check that the device is in updateable state.
 
     click.echo("Going to update from %s" % url)
