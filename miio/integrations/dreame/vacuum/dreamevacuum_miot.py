@@ -177,8 +177,8 @@ _DREAME_X10_MOP_MAPPING: MiotMapping = {
     "brush_life_level2": {"siid": 10, "piid": 2},
     "filter_life_level": {"siid": 11, "piid": 1},
     "filter_left_time": {"siid": 11, "piid": 2},
-	"sensor_life_level": {"siid": 16, "piid": 1},
-	"sensor_left_time": {"siid": 16, "piid": 2},
+    "sensor_life_level": {"siid": 16, "piid": 1},
+    "sensor_left_time": {"siid": 16, "piid": 2},
     "operating_mode": {"siid": 4, "piid": 1},  # work-mode
     "cleaning_mode": {"siid": 4, "piid": 4},
     "delete_timer": {"siid": 8, "aiid": 1},
@@ -197,19 +197,19 @@ _DREAME_X10_MOP_MAPPING: MiotMapping = {
     "voice_package": {"siid": 7, "piid": 2},  # voice-packet-id
     "water_flow": {"siid": 4, "piid": 5},  # mop-mode
     "water_box_carriage_status": {"siid": 4, "piid": 6},  # waterbox-status
-	"dust_auto_collect": {"siid": 15, "piid": 1},  # auto-collect-dust
+    "dust_auto_collect": {"siid": 15, "piid": 1},  # auto-collect-dust
     "dust_collect_every": {"siid": 15, "piid": 2},  # Collect dust every n-th cleaing
     "timezone": {"siid": 8, "piid": 1},  # time-zone
     "home": {"siid": 3, "aiid": 1},  # start-charge
     "locate": {"siid": 7, "aiid": 1},  # audio -> position
     "start_clean": {"siid": 4, "aiid": 1},
     "stop_clean": {"siid": 4, "aiid": 2},
-	"start_room_sweap": {"siid": 4, "aiid": 1},
+    "start_room_sweap": {"siid": 4, "aiid": 1},
     "reset_mainbrush_life": {"siid": 9, "aiid": 1},
     "reset_filter_life": {"siid": 11, "aiid": 1},
     "reset_sidebrush_life": {"siid": 10, "aiid": 1},
-	"reset_sensor_life": {"siid": 16, "aiid": 1},
-	"start_dust_collect": {"siid": 15, "aiid": 1},
+    "reset_sensor_life": {"siid": 16, "aiid": 1},
+    "start_dust_collect": {"siid": 15, "aiid": 1},
     "move": {"siid": 21, "aiid": 1},  # not in documentation
     "play_sound": {"siid": 7, "aiid": 2},
 }
@@ -226,7 +226,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_MOP_2: _DREAME_F9_MAPPING,
     DREAME_TROUVER_FINDER: _DREAME_TROUVER_FINDER_MAPPING,
     DREAME_D10_PLUS: _DREAME_TROUVER_FINDER_MAPPING,
-	DREAME_X10_MOP: _DREAME_X10_MOP_MAPPING,
+    DREAME_X10_MOP: _DREAME_X10_MOP_MAPPING,
 }
 
 
@@ -287,7 +287,8 @@ class DeviceStatus(FormattableEnum):
     SweepingAndMopping = 12
     ChargingComplete = 13
     Upgrading = 14
-	
+
+
 class DeviceStatusX10(FormattableEnum):
     Sweeping = 1
     Idle = 2
@@ -298,17 +299,19 @@ class DeviceStatusX10(FormattableEnum):
     SweepingAndMopping = 7
     Building = 11
     Mopping = 12
-    ChargingComplete = 13	
+    ChargingComplete = 13
 
 
 class WaterFlow(FormattableEnum):
     Low = 1
     Medium = 2
     High = 3
-	
+
+
 class DustAutoCollect(FormattableEnum):
     Off = 0
     On = 1
+
 
 def _enum_as_dict(cls):
     return {x.name: x.value for x in list(cls)}
@@ -318,8 +321,9 @@ def _get_device_status_enum_class(model):
     """Return device status enum class for model"""
     if model == DREAME_X10_MOP:
         return DeviceStatusX10
-    else: 
+    else:
         return DeviceStatus
+
 
 def _get_cleaning_mode_enum_class(model):
     """Return cleaning mode enum class for model if found or None."""
@@ -407,7 +411,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
     @property
     def filter_life_level(self) -> str:
         return self.data["filter_life_level"]
-		
+
     @property
     def sensor_left_time(self) -> str:
         return self.data["sensor_left_time"]
@@ -453,7 +457,6 @@ class DreameVacuumStatus(DeviceStatusContainer):
         except ValueError:
             _LOGGER.error(f"Unknown DeviceStatus ({device_status})")
             return None
-
 
     @property
     def timer_enable(self) -> str:
@@ -534,6 +537,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         return self.data.get("life_brush_main")
 
     # TODO: get/set water flow for Dreame 1C
+
     @property
     def water_flow(self) -> Optional[WaterFlow]:
         try:
@@ -563,12 +567,15 @@ class DreameVacuumStatus(DeviceStatusContainer):
         try:
             return DustAutoCollect(dust_auto_collect)
         except ValueError:
-            _LOGGER.error("Unknown DustAutoCollect (%s)", self.data["dust_auto_collect"])
+            _LOGGER.error(
+                "Unknown DustAutoCollect (%s)", self.data["dust_auto_collect"]
+            )
             return None
-			
+
     @property
     def dust_collect_every(self) -> str:
         return self.data["dust_collect_every"]
+
 
 class DreameVacuum(MiotDevice):
     _mappings = MIOT_MAPPING
@@ -585,7 +592,7 @@ class DreameVacuum(MiotDevice):
             "Device status: {result.device_status}\n"
             "Filter left level: {result.filter_left_time}\n"
             "Filter life level: {result.filter_life_level}\n"
-			"Sensor left level: {result.sensor_left_time}\n"
+            "Sensor left level: {result.sensor_left_time}\n"
             "Sensor life level: {result.sensor_life_level}\n"
             "Life brush main: {result.life_brush_main}\n"
             "Life brush side: {result.life_brush_side}\n"
@@ -602,7 +609,7 @@ class DreameVacuum(MiotDevice):
             "Volume: {result.volume}\n"
             "Water flow: {result.water_flow}\n"
             "Water box attached: {result.is_water_box_carriage_attached} \n"
-			"Dust auto collect: {result.dust_auto_collect}\n"
+            "Dust auto collect: {result.dust_auto_collect}\n"
             "Dust collect every n-th cleaning: {result.dust_collect_every} \n"
             "Cleaning time: {result.cleaning_time}\n"
             "Cleaning area: {result.cleaning_area}\n"
@@ -624,6 +631,7 @@ class DreameVacuum(MiotDevice):
         )
 
     # TODO: check the actual limit for this
+
     MANUAL_ROTATION_MAX = 120
     MANUAL_ROTATION_MIN = -MANUAL_ROTATION_MAX
     MANUAL_DISTANCE_MAX = 300
@@ -663,7 +671,7 @@ class DreameVacuum(MiotDevice):
     def reset_sidebrush_life(self) -> None:
         """Reset side brush life."""
         return self.call_action_from_mapping("reset_sidebrush_life")
-		
+
     @command()
     def reset_sensor_life(self) -> None:
         """Reset sensor life."""
@@ -810,14 +818,14 @@ class DreameVacuum(MiotDevice):
                 },
             ],
         )
-	
+
     @command(
         click.argument("room", default=3, type=int),
-		click.argument("cleaning_mode", default=1, type=int),
-    )	
+        click.argument("cleaning_mode", default=1, type=int),
+    )
     def start_room_sweap(self, room: int, clean_mode: int) -> None:
         """Start room cleaning."""
-        		
+
         mapping = self._get_mapping()
         if "cleaning_mode" not in mapping:
             return None
@@ -827,8 +835,6 @@ class DreameVacuum(MiotDevice):
         except ValueError:
             _LOGGER.error(f"Unknown cleaning mode value passed {cleaning_mode}")
             return None
-			
-			
         self.call_action_from_mapping(
             "start_room_sweap",
             [
@@ -841,7 +847,7 @@ class DreameVacuum(MiotDevice):
                     "value": f"\u007b\u0022selects\u0022:[[{room},1,{cleaningmode.value},3,1]]\u007d",
                 },
             ],
-        )		
+        )
 
     @command(
         click.argument("url", type=str),
@@ -875,7 +881,6 @@ class DreameVacuum(MiotDevice):
             t = threading.Thread(target=server.serve_once)
             t.start()
             click.echo(f"Hosting file at {local_url}")
-
         params = [
             {"piid": 3, "value": voice_id},
             {"piid": 4, "value": local_url},
@@ -885,5 +890,4 @@ class DreameVacuum(MiotDevice):
         result_status = self.call_action_from_mapping("set_voice", params=params)
         if result_status["code"] == 0:
             click.echo("Installation complete!")
-
         return result_status
