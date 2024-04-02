@@ -821,19 +821,19 @@ class DreameVacuum(MiotDevice):
 
     @command(
         click.argument("room", default=3, type=int),
-        click.argument("cleaning_mode", default=1, type=int),
+        click.argument("clean_mode", default=1, type=int),
     )
     def start_room_sweap(self, room: int, clean_mode: int) -> None:
         """Start room cleaning."""
 
-        mapping = self._get_mapping()
-        if "cleaning_mode" not in mapping:
-            return None
+        cleaningmode_enum = _get_cleaning_mode_enum_class(self.model)
         cleaningmode = None
+        if not cleaningmode_enum:
+            return
         try:
-            cleaningmode = cleaning_mode_enum_class(cleaning_mode)
+            cleaningmode = cleaningmode_enum(clean_mode)
         except ValueError:
-            _LOGGER.error(f"Unknown cleaning mode value passed {cleaning_mode}")
+            _LOGGER.error(f"Unknown cleaning mode value passed {clean_mode}")
             return None
         self.call_action_from_mapping(
             "start_room_sweap",
