@@ -819,7 +819,7 @@ class DreameVacuum(MiotDevice):
         """Start room cleaning."""
         
 		
-		mapping = self._get_mapping()
+	mapping = self._get_mapping()
         if "cleaning_mode" not in mapping:
             return None
         cleaningmode = None
