@@ -817,9 +817,8 @@ class DreameVacuum(MiotDevice):
     )	
     def start_room_sweap(self, room: int, clean_mode: int) -> None:
         """Start room cleaning."""
-        
-		
-	mapping = self._get_mapping()
+        		
+        mapping = self._get_mapping()
         if "cleaning_mode" not in mapping:
             return None
         cleaningmode = None
