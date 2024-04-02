@@ -264,7 +264,7 @@ class OperatingMode(FormattableEnum):
     ManualCleaning = 13
     Sleeping = 14
     ManualPaused = 17
-	RoomCleaning = 18
+    RoomCleaning = 18
     ZonedCleaning = 19
 
 
