@@ -197,7 +197,7 @@ _DREAME_X10_MOP_MAPPING: MiotMapping = {
     "voice_package": {"siid": 7, "piid": 2},  # voice-packet-id
     "water_flow": {"siid": 4, "piid": 5},  # mop-mode
     "water_box_carriage_status": {"siid": 4, "piid": 6},  # waterbox-status
-    "dust_auto_collect": {"siid": 15, "piid": 1},  # auto-collect-dust
+    "dust_auto_collect_status": {"siid": 15, "piid": 1},  # auto-collect-dust
     "dust_collect_every": {"siid": 15, "piid": 2},  # Collect dust every n-th cleaing
     "timezone": {"siid": 8, "piid": 1},  # time-zone
     "home": {"siid": 3, "aiid": 1},  # start-charge
@@ -306,11 +306,6 @@ class WaterFlow(FormattableEnum):
     Low = 1
     Medium = 2
     High = 3
-
-
-class DustAutoCollect(FormattableEnum):
-    Off = 0
-    On = 1
 
 
 def _enum_as_dict(cls):
@@ -559,18 +554,12 @@ class DreameVacuumStatus(DeviceStatusContainer):
         return None
 
     @property
-    def dust_auto_collect(self) -> Optional[DustAutoCollect]:
-        try:
-            dust_auto_collect = self.data["dust_auto_collect"]
-        except KeyError:
-            return None
-        try:
-            return DustAutoCollect(dust_auto_collect)
-        except ValueError:
-            _LOGGER.error(
-                "Unknown DustAutoCollect (%s)", self.data["dust_auto_collect"]
-            )
-            return None
+    def dust_auto_collect(self) -> Optional[bool]:
+        """Return True if auto dust collect is enabled, None if function is not present."""
+
+        if "dust_auto_collect_status" in self.data:
+            return self.data["dust_auto_collect_status"] == 1
+        return None
 
     @property
     def dust_collect_every(self) -> str:
@@ -824,7 +813,11 @@ class DreameVacuum(MiotDevice):
         click.argument("clean_mode", default=1, type=int),
     )
     def start_room_sweap(self, room: int, clean_mode: int) -> None:
-        """Start room cleaning."""
+        """Start room cleaning.
+
+        :param int room: ID of the room to be vacuumed
+        :param int clean_mode: Value of fan speed to be used for room cleaning
+        """
 
         cleaningmode_enum = _get_cleaning_mode_enum_class(self.model)
         cleaningmode = None
