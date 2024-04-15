@@ -349,7 +349,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data["power"]
 
     @property
-    @setting("Power", setter="set_power")
+    @setting("Power", setter_name="set_power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.is_on else "off"
@@ -371,13 +371,13 @@ class AirPurifierMiotStatus(DeviceStatus):
             return OperationMode.Unknown
 
     @property
-    @setting("Buzzer", setter="set_buzzer")
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> Optional[bool]:
         """Return True if buzzer is on."""
         return self.data.get("buzzer")
 
     @property
-    @setting("Child Lock", setter="set_child_lock")
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> Optional[bool]:
         """Return True if child lock is on."""
         return self.data.get("child_lock")
@@ -445,7 +445,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("led")
 
     @property
-    @setting("LED Brightness", setter="set_led_brightness", range=(0, 2))
+    @setting("LED Brightness", setter_name="set_led_brightness", range=(0, 2))
     def led_brightness(self) -> Optional[LedBrightness]:
         """Brightness of the LED."""
         value = self.data.get("led_brightness")
@@ -465,7 +465,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("buzzer_volume")
 
     @property
-    @setting("Favorite Level", setter="set_favorite_level", range=(0, 15))
+    @setting("Favorite Level", setter_name="set_favorite_level", range=(0, 15))
     def favorite_level(self) -> Optional[int]:
         """Return favorite level, which is used if the mode is ``favorite``."""
         # Favorite level used when the mode is `favorite`.
