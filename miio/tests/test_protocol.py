@@ -151,6 +151,17 @@ def test_decode_json_quirk_cloud(token):
     assert parsed_msg.data.value["id"] == 123456
 
 
+def test_decode_json_empty_result(token):
+    """Test for quirk handling on empty result seen with xiaomi.vacuum.b112."""
+    ctx = {"token": token}
+    serialized_msg = build_msg(b'{"id":2,"result":,"exe_time":0}', token)
+    parsed_msg = Message.parse(serialized_msg, **ctx)
+
+    assert parsed_msg.data.value
+    assert isinstance(parsed_msg.data.value, dict)
+    assert parsed_msg.data.value["id"] == 2
+
+
 def test_decode_json_raises_for_invalid_json(token):
     ctx = {"token": token}
 
