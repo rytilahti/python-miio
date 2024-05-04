@@ -1911,10 +1911,11 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 
 [extras]
 backup-extract = ["android_backup"]
+crcmod = ["crcmod"]
 docs = ["myst-parser", "sphinx", "sphinx_click", "sphinx_rtd_theme", "sphinxcontrib-apidoc"]
 updater = ["netifaces"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "f47d1235ba7dd14061166207842ee2c60c7ba1130b0afebf4bca76a16930af13"
+content-hash = "9b1a95be5a1616574a1888462d7252452b9c96677fdb910f2cb85a78a54a5b11"

@@ -58,6 +58,7 @@ crcmod = { version = "^1.7", optional = true }
 docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme", "myst-parser"]
 updater = ["netifaces"]
 backup_extract = ["android_backup"]
+crcmod = ["crcmod"]
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6.2.5"
