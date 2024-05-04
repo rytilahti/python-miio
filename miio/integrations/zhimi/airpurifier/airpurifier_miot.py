@@ -6,6 +6,7 @@ import click
 
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 from miio.exceptions import UnsupportedFeatureException
 
 from .airfilter_util import FilterType, FilterTypeUtil
@@ -167,6 +168,34 @@ _MAPPING_RMA1 = {
     "led_brightness": {"siid": 13, "piid": 2},
 }
 
+
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-rma2:1
+_MAPPING_RMA2 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    # Environment
+    "humidity": {"siid": 3, "piid": 1},
+    "aqi": {"siid": 3, "piid": 4},
+    "temperature": {"siid": 3, "piid": 7},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Alarm
+    "buzzer": {"siid": 5, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 6, "piid": 1},
+    # Screen
+    "led_brightness": {"siid": 7, "piid": 2},
+    # custom-service
+    "motor_speed": {"siid": 8, "piid": 1},
+    # aqi
+    "aqi_realtime_update_duration": {"siid": 9, "piid": 1},
+    # Favorite fan level
+    "favorite_level": {"siid": 11, "piid": 1},
+}
+
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-rmb1:1
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-rmb1:2
 _MAPPING_RMB1 = {
@@ -249,6 +278,7 @@ _MAPPINGS = {
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
+    "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
     "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
 }
@@ -319,11 +349,13 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data["power"]
 
     @property
+    @setting("Power", setter_name="set_power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.is_on else "off"
 
     @property
+    @sensor("Air Quality Index", unit="μg/m³")
     def aqi(self) -> Optional[int]:
         """Air quality index."""
         return self.data.get("aqi")
@@ -339,26 +371,31 @@ class AirPurifierMiotStatus(DeviceStatus):
             return OperationMode.Unknown
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> Optional[bool]:
         """Return True if buzzer is on."""
         return self.data.get("buzzer")
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> Optional[bool]:
         """Return True if child lock is on."""
         return self.data.get("child_lock")
 
     @property
+    @sensor("Filter Life Remaining", unit="%")
     def filter_life_remaining(self) -> Optional[int]:
         """Time until the filter should be changed."""
         return self.data.get("filter_life_remaining")
 
     @property
+    @sensor("Filter Hours Used", unit="h")
     def filter_hours_used(self) -> Optional[int]:
         """How long the filter has been in use."""
         return self.data.get("filter_hours_used")
 
     @property
+    @sensor("Motor Speed", unit="rpm")
     def motor_speed(self) -> Optional[int]:
         """Speed of the motor."""
         return self.data.get("motor_speed")
@@ -374,6 +411,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("average_aqi")
 
     @property
+    @sensor("Humidity", unit="%")
     def humidity(self) -> Optional[int]:
         """Current humidity."""
         return self.data.get("humidity")
@@ -384,6 +422,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("tvoc")
 
     @property
+    @sensor("Temperature", unit="C")
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         temperate = self.data.get("temperature")
@@ -406,6 +445,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("led")
 
     @property
+    @setting("LED Brightness", setter_name="set_led_brightness", range=(0, 2))
     def led_brightness(self) -> Optional[LedBrightness]:
         """Brightness of the LED."""
         value = self.data.get("led_brightness")
@@ -425,12 +465,14 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("buzzer_volume")
 
     @property
+    @setting("Favorite Level", setter_name="set_favorite_level", range=(0, 15))
     def favorite_level(self) -> Optional[int]:
         """Return favorite level, which is used if the mode is ``favorite``."""
         # Favorite level used when the mode is `favorite`.
         return self.data.get("favorite_level")
 
     @property
+    @sensor("Use Time", unit="s")
     def use_time(self) -> Optional[int]:
         """How long the device has been active in seconds."""
         return self.data.get("use_time")
@@ -468,6 +510,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         return self.data.get("anion")
 
     @property
+    @sensor("Filter Left Time", unit="days")
     def filter_left_time(self) -> Optional[int]:
         """How many days can the filter still be used."""
         return self.data.get("filter_left_time")
