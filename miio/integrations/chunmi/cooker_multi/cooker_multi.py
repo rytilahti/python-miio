@@ -5,7 +5,6 @@ from collections import defaultdict
 from typing import List
 
 import click
-import crcmod
 
 from miio.click_common import command, format_output
 from miio.device import Device, DeviceStatus
@@ -204,6 +203,8 @@ class MultiCookerProfile:
         self.update_checksum()
 
     def calc_checksum(self):
+        import crcmod
+
         crc = crcmod.mkCrcFun(0x11021, rev=False, initCrc=0x0, xorOut=0x0)(
             self.profile_bytes
         )
