@@ -558,7 +558,6 @@ class RoidmiVacuumMiot(MiotDevice):
         return RoidmiVacuumStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
                 for prop in self.get_properties_for_mapping()
             }
         )
@@ -569,7 +568,6 @@ class RoidmiVacuumMiot(MiotDevice):
         return RoidmiConsumableStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
                 for prop in self.get_properties_for_mapping()
             }
         )
@@ -580,7 +578,6 @@ class RoidmiVacuumMiot(MiotDevice):
         return RoidmiCleaningSummary(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                # max_properties limmit to 10 to avoid "Checksum error" messages from the device.
                 for prop in self.get_properties_for_mapping()
             }
         )
