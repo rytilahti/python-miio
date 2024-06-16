@@ -411,30 +411,30 @@ def airpurifierVA2B(request):
 class TestAirPurifierVA2B(TestCase):
     def test_status(self):
         status = self.device.status()
-        assert status.is_on is _INITIAL_STATE_VA2["power"]
-        assert status.anion == _INITIAL_STATE_VA2["anion"]
-        assert status.aqi == _INITIAL_STATE_VA2["aqi"]
-        assert status.humidity == _INITIAL_STATE_VA2["humidity"]
+        assert status.is_on is _INITIAL_STATE_VA2B["power"]
+        assert status.anion == _INITIAL_STATE_VA2B["anion"]
+        assert status.aqi == _INITIAL_STATE_VA2B["aqi"]
+        assert status.humidity == _INITIAL_STATE_VA2B["humidity"]
         assert status.temperature == 18.6
-        assert status.fan_level == _INITIAL_STATE_VA2["fan_level"]
-        assert status.mode == OperationMode(_INITIAL_STATE_VA2["mode"])
+        assert status.fan_level == _INITIAL_STATE_VA2B["fan_level"]
+        assert status.mode == OperationMode(_INITIAL_STATE_VA2B["mode"])
         assert status.led is None
         assert status.led_brightness == LedBrightness(
-            _INITIAL_STATE_VA2["led_brightness"]
+            _INITIAL_STATE_VA2B["led_brightness"]
         )
-        assert status.buzzer == _INITIAL_STATE_VA2["buzzer"]
-        assert status.child_lock == _INITIAL_STATE_VA2["child_lock"]
-        assert status.favorite_level == _INITIAL_STATE_VA2["favorite_level"]
+        assert status.buzzer == _INITIAL_STATE_VA2B["buzzer"]
+        assert status.child_lock == _INITIAL_STATE_VA2B["child_lock"]
+        assert status.favorite_level == _INITIAL_STATE_VA2B["favorite_level"]
         assert (
-            status.filter_life_remaining == _INITIAL_STATE_VA2["filter_life_remaining"]
+            status.filter_life_remaining == _INITIAL_STATE_VA2B["filter_life_remaining"]
         )
-        assert status.filter_hours_used == _INITIAL_STATE_VA2["filter_hours_used"]
-        assert status.filter_left_time == _INITIAL_STATE_VA2["filter_left_time"]
+        assert status.filter_hours_used == _INITIAL_STATE_VA2B["filter_hours_used"]
+        assert status.filter_left_time == _INITIAL_STATE_VA2B["filter_left_time"]
         assert status.use_time is None
-        assert status.motor_speed == _INITIAL_STATE_VA2["motor_speed"]
+        assert status.motor_speed == _INITIAL_STATE_VA2B["motor_speed"]
         assert (
             status.filter_rfid_product_id
-            == _INITIAL_STATE_VA2["filter_rfid_product_id"]
+            == _INITIAL_STATE_VA2B["filter_rfid_product_id"]
         )
         assert status.filter_type == FilterType.AntiBacterial
 

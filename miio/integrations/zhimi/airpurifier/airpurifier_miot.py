@@ -599,8 +599,10 @@ class AirPurifierMiot(MiotDevice):
 
         return AirPurifierMiotStatus(
             {
+                # max_properties limited to 10 to avoid "user ack timeout"
+                # messages from some of the devices. (e.g. xiaomi.airp.va2b)
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping()
+                for prop in self.get_properties_for_mapping(max_properties=10)
             },
             self.model,
         )
