@@ -306,7 +306,7 @@ _MAPPINGS = {
     "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.mb5a": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
-    "xiaomi.airp.va2b": _MAPPING_VA2B, # airpurifier 4 pro
+    "xiaomi.airp.va2b": _MAPPING_VA2B,  # airpurifier 4 pro
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
     "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
