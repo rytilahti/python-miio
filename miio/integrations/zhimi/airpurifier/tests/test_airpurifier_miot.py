@@ -325,11 +325,13 @@ class DummyAirPurifierMiotVA2(DummyAirPurifierMiot):
         self.state = _INITIAL_STATE_VA2
         super().__init__(*args, **kwargs)
 
+
 class DummyAirPurifierMiotVA2B(DummyAirPurifierMiot):
     def __init__(self, *args, **kwargs):
         self._model = "xiaomi.airp.va2b"
         self.state = _INITIAL_STATE_VA2B
         super().__init__(*args, **kwargs)
+
 
 class DummyAirPurifierMiotMB5(DummyAirPurifierMiot):
     def __init__(self, *args, **kwargs):
@@ -341,6 +343,7 @@ class DummyAirPurifierMiotMB5(DummyAirPurifierMiot):
 @pytest.fixture(scope="function")
 def airpurifierVA2(request):
     request.cls.device = DummyAirPurifierMiotVA2()
+
 
 @pytest.mark.usefixtures("airpurifierVA2")
 class TestAirPurifierVA2(TestCase):
@@ -398,9 +401,11 @@ class TestAirPurifierVA2(TestCase):
         self.device.set_anion(False)
         assert anion() is False
 
+
 @pytest.fixture(scope="function")
 def airpurifierVA2B(request):
     request.cls.device = DummyAirPurifierMiotVA2B()
+
 
 @pytest.mark.usefixtures("airpurifierVA2B")
 class TestAirPurifierVA2(TestCase):
