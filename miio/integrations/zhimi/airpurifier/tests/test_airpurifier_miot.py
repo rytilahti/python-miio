@@ -79,6 +79,7 @@ _INITIAL_STATE_VA2B = {
     "mode": 0,
     "led_brightness": 1,
     "buzzer": False,
+    "child_lock": False,
     "favorite_level": 10,
     "filter_life_remaining": 80,
     "filter_hours_used": 682,
