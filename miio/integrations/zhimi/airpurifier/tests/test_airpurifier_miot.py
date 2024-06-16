@@ -408,7 +408,7 @@ def airpurifierVA2B(request):
 
 
 @pytest.mark.usefixtures("airpurifierVA2B")
-class TestAirPurifierVA2(TestCase):
+class TestAirPurifierVA2B(TestCase):
     def test_status(self):
         status = self.device.status()
         assert status.is_on is _INITIAL_STATE_VA2["power"]
