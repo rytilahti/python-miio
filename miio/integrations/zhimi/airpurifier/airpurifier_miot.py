@@ -317,7 +317,6 @@ _MAPPINGS = {
 # Models requiring reversed led brightness value
 REVERSED_LED_BRIGHTNESS = [
     "zhimi.airp.va2",
-    "xiaomi.airp.va2b",
     "zhimi.airp.mb5",
     "zhimi.airp.mb5a",
     "zhimi.airp.vb4",
