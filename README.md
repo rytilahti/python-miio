@@ -335,6 +335,7 @@ can find interesting. Feel free to submit more related projects.
 
 * [dustcloud](https://github.com/dgiese/dustcloud) (reverse engineering and rooting xiaomi devices)
 * [Valetudo](https://github.com/Hypfer/Valetudo) (cloud free vacuum firmware)
+* [ESPHome components for MIoT devices](https://github.com/dhewg/esphome-miot) (cloud free firmware, [ESPHome](https://esphome.io/) has become a very popular platform to permanently liberate smart devices from the cloud, it supports e.g. ESP32, ESP8266, [Tuya] (https://esphome.io/components/libretiny.html) microcontrollers and is supported with a native Home Assistant integration)
 * [micloud](https://github.com/Squachen/micloud) (library to access xiaomi cloud services, can be used to obtain device tokens)
 * [micloudfaker](https://github.com/unrelentingtech/micloudfaker) (dummy cloud server, can be used to fix powerstrip status requests when without internet access)
 * [Xiaomi Cloud Tokens Extractor](https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor) (an alternative way to fetch tokens from the cloud)
