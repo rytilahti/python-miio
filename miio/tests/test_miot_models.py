@@ -138,6 +138,26 @@ def test_action():
     assert act.plain_name == "dummy-action"
 
 
+def test_action_with_nulls():
+    """Test that actions with null ins and outs are parsed correctly."""
+    simple_action = """\
+    {
+        "iid": 1,
+        "type": "urn:miot-spec-v2:action:dummy-action:0000001:dummy:1",
+        "description": "Description",
+        "in": null,
+        "out": null
+    }"""
+    act = MiotAction.parse_raw(simple_action)
+    assert act.aiid == 1
+    assert act.urn.type == "action"
+    assert act.description == "Description"
+    assert act.inputs == []
+    assert act.outputs == []
+
+    assert act.plain_name == "dummy-action"
+
+
 @pytest.mark.parametrize(
     ("urn_string", "unexpected"),
     [
