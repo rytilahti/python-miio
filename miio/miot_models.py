@@ -159,6 +159,15 @@ class MiotAction(MiotBaseModel):
     inputs: Any = Field(alias="in")
     outputs: Any = Field(alias="out")
 
+    @root_validator(pre=True)
+    def default_null_to_empty(cls, values):
+        """Coerce null values for in&out to empty lists."""
+        if values["in"] is None:
+            values["in"] = []
+        if values["out"] is None:
+            values["out"] = []
+        return values
+
     def fill_from_parent(self, service: "MiotService"):
         """Overridden to convert inputs and outputs to property references."""
         super().fill_from_parent(service)
