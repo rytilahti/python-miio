@@ -23,6 +23,7 @@ from miio.deviceinfo import DeviceInfo
 from miio.cloud import CloudDeviceInfo, CloudException, CloudInterface
 from miio.devicefactory import DeviceFactory
 from miio.integrations.airdog.airpurifier import AirDogX3
+from miio.integrations.cuco.plug import CucoPlugMiot
 from miio.integrations.cgllc.airmonitor import AirQualityMonitor, AirQualityMonitorCGDN1
 from miio.integrations.chuangmi.camera import ChuangmiCamera
 from miio.integrations.chuangmi.plug import ChuangmiPlug
@@ -113,4 +114,4 @@ def __getattr__(name):
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-__version__ = version("python-miio")
+__version__ = 0.6 ## version("python-miio")
