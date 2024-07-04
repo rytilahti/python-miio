@@ -114,4 +114,4 @@ def __getattr__(name):
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-__version__ = 0.6 ## version("python-miio")
+__version__ = version("python-miio")
