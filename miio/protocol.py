@@ -157,7 +157,8 @@ class EncryptionAdapter(Adapter):
         """
         # pp(context)
         return Utils.encrypt(
-            json.dumps(obj).encode("utf-8") + b"\x00", context["_"]["token"]
+            json.dumps(obj, separators=(",", ":")).encode("utf-8") + b"\x00",
+            context["_"]["token"],
         )
 
     def _decode(self, obj, context, path) -> Union[Dict, bytes]:

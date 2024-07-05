@@ -11,6 +11,7 @@ from .deviceinfo import DeviceInfo
 from .devicestatus import DeviceStatus
 from .exceptions import (
     DeviceError,
+    DeviceException,
     DeviceInfoUnavailableException,
     PayloadDecodeException,
 )
@@ -314,7 +315,7 @@ class Device(metaclass=DeviceGroupMeta):
         """
         try:
             self.send("get_properties", [{"did": "dummy", "siid": 1, "piid": 1}])
-        except DeviceError as ex:
+        except (DeviceError, DeviceException) as ex:
             _LOGGER.debug("miot query failed, likely non-miot device: %s", repr(ex))
             return False
         return True

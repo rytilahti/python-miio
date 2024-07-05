@@ -21,3 +21,6 @@ docs/api/
 *_BASE_*
 *_LOCAL_*
 *_REMOTE_*
+
+.DS_Store
+.vscode
