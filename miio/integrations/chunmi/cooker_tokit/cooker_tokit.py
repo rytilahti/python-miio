@@ -403,7 +403,7 @@ class TokitCooker(Device):
             "",
             "Status: {result.status}\n"
             "Menu: {result.menu}\n"
-            "Menu Optinos: {result.menu_options}\n"
+            "Menu Options: {result.menu_options}\n"
             "Cook Duration: {result.duration}\n"
             "Cook Remaining: {result.remaining}\n"
             "Temperature: {result.temperature} °C\n"
