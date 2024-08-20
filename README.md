@@ -25,17 +25,23 @@ The full documentation is available at [python-miio.readthedocs.io](https://pyth
 
 ---
 
-* [Installation](#installation)
-* [Getting started](#getting-started)
-* [Controlling modern (MIoT) devices](#controlling-modern-miot-devices)
-* [Controlling older (miIO) devices](#controlling-older-miio-devices)
-* [Troubleshooting](#troubleshooting)
-* [API usage](#api-usage)
-* [Contributing](#contributing)
-* [Simulators](#simulators)
-* [Supported devices](#supported-devices)
-* [Projects using this library](#projects-using-this-library)
-* [Other related projects](#other-related-projects)
+- [Installation](#installation)
+- [Getting started](#getting-started)
+- [Controlling modern (MIoT) devices](#controlling-modern-miot-devices)
+  - [Device status](#device-status)
+  - [Changing settings](#changing-settings)
+  - [Using actions](#using-actions)
+- [Controlling older (miIO) devices](#controlling-older-miio-devices)
+- [Troubleshooting](#troubleshooting)
+- [API usage](#api-usage)
+  - [Introspecting supported features](#introspecting-supported-features)
+- [Contributing](#contributing)
+- [Simulators](#simulators)
+- [Supported devices](#supported-devices)
+- [Projects using this library](#projects-using-this-library)
+  - [Home Assistant (official)](#home-assistant-official)
+  - [Home Assistant (custom)](#home-assistant-custom)
+- [Other related projects](#other-related-projects)
 
 ---
 
@@ -295,6 +301,7 @@ integration, this library supports also the following devices:
 * Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4, wi11)
 * Xiaomi Mi Smart Humidifer S (jsqs, jsq5)
 * Xiaomi Mi Robot Vacuum Mop 2 (Pro+, Ultra)
+* Tokit Smart Rice Cooker (tokit.cooker.tk4001)
 
 *Feel free to create a pull request to add support for new devices as
 well as additional features for already supported ones.*
@@ -327,6 +334,7 @@ parentheses) may also support other devices listed above.
 * [Xiaomi Raw Sensor](https://github.com/syssi/xiaomi_raw)
 * [Xiaomi MIoT Devices](https://github.com/ha0y/xiaomi_miot_raw)
 * [Xiaomi Miot Auto](https://github.com/al-one/hass-xiaomi-miot)
+* [Tokit Smart Rice Cooker](https://github.com/oooohhoo/tokit_cooker)
 
 ## Other related projects
 
