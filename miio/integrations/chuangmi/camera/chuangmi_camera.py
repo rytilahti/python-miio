@@ -73,6 +73,7 @@ SUPPORTED_MODELS = [
     "chuangmi.camera.ipc019",
     "chuangmi.camera.021a04",
     "chuangmi.camera.038a2",
+    "chuangmi.camera.046a01",
 ]
 
 
