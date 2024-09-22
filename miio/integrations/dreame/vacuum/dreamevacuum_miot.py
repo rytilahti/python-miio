@@ -26,6 +26,7 @@ DREAME_MOP_2_ULTRA = "dreame.vacuum.p2150a"
 DREAME_MOP_2 = "dreame.vacuum.p2150o"
 DREAME_TROUVER_FINDER = "dreame.vacuum.p2036"
 DREAME_D10_PLUS = "dreame.vacuum.r2205"
+MIJIA_OMNI_1S = "dreame.vacuum.r2254" # That's not a mistake, it identifies like that
 
 _DREAME_1C_MAPPING: MiotMapping = {
     # https://home.miot-spec.com/spec/dreame.vacuum.mc1808
@@ -124,6 +125,7 @@ _DREAME_F9_MAPPING: MiotMapping = {
 _DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
     # https://home.miot-spec.com/spec/dreame.vacuum.p2029
     # https://home.miot-spec.com/spec/dreame.vacuum.p2036
+    # https://home.miot-spec.com/spec/dreame.vacuum.r2254
     "battery_level": {"siid": 3, "piid": 1},
     "charging_state": {"siid": 3, "piid": 2},
     "device_fault": {"siid": 2, "piid": 2},
@@ -157,12 +159,13 @@ _DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
     "locate": {"siid": 7, "aiid": 1},  # audio -> position
     "start_clean": {"siid": 4, "aiid": 1},
     "stop_clean": {"siid": 4, "aiid": 2},
-    "reset_mainbrush_life": {"siid": 9, "aiid": 1},
+    "reset_mainbrush_life": {"siid": 9, "aiid": 1}, # brush-cleaner -> reset-brush-life for dreame.vacuum.r2254
     "reset_filter_life": {"siid": 11, "aiid": 1},
-    "reset_sidebrush_life": {"siid": 10, "aiid": 1},
+    "reset_sidebrush_life": {"siid": 10, "aiid": 1}, # brush-cleaner (yes, the same name as reset_mainbrush_life) -> reset-brush-life for dreame.vacuum.r2254
     "move": {"siid": 21, "aiid": 1},  # not in documentation
     "play_sound": {"siid": 7, "aiid": 2},
 }
+
 
 MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_1C: _DREAME_1C_MAPPING,
@@ -176,6 +179,7 @@ MIOT_MAPPING: Dict[str, MiotMapping] = {
     DREAME_MOP_2: _DREAME_F9_MAPPING,
     DREAME_TROUVER_FINDER: _DREAME_TROUVER_FINDER_MAPPING,
     DREAME_D10_PLUS: _DREAME_TROUVER_FINDER_MAPPING,
+    MIJIA_OMNI_1S: _DREAME_TROUVER_FINDER_MAPPING,
 }
 
 
@@ -194,6 +198,12 @@ class ChargingState(FormattableEnum):
 class CleaningModeDreame1C(FormattableEnum):
     Quiet = 0
     Default = 1
+    Medium = 2
+    Strong = 3
+
+class CleaningModeMijia1S(FormattableEnum):
+    Quiet = 0
+    Standard = 1
     Medium = 2
     Strong = 3
 
@@ -251,6 +261,8 @@ def _get_cleaning_mode_enum_class(model):
     """Return cleaning mode enum class for model if found or None."""
     if model == DREAME_1C:
         return CleaningModeDreame1C
+    elif model == MIJIA_OMNI_1S:
+        return CleaningModeMijia1S
     elif model in (
         DREAME_F9,
         DREAME_D9,
@@ -261,6 +273,7 @@ def _get_cleaning_mode_enum_class(model):
         DREAME_MOP_2_ULTRA,
         DREAME_MOP_2,
         DREAME_TROUVER_FINDER,
+        MIJIA_OMNI_1S,
     ):
         return CleaningModeDreameF9
     return None
