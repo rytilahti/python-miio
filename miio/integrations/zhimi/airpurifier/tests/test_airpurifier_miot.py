@@ -69,6 +69,27 @@ _INITIAL_STATE_VA2 = {
     "button_pressed": "power",
 }
 
+_INITIAL_STATE_VA2B = {
+    "power": True,
+    "aqi": 10,
+    "anion": True,
+    "humidity": 62,
+    "temperature": 18.599999,
+    "fan_level": 2,
+    "mode": 0,
+    "led_brightness": 1,
+    "buzzer": False,
+    "child_lock": False,
+    "favorite_level": 10,
+    "filter_life_remaining": 80,
+    "filter_hours_used": 682,
+    "filter_left_time": 309,
+    "motor_speed": 354,
+    "filter_rfid_product_id": "0:0:41:30",
+    "filter_rfid_tag": "10:20:30:40:50:60:7",
+    "button_pressed": "power",
+}
+
 
 class DummyAirPurifierMiot(DummyMiotDevice, AirPurifierMiot):
     def __init__(self, *args, **kwargs):
@@ -306,6 +327,13 @@ class DummyAirPurifierMiotVA2(DummyAirPurifierMiot):
         super().__init__(*args, **kwargs)
 
 
+class DummyAirPurifierMiotVA2B(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "xiaomi.airp.va2b"
+        self.state = _INITIAL_STATE_VA2B
+        super().__init__(*args, **kwargs)
+
+
 class DummyAirPurifierMiotMB5(DummyAirPurifierMiot):
     def __init__(self, *args, **kwargs):
         self._model = "zhimi.airp.mb5"
@@ -348,6 +376,66 @@ class TestAirPurifierVA2(TestCase):
         assert (
             status.filter_rfid_product_id
             == _INITIAL_STATE_VA2["filter_rfid_product_id"]
+        )
+        assert status.filter_type == FilterType.AntiBacterial
+
+    def test_set_led_brightness(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led_brightness(LedBrightness.Bright)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led_brightness(LedBrightness.Dim)
+        assert led_brightness() == LedBrightness.Dim
+
+        self.device.set_led_brightness(LedBrightness.Off)
+        assert led_brightness() == LedBrightness.Off
+
+    def test_set_anion(self):
+        def anion():
+            return self.device.status().anion
+
+        self.device.set_anion(True)
+        assert anion() is True
+
+        self.device.set_anion(False)
+        assert anion() is False
+
+
+@pytest.fixture(scope="function")
+def airpurifierVA2B(request):
+    request.cls.device = DummyAirPurifierMiotVA2B()
+
+
+@pytest.mark.usefixtures("airpurifierVA2B")
+class TestAirPurifierVA2B(TestCase):
+    def test_status(self):
+        status = self.device.status()
+        assert status.is_on is _INITIAL_STATE_VA2B["power"]
+        assert status.anion == _INITIAL_STATE_VA2B["anion"]
+        assert status.aqi == _INITIAL_STATE_VA2B["aqi"]
+        assert status.humidity == _INITIAL_STATE_VA2B["humidity"]
+        assert status.temperature == 18.6
+        assert status.fan_level == _INITIAL_STATE_VA2B["fan_level"]
+        assert status.mode == OperationMode(_INITIAL_STATE_VA2B["mode"])
+        assert status.led is None
+        assert status.led_brightness == LedBrightness(
+            _INITIAL_STATE_VA2B["led_brightness"]
+        )
+        assert status.buzzer == _INITIAL_STATE_VA2B["buzzer"]
+        assert status.child_lock == _INITIAL_STATE_VA2B["child_lock"]
+        assert status.favorite_level == _INITIAL_STATE_VA2B["favorite_level"]
+        assert (
+            status.filter_life_remaining == _INITIAL_STATE_VA2B["filter_life_remaining"]
+        )
+        assert status.filter_hours_used == _INITIAL_STATE_VA2B["filter_hours_used"]
+        assert status.filter_left_time == _INITIAL_STATE_VA2B["filter_left_time"]
+        assert status.use_time is None
+        assert status.motor_speed == _INITIAL_STATE_VA2B["motor_speed"]
+        assert (
+            status.filter_rfid_product_id
+            == _INITIAL_STATE_VA2B["filter_rfid_product_id"]
         )
         assert status.filter_type == FilterType.AntiBacterial
 
