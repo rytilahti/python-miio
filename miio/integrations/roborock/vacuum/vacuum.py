@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Type
 
 import click
 import pytz
-from appdirs import user_cache_dir
+from platformdirs import user_cache_dir
 
 from miio.click_common import (
     DeviceGroup,

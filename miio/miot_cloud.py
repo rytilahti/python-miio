@@ -7,7 +7,7 @@ from operator import attrgetter
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import appdirs
+import platformdirs
 from micloud.miotspec import MiotSpec
 
 try:
@@ -66,7 +66,7 @@ class MiotCloud:
     MODEL_MAPPING_FILE = "model-to-urn.json"
 
     def __init__(self):
-        self._cache_dir = Path(appdirs.user_cache_dir("python-miio"))
+        self._cache_dir = Path(platformdirs.user_cache_dir("python-miio"))
 
     def get_release_list(self) -> ReleaseList:
         """Fetch a list of available releases."""
