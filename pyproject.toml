@@ -34,7 +34,7 @@ construct = "^2.10.56"
 zeroconf = "^0"
 attrs = "*"
 pytz = "*"
-appdirs = "^1"
+platformdirs = "*"
 tqdm = "^4"
 micloud = { version = ">=0.6" }
 croniter = ">=1"
@@ -84,13 +84,14 @@ use_parentheses = true
 line_length = 88
 forced_separate = "miio.discover"
 known_first_party = "miio"
-known_third_party = ["appdirs",
+known_third_party = [
   "attr",
   "click",
   "construct",
   "croniter",
   "cryptography",
   "netifaces",
+  "platformdirs",
   "pytest",
   "pytz",
   "setuptools",

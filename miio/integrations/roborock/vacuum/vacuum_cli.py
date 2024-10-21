@@ -10,7 +10,7 @@ from pprint import pformat as pf
 from typing import Any, List  # noqa: F401
 
 import click
-from appdirs import user_cache_dir
+from platformdirs import user_cache_dir
 from tqdm import tqdm
 
 from miio.click_common import (
