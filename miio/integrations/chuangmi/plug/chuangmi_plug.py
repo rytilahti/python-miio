@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -34,7 +34,7 @@ AVAILABLE_PROPERTIES = {
 class ChuangmiPlugStatus(DeviceStatus):
     """Container for status reports from the plug."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Chuangmi Plug V1 (chuangmi.plug.v1)
 
         { 'power': True, 'usb_on': True, 'temperature': 32 }

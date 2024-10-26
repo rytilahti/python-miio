@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -16,7 +16,7 @@ SUPPORTED_MODELS = ["philips.light.ceiling", "philips.light.zyceiling"]
 class CeilStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips LED Ceiling Lamp."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         # {'power': 'off', 'bright': 0, 'snm': 4, 'dv': 0,
         #  'cctsw': [[0, 3], [0, 2], [0, 1]], 'bl': 1,
         #  'mb': 1, 'ac': 1, 'mssw': 1, 'cct': 99}

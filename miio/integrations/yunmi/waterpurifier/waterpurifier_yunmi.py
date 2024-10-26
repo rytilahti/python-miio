@@ -1,6 +1,6 @@
 import logging
 from datetime import timedelta
-from typing import Any, Dict, List
+from typing import Any
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
@@ -95,14 +95,14 @@ class OperationStatus(DeviceStatus):
         ]
 
     @property
-    def errors(self) -> List:
+    def errors(self) -> list:
         return self.err_list
 
 
 class WaterPurifierYunmiStatus(DeviceStatus):
     """Container for status reports from the water purifier (Yunmi model)."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Status of a Water Purifier C1 (yummi.waterpuri.lx11):
 
             [0, 7200, 8640, 520, 379, 7200, 17280, 2110, 4544,

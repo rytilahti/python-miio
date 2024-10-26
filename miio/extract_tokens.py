@@ -2,8 +2,8 @@ import json
 import logging
 import sqlite3
 import tempfile
+from collections.abc import Iterator
 from pprint import pformat as pf
-from typing import Iterator
 
 import attr
 import click

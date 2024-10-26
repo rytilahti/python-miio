@@ -4,7 +4,7 @@ import enum
 import ipaddress
 import logging
 import socket
-from typing import Any, Dict
+from typing import Any
 from urllib.parse import urlparse
 
 import click
@@ -79,7 +79,7 @@ SUPPORTED_MODELS = [
 class CameraStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Chuangmi Camera."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """
         Request:
         ["power", "motion_record", "light", "full_color", "flip", "improve_program", "wdr",
@@ -382,7 +382,7 @@ class ChuangmiCamera(Device):
     ):
         """Set NAS configuration."""
 
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "state": state,
             "sync_interval": sync_interval,
             "video_retention_time": video_retention_time,

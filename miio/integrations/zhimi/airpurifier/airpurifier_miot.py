@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -338,7 +338,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         ]
     """
 
-    def __init__(self, data: Dict[str, Any], model: str) -> None:
+    def __init__(self, data: dict[str, Any], model: str) -> None:
         self.filter_type_util = FilterTypeUtil()
         self.data = data
         self.model = model

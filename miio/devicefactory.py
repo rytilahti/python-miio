@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Optional, Type
+from typing import Optional
 
 import click
 
@@ -22,11 +22,11 @@ class DeviceFactory:
         dev = DeviceFactory.create("127.0.0.1", 32*"0")
     """
 
-    _integration_classes: List[Type[Device]] = []
-    _supported_models: Dict[str, Type[Device]] = {}
+    _integration_classes: list[type[Device]] = []
+    _supported_models: dict[str, type[Device]] = {}
 
     @classmethod
-    def register(cls, integration_cls: Type[Device]):
+    def register(cls, integration_cls: type[Device]):
         """Register class for to the registry."""
         cls._integration_classes.append(integration_cls)
         _LOGGER.debug("Registering %s", integration_cls.__name__)
@@ -44,13 +44,13 @@ class DeviceFactory:
             cls._supported_models[model] = integration_cls
 
     @classmethod
-    def supported_models(cls) -> Dict[str, Type[Device]]:
+    def supported_models(cls) -> dict[str, type[Device]]:
         """Return a dictionary of models and their corresponding implementation
         classes."""
         return cls._supported_models
 
     @classmethod
-    def integrations(cls) -> List[Type[Device]]:
+    def integrations(cls) -> list[type[Device]]:
         """Return the list of integration classes."""
         return cls._integration_classes
 

@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from typing import Dict, List, Optional
+from typing import Optional
 
 from miio import MiotDevice
 from miio.click_common import command
@@ -43,9 +43,9 @@ class GenericMiot(MiotDevice):
         self._model = model
         self._miot_model: Optional[DeviceModel] = None
 
-        self._actions: Dict[str, ActionDescriptor] = {}
-        self._properties: Dict[str, PropertyDescriptor] = {}
-        self._status_query: List[Dict] = []
+        self._actions: dict[str, ActionDescriptor] = {}
+        self._properties: dict[str, PropertyDescriptor] = {}
+        self._status_query: list[dict] = []
 
     def initialize_model(self):
         """Initialize the miot model and create descriptions."""

@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -44,7 +44,7 @@ class OperationMode(enum.Enum):
 class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier mjjsq."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Air Humidifier (deerma.humidifier.mjjsq):
 
         {'Humidifier_Gear': 4, 'Humidity_Value': 44, 'HumiSet_Value': 54,

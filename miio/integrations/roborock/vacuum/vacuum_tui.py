@@ -6,7 +6,6 @@ except ImportError:
     curses_available = False
 
 import enum
-from typing import Tuple
 
 from .vacuum import RoborockVacuum as Vacuum
 
@@ -62,7 +61,7 @@ class VacuumTUI:
             win.addstr(text)
             win.refresh()
 
-    def handle_key(self, key: str) -> Tuple[str, bool]:
+    def handle_key(self, key: str) -> tuple[str, bool]:
         try:
             ctl = Control(key)
         except ValueError as e:

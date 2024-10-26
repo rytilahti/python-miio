@@ -10,7 +10,7 @@ If you are developing an integration, prefer :func:`~miio.devicestatus.sensor`, 
 """
 
 from enum import Enum, Flag, auto
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Any, Callable, Optional
 
 import attr
 
@@ -55,7 +55,7 @@ class Descriptor:
     #: Name of the attribute in the status container that contains the value, if applicable.
     status_attribute: Optional[str] = None
     #: Additional data related to this descriptor.
-    extras: Dict = attr.ib(factory=dict, repr=False)
+    extras: dict = attr.ib(factory=dict, repr=False)
     #: Access flags (read, write, execute) for the described item.
     access: AccessFlags = attr.ib(default=AccessFlags(0))
 
@@ -84,7 +84,7 @@ class ActionDescriptor(Descriptor):
     method: Optional[Callable] = attr.ib(default=None, repr=False)
     #: Name of the method in the device class that can be used to execute the action.
     method_name: Optional[str] = attr.ib(default=None, repr=False)
-    inputs: Optional[List[Any]] = attr.ib(default=None, repr=True)
+    inputs: Optional[list[Any]] = attr.ib(default=None, repr=True)
 
     access: AccessFlags = attr.ib(default=AccessFlags.Execute)
 
@@ -153,7 +153,7 @@ class EnumDescriptor(PropertyDescriptor):
     #: Name of the attribute in the device class that returns the choices.
     choices_attribute: Optional[str] = attr.ib(default=None, repr=False)
     #: Enum class containing the available choices.
-    choices: Optional[Type[Enum]] = attr.ib(default=None, repr=False)
+    choices: Optional[type[Enum]] = attr.ib(default=None, repr=False)
 
     @property
     def __cli_output__(self) -> str:

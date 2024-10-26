@@ -1,6 +1,6 @@
 import enum
 from datetime import timedelta
-from typing import Any, Dict
+from typing import Any
 
 from miio.miot_device import DeviceStatus
 
@@ -13,7 +13,7 @@ class OperatingMode(enum.Enum):
 class PetWaterDispenserStatus(DeviceStatus):
     """Container for status reports from Pet Water Dispenser."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of Pet Water Dispenser (mmgg.pet_waterer.s1)
         [
             {'code': 0, 'did': 'cotton_left_time', 'piid': 1, 'siid': 5, 'value': 10},

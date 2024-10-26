@@ -5,7 +5,6 @@ import logging
 import math
 from datetime import timedelta
 from enum import Enum
-from typing import Dict
 
 import click
 
@@ -650,7 +649,7 @@ class RoidmiVacuumMiot(MiotDevice):
         return self.set_property("fanspeed_mode", fanspeed_mode.value)
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
+    def fan_speed_presets(self) -> dict[str, int]:
         """Return available fan speed presets."""
         return {"Sweep": 0, "Silent": 1, "Basic": 2, "Strong": 3, "FullSpeed": 4}
 

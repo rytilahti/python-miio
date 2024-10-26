@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Optional
 
 import click
 import yaml
@@ -107,13 +107,13 @@ class Gateway(Device):
         self._radio = Radio(parent=self)
         self._zigbee = Zigbee(parent=self)
         self._light = Light(parent=self)
-        self._devices: Dict[str, SubDevice] = {}
+        self._devices: dict[str, SubDevice] = {}
         self._info = None
         self._subdevice_model_map = None
 
         self._push_server = push_server
-        self._event_ids: List[str] = []
-        self._registered_callbacks: Dict[str, GatewayCallback] = {}
+        self._event_ids: list[str] = []
+        self._registered_callbacks: dict[str, GatewayCallback] = {}
 
         if self._push_server is not None:
             self._push_server.register_miio_device(self, self.push_callback)

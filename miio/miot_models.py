@@ -1,7 +1,7 @@
 import logging
 from datetime import timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 try:
     from pydantic.v1 import BaseModel, Field, PrivateAttr, root_validator
@@ -32,7 +32,7 @@ class URN(BaseModel):
     internal_id: str
     model: str
     version: int
-    unexpected: Optional[List[str]]
+    unexpected: Optional[list[str]]
 
     parent_urn: Optional["URN"] = Field(None, repr=False)
 
@@ -112,7 +112,7 @@ class MiotBaseModel(BaseModel):
     urn: URN = Field(alias="type")
     description: str
 
-    extras: Dict = Field(default_factory=dict, repr=False)
+    extras: dict = Field(default_factory=dict, repr=False)
     service: Optional["MiotService"] = None  # backref to containing service
 
     def fill_from_parent(self, service: "MiotService"):
@@ -212,12 +212,12 @@ class MiotProperty(MiotBaseModel):
     piid: int = Field(alias="iid")
 
     format: MiotFormat
-    access: List[MiotAccess] = Field(default=["read"])
+    access: list[MiotAccess] = Field(default=["read"])
     unit: Optional[str] = None
 
-    range: Optional[List[int]] = Field(alias="value-range")
-    choices: Optional[List[MiotEnumValue]] = Field(alias="value-list")
-    gatt_access: Optional[List[Any]] = Field(alias="gatt-access")
+    range: Optional[list[int]] = Field(alias="value-range")
+    choices: Optional[list[MiotEnumValue]] = Field(alias="value-list")
+    gatt_access: Optional[list[Any]] = Field(alias="gatt-access")
 
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
@@ -305,7 +305,7 @@ class MiotProperty(MiotBaseModel):
 
         return desc
 
-    def _miot_access_list_to_access(self, access_list: List[MiotAccess]) -> AccessFlags:
+    def _miot_access_list_to_access(self, access_list: list[MiotAccess]) -> AccessFlags:
         """Convert miot access list to property access list."""
         access = AccessFlags(0)
         if MiotAccess.Read in access_list:
@@ -392,12 +392,12 @@ class MiotService(BaseModel):
     urn: URN = Field(alias="type")
     description: str
 
-    properties: List[MiotProperty] = Field(default_factory=list, repr=False)
-    events: List[MiotEvent] = Field(default_factory=list, repr=False)
-    actions: List[MiotAction] = Field(default_factory=list, repr=False)
+    properties: list[MiotProperty] = Field(default_factory=list, repr=False)
+    events: list[MiotEvent] = Field(default_factory=list, repr=False)
+    actions: list[MiotAction] = Field(default_factory=list, repr=False)
 
-    _property_by_id: Dict[int, MiotProperty] = PrivateAttr(default_factory=dict)
-    _action_by_id: Dict[int, MiotAction] = PrivateAttr(default_factory=dict)
+    _property_by_id: dict[int, MiotProperty] = PrivateAttr(default_factory=dict)
+    _action_by_id: dict[int, MiotAction] = PrivateAttr(default_factory=dict)
 
     def __init__(self, *args, **kwargs):
         """Initialize a service.
@@ -446,14 +446,14 @@ class DeviceModel(BaseModel):
 
     description: str
     urn: URN = Field(alias="type")
-    services: List[MiotService] = Field(repr=False)
+    services: list[MiotService] = Field(repr=False)
 
     # internal mappings to simplify accesses
-    _services_by_id: Dict[int, MiotService] = PrivateAttr(default_factory=dict)
-    _properties_by_id: Dict[int, Dict[int, MiotProperty]] = PrivateAttr(
+    _services_by_id: dict[int, MiotService] = PrivateAttr(default_factory=dict)
+    _properties_by_id: dict[int, dict[int, MiotProperty]] = PrivateAttr(
         default_factory=dict
     )
-    _properties_by_name: Dict[str, Dict[str, MiotProperty]] = PrivateAttr(
+    _properties_by_name: dict[str, dict[str, MiotProperty]] = PrivateAttr(
         default_factory=dict
     )
 

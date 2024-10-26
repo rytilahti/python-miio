@@ -218,7 +218,7 @@ def goto(vac: RoborockVacuum, x_coord: int, y_coord: int):
 @cli.command()
 @pass_dev
 @click.argument("zones", type=LiteralParamType(), required=True)
-def zoned_clean(vac: RoborockVacuum, zones: List):
+def zoned_clean(vac: RoborockVacuum, zones: list):
     """Clean zone."""
     click.echo("Cleaning zone(s) : %s" % vac.zoned_clean(zones))
 

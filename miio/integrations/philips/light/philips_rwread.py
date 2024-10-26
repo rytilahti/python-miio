@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -26,7 +26,7 @@ class MotionDetectionSensitivity(enum.Enum):
 class PhilipsRwreadStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips RW Read."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a RW Read (philips.light.rwread):
 
         {'power': 'on', 'bright': 53, 'dv': 0, 'snm': 1,

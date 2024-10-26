@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, time, timedelta
 from enum import IntEnum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 from urllib import parse
 
 from croniter import croniter
@@ -101,7 +101,7 @@ dock_error_codes = {  # from vacuum_cleaner-EN.pdf
 class MapList(DeviceStatus):
     """Contains a information about the maps/floors of the vacuum."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         # {'max_multi_map': 4, 'max_bak_map': 1, 'multi_map_count': 3, 'map_info': [
         #    {'mapFlag': 0, 'add_time': 1664448893, 'length': 10, 'name': 'Downstairs', 'bak_maps': [{'mapFlag': 4, 'add_time': 1663577737}]},
         #    {'mapFlag': 1, 'add_time': 1663580330, 'length': 8, 'name': 'Upstairs', 'bak_maps': [{'mapFlag': 5, 'add_time': 1663577752}]},
@@ -119,17 +119,17 @@ class MapList(DeviceStatus):
         return self.data["multi_map_count"]
 
     @property
-    def map_id_list(self) -> List[int]:
+    def map_id_list(self) -> list[int]:
         """List of map ids."""
         return list(self._map_name_dict.values())
 
     @property
-    def map_list(self) -> List[Dict[str, Any]]:
+    def map_list(self) -> list[dict[str, Any]]:
         """List of map info."""
         return self.data["map_info"]
 
     @property
-    def map_name_dict(self) -> Dict[str, int]:
+    def map_name_dict(self) -> dict[str, int]:
         """Dictionary of map names (keys) with there ids (values)."""
         return self._map_name_dict
 
@@ -137,7 +137,7 @@ class MapList(DeviceStatus):
 class VacuumStatus(DeviceStatus):
     """Container for status reports from the vacuum."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         # {'result': [{'state': 8, 'dnd_enabled': 1, 'clean_time': 0,
         #  'msg_ver': 4, 'map_present': 1, 'error_code': 0, 'in_cleaning': 0,
         #  'clean_area': 0, 'battery': 100, 'fan_power': 20, 'msg_seq': 320}],
@@ -484,7 +484,7 @@ class VacuumStatus(DeviceStatus):
 class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
 
-    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
+    def __init__(self, data: Union[list[Any], dict[str, Any]]) -> None:
         # total duration, total area, amount of cleans
         # [ list, of, ids ]
         # { "result": [ 174145, 2410150000, 82,
@@ -542,7 +542,7 @@ class CleaningSummary(DeviceStatus):
         return int(self.data["clean_count"])
 
     @property
-    def ids(self) -> List[int]:
+    def ids(self) -> list[int]:
         """A list of available cleaning IDs, see also
         :class:`CleaningDetails`."""
         return list(self.data["records"])
@@ -565,7 +565,7 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: Union[List[Any], Dict[str, Any]]) -> None:
+    def __init__(self, data: Union[list[Any], dict[str, Any]]) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
@@ -662,7 +662,7 @@ class ConsumableStatus(DeviceStatus):
     - Filter: 150 hours
     """
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         # {'id': 1, 'result': [{'filter_work_time': 32454,
         #  'sensor_dirty_time': 3798,
         # 'side_brush_work_time': 32454,
@@ -816,7 +816,7 @@ class ConsumableStatus(DeviceStatus):
 class DNDStatus(DeviceStatus):
     """A container for the do-not-disturb status."""
 
-    def __init__(self, data: Dict[str, Any]):
+    def __init__(self, data: dict[str, Any]):
         # {'end_minute': 0, 'enabled': 1, 'start_minute': 0,
         #  'start_hour': 22, 'end_hour': 8}
         self.data = data
@@ -859,7 +859,7 @@ class Timer(DeviceStatus):
     the creation time.
     """
 
-    def __init__(self, data: List[Any], timezone: BaseTzInfo) -> None:
+    def __init__(self, data: list[Any], timezone: BaseTzInfo) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
         #  ['1488667777661', 'off', ['49 21 * * 3,4,5,6', ['start_clean', '']]
@@ -1030,7 +1030,7 @@ class CarpetModeStatus(DeviceStatus):
 class MopDryerSettings(DeviceStatus):
     """Container for mop dryer add-on."""
 
-    def __init__(self, data: Dict[str, Any]):
+    def __init__(self, data: dict[str, Any]):
         # {'status': 0, 'on': {'cliff_on': 1, 'cliff_off': 1, 'count': 10, 'dry_time': 10800},
         # 'off': {'cliff_on': 2, 'cliff_off': 1, 'count': 10}}
         self.data = data

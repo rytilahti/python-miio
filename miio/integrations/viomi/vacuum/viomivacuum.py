@@ -48,7 +48,7 @@ import time
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 import click
 
@@ -156,7 +156,7 @@ class ViomiConsumableStatus(ConsumableStatus):
     which it doesn't report.
     """
 
-    def __init__(self, data: List[int]) -> None:
+    def __init__(self, data: list[int]) -> None:
         # [17, 17, 17, 17]
         self.data = {
             "main_brush_work_time": data[0] * 60 * 60,
@@ -541,7 +541,7 @@ class ViomiVacuumStatus(DeviceStatus):
         return self.data["zone_data"]
 
 
-def _get_rooms_from_schedules(schedules: List[str]) -> Tuple[bool, Dict]:
+def _get_rooms_from_schedules(schedules: list[str]) -> tuple[bool, dict]:
     """Read the result of "get_ordertime" command to extract room names and ids.
 
     The `schedules` input needs to follow the following format
@@ -610,7 +610,7 @@ class ViomiVacuum(Device):
             model=model,
         )
         self.manual_seqnum = -1
-        self._cache: Dict[str, Any] = {"edge_state": None, "rooms": {}, "maps": {}}
+        self._cache: dict[str, Any] = {"edge_state": None, "rooms": {}, "maps": {}}
 
     @command()
     def status(self) -> ViomiVacuumStatus:
@@ -793,7 +793,7 @@ class ViomiVacuum(Device):
         self.send("set_suction", [speed.value])
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
+    def fan_speed_presets(self) -> dict[str, int]:
         """Return available fan speed presets."""
         return {x.name: x.value for x in list(ViomiVacuumSpeed)}
 
@@ -814,7 +814,7 @@ class ViomiVacuum(Device):
         """
         self.send("set_suction", [watergrade.value])
 
-    def get_positions(self, plan_multiplicator=1) -> List[ViomiPositionPoint]:
+    def get_positions(self, plan_multiplicator=1) -> list[ViomiPositionPoint]:
         """Return the last positions.
 
         plan_multiplicator scale up the coordinates values
@@ -933,7 +933,7 @@ class ViomiVacuum(Device):
     # MISSING: Virtual wall/restricted area
 
     @command()
-    def get_maps(self) -> List[Dict[str, Any]]:
+    def get_maps(self) -> list[dict[str, Any]]:
         """Return map list.
 
         [{'name': 'MapName1', 'id': 1598622255, 'cur': False},
