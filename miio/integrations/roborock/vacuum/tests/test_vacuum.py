@@ -63,6 +63,10 @@ class DummyVacuum(DummyDevice, RoborockVacuum):
         }
         self._maps = None
         self._map_enum_cache = None
+        self._floor_clean_details = {}
+        self._last_clean_details = None
+        self._searched_clean_id = None
+
         self._status_helper = UpdateHelper(self.vacuum_status)
         self.dummies = {
             "consumables": [

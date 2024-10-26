@@ -7,6 +7,7 @@ from urllib import parse
 from croniter import croniter
 from pytz import BaseTzInfo
 
+from miio.descriptors import SensorDescriptor
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
 from miio.identifiers import VacuumId, VacuumState
@@ -377,6 +378,16 @@ class VacuumStatus(DeviceStatus):
             return None
 
     @property
+    def current_map_name(self) -> str:
+        """The name of the current map with regards to the multi map feature."""
+        try:
+            map_list = self.map_list.map_list
+        except AttributeError:
+            return str(self.current_map_id)
+
+        return map_list[self.current_map_id]["name"]
+
+    @property
     def in_zone_cleaning(self) -> bool:
         """Return True if the vacuum is in zone cleaning mode."""
         return self.data["in_cleaning"] == 2
@@ -633,6 +644,17 @@ class CleaningDetails(DeviceStatus):
         return self.data.get("map_flag", 0)
 
     @property
+    @sensor("Last clean map name", icon="mdi:floor-plan", entity_category="diagnostic")
+    def map_name(self) -> str:
+        """The name of the map used (multi map feature) during the cleaning run."""
+        try:
+            map_list = self._parent.map_list.map_list
+        except AttributeError:
+            return str(self.map_id)
+
+        return map_list[self.map_id]["name"]
+
+    @property
     def error_code(self) -> int:
         """Error code."""
         return int(self.data["error"])
@@ -649,6 +671,57 @@ class CleaningDetails(DeviceStatus):
         see also :func:`error`.
         """
         return self.data["complete"] == 1
+
+
+class FloorCleanDetails(DeviceStatus):
+    """Contains details about a last cleaning run per floor."""
+
+    def __init__(self, data: Dict[int, Any]) -> None:
+        self.data = data
+
+        for map_id in self.data:
+            if self.data[map_id] is None:
+                setattr(self, f"CleanDetails_{map_id}", None)
+                setattr(self, f"start_{map_id}", None)
+                continue
+            setattr(self, f"CleanDetails_{map_id}", self.data[map_id])
+            setattr(self, f"start_{map_id}", self.data[map_id].start)
+
+    def __repr__(self):
+        s = f"<{self.__class__.__name__}"
+        for map_id in self.data:
+            name = f"CleanDetails_{map_id}"
+            value = getattr(self, name)
+            s += f" {name}={value}"
+
+            name = f"start_{map_id}"
+            value = getattr(self, name)
+            s += f" {name}={value}"
+
+        for name, embedded in self._embedded.items():
+            s += f" {name}={repr(embedded)}"
+
+        s += ">"
+        return s
+
+    def sensors(self) -> Dict[str, SensorDescriptor]:
+        """Return the dict of sensors exposed by the status container."""
+        self._sensors = {}  # type: ignore[attr-defined]
+
+        for map_id in self.data:
+            self._sensors[f"start_{map_id}"] = SensorDescriptor(
+                id=f"FloorCleanDetails.start_{map_id}",
+                property=f"start_{map_id}",
+                name=f"Floor {map_id} clean start",
+                type=datetime,
+                extras={
+                    "icon": "mdi:clock-time-twelve",
+                    "device_class": "timestamp",
+                    "entity_category": "diagnostic",
+                },
+            )
+
+        return self._sensors
 
 
 class ConsumableStatus(DeviceStatus):
