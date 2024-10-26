@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -124,7 +124,7 @@ class PressedButton(enum.Enum):
 class AirHumidifierMiotCommonStatus(DeviceStatus):
     """Container for status reports from the air humidifier. Common features for CA4 and CA6 models."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
         _LOGGER.debug(
             "Status Common: %s, __cli_output__ %s", repr(self), self.__cli_output__
@@ -288,7 +288,7 @@ class AirHumidifierMiotStatus(AirHumidifierMiotCommonStatus):
         ]
     """
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
         super().__init__(self.data)
         self.embed("common", AirHumidifierMiotCommonStatus(self.data))
@@ -568,7 +568,7 @@ class AirHumidifierMiotCA6Status(AirHumidifierMiotCommonStatus):
         ]
     """
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
         super().__init__(self.data)
         self.embed("common", AirHumidifierMiotCommonStatus(self.data))

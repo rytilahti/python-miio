@@ -1,6 +1,6 @@
 import enum
 import re
-from typing import Dict, Optional
+from typing import Optional
 
 
 class FilterType(enum.Enum):
@@ -20,7 +20,7 @@ FILTER_TYPE_RE = (
 class FilterTypeUtil:
     """Utility class for determining xiaomi air filter type."""
 
-    _filter_type_cache: Dict[str, Optional[FilterType]] = {}
+    _filter_type_cache: dict[str, Optional[FilterType]] = {}
 
     def determine_filter_type(
         self, rfid_tag: Optional[str], product_id: Optional[str]

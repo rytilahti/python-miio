@@ -1,18 +1,9 @@
 import inspect
 import logging
 import warnings
+from collections.abc import Iterable
 from enum import Enum
-from typing import (
-    Callable,
-    Dict,
-    Iterable,
-    Optional,
-    Type,
-    Union,
-    get_args,
-    get_origin,
-    get_type_hints,
-)
+from typing import Callable, Optional, Union, get_args, get_origin, get_type_hints
 
 import attr
 
@@ -37,7 +28,7 @@ class _StatusMeta(type):
 
         cls._descriptors: DescriptorCollection[PropertyDescriptor] = {}
         cls._parent: Optional["DeviceStatus"] = None
-        cls._embedded: Dict[str, "DeviceStatus"] = {}
+        cls._embedded: dict[str, "DeviceStatus"] = {}
 
         for n in namespace:
             prop = getattr(namespace[n], "fget", None)
@@ -222,7 +213,7 @@ def setting(
     max_value: Optional[int] = None,
     step: Optional[int] = None,
     range_attribute: Optional[str] = None,
-    choices: Optional[Type[Enum]] = None,
+    choices: Optional[type[Enum]] = None,
     choices_attribute: Optional[str] = None,
     **kwargs,
 ):

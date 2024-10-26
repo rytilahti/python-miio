@@ -8,7 +8,7 @@ import os
 import pathlib
 import time
 from enum import Enum
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Optional
 
 import click
 import pytz
@@ -285,7 +285,7 @@ class RoborockVacuum(Device):
         return self.send("app_goto_target", [x_coord, y_coord])
 
     @command(click.argument("zones", type=LiteralParamType(), required=True))
-    def zoned_clean(self, zones: List):
+    def zoned_clean(self, zones: list):
         """Clean zones.
 
         :param List zones: List of zones to clean: [[x1,y1,x2,y2, iterations],[x1,y1,x2,y2, iterations]]
@@ -415,7 +415,7 @@ class RoborockVacuum(Device):
         self._maps = MapList(self.send("get_multi_maps_list")[0])
         return self._maps
 
-    def _map_enum(self) -> Optional[Type[Enum]]:
+    def _map_enum(self) -> Optional[type[Enum]]:
         """Enum of the available map names."""
         if self._map_enum_cache is not None:
             return self._map_enum_cache
@@ -559,9 +559,9 @@ class RoborockVacuum(Device):
         return self.send("find_me", [""])
 
     @command()
-    def timer(self) -> List[Timer]:
+    def timer(self) -> list[Timer]:
         """Return a list of timers."""
-        timers: List[Timer] = list()
+        timers: list[Timer] = list()
         res = self.send("get_timer", [""])
         if not res:
             return timers
@@ -656,7 +656,7 @@ class RoborockVacuum(Device):
         return self.send("get_custom_mode")[0]
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
+    def fan_speed_presets(self) -> dict[str, int]:
         """Return available fan speed presets."""
 
         def _enum_as_dict(cls):
@@ -665,7 +665,7 @@ class RoborockVacuum(Device):
         if self.model is None:
             return _enum_as_dict(FanspeedV1)
 
-        fanspeeds: Type[FanspeedEnum] = FanspeedV1
+        fanspeeds: type[FanspeedEnum] = FanspeedV1
 
         if self.model == ROCKROBO_V1:
             _LOGGER.debug("Got robov1, checking for firmware version")
@@ -900,7 +900,7 @@ class RoborockVacuum(Device):
 
     @command(click.argument("segments", type=LiteralParamType(), required=True))
     @command(click.argument("repeat", type=int, required=False, default=1))
-    def segment_clean(self, segments: List, repeat: int = 1):
+    def segment_clean(self, segments: list, repeat: int = 1):
         """Clean segments.
 
         :param List segments: List of segments to clean: [16,17,18]
@@ -1055,7 +1055,7 @@ class RoborockVacuum(Device):
         return self.send("app_set_dryer_status", {"status": 0})[0] == "ok"
 
     @command()
-    def firmware_features(self) -> List[int]:
+    def firmware_features(self) -> list[int]:
         """Return a list of available firmware features.
 
         Information: https://github.com/marcelrv/XiaomiRobotVacuumProtocol/blob/master/fw_features.md

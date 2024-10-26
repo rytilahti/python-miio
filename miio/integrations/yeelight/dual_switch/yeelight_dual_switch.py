@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -40,7 +40,7 @@ _MAPPINGS: MiotMapping = {
 
 
 class DualControlModuleStatus(DeviceStatus):
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """
         Response of Yeelight Dual Control Module
         {

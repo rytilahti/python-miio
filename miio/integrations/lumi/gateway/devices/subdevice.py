@@ -1,7 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 import attr
 import click
@@ -36,7 +36,7 @@ class SubDevice:
         self,
         gw: "Gateway",
         dev_info: SubDeviceInfo,
-        model_info: Optional[Dict] = None,
+        model_info: Optional[dict] = None,
     ) -> None:
         self._gw = gw
         self.sid = dev_info.sid
@@ -63,8 +63,8 @@ class SubDevice:
         self.setter = model_info.get("setter")
 
         self.push_events = model_info.get("push_properties", [])
-        self._event_ids: List[str] = []
-        self._registered_callbacks: Dict[str, GatewayCallback] = {}
+        self._event_ids: list[str] = []
+        self._registered_callbacks: dict[str, GatewayCallback] = {}
 
     def __repr__(self):
         return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(

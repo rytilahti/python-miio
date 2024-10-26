@@ -2,7 +2,6 @@ import enum
 import logging
 import math
 from collections import defaultdict
-from typing import List
 
 import click
 
@@ -108,7 +107,7 @@ class TemperatureHistory(DeviceStatus):
             self.data = []
 
     @property
-    def temperatures(self) -> List[int]:
+    def temperatures(self) -> list[int]:
         return self.data
 
     @property

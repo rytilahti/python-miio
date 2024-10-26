@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -163,7 +163,7 @@ class OperationModeMiotP45(enum.Enum):
 class FanStatusMiot(DeviceStatus):
     """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker P9/P10."""
 
-    def __init__(self, data: Dict[str, Any], model: str) -> None:
+    def __init__(self, data: dict[str, Any], model: str) -> None:
         """
         Response of a FanMiot (dmaker.fan.p10):
 
@@ -244,7 +244,7 @@ class FanStatusMiot(DeviceStatus):
 class FanStatus1C(DeviceStatus):
     """Container for status reports for Xiaomi Mi Smart Pedestal Fan DMaker 1C."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Fan1C (dmaker.fan.1c):
 
         {

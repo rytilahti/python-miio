@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -61,7 +61,7 @@ class LedBrightness(enum.Enum):
 class AirPurifierStatus(DeviceStatus):
     """Container for status reports from the air purifier."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Air Purifier Pro (zhimi.airpurifier.v6):
 
         {'power': 'off', 'aqi': 7, 'average_aqi': 18, 'humidity': 45,

@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -30,7 +30,7 @@ _LOGGER = logging.getLogger(__name__)
 @click.version_option(package_name="python-miio")
 @click.pass_context
 def cli(ctx, debug: int, output: str):
-    logging_config: Dict[str, Any] = {
+    logging_config: dict[str, Any] = {
         "level": logging.DEBUG if debug > 0 else logging.INFO
     }
     try:
@@ -56,7 +56,7 @@ def cli(ctx, debug: int, output: str):
 
 
 for device_class in DeviceGroupMeta._device_classes:
-    cli.add_command(device_class.get_device_group())
+    cli.add_command(device_class.get_device_group())  # type: ignore[attr-defined]
 
 
 @click.command()

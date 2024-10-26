@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -13,7 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 class PhilipsEyecareStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips Eyecare Smart Lamp 2."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         # ['power': 'off', 'bright': 5, 'notifystatus': 'off',
         #  'ambstatus': 'off', 'ambvalue': 41, 'eyecare': 'on',
         #  'scene_num': 3, 'bls': 'on', 'dvalue': 0]

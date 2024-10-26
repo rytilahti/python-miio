@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
@@ -10,7 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 class WaterPurifierStatus(DeviceStatus):
     """Container for status reports from the water purifier."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
     @property

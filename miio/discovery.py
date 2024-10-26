@@ -1,7 +1,7 @@
 import logging
 import time
 from ipaddress import ip_address
-from typing import Dict, Optional
+from typing import Optional
 
 import zeroconf
 
@@ -14,7 +14,7 @@ class Listener(zeroconf.ServiceListener):
     """mDNS listener creating Device objects for detected devices."""
 
     def __init__(self):
-        self.found_devices: Dict[str, Device] = {}
+        self.found_devices: dict[str, Device] = {}
 
     def create_device(self, info, addr) -> Optional[Device]:
         """Get a device instance for a mdns response."""
@@ -63,7 +63,7 @@ class Discovery:
     """
 
     @staticmethod
-    def discover_mdns(*, timeout=5) -> Dict[str, Device]:
+    def discover_mdns(*, timeout=5) -> dict[str, Device]:
         """Discover devices with mdns."""
         _LOGGER.info("Discovering devices with mDNS for %s seconds...", timeout)
 

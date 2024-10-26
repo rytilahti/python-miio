@@ -1,7 +1,7 @@
 import enum
 import logging
 from datetime import timedelta
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -39,7 +39,7 @@ class WalkingpadStatus(DeviceStatus):
      'time': 121}
     """
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
     @property

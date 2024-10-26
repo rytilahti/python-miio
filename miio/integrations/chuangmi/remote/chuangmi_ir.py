@@ -1,6 +1,6 @@
 import base64
 import re
-from typing import Callable, Set, Tuple
+from typing import Callable
 
 import click
 from construct import (
@@ -98,7 +98,7 @@ class ChuangmiIr(Device):
         return self.play_raw(command, frequency, length)
 
     @classmethod
-    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> Tuple[str, int]:
+    def pronto_to_raw(cls, pronto: str, repeats: int = 1) -> tuple[str, int]:
         """Play a Pronto Hex encoded IR command. Supports only raw Pronto format,
         starting with 0000.
 
@@ -116,7 +116,7 @@ class ChuangmiIr(Device):
         if len(pronto_data.intro) == 0:
             repeats += 1
 
-        times: Set[int] = set()
+        times: set[int] = set()
         for pair in pronto_data.intro + pronto_data.repeat * (1 if repeats else 0):
             times.add(pair.pulse)
             times.add(pair.gap)

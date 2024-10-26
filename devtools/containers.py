@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass, field
 from operator import attrgetter
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from dataclasses_json import DataClassJsonMixin, config
 
@@ -45,7 +45,7 @@ class InstanceInfo:
 
 @dataclass
 class ModelMapping(DataClassJsonMixin):
-    instances: List[InstanceInfo]
+    instances: list[InstanceInfo]
 
     def info_for_model(self, model: str, *, status_filter="released") -> InstanceInfo:
         matches = [inst for inst in self.instances if inst.model == model]
@@ -76,12 +76,12 @@ class Property(DataClassJsonMixin):
     type: str
     description: str
     format: str
-    access: List[str]
+    access: list[str]
 
-    value_list: Optional[List[Dict[str, Any]]] = field(
+    value_list: Optional[list[dict[str, Any]]] = field(
         default_factory=list, metadata=config(field_name="value-list")
     )  # type: ignore
-    value_range: Optional[List[int]] = field(
+    value_range: Optional[list[int]] = field(
         default=None, metadata=config(field_name="value-range")
     )
 
@@ -156,8 +156,8 @@ class Action(DataClassJsonMixin):
     iid: int
     type: str
     description: str
-    out: List[Any] = field(default_factory=list)
-    in_: List[Any] = field(default_factory=list, metadata=config(field_name="in"))
+    out: list[Any] = field(default_factory=list)
+    in_: list[Any] = field(default_factory=list, metadata=config(field_name="in"))
 
     def __repr__(self):
         return f"aiid {self.iid} {self.description}: in: {self.in_} -> out: {self.out}"
@@ -178,7 +178,7 @@ class Event(DataClassJsonMixin):
     iid: int
     type: str
     description: str
-    arguments: List[int]
+    arguments: list[int]
 
     def __repr__(self):
         return f"eiid {self.iid} ({self.description}): (args: {self.arguments})"
@@ -189,9 +189,9 @@ class Service(DataClassJsonMixin):
     iid: int
     type: str
     description: str
-    properties: List[Property] = field(default_factory=list)
-    actions: List[Action] = field(default_factory=list)
-    events: List[Event] = field(default_factory=list)
+    properties: list[Property] = field(default_factory=list)
+    actions: list[Action] = field(default_factory=list)
+    events: list[Event] = field(default_factory=list)
 
     def __repr__(self):
         return f"siid {self.iid}: ({self.description}): {len(self.properties)} props, {len(self.actions)} actions"
@@ -220,7 +220,7 @@ class Service(DataClassJsonMixin):
 class Device(DataClassJsonMixin):
     type: str
     description: str
-    services: List[Service] = field(default_factory=list)
+    services: list[Service] = field(default_factory=list)
 
     def as_code(self):
         s = ""

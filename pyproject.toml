@@ -27,7 +27,7 @@ miio-extract-tokens = "miio.extract_tokens:main"
 miiocli = "miio.cli:create_cli"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 click = ">=8"
 cryptography = ">=35"
 construct = "^2.10.56"

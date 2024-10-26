@@ -3,7 +3,7 @@ import json
 import logging
 import random
 from collections import defaultdict
-from typing import List, Union
+from typing import Union
 
 import click
 
@@ -92,13 +92,13 @@ class SimulatedMiotProperty(MiotProperty):
 class SimulatedMiotService(MiotService):
     """Overridden to allow simulated properties."""
 
-    properties: List[SimulatedMiotProperty] = Field(default=[], repr=False)
+    properties: list[SimulatedMiotProperty] = Field(default=[], repr=False)
 
 
 class SimulatedDeviceModel(DeviceModel):
     """Overridden to allow simulated properties."""
 
-    services: List[SimulatedMiotService]
+    services: list[SimulatedMiotService]
 
 
 class MiotSimulator:

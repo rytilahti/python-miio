@@ -2,7 +2,7 @@ import enum
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import click
 
@@ -81,7 +81,7 @@ class SystemStatus(enum.IntEnum):
 
 
 class ViomiDishwasherStatus(DeviceStatus):
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """A ViomiDishwasherStatus representing the most important values for the
         device.
 
@@ -213,7 +213,7 @@ class ViomiDishwasherStatus(DeviceStatus):
             return ProgramStatus.Unknown
 
     @property
-    def errors(self) -> List[SystemStatus]:
+    def errors(self) -> list[SystemStatus]:
         """Returns list of errors if detected in the system."""
 
         errors = []
@@ -424,7 +424,7 @@ class ViomiDishwasher(Device):
         click.argument("time", type=int),
         default_output=format_output("Setting air refresh to '{time}'"),
     )
-    def airrefresh(self, time: int) -> List[str]:
+    def airrefresh(self, time: int) -> list[str]:
         """Set air refresh interval."""
 
         return self.send("set_freshdry_interval_t", [time])

@@ -1,7 +1,6 @@
 import logging
 from datetime import timedelta
 from enum import Enum
-from typing import Dict
 
 import click
 
@@ -379,7 +378,7 @@ class G1Vacuum(MiotDevice):
         return self.set_property("fan_speed", fan_speed.value)
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
+    def fan_speed_presets(self) -> dict[str, int]:
         """Return available fan speed presets."""
         return {x.name: x.value for x in G1FanSpeed}
 

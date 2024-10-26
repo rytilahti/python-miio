@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, Dict
+from typing import Callable
 
 from miio import DeviceException, DeviceStatus
 
@@ -17,7 +17,7 @@ class UpdateHelper:
     """
 
     def __init__(self, main_update_method: Callable):
-        self._update_methods: Dict[str, Callable] = {}
+        self._update_methods: dict[str, Callable] = {}
         self._main_update_method = main_update_method
 
     def add_update_method(self, name: str, update_method: Callable):

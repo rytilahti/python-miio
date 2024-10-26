@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -60,7 +60,7 @@ class LedBrightness(enum.Enum):
 class AirFreshStatus(DeviceStatus):
     """Container for status reports from the air fresh."""
 
-    def __init__(self, data: Dict[str, Any], model: str) -> None:
+    def __init__(self, data: dict[str, Any], model: str) -> None:
         """
         Response of a Air Fresh VA4 (zhimi.airfresh.va4):
 

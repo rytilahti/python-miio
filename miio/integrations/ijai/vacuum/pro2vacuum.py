@@ -1,7 +1,6 @@
 import logging
 from datetime import timedelta
 from enum import Enum
-from typing import Dict
 
 import click
 
@@ -52,7 +51,7 @@ _MAPPINGS = {
     }
 }
 
-ERROR_CODES: Dict[int, str] = {2105: "Fully charged"}
+ERROR_CODES: dict[int, str] = {2105: "Fully charged"}
 
 
 def _enum_as_dict(cls):
@@ -307,7 +306,7 @@ class Pro2Vacuum(MiotDevice):
         return self.set_property("fan_speed", fan_speed)
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
+    def fan_speed_presets(self) -> dict[str, int]:
         """Return available fan speed presets."""
         return _enum_as_dict(FanSpeedMode)
 

@@ -1,5 +1,6 @@
 import logging
-from typing import TYPE_CHECKING, Dict, Iterable
+from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from miio import DeviceStatus
 from miio.miot_models import DeviceModel, MiotAccess, MiotProperty
@@ -97,7 +98,7 @@ class GenericMiotStatus(DeviceStatus):
         """Return the device which returned this status."""
         return self._dev
 
-    def property_dict(self) -> Dict[str, MiotProperty]:
+    def property_dict(self) -> dict[str, MiotProperty]:
         """Return name-keyed dictionary of properties."""
         res = {}
 

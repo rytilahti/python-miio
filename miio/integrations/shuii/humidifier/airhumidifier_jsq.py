@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -46,7 +46,7 @@ class LedBrightness(enum.Enum):
 class AirHumidifierStatus(DeviceStatus):
     """Container for status reports from the air humidifier jsq."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Status of an Air Humidifier (shuii.humidifier.jsq001):
 
             [24, 30, 1, 1, 0, 2, 0, 0, 0]

@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -55,7 +55,7 @@ class Polarity(enum.Enum):
 
 
 class CurtainStatus(DeviceStatus):
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response from device.
 
         {'id': 1, 'result': [

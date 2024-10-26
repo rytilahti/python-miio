@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 import click
 
@@ -36,7 +36,7 @@ class ToiletlidOperatingMode(enum.Enum):
 
 
 class ToiletlidStatus(DeviceStatus):
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         # {"work_state": 1,"filter_use_flux": 100,"filter_use_time": 180, "ambient_light": "Red"}
         self.data = data
 
@@ -128,7 +128,7 @@ class Toiletlid(Device):
             return "Unknown"
 
     @command(default_output=format_output("Get user list."))
-    def get_all_user_info(self) -> List[Dict]:
+    def get_all_user_info(self) -> list[dict]:
         """Get All bind user."""
         users = self.send("get_all_user_info")
         return users

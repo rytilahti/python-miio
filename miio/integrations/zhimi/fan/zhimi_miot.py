@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -57,7 +57,7 @@ class OperationModeFanZA5(enum.Enum):
 class FanStatusZA5(DeviceStatus):
     """Container for status reports for FanZA5."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of FanZA5 (zhimi.fan.za5):
 
         {'code': -4005, 'did': 'set_move', 'piid': 3, 'siid': 6},

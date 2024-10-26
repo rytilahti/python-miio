@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from operator import attrgetter
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 import platformdirs
 from micloud.miotspec import MiotSpec
@@ -37,7 +37,7 @@ class ReleaseInfo(BaseModel):
 class ReleaseList(BaseModel):
     """Model for miotspec release list."""
 
-    releases: List[ReleaseInfo] = Field(alias="instances")
+    releases: list[ReleaseInfo] = Field(alias="instances")
 
     def info_for_model(self, model: str, *, status_filter="released") -> ReleaseInfo:
         releases = [inst for inst in self.releases if inst.model == model]
@@ -93,7 +93,7 @@ class MiotCloud:
 
         return DeviceModel.parse_obj(self.get_model_schema(model))
 
-    def get_model_schema(self, model: str) -> Dict:
+    def get_model_schema(self, model: str) -> dict:
         """Get the preferred schema for the model."""
         specs = self.get_release_list()
         release_info = specs.info_for_model(model)
@@ -110,13 +110,13 @@ class MiotCloud:
 
         return spec
 
-    def _write_to_cache(self, file: Path, data: Dict):
+    def _write_to_cache(self, file: Path, data: dict):
         """Write given *data* to cache file *file*."""
         file.parent.mkdir(parents=True, exist_ok=True)
         written = file.write_text(json.dumps(data))
         _LOGGER.debug("Written %s bytes to %s", written, file)
 
-    def _file_from_cache(self, file, cache_hours=6) -> Dict:
+    def _file_from_cache(self, file, cache_hours=6) -> dict:
         def _valid_cache():
             expiration = timedelta(hours=cache_hours)
             if datetime.fromtimestamp(

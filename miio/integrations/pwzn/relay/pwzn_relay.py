@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -59,7 +59,7 @@ AVAILABLE_PROPERTIES = {
 class PwznRelayStatus(DeviceStatus):
     """Container for status reports from the plug."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a PWZN Relay Apple (pwzn.relay.apple)
 
         { 'relay_status': 9, 'on_count': 2, 'name0': 'channel1', 'name1': '',
@@ -77,7 +77,7 @@ class PwznRelayStatus(DeviceStatus):
         return None
 
     @property
-    def relay_names(self) -> Dict[int, str]:
+    def relay_names(self) -> dict[int, str]:
         def _extract_index_from_key(name) -> int:
             """extract the index from the variable."""
             return int(name[4:])

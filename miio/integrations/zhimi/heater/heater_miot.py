@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -103,7 +103,7 @@ class LedBrightness(enum.Enum):
 class HeaterMiotStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Smart Space Heater S and 1S."""
 
-    def __init__(self, data: Dict[str, Any], model: str) -> None:
+    def __init__(self, data: dict[str, Any], model: str) -> None:
         """
         Response (MIoT format) of Xiaomi Smart Space Heater S (zhimi.heater.mc2):
 

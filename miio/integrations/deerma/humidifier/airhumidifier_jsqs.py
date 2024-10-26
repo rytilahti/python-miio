@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -63,7 +63,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
         ]
     """
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
     # Air Humidifier

@@ -36,8 +36,8 @@ class Device(metaclass=DeviceGroupMeta):
 
     retry_count = 3
     timeout = 5
-    _mappings: Dict[str, Any] = {}
-    _supported_models: List[str] = []
+    _mappings: dict[str, Any] = {}
+    _supported_models: list[str] = []
 
     def __init_subclass__(cls, **kwargs):
         """Overridden to register all integrations to the factory."""
@@ -182,7 +182,7 @@ class Device(metaclass=DeviceGroupMeta):
         return self._protocol.raw_id
 
     @property
-    def supported_models(self) -> List[str]:
+    def supported_models(self) -> list[str]:
         """Return a list of supported models."""
         return list(self._mappings.keys()) or self._supported_models
 

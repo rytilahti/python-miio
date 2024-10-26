@@ -1,7 +1,7 @@
 import logging
 from enum import Enum
 from functools import partial
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 import click
 
@@ -24,7 +24,7 @@ class MiotValueType(Enum):
     Str = str
 
 
-MiotMapping = Dict[str, Dict[str, Any]]
+MiotMapping = dict[str, dict[str, Any]]
 
 
 def _filter_request_fields(req):
@@ -58,7 +58,7 @@ class MiotDevice(Device):
     """
 
     mapping: MiotMapping  # Deprecated, use _mappings instead
-    _mappings: Dict[str, MiotMapping] = {}
+    _mappings: dict[str, MiotMapping] = {}
 
     def __init__(
         self,

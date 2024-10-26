@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Optional
 
 
 class DeviceInfo:
@@ -40,7 +40,7 @@ class DeviceInfo:
         )
 
     @property
-    def network_interface(self) -> Dict:
+    def network_interface(self) -> dict:
         """Information about network configuration.
 
         If unavailable, returns an empty dictionary.

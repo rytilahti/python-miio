@@ -1,6 +1,6 @@
 import logging
 from enum import IntEnum
-from typing import List, Optional, Tuple
+from typing import Optional
 
 import click
 
@@ -54,7 +54,7 @@ class YeelightSubLight(DeviceStatus):
         return int(self.data[self.get_prop_name("bright")])
 
     @property
-    def rgb(self) -> Optional[Tuple[int, int, int]]:
+    def rgb(self) -> Optional[tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
         rgb_int = self.rgb_int
         if rgb_int is not None:
@@ -79,7 +79,7 @@ class YeelightSubLight(DeviceStatus):
             return None
 
     @property
-    def hsv(self) -> Optional[Tuple[int, int, int]]:
+    def hsv(self) -> Optional[tuple[int, int, int]]:
         """Return current color in HSV if HSV mode is active."""
         hue = self.data[self.get_prop_name("hue")]
         sat = self.data[self.get_prop_name("sat")]
@@ -140,7 +140,7 @@ class YeelightStatus(DeviceStatus):
         return self.lights[0].brightness
 
     @property
-    def rgb(self) -> Optional[Tuple[int, int, int]]:
+    def rgb(self) -> Optional[tuple[int, int, int]]:
         """Return color in RGB if RGB mode is active."""
         return self.lights[0].rgb
 
@@ -160,7 +160,7 @@ class YeelightStatus(DeviceStatus):
     @sensor(
         "HSV", setter_name="set_hsv"
     )  # TODO: we need to extend @setting to support tuples to fix this
-    def hsv(self) -> Optional[Tuple[int, int, int]]:
+    def hsv(self) -> Optional[tuple[int, int, int]]:
         """Return current color in HSV if HSV mode is active."""
         return self.lights[0].hsv
 
@@ -243,7 +243,7 @@ class YeelightStatus(DeviceStatus):
         return None
 
     @property
-    def lights(self) -> List[YeelightSubLight]:
+    def lights(self) -> list[YeelightSubLight]:
         """Return list of sub lights."""
         sub_lights = list({YeelightSubLight(self.data, YeelightSubLightType.Main)})
         bg_power = self.data[
@@ -269,7 +269,7 @@ class Yeelight(Device):
     """
 
     _spec_helper = YeelightSpecHelper()
-    _supported_models: List[str] = _spec_helper.supported_models
+    _supported_models: list[str] = _spec_helper.supported_models
 
     def __init__(
         self,
@@ -416,7 +416,7 @@ class Yeelight(Device):
         click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
         default_output=format_output("Setting color to {rgb}"),
     )
-    def set_rgb(self, rgb: Tuple[int, int, int]):
+    def set_rgb(self, rgb: tuple[int, int, int]):
         """Set color in RGB."""
         for color in rgb:
             if color < 0 or color > 255:

@@ -1,7 +1,5 @@
 """Xiaomi Gateway Light implementation."""
 
-from typing import Tuple
-
 from miio.utils import brightness_and_color_to_int, int_to_brightness, int_to_rgb
 
 from .gatewaydevice import GatewayDevice
@@ -59,13 +57,13 @@ class Light(GatewayDevice):
 
         return {"is_on": is_on, "brightness": brightness, "rgb": rgb}
 
-    def set_rgb(self, brightness: int, rgb: Tuple[int, int, int]):
+    def set_rgb(self, brightness: int, rgb: tuple[int, int, int]):
         """Set gateway light using brightness and rgb tuple."""
         brightness_and_color = brightness_and_color_to_int(brightness, rgb)
 
         return self._gateway.send("set_rgb", [brightness_and_color])
 
-    def set_night_light(self, brightness: int, rgb: Tuple[int, int, int]):
+    def set_night_light(self, brightness: int, rgb: tuple[int, int, int]):
         """Set gateway night light using brightness and rgb tuple."""
         brightness_and_color = brightness_and_color_to_int(brightness, rgb)
 

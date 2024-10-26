@@ -1,7 +1,7 @@
 """Xiaomi Gateway device base class."""
 
 import logging
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from miio import DeviceException
 
@@ -28,4 +28,4 @@ class GatewayDevice:
             )
 
         self._gateway = parent
-        self._event_ids: List[str] = []
+        self._event_ids: list[str] = []
