@@ -50,7 +50,7 @@ Alternatively, you can install the latest development version from GitHub:
     pip install git+https://github.com/rytilahti/python-miio.git
 
 **This project is currently ongoing [a major refactoring effort](https://github.com/rytilahti/python-miio/issues/1114).
-If you are interested in controlling modern (MIoT) devices, you want to use the git version until version 0.6.0 is released.**
+If you are interested in controlling modern (MIoT) devices, you want to use the git version (or pre-releases, `pip install --pre python-miio`) until version 0.6.0 is released.**
 
 ## Getting started
 
