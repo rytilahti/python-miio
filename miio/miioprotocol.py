@@ -151,7 +151,7 @@ class MiIOProtocol:
         parameters: Optional[Any] = None,
         retry_count: int = 3,
         *,
-        extra_parameters: Optional[dict] = None
+        extra_parameters: Optional[dict] = None,
     ) -> Any:
         """Build and send the given command. Note that this will implicitly call
         :func:`send_handshake` to do a handshake, and will re-try in case of errors
