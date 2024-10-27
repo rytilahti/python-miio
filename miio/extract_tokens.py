@@ -82,8 +82,8 @@ class BackupDatabaseReader:
         key = bytes.fromhex(keystring)
         cipher = Cipher(
             algorithms.AES(key),
-            modes.ECB(),
-            backend=default_backend(),  # nosec
+            modes.ECB(),  # nosec
+            backend=default_backend(),
         )
         decryptor = cipher.decryptor()
         token = decryptor.update(bytes.fromhex(ztoken[:64])) + decryptor.finalize()
