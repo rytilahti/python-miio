@@ -253,9 +253,7 @@ class PushServer:
         command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"
         message_id = 0
-        magic_number = randint(
-            1590161094, 1642025774
-        )  # nosec, min/max taken from packet captures, unknown use
+        magic_number = randint(1590161094, 1642025774)  # nosec, min/max taken from packet captures, unknown use
 
         if len(command) > 49:
             _LOGGER.error(
