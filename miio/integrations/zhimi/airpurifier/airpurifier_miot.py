@@ -168,6 +168,33 @@ _MAPPING_RMA1 = {
     "led_brightness": {"siid": 13, "piid": 2},
 }
 
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-rma3:1
+_MAPPING_RMA3 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    # Environment
+    "humidity": {"siid": 3, "piid": 1},
+    "aqi": {"siid": 3, "piid": 4},
+    "temperature": {"siid": 3, "piid": 7},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    "favorite_level": {"siid": 9, "piid": 2},
+    # aqi
+    "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
+    # Screen
+    "led_brightness": {"siid": 13, "piid": 2},
+}
+
+
 
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-rma2:1
 _MAPPING_RMA2 = {
@@ -279,6 +306,7 @@ _MAPPINGS = {
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
     "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
+    "zhimi.airp.rma3": _MAPPING_RMA3,  # airpurifier 4 lite
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
     "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
 }
