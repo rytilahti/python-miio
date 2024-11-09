@@ -1,4 +1,5 @@
 import logging
+from abc import abstractmethod
 from datetime import timedelta
 from enum import Enum
 from typing import Any, Optional
@@ -150,6 +151,11 @@ class MiotBaseModel(BaseModel):
         """
         return self.name.replace(":", "_").replace("-", "_")
 
+    @property
+    @abstractmethod
+    def unique_identifier(self) -> str:
+        """Return unique identifier."""
+
 
 class MiotAction(MiotBaseModel):
     """Action presentation for miot."""
@@ -176,8 +182,6 @@ class MiotAction(MiotBaseModel):
 
     def get_descriptor(self):
         """Create a descriptor based on the property information."""
-        id_ = self.name
-
         extras = self.extras
         extras["urn"] = self.urn
         extras["siid"] = self.siid
@@ -190,11 +194,16 @@ class MiotAction(MiotBaseModel):
             inputs = [prop.get_descriptor() for prop in self.inputs]
 
         return ActionDescriptor(
-            id=id_,
+            id=self.unique_identifier,
             name=self.description,
             inputs=inputs,
             extras=extras,
         )
+
+    @property
+    def unique_identifier(self) -> str:
+        """Return unique identifier."""
+        return f"{self.normalized_name}_{self.siid}_{self.aiid}"
 
     class Config:
         extra = "forbid"
@@ -327,7 +336,7 @@ class MiotProperty(MiotBaseModel):
             raise
 
         desc = EnumDescriptor(
-            id=self.name,
+            id=self.unique_identifier,
             name=self.description,
             status_attribute=self.normalized_name,
             unit=self.unit,
@@ -346,7 +355,7 @@ class MiotProperty(MiotBaseModel):
         if self.range is None:
             raise ValueError("Range is None")
         desc = RangeDescriptor(
-            id=self.name,
+            id=self.unique_identifier,
             name=self.description,
             status_attribute=self.normalized_name,
             min_value=self.range[0],
@@ -363,13 +372,18 @@ class MiotProperty(MiotBaseModel):
     def _create_regular_descriptor(self) -> PropertyDescriptor:
         """Create boolean setting descriptor."""
         return PropertyDescriptor(
-            id=self.name,
+            id=self.unique_identifier,
             name=self.description,
             status_attribute=self.normalized_name,
             type=self.format,
             extras=self.extras,
             access=self._miot_access_list_to_access(self.access),
         )
+
+    @property
+    def unique_identifier(self) -> str:
+        """Return unique identifier."""
+        return f"{self.normalized_name}_{self.siid}_{self.piid}"
 
     class Config:
         extra = "forbid"
@@ -380,6 +394,11 @@ class MiotEvent(MiotBaseModel):
 
     eiid: int = Field(alias="iid")
     arguments: Any
+
+    @property
+    def unique_identifier(self) -> str:
+        """Return unique identifier."""
+        return f"{self.normalized_name}_{self.siid}_{self.eiid}"
 
     class Config:
         extra = "forbid"
