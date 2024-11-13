@@ -10,7 +10,7 @@ Status](https://github.com/rytilahti/python-miio/actions/workflows/ci.yml/badge.
 [![Coverage
 Status](https://codecov.io/gh/rytilahti/python-miio/branch/master/graph/badge.svg?token=lYKWubxkLU)](https://codecov.io/gh/rytilahti/python-miio)
 [![Documentation status](https://readthedocs.org/projects/python-miio/badge/?version=latest)](https://python-miio.readthedocs.io/en/latest/?badge=latest)
-[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20python-miio%20Guru-006BFF)](https://gurubase.io/g/python-miio)
+[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20python--miio%20Guru-006BFF)](https://gurubase.io/g/python-miio)
 
 This library (and its accompanying cli tool, `miiocli`) can be used to control devices using Xiaomi's
 [miIO](https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md)
