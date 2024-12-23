@@ -222,7 +222,7 @@ _MAPPING_RMB1 = {
     # Screen
     "led_brightness": {"siid": 13, "piid": 2},
     # Device Display Unit
-    "device-display-unit": {"siid": 14, "piid": 1},
+    "device_display_unit": {"siid": 14, "piid": 1},
 }
 
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-za1:2
@@ -258,9 +258,47 @@ _MAPPING_ZA1 = {
     "filter_rfid_tag": {"siid": 14, "piid": 1},
     "filter_rfid_product_id": {"siid": 14, "piid": 3},
     # Device Display Unit
-    "device-display-unit": {"siid": 16, "piid": 1},
+    "device_display_unit": {"siid": 16, "piid": 1},
     # Other
     "gestures": {"siid": 15, "piid": 13},
+}
+
+# https://home.miot-spec.com/spec/zhimi.airp.meb1
+_MAPPING_MEB1 = {
+    # Air Purifier (siid=2)
+    "power": {"siid": 2, "piid": 1},
+    "fault": {"siid": 2, "piid": 2},
+    "mode": {"siid": 2, "piid": 4},
+    "fan_level": {"siid": 2, "piid": 5},
+    "plasma": {"siid": 2, "piid": 6},
+    "uv": {"siid": 2, "piid": 7},
+    # Environment (siid=3)
+    "pm2_5_density": {"siid": 3, "piid": 4},
+    "pm10_density": {"siid": 3, "piid": 8},
+    "aqi": {"siid": 3, "piid": 9},
+    "humidity": {"siid": 3, "piid": 1},
+    "temperature": {"siid": 3, "piid": 7},
+    # Filter (siid=4)
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    # Alarm (siid=6)
+    "buzzer": {"siid": 6, "piid": 1},
+    "buzzer_volume": {"siid": 6, "piid": 2},
+    # Physical Control Locked (siid=8)
+    "child_lock": {"siid": 8, "piid": 1},
+    # Custom Service (siid=9)
+    "motor_speed": {"siid": 9, "piid": 1},
+    "reboot_cause": {"siid": 9, "piid": 8},
+    "country_code": {"siid": 9, "piid": 11},
+    # AQI (siid=11)
+    "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
+    # RFID (siid=12)
+    "filter_rfid_tag": {"siid": 12, "piid": 1},
+    "filter_rfid_product_id": {"siid": 12, "piid": 3},
+    # Screen (siid=13)
+    "led_brightness": {"siid": 13, "piid": 2},
+    # Device Display Unit (siid=15)
+    "temperature_display_unit": {"siid": 15, "piid": 1},
 }
 
 
@@ -281,6 +319,7 @@ _MAPPINGS = {
     "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
     "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
+    "zhimi.airp.meb1": _MAPPING_MEB1,  # air purifier elite
 }
 
 # Models requiring reversed led brightness value
@@ -290,6 +329,7 @@ REVERSED_LED_BRIGHTNESS = [
     "zhimi.airp.mb5a",
     "zhimi.airp.vb4",
     "zhimi.airp.rmb1",
+    "zhimi.airp.meb1",
 ]
 
 
@@ -305,6 +345,14 @@ class LedBrightness(enum.Enum):
     Bright = 0
     Dim = 1
     Off = 2
+
+
+class FaultCode(enum.Enum):
+    NO_FAULT = 0
+    SENSOR_PM_ERROR = 1
+    SENSOR_HUM_ERROR = 2
+    NO_FILTER = 4
+    UNKNOWN_ERROR = -1
 
 
 class AirPurifierMiotStatus(DeviceStatus):
@@ -429,10 +477,65 @@ class AirPurifierMiotStatus(DeviceStatus):
         return round(temperate, 1) if temperate is not None else None
 
     @property
+    @sensor("PM10 Density", unit="μg/m³")
     def pm10_density(self) -> Optional[float]:
-        """Current temperature, if available."""
+        """Current PM10 density, if available."""
         pm10_density = self.data.get("pm10_density")
         return round(pm10_density, 1) if pm10_density is not None else None
+
+    @property
+    @sensor("PM2.5 Density", unit="μg/m³")
+    def pm25_density(self) -> Optional[float]:
+        """Return the PM2.5 density."""
+        return self.data.get("pm2_5_density")
+
+    @property
+    def is_plasma_on(self) -> bool:
+        """Return True if plasma is on."""
+        return bool(self.data.get("plasma"))
+
+    @property
+    @setting("Plasma", setter_name="set_plasma")
+    def plasma(self) -> str:
+        """Plasma state."""
+        return "on" if self.is_plasma_on else "off"
+
+    @property
+    def is_uv_on(self) -> bool:
+        """Return True if UV is on."""
+        return bool(self.data.get("uv"))
+
+    @property
+    @setting("UV", setter_name="set_uv")
+    def uv(self) -> str:
+        """UV state."""
+        return "on" if self.is_uv_on else "off"
+
+    @property
+    @sensor("Fault Code", unit="")
+    def fault(self) -> Optional[FaultCode]:
+        """Return fault code if any."""
+        fault_code = self.data.get("fault")
+        try:
+            return FaultCode(fault_code) if fault_code is not None else None
+        except ValueError:
+            _LOGGER.warning("Unknown fault code: %s", fault_code)
+            return None
+
+    @property
+    def temperature_display_unit(self) -> Optional[int]:
+        """Return temperature display unit."""
+        return self.data.get("temperature_display_unit")
+
+    @property
+    def country_code(self) -> Optional[int]:
+        """Return country code."""
+        return self.data.get("country_code")
+
+    @property
+    def reboot_cause(self) -> Optional[int]:
+        """Return reboot cause."""
+        return self.data.get("reboot_cause")
 
     @property
     def fan_level(self) -> Optional[int]:
@@ -530,13 +633,19 @@ class AirPurifierMiot(MiotDevice):
         default_output=format_output(
             "",
             "Power: {result.power}\n"
+            "Fault Code: {result.fault}\n"
+            "Fault Description: {result.fault_description}\n"
+            "Plasma: {result.plasma}\n"
+            "UV: {result.uv}\n"
             "Anion: {result.anion}\n"
             "AQI: {result.aqi} μg/m³\n"
             "TVOC: {result.tvoc}\n"
             "Average AQI: {result.average_aqi} μg/m³\n"
             "Humidity: {result.humidity} %\n"
             "Temperature: {result.temperature} °C\n"
+            "Temperature Unit: {result.temperature_display_unit}\n"
             "PM10 Density: {result.pm10_density} μg/m³\n"
+            "PM2.5 Density: {result.pm25_density} μg/m³\n"
             "Fan Level: {result.fan_level}\n"
             "Mode: {result.mode}\n"
             "LED: {result.led}\n"
@@ -555,7 +664,9 @@ class AirPurifierMiot(MiotDevice):
             "Motor speed: {result.motor_speed} rpm\n"
             "Filter RFID product id: {result.filter_rfid_product_id}\n"
             "Filter RFID tag: {result.filter_rfid_tag}\n"
-            "Filter type: {result.filter_type}\n",
+            "Filter type: {result.filter_type}\n"
+            "Country Code: {result.country_code}\n"
+            "Reboot Cause: {result.reboot_cause}\n",
         )
     )
     def status(self) -> AirPurifierMiotStatus:
@@ -764,3 +875,33 @@ class AirPurifierMiot(MiotDevice):
             raise ValueError("Invalid brightness level: %s" % level)
 
         return self.set_property("led_brightness_level", level)
+
+    @command(
+        click.argument("plasma", type=bool),
+        default_output=format_output(
+            lambda plasma: "Turning on plasma" if plasma else "Turning off plasma"
+        ),
+    )
+    def set_plasma(self, plasma: bool):
+        """Set plasma on/off."""
+        if "plasma" not in self._get_mapping():
+            raise UnsupportedFeatureException(
+                "Unsupported plasma for model '%s'" % self.model
+            )
+
+        return self.set_property("plasma", plasma)
+
+    @command(
+        click.argument("uv", type=bool),
+        default_output=format_output(
+            lambda uv: "Turning on UV" if uv else "Turning off UV"
+        ),
+    )
+    def set_uv(self, uv: bool):
+        """Set UV on/off."""
+        if "uv" not in self._get_mapping():
+            raise UnsupportedFeatureException(
+                "Unsupported UV for model '%s'" % self.model
+            )
+
+        return self.set_property("uv", uv)
