@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any
 
 import click
 
@@ -14,10 +14,10 @@ MODEL_MMGG_PET_WATERER_S1 = "mmgg.pet_waterer.s1"
 MODEL_MMGG_PET_WATERER_S4 = "mmgg.pet_waterer.s4"
 MODEL_MMGG_PET_WATERER_WI11 = "mmgg.pet_waterer.wi11"
 
-S_MODELS: List[str] = [MODEL_MMGG_PET_WATERER_S1, MODEL_MMGG_PET_WATERER_S4]
-WI_MODELS: List[str] = [MODEL_MMGG_PET_WATERER_WI11]
+S_MODELS: list[str] = [MODEL_MMGG_PET_WATERER_S1, MODEL_MMGG_PET_WATERER_S4]
+WI_MODELS: list[str] = [MODEL_MMGG_PET_WATERER_WI11]
 
-_MAPPING_COMMON: Dict[str, Dict[str, int]] = {
+_MAPPING_COMMON: dict[str, dict[str, int]] = {
     "mode": {"siid": 2, "piid": 3},
     "filter_left_time": {"siid": 3, "piid": 1},
     "reset_filter_life": {"siid": 3, "aiid": 1},
@@ -35,12 +35,12 @@ _MAPPING_COMMON: Dict[str, Dict[str, int]] = {
     "location": {"siid": 9, "piid": 2},
 }
 
-_MAPPING_S: Dict[str, Dict[str, int]] = {
+_MAPPING_S: dict[str, dict[str, int]] = {
     "fault": {"siid": 2, "piid": 1},
     "on": {"siid": 2, "piid": 2},
 }
 
-_MAPPING_WI: Dict[str, Dict[str, int]] = {
+_MAPPING_WI: dict[str, dict[str, int]] = {
     "on": {"siid": 2, "piid": 1},
     "fault": {"siid": 2, "piid": 2},
 }
@@ -87,12 +87,12 @@ class PetWaterDispenser(MiotDevice):
         return PetWaterDispenserStatus(data)
 
     @command(default_output=format_output("Turning device on"))
-    def on(self) -> List[Dict[str, Any]]:
+    def on(self) -> list[dict[str, Any]]:
         """Turn device on."""
         return self.set_property("on", True)
 
     @command(default_output=format_output("Turning device off"))
-    def off(self) -> List[Dict[str, Any]]:
+    def off(self) -> list[dict[str, Any]]:
         """Turn device off."""
         return self.set_property("on", False)
 
@@ -102,7 +102,7 @@ class PetWaterDispenser(MiotDevice):
             lambda led: "Turning LED on" if led else "Turning LED off"
         ),
     )
-    def set_led(self, led: bool) -> List[Dict[str, Any]]:
+    def set_led(self, led: bool) -> list[dict[str, Any]]:
         """Toggle indicator light on/off."""
         if led:
             return self.set_property("indicator_light", True)
@@ -112,32 +112,32 @@ class PetWaterDispenser(MiotDevice):
         click.argument("mode", type=EnumType(OperatingMode)),
         default_output=format_output('Changing mode to "{mode.name}"'),
     )
-    def set_mode(self, mode: OperatingMode) -> List[Dict[str, Any]]:
+    def set_mode(self, mode: OperatingMode) -> list[dict[str, Any]]:
         """Switch operation mode."""
         return self.set_property("mode", mode.value)
 
     @command(default_output=format_output("Resetting sponge filter"))
-    def reset_sponge_filter(self) -> Dict[str, Any]:
+    def reset_sponge_filter(self) -> dict[str, Any]:
         """Reset sponge filter."""
         return self.call_action_from_mapping("reset_filter_life")
 
     @command(default_output=format_output("Resetting cotton filter"))
-    def reset_cotton_filter(self) -> Dict[str, Any]:
+    def reset_cotton_filter(self) -> dict[str, Any]:
         """Reset cotton filter."""
         return self.call_action_from_mapping("reset_cotton_life")
 
     @command(default_output=format_output("Resetting all filters"))
-    def reset_all_filters(self) -> List[Dict[str, Any]]:
+    def reset_all_filters(self) -> list[dict[str, Any]]:
         """Reset all filters [cotton, sponge]."""
         return [self.reset_cotton_filter(), self.reset_sponge_filter()]
 
     @command(default_output=format_output("Resetting cleaning time"))
-    def reset_cleaning_time(self) -> Dict[str, Any]:
+    def reset_cleaning_time(self) -> dict[str, Any]:
         """Reset cleaning time counter."""
         return self.call_action_from_mapping("reset_clean_time")
 
     @command(default_output=format_output("Resetting device"))
-    def reset(self) -> Dict[str, Any]:
+    def reset(self) -> dict[str, Any]:
         """Reset device."""
         return self.call_action_from_mapping("reset_device")
 
@@ -145,7 +145,7 @@ class PetWaterDispenser(MiotDevice):
         click.argument("timezone", type=click.IntRange(-12, 12)),
         default_output=format_output('Changing timezone to "{timezone}"'),
     )
-    def set_timezone(self, timezone: int) -> List[Dict[str, Any]]:
+    def set_timezone(self, timezone: int) -> list[dict[str, Any]]:
         """Change timezone."""
         return self.set_property("timezone", timezone)
 
@@ -153,6 +153,6 @@ class PetWaterDispenser(MiotDevice):
         click.argument("location", type=str),
         default_output=format_output('Changing location to "{location}"'),
     )
-    def set_location(self, location: str) -> List[Dict[str, Any]]:
+    def set_location(self, location: str) -> list[dict[str, Any]]:
         """Change location."""
         return self.set_property("location", location)

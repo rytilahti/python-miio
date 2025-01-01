@@ -1,7 +1,6 @@
 import logging
 import os
 from enum import IntEnum
-from typing import Dict
 
 import attr
 import yaml
@@ -26,11 +25,11 @@ class YeelightLampInfo:
 class YeelightModelInfo:
     model: str
     night_light: bool
-    lamps: Dict[YeelightSubLightType, YeelightLampInfo]
+    lamps: dict[YeelightSubLightType, YeelightLampInfo]
 
 
 class YeelightSpecHelper:
-    _models: Dict[str, YeelightModelInfo] = {}
+    _models: dict[str, YeelightModelInfo] = {}
 
     def __init__(self):
         if not YeelightSpecHelper._models:

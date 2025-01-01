@@ -183,7 +183,7 @@ texinfo_documents = [
     )
 ]
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3.8", None)}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 apidoc_module_dir = "../miio"
 apidoc_output_dir = "api"

@@ -5,7 +5,7 @@ from 3000K to 6400K
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -113,7 +113,7 @@ _ADDITIONAL_MAPPING_SCENE = {  # Only for write, send "0" to activate
 
 
 class HuizuoStatus(DeviceStatus):
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
     @property

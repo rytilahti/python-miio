@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -36,7 +36,7 @@ class OperationMode(enum.Enum):
 class FanLeshowStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Rosou SS4 Ventilator."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Leshow Fan SS4 (leshow.fan.ss4):
 
         {'power': 1, 'mode': 2, 'blow': 100, 'timer': 0,

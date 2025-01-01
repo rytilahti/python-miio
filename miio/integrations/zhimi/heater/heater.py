@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -24,7 +24,7 @@ AVAILABLE_PROPERTIES_COMMON = [
 AVAILABLE_PROPERTIES_ZA1 = ["poweroff_time", "relative_humidity"]
 AVAILABLE_PROPERTIES_MA1 = ["poweroff_level", "poweroff_value"]
 
-SUPPORTED_MODELS: Dict[str, Dict[str, Any]] = {
+SUPPORTED_MODELS: dict[str, dict[str, Any]] = {
     MODEL_HEATER_ZA1: {
         "available_properties": AVAILABLE_PROPERTIES_COMMON + AVAILABLE_PROPERTIES_ZA1,
         "temperature_range": (16, 32),
@@ -47,7 +47,7 @@ class Brightness(enum.Enum):
 class HeaterStatus(DeviceStatus):
     """Container for status reports from the Smartmi Zhimi Heater."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Heater (zhimi.heater.za1):
 
         {'power': 'off', 'target_temperature': 24, 'brightness': 1,

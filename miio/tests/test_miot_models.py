@@ -21,6 +21,7 @@ from miio.miot_models import (
     URN,
     MiotAccess,
     MiotAction,
+    MiotBaseModel,
     MiotEnumValue,
     MiotEvent,
     MiotFormat,
@@ -127,6 +128,26 @@ def test_action():
         "description": "Description",
         "in": [],
         "out": []
+    }"""
+    act = MiotAction.parse_raw(simple_action)
+    assert act.aiid == 1
+    assert act.urn.type == "action"
+    assert act.description == "Description"
+    assert act.inputs == []
+    assert act.outputs == []
+
+    assert act.plain_name == "dummy-action"
+
+
+def test_action_with_nulls():
+    """Test that actions with null ins and outs are parsed correctly."""
+    simple_action = """\
+    {
+        "iid": 1,
+        "type": "urn:miot-spec-v2:action:dummy-action:0000001:dummy:1",
+        "description": "Description",
+        "in": null,
+        "out": null
     }"""
     act = MiotAction.parse_raw(simple_action)
     assert act.aiid == 1
@@ -329,3 +350,18 @@ def test_get_descriptor_enum_property(read_only, expected):
 def test_property_pretty_value():
     """Test the pretty value conversions."""
     raise NotImplementedError()
+
+
+@pytest.mark.parametrize(
+    ("collection", "id_var"),
+    [("actions", "aiid"), ("properties", "piid"), ("events", "eiid")],
+)
+def test_unique_identifier(collection, id_var):
+    """Test unique identifier for properties, actions, and events."""
+    serv = MiotService.parse_raw(DUMMY_SERVICE)
+    elem: MiotBaseModel = getattr(serv, collection)
+    first = elem[0]
+    assert (
+        first.unique_identifier
+        == f"{first.normalized_name}_{serv.siid}_{getattr(first, id_var)}"
+    )

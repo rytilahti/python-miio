@@ -3,7 +3,7 @@
 import asyncio
 import json
 import logging
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import click
 
@@ -43,7 +43,7 @@ class MiioProperty(BaseModel):
     name: str
     type: Format
     value: Optional[Union[str, bool, int]]
-    models: List[str] = Field(default=[])
+    models: list[str] = Field(default=[])
     setter: Optional[str] = None
     description: Optional[str] = None
     min: Optional[int] = None
@@ -61,7 +61,7 @@ class MiioMethod(BaseModel):
     """Simulated method."""
 
     name: str
-    result: Optional[List] = None
+    result: Optional[list] = None
     result_json: Optional[str] = None
 
 
@@ -76,11 +76,11 @@ class SimulatedMiio(BaseModel):
     """Simulated device model for miio devices."""
 
     name: Optional[str] = Field(default="Unnamed integration")
-    models: List[MiioModel]
+    models: list[MiioModel]
     type: str
-    properties: List[MiioProperty] = Field(default=[])
-    actions: List[MiioAction] = Field(default=[])
-    methods: List[MiioMethod] = Field(default=[])
+    properties: list[MiioProperty] = Field(default=[])
+    actions: list[MiioAction] = Field(default=[])
+    methods: list[MiioMethod] = Field(default=[])
     _model: Optional[str] = PrivateAttr(default=None)
 
     class Config:

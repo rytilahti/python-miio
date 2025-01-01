@@ -10,7 +10,6 @@ Status](https://github.com/rytilahti/python-miio/actions/workflows/ci.yml/badge.
 [![Coverage
 Status](https://codecov.io/gh/rytilahti/python-miio/branch/master/graph/badge.svg?token=lYKWubxkLU)](https://codecov.io/gh/rytilahti/python-miio)
 [![Documentation status](https://readthedocs.org/projects/python-miio/badge/?version=latest)](https://python-miio.readthedocs.io/en/latest/?badge=latest)
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 This library (and its accompanying cli tool, `miiocli`) can be used to control devices using Xiaomi's
 [miIO](https://github.com/OpenMiHome/mihome-binary-protocol/blob/master/doc/PROTOCOL.md)
@@ -50,7 +49,7 @@ Alternatively, you can install the latest development version from GitHub:
     pip install git+https://github.com/rytilahti/python-miio.git
 
 **This project is currently ongoing [a major refactoring effort](https://github.com/rytilahti/python-miio/issues/1114).
-If you are interested in controlling modern (MIoT) devices, you want to use the git version until version 0.6.0 is released.**
+If you are interested in controlling modern (MIoT) devices, you want to use the git version (or pre-releases, `pip install --pre python-miio`) until version 0.6.0 is released.**
 
 ## Getting started
 

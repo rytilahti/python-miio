@@ -1,7 +1,7 @@
 import enum
 import logging
 from datetime import timedelta
-from typing import Any, Dict
+from typing import Any
 
 import click
 
@@ -159,7 +159,7 @@ class TimerStatus(DeviceStatus):
 class AirConditionerMiotStatus(DeviceStatus):
     """Container for status reports from the air conditioner (MIoT)."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """
         Response (MIoT format) of a Mi Smart Air Conditioner A (xiaomi.aircondition.mc4)
         [

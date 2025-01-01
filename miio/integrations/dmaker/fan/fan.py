@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -39,7 +39,7 @@ AVAILABLE_PROPERTIES = {
 class FanStatusP5(DeviceStatus):
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan DMaker P5."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Fan (dmaker.fan.p5):
 
         {'power': False, 'mode': 'normal', 'speed': 35, 'roll_enable': False,

@@ -17,7 +17,7 @@ import datetime
 import hashlib
 import json
 import logging
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Union
 
 from construct import (
     Adapter,
@@ -63,7 +63,7 @@ class Utils:
         return checksum.digest()
 
     @staticmethod
-    def key_iv(token: bytes) -> Tuple[bytes, bytes]:
+    def key_iv(token: bytes) -> tuple[bytes, bytes]:
         """Generate an IV used for encryption based on given token."""
         key = Utils.md5(token)
         iv = Utils.md5(key + token)
@@ -112,7 +112,7 @@ class Utils:
         return unpadded_plaintext
 
     @staticmethod
-    def checksum_field_bytes(ctx: Dict[str, Any]) -> bytearray:
+    def checksum_field_bytes(ctx: dict[str, Any]) -> bytearray:
         """Gather bytes for checksum calculation."""
         x = bytearray(ctx["header"].data)
         x += ctx["_"]["token"]
@@ -160,7 +160,7 @@ class EncryptionAdapter(Adapter):
             json.dumps(obj).encode("utf-8") + b"\x00", context["_"]["token"]
         )
 
-    def _decode(self, obj, context, path) -> Union[Dict, bytes]:
+    def _decode(self, obj, context, path) -> Union[dict, bytes]:
         """Decrypts the payload using the token stored in the context."""
         # Missing payload is expected for discovery messages.
         if not obj:

@@ -10,7 +10,7 @@ from pprint import pformat as pf
 from typing import Any, List  # noqa: F401
 
 import click
-from appdirs import user_cache_dir
+from platformdirs import user_cache_dir
 from tqdm import tqdm
 
 from miio.click_common import (
@@ -218,7 +218,7 @@ def goto(vac: RoborockVacuum, x_coord: int, y_coord: int):
 @cli.command()
 @pass_dev
 @click.argument("zones", type=LiteralParamType(), required=True)
-def zoned_clean(vac: RoborockVacuum, zones: List):
+def zoned_clean(vac: RoborockVacuum, zones: list):
     """Clean zone."""
     click.echo("Cleaning zone(s) : %s" % vac.zoned_clean(zones))
 

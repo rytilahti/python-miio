@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import click
 
@@ -14,7 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 class PhilipsMoonlightStatus(DeviceStatus):
     """Container for status reports from Xiaomi Philips Zhirui Bedside Lamp."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Moonlight (philips.light.moonlight):
 
         {'pow': 'off', 'sta': 0, 'bri': 1, 'rgb': 16741971, 'cct': 1, 'snm': 0, 'spr': 0,
@@ -39,7 +39,7 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["cct"]
 
     @property
-    def rgb(self) -> Tuple[int, int, int]:
+    def rgb(self) -> tuple[int, int, int]:
         """Return color in RGB."""
         return int_to_rgb(int(self.data["rgb"]))
 
@@ -77,7 +77,7 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["mb"] == 1
 
     @property
-    def wake_up_time(self) -> List[int]:
+    def wake_up_time(self) -> list[int]:
         # Example: [weekdays?, hour, minute]
         return self.data["wkp"]
 
@@ -158,7 +158,7 @@ class PhilipsMoonlight(Device):
         click.argument("rgb", default=[255] * 3, type=click.Tuple([int, int, int])),
         default_output=format_output("Setting color to {rgb}"),
     )
-    def set_rgb(self, rgb: Tuple[int, int, int]):
+    def set_rgb(self, rgb: tuple[int, int, int]):
         """Set color in RGB."""
         for color in rgb:
             if color < 0 or color > 255:
@@ -212,7 +212,7 @@ class PhilipsMoonlight(Device):
             "Setting brightness to {brightness} and color to {rgb}"
         ),
     )
-    def set_brightness_and_rgb(self, brightness: int, rgb: Tuple[int, int, int]):
+    def set_brightness_and_rgb(self, brightness: int, rgb: tuple[int, int, int]):
         """Set brightness level and the color."""
         if brightness < 1 or brightness > 100:
             raise ValueError("Invalid brightness: %s" % brightness)

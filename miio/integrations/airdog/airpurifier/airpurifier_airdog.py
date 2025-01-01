@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -38,7 +38,7 @@ class OperationModeMapping(enum.Enum):
 class AirDogStatus(DeviceStatus):
     """Container for status reports from the air dog x3."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Air Dog X3 (airdog.airpurifier.x3):
 
         {'power: 'on', 'mode': 'sleep', 'speed': 1, 'lock': 'unlock',

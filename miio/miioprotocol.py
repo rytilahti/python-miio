@@ -10,7 +10,7 @@ import logging
 import socket
 from datetime import datetime, timedelta, timezone
 from pprint import pformat as pf
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import construct
 
@@ -106,7 +106,7 @@ class MiIOProtocol:
         :param str addr: Target IP address
         """
         is_broadcast = addr is None
-        seen_addrs: List[str] = []
+        seen_addrs: list[str] = []
         if is_broadcast:
             addr = "<broadcast>"
             is_broadcast = True
@@ -151,7 +151,7 @@ class MiIOProtocol:
         parameters: Optional[Any] = None,
         retry_count: int = 3,
         *,
-        extra_parameters: Optional[Dict] = None
+        extra_parameters: Optional[dict] = None,
     ) -> Any:
         """Build and send the given command. Note that this will implicitly call
         :func:`send_handshake` to do a handshake, and will re-try in case of errors
@@ -282,7 +282,7 @@ class MiIOProtocol:
         raise DeviceError(error)
 
     def _create_request(
-        self, command: str, parameters: Any, extra_parameters: Optional[Dict] = None
+        self, command: str, parameters: Any, extra_parameters: Optional[dict] = None
     ):
         """Create request payload."""
         request = {"id": self._id, "method": command}

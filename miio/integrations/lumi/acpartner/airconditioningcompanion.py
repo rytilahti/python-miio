@@ -327,9 +327,9 @@ class AirConditioningCompanion(Device):
         command_bytes = (
             code_bytes[0:1]
             + model_bytes[2:8]
-            + b"\x94\x70\x1F\xFF"
+            + b"\x94\x70\x1f\xff"
             + slot_bytes
-            + b"\xFF"
+            + b"\xff"
             + code_bytes[13:16]
             + b"\x27"
         )

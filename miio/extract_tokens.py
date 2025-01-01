@@ -2,8 +2,8 @@ import json
 import logging
 import sqlite3
 import tempfile
+from collections.abc import Iterator
 from pprint import pformat as pf
-from typing import Iterator
 
 import attr
 import click
@@ -81,7 +81,9 @@ class BackupDatabaseReader:
         keystring = "00000000000000000000000000000000"
         key = bytes.fromhex(keystring)
         cipher = Cipher(
-            algorithms.AES(key), modes.ECB(), backend=default_backend()  # nosec
+            algorithms.AES(key),
+            modes.ECB(),  # nosec
+            backend=default_backend(),
         )
         decryptor = cipher.decryptor()
         token = decryptor.update(bytes.fromhex(ztoken[:64])) + decryptor.finalize()

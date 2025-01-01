@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Optional
 
 import click
 
@@ -127,14 +127,14 @@ class CloudInterface:
         return devs
 
     @classmethod
-    def available_locales(cls) -> Dict[str, str]:
+    def available_locales(cls) -> dict[str, str]:
         """Return available locales.
 
         The value is the human-readable name of the locale.
         """
         return AVAILABLE_LOCALES
 
-    def get_devices(self, locale: Optional[str] = None) -> Dict[str, CloudDeviceInfo]:
+    def get_devices(self, locale: Optional[str] = None) -> dict[str, CloudDeviceInfo]:
         """Return a list of available devices keyed with a device id.
 
         If no locale is given, all known locales are browsed. If a device id is already
@@ -147,7 +147,7 @@ class CloudInterface:
                 self._micloud.get_devices(country=locale), locale=locale
             )
 
-        all_devices: Dict[str, CloudDeviceInfo] = {}
+        all_devices: dict[str, CloudDeviceInfo] = {}
         for loc in AVAILABLE_LOCALES:
             if loc == "all":
                 continue

@@ -3,7 +3,7 @@
 import logging
 import threading
 from enum import Enum
-from typing import Dict, Optional
+from typing import Optional
 
 import click
 
@@ -164,7 +164,7 @@ _DREAME_TROUVER_FINDER_MAPPING: MiotMapping = {
     "play_sound": {"siid": 7, "aiid": 2},
 }
 
-MIOT_MAPPING: Dict[str, MiotMapping] = {
+MIOT_MAPPING: dict[str, MiotMapping] = {
     DREAME_1C: _DREAME_1C_MAPPING,
     DREAME_F9: _DREAME_F9_MAPPING,
     DREAME_D9: _DREAME_F9_MAPPING,
@@ -589,7 +589,7 @@ class DreameVacuum(MiotDevice):
         return self.set_property("cleaning_mode", fanspeed.value)
 
     @command()
-    def fan_speed_presets(self) -> Dict[str, int]:
+    def fan_speed_presets(self) -> dict[str, int]:
         """Return available fan speed presets."""
         fanspeeds_enum = _get_cleaning_mode_enum_class(self.model)
         if not fanspeeds_enum:
@@ -634,7 +634,7 @@ class DreameVacuum(MiotDevice):
         return self.set_property("water_flow", waterflow.value)
 
     @command()
-    def waterflow_presets(self) -> Dict[str, int]:
+    def waterflow_presets(self) -> dict[str, int]:
         """Return dictionary containing supported water flow."""
         mapping = self._get_mapping()
         if "water_flow" not in mapping:

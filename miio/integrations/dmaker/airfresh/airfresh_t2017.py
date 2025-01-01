@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -68,7 +68,7 @@ class DisplayOrientation(enum.Enum):
 class AirFreshStatus(DeviceStatus):
     """Container for status reports from the air fresh t2017."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """
         Response of a Air Fresh A1 (dmaker.airfresh.a1):
         {

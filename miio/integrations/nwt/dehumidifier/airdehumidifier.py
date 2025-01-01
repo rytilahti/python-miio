@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -49,7 +49,7 @@ class FanSpeed(enum.Enum):
 class AirDehumidifierStatus(DeviceStatus):
     """Container for status reports from the air dehumidifier."""
 
-    def __init__(self, data: Dict[str, Any], device_info: DeviceInfo) -> None:
+    def __init__(self, data: dict[str, Any], device_info: DeviceInfo) -> None:
         """Response of a Air Dehumidifier (nwt.derh.wdh318efw1):
 
         {'on_off': 'on', 'mode': 'auto', 'fan_st': 2,

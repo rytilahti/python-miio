@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -66,7 +66,7 @@ AVAILABLE_PROPERTIES = {
 class FanStatus(DeviceStatus):
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a Fan (zhimi.fan.v3):
 
         {'temp_dec': 232, 'humidity': 46, 'angle': 118, 'speed': 298,
@@ -229,7 +229,7 @@ class FanStatus(DeviceStatus):
 class FanStatusZA4(FanStatus):
     """Container for status reports from the Xiaomi Mi Smart Pedestal Fan Zhimi ZA4."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
     @property

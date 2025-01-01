@@ -10,7 +10,7 @@ Support for lumi.camera.aq1
 
 import logging
 from enum import IntEnum
-from typing import Any, Dict
+from typing import Any
 
 import attr
 import click
@@ -62,7 +62,7 @@ class MotionDetectionSensitivity(IntEnum):
 class CameraStatus(DeviceStatus):
     """Container for status reports from the Aqara Camera."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Response of a lumi.camera.aq1:
 
         {"p2p_id":"#################","app_type":"celing",

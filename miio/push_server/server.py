@@ -3,7 +3,7 @@ import logging
 import socket
 from json import dumps
 from random import randint
-from typing import Callable, Dict, Optional, Union
+from typing import Callable, Optional, Union
 
 from ..device import Device
 from ..protocol import Utils
@@ -17,7 +17,7 @@ FAKE_DEVICE_ID = "120009025"
 FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
 
 PushServerCallback = Callable[[str, str, str], None]
-MethodDict = Dict[str, Union[Dict, Callable]]
+MethodDict = dict[str, Union[dict, Callable]]
 
 
 def calculated_token_enc(token):
@@ -96,7 +96,7 @@ class PushServer:
         self._listen_couroutine = None
         self._loop = None
 
-    def add_method(self, name: str, response: Union[Dict, Callable]):
+    def add_method(self, name: str, response: Union[dict, Callable]):
         """Add a method to server.
 
         The response can be either a callable or a dictionary to send back as response.
@@ -253,9 +253,7 @@ class PushServer:
         command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"
         message_id = 0
-        magic_number = randint(
-            1590161094, 1642025774
-        )  # nosec, min/max taken from packet captures, unknown use
+        magic_number = randint(1590161094, 1642025774)  # nosec, min/max taken from packet captures, unknown use
 
         if len(command) > 49:
             _LOGGER.error(

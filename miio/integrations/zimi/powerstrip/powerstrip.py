@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -46,7 +46,7 @@ class PowerMode(enum.Enum):
 class PowerStripStatus(DeviceStatus):
     """Container for status reports from the power strip."""
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Supported device models: qmi.powerstrip.v1, zimi.powerstrip.v2.
 
         Response of a Power Strip 2 (zimi.powerstrip.v2):
