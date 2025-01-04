@@ -8,6 +8,7 @@ from croniter import croniter
 from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
+from miio.deviceinfo import DeviceInfo
 from miio.devicestatus import sensor, setting
 from miio.identifiers import VacuumId, VacuumState
 from miio.utils import pretty_seconds, pretty_time
@@ -1062,3 +1063,20 @@ class MopDryerSettings(DeviceStatus):
     def dry_time(self) -> timedelta:
         """Return mop dry time."""
         return pretty_seconds(self.data["on"]["dry_time"])
+
+
+class ConnectivityStatus(DeviceStatus):
+    def __init__(self, info: DeviceInfo) -> None:
+        self.info = info
+
+    @property
+    @sensor(
+        "Wifi Signal Strengh",
+        unit="dBm",
+        icon="mdi:wifi-strength-2",  # TODO: Make this dynamic?
+        device_class="signal_strength",
+        entity_category="diagnostic",
+    )
+    def total_duration(self) -> timedelta:
+        """Total cleaning duration."""
+        return self.info.accesspoint["rssi"]
