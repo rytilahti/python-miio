@@ -1,4 +1,5 @@
 import logging
+import sys
 from enum import Enum
 from functools import partial
 from typing import Any, Optional, Union
@@ -8,6 +9,9 @@ import click
 from .click_common import EnumType, LiteralParamType, command
 from .device import Device, DeviceStatus  # noqa: F401
 from .exceptions import DeviceException
+
+if sys.version_info >= (3, 11):
+    from enum import member
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,7 +24,12 @@ class MiotValueType(Enum):
 
     Int = int
     Float = float
-    Bool = partial(_str2bool)
+
+    if sys.version_info >= (3, 11):
+        Bool = member(partial(_str2bool))
+    else:
+        Bool = partial(_str2bool)
+
     Str = str
 
 
