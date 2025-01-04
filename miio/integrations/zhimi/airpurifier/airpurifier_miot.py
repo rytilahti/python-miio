@@ -105,6 +105,36 @@ _MAPPING_VA2 = {
     "led_brightness": {"siid": 13, "piid": 2},
 }
 
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:xiaomi-va2b:1
+_MAPPING_VA2B = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    "fan_level": {"siid": 2, "piid": 5},
+    "anion": {"siid": 2, "piid": 6},
+    # Environment
+    "humidity": {"siid": 3, "piid": 1},
+    "temperature": {"siid": 3, "piid": 2},
+    "aqi": {"siid": 3, "piid": 4},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 2},
+    "filter_left_time": {"siid": 4, "piid": 3},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    # RFID
+    "filter_rfid_tag": {"siid": 12, "piid": 1},
+    "filter_rfid_product_id": {"siid": 12, "piid": 3},
+    # Screen
+    "led_brightness": {"siid": 13, "piid": 1},
+    # Air Purifier Favorite
+    "favorite_level": {"siid": 14, "piid": 1},
+}
+
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-vb4:1
 _MAPPING_VB4 = {
     # Air Purifier
@@ -276,6 +306,7 @@ _MAPPINGS = {
     "zhimi.airp.mb5": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.mb5a": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
+    "xiaomi.airp.va2b": _MAPPING_VA2B,  # airpurifier 4 pro
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
     "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
@@ -568,8 +599,10 @@ class AirPurifierMiot(MiotDevice):
 
         return AirPurifierMiotStatus(
             {
+                # max_properties limited to 10 to avoid "user ack timeout"
+                # messages from some of the devices. (e.g. xiaomi.airp.va2b)
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping()
+                for prop in self.get_properties_for_mapping(max_properties=10)
             },
             self.model,
         )
