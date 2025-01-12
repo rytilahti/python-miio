@@ -119,8 +119,7 @@ class MiIOProtocol:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         s.settimeout(timeout)
-        for _ in range(3):
-            s.sendto(helobytes, (addr, 54321))
+        s.sendto(helobytes, (addr, 54321))
         while True:
             try:
                 data, recv_addr = s.recvfrom(1024)
