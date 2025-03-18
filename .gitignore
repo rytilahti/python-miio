@@ -1,23 +1,71 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg
 *.egg-info/
+dist/
+build/
+eggs/
+sdist/
+wheels/
 
-__pycache__
-.idea/
-.cache/
-.mypy_cache/
-.tox/
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.env/
 .venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-.coverage
+# Pytest
+.cache/
+.tox/
 
-# generated apidocs
-docs/_build/
-docs/api/
-
+# IDE configurations
+.idea/
+.vscode/
 .vscode/settings.json
-
-# pycharm shenanigans
 *.orig
 *_BACKUP_*
 *_BASE_*
 *_LOCAL_*
 *_REMOTE_*
+
+# Coverage reports
+.coverage
+*.cover
+*.coverage.*
+
+# Testing files
+test-results/
+.nox/
+
+# MyPy
+.mypy_cache/
+
+# Sphinx documentation
+docs/_build/
+docs/api/
+
+# Local files
+*.log
+*.swp
+.DS_Store
+*.tmp
+*.temp
+*.bak
+
+# Git metadata
+*.rej
+*.un~
