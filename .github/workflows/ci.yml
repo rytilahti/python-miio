@@ -28,7 +28,7 @@ jobs:
           poetry install --extras docs
       - name: "Run pre-commit hooks"
         run: |
-          poetry run pre-commit run --all-files --verbose 
+          poetry run pre-commit run --all-files --verbose
 
   tests:
     name: "Python ${{ matrix.python-version}} on ${{ matrix.os }}"
@@ -52,9 +52,14 @@ jobs:
           poetry install --all-extras
       - name: "Run tests"
         run: |
-          poetry run pytest --cov miio --cov-report xml
+          poetry run pytest --cov miio --cov-report xml --junitxml=junit.xml -o junit_family=legacy
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }} # Run even if tests fail
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: "Upload coverage to Codecov"
-        uses: "codecov/codecov-action@v4"
+        uses: "codecov/codecov-action@v5"
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
