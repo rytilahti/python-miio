@@ -228,6 +228,8 @@ class MiotProperty(MiotBaseModel):
     choices: Optional[list[MiotEnumValue]] = Field(alias="value-list")
     gatt_access: Optional[list[Any]] = Field(alias="gatt-access")
 
+    source: Optional[int] = None
+
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
     value: Optional[Any] = None
@@ -238,7 +240,10 @@ class MiotProperty(MiotBaseModel):
 
         if self.choices is not None:
             # TODO: find a nicer way to get the choice by value
-            selected = next(c.description for c in self.choices if c.value == value)
+            selected = next(
+                (c.description for c in self.choices if c.value == value),
+                self.choices[0],
+            )
             current = f"{selected} (value: {value})"
             return current
 
