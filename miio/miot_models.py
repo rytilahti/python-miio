@@ -240,10 +240,7 @@ class MiotProperty(MiotBaseModel):
 
         if self.choices is not None:
             # TODO: find a nicer way to get the choice by value
-            selected = next(
-                (c.description for c in self.choices if c.value == value),
-                self.choices[0],
-            )
+            selected = next(c.description for c in self.choices if c.value == value)
             current = f"{selected} (value: {value})"
             return current
 
