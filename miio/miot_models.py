@@ -228,6 +228,8 @@ class MiotProperty(MiotBaseModel):
     choices: Optional[list[MiotEnumValue]] = Field(alias="value-list")
     gatt_access: Optional[list[Any]] = Field(alias="gatt-access")
 
+    source: Optional[int] = None
+
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
     value: Optional[Any] = None
