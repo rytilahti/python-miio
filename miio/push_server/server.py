@@ -210,12 +210,13 @@ class PushServer:
 
     async def _get_server_ip(self):
         """Connect to the miio device to get server_ip using a one time use socket."""
-        get_ip_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        get_ip_socket.bind((self._address, SERVER_PORT))
-        get_ip_socket.setblocking(False)
-        await self._loop.sock_connect(get_ip_socket, (self._device_ip, SERVER_PORT))
-        server_ip = get_ip_socket.getsockname()[0]
-        get_ip_socket.close()
+        with socket.socket(
+            family=socket.AF_INET, type=socket.SOCK_DGRAM
+        ) as get_ip_socket:
+            get_ip_socket.bind((self._address, SERVER_PORT))
+            get_ip_socket.setblocking(False)
+            await self._loop.sock_connect(get_ip_socket, (self._device_ip, SERVER_PORT))
+            server_ip = get_ip_socket.getsockname()[0]
         _LOGGER.debug("Miio push server device ip=%s", server_ip)
         return server_ip
 
