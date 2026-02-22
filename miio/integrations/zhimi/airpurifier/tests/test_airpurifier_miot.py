@@ -7,7 +7,7 @@ from miio.tests.dummies import DummyMiotDevice
 
 from .. import AirPurifierMiot
 from ..airfilter_util import FilterType
-from ..airpurifier_miot import LedBrightness, OperationMode
+from ..airpurifier_miot import FaultCode, LedBrightness, OperationMode
 
 _INITIAL_STATE = {
     "power": True,
@@ -67,6 +67,33 @@ _INITIAL_STATE_VA2 = {
     "filter_rfid_product_id": "0:0:41:30",
     "filter_rfid_tag": "10:20:30:40:50:60:7",
     "button_pressed": "power",
+}
+
+_INITIAL_STATE_MEB1 = {
+    "power": True,
+    "fault": 0,
+    "mode": 0,
+    "fan_level": 2,
+    "plasma": True,
+    "uv": True,
+    "pm2_5_density": 9,
+    "pm10_density": 12.7,
+    "aqi": 10,
+    "humidity": 62,
+    "temperature": 18.599999,
+    "filter_life_remaining": 80,
+    "filter_hours_used": 682,
+    "buzzer": False,
+    "buzzer_volume": 1,
+    "child_lock": False,
+    "motor_speed": 354,
+    "aqi_realtime_update_duration": 5,
+    "filter_rfid_tag": "10:20:30:40:50:60:7",
+    "filter_rfid_product_id": "0:0:41:30",
+    "led_brightness": 1,
+    "temperature_display_unit": 0,
+    "country_code": 44,
+    "reboot_cause": 3,
 }
 
 
@@ -313,6 +340,13 @@ class DummyAirPurifierMiotMB5(DummyAirPurifierMiot):
         super().__init__(*args, **kwargs)
 
 
+class DummyAirPurifierMiotMEB1(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "zhimi.airp.meb1"
+        self.state = _INITIAL_STATE_MEB1
+        super().__init__(*args, **kwargs)
+
+
 @pytest.fixture(scope="function")
 def airpurifierVA2(request):
     request.cls.device = DummyAirPurifierMiotVA2()
@@ -373,3 +407,54 @@ class TestAirPurifierVA2(TestCase):
 
         self.device.set_anion(False)
         assert anion() is False
+
+
+@pytest.fixture(scope="function")
+def airpurifierMEB1(request):
+    request.cls.device = DummyAirPurifierMiotMEB1()
+
+
+@pytest.mark.usefixtures("airpurifierMEB1")
+class TestAirPurifierMEB1(TestCase):
+    def test_status(self):
+        status = self.device.status()
+        assert status.is_on is _INITIAL_STATE_MEB1["power"]
+        assert status.mode == OperationMode(_INITIAL_STATE_MEB1["mode"])
+        assert status.pm10_density == 12.7
+        assert status.pm25_density == _INITIAL_STATE_MEB1["pm2_5_density"]
+        assert status.plasma == "on"
+        assert status.uv == "on"
+        assert status.fault == FaultCode.NO_FAULT
+        assert (
+            status.temperature_display_unit
+            == _INITIAL_STATE_MEB1["temperature_display_unit"]
+        )
+        assert status.country_code == _INITIAL_STATE_MEB1["country_code"]
+        assert status.reboot_cause == _INITIAL_STATE_MEB1["reboot_cause"]
+
+    def test_fault_unknown(self):
+        self.device.set_property("fault", 99)
+        assert self.device.status().fault is None
+
+    def test_set_plasma(self):
+        self.device.set_plasma(False)
+        assert self.device.status().plasma == "off"
+        self.device.set_plasma(True)
+        assert self.device.status().plasma == "on"
+
+    def test_set_uv(self):
+        self.device.set_uv(False)
+        assert self.device.status().uv == "off"
+        self.device.set_uv(True)
+        assert self.device.status().uv == "on"
+
+
+@pytest.mark.usefixtures("airpurifierMB4")
+class TestAirPurifierMB4UnsupportedFeatures(TestCase):
+    def test_set_plasma_unsupported(self):
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_plasma(True)
+
+    def test_set_uv_unsupported(self):
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_uv(True)

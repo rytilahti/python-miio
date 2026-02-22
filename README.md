@@ -294,6 +294,7 @@ integration, this library supports also the following devices:
 * Xiaomi Smart Pet Water Dispenser (mmgg.pet_waterer.s1, s4, wi11)
 * Xiaomi Mi Smart Humidifer S (jsqs, jsq5)
 * Xiaomi Mi Robot Vacuum Mop 2 (Pro+, Ultra)
+* Xiaomi Air Purifier Elite (zhimi.airp.meb1)
 
 *Feel free to create a pull request to add support for new devices as
 well as additional features for already supported ones.*

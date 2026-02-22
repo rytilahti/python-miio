@@ -24,7 +24,8 @@ jobs:
           python-version: "${{ matrix.python-version }}"
       - name: "Install dependencies"
         run: |
-          python -m pip install --upgrade pip poetry
+          python -m pip install --upgrade pip
+          python -m pip install "poetry==1.8.2"
           poetry install --extras docs
       - name: "Run pre-commit hooks"
         run: |
@@ -48,7 +49,8 @@ jobs:
           python-version: "${{ matrix.python-version }}"
       - name: "Install dependencies"
         run: |
-          python -m pip install --upgrade pip poetry
+          python -m pip install --upgrade pip
+          python -m pip install "poetry==1.8.2"
           poetry install --all-extras
       - name: "Run tests"
         run: |

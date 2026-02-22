@@ -193,6 +193,11 @@ apidoc_toc_file = False
 
 autodoc_member_order = "groupwise"
 autodoc_inherit_docstrings = True
-autodoc_default_options = {"inherited-members": True}
+autodoc_default_options = {
+    "inherited-members": True,
+    # construct-typed inherited enum helpers have malformed upstream docstrings
+    # that trigger Sphinx parser warnings on RTD with fail_on_warning enabled.
+    "exclude-members": "from_bytes,to_bytes",
+}
 
 myst_heading_anchors = 2
