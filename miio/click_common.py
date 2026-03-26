@@ -14,6 +14,7 @@ from typing import Any, ClassVar
 
 import click
 
+from .device_cache import read_cache, write_cache
 from .exceptions import DeviceError
 
 try:
@@ -266,7 +267,20 @@ class DeviceGroup(click.MultiCommand):
         gco = ctx.find_object(GlobalContextObject)
         if gco:
             kwargs["debug"] = gco.debug
+
+        ip = kwargs.get("ip")
+        if ip:
+            cached = read_cache(ip)
+            kwargs.setdefault("start_id", cached["seq"])
+
         ctx.obj = self.device_class(*args, **kwargs)
+
+        if ip:
+
+            def _save_cache() -> None:
+                write_cache(ip, {"seq": ctx.obj.raw_id})
+
+            ctx.call_on_close(_save_cache)
 
     def command_callback(self, miio_command, miio_device, *args, **kwargs):
         return miio_command.call(miio_device, *args, **kwargs)
