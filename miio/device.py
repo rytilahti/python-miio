@@ -57,6 +57,7 @@ class Device(metaclass=DeviceGroupMeta):
         timeout: int | None = None,
         *,
         model: str | None = None,
+        handshake_timeout: int | None = None,
     ) -> None:
         self.ip = ip
         self.token: str | None = token
@@ -68,7 +69,13 @@ class Device(metaclass=DeviceGroupMeta):
         timeout = timeout if timeout is not None else self.timeout
         self._debug = debug
         self._protocol = MiIOProtocol(
-            ip, token, start_id, debug, lazy_discover, timeout
+            ip,
+            token,
+            start_id,
+            debug,
+            lazy_discover,
+            timeout,
+            handshake_timeout=handshake_timeout,
         )
 
     def send(
