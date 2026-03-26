@@ -1,0 +1,83 @@
+description: Metadata for dreame-specific services
+services:
+  vacuum-extend:
+    description: Extended vacuum services for dreame
+    action:
+      stop-clean:
+        description: Stop cleaning
+        icon: mdi:stop
+      position:
+        description: Locate robot
+    property:
+      work-mode:
+        description: Work mode
+      mop-mode:
+        description: Mop mode
+      waterbox-status:
+        description: Water box attached
+        icon: mdi:cup-water
+      cleaning-mode:
+        description: Cleaning mode
+      cleaning-time:
+        description: Cleaned time
+        icon: mdi:timer-sand
+      cleaning-area:
+        description: Cleaned area
+        icon: mdi:texture-box
+      serial-number:
+        description: Serial number
+      faults:
+        description: Error status
+        icon: mdi:alert
+
+  do-not-disturb:
+    description: DnD for dreame
+    icon: mdi:minus-circle-off
+    property:
+      enable:
+        description: DnD enabled
+        icon: mdi:minus-circle-off
+      start-time:
+        description: DnD start
+        icon: mdi:minus-circle-off
+      end-time:
+        description: DnD end
+        icon: mdi:minus-circle-off
+
+  audio:
+    description: Audio service for dreame
+    action:
+      position:
+        description: Find device
+        icon: mdi:target
+      play-sound:
+        description: Test sound level
+        icon: mdi:volume-medium
+    property:
+      volume:
+        description: Volume
+        icon: mdi:volume-medium
+      voice-packet-id:
+        description: Voice package id
+        icon: mdi:volume-medium
+
+  clean-logs:
+    description: Cleaning logs for dreame
+    property:
+      first-clean-time:
+        description: First cleaned
+      total-clean-time:
+        description: Total cleaning time
+        icon: mdi:timer-sand
+      total-clean-times:
+        description: Total cleaning count
+        icon: mdi:counter
+      total-clean-area:
+        description: Total cleaned area
+        icon: mdi:texture-box
+
+  time:
+    description: Time information for dreame
+    property:
+      time-zone:
+        description: Timezone

@@ -1,0 +1,17 @@
+generic:
+  property:
+    cleaning-time:
+      description: Time cleaned
+      icon: mdi:timer-sand
+    cleaning-area:
+      description: Area cleaned
+      icon: mdi:texture-box
+    brightness:
+      description: Brightness
+      icon: mdi:brightness-6
+    battery:
+      device_class: battery
+      icon: mdi:battery
+namespaces:
+  miot-spec-v2: !include miotspec.yaml
+  dreame-spec: !include dreamespec.yaml
