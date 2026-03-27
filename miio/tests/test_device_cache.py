@@ -62,7 +62,9 @@ class TestReadCache:
 
 
 class TestWriteCache:
-    def test_creates_directory(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_creates_directory(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         nested = tmp_path / "sub" / "dir"
         monkeypatch.setattr("miio.device_cache.CACHE_DIR", nested)
         write_cache("192.168.1.1", DeviceState(seq=5))
