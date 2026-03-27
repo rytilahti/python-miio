@@ -388,9 +388,7 @@ class TestViomiVacuumRooms:
     """Tests for room extraction."""
 
     def test_get_rooms_from_schedules(self):
-        schedules = [
-            "1_0_32_0_0_0_1_1_11_0_1594139992_2_11_room1_13_room2"
-        ]
+        schedules = ["1_0_32_0_0_0_1_1_11_0_1594139992_2_11_room1_13_room2"]
         found, rooms = _get_rooms_from_schedules(schedules)
         assert found is True
         assert rooms == {"11": "room1", "13": "room2"}
