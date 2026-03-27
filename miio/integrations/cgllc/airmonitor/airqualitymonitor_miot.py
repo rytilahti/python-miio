@@ -126,7 +126,9 @@ class AirQualityMonitorCGDN1Status(DeviceStatus):
         return self.data["pm10"]
 
     @property
-    @sensor("Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature")
+    @sensor(
+        "Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature"
+    )
     def temperature(self) -> float:
         """Return temperature value (-30...100°C)."""
         return self.data["temperature"]

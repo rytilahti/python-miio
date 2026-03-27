@@ -82,7 +82,9 @@ class HeaterStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature")
+    @sensor(
+        "Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature"
+    )
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
@@ -131,6 +133,7 @@ class HeaterStatus(DeviceStatus):
         return self.data["use_time"]
 
     @property
+    @sensor(
     @sensor("Delay Off Countdown", unit="s", icon="mdi:timer-sand", device_class="duration")
     def delay_off_countdown(self) -> int | None:
         """Countdown until turning off in seconds."""

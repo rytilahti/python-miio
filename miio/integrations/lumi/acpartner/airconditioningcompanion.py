@@ -196,6 +196,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return self.power == "on"
 
     @property
+    @sensor(
     @sensor("Target Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
     def target_temperature(self) -> int | None:
         """Target temperature."""

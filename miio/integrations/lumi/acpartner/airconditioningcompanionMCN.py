@@ -63,6 +63,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return self.power == "on"
 
     @property
+    @setting(
     @setting("Mode", setter_name="send_command", icon="mdi:air-conditioner", choices=OperationMode)
     def mode(self) -> OperationMode | None:
         """Current operation mode."""
@@ -73,6 +74,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @setting(
     @setting("Target Temperature", setter_name="send_command", unit="°C", icon="mdi:thermometer", device_class="temperature")
     def target_temperature(self) -> int | None:
         """Target temperature."""
@@ -92,6 +94,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @setting(
     @setting("Swing Mode", setter_name="send_command", icon="mdi:arrow-oscillating", choices=SwingMode)
     def swing_mode(self) -> SwingMode | None:
         """Current swing mode."""

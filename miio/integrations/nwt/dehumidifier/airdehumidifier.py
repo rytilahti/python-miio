@@ -90,6 +90,7 @@ class AirDehumidifierStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
+    @sensor(
     @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
     def temperature(self) -> float | None:
         """Current temperature, if available."""

@@ -79,26 +79,26 @@ class CleaningStatus(DeviceStatus):
         Only write 1 or 0 to it would start or abort the auto clean mode.
         """
         self.status = [int(value) for value in status.split(",")]
-    @property
 
+    @property
     @sensor("Cleaning", icon="mdi:broom")
     def cleaning(self) -> bool:
         return bool(self.status[0])
-    @property
 
+    @property
     @sensor("Progress", unit="%", icon="mdi:progress-check")
     def progress(self) -> int:
         return int(self.status[1])
-    @property
 
+    @property
     @sensor("Stage", icon="mdi:broom")
     def stage(self) -> str:
         try:
             return CLEANING_STAGES[self.status[2]]
         except KeyError:
             return "Unknown stage"
-    @property
 
+    @property
     @sensor("Cancellable", icon="mdi:cancel")
     def cancellable(self) -> bool:
         return bool(self.status[3])
@@ -143,23 +143,23 @@ class TimerStatus(DeviceStatus):
         Also, if the countdown minutes set to 0, the timer would be disabled.
         """
         self.status = [int(value) for value in status.split(",")]
-    @property
 
+    @property
     @sensor("Enabled", icon="mdi:timer")
     def enabled(self) -> bool:
         return bool(self.status[0])
-    @property
 
+    @property
     @sensor("Countdown", icon="mdi:timer-outline")
     def countdown(self) -> timedelta:
         return timedelta(minutes=self.status[1])
-    @property
 
+    @property
     @sensor("Power On", icon="mdi:power")
     def power_on(self) -> bool:
         return bool(self.status[2])
-    @property
 
+    @property
     @sensor("Time Left", icon="mdi:timer-outline")
     def time_left(self) -> timedelta:
         return timedelta(minutes=self.status[3])
@@ -193,110 +193,136 @@ class AirConditionerMiotStatus(DeviceStatus):
 
         """
         self.data = data
-    @property
 
+    @property
     @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.data["power"]
-    @property
 
+    @property
     @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Current power state."""
         return "on" if self.is_on else "off"
-    @property
 
-    @setting("Mode", setter_name="set_mode", choices=OperationMode, icon="mdi:air-conditioner")
+    @property
+    @setting(
+        "Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+        icon="mdi:air-conditioner",
+    )
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
-    @property
 
-    @setting("Target Temperature", setter_name="set_target_temperature", unit="°C", min_value=16, max_value=31, step=1, device_class="temperature", icon="mdi:thermometer")
+    @property
+    @setting(
+        "Target Temperature",
+        setter_name="set_target_temperature",
+        unit="°C",
+        min_value=16,
+        max_value=31,
+        step=1,
+        device_class="temperature",
+        icon="mdi:thermometer",
+    )
     def target_temperature(self) -> float:
         """Target temperature in Celsius."""
         return self.data["target_temperature"]
-    @property
 
+    @property
     @setting("ECO", setter_name="set_eco", icon="mdi:leaf")
     def eco(self) -> bool:
         """True if ECO mode is on."""
         return self.data["eco"]
-    @property
 
+    @property
     @setting("Heater", setter_name="set_heater", icon="mdi:radiator")
     def heater(self) -> bool:
         """True if aux heat mode is on."""
         return self.data["heater"]
-    @property
 
+    @property
     @setting("Dryer", setter_name="set_dryer", icon="mdi:water-off")
     def dryer(self) -> bool:
         """True if aux dryer mode is on."""
         return self.data["dryer"]
-    @property
 
+    @property
     @setting("Sleep Mode", setter_name="set_sleep_mode", icon="mdi:sleep")
     def sleep_mode(self) -> bool:
         """True if sleep mode is on."""
         return self.data["sleep_mode"]
-    @property
 
+    @property
     @setting("Fan Speed", setter_name="set_fan_speed", choices=FanSpeed, icon="mdi:fan")
     def fan_speed(self) -> FanSpeed:
         """Current Fan speed."""
         return FanSpeed(self.data["fan_speed"])
-    @property
 
-    @setting("Vertical Swing", setter_name="set_vertical_swing", icon="mdi:arrow-up-down")
+    @property
+    @setting(
+        "Vertical Swing", setter_name="set_vertical_swing", icon="mdi:arrow-up-down"
+    )
     def vertical_swing(self) -> bool:
         """True if vertical swing is on."""
         return self.data["vertical_swing"]
-    @property
 
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @property
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> float:
         """Current ambient temperature in Celsius."""
         return self.data["temperature"]
-    @property
 
+    @property
     @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool:
         """True if buzzer is on."""
         return self.data["buzzer"]
-    @property
 
+    @property
     @setting("LED", setter_name="set_led", icon="mdi:led-on")
     def led(self) -> bool:
         """True if LED is on."""
         return self.data["led"]
-    @property
 
+    @property
     @sensor("Electricity", unit="kWh", device_class="energy", icon="mdi:flash")
     def electricity(self) -> float:
         """Power consumption accumulation in kWh."""
         return self.data["electricity"]
-    @property
 
+    @property
     @sensor("Clean", icon="mdi:broom")
     def clean(self) -> CleaningStatus:
         """Auto clean mode indicator."""
         return CleaningStatus(self.data["clean"])
-    @property
 
+    @property
     @sensor("Total Running Duration", icon="mdi:timer-outline")
     def total_running_duration(self) -> timedelta:
         """Total running duration in hours."""
         return timedelta(hours=self.data["running_duration"])
-    @property
 
-    @setting("Fan Speed Percent", setter_name="set_fan_speed_percent", unit="%", min_value=1, max_value=101, step=1, icon="mdi:fan")
+    @property
+    @setting(
+        "Fan Speed Percent",
+        setter_name="set_fan_speed_percent",
+        unit="%",
+        min_value=1,
+        max_value=101,
+        step=1,
+        icon="mdi:fan",
+    )
     def fan_speed_percent(self) -> int:
         """Current fan speed in percent."""
         return self.data["fan_speed_percent"]
-    @property
 
+    @property
     @sensor("Timer", icon="mdi:timer")
     def timer(self) -> TimerStatus:
         """Countdown timer indicator."""

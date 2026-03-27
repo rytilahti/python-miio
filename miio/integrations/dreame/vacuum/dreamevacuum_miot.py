@@ -304,38 +304,38 @@ class DreameVacuumStatus(DeviceStatusContainer):
     def __init__(self, data, model):
         self.data = data
         self.model = model
-    @property
 
+    @property
     @sensor("Battery Level", unit="%", device_class="battery", icon="mdi:battery")
     def battery_level(self) -> str:
         return self.data["battery_level"]
-    @property
 
+    @property
     @sensor("Brush Left Time", unit="h", icon="mdi:brush")
     def brush_left_time(self) -> str:
         return self.data["brush_left_time"]
-    @property
 
+    @property
     @sensor("Side Brush Left Time", unit="h", icon="mdi:brush")
     def brush_left_time2(self) -> str:
         return self.data["brush_left_time2"]
-    @property
 
+    @property
     @sensor("Side Brush Life Level", unit="%", icon="mdi:brush")
     def brush_life_level2(self) -> str:
         return self.data["brush_life_level2"]
-    @property
 
+    @property
     @sensor("Brush Life Level", unit="%", icon="mdi:brush")
     def brush_life_level(self) -> str:
         return self.data["brush_life_level"]
-    @property
 
+    @property
     @sensor("Filter Left Time", unit="h", icon="mdi:filter-outline")
     def filter_left_time(self) -> str:
         return self.data["filter_left_time"]
-    @property
 
+    @property
     @sensor("Filter Life Level", unit="%", icon="mdi:filter-outline")
     def filter_life_level(self) -> str:
         return self.data["filter_life_level"]
@@ -371,73 +371,81 @@ class DreameVacuumStatus(DeviceStatusContainer):
         except TypeError:
             _LOGGER.error("Unknown DeviceStatus (%s)", self.data["device_status"])
             return None
-    @property
 
+    @property
     @sensor("Timer Enable", icon="mdi:timer")
     def timer_enable(self) -> str:
         return self.data["timer_enable"]
-    @property
 
+    @property
     @sensor("Start Time", icon="mdi:clock-start")
     def start_time(self) -> str:
         return self.data["start_time"]
-    @property
 
+    @property
     @sensor("Stop Time", icon="mdi:clock-end")
     def stop_time(self) -> str:
         return self.data["stop_time"]
-    @property
 
+    @property
     @sensor("Map View", icon="mdi:map")
     def map_view(self) -> str:
         return self.data["map_view"]
-    @property
 
-    @setting("Volume", setter_name="set_sound_volume", unit="%", min_value=0, max_value=100, step=1, icon="mdi:volume-high")
+    @property
+    @setting(
+        "Volume",
+        setter_name="set_sound_volume",
+        unit="%",
+        min_value=0,
+        max_value=100,
+        step=1,
+        icon="mdi:volume-high",
+    )
     def volume(self) -> str:
         return self.data["volume"]
-    @property
 
+    @property
     @sensor("Voice Package", icon="mdi:account-voice")
     def voice_package(self) -> str:
         return self.data["voice_package"]
-    @property
 
+    @property
     @sensor("Timezone", icon="mdi:earth")
     def timezone(self) -> str:
         return self.data["timezone"]
-    @property
 
+    @property
     @sensor("Cleaning Time", unit="min", icon="mdi:timer-outline")
     def cleaning_time(self) -> str:
         return self.data["cleaning_time"]
-    @property
 
+    @property
     @sensor("Cleaning Area", unit="m²", icon="mdi:texture-box")
     def cleaning_area(self) -> str:
         return self.data["cleaning_area"]
-    @property
 
+    @property
     @sensor("First Clean Time", icon="mdi:clock-outline")
     def first_clean_time(self) -> str:
         return self.data["first_clean_time"]
-    @property
 
+    @property
     @sensor("Total Clean Time", unit="min", icon="mdi:timer-outline")
     def total_clean_time(self) -> str:
         return self.data["total_clean_time"]
-    @property
 
+    @property
     @sensor("Total Clean Times", icon="mdi:counter")
     def total_clean_times(self) -> str:
         return self.data["total_clean_times"]
-    @property
 
+    @property
     @sensor("Total Clean Area", unit="m²", icon="mdi:texture-box")
     def total_clean_area(self) -> str:
         return self.data["total_clean_area"]
-    @property
 
+    @property
     @setting("Cleaning Mode", setter_name="set_fan_speed", icon="mdi:fan")
     def cleaning_mode(self):
         cleaning_mode = self.data["cleaning_mode"]
@@ -466,6 +474,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
 
     # TODO: get/set water flow for Dreame 1C
     @property
+    @setting(
     @setting("Water Flow", setter_name="set_waterflow", choices=WaterFlow, icon="mdi:water")
     def water_flow(self) -> WaterFlow | None:
         try:

@@ -98,7 +98,9 @@ class CameraStatus(DeviceStatus):
         return self.data["power"] == "on"
 
     @property
-    @setting(name="Motion Record", setter_name="motion_record_on", icon="mdi:motion-sensor")
+    @setting(
+        name="Motion Record", setter_name="motion_record_on", icon="mdi:motion-sensor"
+    )
     def motion_record(self) -> bool:
         """Motion record status."""
         return self.data["motion_record"] == "on"
@@ -122,7 +124,9 @@ class CameraStatus(DeviceStatus):
         return self.data["flip"] == "on"
 
     @property
-    @setting(name="Improve Program", setter_name="improve_program_on", icon="mdi:chart-line")
+    @setting(
+        name="Improve Program", setter_name="improve_program_on", icon="mdi:chart-line"
+    )
     def improve_program(self) -> bool:
         """Customer experience improvement program status."""
         return self.data["improve_program"] == "on"

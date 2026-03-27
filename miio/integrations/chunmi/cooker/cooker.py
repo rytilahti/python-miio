@@ -124,13 +124,13 @@ class TemperatureHistory(DeviceStatus):
             self.data = [int(data[i : i + 2], 16) for i in range(0, len(data), 2)]
         else:
             self.data = []
-    @property
 
+    @property
     @sensor("Temperatures", unit="°C", icon="mdi:thermometer")
     def temperatures(self) -> list[int]:
         return self.data
-    @property
 
+    @property
     @sensor("Raw", icon="mdi:code-string")
     def raw(self) -> str:
         return "".join([f"{value:02x}" for value in self.data])
@@ -165,33 +165,33 @@ class CookerCustomizations(DeviceStatus):
         Octet 11-16 (01 00 00 00 1d 1f): Meaning unknown
         """
         self.custom = [int(custom[i : i + 2], 16) for i in range(0, len(custom), 2)]
-    @property
 
+    @property
     @sensor("Jingzhu Appointment", icon="mdi:clock-outline")
     def jingzhu_appointment(self) -> time:
         return time(hour=self.custom[0], minute=self.custom[1])
-    @property
 
+    @property
     @sensor("Kuaizhu Appointment", icon="mdi:clock-outline")
     def kuaizhu_appointment(self) -> time:
         return time(hour=self.custom[2], minute=self.custom[3])
-    @property
 
+    @property
     @sensor("Zhuzhou Appointment", icon="mdi:clock-outline")
     def zhuzhou_appointment(self) -> time:
         return time(hour=self.custom[4], minute=self.custom[5])
-    @property
 
+    @property
     @sensor("Zhuzhou Cooking", icon="mdi:clock-outline")
     def zhuzhou_cooking(self) -> time:
         return time(hour=self.custom[6], minute=self.custom[7])
-    @property
 
+    @property
     @sensor("Favorite Appointment", icon="mdi:clock-outline")
     def favorite_appointment(self) -> time:
         return time(hour=self.custom[8], minute=self.custom[9])
-    @property
 
+    @property
     @sensor("Favorite Cooking", icon="mdi:clock-outline")
     def favorite_cooking(self) -> time:
         return time(hour=self.custom[10], minute=self.custom[11])
@@ -214,8 +214,8 @@ class CookingStage(DeviceStatus):
         Octet 5 (ff): Meaning unknown.
         """
         self.stage = stage
-    @property
 
+    @property
     @sensor("State", icon="mdi:pot-steam")
     def state(self) -> int:
         """
@@ -225,18 +225,18 @@ class CookingStage(DeviceStatus):
         12: Cooking finished
         """
         return int(self.stage[0:2], 16)
-    @property
 
+    @property
     @sensor("Rice ID", icon="mdi:rice")
     def rice_id(self) -> int:
         return int(self.stage[2:6], 16)
-    @property
 
+    @property
     @sensor("Taste", icon="mdi:food-variant")
     def taste(self) -> int:
         return int(self.stage[6:8], 16)
-    @property
 
+    @property
     @sensor("Taste Phase", icon="mdi:food-variant")
     def taste_phase(self) -> int:
         phase = int(self.taste / 33)
@@ -244,24 +244,24 @@ class CookingStage(DeviceStatus):
         if phase > 2:
             return 2
         return phase
-    @property
 
+    @property
     @sensor("Name", icon="mdi:label")
     def name(self) -> str:
         try:
             return COOKING_STAGES[self.state]["name"]
         except KeyError:
             return "Unknown stage"
-    @property
 
+    @property
     @sensor("Description", icon="mdi:text")
     def description(self) -> str:
         try:
             return COOKING_STAGES[self.state]["description"]
         except KeyError:
             return ""
-    @property
 
+    @property
     @sensor("Raw", icon="mdi:code-string")
     def raw(self) -> str:
         return self.stage
@@ -283,8 +283,8 @@ class InteractionTimeouts(DeviceStatus):
             self.timeouts = [
                 int(timeouts[i : i + 2], 16) for i in range(0, len(timeouts), 2)
             ]
-    @property
 
+    @property
     @sensor("LED Off Timeout", unit="s", icon="mdi:led-off")
     def led_off(self) -> int:
         return self.timeouts[0]
@@ -292,8 +292,8 @@ class InteractionTimeouts(DeviceStatus):
     @led_off.setter
     def led_off(self, delay: int):
         self.timeouts[0] = delay
-    @property
 
+    @property
     @sensor("Lid Open Timeout", unit="s", icon="mdi:pot-steam-outline")
     def lid_open(self) -> int:
         return self.timeouts[1]
@@ -301,8 +301,8 @@ class InteractionTimeouts(DeviceStatus):
     @lid_open.setter
     def lid_open(self, timeout: int):
         self.timeouts[1] = timeout
-    @property
 
+    @property
     @sensor("Lid Open Warning Timeout", unit="s", icon="mdi:alert")
     def lid_open_warning(self) -> int:
         return self.timeouts[2]
@@ -341,8 +341,8 @@ class CookerSettings(DeviceStatus):
             self._settings = [
                 int(settings[i : i + 2], 16) for i in range(0, len(settings), 2)
             ]
-    @property
 
+    @property
     @sensor("Pressure Supported", icon="mdi:gauge")
     def pressure_supported(self) -> bool:
         return self._settings[0] & 1 != 0
@@ -353,8 +353,8 @@ class CookerSettings(DeviceStatus):
             self._settings[0] |= 1
         else:
             self._settings[0] &= 254
-    @property
 
+    @property
     @sensor("LED On", icon="mdi:led-on")
     def led_on(self) -> bool:
         return self._settings[0] & 2 != 0
@@ -365,8 +365,8 @@ class CookerSettings(DeviceStatus):
             self._settings[0] |= 2
         else:
             self._settings[0] &= 253
-    @property
 
+    @property
     @sensor("Auto Keep Warm", icon="mdi:pot-steam")
     def auto_keep_warm(self) -> bool:
         return self._settings[0] & 4 != 0
@@ -377,8 +377,8 @@ class CookerSettings(DeviceStatus):
             self._settings[0] |= 4
         else:
             self._settings[0] &= 251
-    @property
 
+    @property
     @sensor("Lid Open Warning", icon="mdi:alert")
     def lid_open_warning(self) -> bool:
         return self._settings[0] & 8 != 0
@@ -389,8 +389,8 @@ class CookerSettings(DeviceStatus):
             self._settings[0] |= 8
         else:
             self._settings[0] &= 247
-    @property
 
+    @property
     @sensor("Lid Open Warning Delayed", icon="mdi:alert-outline")
     def lid_open_warning_delayed(self) -> bool:
         return self._settings[0] & 16 != 0
@@ -401,8 +401,8 @@ class CookerSettings(DeviceStatus):
             self._settings[0] |= 16
         else:
             self._settings[0] &= 239
-    @property
 
+    @property
     @sensor("Jingzhu Auto Keep Warm", icon="mdi:pot-steam")
     def jingzhu_auto_keep_warm(self) -> bool:
         return self._settings[1] & 1 != 0
@@ -413,8 +413,8 @@ class CookerSettings(DeviceStatus):
             self._settings[1] |= 1
         else:
             self._settings[1] &= 254
-    @property
 
+    @property
     @sensor("Kuaizhu Auto Keep Warm", icon="mdi:pot-steam")
     def kuaizhu_auto_keep_warm(self) -> bool:
         return self._settings[1] & 2 != 0
@@ -425,8 +425,8 @@ class CookerSettings(DeviceStatus):
             self._settings[1] |= 2
         else:
             self._settings[1] &= 253
-    @property
 
+    @property
     @sensor("Zhuzhou Auto Keep Warm", icon="mdi:pot-steam")
     def zhuzhou_auto_keep_warm(self) -> bool:
         return self._settings[1] & 4 != 0
@@ -437,8 +437,8 @@ class CookerSettings(DeviceStatus):
             self._settings[1] |= 4
         else:
             self._settings[1] &= 251
-    @property
 
+    @property
     @sensor("Favorite Auto Keep Warm", icon="mdi:pot-steam")
     def favorite_auto_keep_warm(self) -> bool:
         return self._settings[1] & 8 != 0
@@ -496,14 +496,14 @@ class CookerStatus(DeviceStatus):
         meal is ready:                     ['autokeepwarm', '0001', '1000000000', '031e0b23031e', '1',      '750',   '60',  '0207', '05040f', '00030017',   '0100', 'ffffffffffff011effff01000000535d']
         """
         self.data = data
-    @property
 
+    @property
     @sensor("Mode", icon="mdi:pot-steam")
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["func"])
-    @property
 
+    @property
     @sensor("Menu", icon="mdi:book-open-variant")
     def menu(self) -> int:
         """Selected recipe id."""
@@ -517,6 +517,7 @@ class CookerStatus(DeviceStatus):
             return CookingStage(stage)
 
         return None
+    @sensor(
     @property
     @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
     def temperature(self) -> int | None:
@@ -542,8 +543,8 @@ class CookerStatus(DeviceStatus):
             return time(hour=int(value[4:6], 16), minute=int(value[6:8], 16))
 
         return None
-    @property
 
+    @property
     @sensor("Remaining", unit="min", icon="mdi:timer-outline")
     def remaining(self) -> int:
         """Remaining minutes of the cooking process."""
@@ -558,38 +559,38 @@ class CookerStatus(DeviceStatus):
             return delay
 
         return None
-    @property
 
+    @property
     @sensor("Duration", unit="min", icon="mdi:timer-outline")
     def duration(self) -> int:
         """Duration of the cooking process."""
         return int(self.data["t_cook"])
-    @property
 
+    @property
     @sensor("Cooker Settings", icon="mdi:cog")
     def cooker_settings(self) -> CookerSettings:
         """Settings of the cooker."""
         return CookerSettings(self.data["setting"])
-    @property
 
+    @property
     @sensor("Interaction Timeouts", icon="mdi:timer-cog-outline")
     def interaction_timeouts(self) -> InteractionTimeouts:
         """Interaction timeouts."""
         return InteractionTimeouts(self.data["delay"])
-    @property
 
+    @property
     @sensor("Hardware Version", icon="mdi:chip")
     def hardware_version(self) -> int:
         """Hardware version."""
         return int(self.data["version"][0:4], 16)
-    @property
 
+    @property
     @sensor("Firmware Version", icon="mdi:update")
     def firmware_version(self) -> int:
         """Firmware version."""
         return int(self.data["version"][4:8], 16)
-    @property
 
+    @property
     @sensor("Favorite", icon="mdi:star")
     def favorite(self) -> int:
         """Favored recipe id.

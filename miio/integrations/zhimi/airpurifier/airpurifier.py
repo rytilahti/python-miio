@@ -129,36 +129,37 @@ class AirPurifierStatus(DeviceStatus):
 
         self.filter_type_util = FilterTypeUtil()
         self.data = data
-    @property
 
+    @property
     @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
-    @property
 
+    @property
     @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.power == "on"
-    @property
 
+    @property
     @sensor("AQI", unit="μg/m³", icon="mdi:air-filter")
     def aqi(self) -> int:
         """Air quality index."""
         return self.data["aqi"]
-    @property
 
+    @property
     @sensor("Average AQI", unit="μg/m³", icon="mdi:air-filter")
     def average_aqi(self) -> int:
         """Average of the air quality index."""
         return self.data["average_aqi"]
-    @property
 
+    @property
     @sensor("Humidity", unit="%", device_class="humidity", icon="mdi:water-percent")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
+    @sensor(
     @property
     @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
     def temperature(self) -> float | None:
@@ -167,9 +168,11 @@ class AirPurifierStatus(DeviceStatus):
             return self.data["temp_dec"] / 10.0
 
         return None
-    @property
 
-    @setting("Mode", setter_name="set_mode", choices=OperationMode, icon="mdi:air-purifier")
+    @property
+    @setting(
+        "Mode", setter_name="set_mode", choices=OperationMode, icon="mdi:air-purifier"
+    )
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
@@ -184,12 +187,13 @@ class AirPurifierStatus(DeviceStatus):
             return SleepMode(self.data["sleep_mode"])
 
         return None
-    @property
 
+    @property
     @setting("LED", setter_name="set_led", icon="mdi:led-on")
     def led(self) -> bool:
         """Return True if LED is on."""
         return self.data["led"] == "on"
+    @setting(
     @property
     @setting("LED Brightness", setter_name="set_led_brightness", choices=LedBrightness, icon="mdi:brightness-6")
     def led_brightness(self) -> LedBrightness | None:
@@ -201,6 +205,7 @@ class AirPurifierStatus(DeviceStatus):
                 return None
 
         return None
+    @sensor(
     @property
     @sensor("Illuminance", unit="lx", device_class="illuminance", icon="mdi:brightness-5")
     def illuminance(self) -> int | None:
@@ -217,45 +222,52 @@ class AirPurifierStatus(DeviceStatus):
             return self.data["buzzer"] == "on"
 
         return None
-    @property
 
+    @property
     @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
-    @property
 
-    @setting("Favorite Level", setter_name="set_favorite_level", min_value=0, max_value=17, step=1, icon="mdi:star")
+    @property
+    @setting(
+        "Favorite Level",
+        setter_name="set_favorite_level",
+        min_value=0,
+        max_value=17,
+        step=1,
+        icon="mdi:star",
+    )
     def favorite_level(self) -> int:
         """Return favorite level, which is used if the mode is ``favorite``."""
         # Favorite level used when the mode is `favorite`.
         return self.data["favorite_level"]
-    @property
 
+    @property
     @sensor("Filter Life Remaining", unit="%", icon="mdi:filter-outline")
     def filter_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["filter1_life"]
-    @property
 
+    @property
     @sensor("Filter Hours Used", unit="h", icon="mdi:filter-outline")
     def filter_hours_used(self) -> int:
         """How long the filter has been in use."""
         return self.data["f1_hour_used"]
-    @property
 
+    @property
     @sensor("Use Time", unit="s", icon="mdi:timer-sand")
     def use_time(self) -> int:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
-    @property
 
+    @property
     @sensor("Purify Volume", unit="m³", icon="mdi:air-purifier")
     def purify_volume(self) -> int:
         """The volume of purified air in cubic meter."""
         return self.data["purify_volume"]
-    @property
 
+    @property
     @sensor("Motor Speed", unit="rpm", icon="mdi:fan")
     def motor_speed(self) -> int:
         """Speed of the motor."""
@@ -265,6 +277,7 @@ class AirPurifierStatus(DeviceStatus):
     def motor2_speed(self) -> int | None:
         """Speed of the 2nd motor."""
         return self.data["motor2_speed"]
+    @setting(
     @property
     @setting("Volume", setter_name="set_volume", unit="%", min_value=0, max_value=100, step=1, icon="mdi:volume-high")
     def volume(self) -> int | None:
@@ -287,8 +300,8 @@ class AirPurifierStatus(DeviceStatus):
         return self.filter_type_util.determine_filter_type(
             self.filter_rfid_tag, self.filter_rfid_product_id
         )
-    @property
 
+    @property
     @setting("Learn Mode", setter_name="set_learn_mode", icon="mdi:school")
     def learn_mode(self) -> bool:
         """Return True if Learn Mode is enabled."""
