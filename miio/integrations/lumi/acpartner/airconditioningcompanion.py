@@ -5,6 +5,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -97,11 +98,13 @@ class AirConditioningCompanionStatus(DeviceStatus):
         self.state = data["model_and_state"][1]
 
     @property
+    @sensor("Load Power", unit="W", device_class="power", icon="mdi:flash")
     def load_power(self) -> int:
         """Current power load of the air conditioner."""
         return int(self.data["model_and_state"][2])
 
     @property
+    @sensor("Power Socket", icon="mdi:power-socket")
     def power_socket(self) -> str | None:
         """Current socket power state."""
         if "power_socket" in self.data and self.data["power_socket"] is not None:
@@ -110,21 +113,25 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Air Condition Model", icon="mdi:air-conditioner")
     def air_condition_model(self) -> bytes:
         """Model of the air conditioner."""
         return bytes.fromhex(self.model)
 
     @property
+    @sensor("Model Format", icon="mdi:information-outline")
     def model_format(self) -> int:
         """Version number of the model format."""
         return self.air_condition_model[0]
 
     @property
+    @sensor("Device Type", icon="mdi:devices")
     def device_type(self) -> int:
         """Device type identifier."""
         return self.air_condition_model[1]
 
     @property
+    @sensor("Air Condition Brand", icon="mdi:tag")
     def air_condition_brand(self) -> int:
         """Brand of the air conditioner.
 
@@ -133,6 +140,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return int(self.air_condition_model[2:4].hex(), 16)
 
     @property
+    @sensor("Air Condition Remote", icon="mdi:remote")
     def air_condition_remote(self) -> int:
         """Remote id.
 
@@ -148,6 +156,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return int(self.air_condition_model[4:8].hex(), 16)
 
     @property
+    @sensor("State Format", icon="mdi:information-outline")
     def state_format(self) -> int:
         """Version number of the state format.
 
@@ -156,15 +165,18 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return int(self.air_condition_model[8])
 
     @property
+    @sensor("Air Condition Configuration", icon="mdi:cog")
     def air_condition_configuration(self) -> int:
         return self.state[2:10]
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Current power state."""
         return "on" if int(self.state[2:3]) == Power.On.value else "off"
 
     @property
+    @sensor("LED", icon="mdi:led-on")
     def led(self) -> bool | None:
         """Current LED state."""
         state = self.state[8:9]
@@ -178,11 +190,13 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @sensor("Target Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
     def target_temperature(self) -> int | None:
         """Target temperature."""
         try:
@@ -191,6 +205,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @sensor("Swing Mode", icon="mdi:arrow-oscillating")
     def swing_mode(self) -> SwingMode | None:
         """Current swing mode."""
         try:
@@ -200,6 +215,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @sensor("Fan Speed", icon="mdi:fan")
     def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         try:
@@ -209,6 +225,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @sensor("Mode", icon="mdi:air-conditioner")
     def mode(self) -> OperationMode | None:
         """Current operation mode."""
         try:

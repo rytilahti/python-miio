@@ -17,6 +17,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,46 +76,59 @@ class CameraStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Type", icon="mdi:camera")
     def type(self) -> str:
         """TODO: Type of the camera? Name?"""
         return self.data["app_type"]
 
     @property
+    @sensor("Video Status", icon="mdi:video")
     def video_status(self) -> bool:
         """Video state."""
         return bool(self.data["video_state"])
 
     @property
+    @sensor("Is On", icon="mdi:video")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.video_status == 1
 
     @property
+    @setting("Motion Detection", setter_name="md_on", icon="mdi:motion-sensor")
     def md(self) -> bool:
         """Motion detection state."""
         return bool(self.data["md_status"])
 
     @property
+    @setting(
+        "Motion Detection Sensitivity",
+        setter_name="md_sensitivity",
+        icon="mdi:motion-sensor",
+    )
     def md_sensitivity(self):
         """Motion detection sensitivity."""
         return self.data["mdsensitivity"]
 
     @property
+    @setting("IR Mode", setter_name="ir_on", icon="mdi:remote")
     def ir(self):
         """IR mode."""
         return bool(self.data["ir_status"])
 
     @property
+    @setting("LED", setter_name="led_on", icon="mdi:led-on")
     def led(self):
         """LED status."""
         return bool(self.data["led_status"])
 
     @property
+    @setting("Flipped", setter_name="flip_on", icon="mdi:flip-vertical")
     def flipped(self) -> bool:
         """TODO: If camera is flipped?"""
         return self.data["flip_state"]
 
     @property
+    @sensor("Camera Offsets", icon="mdi:camera-control")
     def offsets(self) -> CameraOffset:
         """Camera offset information."""
         return CameraOffset(
@@ -124,26 +138,31 @@ class CameraStatus(DeviceStatus):
         )
 
     @property
+    @sensor("Channel ID", icon="mdi:access-point-network")
     def channel_id(self) -> int:
         """TODO: Zigbee channel?"""
         return self.data["channel_id"]
 
     @property
+    @setting("Fullstop", setter_name="fullstop_on", icon="mdi:alarm-light")
     def fullstop(self) -> bool:
         """Is alarm triggered by MD."""
         return self.data["fullstop"] != 0
 
     @property
+    @sensor("P2P ID", icon="mdi:identifier")
     def p2p_id(self) -> str:
         """P2P ID for video and audio."""
         return self.data["p2p_id"]
 
     @property
+    @sensor("AV ID", icon="mdi:identifier")
     def av_id(self) -> str:
         """TODO: What is this? ID for the cloud?"""
         return self.data["avID"]
 
     @property
+    @sensor("AV Password", icon="mdi:lock")
     def av_password(self) -> str:
         """TODO: What is this? Password for the cloud?"""
         return self.data["avPass"]
