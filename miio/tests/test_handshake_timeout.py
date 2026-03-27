@@ -87,9 +87,11 @@ class TestHandshakeTimestamp:
         proto._discovered = True
         proto._last_handshake = datetime.now(tz=timezone.utc)
 
-        with patch.object(proto, "send_handshake") as mock_hs, \
-             patch.object(proto, "_create_request", return_value={"id": 1}), \
-             patch("socket.socket") as mock_sock:
+        with (
+            patch.object(proto, "send_handshake") as mock_hs,
+            patch.object(proto, "_create_request", return_value={"id": 1}),
+            patch("socket.socket") as mock_sock,
+        ):
             mock_instance: MagicMock = mock_sock.return_value
             mock_instance.recvfrom.side_effect = OSError("mocked")
             try:
@@ -105,9 +107,11 @@ class TestHandshakeTimestamp:
         proto._last_handshake = datetime.now(tz=timezone.utc)
         proto._device_id = b"\x01\x02\x03\x04"
 
-        with patch.object(proto, "send_handshake") as mock_hs, \
-             patch.object(proto, "_create_request", return_value={"id": 1}), \
-             patch("socket.socket") as mock_sock:
+        with (
+            patch.object(proto, "send_handshake") as mock_hs,
+            patch.object(proto, "_create_request", return_value={"id": 1}),
+            patch("socket.socket") as mock_sock,
+        ):
             mock_instance: MagicMock = mock_sock.return_value
             mock_instance.recvfrom.side_effect = OSError("mocked")
             try:
