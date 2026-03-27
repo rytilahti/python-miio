@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceException, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 from miio.utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,6 +46,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power", icon="mdi:power-plug")
     def power(self) -> bool:
         """Current power state."""
         if "on" in self.data:
@@ -55,15 +57,18 @@ class ChuangmiPlugStatus(DeviceStatus):
         raise DeviceException("There was neither 'on' or 'power' in data")
 
     @property
+    @setting("Power", setter_name="on", icon="mdi:power-plug")
     def is_on(self) -> bool:
         """True if device is on."""
         return self.power
 
     @property
+    @sensor("Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature")
     def temperature(self) -> int:
         return self.data["temperature"]
 
     @property
+    @setting("USB Power", setter_name="usb_on", icon="mdi:usb")
     def usb_power(self) -> Optional[bool]:
         """True if USB is on."""
         if "usb_on" in self.data and self.data["usb_on"] is not None:
@@ -71,6 +76,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Load Power", unit="W", icon="mdi:flash", device_class="power")
     def load_power(self) -> Optional[float]:
         """Current power load, if available."""
         if "load_power" in self.data and self.data["load_power"] is not None:
@@ -84,6 +90,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         return self.led
 
     @property
+    @setting("LED", setter_name="set_led", icon="mdi:led-on")
     def led(self) -> Optional[bool]:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:

@@ -6,6 +6,7 @@ import click
 
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 _MAPPINGS = {
@@ -121,46 +122,68 @@ class HeaterMiotStatus(DeviceStatus):
         self.model = model
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.is_on else "off"
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.data["power"]
 
     @property
+    @setting(
+        "Target Temperature",
+        unit="°C",
+        setter_name="set_target_temperature",
+        min_value=18,
+        max_value=28,
+        device_class="temperature",
+        icon="mdi:thermometer",
+    )
     def target_temperature(self) -> int:
         """Target temperature."""
         return self.data["target_temperature"]
 
     @property
+    @sensor("Delay Off Countdown", unit="s", icon="mdi:timer-sand", device_class="duration")
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in seconds."""
         return self.data["countdown_time"]
 
     @property
+    @sensor("Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
 
     @property
+    @sensor("Relative Humidity", unit="%", icon="mdi:water-percent", device_class="humidity")
     def relative_humidity(self) -> Optional[int]:
         """Current relative humidity."""
         return self.data.get("relative_humidity")
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
     def child_lock(self) -> bool:
         """True if child lock is on, False otherwise."""
         return self.data["child_lock"] is True
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool:
         """True if buzzer is turned on, False otherwise."""
         return self.data["buzzer"] is True
 
     @property
+    @setting(
+        "LED Brightness",
+        setter_name="set_led_brightness",
+        choices=LedBrightness,
+        icon="mdi:brightness-6",
+    )
     def led_brightness(self) -> LedBrightness:
         """LED indicator brightness."""
         value = self.data["led_brightness"]

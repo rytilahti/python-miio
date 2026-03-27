@@ -5,6 +5,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,46 +47,56 @@ class WifiSpeakerStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Device Name", icon="mdi:speaker")
     def device_name(self) -> str:
         """Name of the device."""
         return self.data["DeviceName"]
 
     @property
+    @sensor("Channel", icon="mdi:radio")
     def channel(self) -> str:
         """Name of the channel."""
         return self.data["channel_title"]
 
     @property
+    @sensor("State", icon="mdi:play-circle")
     def state(self) -> PlayState:
         """State of the device, e.g. PLAYING."""
         return PlayState(self.data["current_state"])
 
     @property
+    @sensor("Hardware Version", icon="mdi:information-outline")
     def hardware_version(self) -> str:
+        """Hardware version."""
         return self.data["hardware_version"]
 
     @property
-    def play_mode(self):
+    @sensor("Play Mode", icon="mdi:repeat")
+    def play_mode(self) -> str:
         """Play mode such as REPEAT_ALL."""
         # note: this can be enumized when all values are known
         return self.data["play_mode"]
 
     @property
+    @sensor("Track Artist", icon="mdi:account-music")
     def track_artist(self) -> str:
         """Artist of the current track."""
         return self.data["track_artist"]
 
     @property
+    @sensor("Track Title", icon="mdi:music-note")
     def track_title(self) -> str:
         """Title of the current track."""
         return self.data["track_title"]
 
     @property
+    @sensor("Track Duration", icon="mdi:timer-music", device_class="duration")
     def track_duration(self) -> str:
         """Total duration of the current track."""
         return self.data["track_duration"]
 
     @property
+    @sensor("Transport Channel", icon="mdi:radio")
     def transport_channel(self) -> TransportChannel:
         """Transport channel, e.g. PLAYLIST."""
         return TransportChannel(self.data["transport_channel"])

@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,14 +38,17 @@ class PhilipsBulbStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         return self.data["power"]
 
     @property
+    @setting("Power", setter_name="on", icon="mdi:power")
     def is_on(self) -> bool:
         return self.power == "on"
 
     @property
+    @setting("Brightness", setter_name="set_brightness", unit="%", icon="mdi:brightness-6")
     def brightness(self) -> Optional[int]:
         if "bright" in self.data:
             return self.data["bright"]
@@ -53,18 +57,21 @@ class PhilipsBulbStatus(DeviceStatus):
         return None
 
     @property
+    @setting("Color Temperature", setter_name="set_color_temperature", icon="mdi:palette")
     def color_temperature(self) -> Optional[int]:
         if "cct" in self.data:
             return self.data["cct"]
         return None
 
     @property
+    @setting("Scene", setter_name="set_scene", icon="mdi:palette")
     def scene(self) -> Optional[int]:
         if "snm" in self.data:
             return self.data["snm"]
         return None
 
     @property
+    @sensor("Delay Off Countdown", unit="s", icon="mdi:timer-outline", device_class="duration")
     def delay_off_countdown(self) -> int:
         return self.data["dv"]
 

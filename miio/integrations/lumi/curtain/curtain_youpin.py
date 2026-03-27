@@ -6,6 +6,7 @@ import click
 
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -73,46 +74,75 @@ class CurtainStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Status", icon="mdi:curtains")
     def status(self) -> Status:
         """Device status."""
         return Status(self.data["status"])
 
     @property
+    @setting("Manual Enabled", setter_name="set_manual_enabled", icon="mdi:hand-back-left")
     def is_manual_enabled(self) -> bool:
         """True if manual controls are enabled."""
         return bool(self.data["is_manual_enabled"])
 
     @property
+    @setting(
+        "Polarity",
+        setter_name="set_polarity",
+        icon="mdi:swap-horizontal",
+        choices=Polarity,
+    )
     def polarity(self) -> Polarity:
         """Motor rotation polarity."""
         return Polarity(self.data["polarity"])
 
     @property
+    @setting("Position Limited", setter_name="set_position_limit", icon="mdi:arrow-collapse-horizontal")
     def is_position_limited(self) -> bool:
         """Position limit."""
         return bool(self.data["is_position_limited"])
 
     @property
+    @setting("Night Tip Light", setter_name="set_night_tip_light", icon="mdi:lightbulb-night")
     def night_tip_light(self) -> bool:
         """Night tip light status."""
         return bool(self.data["night_tip_light"])
 
     @property
+    @sensor("Run Time", icon="mdi:timer-outline", device_class="duration", unit="s")
     def run_time(self) -> int:
         """Run time of the motor."""
         return self.data["run_time"]
 
     @property
+    @sensor("Current Position", icon="mdi:curtains", unit="%")
     def current_position(self) -> int:
         """Current curtain position."""
         return self.data["current_position"]
 
     @property
+    @setting(
+        "Target Position",
+        setter_name="set_target_position",
+        icon="mdi:curtains",
+        unit="%",
+        min_value=0,
+        max_value=100,
+        step=1,
+    )
     def target_position(self) -> int:
         """Target curtain position."""
         return self.data["target_position"]
 
     @property
+    @setting(
+        "Adjust Value",
+        setter_name="set_adjust_value",
+        icon="mdi:tune",
+        min_value=-100,
+        max_value=100,
+        step=1,
+    )
     def adjust_value(self) -> int:
         """Adjust value."""
         return self.data["adjust_value"]

@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,51 +21,81 @@ class PhilipsEyecareStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        "Brightness",
+        unit="%",
+        setter_name="set_brightness",
+        min_value=1,
+        max_value=100,
+        icon="mdi:brightness-6",
+    )
     def brightness(self) -> int:
         """Current brightness of the primary light."""
         return self.data["bright"]
 
     @property
+    @setting("Eye Fatigue Reminder", setter_name="reminder_on", icon="mdi:eye")
     def reminder(self) -> bool:
         """Indicates the eye fatigue notification is enabled or not."""
         return self.data["notifystatus"] == "on"
 
     @property
+    @setting("Ambient Light", setter_name="ambient_on", icon="mdi:lightbulb-outline")
     def ambient(self) -> bool:
         """True if the ambient light (second light source) is on."""
         return self.data["ambstatus"] == "on"
 
     @property
+    @setting(
+        "Ambient Brightness",
+        unit="%",
+        setter_name="set_ambient_brightness",
+        min_value=1,
+        max_value=100,
+        icon="mdi:brightness-6",
+    )
     def ambient_brightness(self) -> int:
         """Brightness of the ambient light."""
         return self.data["ambvalue"]
 
     @property
+    @setting("Eyecare Mode", setter_name="eyecare_on", icon="mdi:eye-check")
     def eyecare(self) -> bool:
         """True if the eyecare mode is on."""
         return self.data["eyecare"] == "on"
 
     @property
+    @setting(
+        "Scene",
+        setter_name="set_scene",
+        min_value=1,
+        max_value=4,
+        icon="mdi:palette",
+    )
     def scene(self) -> int:
         """Current fixed scene."""
         return self.data["scene_num"]
 
     @property
+    @setting("Smart Night Light", setter_name="smart_night_light_on", icon="mdi:weather-night")
     def smart_night_light(self) -> bool:
         """True if the smart night light mode is on."""
         return self.data["bls"] == "on"
 
     @property
+    @sensor("Delay Off Countdown", unit="min", icon="mdi:timer-sand", device_class="duration")
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""
         return self.data["dvalue"]

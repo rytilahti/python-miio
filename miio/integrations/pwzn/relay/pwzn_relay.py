@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,6 +71,7 @@ class PwznRelayStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Relay State", icon="mdi:electric-switch")
     def relay_state(self) -> Optional[int]:
         """Current relay state."""
         if "relay_status" in self.data:
@@ -77,6 +79,7 @@ class PwznRelayStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Relay Names", icon="mdi:rename-box")
     def relay_names(self) -> dict[int, str]:
         def _extract_index_from_key(name) -> int:
             """extract the index from the variable."""
@@ -89,6 +92,7 @@ class PwznRelayStatus(DeviceStatus):
         }
 
     @property
+    @sensor("Active Relay Count", icon="mdi:counter")
     def on_count(self) -> Optional[int]:
         """Number of on relay."""
         if "on_count" in self.data:

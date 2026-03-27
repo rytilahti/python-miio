@@ -7,6 +7,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -115,71 +116,96 @@ class AirFreshStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] else "off"
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.data["power"]
 
     @property
+    @setting("Mode", setter_name="set_mode", choices=OperationMode, icon="mdi:fan")
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
 
     @property
+    @sensor("PM2.5", unit="μg/m³", device_class="pm25", icon="mdi:blur")
     def pm25(self) -> int:
         """Fine particulate patter (PM2.5)."""
         return self.data["pm25"]
 
     @property
+    @sensor(
+        "CO2",
+        unit="ppm",
+        device_class="carbon_dioxide",
+        icon="mdi:molecule-co2",
+    )
     def co2(self) -> int:
         """Carbon dioxide."""
         return self.data["co2"]
 
     @property
+    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
     def temperature(self) -> int:
         """Current temperature in degree celsions."""
         return self.data["temperature_outside"]
 
     @property
+    @setting(
+        "Favorite Speed",
+        setter_name="set_favorite_speed",
+        min_value=0,
+        max_value=150,
+        icon="mdi:fan",
+    )
     def favorite_speed(self) -> int:
         """Favorite speed."""
         return self.data["favourite_speed"]
 
     @property
+    @sensor("Control Speed", icon="mdi:fan")
     def control_speed(self) -> int:
         """Control speed."""
         return self.data["control_speed"]
 
     @property
+    @sensor("Dust Filter Life Remaining", unit="%", icon="mdi:filter")
     def dust_filter_life_remaining(self) -> Optional[int]:
         """Remaining dust filter life in percent."""
         return self.data.get("filter_intermediate", self.data.get("filter_rate"))
 
     @property
+    @sensor("Dust Filter Life Remaining Days", unit="days", icon="mdi:filter")
     def dust_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining dust filter life in days."""
         return self.data.get("filter_inter_day", self.data.get("filter_day"))
 
     @property
+    @sensor("Upper Filter Life Remaining", unit="%", icon="mdi:filter")
     def upper_filter_life_remaining(self) -> Optional[int]:
         """Remaining upper filter life in percent."""
         return self.data.get("filter_efficient")
 
     @property
+    @sensor("Upper Filter Life Remaining Days", unit="days", icon="mdi:filter")
     def upper_filter_life_remaining_days(self) -> Optional[int]:
         """Remaining upper filter life in days."""
         return self.data.get("filter_effi_day")
 
     @property
+    @setting("PTC", setter_name="set_ptc", icon="mdi:radiator")
     def ptc(self) -> bool:
         """Return True if PTC is on."""
         return self.data["ptc_on"]
 
     @property
+    @setting("PTC Level", setter_name="set_ptc_level", choices=PtcLevel, icon="mdi:radiator")
     def ptc_level(self) -> Optional[PtcLevel]:
         """PTC level."""
         try:
@@ -188,26 +214,36 @@ class AirFreshStatus(DeviceStatus):
             return None
 
     @property
+    @sensor("PTC Status", icon="mdi:radiator")
     def ptc_status(self) -> bool:
         """Return true if PTC status is on."""
         return self.data["ptc_status"]
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"]
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool:
         """Return True if sound is on."""
         return self.data["sound"]
 
     @property
+    @setting("Display", setter_name="set_display", icon="mdi:monitor")
     def display(self) -> bool:
         """Return True if the display is on."""
         return self.data["display"]
 
     @property
+    @setting(
+        "Display Orientation",
+        setter_name="set_display_orientation",
+        choices=DisplayOrientation,
+        icon="mdi:monitor",
+    )
     def display_orientation(self) -> Optional[DisplayOrientation]:
         """Display orientation."""
         try:

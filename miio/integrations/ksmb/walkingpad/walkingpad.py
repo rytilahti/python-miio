@@ -7,6 +7,7 @@ import click
 
 from miio import Device, DeviceException, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,51 +44,85 @@ class WalkingpadStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @sensor("Walking Time", icon="mdi:timer", device_class="duration")
     def walking_time(self) -> timedelta:
         """Current walking duration in seconds."""
         return timedelta(seconds=int(self.data["time"]))
 
     @property
+    @setting(
+        "Speed",
+        unit="km/h",
+        setter_name="set_speed",
+        min_value=0,
+        max_value=6,
+        icon="mdi:speedometer",
+    )
     def speed(self) -> float:
         """Current speed."""
         return float(self.data["sp"])
 
     @property
+    @setting(
+        "Start Speed",
+        unit="km/h",
+        setter_name="set_start_speed",
+        min_value=0,
+        max_value=6,
+        icon="mdi:speedometer-slow",
+    )
     def start_speed(self) -> float:
         """Current start speed."""
         return self.data["start_speed"]
 
     @property
+    @setting(
+        "Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+        icon="mdi:run",
+    )
     def mode(self) -> OperationMode:
         """Current mode."""
         return OperationMode(self.data["mode"])
 
     @property
+    @setting(
+        "Sensitivity",
+        setter_name="set_sensitivity",
+        choices=OperationSensitivity,
+        icon="mdi:tune",
+    )
     def sensitivity(self) -> OperationSensitivity:
         """Current sensitivity."""
         return OperationSensitivity(self.data["sensitivity"])
 
     @property
+    @sensor("Step Count", icon="mdi:shoe-print")
     def step_count(self) -> int:
         """Current steps."""
         return int(self.data["step"])
 
     @property
+    @sensor("Distance", unit="m", icon="mdi:map-marker-distance")
     def distance(self) -> int:
         """Current distance in meters."""
         return int(self.data["dist"])
 
     @property
+    @sensor("Calories", unit="cal", icon="mdi:fire")
     def calories(self) -> int:
         """Current calories burnt."""
         return int(self.data["cal"])

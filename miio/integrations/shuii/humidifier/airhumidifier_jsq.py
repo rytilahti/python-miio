@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,16 +60,24 @@ class AirHumidifierStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor(name="Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] == 1 else "off"
 
     @property
+    @setting(name="Power", setter_name="on", icon="mdi:power")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        name="Mode",
+        setter_name="set_mode",
+        icon="mdi:fan",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Operation mode.
 
@@ -84,21 +93,30 @@ class AirHumidifierStatus(DeviceStatus):
         return mode
 
     @property
+    @sensor(name="Temperature", unit="C", device_class="temperature")
     def temperature(self) -> int:
         """Current temperature in degree celsius."""
         return self.data["temperature"]
 
     @property
+    @sensor(name="Humidity", unit="%", device_class="humidity")
     def humidity(self) -> int:
         """Current humidity in percent."""
         return self.data["humidity"]
 
     @property
+    @setting(name="Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] == 1
 
     @property
+    @setting(
+        name="LED Brightness",
+        setter_name="set_led_brightness",
+        icon="mdi:brightness-6",
+        choices=LedBrightness,
+    )
     def led_brightness(self) -> LedBrightness:
         """Buttons illumination Brightness level."""
         try:
@@ -110,26 +128,31 @@ class AirHumidifierStatus(DeviceStatus):
         return brightness
 
     @property
+    @setting(name="LED", setter_name="set_led", icon="mdi:led-outline")
     def led(self) -> bool:
         """True if LED is turned on."""
         return self.led_brightness is not LedBrightness.Off
 
     @property
+    @setting(name="Child Lock", setter_name="set_child_lock", icon="mdi:lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == 1
 
     @property
+    @sensor(name="No Water", icon="mdi:water-off")
     def no_water(self) -> bool:
         """True if the water tank is empty."""
         return self.data["no_water"] == 1
 
     @property
+    @sensor(name="Lid Opened", icon="mdi:cup-water")
     def lid_opened(self) -> bool:
         """True if the water tank is detached."""
         return self.data["lid_opened"] == 1
 
     @property
+    @sensor(name="Use Time", unit="s", icon="mdi:timer")
     def use_time(self) -> Optional[int]:
         """How long the device has been active in seconds.
 
