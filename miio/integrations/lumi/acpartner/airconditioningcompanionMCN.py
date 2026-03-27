@@ -107,7 +107,8 @@ class AirConditioningCompanionMcn02(Device):
         debug: int = 0,
         lazy_discover: bool = True,
         timeout: Optional[int] = None,
-        model: str = MODEL_ACPARTNER_MCN02,
+        *,
+        model: Optional[str] = MODEL_ACPARTNER_MCN02,
     ) -> None:
         if start_id is None:
             start_id = random.randint(0, 999)  # nosec

@@ -279,6 +279,7 @@ class Yeelight(Device):
         debug: int = 0,
         lazy_discover: bool = True,
         timeout: Optional[int] = None,
+        *,
         model: Optional[str] = None,
     ) -> None:
         super().__init__(

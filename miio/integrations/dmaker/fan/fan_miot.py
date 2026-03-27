@@ -467,7 +467,8 @@ class Fan1C(MiotDevice):
         debug: int = 0,
         lazy_discover: bool = True,
         timeout: Optional[int] = None,
-        model: str = MODEL_FAN_1C,
+        *,
+        model: Optional[str] = MODEL_FAN_1C,
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model

@@ -218,7 +218,8 @@ class Huizuo(MiotDevice):
         debug: int = 0,
         lazy_discover: bool = True,
         timeout: Optional[int] = None,
-        model: str = MODEL_HUIZUO_PIS123,
+        *,
+        model: Optional[str] = MODEL_HUIZUO_PIS123,
     ) -> None:
         if model in MODELS_WITH_FAN_WY:
             self.mapping.update(_ADDITIONAL_MAPPING_FAN_WY)
