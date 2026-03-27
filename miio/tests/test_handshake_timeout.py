@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from unittest.mock import MagicMock, patch
 
 from miio.miioprotocol import MiIOProtocol
 
@@ -56,3 +57,61 @@ class TestNeedsHandshake:
         proto._discovered = True
         proto._last_handshake = None
         assert proto._needs_handshake() is True
+
+
+class TestHandshakeTimestamp:
+    """Tests that send_handshake records _last_handshake and send uses it."""
+
+    def test_send_handshake_records_timestamp(self) -> None:
+        """send_handshake should set _last_handshake to current time."""
+        proto = MiIOProtocol("127.0.0.1", handshake_timeout=60)
+        assert proto._last_handshake is None
+
+        mock_msg: MagicMock = MagicMock()
+        mock_msg.header.value.device_id = b"\x01\x02\x03\x04"
+        mock_msg.header.value.ts = datetime.now(tz=timezone.utc)
+        mock_msg.checksum = b"\x00" * 16
+
+        before: datetime = datetime.now(tz=timezone.utc)
+        with patch.object(MiIOProtocol, "discover", return_value=mock_msg):
+            proto.send_handshake()
+        after: datetime = datetime.now(tz=timezone.utc)
+
+        assert proto._last_handshake is not None
+        assert before <= proto._last_handshake <= after
+        assert proto._discovered is True
+
+    def test_send_calls_handshake_when_needed(self) -> None:
+        """send() should call send_handshake when _needs_handshake is True."""
+        proto = MiIOProtocol("127.0.0.1", handshake_timeout=0)
+        proto._discovered = True
+        proto._last_handshake = datetime.now(tz=timezone.utc)
+
+        with patch.object(proto, "send_handshake") as mock_hs, \
+             patch.object(proto, "_create_request", return_value={"id": 1}), \
+             patch("socket.socket") as mock_sock:
+            mock_instance: MagicMock = mock_sock.return_value
+            mock_instance.recvfrom.side_effect = OSError("mocked")
+            try:
+                proto.send("test_cmd", retry_count=0)
+            except Exception:
+                pass
+            mock_hs.assert_called_once()
+
+    def test_send_skips_handshake_when_not_needed(self) -> None:
+        """send() should not call send_handshake when timeout hasn't expired."""
+        proto = MiIOProtocol("127.0.0.1", handshake_timeout=3600)
+        proto._discovered = True
+        proto._last_handshake = datetime.now(tz=timezone.utc)
+        proto._device_id = b"\x01\x02\x03\x04"
+
+        with patch.object(proto, "send_handshake") as mock_hs, \
+             patch.object(proto, "_create_request", return_value={"id": 1}), \
+             patch("socket.socket") as mock_sock:
+            mock_instance: MagicMock = mock_sock.return_value
+            mock_instance.recvfrom.side_effect = OSError("mocked")
+            try:
+                proto.send("test_cmd", retry_count=0)
+            except Exception:
+                pass
+            mock_hs.assert_not_called()
