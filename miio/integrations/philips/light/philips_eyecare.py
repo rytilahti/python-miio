@@ -89,13 +89,22 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["scene_num"]
 
     @property
-    @setting("Smart Night Light", setter_name="smart_night_light_on", icon="mdi:weather-night")
+    @setting(
+        "Smart Night Light",
+        setter_name="smart_night_light_on",
+        icon="mdi:weather-night",
+    )
     def smart_night_light(self) -> bool:
         """True if the smart night light mode is on."""
         return self.data["bls"] == "on"
 
     @property
-    @sensor("Delay Off Countdown", unit="min", icon="mdi:timer-sand", device_class="duration")
+    @sensor(
+        "Delay Off Countdown",
+        unit="min",
+        icon="mdi:timer-sand",
+        device_class="duration",
+    )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""
         return self.data["dvalue"]

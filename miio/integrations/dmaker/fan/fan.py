@@ -105,7 +105,9 @@ class FanStatusP5(DeviceStatus):
         return self.data["roll_angle"]
 
     @property
-    @sensor("Delay Off Countdown", unit="s", icon="mdi:timer-sand", device_class="duration")
+    @sensor(
+        "Delay Off Countdown", unit="s", icon="mdi:timer-sand", device_class="duration"
+    )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in seconds."""
         return self.data["time_off"]

@@ -81,20 +81,20 @@ class FanStatusZA5(DeviceStatus):
         {'code': 0, 'did': 'temperature', 'piid': 7, 'siid': 7, 'value': 26.4},
         """
         self.data = data
-    @property
 
+    @property
     @setting("Ionizer", setter_name="set_ionizer", icon="mdi:atom")
     def ionizer(self) -> bool:
         """True if negative ions generation is enabled."""
         return self.data["anion"]
-    @property
 
+    @property
     @sensor("Battery Supported", icon="mdi:battery")
     def battery_supported(self) -> bool:
         """True if battery is supported."""
         return self.data["battery_supported"]
-    @property
 
+    @property
     @sensor("Buttons Pressed", icon="mdi:gesture-tap-button")
     def buttons_pressed(self) -> str:
         """What buttons on the fan are pressed now."""
@@ -106,21 +106,28 @@ class FanStatusZA5(DeviceStatus):
         if code == 2:
             return "Swing"
         return "Unknown"
-    @property
 
+    @property
     @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"]
-    @property
 
+    @property
     @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
     def child_lock(self) -> bool:
         """True if child lock if on."""
         return self.data["child_lock"]
-    @property
 
-    @setting("Fan Level", setter_name="set_fan_speed", min_value=1, max_value=4, step=1, icon="mdi:fan")
+    @property
+    @setting(
+        "Fan Level",
+        setter_name="set_fan_speed",
+        min_value=1,
+        max_value=4,
+        step=1,
+        icon="mdi:fan",
+    )
     def fan_level(self) -> int:
         """Fan level (1-4)."""
         return self.data["fan_level"]
@@ -130,75 +137,98 @@ class FanStatusZA5(DeviceStatus):
     def fan_speed(self) -> int:
         """Fan speed (1-100)."""
         return self.speed
-    @property
 
-    @setting("Speed", setter_name="set_speed", min_value=1, max_value=100, step=1, unit="%", icon="mdi:fan")
+    @property
+    @setting(
+        "Speed",
+        setter_name="set_speed",
+        min_value=1,
+        max_value=100,
+        step=1,
+        unit="%",
+        icon="mdi:fan",
+    )
     def speed(self) -> int:
         """Fan speed (1-100)."""
         return self.data["fan_speed"]
-    @property
 
+    @property
     @sensor("Humidity", unit="%", device_class="humidity", icon="mdi:water-percent")
     def humidity(self) -> int:
         """Air humidity in percent."""
         return self.data["humidity"]
-    @property
 
-    @setting("LED Brightness", setter_name="set_led_brightness", min_value=0, max_value=100, step=1, unit="%", icon="mdi:brightness-6")
+    @property
+    @setting(
+        "LED Brightness",
+        setter_name="set_led_brightness",
+        min_value=0,
+        max_value=100,
+        step=1,
+        unit="%",
+        icon="mdi:brightness-6",
+    )
     def led_brightness(self) -> int:
         """LED brightness (1-100)."""
         return self.data["light"]
-    @property
 
+    @property
     @setting("Mode", setter_name="set_mode", choices=OperationMode, icon="mdi:fan")
     def mode(self) -> OperationMode:
         """Operation mode (normal or nature)."""
         return OperationMode[OperationModeFanZA5(self.data["mode"]).name]
-    @property
 
+    @property
     @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] else "off"
-    @property
 
+    @property
     @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.data["power"]
-    @property
 
-    @setting("Delay Off Countdown", setter_name="delay_off", unit="s", icon="mdi:timer-off-outline")
+    @property
+    @setting(
+        "Delay Off Countdown",
+        setter_name="delay_off",
+        unit="s",
+        icon="mdi:timer-off-outline",
+    )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""
         return self.data["power_off_time"]
-    @property
 
+    @property
     @sensor("Power Supply Attached", icon="mdi:power-plug")
     def powersupply_attached(self) -> bool:
         """True is power supply is attached."""
         return self.data["powersupply_attached"]
-    @property
 
+    @property
     @sensor("Speed RPM", unit="rpm", icon="mdi:fan")
     def speed_rpm(self) -> int:
         """Fan rotations per minute."""
         return self.data["speed_rpm"]
-    @property
 
+    @property
     @setting("Oscillate", setter_name="set_oscillate", icon="mdi:arrow-left-right")
     def oscillate(self) -> bool:
         """True if oscillation is enabled."""
         return self.data["swing_mode"]
-    @property
 
+    @property
     @setting("Angle", setter_name="set_angle", icon="mdi:angle-acute")
     def angle(self) -> int:
         """Oscillation angle."""
         return self.data["swing_mode_angle"]
-    @property
 
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @property
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> Any:
         """Air temperature (degree celsius)."""
         return self.data["temperature"]

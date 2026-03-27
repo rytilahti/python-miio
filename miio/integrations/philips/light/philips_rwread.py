@@ -87,7 +87,9 @@ class PhilipsRwreadStatus(DeviceStatus):
         return self.data["snm"]
 
     @property
-    @setting("Motion Detection", setter_name="set_motion_detection", icon="mdi:motion-sensor")
+    @setting(
+        "Motion Detection", setter_name="set_motion_detection", icon="mdi:motion-sensor"
+    )
     def motion_detection(self) -> bool:
         """True if motion detection is enabled."""
         return self.data["flm"] == 1

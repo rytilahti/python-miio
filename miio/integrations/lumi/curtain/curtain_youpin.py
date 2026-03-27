@@ -80,7 +80,9 @@ class CurtainStatus(DeviceStatus):
         return Status(self.data["status"])
 
     @property
-    @setting("Manual Enabled", setter_name="set_manual_enabled", icon="mdi:hand-back-left")
+    @setting(
+        "Manual Enabled", setter_name="set_manual_enabled", icon="mdi:hand-back-left"
+    )
     def is_manual_enabled(self) -> bool:
         """True if manual controls are enabled."""
         return bool(self.data["is_manual_enabled"])
@@ -97,13 +99,19 @@ class CurtainStatus(DeviceStatus):
         return Polarity(self.data["polarity"])
 
     @property
-    @setting("Position Limited", setter_name="set_position_limit", icon="mdi:arrow-collapse-horizontal")
+    @setting(
+        "Position Limited",
+        setter_name="set_position_limit",
+        icon="mdi:arrow-collapse-horizontal",
+    )
     def is_position_limited(self) -> bool:
         """Position limit."""
         return bool(self.data["is_position_limited"])
 
     @property
-    @setting("Night Tip Light", setter_name="set_night_tip_light", icon="mdi:lightbulb-night")
+    @setting(
+        "Night Tip Light", setter_name="set_night_tip_light", icon="mdi:lightbulb-night"
+    )
     def night_tip_light(self) -> bool:
         """Night tip light status."""
         return bool(self.data["night_tip_light"])

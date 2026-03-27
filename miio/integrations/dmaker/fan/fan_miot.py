@@ -210,7 +210,9 @@ class FanStatusMiot(DeviceStatus):
         return OperationMode[OperationModeMiot(self.data["mode"]).name]
 
     @property
-    @setting("Speed", setter_name="set_speed", min_value=0, max_value=100, icon="mdi:fan")
+    @setting(
+        "Speed", setter_name="set_speed", min_value=0, max_value=100, icon="mdi:fan"
+    )
     def speed(self) -> int:
         """Speed of the motor."""
         return self.data["fan_speed"]

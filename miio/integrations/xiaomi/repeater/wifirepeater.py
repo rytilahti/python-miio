@@ -38,7 +38,7 @@ class WifiRepeaterStatus(DeviceStatus):
         return self.data["mat"]
 
     def __repr__(self) -> str:
-        s = "<WifiRepeaterStatus access_policy=%s, " "associated_stations=%s>" % (
+        s = "<WifiRepeaterStatus access_policy=%s, associated_stations=%s>" % (
             self.access_policy,
             len(self.associated_stations),
         )

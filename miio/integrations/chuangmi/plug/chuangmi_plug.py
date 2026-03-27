@@ -63,7 +63,9 @@ class ChuangmiPlugStatus(DeviceStatus):
         return self.power
 
     @property
-    @sensor("Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature")
+    @sensor(
+        "Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature"
+    )
     def temperature(self) -> int:
         return self.data["temperature"]
 

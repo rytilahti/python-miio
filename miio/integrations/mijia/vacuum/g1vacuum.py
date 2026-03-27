@@ -158,26 +158,26 @@ class G1Status(DeviceStatus):
             ]
         """
         self.data = data
-    @property
 
+    @property
     @sensor("Battery", unit="%", device_class="battery", icon="mdi:battery")
     def battery(self) -> int:
         """Battery Level."""
         return self.data["battery"]
-    @property
 
+    @property
     @sensor("Charge State", icon="mdi:battery-charging")
     def charge_state(self) -> G1ChargeState:
         """Charging State."""
         return G1ChargeState(self.data["charge_state"])
-    @property
 
+    @property
     @sensor("Error Code", icon="mdi:alert-circle")
     def error_code(self) -> int:
         """Error code as returned by the device."""
         return int(self.data["error_code"])
-    @property
 
+    @property
     @sensor("Error", icon="mdi:alert-circle")
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
@@ -185,80 +185,82 @@ class G1Status(DeviceStatus):
             return ERROR_CODES[self.error_code]
         except KeyError:
             return "Definition missing for error %s" % self.error_code
-    @property
 
+    @property
     @sensor("State", icon="mdi:robot-vacuum")
     def state(self) -> G1State:
         """Vacuum Status."""
         return G1State(self.data["state"])
-    @property
 
-    @setting("Fan Speed", setter_name="set_fan_speed", choices=G1FanSpeed, icon="mdi:fan")
+    @property
+    @setting(
+        "Fan Speed", setter_name="set_fan_speed", choices=G1FanSpeed, icon="mdi:fan"
+    )
     def fan_speed(self) -> G1FanSpeed:
         """Fan Speed."""
         return G1FanSpeed(self.data["fan_speed"])
-    @property
 
+    @property
     @sensor("Operating Mode", icon="mdi:robot-vacuum")
     def operating_mode(self) -> G1VacuumMode:
         """Operating Mode."""
         return G1VacuumMode(self.data["operating_mode"])
-    @property
 
+    @property
     @sensor("Mop State", icon="mdi:robot-vacuum-variant")
     def mop_state(self) -> G1MopState:
         """Mop State."""
         return G1MopState(self.data["mop_state"])
-    @property
 
+    @property
     @sensor("Water Level", icon="mdi:water")
     def water_level(self) -> G1WaterLevel:
         """Water Level."""
         return G1WaterLevel(self.data["water_level"])
-    @property
 
+    @property
     @sensor("Main Brush Life Level", unit="%", icon="mdi:brush")
     def main_brush_life_level(self) -> int:
         """Main Brush Life Level in %."""
         return self.data["main_brush_life_level"]
-    @property
 
+    @property
     @sensor("Main Brush Time Left", icon="mdi:brush")
     def main_brush_time_left(self) -> timedelta:
         """Main Brush Remaining Time in Minutes."""
         return timedelta(minutes=self.data["main_brush_time_left"])
-    @property
 
+    @property
     @sensor("Side Brush Life Level", unit="%", icon="mdi:brush")
     def side_brush_life_level(self) -> int:
         """Side Brush Life Level in %."""
         return self.data["side_brush_life_level"]
-    @property
 
+    @property
     @sensor("Side Brush Time Left", icon="mdi:brush")
     def side_brush_time_left(self) -> timedelta:
         """Side Brush Remaining Time in Minutes."""
         return timedelta(minutes=self.data["side_brush_time_left"])
-    @property
 
+    @property
     @sensor("Filter Life Level", unit="%", icon="mdi:filter-outline")
     def filter_life_level(self) -> int:
         """Filter Life Level in %."""
         return self.data["filter_life_level"]
-    @property
 
+    @property
     @sensor("Filter Time Left", icon="mdi:filter-outline")
     def filter_time_left(self) -> timedelta:
         """Filter remaining time."""
         return timedelta(minutes=self.data["filter_time_left"])
-    @property
 
+    @property
     @sensor("Clean Area", unit="cm²", icon="mdi:texture-box")
     def clean_area(self) -> int:
         """Clean Area in cm2."""
         return self.data["clean_area"]
-    @property
 
+    @property
     @sensor("Clean Time", icon="mdi:timer-outline")
     def clean_time(self) -> timedelta:
         """Clean time."""
@@ -279,20 +281,20 @@ class G1CleaningSummary(DeviceStatus):
 
     def __init__(self, data) -> None:
         self.data = data
-    @property
 
+    @property
     @sensor("Total Clean Count", icon="mdi:counter")
     def total_clean_count(self) -> int:
         """Total Number of Cleanings."""
         return self.data["total_clean_count"]
-    @property
 
+    @property
     @sensor("Total Clean Area", unit="m²", icon="mdi:texture-box")
     def total_clean_area(self) -> int:
         """Total Area Cleaned in m2."""
         return self.data["total_clean_area"]
-    @property
 
+    @property
     @sensor("Total Clean Time", icon="mdi:timer-outline")
     def total_clean_time(self) -> timedelta:
         """Total Cleaning Time."""

@@ -68,7 +68,11 @@ class DualControlModuleStatus(DeviceStatus):
         return bool(self.data["switch_1_state"])
 
     @property
-    @setting("Switch 1 Default State", setter_name="set_default_state", icon="mdi:toggle-switch-outline")
+    @setting(
+        "Switch 1 Default State",
+        setter_name="set_default_state",
+        icon="mdi:toggle-switch-outline",
+    )
     def switch_1_default_state(self) -> bool:
         """First switch default state."""
         return bool(self.data["switch_1_default_state"])
@@ -95,7 +99,11 @@ class DualControlModuleStatus(DeviceStatus):
         return bool(self.data["switch_2_state"])
 
     @property
-    @setting("Switch 2 Default State", setter_name="set_default_state", icon="mdi:toggle-switch-outline")
+    @setting(
+        "Switch 2 Default State",
+        setter_name="set_default_state",
+        icon="mdi:toggle-switch-outline",
+    )
     def switch_2_default_state(self) -> bool:
         """Second switch default state."""
         return bool(self.data["switch_2_default_state"])

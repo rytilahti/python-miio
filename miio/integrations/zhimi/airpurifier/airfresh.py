@@ -91,44 +91,44 @@ class AirFreshStatus(DeviceStatus):
 
         self.data = data
         self.model = model
-    @property
 
+    @property
     @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
-    @property
 
+    @property
     @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.power == "on"
-    @property
 
+    @property
     @sensor("AQI", unit="μg/m³", icon="mdi:air-filter")
     def aqi(self) -> int:
         """Air quality index."""
         return self.data["aqi"]
-    @property
 
+    @property
     @sensor("Average AQI", unit="μg/m³", icon="mdi:air-filter")
     def average_aqi(self) -> int:
         """Average of the air quality index."""
         return self.data["average_aqi"]
-    @property
 
+    @property
     @sensor("CO2", unit="ppm", icon="mdi:molecule-co2", device_class="carbon_dioxide")
     def co2(self) -> int:
         """Carbon dioxide."""
         return self.data["co2"]
-    @property
 
+    @property
     @sensor("Humidity", unit="%", device_class="humidity", icon="mdi:water-percent")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
-    @property
 
+    @property
     @setting("PTC", setter_name="set_ptc", icon="mdi:radiator")
     def ptc(self) -> Optional[bool]:
         """Return True if PTC is on."""
@@ -136,9 +136,11 @@ class AirFreshStatus(DeviceStatus):
             return self.data["ptc_state"] == "on"
 
         return None
-    @property
 
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @property
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
@@ -148,30 +150,37 @@ class AirFreshStatus(DeviceStatus):
                 return self.data["temp_dec"] / 10.0
 
         return None
-    @property
 
-    @sensor("NTC Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @property
+    @sensor(
+        "NTC Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def ntc_temperature(self) -> Optional[float]:
         """Current ntc temperature, if available."""
         if self.data["ntcT"] is not None:
             return self.data["ntcT"]
 
         return None
-    @property
 
+    @property
     @setting("Mode", setter_name="set_mode", choices=OperationMode, icon="mdi:fan")
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
-    @property
 
+    @property
     @setting("LED", setter_name="set_led", icon="mdi:led-on")
     def led(self) -> bool:
         """Return True if LED is on."""
         return self.data["led"] == "on"
-    @property
 
-    @setting("LED Brightness", setter_name="set_led_brightness", choices=LedBrightness, icon="mdi:brightness-6")
+    @property
+    @setting(
+        "LED Brightness",
+        setter_name="set_led_brightness",
+        choices=LedBrightness,
+        icon="mdi:brightness-6",
+    )
     def led_brightness(self) -> Optional[LedBrightness]:
         """Brightness of the LED."""
         if self.data["led_level"] is not None:
@@ -184,8 +193,8 @@ class AirFreshStatus(DeviceStatus):
                 return None
 
         return None
-    @property
 
+    @property
     @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> Optional[bool]:
         """Return True if buzzer is on."""
@@ -193,38 +202,38 @@ class AirFreshStatus(DeviceStatus):
             return self.data["buzzer"] == "on"
 
         return None
-    @property
 
+    @property
     @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
-    @property
 
+    @property
     @sensor("Filter Life Remaining", unit="%", icon="mdi:filter-outline")
     def filter_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["filter_life"]
-    @property
 
+    @property
     @sensor("Filter Hours Used", unit="h", icon="mdi:filter-outline")
     def filter_hours_used(self) -> int:
         """How long the filter has been in use."""
         return self.data["f1_hour_used"]
-    @property
 
+    @property
     @sensor("Use Time", unit="s", icon="mdi:timer-sand")
     def use_time(self) -> int:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
-    @property
 
+    @property
     @sensor("Motor Speed", unit="rpm", icon="mdi:fan")
     def motor_speed(self) -> int:
         """Speed of the motor."""
         return self.data["motor1_speed"]
-    @property
 
+    @property
     @setting("Extra Features", setter_name="set_extra_features", icon="mdi:star")
     def extra_features(self) -> Optional[int]:
         return self.data["app_extra"]

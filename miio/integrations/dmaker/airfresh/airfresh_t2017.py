@@ -151,7 +151,9 @@ class AirFreshStatus(DeviceStatus):
         return self.data["co2"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> int:
         """Current temperature in degree celsions."""
         return self.data["temperature_outside"]
@@ -205,7 +207,9 @@ class AirFreshStatus(DeviceStatus):
         return self.data["ptc_on"]
 
     @property
-    @setting("PTC Level", setter_name="set_ptc_level", choices=PtcLevel, icon="mdi:radiator")
+    @setting(
+        "PTC Level", setter_name="set_ptc_level", choices=PtcLevel, icon="mdi:radiator"
+    )
     def ptc_level(self) -> Optional[PtcLevel]:
         """PTC level."""
         try:

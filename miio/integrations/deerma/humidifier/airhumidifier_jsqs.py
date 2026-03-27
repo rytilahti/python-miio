@@ -163,7 +163,11 @@ class AirHumidifierJsqsStatus(DeviceStatus):
         return self.data.get("water_shortage_fault")
 
     @property
-    @setting(name="Overwet Protect", setter_name="set_overwet_protect", icon="mdi:shield-check")
+    @setting(
+        name="Overwet Protect",
+        setter_name="set_overwet_protect",
+        icon="mdi:shield-check",
+    )
     def overwet_protect(self) -> Optional[bool]:
         """Return True if overwet mode is active."""
         return self.data.get("overwet_protect")

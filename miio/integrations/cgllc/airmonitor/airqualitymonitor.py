@@ -159,7 +159,9 @@ class AirQualityMonitorStatus(DeviceStatus):
         return self.data.get("pm25")
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> Optional[float]:
         """Return temperature value (-10...50°C)."""
         return self.data.get("temperature")
