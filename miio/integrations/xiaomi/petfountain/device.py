@@ -1,5 +1,4 @@
 import logging
-from datetime import time
 from typing import Any
 
 import click
