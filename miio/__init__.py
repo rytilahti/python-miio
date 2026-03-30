@@ -82,6 +82,7 @@ from miio.integrations.tinymu.toiletlid import Toiletlid
 from miio.integrations.viomi.vacuum import ViomiVacuum
 from miio.integrations.viomi.viomidishwasher import ViomiDishwasher
 from miio.integrations.xiaomi.aircondition.airconditioner_miot import AirConditionerMiot
+from miio.integrations.xiaomi.petfountain import XiaomiPetFountain
 from miio.integrations.xiaomi.repeater.wifirepeater import WifiRepeater
 from miio.integrations.xiaomi.wifispeaker.wifispeaker import WifiSpeaker
 from miio.integrations.yeelight.dual_switch import YeelightDualControlModule
