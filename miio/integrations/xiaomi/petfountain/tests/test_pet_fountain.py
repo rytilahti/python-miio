@@ -130,7 +130,9 @@ class TestXiaomiPetFountain(TestCase):
         assert result["did"] == "call-3-1"
 
     def test_status_handles_missing_values(self):
-        self.device.state = _UNKNOWN_STATE
+        self.device.state = [
+            {"did": k, "value": v, "code": 0} for k, v in _UNKNOWN_STATE.items()
+        ]
 
         status = self.device.status()
 
