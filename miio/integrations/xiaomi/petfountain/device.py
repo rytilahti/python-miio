@@ -6,11 +6,7 @@ import click
 from miio.click_common import EnumType, command, format_output
 from miio.miot_device import MiotDevice
 
-from .status import (
-    PetFountainMode,
-    XiaomiPetFountainStatus,
-    _time_to_seconds,
-)
+from .status import PetFountainMode, XiaomiPetFountainStatus, _time_to_seconds
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,9 +82,7 @@ class XiaomiPetFountain(MiotDevice):
 
     @command(
         click.argument("minutes", type=click.IntRange(10, 120)),
-        default_output=format_output(
-            'Changing water interval to "{minutes}" minutes'
-        ),
+        default_output=format_output('Changing water interval to "{minutes}" minutes'),
     )
     def set_water_interval(self, minutes: int) -> list[dict[str, Any]]:
         """Set the interval mode water interval in minutes."""
