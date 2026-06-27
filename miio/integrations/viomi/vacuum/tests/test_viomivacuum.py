@@ -21,7 +21,6 @@ from ..viomivacuum import (
     _get_rooms_from_schedules,
 )
 
-
 # Example v8 state from the ViomiVacuumStatus docstring
 _INITIAL_STATE = {
     "battary_life": 100,
