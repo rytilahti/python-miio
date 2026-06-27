@@ -239,7 +239,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         try:
             return error_codes[self.error_code]
         except KeyError:
-            return "Definition missing for error %s" % self.error_code
+            return f"Definition missing for error {self.error_code}"
 
     @property
     def charging_state(self) -> ChargingState:

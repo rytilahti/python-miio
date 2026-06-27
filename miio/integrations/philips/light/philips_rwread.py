@@ -118,7 +118,7 @@ class PhilipsRwread(Device):
     def set_brightness(self, level: int):
         """Set brightness level of the primary light."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.send("set_bright", [level])
 
@@ -129,7 +129,7 @@ class PhilipsRwread(Device):
     def set_scene(self, number: int):
         """Set one of the fixed eyecare user scenes."""
         if number < 1 or number > 4:
-            raise ValueError("Invalid fixed scene number: %s" % number)
+            raise ValueError(f"Invalid fixed scene number: {number}")
 
         return self.send("apply_fixed_scene", [number])
 
@@ -141,7 +141,7 @@ class PhilipsRwread(Device):
         """Set delay off in seconds."""
 
         if seconds < 0:
-            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError(f"Invalid value for a delayed turn off: {seconds}")
 
         return self.send("delay_off", [seconds])
 

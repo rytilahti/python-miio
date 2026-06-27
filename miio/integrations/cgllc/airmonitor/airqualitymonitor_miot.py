@@ -200,9 +200,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
     def set_monitoring_frequency_duration(self, duration):
         """Set monitoring frequency."""
         if duration < 0 or duration > 600:
-            raise ValueError(
-                "Invalid duration: %s. Must be between 0 and 600" % duration
-            )
+            raise ValueError(f"Invalid duration: {duration}. Must be between 0 and 600")
         return self.set_property("monitoring_frequency", duration)
 
     @command(
@@ -212,9 +210,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
     def set_device_off_duration(self, duration):
         """Set device off duration."""
         if duration < 0 or duration > 60:
-            raise ValueError(
-                "Invalid duration: %s. Must be between 0 and 60" % duration
-            )
+            raise ValueError(f"Invalid duration: {duration}. Must be between 0 and 60")
         return self.set_property("device_off", duration)
 
     @command(
@@ -224,9 +220,7 @@ class AirQualityMonitorCGDN1(MiotDevice):
     def set_screen_off_duration(self, duration):
         """Set screen off duration."""
         if duration < 0 or duration > 300:
-            raise ValueError(
-                "Invalid duration: %s. Must be between 0 and 300" % duration
-            )
+            raise ValueError(f"Invalid duration: {duration}. Must be between 0 and 300")
         return self.set_property("screen_off", duration)
 
     @command(

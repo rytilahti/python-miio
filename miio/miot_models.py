@@ -33,7 +33,7 @@ class URN(BaseModel):
     internal_id: str
     model: str
     version: int
-    unexpected: Optional[list[str]]
+    unexpected: list[str] | None
 
     parent_urn: Optional["URN"] = Field(None, repr=False)
 
@@ -123,7 +123,7 @@ class MiotBaseModel(BaseModel):
         self.urn.parent_urn = service.urn
 
     @property
-    def siid(self) -> Optional[int]:
+    def siid(self) -> int | None:
         """Return siid."""
         if self.service is not None:
             return self.service.siid
@@ -222,17 +222,17 @@ class MiotProperty(MiotBaseModel):
 
     format: MiotFormat
     access: list[MiotAccess] = Field(default=["read"])
-    unit: Optional[str] = None
+    unit: str | None = None
 
-    range: Optional[list[int]] = Field(alias="value-range")
-    choices: Optional[list[MiotEnumValue]] = Field(alias="value-list")
-    gatt_access: Optional[list[Any]] = Field(alias="gatt-access")
+    range: list[int] | None = Field(alias="value-range")
+    choices: list[MiotEnumValue] | None = Field(alias="value-list")
+    gatt_access: list[Any] | None = Field(alias="gatt-access")
 
-    source: Optional[int] = None
+    source: int | None = None
 
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
-    value: Optional[Any] = None
+    value: Any | None = None
 
     @property
     def pretty_value(self):

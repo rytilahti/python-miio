@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -356,7 +356,7 @@ class AirPurifierMiotStatus(DeviceStatus):
 
     @property
     @sensor("Air Quality Index", unit="μg/m³")
-    def aqi(self) -> Optional[int]:
+    def aqi(self) -> int | None:
         """Air quality index."""
         return self.data.get("aqi")
 
@@ -372,81 +372,81 @@ class AirPurifierMiotStatus(DeviceStatus):
 
     @property
     @setting("Buzzer", setter_name="set_buzzer")
-    def buzzer(self) -> Optional[bool]:
+    def buzzer(self) -> bool | None:
         """Return True if buzzer is on."""
         return self.data.get("buzzer")
 
     @property
     @setting("Child Lock", setter_name="set_child_lock")
-    def child_lock(self) -> Optional[bool]:
+    def child_lock(self) -> bool | None:
         """Return True if child lock is on."""
         return self.data.get("child_lock")
 
     @property
     @sensor("Filter Life Remaining", unit="%")
-    def filter_life_remaining(self) -> Optional[int]:
+    def filter_life_remaining(self) -> int | None:
         """Time until the filter should be changed."""
         return self.data.get("filter_life_remaining")
 
     @property
     @sensor("Filter Hours Used", unit="h")
-    def filter_hours_used(self) -> Optional[int]:
+    def filter_hours_used(self) -> int | None:
         """How long the filter has been in use."""
         return self.data.get("filter_hours_used")
 
     @property
     @sensor("Motor Speed", unit="rpm")
-    def motor_speed(self) -> Optional[int]:
+    def motor_speed(self) -> int | None:
         """Speed of the motor."""
         return self.data.get("motor_speed")
 
     @property
-    def favorite_rpm(self) -> Optional[int]:
+    def favorite_rpm(self) -> int | None:
         """Return favorite rpm level."""
         return self.data.get("favorite_rpm")
 
     @property
-    def average_aqi(self) -> Optional[int]:
+    def average_aqi(self) -> int | None:
         """Average of the air quality index."""
         return self.data.get("average_aqi")
 
     @property
     @sensor("Humidity", unit="%")
-    def humidity(self) -> Optional[int]:
+    def humidity(self) -> int | None:
         """Current humidity."""
         return self.data.get("humidity")
 
     @property
-    def tvoc(self) -> Optional[int]:
+    def tvoc(self) -> int | None:
         """Current TVOC."""
         return self.data.get("tvoc")
 
     @property
     @sensor("Temperature", unit="C")
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         temperate = self.data.get("temperature")
         return round(temperate, 1) if temperate is not None else None
 
     @property
-    def pm10_density(self) -> Optional[float]:
+    def pm10_density(self) -> float | None:
         """Current temperature, if available."""
         pm10_density = self.data.get("pm10_density")
         return round(pm10_density, 1) if pm10_density is not None else None
 
     @property
-    def fan_level(self) -> Optional[int]:
+    def fan_level(self) -> int | None:
         """Current fan level."""
         return self.data.get("fan_level")
 
     @property
-    def led(self) -> Optional[bool]:
+    def led(self) -> bool | None:
         """Return True if LED is on."""
         return self.data.get("led")
 
     @property
     @setting("LED Brightness", setter_name="set_led_brightness", range=(0, 2))
-    def led_brightness(self) -> Optional[LedBrightness]:
+    def led_brightness(self) -> LedBrightness | None:
         """Brightness of the LED."""
         value = self.data.get("led_brightness")
         if value is not None:
@@ -460,63 +460,63 @@ class AirPurifierMiotStatus(DeviceStatus):
         return None
 
     @property
-    def buzzer_volume(self) -> Optional[int]:
+    def buzzer_volume(self) -> int | None:
         """Return buzzer volume."""
         return self.data.get("buzzer_volume")
 
     @property
     @setting("Favorite Level", setter_name="set_favorite_level", range=(0, 15))
-    def favorite_level(self) -> Optional[int]:
+    def favorite_level(self) -> int | None:
         """Return favorite level, which is used if the mode is ``favorite``."""
         # Favorite level used when the mode is `favorite`.
         return self.data.get("favorite_level")
 
     @property
     @sensor("Use Time", unit="s")
-    def use_time(self) -> Optional[int]:
+    def use_time(self) -> int | None:
         """How long the device has been active in seconds."""
         return self.data.get("use_time")
 
     @property
-    def purify_volume(self) -> Optional[int]:
+    def purify_volume(self) -> int | None:
         """The volume of purified air in cubic meter."""
         return self.data.get("purify_volume")
 
     @property
-    def filter_rfid_product_id(self) -> Optional[str]:
+    def filter_rfid_product_id(self) -> str | None:
         """RFID product ID of installed filter."""
         return self.data.get("filter_rfid_product_id")
 
     @property
-    def filter_rfid_tag(self) -> Optional[str]:
+    def filter_rfid_tag(self) -> str | None:
         """RFID tag ID of installed filter."""
         return self.data.get("filter_rfid_tag")
 
     @property
-    def filter_type(self) -> Optional[FilterType]:
+    def filter_type(self) -> FilterType | None:
         """Type of installed filter."""
         return self.filter_type_util.determine_filter_type(
             self.filter_rfid_tag, self.filter_rfid_product_id
         )
 
     @property
-    def led_brightness_level(self) -> Optional[int]:
+    def led_brightness_level(self) -> int | None:
         """Return brightness level."""
         return self.data.get("led_brightness_level")
 
     @property
-    def anion(self) -> Optional[bool]:
+    def anion(self) -> bool | None:
         """Return whether anion is on."""
         return self.data.get("anion")
 
     @property
     @sensor("Filter Left Time", unit="days")
-    def filter_left_time(self) -> Optional[int]:
+    def filter_left_time(self) -> int | None:
         """How many days can the filter still be used."""
         return self.data.get("filter_left_time")
 
     @property
-    def gestures(self) -> Optional[bool]:
+    def gestures(self) -> bool | None:
         """Return True if gesture control is on."""
         return self.data.get("gestures")
 
@@ -592,14 +592,13 @@ class AirPurifierMiot(MiotDevice):
         """Set favorite motor speed."""
         if "favorite_rpm" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported favorite rpm for model '%s'" % self.model
+                f"Unsupported favorite rpm for model '{self.model}'"
             )
 
         # Note: documentation says the maximum is 2300, however, the purifier may return an error for rpm over 2200.
         if rpm < 300 or rpm > 2300 or rpm % 10 != 0:
             raise ValueError(
-                "Invalid favorite motor speed: %s. Must be between 300 and 2300 and divisible by 10"
-                % rpm
+                f"Invalid favorite motor speed: {rpm}. Must be between 300 and 2300 and divisible by 10"
             )
         return self.set_property("favorite_rpm", rpm)
 
@@ -621,7 +620,7 @@ class AirPurifierMiot(MiotDevice):
         """Set anion on/off."""
         if "anion" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported anion for model '%s'" % self.model
+                f"Unsupported anion for model '{self.model}'"
             )
         return self.set_property("anion", anion)
 
@@ -635,7 +634,7 @@ class AirPurifierMiot(MiotDevice):
         """Set buzzer on/off."""
         if "buzzer" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported buzzer for model '%s'" % self.model
+                f"Unsupported buzzer for model '{self.model}'"
             )
 
         return self.set_property("buzzer", buzzer)
@@ -652,7 +651,7 @@ class AirPurifierMiot(MiotDevice):
         """Set gestures on/off."""
         if "gestures" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Gestures not support for model '%s'" % self.model
+                f"Gestures not support for model '{self.model}'"
             )
 
         return self.set_property("gestures", gestures)
@@ -667,7 +666,7 @@ class AirPurifierMiot(MiotDevice):
         """Set child lock on/off."""
         if "child_lock" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported child lock for model '%s'" % self.model
+                f"Unsupported child lock for model '{self.model}'"
             )
         return self.set_property("child_lock", lock)
 
@@ -679,11 +678,11 @@ class AirPurifierMiot(MiotDevice):
         """Set fan level."""
         if "fan_level" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported fan level for model '%s'" % self.model
+                f"Unsupported fan level for model '{self.model}'"
             )
 
         if level < 1 or level > 3:
-            raise ValueError("Invalid fan level: %s" % level)
+            raise ValueError(f"Invalid fan level: {level}")
         return self.set_property("fan_level", level)
 
     @command(
@@ -694,11 +693,11 @@ class AirPurifierMiot(MiotDevice):
         """Set buzzer volume."""
         if "volume" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported volume for model '%s'" % self.model
+                f"Unsupported volume for model '{self.model}'"
             )
 
         if volume < 0 or volume > 100:
-            raise ValueError("Invalid volume: %s. Must be between 0 and 100" % volume)
+            raise ValueError(f"Invalid volume: {volume}. Must be between 0 and 100")
         return self.set_property("buzzer_volume", volume)
 
     @command(
@@ -712,11 +711,11 @@ class AirPurifierMiot(MiotDevice):
         """
         if "favorite_level" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported favorite level for model '%s'" % self.model
+                f"Unsupported favorite level for model '{self.model}'"
             )
 
         if level < 0 or level > 14:
-            raise ValueError("Invalid favorite level: %s" % level)
+            raise ValueError(f"Invalid favorite level: {level}")
 
         return self.set_property("favorite_level", level)
 
@@ -728,7 +727,7 @@ class AirPurifierMiot(MiotDevice):
         """Set led brightness."""
         if "led_brightness" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported led brightness for model '%s'" % self.model
+                f"Unsupported led brightness for model '{self.model}'"
             )
 
         value = brightness.value
@@ -746,7 +745,7 @@ class AirPurifierMiot(MiotDevice):
         """Turn led on/off."""
         if "led" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported led for model '%s'" % self.model
+                f"Unsupported led for model '{self.model}'"
             )
         return self.set_property("led", led)
 
@@ -758,9 +757,9 @@ class AirPurifierMiot(MiotDevice):
         """Set led brightness level (0..8)."""
         if "led_brightness_level" not in self._get_mapping():
             raise UnsupportedFeatureException(
-                "Unsupported led brightness level for model '%s'" % self.model
+                f"Unsupported led brightness level for model '{self.model}'"
             )
         if level < 0 or level > 8:
-            raise ValueError("Invalid brightness level: %s" % level)
+            raise ValueError(f"Invalid brightness level: {level}")
 
         return self.set_property("led_brightness_level", level)

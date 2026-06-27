@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 class DeviceInfo:
     """Container of miIO device information.
 
@@ -31,13 +28,7 @@ class DeviceInfo:
         self.data = data
 
     def __repr__(self):
-        return "{} v{} ({}) @ {} - token: {}".format(
-            self.model,
-            self.firmware_version,
-            self.mac_address,
-            self.ip_address,
-            self.token,
-        )
+        return f"{self.model} v{self.firmware_version} ({self.mac_address}) @ {self.ip_address} - token: {self.token}"
 
     @property
     def network_interface(self) -> dict:
@@ -56,32 +47,32 @@ class DeviceInfo:
         return self.data.get("ap", {})
 
     @property
-    def model(self) -> Optional[str]:
+    def model(self) -> str | None:
         """Model string if available."""
         return self.data.get("model")
 
     @property
-    def firmware_version(self) -> Optional[str]:
+    def firmware_version(self) -> str | None:
         """Firmware version if available."""
         return self.data.get("fw_ver")
 
     @property
-    def hardware_version(self) -> Optional[str]:
+    def hardware_version(self) -> str | None:
         """Hardware version if available."""
         return self.data.get("hw_ver")
 
     @property
-    def mac_address(self) -> Optional[str]:
+    def mac_address(self) -> str | None:
         """MAC address, if available."""
         return self.data.get("mac")
 
     @property
-    def ip_address(self) -> Optional[str]:
+    def ip_address(self) -> str | None:
         """IP address, if available."""
         return self.network_interface.get("localIp")
 
     @property
-    def token(self) -> Optional[str]:
+    def token(self) -> str | None:
         """Return the current device token."""
         return self.data.get("token")
 

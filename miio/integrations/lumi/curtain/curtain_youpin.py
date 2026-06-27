@@ -163,7 +163,7 @@ class CurtainMiot(MiotDevice):
         """Set target position."""
         if target_position < 0 or target_position > 100:
             raise ValueError(
-                "Value must be between [0, 100] value, was %s" % target_position
+                f"Value must be between [0, 100] value, was {target_position}"
             )
         return self.set_property("target_position", target_position)
 
@@ -207,6 +207,6 @@ class CurtainMiot(MiotDevice):
         """Adjust to preferred position."""
         if adjust_value < -100 or adjust_value > 100:
             raise ValueError(
-                "Value must be between [-100, 100] value, was %s" % adjust_value
+                f"Value must be between [-100, 100] value, was {adjust_value}"
             )
         return self.set_property("adjust_value", adjust_value)

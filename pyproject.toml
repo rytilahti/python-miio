@@ -18,7 +18,11 @@ classifiers = [
   "Intended Audience :: End Users/Desktop",
   "Operating System :: OS Independent",
   "Topic :: System :: Hardware",
-  "Topic :: Home Automation"
+  "Topic :: Home Automation",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
 
 [tool.poetry.scripts]
@@ -27,7 +31,7 @@ miio-extract-tokens = "miio.extract_tokens:main"
 miiocli = "miio.cli:create_cli"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 click = ">=8"
 cryptography = ">=35"
 construct = "^2.10.56"
@@ -128,6 +132,12 @@ paths = ["docs"]
 # Parser "myst_parser.sphinx_" not found. No module named 'myst_parser'.
 ignore-path-errors = ["docs/index.rst;D000"]
 
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["UP", "F401"]
 
 [build-system]
 requires = ["poetry-core"]

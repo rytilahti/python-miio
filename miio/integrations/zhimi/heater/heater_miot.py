@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -146,7 +146,7 @@ class HeaterMiotStatus(DeviceStatus):
         return self.data["temperature"]
 
     @property
-    def relative_humidity(self) -> Optional[int]:
+    def relative_humidity(self) -> int | None:
         """Current relative humidity."""
         return self.data.get("relative_humidity")
 
@@ -221,8 +221,7 @@ class HeaterMiot(MiotDevice):
         )["temperature_range"]
         if target_temperature < min_temp or target_temperature > max_temp:
             raise ValueError(
-                "Invalid temperature: %s. Must be between %s and %s."
-                % (target_temperature, min_temp, max_temp)
+                f"Invalid temperature: {target_temperature}. Must be between {min_temp} and {max_temp}."
             )
         return self.set_property("target_temperature", target_temperature)
 
@@ -272,7 +271,6 @@ class HeaterMiot(MiotDevice):
         )["delay_off_range"]
         if seconds < min_delay or seconds > max_delay:
             raise ValueError(
-                "Invalid scheduled turn off: %s. Must be between %s and %s"
-                % (seconds, min_delay, max_delay)
+                f"Invalid scheduled turn off: {seconds}. Must be between {min_delay} and {max_delay}"
             )
         return self.set_property("countdown_time", seconds // 3600)

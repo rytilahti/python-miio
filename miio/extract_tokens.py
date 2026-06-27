@@ -132,7 +132,7 @@ class BackupDatabaseReader:
         :param str db: Database file
         """
         self.db = db
-        _LOGGER.info("Reading database from %s" % db)
+        _LOGGER.info(f"Reading database from {db}")
         self.conn = sqlite3.connect(db)
 
         self.conn.row_factory = sqlite3.Row
@@ -191,7 +191,7 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
         else:
             file = tempfile.NamedTemporaryFile()
         with file as fp:
-            click.echo("Saving database to %s" % fp.name)
+            click.echo(f"Saving database to {fp.name}")
             fp.write(db.read())
 
             return list(reader.read_tokens(fp.name))
@@ -231,11 +231,11 @@ def main(backup, write_to_disk, password, dump_all, dump_raw):
     for dev in devices:
         if dev.ip or dump_all:
             click.echo(
-                "%s\n"
-                "\tModel: %s\n"
-                "\tIP address: %s\n"
-                "\tToken: %s\n"
-                "\tMAC: %s" % (dev.name, dev.model, dev.ip, dev.token, dev.mac)
+                f"{dev.name}\n"
+                f"\tModel: {dev.model}\n"
+                f"\tIP address: {dev.ip}\n"
+                f"\tToken: {dev.token}\n"
+                f"\tMAC: {dev.mac}"
             )
             if dump_raw:
                 click.echo(dev)

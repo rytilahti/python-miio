@@ -89,11 +89,7 @@ class Light(GatewayDevice):
         """Set gateway light color using color name ('color_map' variable in the source
         holds the valid values)."""
         if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
         current_brightness = self.rgb_status()["brightness"]
 
         return self.set_rgb(current_brightness, color_map[color_name])
@@ -102,11 +98,7 @@ class Light(GatewayDevice):
         """Set night light color using color name ('color_map' variable in the source
         holds the valid values)."""
         if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
         current_brightness = self.night_light_status()["brightness"]
 
         return self.set_night_light(current_brightness, color_map[color_name])
@@ -117,11 +109,7 @@ class Light(GatewayDevice):
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
 
         return self.set_rgb(brightness, color_map[color_name])
 
@@ -131,10 +119,6 @@ class Light(GatewayDevice):
         if 100 < brightness < 0:
             raise Exception("Brightness must be between 0 and 100")
         if color_name not in color_map.keys():
-            raise Exception(
-                "Cannot find {color} in {colors}".format(
-                    color=color_name, colors=color_map.keys()
-                )
-            )
+            raise Exception(f"Cannot find {color_name} in {color_map.keys()}")
 
         return self.set_night_light(brightness, color_map[color_name])

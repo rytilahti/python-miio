@@ -344,7 +344,7 @@ class AirConditionerMiot(MiotDevice):
             or target_temperature > 31.0
             or target_temperature % 0.5 != 0
         ):
-            raise ValueError("Invalid target temperature: %s" % target_temperature)
+            raise ValueError(f"Invalid target temperature: {target_temperature}")
         return self.set_property("target_temperature", target_temperature)
 
     @command(
@@ -438,7 +438,7 @@ class AirConditionerMiot(MiotDevice):
     def set_fan_speed_percent(self, fan_speed_percent):
         """Set fan speed in percent, should be  between 1 to 100 or 101(auto)."""
         if fan_speed_percent < 1 or fan_speed_percent > 101:
-            raise ValueError("Invalid fan percent: %s" % fan_speed_percent)
+            raise ValueError(f"Invalid fan percent: {fan_speed_percent}")
         return self.set_property("fan_speed_percent", fan_speed_percent)
 
     @command(

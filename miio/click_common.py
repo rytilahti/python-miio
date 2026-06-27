@@ -8,8 +8,9 @@ import ipaddress
 import json
 import logging
 import re
+from collections.abc import Callable
 from functools import partial, wraps
-from typing import Any, Callable, ClassVar, Optional, Union
+from typing import Any, ClassVar
 
 import click
 
@@ -30,7 +31,7 @@ def validate_ip(ctx, param, value):
         ipaddress.ip_address(value)
         return value
     except ValueError as ex:
-        raise click.BadParameter("Invalid IP: %s" % ex)
+        raise click.BadParameter(f"Invalid IP: {ex}")
 
 
 def validate_token(ctx, param, value):
@@ -38,7 +39,7 @@ def validate_token(ctx, param, value):
         return None
     token_len = len(value)
     if token_len != 32:
-        raise click.BadParameter("Token length != 32 chars: %s" % token_len)
+        raise click.BadParameter(f"Token length != 32 chars: {token_len}")
     return value
 
 
@@ -101,11 +102,11 @@ class LiteralParamType(click.ParamType):
         try:
             return ast.literal_eval(value)
         except ValueError:
-            self.fail("%s is not a valid literal" % value, param, ctx)
+            self.fail(f"{value} is not a valid literal", param, ctx)
 
 
 class GlobalContextObject:
-    def __init__(self, debug: int = 0, output: Optional[Callable] = None):
+    def __init__(self, debug: int = 0, output: Callable | None = None):
         self.debug = debug
         self.output = output
 
@@ -272,7 +273,7 @@ class DeviceGroup(click.MultiCommand):
 
     def get_command(self, ctx, cmd_name):
         if cmd_name not in self.commands:
-            ctx.fail("Unknown command (%s)" % cmd_name)
+            ctx.fail(f"Unknown command ({cmd_name})")
 
         cmd = self.commands[cmd_name]
         return self.commands[cmd_name].wrap(
@@ -290,8 +291,8 @@ def command(*decorators, name=None, default_output=None, **kwargs):
 
 
 def format_output(
-    msg_fmt: Union[str, Callable] = "",
-    result_msg_fmt: Union[str, Callable] = "{result}",
+    msg_fmt: str | Callable = "",
+    result_msg_fmt: str | Callable = "{result}",
 ):
     def decorator(func):
         @wraps(func)

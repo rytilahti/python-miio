@@ -1,6 +1,6 @@
 import base64
 import re
-from typing import Callable
+from collections.abc import Callable
 
 import click
 from construct import (

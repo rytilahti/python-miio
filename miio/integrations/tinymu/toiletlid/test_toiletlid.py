@@ -68,7 +68,7 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
     def uid_mac_op(self, args):
         xiaomi_id, band_mac, alias, operating = args
         if operating not in ["bind", "unbind"]:
-            raise ValueError("operating not bind or unbind, but %s" % operating)
+            raise ValueError(f"operating not bind or unbind, but {operating}")
 
         if operating == "bind":
             info = self.users.setdefault(
@@ -81,7 +81,7 @@ class DummyToiletlidV1(DummyDevice, Toiletlid):
     def get_all_user_info(self):
         users = {}
         for index, (xiaomi_id, info) in enumerate(self.users.items(), start=1):
-            user_id = "user%s" % index
+            user_id = f"user{index}"
             users[user_id] = {"uid": xiaomi_id, **info}
         return users
 
@@ -117,9 +117,8 @@ class TestToiletlidV1(TestCase):
         assert self.is_on() is False
         assert self.state().work_state == self.device.start_state["work_state"]
         assert self.state().ambient_light == self.device.start_state["ambient_light"]
-        assert (
-            self.state().filter_use_percentage
-            == "%s%%" % self.device.start_state["filter_use_flux"]
+        assert self.state().filter_use_percentage == "{}%".format(
+            self.device.start_state["filter_use_flux"]
         )
         assert (
             self.state().filter_remaining_time

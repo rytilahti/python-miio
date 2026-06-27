@@ -48,7 +48,7 @@ import time
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -136,9 +136,7 @@ class ViomiPositionPoint:
         return self.pos_y - offset + img_center
 
     def __repr__(self) -> str:
-        return "<ViomiPositionPoint x: {}, y: {}, phi: {}, update {}>".format(
-            self.pos_x, self.pos_y, self.phi, self.update
-        )
+        return f"<ViomiPositionPoint x: {self.pos_x}, y: {self.pos_y}, phi: {self.phi}, update {self.update}>"
 
     def __eq__(self, value) -> bool:
         return (
@@ -365,7 +363,7 @@ class ViomiVacuumStatus(DeviceStatus):
 
     @property
     @sensor("Error", icon="mdi:alert")
-    def error(self) -> Optional[str]:
+    def error(self) -> str | None:
         """String presentation for the error code."""
         if self.vacuum_state != VacuumState.Error:
             return None
@@ -491,7 +489,7 @@ class ViomiVacuumStatus(DeviceStatus):
         setter_name="set_route_pattern",
         icon="mdi:swap-horizontal-variant",
     )
-    def route_pattern(self) -> Optional[ViomiRoutePattern]:
+    def route_pattern(self) -> ViomiRoutePattern | None:
         """Pattern mode."""
         route = self.data["mop_route"]
         if route is None:
@@ -592,13 +590,13 @@ class ViomiVacuum(Device):
     def __init__(
         self,
         ip: str,
-        token: Optional[str] = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = False,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = None,
+        model: str | None = None,
     ) -> None:
         super().__init__(
             ip,
@@ -831,7 +829,7 @@ class ViomiVacuum(Device):
         return positions
 
     @command()
-    def get_current_position(self) -> Optional[ViomiPositionPoint]:
+    def get_current_position(self) -> ViomiPositionPoint | None:
         """Return the current position."""
         positions = self.get_positions()
         if positions:
@@ -978,8 +976,8 @@ class ViomiVacuum(Device):
     )
     def get_rooms(
         self,
-        map_id: Optional[int] = None,
-        map_name: Optional[str] = None,
+        map_id: int | None = None,
+        map_name: str | None = None,
         refresh: bool = False,
     ):
         """Return room ids and names."""

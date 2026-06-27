@@ -1,6 +1,5 @@
 import logging
 from collections import defaultdict
-from typing import Optional
 
 import click
 
@@ -58,7 +57,7 @@ class AirQualityMonitorStatus(DeviceStatus):
         self.data = data
 
     @property
-    def power(self) -> Optional[str]:
+    def power(self) -> str | None:
         """Current power state."""
         return self.data.get("power")
 
@@ -68,78 +67,78 @@ class AirQualityMonitorStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    def usb_power(self) -> Optional[bool]:
+    def usb_power(self) -> bool | None:
         """Return True if the device's usb is on."""
         if "usb_state" in self.data and self.data["usb_state"] is not None:
             return self.data["usb_state"] == "on"
         return None
 
     @property
-    def aqi(self) -> Optional[int]:
+    def aqi(self) -> int | None:
         """Air quality index value (0..600)."""
         return self.data.get("aqi")
 
     @property
-    def battery(self) -> Optional[int]:
+    def battery(self) -> int | None:
         """Current battery level (0..100)."""
         return self.data.get("battery")
 
     @property
-    def display_clock(self) -> Optional[bool]:
+    def display_clock(self) -> bool | None:
         """Display a clock instead the AQI."""
         if "time_state" in self.data and self.data["time_state"] is not None:
             return self.data["time_state"] == "on"
         return None
 
     @property
-    def night_mode(self) -> Optional[bool]:
+    def night_mode(self) -> bool | None:
         """Return True if the night mode is on."""
         if "night_state" in self.data and self.data["night_state"] is not None:
             return self.data["night_state"] == "on"
         return None
 
     @property
-    def night_time_begin(self) -> Optional[str]:
+    def night_time_begin(self) -> str | None:
         """Return the begin of the night time."""
         return self.data.get("night_beg_time")
 
     @property
-    def night_time_end(self) -> Optional[str]:
+    def night_time_end(self) -> str | None:
         """Return the end of the night time."""
         return self.data.get("night_end_time")
 
     @property
-    def sensor_state(self) -> Optional[str]:
+    def sensor_state(self) -> str | None:
         """Sensor state."""
         return self.data.get("sensor_state")
 
     @property
-    def co2(self) -> Optional[int]:
+    def co2(self) -> int | None:
         """Return co2 value (400...9999ppm)."""
         return self.data.get("co2")
 
     @property
-    def co2e(self) -> Optional[int]:
+    def co2e(self) -> int | None:
         """Return co2e value (400...9999ppm)."""
         return self.data.get("co2e")
 
     @property
-    def humidity(self) -> Optional[float]:
+    def humidity(self) -> float | None:
         """Return humidity value (0...100%)."""
         return self.data.get("humidity")
 
     @property
-    def pm25(self) -> Optional[float]:
+    def pm25(self) -> float | None:
         """Return pm2.5 value (0...999μg/m³)."""
         return self.data.get("pm25")
 
     @property
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Return temperature value (-10...50°C)."""
         return self.data.get("temperature")
 
     @property
-    def tvoc(self) -> Optional[int]:
+    def tvoc(self) -> int | None:
         """Return tvoc value."""
         return self.data.get("tvoc")
 

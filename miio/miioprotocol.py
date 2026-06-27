@@ -8,9 +8,9 @@ import binascii
 import codecs
 import logging
 import socket
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pprint import pformat as pf
-from typing import Any, Optional
+from typing import Any
 
 import construct
 
@@ -28,8 +28,8 @@ _LOGGER = logging.getLogger(__name__)
 class MiIOProtocol:
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
@@ -54,7 +54,7 @@ class MiIOProtocol:
 
         self._discovered = False
         # these come from the device, but we initialize them here to make mypy happy
-        self._device_ts: datetime = datetime.now(tz=timezone.utc)
+        self._device_ts: datetime = datetime.now(tz=UTC)
         self._device_id = b""
 
     def send_handshake(self, *, retry_count=3) -> Message:
@@ -78,7 +78,7 @@ class MiIOProtocol:
 
         if m is None:
             _LOGGER.debug("Unable to discover a device at address %s", self.ip)
-            raise DeviceException("Unable to discover the device %s" % self.ip)
+            raise DeviceException(f"Unable to discover the device {self.ip}")
 
         header = m.header.value
         self._device_id = header.device_id
@@ -97,7 +97,7 @@ class MiIOProtocol:
         return m
 
     @staticmethod
-    def discover(addr: Optional[str] = None, timeout: int = 5) -> Any:
+    def discover(addr: str | None = None, timeout: int = 5) -> Any:
         """Scan for devices in the network. This method is used to discover supported
         devices by sending a handshake message to the broadcast address on port 54321.
         If the target IP address is given, the handshake will be send as an unicast
@@ -137,7 +137,7 @@ class MiIOProtocol:
                         codecs.encode(m.checksum, "hex"),
                     )
                     seen_addrs.append(recv_addr[0])
-            except socket.timeout:
+            except TimeoutError:
                 if is_broadcast:
                     _LOGGER.info("Discovery done")
                 return  # ignore timeouts on discover
@@ -148,10 +148,10 @@ class MiIOProtocol:
     def send(
         self,
         command: str,
-        parameters: Optional[Any] = None,
+        parameters: Any | None = None,
         retry_count: int = 3,
         *,
-        extra_parameters: Optional[dict] = None,
+        extra_parameters: dict | None = None,
     ) -> Any:
         """Build and send the given command. Note that this will implicitly call
         :func:`send_handshake` to do a handshake, and will re-try in case of errors
@@ -282,7 +282,7 @@ class MiIOProtocol:
         raise DeviceError(error)
 
     def _create_request(
-        self, command: str, parameters: Any, extra_parameters: Optional[dict] = None
+        self, command: str, parameters: Any, extra_parameters: dict | None = None
     ):
         """Create request payload."""
         request = {"id": self._id, "method": command}

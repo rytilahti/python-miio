@@ -209,7 +209,7 @@ class AqaraCamera(Device):
     def md_sensitivity(self, sensitivity):
         """Get or set the motion detection sensitivity."""
         if sensitivity:
-            click.echo("Setting MD sensitivity to %s" % sensitivity)
+            click.echo(f"Setting MD sensitivity to {sensitivity}")
             return self.send("set_mdsensitivity", [sensitivity])[0] == "ok"
         else:
             return self.send("get_mdsensitivity")
@@ -251,7 +251,7 @@ class AqaraCamera(Device):
     def pair(self, timeout: int):
         """Start (or stop with "0") pairing."""
         if timeout < 0:
-            raise ValueError("Invalid timeout: %s" % timeout)
+            raise ValueError(f"Invalid timeout: {timeout}")
 
         return self.send("start_zigbee_join", [timeout])
 
@@ -288,7 +288,7 @@ class AqaraCamera(Device):
     def set_alarm_volume(self, volume):
         """Set alarm volume."""
         if volume < 0 or volume > 100:
-            raise ValueError("Volume has to be [0,100], was %s" % volume)
+            raise ValueError(f"Volume has to be [0,100], was {volume}")
         return self.send("set_alarming_volume", [volume])[0] == "ok"
 
     @command(click.argument("sound_id", type=str, required=False, default=None))
@@ -306,7 +306,7 @@ class AqaraCamera(Device):
 
             return sound_status
 
-        click.echo("Setting alarm sound to %s" % sound_id)
+        click.echo(f"Setting alarm sound to {sound_id}")
         return self.send("set_default_music", [0, sound_id])[0] == "ok"
 
     @command(default_output=format_output("Arming"))

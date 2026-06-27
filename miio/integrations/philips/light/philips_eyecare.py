@@ -133,7 +133,7 @@ class PhilipsEyecare(Device):
     def set_brightness(self, level: int):
         """Set brightness level of the primary light."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.send("set_bright", [level])
 
@@ -144,7 +144,7 @@ class PhilipsEyecare(Device):
     def set_scene(self, number: int):
         """Set one of the fixed eyecare user scenes."""
         if number < 1 or number > 4:
-            raise ValueError("Invalid fixed scene number: %s" % number)
+            raise ValueError(f"Invalid fixed scene number: {number}")
 
         return self.send("set_user_scene", [number])
 
@@ -156,7 +156,7 @@ class PhilipsEyecare(Device):
         """Set delay off minutes."""
 
         if minutes < 0:
-            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError(f"Invalid value for a delayed turn off: {minutes}")
 
         return self.send("delay_off", [minutes])
 
@@ -197,6 +197,6 @@ class PhilipsEyecare(Device):
     def set_ambient_brightness(self, level: int):
         """Set the brightness of the ambient light."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid ambient brightness: %s" % level)
+            raise ValueError(f"Invalid ambient brightness: {level}")
 
         return self.send("set_amb_bright", [level])

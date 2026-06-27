@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import attr
 
@@ -19,9 +19,9 @@ class EventInfo:
 
     action: str
     extra: str
-    event: Optional[str] = None
+    event: str | None = None
     command_extra: str = ""
-    trigger_value: Optional[Any] = None
+    trigger_value: Any | None = None
     trigger_token: str = ""
-    source_sid: Optional[str] = None
-    source_model: Optional[str] = None
+    source_sid: str | None = None
+    source_model: str | None = None

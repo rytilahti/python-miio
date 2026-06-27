@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -365,7 +365,7 @@ class FanMiot(MiotDevice):
     def set_speed(self, speed: int):
         """Set speed."""
         if speed < 0 or speed > 100:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.set_property("fan_speed", speed)
 
@@ -433,7 +433,7 @@ class FanMiot(MiotDevice):
         """Set delay off minutes."""
 
         if minutes < 0 or minutes > 480:
-            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError(f"Invalid value for a delayed turn off: {minutes}")
 
         return self.set_property("power_off_time", minutes)
 
@@ -461,14 +461,14 @@ class Fan1C(MiotDevice):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = MODEL_FAN_1C,
+        model: str = MODEL_FAN_1C,
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
@@ -521,7 +521,7 @@ class Fan1C(MiotDevice):
     def set_speed(self, speed: int):
         """Set speed."""
         if speed not in (1, 2, 3):
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.set_property("fan_level", speed)
 
@@ -575,6 +575,6 @@ class Fan1C(MiotDevice):
         """Set delay off minutes."""
 
         if minutes < 0 or minutes > 480:
-            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError(f"Invalid value for a delayed turn off: {minutes}")
 
         return self.set_property("power_off_time", minutes)

@@ -2,10 +2,9 @@
 
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from operator import attrgetter
 from pathlib import Path
-from typing import Optional
 
 import platformdirs
 from micloud.miotspec import MiotSpec
@@ -25,7 +24,7 @@ class ReleaseInfo(BaseModel):
     """Information about individual miotspec release."""
 
     model: str
-    status: Optional[str]  # only available on full listing
+    status: str | None  # only available on full listing
     type: str
     version: int
 
@@ -89,7 +88,7 @@ class MiotCloud:
             spec = self._file_from_cache(file)
             return DeviceModel.parse_obj(spec)
         except FileNotFoundError:
-            _LOGGER.debug("Unable to find schema file %s, going to fetch" % file)
+            _LOGGER.debug(f"Unable to find schema file {file}, going to fetch")
 
         return DeviceModel.parse_obj(self.get_model_schema(model))
 
@@ -120,8 +119,8 @@ class MiotCloud:
         def _valid_cache():
             expiration = timedelta(hours=cache_hours)
             if datetime.fromtimestamp(
-                file.stat().st_mtime, tz=timezone.utc
-            ) + expiration > datetime.now(tz=timezone.utc):
+                file.stat().st_mtime, tz=UTC
+            ) + expiration > datetime.now(tz=UTC):
                 return True
 
             return False
@@ -130,4 +129,4 @@ class MiotCloud:
             _LOGGER.debug("Cache hit, returning contents of %s", file)
             return json.loads(file.read_text())
 
-        raise FileNotFoundError("Cache file %s not found or it is stale" % file)
+        raise FileNotFoundError(f"Cache file {file} not found or it is stale")

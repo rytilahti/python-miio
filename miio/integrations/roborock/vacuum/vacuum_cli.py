@@ -7,7 +7,6 @@ import sys
 import threading
 import time
 from pprint import pformat as pf
-from typing import Any, List  # noqa: F401
 
 import click
 from platformdirs import user_cache_dir
@@ -124,17 +123,17 @@ def status(vac: RoborockVacuum):
         return  # bail out
 
     if res.error_code:
-        click.echo(click.style("Error: %s !" % res.error, bold=True, fg="red"))
+        click.echo(click.style(f"Error: {res.error} !", bold=True, fg="red"))
     if res.is_water_shortage:
         click.echo(click.style("Water is running low!", bold=True, fg="blue"))
-    click.echo(click.style("State: %s" % res.state, bold=True))
-    click.echo("Battery: %s %%" % res.battery)
-    click.echo("Fanspeed: %s %%" % res.fanspeed)
-    click.echo("Cleaning since: %s" % res.clean_time)
-    click.echo("Cleaned area: %s m²" % res.clean_area)
-    click.echo("Water box attached: %s" % res.is_water_box_attached)
+    click.echo(click.style(f"State: {res.state}", bold=True))
+    click.echo(f"Battery: {res.battery} %")
+    click.echo(f"Fanspeed: {res.fanspeed} %")
+    click.echo(f"Cleaning since: {res.clean_time}")
+    click.echo(f"Cleaned area: {res.clean_area} m²")
+    click.echo(f"Water box attached: {res.is_water_box_attached}")
     if res.is_water_box_carriage_attached is not None:
-        click.echo("Mop attached: %s" % res.is_water_box_carriage_attached)
+        click.echo(f"Mop attached: {res.is_water_box_carriage_attached}")
 
 
 @cli.command()
@@ -165,7 +164,7 @@ def reset_consumable(vac: RoborockVacuum, name):
     elif name == "sensor_dirty":
         consumable = Consumable.SensorDirty
     else:
-        click.echo("Unexpected state name: %s" % name)
+        click.echo(f"Unexpected state name: {name}")
         return
 
     click.echo(f"Resetting consumable {name!r}: {vac.consumable_reset(consumable)}")
@@ -175,35 +174,35 @@ def reset_consumable(vac: RoborockVacuum, name):
 @pass_dev
 def start(vac: RoborockVacuum):
     """Start cleaning."""
-    click.echo("Starting cleaning: %s" % vac.start())
+    click.echo(f"Starting cleaning: {vac.start()}")
 
 
 @cli.command()
 @pass_dev
 def spot(vac: RoborockVacuum):
     """Start spot cleaning."""
-    click.echo("Starting spot cleaning: %s" % vac.spot())
+    click.echo(f"Starting spot cleaning: {vac.spot()}")
 
 
 @cli.command()
 @pass_dev
 def pause(vac: RoborockVacuum):
     """Pause cleaning."""
-    click.echo("Pausing: %s" % vac.pause())
+    click.echo(f"Pausing: {vac.pause()}")
 
 
 @cli.command()
 @pass_dev
 def stop(vac: RoborockVacuum):
     """Stop cleaning."""
-    click.echo("Stop cleaning: %s" % vac.stop())
+    click.echo(f"Stop cleaning: {vac.stop()}")
 
 
 @cli.command()
 @pass_dev
 def home(vac: RoborockVacuum):
     """Return home."""
-    click.echo("Requesting return to home: %s" % vac.home())
+    click.echo(f"Requesting return to home: {vac.home()}")
 
 
 @cli.command()
@@ -212,7 +211,7 @@ def home(vac: RoborockVacuum):
 @click.argument("y_coord", type=int)
 def goto(vac: RoborockVacuum, x_coord: int, y_coord: int):
     """Go to specific target."""
-    click.echo("Going to target : %s" % vac.goto(x_coord, y_coord))
+    click.echo(f"Going to target : {vac.goto(x_coord, y_coord)}")
 
 
 @cli.command()
@@ -220,7 +219,7 @@ def goto(vac: RoborockVacuum, x_coord: int, y_coord: int):
 @click.argument("zones", type=LiteralParamType(), required=True)
 def zoned_clean(vac: RoborockVacuum, zones: list):
     """Clean zone."""
-    click.echo("Cleaning zone(s) : %s" % vac.zoned_clean(zones))
+    click.echo(f"Cleaning zone(s) : {vac.zoned_clean(zones)}")
 
 
 @cli.group()
@@ -266,7 +265,7 @@ def manual_stop(vac: RoborockVacuum):  # noqa: F811  # redef of stop
 @click.argument("degrees", type=int)
 def left(vac: RoborockVacuum, degrees: int):
     """Turn to left."""
-    click.echo("Turning %s degrees left" % degrees)
+    click.echo(f"Turning {degrees} degrees left")
     return vac.manual_control(degrees, 0)
 
 
@@ -345,10 +344,10 @@ def dnd(
 def fanspeed(vac: RoborockVacuum, speed):
     """Query and adjust the fan speed."""
     if speed:
-        click.echo("Setting fan speed to %s" % speed)
+        click.echo(f"Setting fan speed to {speed}")
         vac.set_fan_speed(speed)
     else:
-        click.echo("Current fan speed: %s" % vac.fan_speed())
+        click.echo(f"Current fan speed: {vac.fan_speed()}")
 
 
 @cli.group(invoke_without_command=True)
@@ -359,7 +358,7 @@ def timer(ctx, vac: RoborockVacuum):
     if ctx.invoked_subcommand is not None:
         return
     timers = vac.timer()
-    click.echo("Timezone: %s\n" % vac.timezone())
+    click.echo(f"Timezone: {vac.timezone()}\n")
     for idx, timer in enumerate(timers):
         color = "green" if timer.enabled else "yellow"
         click.echo(
@@ -369,10 +368,10 @@ def timer(ctx, vac: RoborockVacuum):
                 fg=color,
             )
         )
-        click.echo("  %s" % timer.cron)
+        click.echo(f"  {timer.cron}")
         min, hr, x, y, days = timer.cron.split(" ")
         cron = f"{min} {hr} {x} {y} {days}"
-        click.echo("  %s" % cron)
+        click.echo(f"  {cron}")
 
 
 @timer.command()
@@ -430,7 +429,7 @@ def info(vac: RoborockVacuum):
     try:
         res = vac.info()
 
-        click.echo("%s" % res)
+        click.echo(f"{res}")
         _LOGGER.debug("Full response: %s", pf(res.raw))
     except DeviceInfoUnavailableException:
         click.echo(
@@ -444,24 +443,23 @@ def info(vac: RoborockVacuum):
 def cleaning_history(vac: RoborockVacuum):
     """Query the cleaning history."""
     res = vac.clean_history()
-    click.echo("Total clean count: %s" % res.count)
+    click.echo(f"Total clean count: {res.count}")
     click.echo(f"Cleaned for: {res.total_duration} (area: {res.total_area} m²)")
     if res.dust_collection_count is not None:
-        click.echo("Emptied dust collection bin: %s times" % res.dust_collection_count)
+        click.echo(f"Emptied dust collection bin: {res.dust_collection_count} times")
     click.echo()
     for idx, id_ in enumerate(res.ids):
         details = vac.clean_details(id_, return_list=False)
         color = "green" if details.complete else "yellow"
         click.echo(
             click.style(
-                "Clean #%s: %s-%s (complete: %s, error: %s)"
-                % (idx, details.start, details.end, details.complete, details.error),
+                f"Clean #{idx}: {details.start}-{details.end} (complete: {details.complete}, error: {details.error})",
                 bold=True,
                 fg=color,
             )
         )
-        click.echo("  Area cleaned: %s m²" % details.area)
-        click.echo("  Duration: (%s)" % details.duration)
+        click.echo(f"  Area cleaned: {details.area} m²")
+        click.echo(f"  Duration: ({details.duration})")
         click.echo()
 
 
@@ -472,13 +470,13 @@ def cleaning_history(vac: RoborockVacuum):
 def sound(vac: RoborockVacuum, volume: int, test_mode: bool):
     """Query and change sound settings."""
     if volume is not None:
-        click.echo("Setting sound volume to %s" % volume)
+        click.echo(f"Setting sound volume to {volume}")
         vac.set_sound_volume(volume)
     if test_mode:
         vac.test_sound_volume()
-    click.echo("Current sound: %s" % vac.sound_info())
-    click.echo("Current volume: %s" % vac.sound_volume())
-    click.echo("Install progress: %s" % vac.sound_install_progress())
+    click.echo(f"Current sound: {vac.sound_info()}")
+    click.echo(f"Current volume: {vac.sound_volume()}")
+    click.echo(f"Install progress: {vac.sound_install_progress()}")
 
 
 @cli.command()
@@ -514,7 +512,7 @@ def install_sound(vac: RoborockVacuum, url: str, md5sum: str, sid: int, ip: str)
 
         t = threading.Thread(target=server.serve_once)
         t.start()
-        click.echo("Hosting file at %s" % local_url)
+        click.echo(f"Hosting file at {local_url}")
 
     click.echo(vac.install_sound(local_url, md5sum, sid))
 
@@ -527,9 +525,9 @@ def install_sound(vac: RoborockVacuum, url: str, md5sum: str, sid: int, ip: str)
     progress = vac.sound_install_progress()
 
     if progress.is_errored:
-        click.echo("Error during installation: %s" % progress.error)
+        click.echo(f"Error during installation: {progress.error}")
     else:
-        click.echo("Installation of sid '%s' complete!" % sid)
+        click.echo(f"Installation of sid '{sid}' complete!")
 
     if server is not None:
         t.join()
@@ -539,7 +537,7 @@ def install_sound(vac: RoborockVacuum, url: str, md5sum: str, sid: int, ip: str)
 @pass_dev
 def serial_number(vac: RoborockVacuum):
     """Query serial number."""
-    click.echo("Serial#: %s" % vac.serial_number())
+    click.echo(f"Serial#: {vac.serial_number()}")
 
 
 @cli.command()
@@ -548,10 +546,10 @@ def serial_number(vac: RoborockVacuum):
 def timezone(vac: RoborockVacuum, tz=None):
     """Query or set the timezone."""
     if tz is not None:
-        click.echo("Setting timezone to: %s" % tz)
+        click.echo(f"Setting timezone to: {tz}")
         click.echo(vac.set_timezone(tz))
     else:
-        click.echo("Timezone: %s" % vac.timezone())
+        click.echo(f"Timezone: {vac.timezone()}")
 
 
 @cli.command()
@@ -575,11 +573,10 @@ def carpet_cleaning_mode(vac: RoborockVacuum, mode=None):
     """
 
     if mode is None:
-        click.echo("Carpet cleaning mode: %s" % vac.carpet_cleaning_mode())
+        click.echo(f"Carpet cleaning mode: {vac.carpet_cleaning_mode()}")
     else:
         click.echo(
-            "Setting carpet cleaning mode: %s"
-            % vac.set_carpet_cleaning_mode(CarpetCleaningMode[mode])
+            f"Setting carpet cleaning mode: {vac.set_carpet_cleaning_mode(CarpetCleaningMode[mode])}"
         )
 
 
@@ -597,7 +594,7 @@ def configure_wifi(
     Note that some newer firmwares may expect you to define the timezone by using
     --timezone.
     """
-    click.echo("Configuring wifi to SSID: %s" % ssid)
+    click.echo(f"Configuring wifi to SSID: {ssid}")
     click.echo(vac.configure_wifi(ssid, password, uid, timezone))
 
 
@@ -606,10 +603,10 @@ def configure_wifi(
 def update_status(vac: RoborockVacuum):
     """Return update state and progress."""
     update_state = vac.update_state()
-    click.echo("Update state: %s" % update_state)
+    click.echo(f"Update state: {update_state}")
 
     if update_state == UpdateState.Downloading:
-        click.echo("Update progress: %s" % vac.update_progress())
+        click.echo(f"Update progress: {vac.update_progress()}")
 
 
 @cli.command()
@@ -629,7 +626,7 @@ def update_firmware(vac: RoborockVacuum, url: str, md5: str, ip: str):
 
     # TODO Check that the device is in updateable state.
 
-    click.echo("Going to update from %s" % url)
+    click.echo(f"Going to update from {url}")
     if url.lower().startswith("http"):
         if md5 is None:
             click.echo("You need to pass md5 when using URL for updating.")
@@ -642,14 +639,14 @@ def update_firmware(vac: RoborockVacuum, url: str, md5: str, ip: str):
 
         t = threading.Thread(target=server.serve_once)
         t.start()
-        click.echo("Hosting file at %s" % url)
+        click.echo(f"Hosting file at {url}")
         md5 = server.md5
 
     update_res = vac.update(url, md5)
     if update_res:
         click.echo("Update started!")
     else:
-        click.echo("Starting the update failed: %s" % update_res)
+        click.echo(f"Starting the update failed: {update_res}")
 
     with tqdm(total=100) as pbar:
         state = vac.update_state()
@@ -666,7 +663,7 @@ def update_firmware(vac: RoborockVacuum, url: str, md5: str, ip: str):
                 break
 
             pbar.update(progress - pbar.n)
-            pbar.set_description("%s" % state.name)
+            pbar.set_description(f"{state.name}")
             time.sleep(1)
 
 
@@ -676,7 +673,7 @@ def update_firmware(vac: RoborockVacuum, url: str, md5: str, ip: str):
 @pass_dev
 def raw_command(vac: RoborockVacuum, cmd, parameters):
     """Run a raw command."""
-    params = []  # type: Any
+    params = []
     if parameters:
         params = ast.literal_eval(parameters)
     click.echo(f"Sending cmd {cmd} with params {params}")

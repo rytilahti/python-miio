@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -74,7 +74,7 @@ class PowerStripStatus(DeviceStatus):
 
     @property
     @sensor(name="Current", unit="A", device_class="current")
-    def current(self) -> Optional[float]:
+    def current(self) -> float | None:
         """Current, if available.
 
         Meaning and voltage reference unknown.
@@ -85,14 +85,14 @@ class PowerStripStatus(DeviceStatus):
 
     @property
     @sensor(name="Load power", unit="W", device_class="power")
-    def load_power(self) -> Optional[float]:
+    def load_power(self) -> float | None:
         """Current power load, if available."""
         if self.data["power_consume_rate"] is not None:
             return self.data["power_consume_rate"]
         return None
 
     @property
-    def mode(self) -> Optional[PowerMode]:
+    def mode(self) -> PowerMode | None:
         """Current operation mode, can be either green or normal."""
         if self.data["mode"] is not None:
             return PowerMode(self.data["mode"])
@@ -100,7 +100,7 @@ class PowerStripStatus(DeviceStatus):
 
     @property  # type: ignore
     @deprecated("Use led instead of wifi_led")
-    def wifi_led(self) -> Optional[bool]:
+    def wifi_led(self) -> bool | None:
         """True if the wifi led is turned on."""
         return self.led
 
@@ -108,14 +108,14 @@ class PowerStripStatus(DeviceStatus):
     @setting(
         name="LED", icon="mdi:led-outline", setter_name="set_led", device_class="switch"
     )
-    def led(self) -> Optional[bool]:
+    def led(self) -> bool | None:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"
         return None
 
     @property
-    def power_price(self) -> Optional[int]:
+    def power_price(self) -> int | None:
         """The stored power price, if available."""
         if "power_price" in self.data and self.data["power_price"] is not None:
             return self.data["power_price"]
@@ -123,7 +123,7 @@ class PowerStripStatus(DeviceStatus):
 
     @property
     @sensor(name="Leakage current", unit="A", device_class="current")
-    def leakage_current(self) -> Optional[int]:
+    def leakage_current(self) -> int | None:
         """The leakage current, if available."""
         if "elec_leakage" in self.data and self.data["elec_leakage"] is not None:
             return self.data["elec_leakage"]
@@ -131,7 +131,7 @@ class PowerStripStatus(DeviceStatus):
 
     @property
     @sensor(name="Voltage", unit="V", device_class="voltage")
-    def voltage(self) -> Optional[float]:
+    def voltage(self) -> float | None:
         """The voltage, if available."""
         if "voltage" in self.data and self.data["voltage"] is not None:
             return self.data["voltage"] / 100.0
@@ -139,7 +139,7 @@ class PowerStripStatus(DeviceStatus):
 
     @property
     @sensor(name="Power Factor", unit="%", device_class="power_factor")
-    def power_factor(self) -> Optional[float]:
+    def power_factor(self) -> float | None:
         """The power factor, if available."""
         if "power_factor" in self.data and self.data["power_factor"] is not None:
             return self.data["power_factor"]
@@ -233,7 +233,7 @@ class PowerStrip(Device):
     def set_power_price(self, price: int):
         """Set the power price."""
         if price < 0 or price > 999:
-            raise ValueError("Invalid power price: %s" % price)
+            raise ValueError(f"Invalid power price: {price}")
 
         return self.send("set_power_price", [price])
 

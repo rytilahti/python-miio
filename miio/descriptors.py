@@ -9,8 +9,11 @@ If you are developing an integration, prefer :func:`~miio.devicestatus.sensor`, 
 :func:`~miio.devicestatus.action` decorators over creating the descriptors manually.
 """
 
+from __future__ import annotations
+
+from collections.abc import Callable
 from enum import Enum, Flag, auto
-from typing import Any, Callable, Optional
+from typing import Any
 
 import attr
 
@@ -49,11 +52,11 @@ class Descriptor:
     #: Human readable name.
     name: str
     #: Type of the property, if applicable.
-    type: Optional[type] = None
+    type: type | None = None
     #: Unit of the property, if applicable.
-    unit: Optional[str] = None
+    unit: str | None = None
     #: Name of the attribute in the status container that contains the value, if applicable.
-    status_attribute: Optional[str] = None
+    status_attribute: str | None = None
     #: Additional data related to this descriptor.
     extras: dict = attr.ib(factory=dict, repr=False)
     #: Access flags (read, write, execute) for the described item.
@@ -81,10 +84,10 @@ class ActionDescriptor(Descriptor):
     """Describes a button exposed by the device."""
 
     # Callable to execute the action.
-    method: Optional[Callable] = attr.ib(default=None, repr=False)
+    method: Callable | None = attr.ib(default=None, repr=False)
     #: Name of the method in the device class that can be used to execute the action.
-    method_name: Optional[str] = attr.ib(default=None, repr=False)
-    inputs: Optional[list[Any]] = attr.ib(default=None, repr=True)
+    method_name: str | None = attr.ib(default=None, repr=False)
+    inputs: list[Any] | None = attr.ib(default=None, repr=True)
 
     access: AccessFlags = attr.ib(default=AccessFlags.Execute)
 
@@ -125,10 +128,10 @@ class PropertyDescriptor(Descriptor):
     #: Constraint type defining the allowed values for an integer property.
     constraint: PropertyConstraint = attr.ib(default=PropertyConstraint.Unset)
     #: Callable to set the value of the property.
-    setter: Optional[Callable] = attr.ib(default=None, repr=False)
+    setter: Callable | None = attr.ib(default=None, repr=False)
     #: Name of the method in the device class that can be used to set the value.
     #: If set, the callable with this name will override the `setter` attribute.
-    setter_name: Optional[str] = attr.ib(default=None, repr=False)
+    setter_name: str | None = attr.ib(default=None, repr=False)
 
     @property
     def __cli_output__(self) -> str:
@@ -151,9 +154,9 @@ class EnumDescriptor(PropertyDescriptor):
 
     constraint: PropertyConstraint = PropertyConstraint.Choice
     #: Name of the attribute in the device class that returns the choices.
-    choices_attribute: Optional[str] = attr.ib(default=None, repr=False)
+    choices_attribute: str | None = attr.ib(default=None, repr=False)
     #: Enum class containing the available choices.
-    choices: Optional[type[Enum]] = attr.ib(default=None, repr=False)
+    choices: type[Enum] | None = attr.ib(default=None, repr=False)
 
     @property
     def __cli_output__(self) -> str:
@@ -181,7 +184,7 @@ class RangeDescriptor(PropertyDescriptor):
     step: int
     #: Name of the attribute in the device class that returns the range.
     #: If set, this will override the individual min/max/step values.
-    range_attribute: Optional[str] = attr.ib(default=None)
+    range_attribute: str | None = attr.ib(default=None)
     type: type = int
     constraint: PropertyConstraint = PropertyConstraint.Range
 

@@ -8,7 +8,7 @@ import os
 import pathlib
 import time
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import click
 import pytz
@@ -139,11 +139,11 @@ class RoborockVacuum(Device):
     def __init__(
         self,
         ip: str,
-        token: Optional[str] = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
         model=None,
     ):
@@ -151,7 +151,7 @@ class RoborockVacuum(Device):
             ip, token, start_id, debug, lazy_discover, timeout, model=model
         )
         self.manual_seqnum = -1
-        self._maps: Optional[MapList] = None
+        self._maps: MapList | None = None
         self._map_enum_cache = None
         self._status_helper = UpdateHelper(self.vacuum_status)
         self._status_helper.add_update_method("consumables", self.consumable_status)
@@ -163,8 +163,8 @@ class RoborockVacuum(Device):
     def send(
         self,
         command: str,
-        parameters: Optional[Any] = None,
-        retry_count: Optional[int] = None,
+        parameters: Any | None = None,
+        retry_count: int | None = None,
         *,
         extra_parameters=None,
     ) -> Any:
@@ -352,13 +352,11 @@ class RoborockVacuum(Device):
         """Give a command over manual control interface."""
         if rotation < self.MANUAL_ROTATION_MIN or rotation > self.MANUAL_ROTATION_MAX:
             raise ValueError(
-                "Given rotation is invalid, should be ]%s, %s[, was %s"
-                % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotation)
+                f"Given rotation is invalid, should be ]{self.MANUAL_ROTATION_MIN}, {self.MANUAL_ROTATION_MAX}[, was {rotation}"
             )
         if velocity < self.MANUAL_VELOCITY_MIN or velocity > self.MANUAL_VELOCITY_MAX:
             raise ValueError(
-                "Given velocity is invalid, should be ]%s, %s[, was: %s"
-                % (self.MANUAL_VELOCITY_MIN, self.MANUAL_VELOCITY_MAX, velocity)
+                f"Given velocity is invalid, should be ]{self.MANUAL_VELOCITY_MIN}, {self.MANUAL_VELOCITY_MAX}[, was: {velocity}"
             )
 
         self.manual_seqnum += 1
@@ -415,7 +413,7 @@ class RoborockVacuum(Device):
         self._maps = MapList(self.send("get_multi_maps_list")[0])
         return self._maps
 
-    def _map_enum(self) -> Optional[type[Enum]]:
+    def _map_enum(self) -> type[Enum] | None:
         """Enum of the available map names."""
         if self._map_enum_cache is not None:
             return self._map_enum_cache
@@ -428,8 +426,8 @@ class RoborockVacuum(Device):
     @command(click.argument("map_id", type=int))
     def load_map(
         self,
-        map_enum: Optional[enum.Enum] = None,
-        map_id: Optional[int] = None,
+        map_enum: enum.Enum | None = None,
+        map_id: int | None = None,
     ):
         """Change the current map used."""
         if map_enum is None and map_id is None:
@@ -452,7 +450,7 @@ class RoborockVacuum(Device):
     def fresh_map(self, version):
         """Return fresh map?"""
         if version not in [1, 2]:
-            raise ValueError("Unknown map version: %s" % version)
+            raise ValueError(f"Unknown map version: {version}")
 
         if version == 1:
             return self.send("get_fresh_map")
@@ -463,7 +461,7 @@ class RoborockVacuum(Device):
     def persist_map(self, version):
         """Return fresh map?"""
         if version not in [1, 2]:
-            raise ValueError("Unknown map version: %s" % version)
+            raise ValueError(f"Unknown map version: {version}")
 
         if version == 1:
             return self.send("get_persist_map")
@@ -526,7 +524,7 @@ class RoborockVacuum(Device):
         return CleaningSummary(self.send("get_clean_summary"))
 
     @command()
-    def last_clean_details(self) -> Optional[CleaningDetails]:
+    def last_clean_details(self) -> CleaningDetails | None:
         """Return details from the last cleaning.
 
         Returns None if there has been no cleanups.
@@ -541,7 +539,7 @@ class RoborockVacuum(Device):
     @command(
         click.argument("id_", type=int, metavar="ID"),
     )
-    def clean_details(self, id_: int) -> Optional[CleaningDetails]:
+    def clean_details(self, id_: int) -> CleaningDetails | None:
         """Return details about specific cleaning."""
         details = self.send("get_clean_record", [id_])
 
@@ -811,7 +809,7 @@ class RoborockVacuum(Device):
         integral: int = 450,
     ):
         """Set the carpet mode."""
-        click.echo("Setting carpet mode: %s" % enabled)
+        click.echo(f"Setting carpet mode: {enabled}")
         data = {
             "enable": int(enabled),
             "stall_time": stall_time,
@@ -822,7 +820,7 @@ class RoborockVacuum(Device):
         return self.send("set_carpet_mode", [data])[0] == "ok"
 
     @command()
-    def carpet_cleaning_mode(self) -> Optional[CarpetCleaningMode]:
+    def carpet_cleaning_mode(self) -> CarpetCleaningMode | None:
         """Get carpet cleaning mode/avoidance setting."""
         try:
             return CarpetCleaningMode(
@@ -841,7 +839,7 @@ class RoborockVacuum(Device):
         )
 
     @command()
-    def dust_collection_mode(self) -> Optional[DustCollectionMode]:
+    def dust_collection_mode(self) -> DustCollectionMode | None:
         """Get the dust collection mode setting."""
         self._verify_auto_empty_support()
         try:
@@ -923,7 +921,7 @@ class RoborockVacuum(Device):
     @command(click.argument("id", type=int))
     def use_backup_map(self, id: int):
         """Set backup map."""
-        click.echo("Setting the map %s as active" % id)
+        click.echo(f"Setting the map {id} as active")
         return self.send("recover_map", [id])
 
     @command()
@@ -967,7 +965,7 @@ class RoborockVacuum(Device):
         return self.send("set_water_box_custom_mode", [waterflow.value])
 
     @command()
-    def mop_mode(self) -> Optional[MopMode]:
+    def mop_mode(self) -> MopMode | None:
         """Get mop mode setting."""
         try:
             return MopMode(self.send("get_mop_mode")[0])
@@ -1084,9 +1082,10 @@ class RoborockVacuum(Device):
                 kwargs["debug"] = gco.debug
 
             start_id = manual_seq = 0
-            with contextlib.suppress(FileNotFoundError, TypeError, ValueError), open(
-                id_file
-            ) as f:
+            with (
+                contextlib.suppress(FileNotFoundError, TypeError, ValueError),
+                open(id_file) as f,
+            ):
                 x = json.load(f)
                 start_id = x.get("seq", 0)
                 manual_seq = x.get("manual_seq", 0)

@@ -3,7 +3,6 @@
 import asyncio
 import json
 import logging
-from typing import Optional, Union
 
 import click
 
@@ -42,12 +41,12 @@ class MiioProperty(BaseModel):
 
     name: str
     type: Format
-    value: Optional[Union[str, bool, int]]
+    value: str | bool | int | None
     models: list[str] = Field(default=[])
-    setter: Optional[str] = None
-    description: Optional[str] = None
-    min: Optional[int] = None
-    max: Optional[int] = None
+    setter: str | None = None
+    description: str | None = None
+    min: int | None = None
+    max: int | None = None
 
     class Config:
         extra = "forbid"
@@ -61,27 +60,27 @@ class MiioMethod(BaseModel):
     """Simulated method."""
 
     name: str
-    result: Optional[list] = None
-    result_json: Optional[str] = None
+    result: list | None = None
+    result_json: str | None = None
 
 
 class MiioModel(BaseModel):
     """Model information."""
 
     model: str
-    name: Optional[str] = "unknown name"
+    name: str | None = "unknown name"
 
 
 class SimulatedMiio(BaseModel):
     """Simulated device model for miio devices."""
 
-    name: Optional[str] = Field(default="Unnamed integration")
+    name: str | None = Field(default="Unnamed integration")
     models: list[MiioModel]
     type: str
     properties: list[MiioProperty] = Field(default=[])
     actions: list[MiioAction] = Field(default=[])
     methods: list[MiioMethod] = Field(default=[])
-    _model: Optional[str] = PrivateAttr(default=None)
+    _model: str | None = PrivateAttr(default=None)
 
     class Config:
         extra = "forbid"

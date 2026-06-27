@@ -1,6 +1,5 @@
 import logging
 from functools import partial
-from typing import Optional
 
 from miio import MiotDevice
 from miio.click_common import command
@@ -20,15 +19,15 @@ class GenericMiot(MiotDevice):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = None,
-        mapping: Optional[MiotMapping] = None,
+        model: str | None = None,
+        mapping: MiotMapping | None = None,
     ):
         super().__init__(
             ip,
@@ -41,7 +40,7 @@ class GenericMiot(MiotDevice):
             mapping=mapping,
         )
         self._model = model
-        self._miot_model: Optional[DeviceModel] = None
+        self._miot_model: DeviceModel | None = None
 
         self._actions: dict[str, ActionDescriptor] = {}
         self._properties: dict[str, PropertyDescriptor] = {}
@@ -71,7 +70,7 @@ class GenericMiot(MiotDevice):
 
         return GenericMiotStatus(response, self)
 
-    def _create_action(self, act: MiotAction) -> Optional[ActionDescriptor]:
+    def _create_action(self, act: MiotAction) -> ActionDescriptor | None:
         """Create action descriptor for miot action."""
         desc = act.get_descriptor()
         call_action = partial(self.call_action_by, act.siid, act.aiid)
@@ -144,7 +143,7 @@ class GenericMiot(MiotDevice):
         self._initialized = True
 
     @property
-    def device_type(self) -> Optional[str]:
+    def device_type(self) -> str | None:
         """Return device type."""
         # TODO: this should be probably mapped to an enum
         if self._miot_model is not None:
