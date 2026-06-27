@@ -232,7 +232,8 @@ class AirConditioningCompanion(Device):
         debug: int = 0,
         lazy_discover: bool = True,
         timeout: Optional[int] = None,
-        model: str = MODEL_ACPARTNER_V2,
+        *,
+        model: Optional[str] = MODEL_ACPARTNER_V2,
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
