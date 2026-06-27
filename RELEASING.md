@@ -8,7 +8,7 @@ export NEW_RELEASE=0.5.1
 2. Update the version number
 
 ```
-poetry version $NEW_RELEASE
+uv version $NEW_RELEASE
 ```
 
 2. Generate changelog since the last release
@@ -43,14 +43,14 @@ git push --tags
 
 If not done already, create an API key for pypi (https://pypi.org/manage/account/token/) and configure it:
 ```
-poetry config pypi-token.pypi <token>
+uv publish --token <token>
 ```
 
 To build & release:
 
 ```bash
-poetry build
-poetry publish
+uv build
+uv publish
 ```
 
 8. Click the "Draft a new release" button on github, select the new tag and copy & paste the changelog into the description.
