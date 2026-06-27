@@ -116,34 +116,34 @@ class MiIOProtocol:
             "21310020ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         )
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.settimeout(timeout)
-        for _ in range(3):
-            s.sendto(helobytes, (addr, 54321))
-        while True:
-            try:
-                data, recv_addr = s.recvfrom(1024)
-                m: Message = Message.parse(data)
-                _LOGGER.debug("Got a response: %s", m)
-                if not is_broadcast:
-                    return m
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            s.settimeout(timeout)
+            for _ in range(3):
+                s.sendto(helobytes, (addr, 54321))
+            while True:
+                try:
+                    data, recv_addr = s.recvfrom(1024)
+                    m: Message = Message.parse(data)
+                    _LOGGER.debug("Got a response: %s", m)
+                    if not is_broadcast:
+                        return m
 
-                if recv_addr[0] not in seen_addrs:
-                    _LOGGER.info(
-                        "  IP %s (ID: %s) - token: %s",
-                        recv_addr[0],
-                        binascii.hexlify(m.header.value.device_id).decode(),
-                        codecs.encode(m.checksum, "hex"),
-                    )
-                    seen_addrs.append(recv_addr[0])
-            except socket.timeout:
-                if is_broadcast:
-                    _LOGGER.info("Discovery done")
-                return  # ignore timeouts on discover
-            except Exception as ex:
-                _LOGGER.warning("error while reading discover results: %s", ex)
-                break
+                    if recv_addr[0] not in seen_addrs:
+                        _LOGGER.info(
+                            "  IP %s (ID: %s) - token: %s",
+                            recv_addr[0],
+                            binascii.hexlify(m.header.value.device_id).decode(),
+                            codecs.encode(m.checksum, "hex"),
+                        )
+                        seen_addrs.append(recv_addr[0])
+                except socket.timeout:
+                    if is_broadcast:
+                        _LOGGER.info("Discovery done")
+                    return  # ignore timeouts on discover
+                except Exception as ex:
+                    _LOGGER.warning("error while reading discover results: %s", ex)
+                    break
 
     def send(
         self,
@@ -187,80 +187,80 @@ class MiIOProtocol:
                 Message.parse(m, token=self.token),
             )
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.settimeout(self._timeout)
-
-        try:
-            s.sendto(m, (self.ip, self.port))
-        except OSError as ex:
-            _LOGGER.error("failed to send msg: %s", ex)
-            raise DeviceException from ex
-
-        try:
-            data, addr = s.recvfrom(4096)
-            m = Message.parse(data, token=self.token)
-
-            if self.debug > 1:
-                _LOGGER.debug("recv from %s: %s", addr[0], m)
-
-            header = m.header.value
-            payload = m.data.value
-
-            self.__id = payload["id"]
-            self._device_ts = header["ts"]  # type: ignore  # ts uses timeadapter
-
-            _LOGGER.debug(
-                "%s:%s (ts: %s, id: %s) << %s",
-                self.ip,
-                self.port,
-                header["ts"],
-                payload["id"],
-                pf(payload),
-            )
-            if "error" in payload:
-                self._handle_error(payload["error"])
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.settimeout(self._timeout)
 
             try:
-                return payload["result"]
-            except KeyError:
-                return payload
-        except construct.core.ChecksumError as ex:
-            raise InvalidTokenException(
-                "Got checksum error which indicates use "
-                "of an invalid token. "
-                "Please check your token!"
-            ) from ex
-        except OSError as ex:
-            if retry_count > 0:
+                s.sendto(m, (self.ip, self.port))
+            except OSError as ex:
+                _LOGGER.error("failed to send msg: %s", ex)
+                raise DeviceException from ex
+
+            try:
+                data, addr = s.recvfrom(4096)
+                m = Message.parse(data, token=self.token)
+
+                if self.debug > 1:
+                    _LOGGER.debug("recv from %s: %s", addr[0], m)
+
+                header = m.header.value
+                payload = m.data.value
+
+                self.__id = payload["id"]
+                self._device_ts = header["ts"]  # type: ignore  # ts uses timeadapter
+
                 _LOGGER.debug(
-                    "Retrying with incremented id, retries left: %s", retry_count
+                    "%s:%s (ts: %s, id: %s) << %s",
+                    self.ip,
+                    self.port,
+                    header["ts"],
+                    payload["id"],
+                    pf(payload),
                 )
-                self.__id += 100
-                self._discovered = False
-                return self.send(
-                    command,
-                    parameters,
-                    retry_count - 1,
-                    extra_parameters=extra_parameters,
-                )
+                if "error" in payload:
+                    self._handle_error(payload["error"])
 
-            _LOGGER.error("Got error when receiving: %s", ex)
-            raise DeviceException("No response from the device") from ex
+                try:
+                    return payload["result"]
+                except KeyError:
+                    return payload
+            except construct.core.ChecksumError as ex:
+                raise InvalidTokenException(
+                    "Got checksum error which indicates use "
+                    "of an invalid token. "
+                    "Please check your token!"
+                ) from ex
+            except OSError as ex:
+                if retry_count > 0:
+                    _LOGGER.debug(
+                        "Retrying with incremented id, retries left: %s", retry_count
+                    )
+                    self.__id += 100
+                    self._discovered = False
+                    return self.send(
+                        command,
+                        parameters,
+                        retry_count - 1,
+                        extra_parameters=extra_parameters,
+                    )
 
-        except RecoverableError as ex:
-            if retry_count > 0:
-                _LOGGER.debug(
-                    "Retrying to send failed command, retries left: %s", retry_count
-                )
-                return self.send(
-                    command,
-                    parameters,
-                    retry_count - 1,
-                    extra_parameters=extra_parameters,
-                )
+                _LOGGER.error("Got error when receiving: %s", ex)
+                raise DeviceException("No response from the device") from ex
 
-            _LOGGER.error("Got error when receiving: %s", ex)
-            raise DeviceException("Unable to recover failed command") from ex
+            except RecoverableError as ex:
+                if retry_count > 0:
+                    _LOGGER.debug(
+                        "Retrying to send failed command, retries left: %s", retry_count
+                    )
+                    return self.send(
+                        command,
+                        parameters,
+                        retry_count - 1,
+                        extra_parameters=extra_parameters,
+                    )
+
+                _LOGGER.error("Got error when receiving: %s", ex)
+                raise DeviceException("Unable to recover failed command") from ex
 
     @property
     def _id(self) -> int:
