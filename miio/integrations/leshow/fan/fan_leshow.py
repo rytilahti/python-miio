@@ -109,7 +109,7 @@ class FanLeshow(Device):
         )
         values = self.get_properties(properties, max_properties=15)
 
-        return FanLeshowStatus(dict(zip(properties, values)))
+        return FanLeshowStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):

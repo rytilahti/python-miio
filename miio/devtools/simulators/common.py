@@ -33,7 +33,7 @@ def did_and_mac_for_model(model):
 
     These identifiers allow making a simulated device unique for testing.
     """
-    m = md5()  # nosec
+    m = md5()  # noqa: S324
     m.update(model.encode())
     digest = m.hexdigest()[:12]
     did = int(digest[:8], base=16)

@@ -110,7 +110,7 @@ class PwznRelay(Device):
         ).copy()
         values = self.get_properties(properties)
 
-        return PwznRelayStatus(defaultdict(lambda: None, zip(properties, values)))
+        return PwznRelayStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
 
     @command(
         click.argument("number", type=int),

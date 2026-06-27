@@ -58,7 +58,7 @@ class PushServer:
         """Initialize the class."""
         self._device_ip = device_ip
 
-        self._address = "0.0.0.0"  # nosec
+        self._address = "0.0.0.0"  # noqa: S104
         self._server_ip = None
 
         self._device_id = device_id if device_id is not None else int(FAKE_DEVICE_ID)
@@ -234,7 +234,7 @@ class PushServer:
             sock=udp_socket,
         )
 
-    def _construct_event(  # nosec
+    def _construct_event(
         self,
         event_id: str,
         info: EventInfo,
@@ -253,7 +253,7 @@ class PushServer:
         command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"
         message_id = 0
-        magic_number = randint(1590161094, 1642025774)  # nosec, min/max taken from packet captures, unknown use
+        magic_number = randint(1590161094, 1642025774)  # noqa: S311  # min/max taken from packet captures, unknown use
 
         if len(command) > 49:
             _LOGGER.error(

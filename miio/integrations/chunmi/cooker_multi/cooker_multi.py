@@ -359,7 +359,7 @@ class MultiCooker(Device):
                 values_count,
             )
 
-        return CookerStatus(defaultdict(lambda: None, zip(properties, values)))
+        return CookerStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
 
     @command(
         click.argument("profile", type=str, required=True),

@@ -687,7 +687,7 @@ class ViomiVacuum(Device):
 
         values = self.get_properties(properties)
 
-        status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values)))
+        status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
         status.embed("consumables", self.consumable_status())
         status.embed("dnd", self.dnd_status())
 
@@ -820,7 +820,7 @@ class ViomiVacuum(Device):
         results = self.send("get_curpos", [])
         positions = []
         # Group result 4 by 4
-        for res in [i for i in zip(*(results[i::4] for i in range(4)))]:
+        for res in [i for i in zip(*(results[i::4] for i in range(4)), strict=False)]:
             # ignore type require for mypy error
             # "ViomiPositionPoint" gets multiple values for keyword argument "plan_multiplicator"
             positions.append(

@@ -153,7 +153,7 @@ class Heater(Device):
 
         values = self.get_properties(properties, max_properties=_props_per_request)
 
-        return HeaterStatus(dict(zip(properties, values)))
+        return HeaterStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):

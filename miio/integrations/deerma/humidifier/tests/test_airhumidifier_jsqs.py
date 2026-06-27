@@ -35,9 +35,9 @@ class DummyAirHumidifierJsqs(DummyMiotDevice, AirHumidifierJsqs):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture()
+@pytest.fixture
 def dev(request):
-    yield DummyAirHumidifierJsqs()
+    return DummyAirHumidifierJsqs()
 
 
 def test_on(dev):

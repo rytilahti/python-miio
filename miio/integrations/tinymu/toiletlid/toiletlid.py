@@ -94,7 +94,7 @@ class Toiletlid(Device):
         values = self.get_properties(properties)
 
         color = self.get_ambient_light()
-        return ToiletlidStatus(dict(zip(properties, values), ambient_light=color))
+        return ToiletlidStatus(dict(zip(properties, values, strict=False), ambient_light=color))
 
     @command(default_output=format_output("Nozzle clean"))
     def nozzle_clean(self):

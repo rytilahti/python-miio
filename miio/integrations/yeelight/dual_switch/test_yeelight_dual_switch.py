@@ -28,7 +28,7 @@ class DummyYeelightDualControlModule(DummyMiotDevice, YeelightDualControlModule)
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def switch(request):
     request.cls.device = DummyYeelightDualControlModule()
 

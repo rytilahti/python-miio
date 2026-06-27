@@ -103,10 +103,10 @@ class CloudInterface:
         try:
             from micloud import MiCloud  # noqa: F811
             from micloud.micloudexception import MiCloudAccessDenied
-        except ImportError:
+        except ImportError as ex:
             raise CloudException(
                 "You need to install 'micloud' package to use cloud interface"
-            )
+            ) from ex
 
         self._micloud: MiCloud = MiCloud(username=self.username, password=self.password)
         try:  # login() can either return False or raise an exception on failure
@@ -165,9 +165,9 @@ def cloud(ctx: click.Context, username, password):
     """Cloud commands."""
     try:
         import micloud  # noqa: F401
-    except ImportError:
+    except ImportError as ex:
         _LOGGER.error("micloud is not installed, no cloud access available")
-        raise CloudException("install micloud for cloud access")
+        raise CloudException("install micloud for cloud access") from ex
 
     ctx.obj = CloudInterface(username=username, password=password)
     if ctx.invoked_subcommand is None:

@@ -43,7 +43,7 @@ def test_get_property_by(dev):
 
 
 @pytest.mark.parametrize(
-    "value_type,value",
+    ("value_type", "value"),
     [
         (None, 1),
         (MiotValueType.Int, "1"),
@@ -107,7 +107,7 @@ def test_call_action_by(dev):
 
 
 @pytest.mark.parametrize(
-    "model,expected_mapping,expected_log",
+    ("model", "expected_mapping", "expected_log"),
     [
         ("some.model", {"x": {"y": 1}}, ""),
         ("unknown.model", {"x": {"y": 1}}, "Unable to find mapping"),
@@ -174,7 +174,7 @@ def test_call_action_from_mapping(dev):
 
 
 @pytest.mark.parametrize(
-    "props,included_in_request",
+    ("props", "included_in_request"),
     [
         ({"access": ["read"]}, True),  # read only
         ({"access": ["read", "write"]}, True),  # read-write

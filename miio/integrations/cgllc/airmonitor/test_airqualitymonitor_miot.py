@@ -45,7 +45,7 @@ class DummyAirQualityMonitorCGDN1(DummyMiotDevice, AirQualityMonitorCGDN1):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def airqualitymonitorcgdn1(request):
     request.cls.device = DummyAirQualityMonitorCGDN1()
 

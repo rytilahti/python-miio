@@ -141,7 +141,7 @@ class PhilipsMoonlight(Device):
         values = self.get_properties(properties)
 
         return PhilipsMoonlightStatus(
-            defaultdict(lambda: None, zip(properties, values))
+            defaultdict(lambda: None, zip(properties, values, strict=False))
         )
 
     @command(default_output=format_output("Powering on"))

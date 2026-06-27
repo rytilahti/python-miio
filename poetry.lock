@@ -1983,4 +1983,4 @@ updater = ["netifaces"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "36c6770ec380f4e83d46f0174fcb33e84cef9f6cfbcc3ea060f193bd11e4dec8"
+content-hash = "97b5da356be7bf2bda26df0bf1be53c5e6bbaf7041d3f64fe513b5b44e67182a"

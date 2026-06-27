@@ -82,7 +82,7 @@ class BackupDatabaseReader:
         key = bytes.fromhex(keystring)
         cipher = Cipher(
             algorithms.AES(key),
-            modes.ECB(),  # nosec
+            modes.ECB(),  # noqa: S305
             backend=default_backend(),
         )
         decryptor = cipher.decryptor()

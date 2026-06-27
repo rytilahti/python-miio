@@ -200,7 +200,7 @@ class ChuangmiCamera(Device):
 
         values = self.get_properties(properties)
 
-        return CameraStatus(dict(zip(properties, values)))
+        return CameraStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Power on"))
     def on(self):

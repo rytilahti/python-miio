@@ -125,8 +125,8 @@ class TestViomiDishwasher(TestCase):
         assert self.device._is_running() is True
         assert SystemStatus.ThermistorError in self.state().errors
         assert SystemStatus.InsufficientWaterSoftener in self.state().errors
-        self.assertIsInstance(self.state().air_refresh_interval, int)
-        self.assertIsInstance(self.state().temperature, int)
+        assert isinstance(self.state().air_refresh_interval, int)
+        assert isinstance(self.state().temperature, int)
 
     def test_child_lock(self):
         self.device.on()  # ensure on
@@ -160,14 +160,14 @@ class TestViomiDishwasher(TestCase):
             second=0, microsecond=0
         )
         self.device.schedule(enough_time, Program.Quick)
-        self.assertIsInstance(self.state().schedule, datetime)
+        assert isinstance(self.state().schedule, datetime)
         assert self.state().schedule == enough_time
 
     def test_freshdry_interval(self):
         self.device.on()  # ensure on
         assert self.is_on() is True
 
-        self.assertIsInstance(self.state().air_refresh_interval, int)
+        assert isinstance(self.state().air_refresh_interval, int)
 
         self.device.airrefresh(8)
         assert self.state().air_refresh_interval == 8

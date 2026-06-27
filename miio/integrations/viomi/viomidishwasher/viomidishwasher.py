@@ -273,7 +273,7 @@ class ViomiDishwasher(Device):
 
         values = self.get_properties(properties, max_properties=1)
 
-        return ViomiDishwasherStatus(defaultdict(lambda: None, zip(properties, values)))
+        return ViomiDishwasherStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
 
     # FIXME: Change these to use the ViomiDishwasherStatus once we can query multiple properties at once (or cache?).
     def _is_on(self) -> bool:

@@ -329,7 +329,7 @@ class Device(metaclass=DeviceGroupMeta):
         try:
             act = self.actions()[name]
         except KeyError:
-            raise ValueError(f"Unable to find action '{name}'")
+            raise ValueError(f"Unable to find action '{name}'") from None
 
         if params is None:
             return act.method()
@@ -346,7 +346,7 @@ class Device(metaclass=DeviceGroupMeta):
         try:
             setting = self.settings()[name]
         except KeyError:
-            raise ValueError(f"Unable to find setting '{name}'")
+            raise ValueError(f"Unable to find setting '{name}'") from None
 
         params = params if params is not None else []
 

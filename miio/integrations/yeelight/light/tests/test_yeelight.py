@@ -238,31 +238,44 @@ class TestYeelightLightColor(TestCase):
         assert status.delay_off == 0
         assert status.music_mode is True
         assert len(status.lights) == 1
-        assert status.is_on is False and status.is_on == status.lights[0].is_on
+        assert status.is_on is False
+        assert status.is_on == status.lights[0].is_on
         assert (
             status.brightness == 100
-            and status.brightness == status.lights[0].brightness
+        )
+        assert (
+            status.brightness == status.lights[0].brightness
         )
         assert (
             status.color_mode == YeelightMode.ColorTemperature
-            and status.color_mode == status.lights[0].color_mode
+        )
+        assert (
+            status.color_mode == status.lights[0].color_mode
         )
         assert (
             status.color_temp == 3584
-            and status.color_temp == status.lights[0].color_temp
         )
-        assert status.rgb is None and status.rgb == status.lights[0].rgb
-        assert status.hsv is None and status.hsv == status.lights[0].hsv
+        assert (
+            status.color_temp == status.lights[0].color_temp
+        )
+        assert status.rgb is None
+        assert status.rgb == status.lights[0].rgb
+        assert status.hsv is None
+        assert status.hsv == status.lights[0].hsv
         # following are tested in set mode tests
         # assert status.rgb == 16711680
         # assert status.hsv == (359, 100, 100)
         assert (
             status.color_flowing is False
-            and status.color_flowing == status.lights[0].color_flowing
+        )
+        assert (
+            status.color_flowing == status.lights[0].color_flowing
         )
         assert (
             status.color_flow_params is None
-            and status.color_flow_params == status.lights[0].color_flow_params
+        )
+        assert (
+            status.color_flow_params == status.lights[0].color_flow_params
         )
         # color_flow_params will be tested after future implementation
         # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params
@@ -366,31 +379,44 @@ class TestYeelightLightCeilingV1(TestCase):
         assert status.delay_off == 0
         assert status.music_mode is None
         assert len(status.lights) == 1
-        assert status.is_on is False and status.is_on == status.lights[0].is_on
+        assert status.is_on is False
+        assert status.is_on == status.lights[0].is_on
         assert (
             status.brightness == 100
-            and status.brightness == status.lights[0].brightness
+        )
+        assert (
+            status.brightness == status.lights[0].brightness
         )
         assert (
             status.color_mode == YeelightMode.ColorTemperature
-            and status.color_mode == status.lights[0].color_mode
+        )
+        assert (
+            status.color_mode == status.lights[0].color_mode
         )
         assert (
             status.color_temp == 3584
-            and status.color_temp == status.lights[0].color_temp
         )
-        assert status.rgb is None and status.rgb == status.lights[0].rgb
-        assert status.hsv is None and status.hsv == status.lights[0].hsv
+        assert (
+            status.color_temp == status.lights[0].color_temp
+        )
+        assert status.rgb is None
+        assert status.rgb == status.lights[0].rgb
+        assert status.hsv is None
+        assert status.hsv == status.lights[0].hsv
         # following are tested in set mode tests
         # assert status.rgb == 16711680
         # assert status.hsv == (359, 100, 100)
         assert (
             status.color_flowing is False
-            and status.color_flowing == status.lights[0].color_flowing
+        )
+        assert (
+            status.color_flowing == status.lights[0].color_flowing
         )
         assert (
             status.color_flow_params is None
-            and status.color_flow_params == status.lights[0].color_flow_params
+        )
+        assert (
+            status.color_flow_params == status.lights[0].color_flow_params
         )
         # color_flow_params will be tested after future implementation
         # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params
@@ -450,31 +476,44 @@ class TestYeelightLightCeilingV2(TestCase):
         assert status.delay_off == 0
         assert status.music_mode is None
         assert len(status.lights) == 2
-        assert status.is_on is False and status.is_on == status.lights[0].is_on
+        assert status.is_on is False
+        assert status.is_on == status.lights[0].is_on
         assert (
             status.brightness == 100
-            and status.brightness == status.lights[0].brightness
+        )
+        assert (
+            status.brightness == status.lights[0].brightness
         )
         assert (
             status.color_mode == YeelightMode.ColorTemperature
-            and status.color_mode == status.lights[0].color_mode
+        )
+        assert (
+            status.color_mode == status.lights[0].color_mode
         )
         assert (
             status.color_temp == 3584
-            and status.color_temp == status.lights[0].color_temp
         )
-        assert status.rgb is None and status.rgb == status.lights[0].rgb
-        assert status.hsv is None and status.hsv == status.lights[0].hsv
+        assert (
+            status.color_temp == status.lights[0].color_temp
+        )
+        assert status.rgb is None
+        assert status.rgb == status.lights[0].rgb
+        assert status.hsv is None
+        assert status.hsv == status.lights[0].hsv
         # following are tested in set mode tests
         # assert status.rgb == 16711680
         # assert status.hsv == (359, 100, 100)
         assert (
             status.color_flowing is False
-            and status.color_flowing == status.lights[0].color_flowing
+        )
+        assert (
+            status.color_flowing == status.lights[0].color_flowing
         )
         assert (
             status.color_flow_params is None
-            and status.color_flow_params == status.lights[0].color_flow_params
+        )
+        assert (
+            status.color_flow_params == status.lights[0].color_flow_params
         )
         # color_flow_params will be tested after future implementation
         # assert status.color_flow_params == "0,0,1000,1,16711680,100,1000,1,65280,100,1000,1,255,100" and status.color_flow_params == status.lights[0].color_flow_params

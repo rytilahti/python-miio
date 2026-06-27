@@ -138,7 +138,7 @@ class FanP5(Device):
         properties = AVAILABLE_PROPERTIES[self.model]
         values = self.get_properties(properties, max_properties=15)
 
-        return FanStatusP5(dict(zip(properties, values)))
+        return FanStatusP5(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):

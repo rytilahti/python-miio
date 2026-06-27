@@ -19,14 +19,13 @@ from miio.click_common import (
     validate_token,
 )
 from miio.device import Device, UpdateState
+from miio.discovery import Discovery
 from miio.exceptions import DeviceInfoUnavailableException
 from miio.miioprotocol import MiIOProtocol
 from miio.updater import OneShotServer
 
 from .vacuum import CarpetCleaningMode, Consumable, RoborockVacuum, TimerState
 from .vacuum_tui import VacuumTUI
-
-from miio.discovery import Discovery
 
 _LOGGER = logging.getLogger(__name__)
 pass_dev = click.make_pass_decorator(Device, ensure=True)
