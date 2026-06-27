@@ -199,7 +199,7 @@ class AirQualityMonitor(Device):
             return AirQualityMonitorStatus(defaultdict(lambda: None, values))
         else:
             return AirQualityMonitorStatus(
-                defaultdict(lambda: None, zip(properties, values))
+                defaultdict(lambda: None, zip(properties, values, strict=False))
             )
 
     @command(default_output=format_output("Powering on"))

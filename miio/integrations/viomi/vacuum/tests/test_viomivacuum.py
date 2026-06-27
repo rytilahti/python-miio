@@ -97,9 +97,9 @@ class DummyViomiVacuum(DummyDevice, ViomiVacuum):
         super().__init__(args, kwargs)
 
 
-@pytest.fixture()
+@pytest.fixture
 def dev(request):
-    yield DummyViomiVacuum()
+    return DummyViomiVacuum()
 
 
 class TestViomiVacuumStatus:

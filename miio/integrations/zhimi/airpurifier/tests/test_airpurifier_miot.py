@@ -95,7 +95,7 @@ class DummyAirPurifierMiot(DummyMiotDevice, AirPurifierMiot):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def airpurifier(request):
     request.cls.device = DummyAirPurifierMiot()
 
@@ -243,7 +243,7 @@ class DummyAirPurifierMiotMB4(DummyAirPurifierMiot):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def airpurifierMB4(request):
     request.cls.device = DummyAirPurifierMiotMB4()
 
@@ -313,7 +313,7 @@ class DummyAirPurifierMiotMB5(DummyAirPurifierMiot):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def airpurifierVA2(request):
     request.cls.device = DummyAirPurifierMiotVA2()
 

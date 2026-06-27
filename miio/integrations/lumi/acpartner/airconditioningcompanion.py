@@ -310,13 +310,17 @@ class AirConditioningCompanion(Device):
         """
         try:
             model_bytes = bytes.fromhex(model)
-        except ValueError:
-            raise ValueError("Invalid model. A hexadecimal string must be provided")
+        except ValueError as ex:
+            raise ValueError(
+                "Invalid model. A hexadecimal string must be provided"
+            ) from ex
 
         try:
             code_bytes = bytes.fromhex(code)
-        except ValueError:
-            raise ValueError("Invalid code. A hexadecimal string must be provided")
+        except ValueError as ex:
+            raise ValueError(
+                "Invalid code. A hexadecimal string must be provided"
+            ) from ex
 
         if slot < 0 or slot > 134:
             raise ValueError(f"Invalid slot: {slot}")

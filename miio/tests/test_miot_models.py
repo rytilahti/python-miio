@@ -107,7 +107,7 @@ TYPES_FOR_FORMAT = [
 ]
 
 
-@pytest.mark.parametrize("format,expected_type", TYPES_FOR_FORMAT)
+@pytest.mark.parametrize(("format", "expected_type"), TYPES_FOR_FORMAT)
 def test_format(format, expected_type):
     class Wrapper(BaseModel):
         """Need to wrap as plain string is not valid json."""

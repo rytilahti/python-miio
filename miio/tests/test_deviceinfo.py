@@ -3,7 +3,7 @@ import pytest
 from miio.deviceinfo import DeviceInfo
 
 
-@pytest.fixture()
+@pytest.fixture
 def info():
     """Example response from Xiaomi Smart WiFi Plug (c&p from deviceinfo ctor)."""
     return DeviceInfo(

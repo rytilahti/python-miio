@@ -111,7 +111,7 @@ class AirConditioningCompanionMcn02(Device):
         model: str = MODEL_ACPARTNER_MCN02,
     ) -> None:
         if start_id is None:
-            start_id = random.randint(0, 999)  # nosec
+            start_id = random.randint(0, 999)  # noqa: S311
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
         )

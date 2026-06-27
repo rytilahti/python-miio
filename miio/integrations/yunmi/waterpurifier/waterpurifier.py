@@ -145,7 +145,7 @@ class WaterPurifier(Device):
         _props_per_request = 1
         values = self.get_properties(properties, max_properties=_props_per_request)
 
-        return WaterPurifierStatus(dict(zip(properties, values)))
+        return WaterPurifierStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):

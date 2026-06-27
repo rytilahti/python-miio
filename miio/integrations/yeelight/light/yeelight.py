@@ -326,7 +326,7 @@ class Yeelight(Device):
 
         values = self.get_properties(properties)
 
-        return YeelightStatus(dict(zip(properties, values)))
+        return YeelightStatus(dict(zip(properties, values, strict=False)))
 
     @property
     def color_temperature_range(self) -> ValidSettingRange:

@@ -90,7 +90,9 @@ class Ceil(Device):
         properties = ["power", "bright", "cct", "snm", "dv", "bl", "ac"]
         values = self.get_properties(properties)
 
-        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
+        return CeilStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):

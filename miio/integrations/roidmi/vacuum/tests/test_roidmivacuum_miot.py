@@ -65,7 +65,7 @@ class DummyRoidmiVacuumMiot(DummyMiotDevice, RoidmiVacuumMiot):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def dummyroidmivacuum(request):
     request.cls.device = DummyRoidmiVacuumMiot()
 
@@ -200,7 +200,7 @@ class DummyRoidmiVacuumMiot2(DummyMiotDevice, RoidmiVacuumMiot):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def dummyroidmivacuum2(request):
     request.cls.device = DummyRoidmiVacuumMiot2()
 

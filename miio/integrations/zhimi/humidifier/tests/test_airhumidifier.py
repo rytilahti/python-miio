@@ -102,7 +102,7 @@ class DummyAirHumidifier(DummyDevice, AirHumidifier):
     params=[MODEL_HUMIDIFIER_V1, MODEL_HUMIDIFIER_CA1, MODEL_HUMIDIFIER_CB1]
 )
 def dev(request):
-    yield DummyAirHumidifier(model=request.param)
+    return DummyAirHumidifier(model=request.param)
     # TODO add ability to test on a real device
 
 
@@ -295,7 +295,8 @@ def test_set_dry(dev):
 
 
 @pytest.mark.parametrize(
-    "depth,expected", [(-1, 0), (0, 0), (60, 50), (120, 100), (125, 100), (127, None)]
+    ("depth", "expected"),
+    [(-1, 0), (0, 0), (60, 50), (120, 100), (125, 100), (127, None)],
 )
 def test_water_level(dev, depth, expected):
     """Test the water level conversions."""

@@ -8,13 +8,13 @@ from ..status import GenericMiotStatus
 
 @pytest.fixture(scope="session")
 def mockdev():
-    yield Mock()
+    return Mock()
 
 
 VALID_RESPONSE = {"code": 0, "did": "valid-response", "piid": 1, "siid": 1, "value": 1}
 
 
-@pytest.mark.parametrize("key", ("did", "piid", "siid", "value", "code"))
+@pytest.mark.parametrize("key", ["did", "piid", "siid", "value", "code"])
 def test_response_with_missing_value(key, mockdev, caplog: pytest.LogCaptureFixture):
     """Verify that property responses without necessary keys are ignored."""
     caplog.set_level(logging.DEBUG)
@@ -27,7 +27,7 @@ def test_response_with_missing_value(key, mockdev, caplog: pytest.LogCaptureFixt
     assert len(status.data) == 1
 
 
-@pytest.mark.parametrize("code", (-123, 123))
+@pytest.mark.parametrize("code", [-123, 123])
 def test_response_with_error_codes(code, mockdev, caplog: pytest.LogCaptureFixture):
     caplog.set_level(logging.WARNING)
 

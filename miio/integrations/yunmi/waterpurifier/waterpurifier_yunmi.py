@@ -316,4 +316,4 @@ class WaterPurifierYunmi(Device):
                 val_count,
             )
 
-        return WaterPurifierYunmiStatus(dict(zip(properties, values)))
+        return WaterPurifierYunmiStatus(dict(zip(properties, values, strict=False)))

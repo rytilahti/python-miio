@@ -200,7 +200,7 @@ class TestAirConditioningCompanion(TestCase):
         for args in test_data["test_send_ir_code_ok"]:
             with self.subTest():
                 self.device._reset_state()
-                self.assertTrue(self.device.send_ir_code(*args["in"]))
+                assert self.device.send_ir_code(*args["in"])
                 self.assertSequenceEqual(self.device.get_last_ir_played(), args["out"])
 
         for args in test_data["test_send_ir_code_exception"]:
@@ -214,7 +214,7 @@ class TestAirConditioningCompanion(TestCase):
         for args in test_data["test_send_configuration_ok"]:
             with self.subTest():
                 self.device._reset_state()
-                self.assertTrue(self.device.send_configuration(*args["in"]))
+                assert self.device.send_configuration(*args["in"])
                 self.assertSequenceEqual(self.device.get_last_ir_played(), args["out"])
 
 

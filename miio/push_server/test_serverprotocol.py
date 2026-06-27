@@ -26,7 +26,7 @@ def protocol(mocker, event_loop) -> ServerProtocol:
     proto = ServerProtocol(event_loop, socket, server)
     proto.transport = mocker.Mock()
 
-    yield proto
+    return proto
 
 
 def test_send_ping_ack(protocol: ServerProtocol, mocker):
@@ -114,7 +114,7 @@ def test_datagram_with_known_method(protocol: ServerProtocol, mocker):
 
 
 @pytest.mark.parametrize(
-    "method,err_code", [("unknown_method", ERR_UNSUPPORTED), (None, ERR_INVALID)]
+    ("method", "err_code"), [("unknown_method", ERR_UNSUPPORTED), (None, ERR_INVALID)]
 )
 def test_datagram_with_unknown_method(
     method, err_code, protocol: ServerProtocol, mocker

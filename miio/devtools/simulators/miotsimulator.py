@@ -30,18 +30,18 @@ def create_random(values):
 
     if values["choices"] is not None:
         choices = values["choices"]
-        choice = choices[random.randint(0, len(choices) - 1)]  # nosec
+        choice = choices[random.randint(0, len(choices) - 1)]  # noqa: S311
         _LOGGER.debug("Got enum %r for %s", choice, piid)
         return choice.value
 
     if values["range"] is not None:
         range = values["range"]
-        value = random.randint(range[0], range[1])  # nosec
+        value = random.randint(range[0], range[1])  # noqa: S311
         _LOGGER.debug("Got value %r from %s for piid %s", value, range, piid)
         return value
 
     if values["format"] == bool:
-        value = bool(random.randint(0, 1))  # nosec
+        value = bool(random.randint(0, 1))  # noqa: S311
         _LOGGER.debug("Got bool %r for piid %s", value, piid)
         return value
 
@@ -277,13 +277,13 @@ def miot_simulator(file, model):
             dev = SimulatedDeviceModel.parse_obj(schema)
         except Exception as ex:
             # this is far from optimal, but considering this is a developer tool it can be fixed later
-            fn = f"/tmp/pythonmiio_unparseable_{model}.json"  # nosec
+            fn = f"/tmp/pythonmiio_unparseable_{model}.json"  # noqa: S108
             with open(fn, "w") as f:
                 json.dump(schema, f, indent=4)
             _LOGGER.error("Unable to parse the schema, see %s: %s", fn, ex)
             return
 
     loop = asyncio.get_event_loop()
-    random.seed(1)  # nosec
+    random.seed(1)  # noqa: S311
     loop.run_until_complete(main(dev, model=model))
     loop.run_forever()

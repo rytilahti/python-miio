@@ -64,7 +64,7 @@ updater = ["netifaces"]
 backup_extract = ["android_backup"]
 crcmod = ["crcmod"]
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = ">=6.2.5"
 pytest-cov = "*"
 pytest-mock = "*"
@@ -79,29 +79,6 @@ docformatter = "*"
 mypy = {version = "*", markers = "platform_python_implementation == 'CPython'"}
 coverage = {extras = ["toml"], version = "*"}
 
-
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 88
-forced_separate = "miio.discover"
-known_first_party = "miio"
-known_third_party = [
-  "attr",
-  "click",
-  "construct",
-  "croniter",
-  "cryptography",
-  "netifaces",
-  "platformdirs",
-  "pytest",
-  "pytz",
-  "setuptools",
-  "tqdm",
-  "zeroconf"
-]
 
 
 [tool.coverage.run]
@@ -137,7 +114,14 @@ ignore-path-errors = ["docs/index.rst;D000"]
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["UP", "F401"]
+select = ["UP", "F", "B", "S", "PT", "I"]
+ignore = [
+  "PT011",  # pytest.raises() without match= — too many existing cases to fix at once
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/test_*.py" = ["S101", "S105", "S106", "B018", "B904", "PT009", "PT012", "PT027"]
+"miio/tests/**" = ["S101", "S105", "S106", "B018", "B904", "PT009", "PT012", "PT027"]
 
 [build-system]
 requires = ["poetry-core"]

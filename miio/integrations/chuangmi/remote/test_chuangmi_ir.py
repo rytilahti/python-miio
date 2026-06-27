@@ -64,7 +64,7 @@ class TestChuangmiIr(TestCase):
         for args in test_data["test_raw_ok"]:
             with self.subTest():
                 self.device._reset_state()
-                self.assertTrue(self.device.play_raw(*args["in"]))
+                assert self.device.play_raw(*args["in"])
                 self.assertSequenceEqual(
                     self.device.state["last_ir_played"], args["out"]
                 )
@@ -84,7 +84,7 @@ class TestChuangmiIr(TestCase):
         for args in test_data["test_pronto_ok"]:
             with self.subTest():
                 self.device._reset_state()
-                self.assertTrue(self.device.play_pronto(*args["in"]))
+                assert self.device.play_pronto(*args["in"])
                 self.assertSequenceEqual(
                     self.device.state["last_ir_played"], args["out"]
                 )
@@ -99,7 +99,7 @@ class TestChuangmiIr(TestCase):
                 continue
             with self.subTest():
                 self.device._reset_state()
-                self.assertTrue(self.device.play(*args["in"]))
+                assert self.device.play(*args["in"])
                 self.assertSequenceEqual(
                     self.device.state["last_ir_played"], args["out"]
                 )
@@ -112,7 +112,7 @@ class TestChuangmiIr(TestCase):
             for args in tests:
                 with self.subTest():
                     command = "{}:{}".format(type_, ":".join(map(str, args["in"])))
-                    self.assertTrue(self.device.play(command))
+                    assert self.device.play(command)
                     self.assertSequenceEqual(
                         self.device.state["last_ir_played"], args["out"]
                     )

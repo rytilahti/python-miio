@@ -31,7 +31,7 @@ def validate_ip(ctx, param, value):
         ipaddress.ip_address(value)
         return value
     except ValueError as ex:
-        raise click.BadParameter(f"Invalid IP: {ex}")
+        raise click.BadParameter(f"Invalid IP: {ex}") from ex
 
 
 def validate_token(ctx, param, value):

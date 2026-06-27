@@ -14,7 +14,9 @@ class DummyMiIOProtocol:
         try:
             return self.dummy_device.return_values[command](parameters)
         except KeyError:
-            raise DeviceError({"code": -32601, "message": "Method not found."})
+            raise DeviceError(
+                {"code": -32601, "message": "Method not found."}
+            ) from None
 
 
 class DummyDevice:
@@ -51,7 +53,7 @@ class DummyDevice:
         # TODO: ugly hack to check for pre-existing _model
         if getattr(self, "_model", None) is None:
             self._model = "dummy.model"
-        self.token = "ffffffffffffffffffffffffffffffff"  # nosec
+        self.token = "ffffffffffffffffffffffffffffffff"  # noqa: S105
         self.ip = "192.0.2.1"
 
     def _reset_state(self):

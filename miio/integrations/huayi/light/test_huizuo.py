@@ -4,11 +4,16 @@ import pytest
 
 from miio.tests.dummies import DummyMiotDevice
 
-from .huizuo import MODEL_HUIZUO_FANWY  # Fan model extended
-from .huizuo import MODEL_HUIZUO_FANWY2  # Fan model basic
-from .huizuo import MODEL_HUIZUO_PIS123  # Basic model
-from .huizuo import MODEL_HUIZUO_WYHEAT  # Heater model
-from .huizuo import Huizuo, HuizuoLampFan, HuizuoLampHeater, UnsupportedFeatureException
+from .huizuo import (
+    MODEL_HUIZUO_FANWY,  # Fan model extended
+    MODEL_HUIZUO_FANWY2,  # Fan model basic
+    MODEL_HUIZUO_PIS123,  # Basic model
+    MODEL_HUIZUO_WYHEAT,  # Heater model
+    Huizuo,
+    HuizuoLampFan,
+    HuizuoLampHeater,
+    UnsupportedFeatureException,
+)
 
 _INITIAL_STATE = {
     "power": True,
@@ -63,22 +68,22 @@ class DummyHuizuoHeater(DummyMiotDevice, HuizuoLampHeater):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def huizuo(request):
     request.cls.device = DummyHuizuo()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def huizuo_fan(request):
     request.cls.device = DummyHuizuoFan()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def huizuo_fan2(request):
     request.cls.device = DummyHuizuoFan2()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def huizuo_heater(request):
     request.cls.device = DummyHuizuoHeater()
 

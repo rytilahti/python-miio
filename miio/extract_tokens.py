@@ -34,7 +34,7 @@ def read_android_yeelight(db) -> Iterator[DeviceConfig]:
     devicelist = xml.find(".//set[@name='deviceList']")
     if not devicelist:
         _LOGGER.warning("Unable to find deviceList")
-        return []
+        return
 
     for dev_elem in list(devicelist):
         dev = json.loads(dev_elem.text)
@@ -82,7 +82,7 @@ class BackupDatabaseReader:
         key = bytes.fromhex(keystring)
         cipher = Cipher(
             algorithms.AES(key),
-            modes.ECB(),  # nosec
+            modes.ECB(),  # noqa: S305
             backend=default_backend(),
         )
         decryptor = cipher.decryptor()

@@ -119,7 +119,9 @@ class AirDogX3(Device):
         )
         values = self.get_properties(properties, max_properties=10)
 
-        return AirDogStatus(defaultdict(lambda: None, zip(properties, values)))
+        return AirDogStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):

@@ -246,7 +246,7 @@ class AirFresh(Device):
         values = self.get_properties(properties, max_properties=15)
 
         return AirFreshStatus(
-            defaultdict(lambda: None, zip(properties, values)), self.model
+            defaultdict(lambda: None, zip(properties, values, strict=False)), self.model
         )
 
     @command(default_output=format_output("Powering on"))

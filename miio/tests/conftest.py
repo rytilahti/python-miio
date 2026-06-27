@@ -4,7 +4,7 @@ from ..device import Device
 from ..devicestatus import DeviceStatus, action, sensor, setting
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_status():
     """Fixture for a status class with different sensors and settings."""
 
@@ -34,10 +34,10 @@ def dummy_status():
         def sensor_returning_none(self):
             return None
 
-    yield Status()
+    return Status()
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_device(mocker, dummy_status):
     """Returns a very basic device with patched out I/O and a dummy status."""
 
@@ -55,4 +55,4 @@ def dummy_device(mocker, dummy_status):
     patched_status.__annotations__ = {}
     patched_status.__annotations__["return"] = dummy_status
 
-    yield d
+    return d

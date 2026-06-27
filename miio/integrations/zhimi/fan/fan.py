@@ -260,9 +260,9 @@ class Fan(Device):
 
         # The ZA4 has a countdown timer in minutes
         if self.model in [MODEL_FAN_ZA4]:
-            return FanStatusZA4(dict(zip(properties, values)))
+            return FanStatusZA4(dict(zip(properties, values, strict=False)))
 
-        return FanStatus(dict(zip(properties, values)))
+        return FanStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):
