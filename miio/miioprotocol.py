@@ -35,7 +35,7 @@ class MiIOProtocol:
         lazy_discover: bool = True,
         timeout: int = 5,
         *,
-        handshake_timeout: Optional[int] = None,
+        handshake_timeout: int | None = None,
     ) -> None:
         """Create a :class:`Device` instance.
 
@@ -60,7 +60,7 @@ class MiIOProtocol:
         self.__id = start_id
 
         if handshake_timeout is not None:
-            self._handshake_timeout: Optional[timedelta] = timedelta(
+            self._handshake_timeout: timedelta | None = timedelta(
                 seconds=handshake_timeout
             )
         elif lazy_discover:
@@ -69,7 +69,7 @@ class MiIOProtocol:
             self._handshake_timeout = timedelta(seconds=0)  # every request
 
         self._discovered = False
-        self._last_handshake: Optional[datetime] = None
+        self._last_handshake: datetime | None = None
         # these come from the device, but we initialize them here to make mypy happy
         self._device_ts: datetime = datetime.now(tz=UTC)
         self._device_id = b""
@@ -101,7 +101,7 @@ class MiIOProtocol:
         self._device_id = header.device_id
         self._device_ts = header.ts
         self._discovered = True
-        self._last_handshake = datetime.now(tz=timezone.utc)
+        self._last_handshake = datetime.now(tz=UTC)
 
         if self.debug > 1:
             _LOGGER.debug(m)
@@ -132,7 +132,7 @@ class MiIOProtocol:
         if self._last_handshake is None:
             return True
 
-        elapsed = datetime.now(tz=timezone.utc) - self._last_handshake
+        elapsed = datetime.now(tz=UTC) - self._last_handshake
         return elapsed >= self._handshake_timeout
 
     @staticmethod
