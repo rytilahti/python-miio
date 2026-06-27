@@ -19,15 +19,14 @@ Development environment
 -----------------------
 
 This section will shortly go through how to get you started with a working development environment.
-We use `poetry <https://python-poetry.org/>`__ for managing the dependencies and packaging, so simply execute::
+We use `uv <https://docs.astral.sh/uv>`__ for managing the dependencies and packaging, so simply execute::
 
-    poetry install
+    uv sync
 
-If you were not already inside a virtual environment during the install,
-poetry will create one for you.
-You can execute commands inside this environment by using ``poetry run <command>``,
+uv will create a virtual environment for you automatically.
+You can execute commands inside this environment by using ``uv run <command>``,
 or alternatively,
-enter the virtual environment shell by executing ``poetry shell`` to avoid repeating ``poetry run``.
+activate the virtual environment with ``source .venv/bin/activate`` to avoid repeating ``uv run``.
 
 To verify the installation, you can launch tox_ to run all the checks::
 

@@ -14,30 +14,30 @@ You can install the most recent release using pip:
     pip install python-miio
 
 
-Alternatively, you can clone this repository and use `poetry <https://python-poetry.org>`_ to install the current master:
+Alternatively, you can clone this repository and use `uv <https://docs.astral.sh/uv>`_ to install the current master:
 
 .. code-block:: console
 
     git clone https://github.com/rytilahti/python-miio.git
     cd python-miio/
-    poetry install
+    uv sync
 
 This will install python-miio into a separate virtual environment outside of your regular python installation.
 You can then execute installed programs (like ``miiocli``):
 
 .. code-block:: console
 
-    poetry run miiocli --help
+    uv run miiocli --help
 
 .. tip::
 
     If you want to execute more commands in a row, you can activate the
-    created virtual environment to avoid typing ``poetry run`` for each
+    created virtual environment to avoid typing ``uv run`` for each
     invocation:
 
     .. code-block:: console
 
-        poetry shell
+        source .venv/bin/activate
         miiocli --help
         miiocli discover
 
