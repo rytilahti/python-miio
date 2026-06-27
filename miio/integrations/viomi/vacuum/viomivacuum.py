@@ -687,7 +687,9 @@ class ViomiVacuum(Device):
 
         values = self.get_properties(properties)
 
-        status = ViomiVacuumStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
+        status = ViomiVacuumStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
         status.embed("consumables", self.consumable_status())
         status.embed("dnd", self.dnd_status())
 

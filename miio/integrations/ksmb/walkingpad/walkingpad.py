@@ -121,7 +121,9 @@ class Walkingpad(Device):
         properties_additional = ["power", "mode", "start_speed", "sensitivity"]
         values_additional = self.get_properties(properties_additional, max_properties=1)
 
-        additional_props = dict(zip(properties_additional, values_additional, strict=False))
+        additional_props = dict(
+            zip(properties_additional, values_additional, strict=False)
+        )
         data.update(additional_props)
 
         return WalkingpadStatus(data)

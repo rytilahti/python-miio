@@ -173,7 +173,9 @@ class PowerStrip(Device):
         )
         values = self.get_properties(properties)
 
-        return PowerStripStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
+        return PowerStripStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(click.argument("power", type=bool))
     def set_power(self, power: bool):

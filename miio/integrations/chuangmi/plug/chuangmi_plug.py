@@ -119,7 +119,9 @@ class ChuangmiPlug(Device):
                 properties.append("load_power")
                 values.append(load_power[0] * 0.01)
 
-        return ChuangmiPlugStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
+        return ChuangmiPlugStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):

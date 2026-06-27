@@ -188,7 +188,9 @@ class AirHumidifierJsq(Device):
                 values,
             )
 
-        return AirHumidifierStatus({k: v for k, v in zip(properties, values, strict=False)})
+        return AirHumidifierStatus(
+            {k: v for k, v in zip(properties, values, strict=False)}
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):

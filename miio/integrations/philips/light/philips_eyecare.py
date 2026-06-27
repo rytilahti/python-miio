@@ -104,7 +104,9 @@ class PhilipsEyecare(Device):
         ]
         values = self.get_properties(properties)
 
-        return PhilipsEyecareStatus(defaultdict(lambda: None, zip(properties, values, strict=False)))
+        return PhilipsEyecareStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):

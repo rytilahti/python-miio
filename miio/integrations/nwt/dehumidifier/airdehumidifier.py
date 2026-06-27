@@ -184,7 +184,8 @@ class AirDehumidifier(Device):
         values = self.get_properties(properties, max_properties=1)
 
         return AirDehumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values, strict=False)), self.info()
+            defaultdict(lambda: None, zip(properties, values, strict=False)),
+            self.info(),
         )
 
     @command(default_output=format_output("Powering on"))

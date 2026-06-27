@@ -34,7 +34,7 @@ def read_android_yeelight(db) -> Iterator[DeviceConfig]:
     devicelist = xml.find(".//set[@name='deviceList']")
     if not devicelist:
         _LOGGER.warning("Unable to find deviceList")
-        return []
+        return
 
     for dev_elem in list(devicelist):
         dev = json.loads(dev_elem.text)
