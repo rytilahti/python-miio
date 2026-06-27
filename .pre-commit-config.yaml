@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v6.0.0
+  rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # v6.0.0
   hooks:
   - id: trailing-whitespace
   - id: end-of-file-fixer
@@ -12,14 +12,14 @@ repos:
   - id: check-ast
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.15.20
+  rev: c59bba8fb259db0fec2bbb77ad8ba51ea7341b56  # v0.15.20
   hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix]
     - id: ruff-format
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v2.1.0
+  rev: d2823d321df3af8f878f7ee3414dc94d037145b9  # v2.1.0
   hooks:
   - id: mypy
     additional_dependencies: [types-attrs, types-PyYAML, types-requests, types-pytz, types-croniter, types-freezegun]
