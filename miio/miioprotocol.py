@@ -34,13 +34,25 @@ class MiIOProtocol:
         debug: int = 0,
         lazy_discover: bool = True,
         timeout: int = 5,
+        *,
+        handshake_timeout: int | None = None,
     ) -> None:
         """Create a :class:`Device` instance.
+
+        Some devices require a recent handshake to accept commands, but
+        handshaking before every request adds unnecessary latency. Use
+        handshake_timeout to control how often the handshake is renewed.
 
         :param ip: IP address or a hostname for the device
         :param token: Token used for encryption
         :param start_id: Running message id sent to the device
         :param debug: Wanted debug level
+        :param lazy_discover: If True, only handshake once on first request.
+            If False, handshake before every request. Deprecated in favor of
+            handshake_timeout, which allows finer control.
+        :param handshake_timeout: How many seconds can pass before a new handshake
+            is needed. Set to 0 to handshake before every request. When not set,
+            falls back to the lazy_discover behavior for backward compatibility.
         """
         self.ip = ip
         self.port = 54321
@@ -48,11 +60,20 @@ class MiIOProtocol:
             token = 32 * "0"
         self.token = bytes.fromhex(token)
         self.debug = debug
-        self.lazy_discover = lazy_discover
         self._timeout = timeout
         self.__id = start_id
 
+        if handshake_timeout is not None:
+            self._handshake_timeout: timedelta | None = timedelta(
+                seconds=handshake_timeout
+            )
+        elif lazy_discover:
+            self._handshake_timeout = None  # handshake once, never re-handshake
+        else:
+            self._handshake_timeout = timedelta(seconds=0)  # every request
+
         self._discovered = False
+        self._last_handshake: datetime | None = None
         # these come from the device, but we initialize them here to make mypy happy
         self._device_ts: datetime = datetime.now(tz=UTC)
         self._device_id = b""
@@ -84,6 +105,7 @@ class MiIOProtocol:
         self._device_id = header.device_id
         self._device_ts = header.ts
         self._discovered = True
+        self._last_handshake = datetime.now(tz=UTC)
 
         if self.debug > 1:
             _LOGGER.debug(m)
@@ -95,6 +117,25 @@ class MiIOProtocol:
         )
 
         return m
+
+    def _needs_handshake(self) -> bool:
+        """Return True if a handshake is needed before sending.
+
+        Handshake is required on first contact or when the configured timeout
+        has elapsed since the last handshake. If no timeout is set, handshake
+        only once and never repeat it.
+        """
+        if not self._discovered:
+            return True
+
+        if self._handshake_timeout is None:
+            return False
+
+        if self._last_handshake is None:
+            return True
+
+        elapsed = datetime.now(tz=UTC) - self._last_handshake
+        return elapsed >= self._handshake_timeout
 
     @staticmethod
     def discover(addr: str | None = None, timeout: int = 5) -> Any:
@@ -164,7 +205,7 @@ class MiIOProtocol:
         :raises DeviceException: if an error has occurred during communication.
         """
 
-        if not self.lazy_discover or not self._discovered:
+        if self._needs_handshake():
             self.send_handshake()
 
         request = self._create_request(command, parameters, extra_parameters)
