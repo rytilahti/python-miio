@@ -37,7 +37,6 @@ cryptography = ">=35"
 construct = "^2.10.56"
 zeroconf = "^0"
 attrs = "*"
-pytz = "*"
 platformdirs = "*"
 tqdm = "^4"
 micloud = { version = ">=0.6" }

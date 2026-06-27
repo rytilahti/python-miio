@@ -3,9 +3,9 @@ from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any
 from urllib import parse
+from zoneinfo import ZoneInfo
 
 from croniter import croniter
-from pytz import BaseTzInfo
 
 from miio.device import DeviceStatus
 from miio.devicestatus import sensor, setting
@@ -859,7 +859,7 @@ class Timer(DeviceStatus):
     the creation time.
     """
 
-    def __init__(self, data: list[Any], timezone: BaseTzInfo) -> None:
+    def __init__(self, data: list[Any], timezone: ZoneInfo) -> None:
         # id / timestamp, enabled, ['<cron string>', ['command', 'params']
         # [['1488667794112', 'off', ['49 22 * * 6', ['start_clean', '']]],
         #  ['1488667777661', 'off', ['49 21 * * 3,4,5,6', ['start_clean', '']]
@@ -867,7 +867,7 @@ class Timer(DeviceStatus):
         self.data = data
         self.timezone = timezone
 
-        localized_ts = timezone.localize(self._now())
+        localized_ts = self._now().replace(tzinfo=timezone)
 
         # Initialize croniter to cause an exception on invalid entries (#847)
         self.croniter = croniter(self.cron, start_time=localized_ts)

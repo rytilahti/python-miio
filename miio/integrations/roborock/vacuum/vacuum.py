@@ -9,9 +9,9 @@ import pathlib
 import time
 from enum import Enum
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import click
-import pytz
 from platformdirs import user_cache_dir
 
 from miio.click_common import (
@@ -564,7 +564,7 @@ class RoborockVacuum(Device):
         if not res:
             return timers
 
-        timezone = pytz.timezone(self.timezone())
+        timezone = ZoneInfo(self.timezone())
         for rec in res:
             try:
                 timers.append(Timer(rec, timezone=timezone))
@@ -781,7 +781,7 @@ class RoborockVacuum(Device):
         """Configure the wifi settings."""
         extra_params = {}
         if timezone is not None:
-            now = datetime.datetime.now(pytz.timezone(timezone))
+            now = datetime.datetime.now(ZoneInfo(timezone))
             offset_as_float = now.utcoffset().total_seconds() / 60 / 60
             extra_params["tz"] = timezone
             extra_params["gmt_offset"] = offset_as_float

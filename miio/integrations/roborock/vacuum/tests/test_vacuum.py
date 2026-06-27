@@ -1,6 +1,7 @@
 import datetime
 from unittest import TestCase
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -16,7 +17,7 @@ from ..vacuum import (
     MopMode,
     WaterFlow,
 )
-from ..vacuumcontainers import VacuumStatus
+from ..vacuumcontainers import Timer, VacuumStatus
 
 
 class DummyRoborockProtocol(DummyMiIOProtocol):
@@ -507,6 +508,63 @@ class TestVacuum(TestCase):
 
     def test_set_waterflow(self):
         self.device.set_waterflow(WaterFlow.High)
+
+    def test_timer_with_timezone(self):
+        tz = ZoneInfo("Europe/Berlin")
+        data = ["1488667794112", "on", ["30 8 * * 1,2,3,4,5", ["start_clean", ""]]]
+        timer = Timer(data, timezone=tz)
+        assert timer.id == "1488667794112"
+        assert timer.enabled is True
+        assert timer.cron == "30 8 * * 1,2,3,4,5"
+        assert timer.next_schedule.tzinfo is not None
+
+    def test_timer_disabled(self):
+        tz = ZoneInfo("UTC")
+        data = ["1488667777661", "off", ["49 21 * * 3,4,5,6", ["start_clean", ""]]]
+        timer = Timer(data, timezone=tz)
+        assert timer.enabled is False
+
+    def test_timer_ts(self):
+        tz = ZoneInfo("UTC")
+        data = ["1488667794112", "on", ["0 0 * * *", ["start_clean", ""]]]
+        timer = Timer(data, timezone=tz)
+        assert timer.ts is not None
+
+    def test_timer_ts_non_numeric_id(self):
+        tz = ZoneInfo("UTC")
+        data = ["valetudo-timer", "on", ["0 0 * * *", ["start_clean", ""]]]
+        timer = Timer(data, timezone=tz)
+        assert timer.ts is None
+
+    def test_timer_list(self):
+        timer_data = [
+            ["1488667794112", "on", ["30 8 * * 1,2,3,4,5", ["start_clean", ""]]],
+            ["1488667777661", "off", ["49 21 * * 3,4,5,6", ["start_clean", ""]]],
+        ]
+        with patch.object(self.device, "send") as mock_send:
+            mock_send.side_effect = lambda cmd, *a, **kw: (
+                [{"olson": "Europe/Berlin", "posix": "CET-1CEST,M3.5.0,M10.5.0/3"}]
+                if cmd == "get_timezone"
+                else timer_data
+            )
+            timers = self.device.timer()
+        assert len(timers) == 2
+        assert timers[0].enabled is True
+        assert timers[1].enabled is False
+
+    def test_configure_wifi_with_timezone(self):
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_send:
+            self.device.configure_wifi("MySSID", "secret", timezone="UTC")
+            call_params = mock_send.call_args[0][1]
+        assert call_params["tz"] == "UTC"
+        assert call_params["gmt_offset"] == 0.0
+
+    def test_configure_wifi_with_offset_timezone(self):
+        with patch.object(self.device, "send", return_value=["ok"]) as mock_send:
+            self.device.configure_wifi("MySSID", "secret", timezone="Asia/Shanghai")
+            call_params = mock_send.call_args[0][1]
+        assert call_params["tz"] == "Asia/Shanghai"
+        assert call_params["gmt_offset"] == 8.0
 
 
 class DummyVacuumS7(DummyVacuum):
