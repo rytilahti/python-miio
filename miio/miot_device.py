@@ -1,6 +1,5 @@
 import logging
 from enum import Enum, member
-from functools import partial
 from typing import Any
 
 import click
@@ -12,7 +11,6 @@ from .exceptions import DeviceException
 _LOGGER = logging.getLogger(__name__)
 
 
-# partial is required here for str2bool, see https://stackoverflow.com/a/40339397
 class MiotValueType(Enum):
     def _str2bool(x):
         """Helper to convert string to boolean."""
@@ -20,7 +18,7 @@ class MiotValueType(Enum):
 
     Int = int
     Float = float
-    Bool = member(partial(_str2bool))
+    Bool = member(_str2bool)
     Str = str
 
 
