@@ -5,6 +5,7 @@ from typing import Any, Optional
 import click
 
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,21 +70,30 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Air Humidifier
 
     @property
+    @setting(name="Power", setter_name="on", icon="mdi:power")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.data["power"]
 
     @property
+    @sensor(name="Power", icon="mdi:power")
     def power(self) -> str:
         """Return power state."""
         return "on" if self.is_on else "off"
 
     @property
+    @sensor(name="Error", icon="mdi:alert-circle")
     def error(self) -> int:
         """Return error state."""
         return self.data["fault"]
 
     @property
+    @setting(
+        name="Mode",
+        setter_name="set_mode",
+        icon="mdi:fan",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Return current operation mode."""
 
@@ -96,6 +106,14 @@ class AirHumidifierJsqsStatus(DeviceStatus):
         return mode
 
     @property
+    @setting(
+        name="Target Humidity",
+        setter_name="set_target_humidity",
+        unit="%",
+        icon="mdi:water-percent",
+        min_value=40,
+        max_value=80,
+    )
     def target_humidity(self) -> Optional[int]:
         """Return target humidity."""
         return self.data.get("target_humidity")
@@ -103,11 +121,13 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Environment
 
     @property
+    @sensor(name="Relative Humidity", unit="%", device_class="humidity")
     def relative_humidity(self) -> Optional[int]:
         """Return current humidity."""
         return self.data.get("relative_humidity")
 
     @property
+    @sensor(name="Temperature", unit="C", device_class="temperature")
     def temperature(self) -> Optional[float]:
         """Return current temperature, if available."""
         return self.data.get("temperature")
@@ -115,6 +135,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Alarm
 
     @property
+    @setting(name="Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> Optional[bool]:
         """Return True if buzzer is on."""
         return self.data.get("buzzer")
@@ -122,6 +143,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Indicator Light
 
     @property
+    @setting(name="LED Light", setter_name="set_light", icon="mdi:led-outline")
     def led_light(self) -> Optional[bool]:
         """Return status of the LED."""
         return self.data.get("led_light")
@@ -129,16 +151,23 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Other
 
     @property
+    @sensor(name="Tank Filed", icon="mdi:cup-water")
     def tank_filed(self) -> Optional[bool]:
         """Return the tank filed."""
         return self.data.get("tank_filed")
 
     @property
+    @sensor(name="Water Shortage Fault", icon="mdi:water-off")
     def water_shortage_fault(self) -> Optional[bool]:
         """Return water shortage fault."""
         return self.data.get("water_shortage_fault")
 
     @property
+    @setting(
+        name="Overwet Protect",
+        setter_name="set_overwet_protect",
+        icon="mdi:shield-check",
+    )
     def overwet_protect(self) -> Optional[bool]:
         """Return True if overwet mode is active."""
         return self.data.get("overwet_protect")

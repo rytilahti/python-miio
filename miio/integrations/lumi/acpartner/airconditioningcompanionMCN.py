@@ -5,6 +5,7 @@ from typing import Any, Optional
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,21 +45,30 @@ class AirConditioningCompanionStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Load Power", unit="W", icon="mdi:flash", device_class="power")
     def load_power(self) -> int:
         """Current power load of the air conditioner."""
         return int(self.data[-1])
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Current power state."""
         return self.data[0]
 
     @property
+    @setting("Power", setter_name="on", icon="mdi:power")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        "Mode",
+        setter_name="send_command",
+        icon="mdi:air-conditioner",
+        choices=OperationMode,
+    )
     def mode(self) -> Optional[OperationMode]:
         """Current operation mode."""
         try:
@@ -68,6 +78,13 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @setting(
+        "Target Temperature",
+        setter_name="send_command",
+        unit="°C",
+        icon="mdi:thermometer",
+        device_class="temperature",
+    )
     def target_temperature(self) -> Optional[int]:
         """Target temperature."""
         try:
@@ -76,6 +93,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @setting("Fan Speed", setter_name="send_command", icon="mdi:fan", choices=FanSpeed)
     def fan_speed(self) -> Optional[FanSpeed]:
         """Current fan speed."""
         try:
@@ -85,6 +103,12 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
+    @setting(
+        "Swing Mode",
+        setter_name="send_command",
+        icon="mdi:arrow-oscillating",
+        choices=SwingMode,
+    )
     def swing_mode(self) -> Optional[SwingMode]:
         """Current swing mode."""
         try:

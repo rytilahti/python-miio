@@ -4,6 +4,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,17 +26,19 @@ class WifiRepeaterStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Access Policy", icon="mdi:security")
     def access_policy(self) -> int:
         """Access policy of the associated stations."""
         return self.data["sta"]["access_policy"]
 
     @property
+    @sensor("Associated Stations", icon="mdi:devices")
     def associated_stations(self) -> dict:
         """List of associated stations."""
         return self.data["mat"]
 
     def __repr__(self) -> str:
-        s = "<WifiRepeaterStatus access_policy=%s, " "associated_stations=%s>" % (
+        s = "<WifiRepeaterStatus access_policy=%s, associated_stations=%s>" % (
             self.access_policy,
             len(self.associated_stations),
         )
@@ -51,14 +54,17 @@ class WifiRepeaterConfiguration(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("SSID", icon="mdi:wifi")
     def ssid(self) -> str:
         return self.data["ssid"]
 
     @property
+    @sensor("Password", icon="mdi:lock")
     def password(self) -> str:
         return self.data["pwd"]
 
     @property
+    @sensor("SSID Hidden", icon="mdi:wifi-off")
     def ssid_hidden(self) -> bool:
         return self.data["hidden"] == 1
 

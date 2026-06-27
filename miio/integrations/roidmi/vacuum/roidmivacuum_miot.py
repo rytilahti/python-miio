@@ -9,6 +9,7 @@ from enum import Enum
 import click
 
 from miio.click_common import EnumType, command
+from miio.devicestatus import sensor, setting
 from miio.integrations.roborock.vacuum.vacuumcontainers import (  # TODO: remove roborock import
     DNDStatus,
 )
@@ -224,16 +225,19 @@ class RoidmiVacuumStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Battery", unit="%", device_class="battery", icon="mdi:battery")
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return self.data["battery_level"]
 
     @property
+    @sensor("Error Code", icon="mdi:alert-circle")
     def error_code(self) -> int:
         """Error code as returned by the device."""
         return int(self.data["error_code"])
 
     @property
+    @sensor("Error", icon="mdi:alert-circle")
     def error(self) -> str:
         """Human readable error description, see also :func:`error_code`."""
         try:
@@ -242,6 +246,7 @@ class RoidmiVacuumStatus(DeviceStatus):
             return "Definition missing for error %s" % self.error_code
 
     @property
+    @sensor("Charging State", icon="mdi:battery-charging")
     def charging_state(self) -> ChargingState:
         """Charging state (Charging/Discharging)"""
         try:
@@ -251,6 +256,7 @@ class RoidmiVacuumStatus(DeviceStatus):
             return ChargingState.Unknown
 
     @property
+    @sensor("Sweep Mode", icon="mdi:robot-vacuum")
     def sweep_mode(self) -> SweepMode:
         """Sweep mode point/area/total etc."""
         try:
@@ -260,6 +266,7 @@ class RoidmiVacuumStatus(DeviceStatus):
             return SweepMode.Unknown
 
     @property
+    @setting("Fan Speed", setter_name="set_fanspeed", choices=FanSpeed, icon="mdi:fan")
     def fan_speed(self) -> FanSpeed:
         """Current fan speed."""
         try:
@@ -269,6 +276,12 @@ class RoidmiVacuumStatus(DeviceStatus):
             return FanSpeed.Unknown
 
     @property
+    @setting(
+        "Sweep Type",
+        setter_name="set_sweep_type",
+        choices=SweepType,
+        icon="mdi:robot-vacuum",
+    )
     def sweep_type(self) -> SweepType:
         """Current sweep type sweep/mop/sweep&mop."""
         try:
@@ -278,6 +291,12 @@ class RoidmiVacuumStatus(DeviceStatus):
             return SweepType.Unknown
 
     @property
+    @setting(
+        "Path Mode",
+        setter_name="set_path_mode",
+        choices=PathMode,
+        icon="mdi:map-marker-path",
+    )
     def path_mode(self) -> PathMode:
         """Current path-mode:  normal/y-mopping etc."""
         try:
@@ -287,11 +306,20 @@ class RoidmiVacuumStatus(DeviceStatus):
             return PathMode.Unknown
 
     @property
+    @sensor("Mop Attached", icon="mdi:robot-vacuum-variant")
     def is_mop_attached(self) -> bool:
         """Return True if mop is attached."""
         return self.data["mop_present"]
 
     @property
+    @setting(
+        "Dust Collection Frequency",
+        setter_name="set_dust_collection_frequency",
+        min_value=0,
+        max_value=3,
+        step=1,
+        icon="mdi:delete-variant",
+    )
     def dust_collection_frequency(self) -> int:
         """Frequency for emptying the dust bin.
 
@@ -300,6 +328,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["work_station_freq"]
 
     @property
+    @setting("Timing", setter_name="set_timing", icon="mdi:clock-outline")
     def timing(self) -> str:
         """Repeated cleaning.
 
@@ -337,6 +366,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["timing"]
 
     @property
+    @setting("Carpet Mode", setter_name="set_carpet_mode", icon="mdi:rug")
     def carpet_mode(self) -> bool:
         """Auto boost on carpet."""
         return self.data["auto_boost"]
@@ -363,11 +393,18 @@ class RoidmiVacuumStatus(DeviceStatus):
         )
 
     @property
+    @sensor("DND Status", icon="mdi:minus-circle")
     def dnd_status(self) -> DNDStatus:
         """Returns do-not-disturb status."""
         return self._parse_forbid_mode(self.data["forbid_mode"])
 
     @property
+    @setting(
+        "Water Level",
+        setter_name="set_water_level",
+        choices=WaterLevel,
+        icon="mdi:water",
+    )
     def water_level(self) -> WaterLevel:
         """Get current water level."""
         try:
@@ -377,32 +414,42 @@ class RoidmiVacuumStatus(DeviceStatus):
             return WaterLevel.Unknown
 
     @property
+    @setting("Double Clean", setter_name="set_double_clean", icon="mdi:refresh")
     def double_clean(self) -> bool:
         """Is double clean enabled."""
         return self.data["double_clean"]
 
     @property
+    @setting("LED", setter_name="set_led", icon="mdi:led-on")
     def led(self) -> bool:
         """Return True if led/display on vaccum is on."""
         return self.data["led_switch"]
 
     @property
+    @setting(
+        "Lidar Collision Sensor",
+        setter_name="set_lidar_collision_sensor",
+        icon="mdi:radar",
+    )
     def is_lidar_collision_sensor(self) -> bool:
         """When ON, the robot will use lidar as the main detection sensor to help reduce
         collisions."""
         return self.data["lidar_collision"]
 
     @property
+    @sensor("Station Key", icon="mdi:gesture-tap-button")
     def station_key(self) -> bool:
         """When ON: long press the display will turn on dust collection."""
         return self.data["station_key"]
 
     @property
+    @setting("Station LED", setter_name="set_station_led", icon="mdi:led-on")
     def station_led(self) -> bool:
         """Return if station display is on."""
         return self.data["station_led"]
 
     @property
+    @sensor("Current Audio", icon="mdi:account-voice")
     def current_audio(self) -> str:
         """Current voice setting.
 
@@ -411,21 +458,25 @@ class RoidmiVacuumStatus(DeviceStatus):
         return self.data["current_audio"]
 
     @property
+    @sensor("Clean Time", icon="mdi:timer-outline")
     def clean_time(self) -> timedelta:
         """Time used for cleaning (if finished, shows how long it took)."""
         return timedelta(seconds=self.data["clean_time_sec"])
 
     @property
+    @sensor("Clean Area", unit="m²", icon="mdi:texture-box")
     def clean_area(self) -> int:
         """Cleaned area in m2."""
         return self.data["clean_area"]
 
     @property
+    @sensor("State Code", icon="mdi:robot-vacuum")
     def state_code(self) -> int:
         """State code as returned by the device."""
         return int(self.data["state"])
 
     @property
+    @sensor("State", icon="mdi:robot-vacuum")
     def state(self) -> RoidmiState:
         """Human readable state description, see also :func:`state_code`."""
         try:
@@ -435,26 +486,39 @@ class RoidmiVacuumStatus(DeviceStatus):
             return RoidmiState.Unknown
 
     @property
+    @setting(
+        "Volume",
+        setter_name="set_sound_volume",
+        unit="%",
+        min_value=0,
+        max_value=100,
+        step=1,
+        icon="mdi:volume-high",
+    )
     def volume(self) -> int:
         """Return device sound volumen level."""
         return self.data["volume"]
 
     @property
+    @setting("Muted", setter_name="set_sound_muted", icon="mdi:volume-off")
     def is_muted(self) -> bool:
         """True if device is muted."""
         return bool(self.data["mute"])
 
     @property
+    @sensor("Is Paused", icon="mdi:pause-circle")
     def is_paused(self) -> bool:
         """Return True if vacuum is paused."""
         return self.state in [RoidmiState.Paused, RoidmiState.FindChargerPause]
 
     @property
+    @sensor("Is On", icon="mdi:robot-vacuum")
     def is_on(self) -> bool:
         """True if device is currently cleaning in any mode."""
         return self.state == RoidmiState.Sweeping
 
     @property
+    @sensor("Got Error", icon="mdi:alert-circle")
     def got_error(self) -> bool:
         """True if an error has occurred."""
         return self.error_code != 0
@@ -467,16 +531,19 @@ class RoidmiCleaningSummary(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Total Duration", icon="mdi:timer-outline")
     def total_duration(self) -> timedelta:
         """Total cleaning duration."""
         return timedelta(seconds=self.data["total_clean_time_sec"])
 
     @property
+    @sensor("Total Area", unit="m²", icon="mdi:texture-box")
     def total_area(self) -> int:
         """Total cleaned area."""
         return self.data["total_clean_areas"]
 
     @property
+    @sensor("Count", icon="mdi:counter")
     def count(self) -> int:
         """Number of cleaning runs."""
         return self.data["clean_counts"]
@@ -500,16 +567,19 @@ class RoidmiConsumableStatus(DeviceStatus):
         return original_total * (1 - remaning_fraction)
 
     @property
+    @sensor("Filter Usage", icon="mdi:filter-outline")
     def filter(self) -> timedelta:
         """Filter usage time."""
         return self._calcUsageTime(self.filter_left, self.data["filter_life_level"])
 
     @property
+    @sensor("Filter Left", icon="mdi:filter-outline")
     def filter_left(self) -> timedelta:
         """How long until the filter should be changed."""
         return timedelta(minutes=self.data["filter_left_minutes"])
 
     @property
+    @sensor("Main Brush Usage", icon="mdi:brush")
     def main_brush(self) -> timedelta:
         """Main brush usage time."""
         return self._calcUsageTime(
@@ -517,11 +587,13 @@ class RoidmiConsumableStatus(DeviceStatus):
         )
 
     @property
+    @sensor("Main Brush Left", icon="mdi:brush")
     def main_brush_left(self) -> timedelta:
         """How long until the main brush should be changed."""
         return timedelta(minutes=self.data["main_brush_left_minutes"])
 
     @property
+    @sensor("Side Brush Usage", icon="mdi:brush")
     def side_brush(self) -> timedelta:
         """Main brush usage time."""
         return self._calcUsageTime(
@@ -529,11 +601,13 @@ class RoidmiConsumableStatus(DeviceStatus):
         )
 
     @property
+    @sensor("Side Brush Left", icon="mdi:brush")
     def side_brush_left(self) -> timedelta:
         """How long until the side brushes should be changed."""
         return timedelta(minutes=self.data["side_brushes_left_minutes"])
 
     @property
+    @sensor("Sensor Dirty", icon="mdi:eye-off")
     def sensor_dirty(self) -> timedelta:
         """Return time since last sensor clean."""
         return self._calcUsageTime(
@@ -541,6 +615,7 @@ class RoidmiConsumableStatus(DeviceStatus):
         )
 
     @property
+    @sensor("Sensor Dirty Left", icon="mdi:eye-off")
     def sensor_dirty_left(self) -> timedelta:
         """How long until the sensors should be cleaned."""
         return timedelta(minutes=self.data["sensor_dirty_time_left_minutes"])

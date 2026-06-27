@@ -5,6 +5,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command
+from miio.devicestatus import sensor
 
 
 class HourlySystem(enum.Enum):
@@ -36,15 +37,18 @@ class Nightmode(DeviceStatus):
         self._end = data[2]
 
     @property
+    @sensor("Enabled", icon="mdi:alarm")
     def enabled(self) -> bool:
         return self._enabled
 
     @property
-    def start(self):
+    @sensor("Start Time", icon="mdi:clock-start")
+    def start(self) -> str:
         return self._start
 
     @property
-    def end(self):
+    @sensor("End Time", icon="mdi:clock-end")
+    def end(self) -> str:
         return self._end
 
 

@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,41 +46,71 @@ class FanLeshowStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] == 1 else "off"
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.data["power"] == 1
 
     @property
+    @setting(
+        "Mode",
+        setter_name="set_mode",
+        icon="mdi:fan",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Operation mode."""
         return OperationMode(self.data["mode"])
 
     @property
+    @setting(
+        "Speed",
+        setter_name="set_speed",
+        icon="mdi:speedometer",
+        unit="%",
+        min_value=0,
+        max_value=100,
+        step=1,
+    )
     def speed(self) -> int:
         """Speed of the fan in percent."""
         return self.data["blow"]
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["sound"] == 1
 
     @property
+    @setting("Oscillate", setter_name="set_oscillate", icon="mdi:rotate-3d-variant")
     def oscillate(self) -> bool:
         """True if oscillation is enabled."""
         return self.data["yaw"] == 1
 
     @property
+    @setting(
+        "Delay Off Countdown",
+        setter_name="delay_off",
+        icon="mdi:timer",
+        device_class="duration",
+        unit="min",
+        min_value=0,
+        max_value=540,
+        step=1,
+    )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""
         return self.data["timer"]
 
     @property
+    @sensor("Error Detected", icon="mdi:alert-circle")
     def error_detected(self) -> bool:
         """True if a fault was detected."""
         return self.data["fault"] == 1

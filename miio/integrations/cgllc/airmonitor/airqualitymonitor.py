@@ -6,6 +6,7 @@ import click
 
 from miio.click_common import command, format_output
 from miio.device import Device, DeviceStatus
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -58,16 +59,19 @@ class AirQualityMonitorStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> Optional[str]:
         """Current power state."""
         return self.data.get("power")
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """Return True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @sensor("USB Power", icon="mdi:usb")
     def usb_power(self) -> Optional[bool]:
         """Return True if the device's usb is on."""
         if "usb_state" in self.data and self.data["usb_state"] is not None:
@@ -75,16 +79,19 @@ class AirQualityMonitorStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("AQI", icon="mdi:air-filter")
     def aqi(self) -> Optional[int]:
         """Air quality index value (0..600)."""
         return self.data.get("aqi")
 
     @property
+    @sensor("Battery", unit="%", device_class="battery", icon="mdi:battery")
     def battery(self) -> Optional[int]:
         """Current battery level (0..100)."""
         return self.data.get("battery")
 
     @property
+    @setting("Display Clock", setter_name="set_display_clock", icon="mdi:clock-outline")
     def display_clock(self) -> Optional[bool]:
         """Display a clock instead the AQI."""
         if "time_state" in self.data and self.data["time_state"] is not None:
@@ -92,6 +99,7 @@ class AirQualityMonitorStatus(DeviceStatus):
         return None
 
     @property
+    @setting("Night Mode", setter_name="set_night_mode", icon="mdi:weather-night")
     def night_mode(self) -> Optional[bool]:
         """Return True if the night mode is on."""
         if "night_state" in self.data and self.data["night_state"] is not None:
@@ -99,46 +107,67 @@ class AirQualityMonitorStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Night Time Begin", icon="mdi:clock-start")
     def night_time_begin(self) -> Optional[str]:
         """Return the begin of the night time."""
         return self.data.get("night_beg_time")
 
     @property
+    @sensor("Night Time End", icon="mdi:clock-end")
     def night_time_end(self) -> Optional[str]:
         """Return the end of the night time."""
         return self.data.get("night_end_time")
 
     @property
+    @sensor("Sensor State", icon="mdi:eye")
     def sensor_state(self) -> Optional[str]:
         """Sensor state."""
         return self.data.get("sensor_state")
 
     @property
+    @sensor(
+        "CO2",
+        unit="ppm",
+        device_class="carbon_dioxide",
+        icon="mdi:molecule-co2",
+    )
     def co2(self) -> Optional[int]:
         """Return co2 value (400...9999ppm)."""
         return self.data.get("co2")
 
     @property
+    @sensor(
+        "CO2e",
+        unit="ppm",
+        device_class="carbon_dioxide",
+        icon="mdi:molecule-co2",
+    )
     def co2e(self) -> Optional[int]:
         """Return co2e value (400...9999ppm)."""
         return self.data.get("co2e")
 
     @property
+    @sensor("Humidity", unit="%", device_class="humidity", icon="mdi:water-percent")
     def humidity(self) -> Optional[float]:
         """Return humidity value (0...100%)."""
         return self.data.get("humidity")
 
     @property
+    @sensor("PM2.5", unit="μg/m³", device_class="pm25", icon="mdi:blur")
     def pm25(self) -> Optional[float]:
         """Return pm2.5 value (0...999μg/m³)."""
         return self.data.get("pm25")
 
     @property
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> Optional[float]:
         """Return temperature value (-10...50°C)."""
         return self.data.get("temperature")
 
     @property
+    @sensor("TVOC", icon="mdi:cloud")
     def tvoc(self) -> Optional[int]:
         """Return tvoc value."""
         return self.data.get("tvoc")

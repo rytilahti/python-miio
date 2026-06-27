@@ -4,6 +4,7 @@ from typing import Any
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ class OperationStatus(DeviceStatus):
         ]
 
     @property
+    @sensor("Errors", icon="mdi:alert-circle")
     def errors(self) -> list:
         return self.err_list
 
@@ -119,121 +121,147 @@ class WaterPurifierYunmiStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Operation Status", icon="mdi:information-outline")
     def operation_status(self) -> OperationStatus:
         """Current operation status."""
         return OperationStatus(self.data["run_status"])
 
     @property
+    @sensor("Filter 1 Life Total", icon="mdi:filter-outline")
     def filter1_life_total(self) -> timedelta:
         """Filter1 total available time in hours."""
         return timedelta(hours=self.data["f1_totaltime"])
 
     @property
+    @sensor("Filter 1 Life Used", icon="mdi:filter-outline")
     def filter1_life_used(self) -> timedelta:
         """Filter1 used time in hours."""
         return timedelta(hours=self.data["f1_usedtime"])
 
     @property
+    @sensor("Filter 1 Life Remaining", icon="mdi:filter-outline")
     def filter1_life_remaining(self) -> timedelta:
         """Filter1 remaining time in hours."""
         return self.filter1_life_total - self.filter1_life_used
 
     @property
+    @sensor("Filter 1 Flow Total", unit="L", icon="mdi:water")
     def filter1_flow_total(self) -> int:
         """Filter1 total available flow in Metric Liter (L)."""
         return self.data["f1_totalflow"]
 
     @property
+    @sensor("Filter 1 Flow Used", unit="L", icon="mdi:water")
     def filter1_flow_used(self) -> int:
         """Filter1 used flow in Metric Liter (L)."""
         return self.data["f1_usedflow"]
 
     @property
+    @sensor("Filter 1 Flow Remaining", unit="L", icon="mdi:water")
     def filter1_flow_remaining(self) -> int:
         """Filter1 remaining flow in Metric Liter (L)."""
         return self.filter1_flow_total - self.filter1_flow_used
 
     @property
+    @sensor("Filter 2 Life Total", icon="mdi:filter-outline")
     def filter2_life_total(self) -> timedelta:
         """Filter2 total available time in hours."""
         return timedelta(hours=self.data["f2_totaltime"])
 
     @property
+    @sensor("Filter 2 Life Used", icon="mdi:filter-outline")
     def filter2_life_used(self) -> timedelta:
         """Filter2 used time in hours."""
         return timedelta(hours=self.data["f2_usedtime"])
 
     @property
+    @sensor("Filter 2 Life Remaining", icon="mdi:filter-outline")
     def filter2_life_remaining(self) -> timedelta:
         """Filter2 remaining time in hours."""
         return self.filter2_life_total - self.filter2_life_used
 
     @property
+    @sensor("Filter 2 Flow Total", unit="L", icon="mdi:water")
     def filter2_flow_total(self) -> int:
         """Filter2 total available flow in Metric Liter (L)."""
         return self.data["f2_totalflow"]
 
     @property
+    @sensor("Filter 2 Flow Used", unit="L", icon="mdi:water")
     def filter2_flow_used(self) -> int:
         """Filter2 used flow in Metric Liter (L)."""
         return self.data["f2_usedflow"]
 
     @property
+    @sensor("Filter 2 Flow Remaining", unit="L", icon="mdi:water")
     def filter2_flow_remaining(self) -> int:
         """Filter2 remaining flow in Metric Liter (L)."""
         return self.filter2_flow_total - self.filter2_flow_used
 
     @property
+    @sensor("Filter 3 Life Total", icon="mdi:filter-outline")
     def filter3_life_total(self) -> timedelta:
         """Filter3 total available time in hours."""
         return timedelta(hours=self.data["f3_totaltime"])
 
     @property
+    @sensor("Filter 3 Life Used", icon="mdi:filter-outline")
     def filter3_life_used(self) -> timedelta:
         """Filter3 used time in hours."""
         return timedelta(hours=self.data["f3_usedtime"])
 
     @property
+    @sensor("Filter 3 Life Remaining", icon="mdi:filter-outline")
     def filter3_life_remaining(self) -> timedelta:
         """Filter3 remaining time in hours."""
         return self.filter3_life_total - self.filter3_life_used
 
     @property
+    @sensor("Filter 3 Flow Total", unit="L", icon="mdi:water")
     def filter3_flow_total(self) -> int:
         """Filter3 total available flow in Metric Liter (L)."""
         return self.data["f3_totalflow"]
 
     @property
+    @sensor("Filter 3 Flow Used", unit="L", icon="mdi:water")
     def filter3_flow_used(self) -> int:
         """Filter3 used flow in Metric Liter (L)."""
         return self.data["f3_usedflow"]
 
     @property
+    @sensor("Filter 3 Flow Remaining", unit="L", icon="mdi:water")
     def filter3_flow_remaining(self) -> int:
         """Filter1 remaining flow in Metric Liter (L)."""
         return self.filter3_flow_total - self.filter3_flow_used
 
     @property
+    @sensor("TDS In", unit="ppm", icon="mdi:water-check")
     def tds_in(self) -> int:
         """TDS value of input water."""
         return self.data["tds_in"]
 
     @property
+    @sensor("TDS Out", unit="ppm", icon="mdi:water-check")
     def tds_out(self) -> int:
         """TDS value of output water."""
         return self.data["tds_out"]
 
     @property
+    @sensor("Rinse", icon="mdi:water-sync")
     def rinse(self) -> bool:
         """True if the device is rinsing."""
         return self.data["rinse"]
 
     @property
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> int:
         """Current water temperature in Celsius."""
         return self.data["temperature"]
 
     @property
+    @sensor("TDS Warning Threshold", unit="ppm", icon="mdi:water-alert")
     def tds_warn_thd(self) -> int:
         """TDS warning threshold."""
         return self.data["tds_warn_thd"]

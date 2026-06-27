@@ -11,6 +11,7 @@ import click
 
 from miio import DeviceStatus, MiotDevice, UnsupportedFeatureException
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -117,21 +118,40 @@ class HuizuoStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.data["power"]
 
     @property
+    @setting(
+        "Brightness",
+        unit="%",
+        setter_name="set_brightness",
+        min_value=0,
+        max_value=100,
+        icon="mdi:brightness-6",
+    )
     def brightness(self) -> int:
         """Return current brightness."""
         return self.data["brightness"]
 
     @property
+    @setting(
+        "Color Temperature",
+        unit="K",
+        setter_name="set_color_temp",
+        min_value=3000,
+        max_value=6400,
+        icon="mdi:thermometer",
+        device_class="temperature",
+    )
     def color_temp(self) -> int:
         """Return current color temperature."""
         return self.data["color_temp"]
 
     @property
+    @sensor("Fan On", icon="mdi:fan")
     def is_fan_on(self) -> Optional[bool]:
         """Return True if Fan is on."""
         if "fan_power" in self.data:
@@ -139,6 +159,14 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
+    @setting(
+        "Fan Speed Level",
+        unit="%",
+        setter_name="set_fan_level",
+        min_value=0,
+        max_value=100,
+        icon="mdi:fan",
+    )
     def fan_speed_level(self) -> Optional[int]:
         """Return current Fan speed level."""
         if "fan_level" in self.data:
@@ -146,6 +174,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Fan Reverse", icon="mdi:fan-chevron-down")
     def is_fan_reverse(self) -> Optional[bool]:
         """Return True if Fan reverse is on."""
         if "fan_motor_reverse" in self.data:
@@ -153,6 +182,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Fan Mode", icon="mdi:fan-auto")
     def fan_mode(self) -> Optional[int]:
         """Return 0 if 'Basic' and 1 if 'Natural wind'."""
         if "fan_mode" in self.data:
@@ -160,6 +190,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Heater On", icon="mdi:radiator")
     def is_heater_on(self) -> Optional[bool]:
         """Return True if Heater is on."""
         if "heater_power" in self.data:
@@ -167,6 +198,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Heater Fault Code", icon="mdi:alert-circle")
     def heater_fault_code(self) -> Optional[int]:
         """Return Heater's fault code.
 
@@ -177,6 +209,13 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
+    @setting(
+        "Heat Level",
+        setter_name="set_heat_level",
+        min_value=1,
+        max_value=3,
+        icon="mdi:radiator",
+    )
     def heat_level(self) -> Optional[int]:
         """Return Heater's heat level."""
         if "heat_level" in self.data:

@@ -7,6 +7,7 @@ import click
 
 from miio import Device, DeviceError, DeviceException, DeviceInfo, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,16 +64,24 @@ class AirDehumidifierStatus(DeviceStatus):
         self.device_info = device_info
 
     @property
+    @sensor("Power", icon="mdi:power")
     def power(self) -> str:
         """Power state."""
         return self.data["on_off"]
 
     @property
+    @sensor("Is On", icon="mdi:power")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        "Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+        icon="mdi:air-humidifier",
+    )
     def mode(self) -> OperationMode:
         """Operation mode.
 
@@ -81,6 +90,9 @@ class AirDehumidifierStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> Optional[float]:
         """Current temperature, if available."""
         if "temp" in self.data and self.data["temp"] is not None:
@@ -88,26 +100,36 @@ class AirDehumidifierStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Humidity", unit="%", device_class="humidity", icon="mdi:water-percent")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] == "on"
 
     @property
+    @setting("LED", setter_name="set_led", icon="mdi:led-on")
     def led(self) -> bool:
         """LED brightness if available."""
         return self.data["led"] == "on"
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
+    @setting(
+        "Target Humidity",
+        setter_name="set_target_humidity",
+        unit="%",
+        icon="mdi:water-percent",
+    )
     def target_humidity(self) -> Optional[int]:
         """Target humiditiy.
 
@@ -118,6 +140,12 @@ class AirDehumidifierStatus(DeviceStatus):
         return None
 
     @property
+    @setting(
+        "Fan Speed",
+        setter_name="set_fan_speed",
+        choices=FanSpeed,
+        icon="mdi:fan",
+    )
     def fan_speed(self) -> Optional[FanSpeed]:
         """Current fan speed."""
         if "fan_speed" in self.data and self.data["fan_speed"] is not None:
@@ -125,26 +153,31 @@ class AirDehumidifierStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Tank Full", icon="mdi:cup-water")
     def tank_full(self) -> bool:
         """The remaining amount of water in percent."""
         return self.data["tank_full"] == "on"
 
     @property
+    @sensor("Compressor Status", icon="mdi:air-conditioner")
     def compressor_status(self) -> bool:
         """Compressor status."""
         return self.data["compressor_status"] == "on"
 
     @property
+    @sensor("Defrost Status", icon="mdi:snowflake-melt")
     def defrost_status(self) -> bool:
         """Defrost status."""
         return self.data["defrost_status"] == "on"
 
     @property
+    @sensor("Fan St", icon="mdi:fan")
     def fan_st(self) -> int:
         """Fan st."""
         return self.data["fan_st"]
 
     @property
+    @sensor("Alarm", icon="mdi:alarm-light")
     def alarm(self) -> str:
         """Alarm."""
         return self.data["alarm"]

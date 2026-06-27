@@ -4,6 +4,7 @@ import logging
 import click
 
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -107,57 +108,96 @@ class AirQualityMonitorCGDN1Status(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Humidity", unit="%", icon="mdi:water-percent", device_class="humidity")
     def humidity(self) -> int:
         """Return humidity value (0...100%)."""
         return self.data["humidity"]
 
     @property
+    @sensor("PM2.5", unit="µg/m³", icon="mdi:blur")
     def pm25(self) -> int:
         """Return PM 2.5 value (0...1000ppm)."""
         return self.data["pm25"]
 
     @property
+    @sensor("PM10", unit="µg/m³", icon="mdi:blur-linear")
     def pm10(self) -> int:
         """Return PM 10 value (0...1000ppm)."""
         return self.data["pm10"]
 
     @property
+    @sensor(
+        "Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature"
+    )
     def temperature(self) -> float:
         """Return temperature value (-30...100°C)."""
         return self.data["temperature"]
 
     @property
+    @sensor("CO2", unit="ppm", icon="mdi:molecule-co2", device_class="carbon_dioxide")
     def co2(self) -> int:
         """Return co2 value (0...9999ppm)."""
         return self.data["co2"]
 
     @property
+    @sensor("Battery", unit="%", icon="mdi:battery", device_class="battery")
     def battery(self) -> int:
         """Return battery level (0...100%)."""
         return self.data["battery"]
 
     @property
+    @sensor("Charging State", icon="mdi:battery-charging")
     def charging_state(self) -> ChargingState:
         """Return charging state."""
         return ChargingState(self.data["charging_state"])
 
     @property
+    @setting(
+        "Monitoring Frequency",
+        unit="s",
+        setter_name="set_monitoring_frequency_duration",
+        min_value=0,
+        max_value=600,
+        icon="mdi:update",
+    )
     def monitoring_frequency(self) -> int:
         """Return monitoring frequency time (0..600 s)."""
         return self.data["monitoring_frequency"]
 
     @property
+    @setting(
+        "Screen Off",
+        unit="s",
+        setter_name="set_screen_off_duration",
+        min_value=0,
+        max_value=300,
+        icon="mdi:monitor-off",
+    )
     def screen_off(self) -> int:
         """Return screen off time (0..300 s)."""
         return self.data["screen_off"]
 
     @property
+    @setting(
+        "Device Off",
+        unit="min",
+        setter_name="set_device_off_duration",
+        min_value=0,
+        max_value=60,
+        icon="mdi:power-off",
+    )
     def device_off(self) -> int:
         """Return device off time (0..60 min)."""
         return self.data["device_off"]
 
     @property
-    def display_temperature_unit(self):
+    @setting(
+        "Display Temperature Unit",
+        setter_name="set_display_temperature_unit",
+        choices=DisplayTemperatureUnitCGDN1,
+        icon="mdi:temperature-celsius",
+    )
+    def display_temperature_unit(self) -> DisplayTemperatureUnitCGDN1:
         """Return display temperature unit."""
         return DisplayTemperatureUnitCGDN1(self.data["temperature_unit"])
 
