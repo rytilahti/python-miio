@@ -6,7 +6,7 @@ import pytest
 from miio.device_cache import DeviceState, _cache_path, read_cache, write_cache
 
 
-@pytest.fixture()
+@pytest.fixture
 def cache_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr("miio.device_cache.CACHE_DIR", tmp_path)
     return tmp_path
