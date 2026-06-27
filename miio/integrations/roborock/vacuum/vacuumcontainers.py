@@ -3,7 +3,6 @@ from datetime import datetime, time, timedelta
 from enum import IntEnum
 from typing import Any
 from urllib import parse
-
 from zoneinfo import ZoneInfo
 
 from croniter import croniter

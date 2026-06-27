@@ -9,10 +9,9 @@ import pathlib
 import time
 from enum import Enum
 from typing import Any
-
-import click
 from zoneinfo import ZoneInfo
 
+import click
 from platformdirs import user_cache_dir
 
 from miio.click_common import (
