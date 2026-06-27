@@ -1,15 +1,11 @@
-[tool.poetry]
+[project]
 name = "python-miio"
 version = "0.6.0.dev0"
 description = "Python library for interfacing with Xiaomi smart appliances"
-authors = ["Teemu R <tpr@iki.fi>"]
-repository = "https://github.com/rytilahti/python-miio"
-documentation = "https://python-miio.readthedocs.io"
+authors = [{name = "Teemu R", email = "tpr@iki.fi"}]
 license = "GPL-3.0-only"
 readme = "README.md"
-packages = [
-  { include = "miio" }
-]
+requires-python = ">=3.11"
 keywords = ["xiaomi", "miio", "miot", "smart home"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
@@ -24,61 +20,65 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
+dependencies = [
+  "click>=8",
+  "cryptography>=35",
+  "construct>=2.10.56,<3",
+  "zeroconf>=0,<1",
+  "attrs",
+  "platformdirs",
+  "tqdm>=4,<5",
+  "micloud>=0.6",
+  "croniter>=1",
+  "defusedxml>=0,<1",
+  "pydantic>=1,<3",
+  "PyYAML>=5,<7",
+]
 
-[tool.poetry.scripts]
+[project.urls]
+Repository = "https://github.com/rytilahti/python-miio"
+Documentation = "https://python-miio.readthedocs.io"
+
+[project.scripts]
 mirobo = "miio.integrations.roborock.vacuum.vacuum_cli:cli"
 miio-extract-tokens = "miio.extract_tokens:main"
 miiocli = "miio.cli:create_cli"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-click = ">=8"
-cryptography = ">=35"
-construct = "^2.10.56"
-zeroconf = "^0"
-attrs = "*"
-platformdirs = "*"
-tqdm = "^4"
-micloud = { version = ">=0.6" }
-croniter = ">=1"
-defusedxml = "^0"
-pydantic = ">=1,<3"
-PyYAML = ">=5,<7"
+[project.optional-dependencies]
+docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme>=1.3.0", "myst-parser"]
+updater = ["netifaces>=0,<1"]
+backup_extract = ["android_backup>=0,<1"]
+crcmod = ["crcmod>=1.7,<2"]
 
-# doc dependencies
-sphinx = { version = "*", optional = true }
-sphinx_click = { version = "*", optional = true }
-sphinxcontrib-apidoc = { version = "*", optional = true }
-sphinx_rtd_theme = { version = ">=1.3.0", optional = true }
-myst-parser = { version = "*", optional = true }
+[dependency-groups]
+dev = [
+  "pytest>=6.2.5",
+  "pytest-cov",
+  "pytest-mock",
+  "pytest-asyncio",
+  "pre-commit",
+  "doc8",
+  "restructuredtext_lint",
+  "tox",
+  "isort",
+  "cffi",
+  "docformatter",
+  "mypy; platform_python_implementation == 'CPython'",
+  "coverage[toml]",
+  "types-attrs",
+  "types-PyYAML",
+  "types-requests",
+  "types-pytz",
+  "types-croniter",
+  "types-freezegun",
+]
 
-# optionals
-netifaces = { version = "^0", optional = true }
-android_backup = { version = "^0", optional = true }
-crcmod = { version = "^1.7", optional = true }
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.extras]
-docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme", "myst-parser"]
-updater = ["netifaces"]
-backup_extract = ["android_backup"]
-crcmod = ["crcmod"]
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=6.2.5"
-pytest-cov = "*"
-pytest-mock = "*"
-pytest-asyncio = "*"
-pre-commit = "*"
-doc8 = "*"
-restructuredtext_lint = "*"
-tox = "*"
-isort = "*"
-cffi = "*"
-docformatter = "*"
-mypy = {version = "*", markers = "platform_python_implementation == 'CPython'"}
-coverage = {extras = ["toml"], version = "*"}
-
-
+[tool.hatch.build.targets.wheel]
+packages = ["miio"]
 
 [tool.coverage.run]
 source = ["miio"]
@@ -121,7 +121,3 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "**/test_*.py" = ["S101", "S105", "S106", "B018", "B904", "PT009", "PT012", "PT027"]
 "miio/tests/**" = ["S101", "S105", "S106", "B018", "B904", "PT009", "PT012", "PT027"]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
