@@ -194,7 +194,7 @@ class Walkingpad(Device):
         """Set mode (auto/manual)."""
 
         if not isinstance(mode, OperationMode):
-            raise ValueError("Invalid mode: %s" % mode)
+            raise ValueError(f"Invalid mode: {mode}")
 
         return self.send("set_mode", [mode.value])
 
@@ -210,10 +210,10 @@ class Walkingpad(Device):
             raise DeviceException("Cannot set the speed, device is turned off")
 
         if not isinstance(speed, float):
-            raise TypeError("Invalid speed: %s" % speed)
+            raise TypeError(f"Invalid speed: {speed}")
 
         if speed < 0 or speed > 6:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("set_speed", [speed])
 
@@ -229,10 +229,10 @@ class Walkingpad(Device):
             raise DeviceException("Cannot set the start speed, device is turned off")
 
         if not isinstance(speed, float):
-            raise TypeError("Invalid start speed: %s" % speed)
+            raise TypeError(f"Invalid start speed: {speed}")
 
         if speed < 0 or speed > 6:
-            raise ValueError("Invalid start speed: %s" % speed)
+            raise ValueError(f"Invalid start speed: {speed}")
 
         return self.send("set_start_speed", [speed])
 
@@ -244,7 +244,7 @@ class Walkingpad(Device):
         """Set sensitivity."""
 
         if not isinstance(sensitivity, OperationSensitivity):
-            raise TypeError("Invalid mode: %s" % sensitivity)
+            raise TypeError(f"Invalid mode: {sensitivity}")
 
         return self.send("set_sensitivity", [sensitivity.value])
 

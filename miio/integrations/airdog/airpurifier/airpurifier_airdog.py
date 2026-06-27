@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -86,7 +86,7 @@ class AirDogStatus(DeviceStatus):
         return self.data["pm"]
 
     @property
-    def hcho(self) -> Optional[int]:
+    def hcho(self) -> int | None:
         """Return formaldehyde value."""
         if self.data["hcho"] is not None:
             return self.data["hcho"]
@@ -153,7 +153,7 @@ class AirDogX3(Device):
             max_speed = 5
 
         if speed < 1 or speed > max_speed:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("set_wind", [OperationModeMapping[mode.name].value, speed])
 

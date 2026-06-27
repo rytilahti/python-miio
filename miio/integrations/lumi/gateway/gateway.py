@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import Callable, Optional
+from collections.abc import Callable
 
 import click
 import yaml
@@ -89,14 +89,14 @@ class Gateway(Device):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = None,
+        model: str | None = None,
         push_server=None,
     ) -> None:
         super().__init__(
@@ -376,7 +376,7 @@ class Gateway(Device):
     def set_developer_key(self, key):
         """Set the developer API key."""
         if len(key) != 16:
-            click.echo("Key must be of length 16, was %s" % len(key))
+            click.echo(f"Key must be of length 16, was {len(key)}")
 
         return self.send("set_lumi_dpf_aes_key", [key])
 

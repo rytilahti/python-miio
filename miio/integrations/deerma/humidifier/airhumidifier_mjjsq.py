@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -108,7 +108,7 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["watertankstatus"] == 0
 
     @property
-    def wet_protection(self) -> Optional[bool]:
+    def wet_protection(self) -> bool | None:
         """True if wet protection is enabled."""
         if self.data["wet_and_protect"] is not None:
             return self.data["wet_and_protect"] == 1
@@ -116,7 +116,7 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    def use_time(self) -> Optional[int]:
+    def use_time(self) -> int | None:
         """How long the device has been active in seconds.
 
         Not supported by the device, so we return none here.
@@ -199,7 +199,7 @@ class AirHumidifierMjjsq(Device):
     def set_target_humidity(self, humidity: int):
         """Set the target humidity in percent."""
         if humidity < 0 or humidity > 99:
-            raise ValueError("Invalid target humidity: %s" % humidity)
+            raise ValueError(f"Invalid target humidity: {humidity}")
 
         return self.send("Set_HumiValue", [humidity])
 

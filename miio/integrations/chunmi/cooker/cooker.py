@@ -3,7 +3,6 @@ import logging
 import string
 from collections import defaultdict
 from datetime import time
-from typing import Optional
 
 import click
 
@@ -253,7 +252,7 @@ class CookingStage(DeviceStatus):
 
 
 class InteractionTimeouts(DeviceStatus):
-    def __init__(self, timeouts: Optional[str] = None):
+    def __init__(self, timeouts: str | None = None):
         """Example timeouts: 05040f, 05060f.
 
         Data structure:
@@ -298,7 +297,7 @@ class InteractionTimeouts(DeviceStatus):
 
 
 class CookerSettings(DeviceStatus):
-    def __init__(self, settings: Optional[str] = None):
+    def __init__(self, settings: str | None = None):
         """Example settings: 1407, 0607, 0207.
 
         Data structure:
@@ -481,7 +480,7 @@ class CookerStatus(DeviceStatus):
         return int(self.data["menu"], 16)
 
     @property
-    def stage(self) -> Optional[CookingStage]:
+    def stage(self) -> CookingStage | None:
         """Current stage if cooking."""
         stage = self.data["stage"]
         if len(stage) == 10:
@@ -490,7 +489,7 @@ class CookerStatus(DeviceStatus):
         return None
 
     @property
-    def temperature(self) -> Optional[int]:
+    def temperature(self) -> int | None:
         """Current temperature, if idle.
 
         Example values: *29*, 031e0b23, 031e0b23031e
@@ -502,7 +501,7 @@ class CookerStatus(DeviceStatus):
         return None
 
     @property
-    def start_time(self) -> Optional[time]:
+    def start_time(self) -> time | None:
         """Start time of cooking?
 
         The property "temp" is used for different purposes. Example values: 29,
@@ -520,7 +519,7 @@ class CookerStatus(DeviceStatus):
         return int(self.data["t_func"])
 
     @property
-    def cooking_delayed(self) -> Optional[int]:
+    def cooking_delayed(self) -> int | None:
         """Wait n minutes before cooking / scheduled cooking."""
         delay = int(self.data["t_precook"])
 
@@ -563,7 +562,7 @@ class CookerStatus(DeviceStatus):
         return int(self.data["favorite"], 16)
 
     @property
-    def custom(self) -> Optional[CookerCustomizations]:
+    def custom(self) -> CookerCustomizations | None:
         custom = self.data["custom"]
 
         if len(custom) > 31:
@@ -639,7 +638,7 @@ class Cooker(Device):
     def start(self, profile: str):
         """Start cooking a profile."""
         if not self._validate_profile(profile):
-            raise ValueError("Invalid cooking profile: %s" % profile)
+            raise ValueError(f"Invalid cooking profile: {profile}")
 
         self.send("set_start", [profile])
 
@@ -686,7 +685,7 @@ class Cooker(Device):
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles."""
         if not self._validate_profile(profile):
-            raise ValueError("Invalid cooking profile: %s" % profile)
+            raise ValueError(f"Invalid cooking profile: {profile}")
 
         self.send("set_menu", [profile])
 

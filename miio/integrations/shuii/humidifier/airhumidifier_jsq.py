@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -130,7 +130,7 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["lid_opened"] == 1
 
     @property
-    def use_time(self) -> Optional[int]:
+    def use_time(self) -> int | None:
         """How long the device has been active in seconds.
 
         Not supported by the device, so we return none here.

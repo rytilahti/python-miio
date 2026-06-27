@@ -1,7 +1,6 @@
 import logging
 import time
 from ipaddress import ip_address
-from typing import Optional
 
 import zeroconf
 
@@ -16,7 +15,7 @@ class Listener(zeroconf.ServiceListener):
     def __init__(self):
         self.found_devices: dict[str, Device] = {}
 
-    def create_device(self, info, addr) -> Optional[Device]:
+    def create_device(self, info, addr) -> Device | None:
         """Get a device instance for a mdns response."""
         name = info.name
         # Example: yeelink-light-color1_miioXXXX._miio._udp.local.

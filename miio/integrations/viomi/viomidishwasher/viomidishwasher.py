@@ -2,7 +2,7 @@ import enum
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -174,7 +174,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid integer for time_left.")
 
     @property
-    def schedule(self) -> Optional[datetime]:
+    def schedule(self) -> datetime | None:
         """Returns a datetime when the scheduled program should be finished.
 
         Will always be 0 if nothing is scheduled.
@@ -371,7 +371,7 @@ class ViomiDishwasher(Device):
     @command(
         click.argument("program", type=EnumType(Program), required=False),
     )
-    def start(self, program: Optional[Program]) -> str:
+    def start(self, program: Program | None) -> str:
         """Start a program (with optional program or current)."""
 
         if program:

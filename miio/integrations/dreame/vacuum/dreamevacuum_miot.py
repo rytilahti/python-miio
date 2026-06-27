@@ -3,7 +3,6 @@
 import logging
 import threading
 from enum import Enum
-from typing import Optional
 
 import click
 
@@ -334,7 +333,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         return self.data["filter_life_level"]
 
     @property
-    def device_fault(self) -> Optional[FaultStatus]:
+    def device_fault(self) -> FaultStatus | None:
         try:
             return FaultStatus(self.data["device_fault"])
         except ValueError:
@@ -342,7 +341,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
             return None
 
     @property
-    def charging_state(self) -> Optional[ChargingState]:
+    def charging_state(self) -> ChargingState | None:
         try:
             return ChargingState(self.data["charging_state"])
         except ValueError:
@@ -350,7 +349,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
             return None
 
     @property
-    def operating_mode(self) -> Optional[OperatingMode]:
+    def operating_mode(self) -> OperatingMode | None:
         try:
             return OperatingMode(self.data["operating_mode"])
         except ValueError:
@@ -358,7 +357,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
             return None
 
     @property
-    def device_status(self) -> Optional[DeviceStatus]:
+    def device_status(self) -> DeviceStatus | None:
         try:
             return DeviceStatus(self.data["device_status"])
         except TypeError:
@@ -432,20 +431,20 @@ class DreameVacuumStatus(DeviceStatusContainer):
             return None
 
     @property
-    def life_sieve(self) -> Optional[str]:
+    def life_sieve(self) -> str | None:
         return self.data.get("life_sieve")
 
     @property
-    def life_brush_side(self) -> Optional[str]:
+    def life_brush_side(self) -> str | None:
         return self.data.get("life_brush_side")
 
     @property
-    def life_brush_main(self) -> Optional[str]:
+    def life_brush_main(self) -> str | None:
         return self.data.get("life_brush_main")
 
     # TODO: get/set water flow for Dreame 1C
     @property
-    def water_flow(self) -> Optional[WaterFlow]:
+    def water_flow(self) -> WaterFlow | None:
         try:
             water_flow = self.data["water_flow"]
         except KeyError:
@@ -457,7 +456,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
             return None
 
     @property
-    def is_water_box_carriage_attached(self) -> Optional[bool]:
+    def is_water_box_carriage_attached(self) -> bool | None:
         """Return True if water box carriage (mop) is installed, None if sensor not
         present."""
         if "water_box_carriage_status" in self.data:
@@ -648,8 +647,7 @@ class DreameVacuum(MiotDevice):
         """Move forward."""
         if distance < self.MANUAL_DISTANCE_MIN or distance > self.MANUAL_DISTANCE_MAX:
             raise ValueError(
-                "Given distance is invalid, should be [%s, %s], was: %s"
-                % (self.MANUAL_DISTANCE_MIN, self.MANUAL_DISTANCE_MAX, distance)
+                f"Given distance is invalid, should be [{self.MANUAL_DISTANCE_MIN}, {self.MANUAL_DISTANCE_MAX}], was: {distance}"
             )
         self.call_action_from_mapping(
             "move",
@@ -675,8 +673,7 @@ class DreameVacuum(MiotDevice):
             or rotatation > self.MANUAL_ROTATION_MAX
         ):
             raise ValueError(
-                "Given rotation is invalid, should be [%s, %s], was %s"
-                % (self.MANUAL_ROTATION_MIN, self.MANUAL_ROTATION_MAX, rotatation)
+                f"Given rotation is invalid, should be [{self.MANUAL_ROTATION_MIN}, {self.MANUAL_ROTATION_MAX}], was {rotatation}"
             )
         self.call_action_from_mapping(
             "move",

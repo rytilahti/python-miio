@@ -5,7 +5,7 @@ from 3000K to 6400K
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -132,42 +132,42 @@ class HuizuoStatus(DeviceStatus):
         return self.data["color_temp"]
 
     @property
-    def is_fan_on(self) -> Optional[bool]:
+    def is_fan_on(self) -> bool | None:
         """Return True if Fan is on."""
         if "fan_power" in self.data:
             return self.data["fan_power"]
         return None
 
     @property
-    def fan_speed_level(self) -> Optional[int]:
+    def fan_speed_level(self) -> int | None:
         """Return current Fan speed level."""
         if "fan_level" in self.data:
             return self.data["fan_level"]
         return None
 
     @property
-    def is_fan_reverse(self) -> Optional[bool]:
+    def is_fan_reverse(self) -> bool | None:
         """Return True if Fan reverse is on."""
         if "fan_motor_reverse" in self.data:
             return self.data["fan_motor_reverse"]
         return None
 
     @property
-    def fan_mode(self) -> Optional[int]:
+    def fan_mode(self) -> int | None:
         """Return 0 if 'Basic' and 1 if 'Natural wind'."""
         if "fan_mode" in self.data:
             return self.data["fan_mode"]
         return None
 
     @property
-    def is_heater_on(self) -> Optional[bool]:
+    def is_heater_on(self) -> bool | None:
         """Return True if Heater is on."""
         if "heater_power" in self.data:
             return self.data["heater_power"]
         return None
 
     @property
-    def heater_fault_code(self) -> Optional[int]:
+    def heater_fault_code(self) -> int | None:
         """Return Heater's fault code.
 
         0 - No Fault
@@ -177,7 +177,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
-    def heat_level(self) -> Optional[int]:
+    def heat_level(self) -> int | None:
         """Return Heater's heat level."""
         if "heat_level" in self.data:
             return self.data["heat_level"]
@@ -212,14 +212,14 @@ class Huizuo(MiotDevice):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = MODEL_HUIZUO_PIS123,
+        model: str = MODEL_HUIZUO_PIS123,
     ) -> None:
         if model in MODELS_WITH_FAN_WY:
             self.mapping.update(_ADDITIONAL_MAPPING_FAN_WY)
@@ -281,7 +281,7 @@ class Huizuo(MiotDevice):
     def set_brightness(self, level):
         """Set brightness."""
         if level < 0 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.set_property("brightness", level)
 
@@ -300,7 +300,7 @@ class Huizuo(MiotDevice):
             max_color_temp = 6400
 
         if color_temp < 3000 or color_temp > max_color_temp:
-            raise ValueError("Invalid color temperature: %s" % color_temp)
+            raise ValueError(f"Invalid color temperature: {color_temp}")
 
         return self.set_property("color_temp", color_temp)
 
@@ -344,7 +344,7 @@ class HuizuoLampFan(Huizuo):
     def set_fan_level(self, fan_level):
         """Set fan speed level (only for models with fan)"""
         if fan_level < 0 or fan_level > 100:
-            raise ValueError("Invalid fan speed level: %s" % fan_level)
+            raise ValueError(f"Invalid fan speed level: {fan_level}")
 
         if self.model in MODELS_WITH_FAN_WY or self.model in MODELS_WITH_FAN_WY2:
             return self.set_property("fan_level", fan_level)
@@ -468,7 +468,7 @@ class HuizuoLampHeater(Huizuo):
     def set_heat_level(self, heat_level):
         """Set heat level (only for models with heater)"""
         if heat_level not in [1, 2, 3]:
-            raise ValueError("Invalid heat level: %s" % heat_level)
+            raise ValueError(f"Invalid heat level: {heat_level}")
 
         if self.model in MODELS_WITH_HEATER:
             return self.set_property("heat_level", heat_level)

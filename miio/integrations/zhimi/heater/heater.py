@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -67,7 +67,7 @@ class HeaterStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    def humidity(self) -> Optional[int]:
+    def humidity(self) -> int | None:
         """Current humidity."""
         if (
             "relative_humidity" in self.data
@@ -108,7 +108,7 @@ class HeaterStatus(DeviceStatus):
         return self.data["use_time"]
 
     @property
-    def delay_off_countdown(self) -> Optional[int]:
+    def delay_off_countdown(self) -> int | None:
         """Countdown until turning off in seconds."""
         if "poweroff_time" in self.data and self.data["poweroff_time"] is not None:
             return self.data["poweroff_time"]
@@ -177,7 +177,7 @@ class Heater(Device):
             self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
         )["temperature_range"]
         if not min_temp <= temperature <= max_temp:
-            raise ValueError("Invalid target temperature: %s" % temperature)
+            raise ValueError(f"Invalid target temperature: {temperature}")
 
         return self.send("set_target_temperature", [temperature])
 
@@ -227,7 +227,7 @@ class Heater(Device):
             self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
         )["delay_off_range"]
         if not min_delay <= seconds <= max_delay:
-            raise ValueError("Invalid delay time: %s" % seconds)
+            raise ValueError(f"Invalid delay time: {seconds}")
 
         if self.model == MODEL_HEATER_ZA1:
             return self.send("set_poweroff_time", [seconds])

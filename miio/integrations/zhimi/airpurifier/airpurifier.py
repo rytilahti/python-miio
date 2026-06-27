@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -155,7 +155,7 @@ class AirPurifierStatus(DeviceStatus):
         return self.data["humidity"]
 
     @property
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
@@ -168,7 +168,7 @@ class AirPurifierStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
-    def sleep_mode(self) -> Optional[SleepMode]:
+    def sleep_mode(self) -> SleepMode | None:
         """Operation mode of the sleep state.
 
         (Idle vs. Silent)
@@ -184,7 +184,7 @@ class AirPurifierStatus(DeviceStatus):
         return self.data["led"] == "on"
 
     @property
-    def led_brightness(self) -> Optional[LedBrightness]:
+    def led_brightness(self) -> LedBrightness | None:
         """Brightness of the LED."""
         if self.data["led_b"] is not None:
             try:
@@ -195,7 +195,7 @@ class AirPurifierStatus(DeviceStatus):
         return None
 
     @property
-    def illuminance(self) -> Optional[int]:
+    def illuminance(self) -> int | None:
         """Environment illuminance level in lux [0-200].
 
         Sensor value is updated only when device is turned on.
@@ -203,7 +203,7 @@ class AirPurifierStatus(DeviceStatus):
         return self.data["bright"]
 
     @property
-    def buzzer(self) -> Optional[bool]:
+    def buzzer(self) -> bool | None:
         """Return True if buzzer is on."""
         if self.data["buzzer"] is not None:
             return self.data["buzzer"] == "on"
@@ -247,27 +247,27 @@ class AirPurifierStatus(DeviceStatus):
         return self.data["motor1_speed"]
 
     @property
-    def motor2_speed(self) -> Optional[int]:
+    def motor2_speed(self) -> int | None:
         """Speed of the 2nd motor."""
         return self.data["motor2_speed"]
 
     @property
-    def volume(self) -> Optional[int]:
+    def volume(self) -> int | None:
         """Volume of sound notifications [0-100]."""
         return self.data["volume"]
 
     @property
-    def filter_rfid_product_id(self) -> Optional[str]:
+    def filter_rfid_product_id(self) -> str | None:
         """RFID product ID of installed filter."""
         return self.data["rfid_product_id"]
 
     @property
-    def filter_rfid_tag(self) -> Optional[str]:
+    def filter_rfid_tag(self) -> str | None:
         """RFID tag ID of installed filter."""
         return self.data["rfid_tag"]
 
     @property
-    def filter_type(self) -> Optional[FilterType]:
+    def filter_type(self) -> FilterType | None:
         """Type of installed filter."""
         return self.filter_type_util.determine_filter_type(
             self.filter_rfid_tag, self.filter_rfid_product_id
@@ -279,26 +279,26 @@ class AirPurifierStatus(DeviceStatus):
         return self.data["act_sleep"] == "single"
 
     @property
-    def sleep_time(self) -> Optional[int]:
+    def sleep_time(self) -> int | None:
         return self.data["sleep_time"]
 
     @property
-    def sleep_mode_learn_count(self) -> Optional[int]:
+    def sleep_mode_learn_count(self) -> int | None:
         return self.data["sleep_data_num"]
 
     @property
-    def extra_features(self) -> Optional[int]:
+    def extra_features(self) -> int | None:
         return self.data["app_extra"]
 
     @property
-    def turbo_mode_supported(self) -> Optional[bool]:
+    def turbo_mode_supported(self) -> bool | None:
         if self.data["app_extra"] is not None:
             return self.data["app_extra"] == 1
 
         return None
 
     @property
-    def auto_detect(self) -> Optional[bool]:
+    def auto_detect(self) -> bool | None:
         """Return True if auto detect is enabled."""
         if self.data["act_det"] is not None:
             return self.data["act_det"] == "on"
@@ -306,7 +306,7 @@ class AirPurifierStatus(DeviceStatus):
         return None
 
     @property
-    def button_pressed(self) -> Optional[str]:
+    def button_pressed(self) -> str | None:
         """Last pressed button."""
         return self.data["button_pressed"]
 
@@ -413,7 +413,7 @@ class AirPurifier(Device):
     def set_favorite_level(self, level: int):
         """Set favorite level."""
         if level < 0 or level > 17:
-            raise ValueError("Invalid favorite level: %s" % level)
+            raise ValueError(f"Invalid favorite level: {level}")
 
         # Possible alternative property: set_speed_favorite
 
@@ -475,7 +475,7 @@ class AirPurifier(Device):
     def set_volume(self, volume: int):
         """Set volume of sound notifications [0-100]."""
         if volume < 0 or volume > 100:
-            raise ValueError("Invalid volume: %s" % volume)
+            raise ValueError(f"Invalid volume: {volume}")
 
         return self.send("set_volume", [volume])
 
@@ -522,7 +522,7 @@ class AirPurifier(Device):
         app_extra=1 unlocks a turbo mode supported feature
         """
         if value < 0:
-            raise ValueError("Invalid app extra value: %s" % value)
+            raise ValueError(f"Invalid app extra value: {value}")
 
         return self.send("set_app_extra", [value])
 

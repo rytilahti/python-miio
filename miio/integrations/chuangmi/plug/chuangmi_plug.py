@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -64,14 +64,14 @@ class ChuangmiPlugStatus(DeviceStatus):
         return self.data["temperature"]
 
     @property
-    def usb_power(self) -> Optional[bool]:
+    def usb_power(self) -> bool | None:
         """True if USB is on."""
         if "usb_on" in self.data and self.data["usb_on"] is not None:
             return self.data["usb_on"]
         return None
 
     @property
-    def load_power(self) -> Optional[float]:
+    def load_power(self) -> float | None:
         """Current power load, if available."""
         if "load_power" in self.data and self.data["load_power"] is not None:
             return float(self.data["load_power"])
@@ -79,12 +79,12 @@ class ChuangmiPlugStatus(DeviceStatus):
 
     @property  # type: ignore
     @deprecated("Use led()")
-    def wifi_led(self) -> Optional[bool]:
+    def wifi_led(self) -> bool | None:
         """True if the wifi led is turned on."""
         return self.led
 
     @property
-    def led(self) -> Optional[bool]:
+    def led(self) -> bool | None:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"

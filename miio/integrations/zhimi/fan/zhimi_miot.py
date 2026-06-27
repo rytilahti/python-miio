@@ -246,7 +246,7 @@ class FanZA5(MiotDevice):
     def set_speed(self, speed: int):
         """Set fan speed."""
         if speed < 1 or speed > 100:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.set_property("fan_speed", speed)
 
@@ -303,7 +303,7 @@ class FanZA5(MiotDevice):
     def set_led_brightness(self, brightness: int):
         """Set LED brightness."""
         if brightness < 0 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         return self.set_property("light", brightness)
 
@@ -323,7 +323,7 @@ class FanZA5(MiotDevice):
         """Set delay off seconds."""
 
         if seconds < 0 or seconds > 10 * 60 * 60:
-            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError(f"Invalid value for a delayed turn off: {seconds}")
 
         return self.set_property("power_off_time", seconds)
 

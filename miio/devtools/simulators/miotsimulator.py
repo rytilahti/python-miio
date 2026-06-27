@@ -3,7 +3,6 @@ import json
 import logging
 import random
 from collections import defaultdict
-from typing import Union
 
 import click
 
@@ -54,7 +53,7 @@ class SimulatedMiotProperty(MiotProperty):
     * Validates inputs for set_properties
     """
 
-    current_value: Union[int, str, bool] = Field(default=UNSET)
+    current_value: int | str | bool = Field(default=UNSET)
 
     @validator("current_value", pre=True, always=True)
     def verify_value(cls, v, values):
@@ -207,8 +206,7 @@ class MiotSimulator:
         action_inputs = action.inputs
         if len(inputs) != len(action_inputs):
             raise ValueError(
-                "Invalid parameter count, was expecting %s params, got %s"
-                % (len(inputs), len(action_inputs))
+                f"Invalid parameter count, was expecting {len(inputs)} params, got {len(action_inputs)}"
             )
 
         for idx, param in enumerate(inputs):
@@ -217,30 +215,26 @@ class MiotSimulator:
             if wanted_input.choices:
                 if not isinstance(param, int):
                     raise TypeError(
-                        "Param #%s: enum value expects an integer %s, got %s"
-                        % (idx, wanted_input, param)
+                        f"Param #{idx}: enum value expects an integer {wanted_input}, got {param}"
                     )
                 for choice in wanted_input.choices:
                     if param == choice.value:
                         break
                 else:
                     raise ValueError(
-                        "Param #%s: invalid value '%s' for %s"
-                        % (idx, param, wanted_input.choices)
+                        f"Param #{idx}: invalid value '{param}' for {wanted_input.choices}"
                     )
 
             elif wanted_input.range:
                 if not isinstance(param, int):
                     raise TypeError(
-                        "Param #%s: ranged value expects an integer %s, got %s"
-                        % (idx, wanted_input, param)
+                        f"Param #{idx}: ranged value expects an integer {wanted_input}, got {param}"
                     )
 
                 min, max, step = wanted_input.range
                 if param < min or param > max:
                     raise ValueError(
-                        "Param #%s: value '%s' out of range [%s, %s]"
-                        % (idx, param, min, max)
+                        f"Param #{idx}: value '{param}' out of range [{min}, {max}]"
                     )
 
             elif wanted_input.format == str and not isinstance(param, str):
@@ -277,7 +271,7 @@ def miot_simulator(file, model):
         try:
             schema = cloud.get_model_schema(model)
         except Exception as ex:
-            _LOGGER.error("Unable to get schema: %s" % ex)
+            _LOGGER.error(f"Unable to get schema: {ex}")
             return
         try:
             dev = SimulatedDeviceModel.parse_obj(schema)

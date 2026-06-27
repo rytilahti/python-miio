@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -97,7 +97,7 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @sensor("Temperature", unit="°C", device_class="temperature")
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         if "temp_dec" in self.data and self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
@@ -131,7 +131,7 @@ class AirHumidifierStatus(DeviceStatus):
         choices=LedBrightness,
         entity_category="config",
     )
-    def led_brightness(self) -> Optional[LedBrightness]:
+    def led_brightness(self) -> LedBrightness | None:
         """LED brightness if available."""
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
@@ -158,7 +158,7 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["limit_hum"]
 
     @property
-    def trans_level(self) -> Optional[int]:
+    def trans_level(self) -> int | None:
         """The meaning of the property is unknown.
 
         The property is used to determine the strong mode is enabled on old firmware.
@@ -210,14 +210,14 @@ class AirHumidifierStatus(DeviceStatus):
         icon="mdi:fast-forward",
         entity_category="diagnostic",
     )
-    def motor_speed(self) -> Optional[int]:
+    def motor_speed(self) -> int | None:
         """Current motor speed."""
         if "speed" in self.data and self.data["speed"] is not None:
             return self.data["speed"]
         return None
 
     @property
-    def depth(self) -> Optional[int]:
+    def depth(self) -> int | None:
         """Return raw value of depth."""
         _LOGGER.warning(
             "The 'depth' property is deprecated and will be removed in the future. Use 'water_level' and 'water_tank_attached' properties instead."
@@ -234,7 +234,7 @@ class AirHumidifierStatus(DeviceStatus):
         icon="mdi:water-check",
         entity_category="diagnostic",
     )
-    def water_level(self) -> Optional[int]:
+    def water_level(self) -> int | None:
         """Return current water level in percent.
 
         If water tank is full, depth is 120. If water tank is overfilled, depth is 125.
@@ -255,7 +255,7 @@ class AirHumidifierStatus(DeviceStatus):
         icon="mdi:car-coolant-level",
         entity_category="diagnostic",
     )
-    def water_tank_attached(self) -> Optional[bool]:
+    def water_tank_attached(self) -> bool | None:
         """True if the water tank is attached.
 
         If water tank is detached, depth is 127.
@@ -265,7 +265,7 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    def water_tank_detached(self) -> Optional[bool]:
+    def water_tank_detached(self) -> bool | None:
         """True if the water tank is detached.
 
         If water tank is detached, depth is 127.
@@ -286,7 +286,7 @@ class AirHumidifierStatus(DeviceStatus):
         device_class="switch",
         entity_category="config",
     )
-    def dry(self) -> Optional[bool]:
+    def dry(self) -> bool | None:
         """Dry mode: The amount of water is not enough to continue to work for about 8
         hours.
 
@@ -304,17 +304,17 @@ class AirHumidifierStatus(DeviceStatus):
         icon="mdi:progress-clock",
         entity_category="diagnostic",
     )
-    def use_time(self) -> Optional[int]:
+    def use_time(self) -> int | None:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
 
     @property
-    def hardware_version(self) -> Optional[str]:
+    def hardware_version(self) -> str | None:
         """The hardware version."""
         return self.data["hw_version"]
 
     @property
-    def button_pressed(self) -> Optional[str]:
+    def button_pressed(self) -> str | None:
         """Last pressed button."""
         if "button_pressed" in self.data and self.data["button_pressed"] is not None:
             return self.data["button_pressed"]
@@ -434,7 +434,7 @@ class AirHumidifier(Device):
     def set_target_humidity(self, humidity: int):
         """Set the target humidity."""
         if humidity not in [30, 40, 50, 60, 70, 80]:
-            raise ValueError("Invalid target humidity: %s" % humidity)
+            raise ValueError(f"Invalid target humidity: {humidity}")
 
         return self.send("set_limit_hum", [humidity])
 

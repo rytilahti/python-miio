@@ -17,7 +17,7 @@ import datetime
 import hashlib
 import json
 import logging
-from typing import Any, Union
+from typing import Any
 
 from construct import (
     Adapter,
@@ -144,7 +144,7 @@ class TimeAdapter(Adapter):
         return calendar.timegm(obj.timetuple())
 
     def _decode(self, obj, context, path):
-        return datetime.datetime.fromtimestamp(obj, tz=datetime.timezone.utc)
+        return datetime.datetime.fromtimestamp(obj, tz=datetime.UTC)
 
 
 class EncryptionAdapter(Adapter):
@@ -160,7 +160,7 @@ class EncryptionAdapter(Adapter):
             json.dumps(obj).encode("utf-8") + b"\x00", context["_"]["token"]
         )
 
-    def _decode(self, obj, context, path) -> Union[dict, bytes]:
+    def _decode(self, obj, context, path) -> dict | bytes:
         """Decrypts the payload using the token stored in the context."""
         # Missing payload is expected for discovery messages.
         if not obj:
@@ -228,7 +228,7 @@ Message = Struct(
             / TimeAdapter(
                 Default(
                     Int32ub,
-                    datetime.datetime.now(tz=datetime.timezone.utc),
+                    datetime.datetime.now(tz=datetime.UTC),
                 )
             ),
         )

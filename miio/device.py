@@ -1,6 +1,6 @@
 import logging
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union, cast, final  # noqa: F401
+from typing import Any, final
 
 import click
 
@@ -49,19 +49,19 @@ class Device(metaclass=DeviceGroupMeta):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = None,
+        model: str | None = None,
     ) -> None:
         self.ip = ip
-        self.token: Optional[str] = token
-        self._model: Optional[str] = model
-        self._info: Optional[DeviceInfo] = None
+        self.token: str | None = token
+        self._model: str | None = model
+        self._info: DeviceInfo | None = None
         # TODO: use _info's noneness instead?
         self._initialized: bool = False
         self._descriptors: DescriptorCollection = DescriptorCollection(device=self)
@@ -74,8 +74,8 @@ class Device(metaclass=DeviceGroupMeta):
     def send(
         self,
         command: str,
-        parameters: Optional[Any] = None,
-        retry_count: Optional[int] = None,
+        parameters: Any | None = None,
+        retry_count: int | None = None,
         *,
         extra_parameters=None,
     ) -> Any:
@@ -329,7 +329,7 @@ class Device(metaclass=DeviceGroupMeta):
         try:
             act = self.actions()[name]
         except KeyError:
-            raise ValueError("Unable to find action '%s'" % name)
+            raise ValueError(f"Unable to find action '{name}'")
 
         if params is None:
             return act.method()
@@ -346,7 +346,7 @@ class Device(metaclass=DeviceGroupMeta):
         try:
             setting = self.settings()[name]
         except KeyError:
-            raise ValueError("Unable to find setting '%s'" % name)
+            raise ValueError(f"Unable to find setting '{name}'")
 
         params = params if params is not None else []
 

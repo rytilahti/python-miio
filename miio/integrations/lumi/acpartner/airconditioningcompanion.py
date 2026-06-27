@@ -1,6 +1,5 @@
 import enum
 import logging
-from typing import Optional
 
 import click
 
@@ -103,7 +102,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return int(self.data["model_and_state"][2])
 
     @property
-    def power_socket(self) -> Optional[str]:
+    def power_socket(self) -> str | None:
         """Current socket power state."""
         if "power_socket" in self.data and self.data["power_socket"] is not None:
             return self.data["power_socket"]
@@ -166,7 +165,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return "on" if int(self.state[2:3]) == Power.On.value else "off"
 
     @property
-    def led(self) -> Optional[bool]:
+    def led(self) -> bool | None:
         """Current LED state."""
         state = self.state[8:9]
         if state == Led.On.value:
@@ -184,7 +183,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    def target_temperature(self) -> Optional[int]:
+    def target_temperature(self) -> int | None:
         """Target temperature."""
         try:
             return int(self.state[6:8], 16)
@@ -192,7 +191,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def swing_mode(self) -> Optional[SwingMode]:
+    def swing_mode(self) -> SwingMode | None:
         """Current swing mode."""
         try:
             mode = self.state[5:6]
@@ -201,7 +200,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def fan_speed(self) -> Optional[FanSpeed]:
+    def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         try:
             speed = int(self.state[4:5])
@@ -210,7 +209,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def mode(self) -> Optional[OperationMode]:
+    def mode(self) -> OperationMode | None:
         """Current operation mode."""
         try:
             mode = int(self.state[3:4])
@@ -226,14 +225,14 @@ class AirConditioningCompanion(Device):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = MODEL_ACPARTNER_V2,
+        model: str = MODEL_ACPARTNER_V2,
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
@@ -320,7 +319,7 @@ class AirConditioningCompanion(Device):
             raise ValueError("Invalid code. A hexadecimal string must be provided")
 
         if slot < 0 or slot > 134:
-            raise ValueError("Invalid slot: %s" % slot)
+            raise ValueError(f"Invalid slot: {slot}")
 
         slot_bytes = bytes([121 + slot])
 
@@ -413,8 +412,8 @@ class AirConditioningCompanion(Device):
 class AirConditioningCompanionV3(AirConditioningCompanion):
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,

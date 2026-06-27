@@ -179,7 +179,7 @@ class G1Status(DeviceStatus):
         try:
             return ERROR_CODES[self.error_code]
         except KeyError:
-            return "Definition missing for error %s" % self.error_code
+            return f"Definition missing for error {self.error_code}"
 
     @property
     def state(self) -> G1State:

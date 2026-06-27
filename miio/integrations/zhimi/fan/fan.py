@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -101,7 +101,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @sensor("Humidity")
-    def humidity(self) -> Optional[int]:
+    def humidity(self) -> int | None:
         """Current humidity."""
         if "humidity" in self.data and self.data["humidity"] is not None:
             return self.data["humidity"]
@@ -109,7 +109,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @sensor("Temperature", unit="C")
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         if "temp_dec" in self.data and self.data["temp_dec"] is not None:
             return self.data["temp_dec"] / 10.0
@@ -117,7 +117,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @setting("LED", setter_name="set_led")
-    def led(self) -> Optional[bool]:
+    def led(self) -> bool | None:
         """True if LED is turned on, if available."""
         if "led" in self.data and self.data["led"] is not None:
             return self.data["led"] == "on"
@@ -125,7 +125,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @setting("LED Brightness", choices=LedBrightness, setter_name="set_led_brightness")
-    def led_brightness(self) -> Optional[LedBrightness]:
+    def led_brightness(self) -> LedBrightness | None:
         """LED brightness, if available."""
         if self.data["led_b"] is not None:
             return LedBrightness(self.data["led_b"])
@@ -145,7 +145,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @setting("Natural Speed Level", setter_name="set_natural_speed", max_value=100)
-    def natural_speed(self) -> Optional[int]:
+    def natural_speed(self) -> int | None:
         """Speed level in natural mode."""
         if "natural_level" in self.data and self.data["natural_level"] is not None:
             return self.data["natural_level"]
@@ -153,7 +153,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @setting("Direct Speed", setter_name="set_direct_speed", max_value=100)
-    def direct_speed(self) -> Optional[int]:
+    def direct_speed(self) -> int | None:
         """Speed level in direct mode."""
         if "speed_level" in self.data and self.data["speed_level"] is not None:
             return self.data["speed_level"]
@@ -167,7 +167,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @sensor("Battery", unit="%")
-    def battery(self) -> Optional[int]:
+    def battery(self) -> int | None:
         """Current battery level."""
         if "battery" in self.data and self.data["battery"] is not None:
             return self.data["battery"]
@@ -175,7 +175,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @sensor("Battery Charge State")
-    def battery_charge(self) -> Optional[str]:
+    def battery_charge(self) -> str | None:
         """State of the battery charger, if available."""
         if "bat_charge" in self.data and self.data["bat_charge"] is not None:
             return self.data["bat_charge"]
@@ -183,7 +183,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @sensor("Battery State")
-    def battery_state(self) -> Optional[str]:
+    def battery_state(self) -> str | None:
         """State of the battery, if available."""
         if "bat_state" in self.data and self.data["bat_state"] is not None:
             return self.data["bat_state"]
@@ -219,7 +219,7 @@ class FanStatus(DeviceStatus):
 
     @property
     @sensor("Last Pressed Button")
-    def button_pressed(self) -> Optional[str]:
+    def button_pressed(self) -> str | None:
         """Last pressed button."""
         if "button_pressed" in self.data and self.data["button_pressed"] is not None:
             return self.data["button_pressed"]
@@ -291,7 +291,7 @@ class Fan(Device):
     def set_natural_speed(self, speed: int):
         """Set natural level."""
         if speed < 0 or speed > 100:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("set_natural_level", [speed])
 
@@ -302,7 +302,7 @@ class Fan(Device):
     def set_direct_speed(self, speed: int):
         """Set speed of the direct mode."""
         if speed < 0 or speed > 100:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("set_speed_level", [speed])
 
@@ -321,7 +321,7 @@ class Fan(Device):
     def set_angle(self, angle: int):
         """Set the oscillation angle."""
         if angle < 0 or angle > 120:
-            raise ValueError("Invalid angle: %s" % angle)
+            raise ValueError(f"Invalid angle: {angle}")
 
         return self.send("set_angle", [angle])
 
@@ -404,7 +404,7 @@ class Fan(Device):
         """Set delay off seconds."""
 
         if seconds < 0:
-            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError(f"Invalid value for a delayed turn off: {seconds}")
 
         # Set delay countdown in minutes for model ZA4
         if self.model in [MODEL_FAN_ZA4]:

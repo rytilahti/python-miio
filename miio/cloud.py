@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import click
 
@@ -134,7 +134,7 @@ class CloudInterface:
         """
         return AVAILABLE_LOCALES
 
-    def get_devices(self, locale: Optional[str] = None) -> dict[str, CloudDeviceInfo]:
+    def get_devices(self, locale: str | None = None) -> dict[str, CloudDeviceInfo]:
         """Return a list of available devices keyed with a device id.
 
         If no locale is given, all known locales are browsed. If a device id is already
@@ -178,7 +178,7 @@ def cloud(ctx: click.Context, username, password):
 @click.pass_context
 @click.option("--locale", prompt=True, type=click.Choice(AVAILABLE_LOCALES.keys()))
 @click.option("--raw", is_flag=True, default=False)
-def cloud_list(ctx: click.Context, locale: Optional[str], raw: bool):
+def cloud_list(ctx: click.Context, locale: str | None, raw: bool):
     """List devices connected to the cloud account."""
 
     ci = ctx.obj

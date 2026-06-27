@@ -162,7 +162,7 @@ class PhilipsMoonlight(Device):
         """Set color in RGB."""
         for color in rgb:
             if color < 0 or color > 255:
-                raise ValueError("Invalid color: %s" % color)
+                raise ValueError(f"Invalid color: {color}")
 
         return self.send("set_rgb", [*rgb])
 
@@ -173,7 +173,7 @@ class PhilipsMoonlight(Device):
     def set_brightness(self, level: int):
         """Set brightness level."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.send("set_bright", [level])
 
@@ -184,7 +184,7 @@ class PhilipsMoonlight(Device):
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid color temperature: %s" % level)
+            raise ValueError(f"Invalid color temperature: {level}")
 
         return self.send("set_cct", [level])
 
@@ -198,10 +198,10 @@ class PhilipsMoonlight(Device):
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         if cct < 1 or cct > 100:
-            raise ValueError("Invalid color temperature: %s" % cct)
+            raise ValueError(f"Invalid color temperature: {cct}")
 
         return self.send("set_bricct", [brightness, cct])
 
@@ -215,11 +215,11 @@ class PhilipsMoonlight(Device):
     def set_brightness_and_rgb(self, brightness: int, rgb: tuple[int, int, int]):
         """Set brightness level and the color."""
         if brightness < 1 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         for color in rgb:
             if color < 0 or color > 255:
-                raise ValueError("Invalid color: %s" % color)
+                raise ValueError(f"Invalid color: {color}")
 
         return self.send("set_brirgb", [*rgb, brightness])
 
@@ -230,7 +230,7 @@ class PhilipsMoonlight(Device):
     def set_scene(self, number: int):
         """Set scene number."""
         if number < 1 or number > 6:
-            raise ValueError("Invalid fixed scene number: %s" % number)
+            raise ValueError(f"Invalid fixed scene number: {number}")
 
         if number == 6:
             return self.send("go_night")

@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -106,14 +106,14 @@ class FanP5(Device):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = MODEL_FAN_P5,
+        model: str = MODEL_FAN_P5,
     ) -> None:
         super().__init__(
             ip, token, start_id, debug, lazy_discover, timeout=timeout, model=model
@@ -165,7 +165,7 @@ class FanP5(Device):
     def set_speed(self, speed: int):
         """Set speed."""
         if speed < 0 or speed > 100:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("s_speed", [speed])
 
@@ -244,7 +244,7 @@ class FanP5(Device):
         """Set delay off minutes."""
 
         if minutes < 0:
-            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError(f"Invalid value for a delayed turn off: {minutes}")
 
         return self.send("s_t_off", [minutes])
 

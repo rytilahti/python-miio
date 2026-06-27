@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import click
 
@@ -78,14 +77,14 @@ class DeviceFactory:
                 )
                 return impl
 
-        raise DeviceException("No implementation found for model %s" % model)
+        raise DeviceException(f"No implementation found for model {model}")
 
     @classmethod
     def create(
         self,
         host: str,
         token: str,
-        model: Optional[str] = None,
+        model: str | None = None,
         *,
         force_generic_miot=False,
     ) -> Device:

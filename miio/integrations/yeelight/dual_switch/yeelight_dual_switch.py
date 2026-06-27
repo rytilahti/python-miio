@@ -200,7 +200,7 @@ class YeelightDualControlModule(MiotDevice):
         """Set switch off delay, should be between -1 to 43200 (in seconds)"""
         if delay < -1 or delay > 43200:
             raise ValueError(
-                "Invalid switch delay: %s (should be between -1 to 43200)" % delay
+                f"Invalid switch delay: {delay} (should be between -1 to 43200)"
             )
 
         if switch == Switch.First:

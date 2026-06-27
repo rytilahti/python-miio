@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -122,7 +122,7 @@ class AirFreshStatus(DeviceStatus):
         return self.data["humidity"]
 
     @property
-    def ptc(self) -> Optional[bool]:
+    def ptc(self) -> bool | None:
         """Return True if PTC is on."""
         if self.data["ptc_state"] is not None:
             return self.data["ptc_state"] == "on"
@@ -130,7 +130,7 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             if self.model == MODEL_AIRFRESH_VA4:
@@ -141,7 +141,7 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    def ntc_temperature(self) -> Optional[float]:
+    def ntc_temperature(self) -> float | None:
         """Current ntc temperature, if available."""
         if self.data["ntcT"] is not None:
             return self.data["ntcT"]
@@ -159,7 +159,7 @@ class AirFreshStatus(DeviceStatus):
         return self.data["led"] == "on"
 
     @property
-    def led_brightness(self) -> Optional[LedBrightness]:
+    def led_brightness(self) -> LedBrightness | None:
         """Brightness of the LED."""
         if self.data["led_level"] is not None:
             try:
@@ -173,7 +173,7 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    def buzzer(self) -> Optional[bool]:
+    def buzzer(self) -> bool | None:
         """Return True if buzzer is on."""
         if self.data["buzzer"] is not None:
             return self.data["buzzer"] == "on"
@@ -206,7 +206,7 @@ class AirFreshStatus(DeviceStatus):
         return self.data["motor1_speed"]
 
     @property
-    def extra_features(self) -> Optional[int]:
+    def extra_features(self) -> int | None:
         return self.data["app_extra"]
 
 
@@ -321,7 +321,7 @@ class AirFresh(Device):
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app."""
         if value < 0:
-            raise ValueError("Invalid app extra value: %s" % value)
+            raise ValueError(f"Invalid app extra value: {value}")
 
         return self.send("set_app_extra", [value])
 

@@ -1,7 +1,7 @@
 import enum
 import logging
 import random
-from typing import Any, Optional
+from typing import Any
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
@@ -59,7 +59,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    def mode(self) -> Optional[OperationMode]:
+    def mode(self) -> OperationMode | None:
         """Current operation mode."""
         try:
             mode = self.data[1]
@@ -68,7 +68,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def target_temperature(self) -> Optional[int]:
+    def target_temperature(self) -> int | None:
         """Target temperature."""
         try:
             return self.data[2]
@@ -76,7 +76,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def fan_speed(self) -> Optional[FanSpeed]:
+    def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         try:
             speed = self.data[3]
@@ -85,7 +85,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def swing_mode(self) -> Optional[SwingMode]:
+    def swing_mode(self) -> SwingMode | None:
         """Current swing mode."""
         try:
             mode = self.data[4]
@@ -101,14 +101,14 @@ class AirConditioningCompanionMcn02(Device):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
-        start_id: Optional[int] = None,
+        ip: str | None = None,
+        token: str | None = None,
+        start_id: int | None = None,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = MODEL_ACPARTNER_MCN02,
+        model: str = MODEL_ACPARTNER_MCN02,
     ) -> None:
         if start_id is None:
             start_id = random.randint(0, 999)  # nosec
@@ -154,7 +154,7 @@ class AirConditioningCompanionMcn02(Device):
     @command(
         default_output=format_output("Sending a command to the air conditioner"),
     )
-    def send_command(self, command: str, parameters: Optional[Any] = None) -> Any:
+    def send_command(self, command: str, parameters: Any | None = None) -> Any:
         """Send a command to the air conditioner.
 
         :param str command: Command to execute

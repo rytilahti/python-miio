@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, time, timedelta
 from enum import IntEnum
-from typing import Any, Optional, Union
+from typing import Any
 from urllib import parse
 
 from croniter import croniter
@@ -206,7 +206,7 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @sensor("Cleaning Progress", icon="mdi:progress-check", unit="%")
-    def clean_percent(self) -> Optional[int]:
+    def clean_percent(self) -> int | None:
         """Return progress of the current clean."""
         if "clean_percent" in self.data:
             return int(self.data["clean_percent"])
@@ -238,7 +238,7 @@ class VacuumStatus(DeviceStatus):
         try:
             return ERROR_CODES[self.error_code]
         except KeyError:
-            return "Definition missing for error %s" % self.error_code
+            return f"Definition missing for error {self.error_code}"
 
     @property
     @sensor(
@@ -247,7 +247,7 @@ class VacuumStatus(DeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def dock_error_code(self) -> Optional[int]:
+    def dock_error_code(self) -> int | None:
         """Dock error status as returned by the device."""
         if "dock_error_status" in self.data:
             return int(self.data["dock_error_status"])
@@ -262,14 +262,14 @@ class VacuumStatus(DeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def dock_error(self) -> Optional[str]:
+    def dock_error(self) -> str | None:
         """Human readable dock error description, see also :func:`dock_error_code`."""
         if self.dock_error_code is None:
             return None
         try:
             return dock_error_codes[self.dock_error_code]
         except KeyError:
-            return "Definition missing for dock error %s" % self.dock_error_code
+            return f"Definition missing for dock error {self.dock_error_code}"
 
     @property
     @sensor("Battery", unit="%", device_class="battery", id=VacuumId.Battery)
@@ -287,7 +287,7 @@ class VacuumStatus(DeviceStatus):
         step=1,
         icon="mdi:fan",
     )
-    def fanspeed(self) -> Optional[int]:
+    def fanspeed(self) -> int | None:
         """Current fan speed."""
         fan_power = int(self.data["fan_power"])
         if fan_power > 100:
@@ -313,7 +313,7 @@ class VacuumStatus(DeviceStatus):
         setter_name="set_mop_intensity",
         icon="mdi:checkbox-multiple-blank-circle-outline",
     )
-    def mop_intensity(self) -> Optional[int]:
+    def mop_intensity(self) -> int | None:
         """Current mop intensity."""
         if "water_box_mode" in self.data:
             return int(self.data["water_box_mode"])
@@ -326,7 +326,7 @@ class VacuumStatus(DeviceStatus):
         setter_name="set_mop_mode",
         icon="mdi:swap-horizontal-variant",
     )
-    def mop_route(self) -> Optional[int]:
+    def mop_route(self) -> int | None:
         """Current mop route."""
         if "mop_mode" in self.data:
             return int(self.data["mop_mode"])
@@ -366,7 +366,7 @@ class VacuumStatus(DeviceStatus):
         setter_name="load_map",
         icon="mdi:floor-plan",
     )
-    def current_map_id(self) -> Optional[int]:
+    def current_map_id(self) -> int | None:
         """The id of the current map with regards to the multi map feature,
 
         [3,7,11,15] -> [0,1,2,3].
@@ -404,7 +404,7 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @sensor("Water box attached", icon="mdi:cup-water")
-    def is_water_box_attached(self) -> Optional[bool]:
+    def is_water_box_attached(self) -> bool | None:
         """Return True is water box is installed."""
         if "water_box_status" in self.data:
             return self.data["water_box_status"] == 1
@@ -412,7 +412,7 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @sensor("Mop attached")
-    def is_water_box_carriage_attached(self) -> Optional[bool]:
+    def is_water_box_carriage_attached(self) -> bool | None:
         """Return True if water box carriage (mop) is installed, None if sensor not
         present."""
         if "water_box_carriage_status" in self.data:
@@ -421,7 +421,7 @@ class VacuumStatus(DeviceStatus):
 
     @property
     @sensor("Water level low", device_class="problem", icon="mdi:water-alert-outline")
-    def is_water_shortage(self) -> Optional[bool]:
+    def is_water_shortage(self) -> bool | None:
         """Returns True if water is low in the tank, None if sensor not present."""
         if "water_shortage_status" in self.data:
             return self.data["water_shortage_status"] == 1
@@ -434,7 +434,7 @@ class VacuumStatus(DeviceStatus):
         icon="mdi:turbine",
         entity_category="config",
     )
-    def auto_dust_collection(self) -> Optional[bool]:
+    def auto_dust_collection(self) -> bool | None:
         """Returns True if auto dust collection is enabled, None if sensor not
         present."""
         if "auto_dust_collection" in self.data:
@@ -460,7 +460,7 @@ class VacuumStatus(DeviceStatus):
         enabled_default=False,
         device_class="heat",
     )
-    def is_mop_drying(self) -> Optional[bool]:
+    def is_mop_drying(self) -> bool | None:
         """Return if mop drying is running."""
         if "dry_status" in self.data:
             return self.data["dry_status"] == 1
@@ -474,7 +474,7 @@ class VacuumStatus(DeviceStatus):
         device_class="duration",
         enabled_default=False,
     )
-    def mop_dryer_remaining_seconds(self) -> Optional[timedelta]:
+    def mop_dryer_remaining_seconds(self) -> timedelta | None:
         """Return remaining mop drying seconds."""
         if "rdt" in self.data:
             return pretty_seconds(self.data["rdt"])
@@ -484,7 +484,7 @@ class VacuumStatus(DeviceStatus):
 class CleaningSummary(DeviceStatus):
     """Contains summarized information about available cleaning runs."""
 
-    def __init__(self, data: Union[list[Any], dict[str, Any]]) -> None:
+    def __init__(self, data: list[Any] | dict[str, Any]) -> None:
         # total duration, total area, amount of cleans
         # [ list, of, ids ]
         # { "result": [ 174145, 2410150000, 82,
@@ -554,7 +554,7 @@ class CleaningSummary(DeviceStatus):
         state_class="total_increasing",
         entity_category="diagnostic",
     )
-    def dust_collection_count(self) -> Optional[int]:
+    def dust_collection_count(self) -> int | None:
         """Total number of dust collections."""
         if "dust_collection_count" in self.data:
             return int(self.data["dust_collection_count"])
@@ -565,7 +565,7 @@ class CleaningSummary(DeviceStatus):
 class CleaningDetails(DeviceStatus):
     """Contains details about a specific cleaning run."""
 
-    def __init__(self, data: Union[list[Any], dict[str, Any]]) -> None:
+    def __init__(self, data: list[Any] | dict[str, Any]) -> None:
         # start, end, duration, area, unk, complete
         # { "result": [ [ 1488347071, 1488347123, 16, 0, 0, 0 ] ], "id": 1 }
         # newer models return a dict
@@ -780,7 +780,7 @@ class ConsumableStatus(DeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def dustbin_auto_empty_used(self) -> Optional[int]:
+    def dustbin_auto_empty_used(self) -> int | None:
         """Return ``dust_collection_work_times``"""
         if "dust_collection_work_times" in self.data:
             return self.data["dust_collection_work_times"]
@@ -793,7 +793,7 @@ class ConsumableStatus(DeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def strainer_cleaned_count(self) -> Optional[int]:
+    def strainer_cleaned_count(self) -> int | None:
         """Return strainer cleaned count."""
         if "strainer_work_times" in self.data:
             return self.data["strainer_work_times"]
@@ -806,7 +806,7 @@ class ConsumableStatus(DeviceStatus):
         entity_category="diagnostic",
         enabled_default=False,
     )
-    def cleaning_brush_cleaned_count(self) -> Optional[int]:
+    def cleaning_brush_cleaned_count(self) -> int | None:
         """Return cleaning brush cleaned count."""
         if "cleaning_brush_work_times" in self.data:
             return self.data["cleaning_brush_work_times"]
@@ -871,7 +871,7 @@ class Timer(DeviceStatus):
 
         # Initialize croniter to cause an exception on invalid entries (#847)
         self.croniter = croniter(self.cron, start_time=localized_ts)
-        self._next_schedule: Optional[datetime] = None
+        self._next_schedule: datetime | None = None
 
     @property
     def id(self) -> str:
@@ -884,7 +884,7 @@ class Timer(DeviceStatus):
         return self.data[0]
 
     @property
-    def ts(self) -> Optional[datetime]:
+    def ts(self) -> datetime | None:
         """Timer creation time, if the id is a unix timestamp."""
         try:
             return pretty_time(int(self.data[0]) / 1000)

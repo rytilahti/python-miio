@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -81,7 +81,7 @@ class AirDehumidifierStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         if "temp" in self.data and self.data["temp"] is not None:
             return self.data["temp"]
@@ -108,7 +108,7 @@ class AirDehumidifierStatus(DeviceStatus):
         return self.data["child_lock"] == "on"
 
     @property
-    def target_humidity(self) -> Optional[int]:
+    def target_humidity(self) -> int | None:
         """Target humiditiy.
 
         Can be either 40, 50, 60 percent.
@@ -118,7 +118,7 @@ class AirDehumidifierStatus(DeviceStatus):
         return None
 
     @property
-    def fan_speed(self) -> Optional[FanSpeed]:
+    def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         if "fan_speed" in self.data and self.data["fan_speed"] is not None:
             return FanSpeed(self.data["fan_speed"])
@@ -274,6 +274,6 @@ class AirDehumidifier(Device):
     def set_target_humidity(self, humidity: int):
         """Set the auto target humidity."""
         if humidity not in [40, 50, 60]:
-            raise ValueError("Invalid auto target humidity: %s" % humidity)
+            raise ValueError(f"Invalid auto target humidity: {humidity}")
 
         return self.send("set_auto", [humidity])

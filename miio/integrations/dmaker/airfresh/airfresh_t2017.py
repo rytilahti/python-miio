@@ -1,7 +1,7 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -155,22 +155,22 @@ class AirFreshStatus(DeviceStatus):
         return self.data["control_speed"]
 
     @property
-    def dust_filter_life_remaining(self) -> Optional[int]:
+    def dust_filter_life_remaining(self) -> int | None:
         """Remaining dust filter life in percent."""
         return self.data.get("filter_intermediate", self.data.get("filter_rate"))
 
     @property
-    def dust_filter_life_remaining_days(self) -> Optional[int]:
+    def dust_filter_life_remaining_days(self) -> int | None:
         """Remaining dust filter life in days."""
         return self.data.get("filter_inter_day", self.data.get("filter_day"))
 
     @property
-    def upper_filter_life_remaining(self) -> Optional[int]:
+    def upper_filter_life_remaining(self) -> int | None:
         """Remaining upper filter life in percent."""
         return self.data.get("filter_efficient")
 
     @property
-    def upper_filter_life_remaining_days(self) -> Optional[int]:
+    def upper_filter_life_remaining_days(self) -> int | None:
         """Remaining upper filter life in days."""
         return self.data.get("filter_effi_day")
 
@@ -180,7 +180,7 @@ class AirFreshStatus(DeviceStatus):
         return self.data["ptc_on"]
 
     @property
-    def ptc_level(self) -> Optional[PtcLevel]:
+    def ptc_level(self) -> PtcLevel | None:
         """PTC level."""
         try:
             return PtcLevel(self.data["ptc_level"])
@@ -208,7 +208,7 @@ class AirFreshStatus(DeviceStatus):
         return self.data["display"]
 
     @property
-    def display_orientation(self) -> Optional[DisplayOrientation]:
+    def display_orientation(self) -> DisplayOrientation | None:
         """Display orientation."""
         try:
             return DisplayOrientation(self.data["screen_direction"])
@@ -320,7 +320,7 @@ class AirFreshA1(Device):
     def set_favorite_speed(self, speed: int):
         """Sets the fan speed in favorite mode."""
         if speed < 0 or speed > 150:
-            raise ValueError("Invalid favorite speed: %s" % speed)
+            raise ValueError(f"Invalid favorite speed: {speed}")
 
         return self.send("set_favourite_speed", [speed])
 
@@ -387,7 +387,7 @@ class AirFreshT2017(AirFreshA1):
     def set_favorite_speed(self, speed: int):
         """Sets the fan speed in favorite mode."""
         if speed < 60 or speed > 300:
-            raise ValueError("Invalid favorite speed: %s" % speed)
+            raise ValueError(f"Invalid favorite speed: {speed}")
 
         return self.send("set_favourite_speed", [speed])
 
