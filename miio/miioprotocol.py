@@ -39,6 +39,10 @@ class MiIOProtocol:
     ) -> None:
         """Create a :class:`Device` instance.
 
+        Some devices require a recent handshake to accept commands, but
+        handshaking before every request adds unnecessary latency. Use
+        handshake_timeout to control how often the handshake is renewed.
+
         :param ip: IP address or a hostname for the device
         :param token: Token used for encryption
         :param start_id: Running message id sent to the device
@@ -117,11 +121,9 @@ class MiIOProtocol:
     def _needs_handshake(self) -> bool:
         """Return True if a handshake is needed before sending.
 
-        The decision is based on _handshake_timeout, which is set in __init__
-        either from the explicit handshake_timeout parameter, or derived from
-        the legacy lazy_discover flag:
-        - lazy_discover=True  -> _handshake_timeout=None  (handshake once)
-        - lazy_discover=False -> _handshake_timeout=0s     (every request)
+        Handshake is required on first contact or when the configured timeout
+        has elapsed since the last handshake. If no timeout is set, handshake
+        only once and never repeat it.
         """
         if not self._discovered:
             return True
