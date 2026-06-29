@@ -61,6 +61,7 @@ from miio.integrations.lumi.acpartner import (
 )
 from miio.integrations.lumi.camera.aqaracamera import AqaraCamera
 from miio.integrations.lumi.curtain import CurtainMiot
+from miio.integrations.yeelink.curtain import CurtainYeelight
 from miio.integrations.lumi.gateway import Gateway
 from miio.integrations.mijia.vacuum import G1Vacuum
 from miio.integrations.mmgg.petwaterdispenser import PetWaterDispenser
