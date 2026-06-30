@@ -144,6 +144,10 @@ Use `miiocli genericmiot --help` for more available commands.
 
 **Note, using this integration requires you to use the git version until [version 0.6.0](https://github.com/rytilahti/python-miio/issues/1114) is released.**
 
+Some MIoT devices also have dedicated integrations built on top of the same protocol.
+For example, `xiaomi.vacuum.e101gb` (Xiaomi Robot Vacuum S40C EU) is supported through
+the `XiaomiVacuumE101GB` integration and `DeviceFactory.create()`.
+
 ## Controlling older (miIO) devices
 
 Older devices are mainly supported by their corresponding modules (e.g.,
@@ -237,6 +241,7 @@ While all MIoT devices are supported through the `genericmiot`
 integration, this library supports also the following devices:
 
 * Xiaomi Mi Robot Vacuum V1, S4, S4 MAX, S5, S5 MAX, S6 Pure, M1S, S7
+* Xiaomi Robot Vacuum S40C EU (`xiaomi.vacuum.e101gb`)
 * Xiaomi Mi Home Air Conditioner Companion
 * Xiaomi Mi Smart Air Conditioner A (xiaomi.aircondition.mc1, mc2, mc4, mc5)
 * Xiaomi Mi Air Purifier 2, 3H, 3C, 4, Pro, Pro H, 4 Pro (zhimi.airpurifier.m2, mb3, mb4, mb5, v7, vb2, va2), 4 Lite

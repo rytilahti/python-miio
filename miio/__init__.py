@@ -83,6 +83,7 @@ from miio.integrations.viomi.vacuum import ViomiVacuum
 from miio.integrations.viomi.viomidishwasher import ViomiDishwasher
 from miio.integrations.xiaomi.aircondition.airconditioner_miot import AirConditionerMiot
 from miio.integrations.xiaomi.repeater.wifirepeater import WifiRepeater
+from miio.integrations.xiaomi.vacuum.vacuum_miot import XiaomiVacuumE101GB
 from miio.integrations.xiaomi.wifispeaker.wifispeaker import WifiSpeaker
 from miio.integrations.yeelight.dual_switch import YeelightDualControlModule
 from miio.integrations.yeelight.light import Yeelight
