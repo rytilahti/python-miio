@@ -187,7 +187,6 @@ class G1Status(DeviceStatus):
             return f"Definition missing for error {self.error_code}"
 
     @property
-    @property
     @sensor("State")
     def state(self) -> G1State:
         """Vacuum Status."""
