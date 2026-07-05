@@ -1,0 +1,46 @@
+---
+
+name: Stale
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  stale:
+    if: github.repository_owner == 'rytilahti'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stale Issues and PRs Policy
+        id: stale-issues-and-prs-policy
+        uses: actions/stale@v10
+        with:
+          repo-token: ${{ github.token }}
+          days-before-stale: 90
+          days-before-close: 7
+          operations-per-run: 250
+          remove-stale-when-updated: true
+          stale-issue-label: "stale"
+          exempt-issue-labels: "no-stale,help wanted"
+          stale-pr-label: "stale"
+          exempt-pr-labels: "no-stale"
+          stale-pr-message: >
+            There hasn't been any activity on this pull request recently. This
+            pull request has been automatically marked as stale because of that
+            and will be closed if no further activity occurs within 7 days.
+
+            If you are the author of this PR, please leave a comment if you want
+            to keep it open. Also, please rebase your PR onto the latest master
+            branch to ensure that it's up to date with the latest changes.
+
+            Thank you for your contribution!
+          stale-issue-message: >
+            There hasn't been any activity on this issue recently. This issue has
+            been automatically marked as stale because of that. It will be closed
+            if no further activity occurs.
+
+            Please make sure to update to the latest python-miio version and
+            check if that solves the issue.
+
+            Thank you for your contributions.
