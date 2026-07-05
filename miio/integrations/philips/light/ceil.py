@@ -26,13 +26,13 @@ class CeilStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
@@ -41,7 +41,6 @@ class CeilStatus(DeviceStatus):
     @setting(
         "Brightness",
         setter_name="set_brightness",
-        icon="mdi:brightness-6",
         unit="%",
         min_value=1,
         max_value=100,
@@ -55,7 +54,6 @@ class CeilStatus(DeviceStatus):
     @setting(
         "Scene",
         setter_name="set_scene",
-        icon="mdi:palette",
         min_value=1,
         max_value=4,
         step=1,
@@ -68,7 +66,6 @@ class CeilStatus(DeviceStatus):
     @setting(
         "Delay Off Countdown",
         setter_name="delay_off",
-        icon="mdi:timer",
         device_class="duration",
         unit="s",
     )
@@ -80,7 +77,6 @@ class CeilStatus(DeviceStatus):
     @setting(
         "Color Temperature",
         setter_name="set_color_temperature",
-        icon="mdi:temperature-kelvin",
         min_value=1,
         max_value=100,
         step=1,
@@ -90,13 +86,13 @@ class CeilStatus(DeviceStatus):
         return self.data["cct"]
 
     @property
-    @sensor("Smart Night Light", icon="mdi:weather-night")
+    @sensor("Smart Night Light")
     def smart_night_light(self) -> bool:
         """Smart night mode state."""
         return self.data["bl"] == 1
 
     @property
-    @sensor("Automatic Color Temperature", icon="mdi:theme-light-dark")
+    @sensor("Automatic Color Temperature")
     def automatic_color_temperature(self) -> bool:
         """Automatic color temperature state."""
         return self.data["ac"] == 1

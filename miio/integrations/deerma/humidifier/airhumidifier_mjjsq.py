@@ -56,13 +56,13 @@ class AirHumidifierStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor(name="Power", icon="mdi:power")
+    @sensor(name="Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["OnOff_State"] == 1 else "off"
 
     @property
-    @setting(name="Power", setter_name="on", icon="mdi:power")
+    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"
@@ -71,7 +71,6 @@ class AirHumidifierStatus(DeviceStatus):
     @setting(
         name="Mode",
         setter_name="set_mode",
-        icon="mdi:fan",
         choices=OperationMode,
     )
     def mode(self) -> OperationMode:
@@ -94,13 +93,13 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["Humidity_Value"]
 
     @property
-    @setting(name="Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
+    @setting(name="Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["TipSound_State"] == 1
 
     @property
-    @setting(name="LED", setter_name="set_led", icon="mdi:led-outline")
+    @setting(name="LED", setter_name="set_led")
     def led(self) -> bool:
         """True if LED is turned on."""
         return self.data["Led_State"] == 1
@@ -110,7 +109,6 @@ class AirHumidifierStatus(DeviceStatus):
         name="Target Humidity",
         setter_name="set_target_humidity",
         unit="%",
-        icon="mdi:water-percent",
         min_value=0,
         max_value=99,
     )
@@ -119,21 +117,19 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["HumiSet_Value"]
 
     @property
-    @sensor(name="No Water", icon="mdi:water-off")
+    @sensor(name="No Water")
     def no_water(self) -> bool:
         """True if the water tank is empty."""
         return self.data["waterstatus"] == 0
 
     @property
-    @sensor(name="Water Tank Detached", icon="mdi:cup-water")
+    @sensor(name="Water Tank Detached")
     def water_tank_detached(self) -> bool:
         """True if the water tank is detached."""
         return self.data["watertankstatus"] == 0
 
     @property
-    @setting(
-        name="Wet Protection", setter_name="set_wet_protection", icon="mdi:shield-check"
-    )
+    @setting(name="Wet Protection", setter_name="set_wet_protection")
     def wet_protection(self) -> bool | None:
         """True if wet protection is enabled."""
         if self.data["wet_and_protect"] is not None:
@@ -142,7 +138,7 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    @sensor(name="Use Time", unit="s", icon="mdi:timer")
+    @sensor(name="Use Time", unit="s")
     def use_time(self) -> int | None:
         """How long the device has been active in seconds.
 

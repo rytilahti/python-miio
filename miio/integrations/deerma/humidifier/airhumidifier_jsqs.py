@@ -70,19 +70,19 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Air Humidifier
 
     @property
-    @setting(name="Power", setter_name="on", icon="mdi:power")
+    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.data["power"]
 
     @property
-    @sensor(name="Power", icon="mdi:power")
+    @sensor(name="Power")
     def power(self) -> str:
         """Return power state."""
         return "on" if self.is_on else "off"
 
     @property
-    @sensor(name="Error", icon="mdi:alert-circle")
+    @sensor(name="Error")
     def error(self) -> int:
         """Return error state."""
         return self.data["fault"]
@@ -91,7 +91,6 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     @setting(
         name="Mode",
         setter_name="set_mode",
-        icon="mdi:fan",
         choices=OperationMode,
     )
     def mode(self) -> OperationMode:
@@ -127,7 +126,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Alarm
 
     @property
-    @setting(name="Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
+    @setting(name="Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool | None:
         """Return True if buzzer is on."""
         return self.data.get("buzzer")
@@ -135,7 +134,7 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Indicator Light
 
     @property
-    @setting(name="LED Light", setter_name="set_light", icon="mdi:led-outline")
+    @setting(name="LED Light", setter_name="set_light")
     def led_light(self) -> bool | None:
         """Return status of the LED."""
         return self.data.get("led_light")
@@ -143,23 +142,19 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Other
 
     @property
-    @sensor(name="Tank Filed", icon="mdi:cup-water")
+    @sensor(name="Tank Filed")
     def tank_filed(self) -> bool | None:
         """Return the tank filed."""
         return self.data.get("tank_filed")
 
     @property
-    @sensor(name="Water Shortage Fault", icon="mdi:water-off")
+    @sensor(name="Water Shortage Fault")
     def water_shortage_fault(self) -> bool | None:
         """Return water shortage fault."""
         return self.data.get("water_shortage_fault")
 
     @property
-    @setting(
-        name="Overwet Protect",
-        setter_name="set_overwet_protect",
-        icon="mdi:shield-check",
-    )
+    @setting(name="Overwet Protect", setter_name="set_overwet_protect")
     def overwet_protect(self) -> bool | None:
         """Return True if overwet mode is active."""
         return self.data.get("overwet_protect")

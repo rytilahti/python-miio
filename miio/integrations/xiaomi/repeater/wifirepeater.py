@@ -26,13 +26,13 @@ class WifiRepeaterStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Access Policy", icon="mdi:security")
+    @sensor("Access Policy")
     def access_policy(self) -> int:
         """Access policy of the associated stations."""
         return self.data["sta"]["access_policy"]
 
     @property
-    @sensor("Associated Stations", icon="mdi:devices")
+    @sensor("Associated Stations")
     def associated_stations(self) -> dict:
         """List of associated stations."""
         return self.data["mat"]
@@ -54,17 +54,17 @@ class WifiRepeaterConfiguration(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("SSID", icon="mdi:wifi")
+    @sensor("SSID")
     def ssid(self) -> str:
         return self.data["ssid"]
 
     @property
-    @sensor("Password", icon="mdi:lock")
+    @sensor("Password")
     def password(self) -> str:
         return self.data["pwd"]
 
     @property
-    @sensor("SSID Hidden", icon="mdi:wifi-off")
+    @sensor("SSID Hidden")
     def ssid_hidden(self) -> bool:
         return self.data["hidden"] == 1
 

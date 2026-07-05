@@ -45,30 +45,25 @@ class AirConditioningCompanionStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Load Power", unit="W", icon="mdi:flash", device_class="power")
+    @sensor("Load Power", unit="W", device_class="power")
     def load_power(self) -> int:
         """Current power load of the air conditioner."""
         return int(self.data[-1])
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         """Current power state."""
         return self.data[0]
 
     @property
-    @setting("Power", setter_name="on", icon="mdi:power")
+    @setting("Power", setter_name="on")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
-    @setting(
-        "Mode",
-        setter_name="send_command",
-        icon="mdi:air-conditioner",
-        choices=OperationMode,
-    )
+    @setting("Mode", setter_name="send_command", choices=OperationMode)
     def mode(self) -> OperationMode | None:
         """Current operation mode."""
         try:
@@ -82,7 +77,6 @@ class AirConditioningCompanionStatus(DeviceStatus):
         "Target Temperature",
         setter_name="send_command",
         unit="°C",
-        icon="mdi:thermometer",
         device_class="temperature",
     )
     def target_temperature(self) -> int | None:
@@ -93,7 +87,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    @setting("Fan Speed", setter_name="send_command", icon="mdi:fan", choices=FanSpeed)
+    @setting("Fan Speed", setter_name="send_command", choices=FanSpeed)
     def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         try:
@@ -103,12 +97,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    @setting(
-        "Swing Mode",
-        setter_name="send_command",
-        icon="mdi:arrow-oscillating",
-        choices=SwingMode,
-    )
+    @setting("Swing Mode", setter_name="send_command", choices=SwingMode)
     def swing_mode(self) -> SwingMode | None:
         """Current swing mode."""
         try:

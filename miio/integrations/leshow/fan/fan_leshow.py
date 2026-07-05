@@ -46,13 +46,13 @@ class FanLeshowStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] == 1 else "off"
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.data["power"] == 1
@@ -61,7 +61,6 @@ class FanLeshowStatus(DeviceStatus):
     @setting(
         "Mode",
         setter_name="set_mode",
-        icon="mdi:fan",
         choices=OperationMode,
     )
     def mode(self) -> OperationMode:
@@ -72,7 +71,6 @@ class FanLeshowStatus(DeviceStatus):
     @setting(
         "Speed",
         setter_name="set_speed",
-        icon="mdi:speedometer",
         unit="%",
         min_value=0,
         max_value=100,
@@ -83,13 +81,13 @@ class FanLeshowStatus(DeviceStatus):
         return self.data["blow"]
 
     @property
-    @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["sound"] == 1
 
     @property
-    @setting("Oscillate", setter_name="set_oscillate", icon="mdi:rotate-3d-variant")
+    @setting("Oscillate", setter_name="set_oscillate")
     def oscillate(self) -> bool:
         """True if oscillation is enabled."""
         return self.data["yaw"] == 1
@@ -98,7 +96,6 @@ class FanLeshowStatus(DeviceStatus):
     @setting(
         "Delay Off Countdown",
         setter_name="delay_off",
-        icon="mdi:timer",
         device_class="duration",
         unit="min",
         min_value=0,
@@ -110,7 +107,7 @@ class FanLeshowStatus(DeviceStatus):
         return self.data["timer"]
 
     @property
-    @sensor("Error Detected", icon="mdi:alert-circle")
+    @sensor("Error Detected")
     def error_detected(self) -> bool:
         """True if a fault was detected."""
         return self.data["fault"] == 1

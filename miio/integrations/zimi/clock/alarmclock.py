@@ -37,17 +37,17 @@ class Nightmode(DeviceStatus):
         self._end = data[2]
 
     @property
-    @sensor("Enabled", icon="mdi:alarm")
+    @sensor("Enabled")
     def enabled(self) -> bool:
         return self._enabled
 
     @property
-    @sensor("Start Time", icon="mdi:clock-start")
+    @sensor("Start Time")
     def start(self) -> str:
         return self._start
 
     @property
-    @sensor("End Time", icon="mdi:clock-end")
+    @sensor("End Time")
     def end(self) -> str:
         return self._end
 

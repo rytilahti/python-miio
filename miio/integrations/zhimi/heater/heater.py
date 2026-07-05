@@ -58,19 +58,19 @@ class HeaterStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.power == "on"
 
     @property
-    @sensor("Humidity", unit="%", icon="mdi:water-percent", device_class="humidity")
+    @sensor("Humidity", unit="%", device_class="humidity")
     def humidity(self) -> int | None:
         """Current humidity."""
         if (
@@ -82,9 +82,7 @@ class HeaterStatus(DeviceStatus):
         return None
 
     @property
-    @sensor(
-        "Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature"
-    )
+    @sensor("Temperature", unit="°C", device_class="temperature")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
@@ -97,7 +95,6 @@ class HeaterStatus(DeviceStatus):
         min_value=16,
         max_value=32,
         device_class="temperature",
-        icon="mdi:thermometer",
     )
     def target_temperature(self) -> int:
         """Target temperature."""
@@ -108,34 +105,31 @@ class HeaterStatus(DeviceStatus):
         "Brightness",
         setter_name="set_brightness",
         choices=Brightness,
-        icon="mdi:brightness-6",
     )
     def brightness(self) -> Brightness:
         """Display brightness."""
         return Brightness(self.data["brightness"])
 
     @property
-    @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] in ["on", 1, 2]
 
     @property
-    @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
-    @sensor("Use Time", unit="s", icon="mdi:timer", device_class="duration")
+    @sensor("Use Time", unit="s", device_class="duration")
     def use_time(self) -> int:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
 
     @property
-    @sensor(
-        "Delay Off Countdown", unit="s", icon="mdi:timer-sand", device_class="duration"
-    )
+    @sensor("Delay Off Countdown", unit="s", device_class="duration")
     def delay_off_countdown(self) -> int | None:
         """Countdown until turning off in seconds."""
         if "poweroff_time" in self.data and self.data["poweroff_time"] is not None:

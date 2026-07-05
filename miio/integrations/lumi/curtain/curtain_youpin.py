@@ -74,15 +74,13 @@ class CurtainStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Status", icon="mdi:curtains")
+    @sensor("Status")
     def status(self) -> Status:
         """Device status."""
         return Status(self.data["status"])
 
     @property
-    @setting(
-        "Manual Enabled", setter_name="set_manual_enabled", icon="mdi:hand-back-left"
-    )
+    @setting("Manual Enabled", setter_name="set_manual_enabled")
     def is_manual_enabled(self) -> bool:
         """True if manual controls are enabled."""
         return bool(self.data["is_manual_enabled"])
@@ -91,7 +89,6 @@ class CurtainStatus(DeviceStatus):
     @setting(
         "Polarity",
         setter_name="set_polarity",
-        icon="mdi:swap-horizontal",
         choices=Polarity,
     )
     def polarity(self) -> Polarity:
@@ -102,28 +99,25 @@ class CurtainStatus(DeviceStatus):
     @setting(
         "Position Limited",
         setter_name="set_position_limit",
-        icon="mdi:arrow-collapse-horizontal",
     )
     def is_position_limited(self) -> bool:
         """Position limit."""
         return bool(self.data["is_position_limited"])
 
     @property
-    @setting(
-        "Night Tip Light", setter_name="set_night_tip_light", icon="mdi:lightbulb-night"
-    )
+    @setting("Night Tip Light", setter_name="set_night_tip_light")
     def night_tip_light(self) -> bool:
         """Night tip light status."""
         return bool(self.data["night_tip_light"])
 
     @property
-    @sensor("Run Time", icon="mdi:timer-outline", device_class="duration", unit="s")
+    @sensor("Run Time", device_class="duration", unit="s")
     def run_time(self) -> int:
         """Run time of the motor."""
         return self.data["run_time"]
 
     @property
-    @sensor("Current Position", icon="mdi:curtains", unit="%")
+    @sensor("Current Position", unit="%")
     def current_position(self) -> int:
         """Current curtain position."""
         return self.data["current_position"]
@@ -132,7 +126,6 @@ class CurtainStatus(DeviceStatus):
     @setting(
         "Target Position",
         setter_name="set_target_position",
-        icon="mdi:curtains",
         unit="%",
         min_value=0,
         max_value=100,
@@ -146,7 +139,6 @@ class CurtainStatus(DeviceStatus):
     @setting(
         "Adjust Value",
         setter_name="set_adjust_value",
-        icon="mdi:tune",
         min_value=-100,
         max_value=100,
         step=1,

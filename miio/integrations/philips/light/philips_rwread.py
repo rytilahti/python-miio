@@ -36,13 +36,13 @@ class PhilipsRwreadStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
@@ -51,7 +51,6 @@ class PhilipsRwreadStatus(DeviceStatus):
     @setting(
         "Brightness",
         setter_name="set_brightness",
-        icon="mdi:brightness-6",
         unit="%",
         min_value=1,
         max_value=100,
@@ -65,7 +64,6 @@ class PhilipsRwreadStatus(DeviceStatus):
     @setting(
         "Delay Off Countdown",
         setter_name="delay_off",
-        icon="mdi:timer",
         device_class="duration",
         unit="s",
     )
@@ -77,7 +75,6 @@ class PhilipsRwreadStatus(DeviceStatus):
     @setting(
         "Scene",
         setter_name="set_scene",
-        icon="mdi:palette",
         min_value=1,
         max_value=4,
         step=1,
@@ -87,9 +84,7 @@ class PhilipsRwreadStatus(DeviceStatus):
         return self.data["snm"]
 
     @property
-    @setting(
-        "Motion Detection", setter_name="set_motion_detection", icon="mdi:motion-sensor"
-    )
+    @setting("Motion Detection", setter_name="set_motion_detection")
     def motion_detection(self) -> bool:
         """True if motion detection is enabled."""
         return self.data["flm"] == 1
@@ -98,7 +93,6 @@ class PhilipsRwreadStatus(DeviceStatus):
     @setting(
         "Motion Detection Sensitivity",
         setter_name="set_motion_detection_sensitivity",
-        icon="mdi:signal-cellular-2",
         choices=MotionDetectionSensitivity,
     )
     def motion_detection_sensitivity(self) -> MotionDetectionSensitivity:
@@ -106,7 +100,7 @@ class PhilipsRwreadStatus(DeviceStatus):
         return MotionDetectionSensitivity(self.data["flmv"])
 
     @property
-    @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """True if child lock is enabled."""
         return self.data["chl"] == 1

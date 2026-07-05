@@ -46,7 +46,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power-plug")
+    @sensor("Power")
     def power(self) -> bool:
         """Current power state."""
         if "on" in self.data:
@@ -57,20 +57,18 @@ class ChuangmiPlugStatus(DeviceStatus):
         raise DeviceException("There was neither 'on' or 'power' in data")
 
     @property
-    @setting("Power", setter_name="on", icon="mdi:power-plug")
+    @setting("Power", setter_name="on")
     def is_on(self) -> bool:
         """True if device is on."""
         return self.power
 
     @property
-    @sensor(
-        "Temperature", unit="°C", icon="mdi:thermometer", device_class="temperature"
-    )
+    @sensor("Temperature", unit="°C", device_class="temperature")
     def temperature(self) -> int:
         return self.data["temperature"]
 
     @property
-    @setting("USB Power", setter_name="usb_on", icon="mdi:usb")
+    @setting("USB Power", setter_name="usb_on")
     def usb_power(self) -> bool | None:
         """True if USB is on."""
         if "usb_on" in self.data and self.data["usb_on"] is not None:
@@ -78,7 +76,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Load Power", unit="W", icon="mdi:flash", device_class="power")
+    @sensor("Load Power", unit="W", device_class="power")
     def load_power(self) -> float | None:
         """Current power load, if available."""
         if "load_power" in self.data and self.data["load_power"] is not None:
@@ -92,7 +90,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         return self.led
 
     @property
-    @setting("LED", setter_name="set_led", icon="mdi:led-on")
+    @setting("LED", setter_name="set_led")
     def led(self) -> bool | None:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:

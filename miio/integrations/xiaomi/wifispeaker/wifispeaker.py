@@ -47,56 +47,56 @@ class WifiSpeakerStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Device Name", icon="mdi:speaker")
+    @sensor("Device Name")
     def device_name(self) -> str:
         """Name of the device."""
         return self.data["DeviceName"]
 
     @property
-    @sensor("Channel", icon="mdi:radio")
+    @sensor("Channel")
     def channel(self) -> str:
         """Name of the channel."""
         return self.data["channel_title"]
 
     @property
-    @sensor("State", icon="mdi:play-circle")
+    @sensor("State")
     def state(self) -> PlayState:
         """State of the device, e.g. PLAYING."""
         return PlayState(self.data["current_state"])
 
     @property
-    @sensor("Hardware Version", icon="mdi:information-outline")
+    @sensor("Hardware Version")
     def hardware_version(self) -> str:
         """Hardware version."""
         return self.data["hardware_version"]
 
     @property
-    @sensor("Play Mode", icon="mdi:repeat")
+    @sensor("Play Mode")
     def play_mode(self) -> str:
         """Play mode such as REPEAT_ALL."""
         # note: this can be enumized when all values are known
         return self.data["play_mode"]
 
     @property
-    @sensor("Track Artist", icon="mdi:account-music")
+    @sensor("Track Artist")
     def track_artist(self) -> str:
         """Artist of the current track."""
         return self.data["track_artist"]
 
     @property
-    @sensor("Track Title", icon="mdi:music-note")
+    @sensor("Track Title")
     def track_title(self) -> str:
         """Title of the current track."""
         return self.data["track_title"]
 
     @property
-    @sensor("Track Duration", icon="mdi:timer-music", device_class="duration")
+    @sensor("Track Duration", device_class="duration")
     def track_duration(self) -> str:
         """Total duration of the current track."""
         return self.data["track_duration"]
 
     @property
-    @sensor("Transport Channel", icon="mdi:radio")
+    @sensor("Transport Channel")
     def transport_channel(self) -> TransportChannel:
         """Transport channel, e.g. PLAYLIST."""
         return TransportChannel(self.data["transport_channel"])

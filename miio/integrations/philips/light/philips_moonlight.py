@@ -24,12 +24,12 @@ class PhilipsMoonlightStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor(name="Power", icon="mdi:power")
+    @sensor(name="Power")
     def power(self) -> str:
         return self.data["pow"]
 
     @property
-    @setting(name="Power", setter_name="on", icon="mdi:power")
+    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         return self.power == "on"
 
@@ -38,7 +38,6 @@ class PhilipsMoonlightStatus(DeviceStatus):
         name="Brightness",
         setter_name="set_brightness",
         unit="%",
-        icon="mdi:brightness-6",
         min_value=1,
         max_value=100,
     )
@@ -49,7 +48,6 @@ class PhilipsMoonlightStatus(DeviceStatus):
     @setting(
         name="Color Temperature",
         setter_name="set_color_temperature",
-        icon="mdi:thermometer",
         min_value=1,
         max_value=100,
     )
@@ -57,7 +55,7 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["cct"]
 
     @property
-    @setting(name="RGB", setter_name="set_rgb", icon="mdi:palette")
+    @setting(name="RGB", setter_name="set_rgb")
     def rgb(self) -> tuple[int, int, int]:
         """Return color in RGB."""
         return int_to_rgb(int(self.data["rgb"]))
@@ -66,7 +64,6 @@ class PhilipsMoonlightStatus(DeviceStatus):
     @setting(
         name="Scene",
         setter_name="set_scene",
-        icon="mdi:palette-swatch",
         min_value=1,
         max_value=6,
     )
@@ -74,7 +71,7 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["snm"]
 
     @property
-    @sensor(name="Sleep Assistant", icon="mdi:sleep")
+    @sensor(name="Sleep Assistant")
     def sleep_assistant(self) -> int:
         """Example values:
 
@@ -86,29 +83,29 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["sta"]
 
     @property
-    @sensor(name="Sleep Off Time", unit="s", icon="mdi:timer-off")
+    @sensor(name="Sleep Off Time", unit="s")
     def sleep_off_time(self) -> int:
         return self.data["spr"]
 
     @property
-    @sensor(name="Total Assistant Sleep Time", unit="s", icon="mdi:timer")
+    @sensor(name="Total Assistant Sleep Time", unit="s")
     def total_assistant_sleep_time(self) -> int:
         return self.data["spt"]
 
     @property
-    @sensor(name="Brand Sleep", icon="mdi:sleep")
+    @sensor(name="Brand Sleep")
     def brand_sleep(self) -> bool:
         # sp_sleep_open?
         return self.data["ms"] == 1
 
     @property
-    @sensor(name="Brand", icon="mdi:watch")
+    @sensor(name="Brand")
     def brand(self) -> bool:
         # sp_xm_bracelet?
         return self.data["mb"] == 1
 
     @property
-    @sensor(name="Wake Up Time", icon="mdi:alarm")
+    @sensor(name="Wake Up Time")
     def wake_up_time(self) -> list[int]:
         # Example: [weekdays?, hour, minute]
         return self.data["wkp"]

@@ -71,7 +71,7 @@ class PwznRelayStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Relay State", icon="mdi:electric-switch")
+    @sensor("Relay State")
     def relay_state(self) -> int | None:
         """Current relay state."""
         if "relay_status" in self.data:
@@ -79,7 +79,7 @@ class PwznRelayStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Relay Names", icon="mdi:rename-box")
+    @sensor("Relay Names")
     def relay_names(self) -> dict[int, str]:
         def _extract_index_from_key(name) -> int:
             """extract the index from the variable."""
@@ -92,7 +92,7 @@ class PwznRelayStatus(DeviceStatus):
         }
 
     @property
-    @sensor("Active Relay Count", icon="mdi:counter")
+    @sensor("Active Relay Count")
     def on_count(self) -> int | None:
         """Number of on relay."""
         if "on_count" in self.data:

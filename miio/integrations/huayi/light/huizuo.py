@@ -118,7 +118,7 @@ class HuizuoStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.data["power"]
@@ -130,7 +130,6 @@ class HuizuoStatus(DeviceStatus):
         setter_name="set_brightness",
         min_value=0,
         max_value=100,
-        icon="mdi:brightness-6",
     )
     def brightness(self) -> int:
         """Return current brightness."""
@@ -143,7 +142,6 @@ class HuizuoStatus(DeviceStatus):
         setter_name="set_color_temp",
         min_value=3000,
         max_value=6400,
-        icon="mdi:thermometer",
         device_class="temperature",
     )
     def color_temp(self) -> int:
@@ -151,7 +149,7 @@ class HuizuoStatus(DeviceStatus):
         return self.data["color_temp"]
 
     @property
-    @sensor("Fan On", icon="mdi:fan")
+    @sensor("Fan On")
     def is_fan_on(self) -> bool | None:
         """Return True if Fan is on."""
         if "fan_power" in self.data:
@@ -166,7 +164,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Fan Reverse", icon="mdi:fan-chevron-down")
+    @sensor("Fan Reverse")
     def is_fan_reverse(self) -> bool | None:
         """Return True if Fan reverse is on."""
         if "fan_motor_reverse" in self.data:
@@ -174,7 +172,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Fan Mode", icon="mdi:fan-auto")
+    @sensor("Fan Mode")
     def fan_mode(self) -> int | None:
         """Return 0 if 'Basic' and 1 if 'Natural wind'."""
         if "fan_mode" in self.data:
@@ -182,7 +180,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Heater On", icon="mdi:radiator")
+    @sensor("Heater On")
     def is_heater_on(self) -> bool | None:
         """Return True if Heater is on."""
         if "heater_power" in self.data:
@@ -190,7 +188,7 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Heater Fault Code", icon="mdi:alert-circle")
+    @sensor("Heater Fault Code")
     def heater_fault_code(self) -> int | None:
         """Return Heater's fault code.
 

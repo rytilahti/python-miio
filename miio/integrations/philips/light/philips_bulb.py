@@ -38,19 +38,17 @@ class PhilipsBulbStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         return self.data["power"]
 
     @property
-    @setting("Power", setter_name="on", icon="mdi:power")
+    @setting("Power", setter_name="on")
     def is_on(self) -> bool:
         return self.power == "on"
 
     @property
-    @setting(
-        "Brightness", setter_name="set_brightness", unit="%", icon="mdi:brightness-6"
-    )
+    @setting("Brightness", setter_name="set_brightness", unit="%")
     def brightness(self) -> int | None:
         if "bright" in self.data:
             return self.data["bright"]
@@ -59,16 +57,14 @@ class PhilipsBulbStatus(DeviceStatus):
         return None
 
     @property
-    @setting(
-        "Color Temperature", setter_name="set_color_temperature", icon="mdi:palette"
-    )
+    @setting("Color Temperature", setter_name="set_color_temperature")
     def color_temperature(self) -> int | None:
         if "cct" in self.data:
             return self.data["cct"]
         return None
 
     @property
-    @setting("Scene", setter_name="set_scene", icon="mdi:palette")
+    @setting("Scene", setter_name="set_scene")
     def scene(self) -> int | None:
         if "snm" in self.data:
             return self.data["snm"]
@@ -78,7 +74,6 @@ class PhilipsBulbStatus(DeviceStatus):
     @sensor(
         "Delay Off Countdown",
         unit="s",
-        icon="mdi:timer-outline",
         device_class="duration",
     )
     def delay_off_countdown(self) -> int:

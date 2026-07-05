@@ -49,13 +49,13 @@ class AirDogStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"
@@ -64,7 +64,6 @@ class AirDogStatus(DeviceStatus):
     @setting(
         "Mode",
         setter_name="set_mode_and_speed",
-        icon="mdi:fan",
         choices=OperationMode,
     )
     def mode(self) -> OperationMode:
@@ -78,7 +77,6 @@ class AirDogStatus(DeviceStatus):
     @setting(
         "Speed",
         setter_name="set_mode_and_speed",
-        icon="mdi:speedometer",
         min_value=1,
         max_value=5,
         step=1,
@@ -88,25 +86,25 @@ class AirDogStatus(DeviceStatus):
         return self.data["speed"]
 
     @property
-    @setting("Child Lock", setter_name="set_child_lock", icon="mdi:lock")
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["lock"] == "lock"
 
     @property
-    @sensor("Clean Filters", icon="mdi:air-filter")
+    @sensor("Clean Filters")
     def clean_filters(self) -> bool:
         """True if the display shows "-C-" and the filter must be cleaned."""
         return self.data["clean"] == "y"
 
     @property
-    @sensor("PM2.5", unit="μg/m³", icon="mdi:blur", device_class="pm25")
+    @sensor("PM2.5", unit="μg/m³", device_class="pm25")
     def pm25(self) -> int:
         """Return particulate matter value (0...300μg/m³)."""
         return self.data["pm"]
 
     @property
-    @sensor("Formaldehyde", icon="mdi:chemical-weapon")
+    @sensor("Formaldehyde")
     def hcho(self) -> int | None:
         """Return formaldehyde value."""
         if self.data["hcho"] is not None:

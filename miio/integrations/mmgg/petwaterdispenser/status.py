@@ -35,13 +35,13 @@ class PetWaterDispenserStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor(name="Sponge Filter Left Days", icon="mdi:filter")
+    @sensor(name="Sponge Filter Left Days")
     def sponge_filter_left_days(self) -> timedelta:
         """Filter life time remaining in days."""
         return timedelta(days=self.data["filter_left_time"])
 
     @property
-    @setting(name="Power", setter_name="on", icon="mdi:power")
+    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         """True if device is on."""
         return self.data["on"]
@@ -50,7 +50,6 @@ class PetWaterDispenserStatus(DeviceStatus):
     @setting(
         name="Mode",
         setter_name="set_mode",
-        icon="mdi:water-pump",
         choices=OperatingMode,
     )
     def mode(self) -> OperatingMode:
@@ -58,25 +57,25 @@ class PetWaterDispenserStatus(DeviceStatus):
         return OperatingMode(self.data["mode"])
 
     @property
-    @setting(name="LED", setter_name="set_led", icon="mdi:led-outline")
+    @setting(name="LED", setter_name="set_led")
     def is_led_on(self) -> bool:
         """True if enabled."""
         return self.data["indicator_light"]
 
     @property
-    @sensor(name="Cotton Left Days", icon="mdi:filter")
+    @sensor(name="Cotton Left Days")
     def cotton_left_days(self) -> timedelta:
         """Cotton filter life time remaining in days."""
         return timedelta(days=self.data["cotton_left_time"])
 
     @property
-    @sensor(name="Before Cleaning Days", icon="mdi:broom")
+    @sensor(name="Before Cleaning Days")
     def before_cleaning_days(self) -> timedelta:
         """Days before cleaning."""
         return timedelta(days=self.data["remain_clean_time"])
 
     @property
-    @sensor(name="No Water", icon="mdi:water-off")
+    @sensor(name="No Water")
     def is_no_water(self) -> bool:
         """True if there is no water left."""
         if self.data["no_water_flag"]:
@@ -84,19 +83,19 @@ class PetWaterDispenserStatus(DeviceStatus):
         return True
 
     @property
-    @sensor(name="No Water Duration", icon="mdi:water-off")
+    @sensor(name="No Water Duration")
     def no_water_minutes(self) -> timedelta:
         """Minutes without water."""
         return timedelta(minutes=self.data["no_water_time"])
 
     @property
-    @sensor(name="Pump Blocked", icon="mdi:water-pump-off")
+    @sensor(name="Pump Blocked")
     def is_pump_blocked(self) -> bool:
         """True if pump is blocked."""
         return self.data["pump_block_flag"]
 
     @property
-    @sensor(name="Lid Up", icon="mdi:archive-arrow-up")
+    @sensor(name="Lid Up")
     def is_lid_up(self) -> bool:
         """True if lid is up."""
         return self.data["lid_up_flag"]
@@ -105,7 +104,6 @@ class PetWaterDispenserStatus(DeviceStatus):
     @setting(
         name="Timezone",
         setter_name="set_timezone",
-        icon="mdi:map-clock",
         min_value=-12,
         max_value=12,
     )
@@ -114,13 +112,13 @@ class PetWaterDispenserStatus(DeviceStatus):
         return self.data["timezone"]
 
     @property
-    @setting(name="Location", setter_name="set_location", icon="mdi:map-marker")
+    @setting(name="Location", setter_name="set_location")
     def location(self) -> str:
         """Device location string."""
         return self.data["location"]
 
     @property
-    @sensor(name="Error Detected", icon="mdi:alert-circle")
+    @sensor(name="Error Detected")
     def is_error_detected(self) -> bool:
         """True if fault detected."""
         return self.data["fault"] > 0

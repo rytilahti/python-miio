@@ -60,13 +60,13 @@ class AirHumidifierStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor(name="Power", icon="mdi:power")
+    @sensor(name="Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] == 1 else "off"
 
     @property
-    @setting(name="Power", setter_name="on", icon="mdi:power")
+    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"
@@ -75,7 +75,6 @@ class AirHumidifierStatus(DeviceStatus):
     @setting(
         name="Mode",
         setter_name="set_mode",
-        icon="mdi:fan",
         choices=OperationMode,
     )
     def mode(self) -> OperationMode:
@@ -105,7 +104,7 @@ class AirHumidifierStatus(DeviceStatus):
         return self.data["humidity"]
 
     @property
-    @setting(name="Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
+    @setting(name="Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] == 1
@@ -114,7 +113,6 @@ class AirHumidifierStatus(DeviceStatus):
     @setting(
         name="LED Brightness",
         setter_name="set_led_brightness",
-        icon="mdi:brightness-6",
         choices=LedBrightness,
     )
     def led_brightness(self) -> LedBrightness:
@@ -128,31 +126,31 @@ class AirHumidifierStatus(DeviceStatus):
         return brightness
 
     @property
-    @setting(name="LED", setter_name="set_led", icon="mdi:led-outline")
+    @setting(name="LED", setter_name="set_led")
     def led(self) -> bool:
         """True if LED is turned on."""
         return self.led_brightness is not LedBrightness.Off
 
     @property
-    @setting(name="Child Lock", setter_name="set_child_lock", icon="mdi:lock")
+    @setting(name="Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == 1
 
     @property
-    @sensor(name="No Water", icon="mdi:water-off")
+    @sensor(name="No Water")
     def no_water(self) -> bool:
         """True if the water tank is empty."""
         return self.data["no_water"] == 1
 
     @property
-    @sensor(name="Lid Opened", icon="mdi:cup-water")
+    @sensor(name="Lid Opened")
     def lid_opened(self) -> bool:
         """True if the water tank is detached."""
         return self.data["lid_opened"] == 1
 
     @property
-    @sensor(name="Use Time", unit="s", icon="mdi:timer")
+    @sensor(name="Use Time", unit="s")
     def use_time(self) -> int | None:
         """How long the device has been active in seconds.
 

@@ -42,24 +42,24 @@ class ToiletlidStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Work State", icon="mdi:state-machine")
+    @sensor("Work State")
     def work_state(self) -> int:
         """Device state code."""
         return self.data["work_state"]
 
     @property
-    @sensor("Work Mode", icon="mdi:toilet")
+    @sensor("Work Mode")
     def work_mode(self) -> ToiletlidOperatingMode:
         """Device working mode."""
         return ToiletlidOperatingMode((self.work_state - 1) // 16)
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def is_on(self) -> bool:
         return self.work_state != 1
 
     @property
-    @sensor("Filter Life Remaining", icon="mdi:filter")
+    @sensor("Filter Life Remaining")
     def filter_use_percentage(self) -> str:
         """Filter percentage of remaining life."""
         return "{}%".format(self.data["filter_use_flux"])
@@ -68,7 +68,6 @@ class ToiletlidStatus(DeviceStatus):
     @sensor(
         "Filter Remaining Time",
         unit="d",
-        icon="mdi:filter-outline",
         device_class="duration",
     )
     def filter_remaining_time(self) -> int:
@@ -79,7 +78,6 @@ class ToiletlidStatus(DeviceStatus):
     @setting(
         "Ambient Light",
         setter_name="set_ambient_light",
-        icon="mdi:lightbulb-variant",
         choices=AmbientLightColor,
     )
     def ambient_light(self) -> str:

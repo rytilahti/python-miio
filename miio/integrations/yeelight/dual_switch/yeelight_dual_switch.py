@@ -62,7 +62,7 @@ class DualControlModuleStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Switch 1 State", icon="mdi:toggle-switch")
+    @sensor("Switch 1 State")
     def switch_1_state(self) -> bool:
         """First switch state."""
         return bool(self.data["switch_1_state"])
@@ -71,7 +71,6 @@ class DualControlModuleStatus(DeviceStatus):
     @setting(
         "Switch 1 Default State",
         setter_name="set_default_state",
-        icon="mdi:toggle-switch-outline",
     )
     def switch_1_default_state(self) -> bool:
         """First switch default state."""
@@ -81,7 +80,6 @@ class DualControlModuleStatus(DeviceStatus):
     @setting(
         "Switch 1 Off Delay",
         setter_name="set_switch_off_delay",
-        icon="mdi:timer",
         device_class="duration",
         unit="s",
         min_value=-1,
@@ -93,7 +91,7 @@ class DualControlModuleStatus(DeviceStatus):
         return self.data["switch_1_off_delay"]
 
     @property
-    @sensor("Switch 2 State", icon="mdi:toggle-switch")
+    @sensor("Switch 2 State")
     def switch_2_state(self) -> bool:
         """Second switch state."""
         return bool(self.data["switch_2_state"])
@@ -102,7 +100,6 @@ class DualControlModuleStatus(DeviceStatus):
     @setting(
         "Switch 2 Default State",
         setter_name="set_default_state",
-        icon="mdi:toggle-switch-outline",
     )
     def switch_2_default_state(self) -> bool:
         """Second switch default state."""
@@ -112,7 +109,6 @@ class DualControlModuleStatus(DeviceStatus):
     @setting(
         "Switch 2 Off Delay",
         setter_name="set_switch_off_delay",
-        icon="mdi:timer",
         device_class="duration",
         unit="s",
         min_value=-1,
@@ -124,19 +120,19 @@ class DualControlModuleStatus(DeviceStatus):
         return self.data["switch_2_off_delay"]
 
     @property
-    @setting("Interlock", setter_name="set_interlock", icon="mdi:lock-outline")
+    @setting("Interlock", setter_name="set_interlock")
     def interlock(self) -> bool:
         """Interlock."""
         return bool(self.data["interlock"])
 
     @property
-    @setting("Flex Mode", setter_name="set_flex_mode", icon="mdi:shuffle-variant")
+    @setting("Flex Mode", setter_name="set_flex_mode")
     def flex_mode(self) -> int:
         """Flex mode."""
         return self.data["flex_mode"]
 
     @property
-    @sensor("RC List", icon="mdi:remote")
+    @sensor("RC List")
     def rc_list(self) -> str:
         """List of paired remote controls."""
         return self.data["rc_list"]

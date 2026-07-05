@@ -58,19 +58,19 @@ class AirQualityMonitorStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str | None:
         """Current power state."""
         return self.data.get("power")
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         """Return True if the device is turned on."""
         return self.power == "on"
 
     @property
-    @sensor("USB Power", icon="mdi:usb")
+    @sensor("USB Power")
     def usb_power(self) -> bool | None:
         """Return True if the device's usb is on."""
         if "usb_state" in self.data and self.data["usb_state"] is not None:
@@ -78,19 +78,19 @@ class AirQualityMonitorStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("AQI", icon="mdi:air-filter")
+    @sensor("AQI")
     def aqi(self) -> int | None:
         """Air quality index value (0..600)."""
         return self.data.get("aqi")
 
     @property
-    @sensor("Battery", unit="%", device_class="battery", icon="mdi:battery")
+    @sensor("Battery", unit="%", device_class="battery")
     def battery(self) -> int | None:
         """Current battery level (0..100)."""
         return self.data.get("battery")
 
     @property
-    @setting("Display Clock", setter_name="set_display_clock", icon="mdi:clock-outline")
+    @setting("Display Clock", setter_name="set_display_clock")
     def display_clock(self) -> bool | None:
         """Display a clock instead the AQI."""
         if "time_state" in self.data and self.data["time_state"] is not None:
@@ -98,7 +98,7 @@ class AirQualityMonitorStatus(DeviceStatus):
         return None
 
     @property
-    @setting("Night Mode", setter_name="set_night_mode", icon="mdi:weather-night")
+    @setting("Night Mode", setter_name="set_night_mode")
     def night_mode(self) -> bool | None:
         """Return True if the night mode is on."""
         if "night_state" in self.data and self.data["night_state"] is not None:
@@ -106,19 +106,19 @@ class AirQualityMonitorStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Night Time Begin", icon="mdi:clock-start")
+    @sensor("Night Time Begin")
     def night_time_begin(self) -> str | None:
         """Return the begin of the night time."""
         return self.data.get("night_beg_time")
 
     @property
-    @sensor("Night Time End", icon="mdi:clock-end")
+    @sensor("Night Time End")
     def night_time_end(self) -> str | None:
         """Return the end of the night time."""
         return self.data.get("night_end_time")
 
     @property
-    @sensor("Sensor State", icon="mdi:eye")
+    @sensor("Sensor State")
     def sensor_state(self) -> str | None:
         """Sensor state."""
         return self.data.get("sensor_state")
@@ -134,27 +134,25 @@ class AirQualityMonitorStatus(DeviceStatus):
         return self.data.get("co2e")
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity", icon="mdi:water-percent")
+    @sensor("Humidity", unit="%", device_class="humidity")
     def humidity(self) -> float | None:
         """Return humidity value (0...100%)."""
         return self.data.get("humidity")
 
     @property
-    @sensor("PM2.5", unit="μg/m³", device_class="pm25", icon="mdi:blur")
+    @sensor("PM2.5", unit="μg/m³", device_class="pm25")
     def pm25(self) -> float | None:
         """Return pm2.5 value (0...999μg/m³)."""
         return self.data.get("pm25")
 
     @property
-    @sensor(
-        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
-    )
+    @sensor("Temperature", unit="°C", device_class="temperature")
     def temperature(self) -> float | None:
         """Return temperature value (-10...50°C)."""
         return self.data.get("temperature")
 
     @property
-    @sensor("TVOC", icon="mdi:cloud")
+    @sensor("TVOC")
     def tvoc(self) -> int | None:
         """Return tvoc value."""
         return self.data.get("tvoc")

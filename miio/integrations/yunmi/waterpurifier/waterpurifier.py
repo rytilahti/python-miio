@@ -15,98 +15,96 @@ class WaterPurifierStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Power", icon="mdi:power")
+    @sensor("Power")
     def power(self) -> str:
         return self.data["power"]
 
     @property
-    @sensor("Is On", icon="mdi:power")
+    @sensor("Is On")
     def is_on(self) -> bool:
         return self.power == "on"
 
     @property
-    @sensor("Mode", icon="mdi:water")
+    @sensor("Mode")
     def mode(self) -> str:
         """Current operation mode."""
         return self.data["mode"]
 
     @property
-    @sensor("TDS", unit="ppm", icon="mdi:water-opacity")
+    @sensor("TDS", unit="ppm")
     def tds(self) -> str:
         return self.data["tds"]
 
     @property
-    @sensor("Filter Life Remaining", unit="%", icon="mdi:filter")
+    @sensor("Filter Life Remaining", unit="%")
     def filter_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["filter1_life"]
 
     @property
-    @sensor("Filter State", icon="mdi:filter")
+    @sensor("Filter State")
     def filter_state(self) -> str:
         return self.data["filter1_state"]
 
     @property
-    @sensor("Filter 2 Life Remaining", unit="%", icon="mdi:filter")
+    @sensor("Filter 2 Life Remaining", unit="%")
     def filter2_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["filter_life"]
 
     @property
-    @sensor("Filter 2 State", icon="mdi:filter")
+    @sensor("Filter 2 State")
     def filter2_state(self) -> str:
         return self.data["filter_state"]
 
     @property
-    @sensor("Life", icon="mdi:clock-outline")
+    @sensor("Life")
     def life(self) -> str:
         return self.data["life"]
 
     @property
-    @sensor("State", icon="mdi:information-outline")
+    @sensor("State")
     def state(self) -> str:
         return self.data["state"]
 
     @property
-    @sensor("Level", icon="mdi:water")
+    @sensor("Level")
     def level(self) -> str:
         return self.data["level"]
 
     @property
-    @sensor("Volume", icon="mdi:cup-water")
+    @sensor("Volume")
     def volume(self) -> str:
         return self.data["volume"]
 
     @property
-    @sensor("Filter", icon="mdi:filter")
+    @sensor("Filter")
     def filter(self) -> str:
         return self.data["filter"]
 
     @property
-    @sensor("Usage", icon="mdi:chart-line")
+    @sensor("Usage")
     def usage(self) -> str:
         return self.data["usage"]
 
     @property
-    @sensor(
-        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
-    )
+    @sensor("Temperature", unit="°C", device_class="temperature")
     def temperature(self) -> str:
         return self.data["temperature"]
 
     @property
-    @sensor("UV Filter Life Remaining", unit="%", icon="mdi:filter")
+    @sensor("UV Filter Life Remaining", unit="%")
     def uv_filter_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["uv_life"]
 
     @property
-    @sensor("UV Filter State", icon="mdi:filter")
+    @sensor("UV Filter State")
     def uv_filter_state(self) -> str:
         return self.data["uv_state"]
 
     @property
-    @sensor("Valve", icon="mdi:valve")
+    @sensor("Valve")
     def valve(self) -> str:
         return self.data["elecval_state"]
 

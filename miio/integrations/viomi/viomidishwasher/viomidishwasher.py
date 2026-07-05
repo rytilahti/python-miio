@@ -104,7 +104,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         self.data = data
 
     @property
-    @setting(name="Child Lock", setter_name="child_lock", icon="mdi:lock")
+    @setting(name="Child Lock", setter_name="child_lock")
     def child_lock(self) -> bool:
         """Returns the child lock status of the device."""
         value = self.data["child_lock"]
@@ -117,7 +117,6 @@ class ViomiDishwasherStatus(DeviceStatus):
     @setting(
         name="Program",
         setter_name="start",
-        icon="mdi:dishwasher",
         choices=Program,
     )
     def program(self) -> Program:
@@ -130,14 +129,14 @@ class ViomiDishwasherStatus(DeviceStatus):
             return Program.Unknown
 
     @property
-    @sensor(name="Door Open", icon="mdi:door-open")
+    @sensor(name="Door Open")
     def door_open(self) -> bool:
         """Returns True if the door is open."""
 
         return bool(self.data["run_status"] & (1 << 7))
 
     @property
-    @sensor(name="System Status Raw", icon="mdi:information-outline")
+    @sensor(name="System Status Raw")
     def system_status_raw(self) -> int:
         """Returns the raw status number of the device.
 
@@ -149,7 +148,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         return self.data["run_status"]
 
     @property
-    @sensor(name="Status", icon="mdi:dishwasher")
+    @sensor(name="Status")
     def status(self) -> MachineStatus:
         """Returns the machine status of the device."""
 
@@ -164,7 +163,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         return self.data["wash_temp"]
 
     @property
-    @setting(name="Power", setter_name="on", icon="mdi:power")
+    @setting(name="Power", setter_name="on")
     def power(self) -> bool:
         """Returns the power status of the device."""
 
@@ -175,7 +174,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid power status.")
 
     @property
-    @sensor(name="Time Left", icon="mdi:timer")
+    @sensor(name="Time Left")
     def time_left(self) -> timedelta:
         """Returns the timedelta in seconds of time left of the current program.
 
@@ -188,7 +187,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid integer for time_left.")
 
     @property
-    @sensor(name="Schedule", icon="mdi:calendar-clock")
+    @sensor(name="Schedule")
     def schedule(self) -> datetime | None:
         """Returns a datetime when the scheduled program should be finished.
 
@@ -204,7 +203,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         )
 
     @property
-    @setting(name="Air Refresh Interval", setter_name="airrefresh", icon="mdi:fan")
+    @setting(name="Air Refresh Interval", setter_name="airrefresh")
     def air_refresh_interval(self) -> int:
         """Returns an integer on how often the air in the device should be refreshed.
 
@@ -219,7 +218,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid integer for freshdry_interval.")
 
     @property
-    @sensor(name="Program Progress", icon="mdi:progress-check")
+    @sensor(name="Program Progress")
     def program_progress(self) -> ProgramStatus:
         """Returns the program status of the running program."""
         value = self.data["wash_process"]
@@ -230,7 +229,7 @@ class ViomiDishwasherStatus(DeviceStatus):
             return ProgramStatus.Unknown
 
     @property
-    @sensor(name="Errors", icon="mdi:alert-circle")
+    @sensor(name="Errors")
     def errors(self) -> list[SystemStatus]:
         """Returns list of errors if detected in the system."""
 

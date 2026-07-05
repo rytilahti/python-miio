@@ -92,83 +92,79 @@ class CameraStatus(DeviceStatus):
         self.data = data
 
     @property
-    @setting(name="Power", setter_name="on", icon="mdi:power")
+    @setting(name="Power", setter_name="on")
     def power(self) -> bool:
         """Camera power."""
         return self.data["power"] == "on"
 
     @property
-    @setting(
-        name="Motion Record", setter_name="motion_record_on", icon="mdi:motion-sensor"
-    )
+    @setting(name="Motion Record", setter_name="motion_record_on")
     def motion_record(self) -> bool:
         """Motion record status."""
         return self.data["motion_record"] == "on"
 
     @property
-    @setting(name="Light", setter_name="light_on", icon="mdi:lightbulb")
+    @setting(name="Light", setter_name="light_on")
     def light(self) -> bool:
         """Camera light status."""
         return self.data["light"] == "on"
 
     @property
-    @setting(name="Full Color", setter_name="full_color_on", icon="mdi:palette")
+    @setting(name="Full Color", setter_name="full_color_on")
     def full_color(self) -> bool:
         """Full color with bad lighting conditions."""
         return self.data["full_color"] == "on"
 
     @property
-    @setting(name="Flip", setter_name="flip_on", icon="mdi:flip-vertical")
+    @setting(name="Flip", setter_name="flip_on")
     def flip(self) -> bool:
         """Image 180 degrees flip status."""
         return self.data["flip"] == "on"
 
     @property
-    @setting(
-        name="Improve Program", setter_name="improve_program_on", icon="mdi:chart-line"
-    )
+    @setting(name="Improve Program", setter_name="improve_program_on")
     def improve_program(self) -> bool:
         """Customer experience improvement program status."""
         return self.data["improve_program"] == "on"
 
     @property
-    @setting(name="WDR", setter_name="wdr_on", icon="mdi:contrast-box")
+    @setting(name="WDR", setter_name="wdr_on")
     def wdr(self) -> bool:
         """Wide dynamic range status."""
         return self.data["wdr"] == "on"
 
     @property
-    @sensor(name="Track", icon="mdi:crosshairs-gps")
+    @sensor(name="Track")
     def track(self) -> bool:
         """Tracking status."""
         return self.data["track"] == "on"
 
     @property
-    @setting(name="Watermark", setter_name="watermark_on", icon="mdi:watermark")
+    @setting(name="Watermark", setter_name="watermark_on")
     def watermark(self) -> bool:
         """Apply watermark to video."""
         return self.data["watermark"] == "on"
 
     @property
-    @sensor(name="SD Card Status", icon="mdi:sd")
+    @sensor(name="SD Card Status")
     def sdcard_status(self) -> int:
         """SD card status."""
         return self.data["sdcard_status"]
 
     @property
-    @sensor(name="Max Client", icon="mdi:account-multiple")
+    @sensor(name="Max Client")
     def max_client(self) -> int:
         """Unknown."""
         return self.data["max_client"]
 
     @property
-    @sensor(name="Night Mode", icon="mdi:weather-night")
+    @sensor(name="Night Mode")
     def night_mode(self) -> int:
         """Night mode."""
         return self.data["night_mode"]
 
     @property
-    @sensor(name="Mini Level", icon="mdi:volume-low")
+    @sensor(name="Mini Level")
     def mini_level(self) -> int:
         """Unknown."""
         return self.data["mini_level"]
