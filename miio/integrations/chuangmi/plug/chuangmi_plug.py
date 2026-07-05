@@ -57,7 +57,6 @@ class ChuangmiPlugStatus(DeviceStatus):
         raise DeviceException("There was neither 'on' or 'power' in data")
 
     @property
-    @setting("Power", setter_name="on")
     def is_on(self) -> bool:
         """True if device is on."""
         return self.power
@@ -68,7 +67,6 @@ class ChuangmiPlugStatus(DeviceStatus):
         return self.data["temperature"]
 
     @property
-    @setting("USB Power", setter_name="usb_on")
     def usb_power(self) -> bool | None:
         """True if USB is on."""
         if "usb_on" in self.data and self.data["usb_on"] is not None:

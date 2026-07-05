@@ -43,7 +43,6 @@ class PhilipsBulbStatus(DeviceStatus):
         return self.data["power"]
 
     @property
-    @setting("Power", setter_name="on")
     def is_on(self) -> bool:
         return self.power == "on"
 

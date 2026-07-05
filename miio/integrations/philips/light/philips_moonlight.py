@@ -29,7 +29,6 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["pow"]
 
     @property
-    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         return self.power == "on"
 

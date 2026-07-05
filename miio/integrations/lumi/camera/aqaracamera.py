@@ -94,7 +94,6 @@ class CameraStatus(DeviceStatus):
         return self.video_status == 1
 
     @property
-    @setting("Motion Detection", setter_name="md_on")
     def md(self) -> bool:
         """Motion detection state."""
         return bool(self.data["md_status"])
@@ -109,19 +108,16 @@ class CameraStatus(DeviceStatus):
         return self.data["mdsensitivity"]
 
     @property
-    @setting("IR Mode", setter_name="ir_on")
     def ir(self):
         """IR mode."""
         return bool(self.data["ir_status"])
 
     @property
-    @setting("LED", setter_name="led_on")
     def led(self):
         """LED status."""
         return bool(self.data["led_status"])
 
     @property
-    @setting("Flipped", setter_name="flip_on")
     def flipped(self) -> bool:
         """TODO: If camera is flipped?"""
         return self.data["flip_state"]
@@ -143,7 +139,6 @@ class CameraStatus(DeviceStatus):
         return self.data["channel_id"]
 
     @property
-    @setting("Fullstop", setter_name="fullstop_on")
     def fullstop(self) -> bool:
         """Is alarm triggered by MD."""
         return self.data["fullstop"] != 0

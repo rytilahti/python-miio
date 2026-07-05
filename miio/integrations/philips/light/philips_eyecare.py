@@ -45,13 +45,11 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["bright"]
 
     @property
-    @setting("Eye Fatigue Reminder", setter_name="reminder_on")
     def reminder(self) -> bool:
         """Indicates the eye fatigue notification is enabled or not."""
         return self.data["notifystatus"] == "on"
 
     @property
-    @setting("Ambient Light", setter_name="ambient_on")
     def ambient(self) -> bool:
         """True if the ambient light (second light source) is on."""
         return self.data["ambstatus"] == "on"
@@ -69,7 +67,6 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["ambvalue"]
 
     @property
-    @setting("Eyecare Mode", setter_name="eyecare_on")
     def eyecare(self) -> bool:
         """True if the eyecare mode is on."""
         return self.data["eyecare"] == "on"
@@ -86,10 +83,6 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["scene_num"]
 
     @property
-    @setting(
-        "Smart Night Light",
-        setter_name="smart_night_light_on",
-    )
     def smart_night_light(self) -> bool:
         """True if the smart night light mode is on."""
         return self.data["bls"] == "on"

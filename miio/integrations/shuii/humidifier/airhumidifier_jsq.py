@@ -66,7 +66,6 @@ class AirHumidifierStatus(DeviceStatus):
         return "on" if self.data["power"] == 1 else "off"
 
     @property
-    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"

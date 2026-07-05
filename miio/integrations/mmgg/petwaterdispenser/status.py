@@ -41,7 +41,6 @@ class PetWaterDispenserStatus(DeviceStatus):
         return timedelta(days=self.data["filter_left_time"])
 
     @property
-    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         """True if device is on."""
         return self.data["on"]

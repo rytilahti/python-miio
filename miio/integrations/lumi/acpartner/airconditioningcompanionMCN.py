@@ -57,7 +57,6 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return self.data[0]
 
     @property
-    @setting("Power", setter_name="on")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"

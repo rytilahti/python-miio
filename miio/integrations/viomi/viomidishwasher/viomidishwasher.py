@@ -163,7 +163,6 @@ class ViomiDishwasherStatus(DeviceStatus):
         return self.data["wash_temp"]
 
     @property
-    @setting(name="Power", setter_name="on")
     def power(self) -> bool:
         """Returns the power status of the device."""
 

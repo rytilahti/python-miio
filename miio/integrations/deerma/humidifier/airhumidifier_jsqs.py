@@ -70,7 +70,6 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Air Humidifier
 
     @property
-    @setting(name="Power", setter_name="on")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.data["power"]

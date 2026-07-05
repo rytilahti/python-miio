@@ -11,7 +11,7 @@ import click
 
 from miio.click_common import EnumType, command, format_output
 from miio.device import Device, DeviceStatus
-from miio.devicestatus import sensor, setting
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -92,43 +92,36 @@ class CameraStatus(DeviceStatus):
         self.data = data
 
     @property
-    @setting(name="Power", setter_name="on")
     def power(self) -> bool:
         """Camera power."""
         return self.data["power"] == "on"
 
     @property
-    @setting(name="Motion Record", setter_name="motion_record_on")
     def motion_record(self) -> bool:
         """Motion record status."""
         return self.data["motion_record"] == "on"
 
     @property
-    @setting(name="Light", setter_name="light_on")
     def light(self) -> bool:
         """Camera light status."""
         return self.data["light"] == "on"
 
     @property
-    @setting(name="Full Color", setter_name="full_color_on")
     def full_color(self) -> bool:
         """Full color with bad lighting conditions."""
         return self.data["full_color"] == "on"
 
     @property
-    @setting(name="Flip", setter_name="flip_on")
     def flip(self) -> bool:
         """Image 180 degrees flip status."""
         return self.data["flip"] == "on"
 
     @property
-    @setting(name="Improve Program", setter_name="improve_program_on")
     def improve_program(self) -> bool:
         """Customer experience improvement program status."""
         return self.data["improve_program"] == "on"
 
     @property
-    @setting(name="WDR", setter_name="wdr_on")
     def wdr(self) -> bool:
         """Wide dynamic range status."""
         return self.data["wdr"] == "on"
@@ -140,7 +133,6 @@ class CameraStatus(DeviceStatus):
         return self.data["track"] == "on"
 
     @property
-    @setting(name="Watermark", setter_name="watermark_on")
     def watermark(self) -> bool:
         """Apply watermark to video."""
         return self.data["watermark"] == "on"
