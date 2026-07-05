@@ -77,6 +77,7 @@ class MiotDevice(Device):
 
         if mapping is not None:
             self.mapping = mapping
+        self._fallback_warning_done: bool = False
 
     def get_properties_for_mapping(self, *, max_properties=15) -> list:
         """Retrieve raw properties based on mapping."""
@@ -195,8 +196,12 @@ class MiotDevice(Device):
             return mapping
 
         first_model, first_mapping = list(self._mappings.items())[0]
-        _LOGGER.warning(
-            "Unable to find mapping for %s, falling back to %s", self.model, first_model
-        )
+        if not getattr(self, "_fallback_warning_done", False):
+            _LOGGER.warning(
+                "Unable to find mapping for %s, falling back to %s",
+                self.model,
+                first_model,
+            )
+            self._fallback_warning_done = True
 
         return first_mapping
