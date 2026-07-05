@@ -197,7 +197,11 @@ class AirConditioningCompanionStatus(DeviceStatus):
 
     @property
     @sensor(
-    @sensor("Target Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+        "Target Temperature",
+        unit="°C",
+        device_class="temperature",
+        icon="mdi:thermometer",
+    )
     def target_temperature(self) -> int | None:
         """Target temperature."""
         try:

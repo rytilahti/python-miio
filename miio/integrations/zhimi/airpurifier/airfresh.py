@@ -127,6 +127,7 @@ class AirFreshStatus(DeviceStatus):
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
+
     @property
     @setting("PTC", setter_name="set_ptc", icon="mdi:radiator")
     def ptc(self) -> bool | None:
@@ -135,9 +136,11 @@ class AirFreshStatus(DeviceStatus):
             return self.data["ptc_state"] == "on"
 
         return None
-    @sensor(
+
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> float | None:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
@@ -147,9 +150,11 @@ class AirFreshStatus(DeviceStatus):
                 return self.data["temp_dec"] / 10.0
 
         return None
-    @sensor(
+
     @property
-    @sensor("NTC Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @sensor(
+        "NTC Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def ntc_temperature(self) -> float | None:
         """Current ntc temperature, if available."""
         if self.data["ntcT"] is not None:
@@ -168,9 +173,14 @@ class AirFreshStatus(DeviceStatus):
     def led(self) -> bool:
         """Return True if LED is on."""
         return self.data["led"] == "on"
-    @setting(
+
     @property
-    @setting("LED Brightness", setter_name="set_led_brightness", choices=LedBrightness, icon="mdi:brightness-6")
+    @setting(
+        "LED Brightness",
+        setter_name="set_led_brightness",
+        choices=LedBrightness,
+        icon="mdi:brightness-6",
+    )
     def led_brightness(self) -> LedBrightness | None:
         """Brightness of the LED."""
         if self.data["led_level"] is not None:
@@ -183,6 +193,7 @@ class AirFreshStatus(DeviceStatus):
                 return None
 
         return None
+
     @property
     @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool | None:
@@ -221,6 +232,7 @@ class AirFreshStatus(DeviceStatus):
     def motor_speed(self) -> int:
         """Speed of the motor."""
         return self.data["motor1_speed"]
+
     @property
     @setting("Extra Features", setter_name="set_extra_features", icon="mdi:star")
     def extra_features(self) -> int | None:

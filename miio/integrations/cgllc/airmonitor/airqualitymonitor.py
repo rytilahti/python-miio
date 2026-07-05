@@ -124,13 +124,11 @@ class AirQualityMonitorStatus(DeviceStatus):
         return self.data.get("sensor_state")
 
     @property
-    @sensor(
     def co2(self) -> int | None:
         """Return co2 value (400...9999ppm)."""
         return self.data.get("co2")
 
     @property
-    @sensor(
     def co2e(self) -> int | None:
         """Return co2e value (400...9999ppm)."""
         return self.data.get("co2e")
@@ -149,7 +147,8 @@ class AirQualityMonitorStatus(DeviceStatus):
 
     @property
     @sensor(
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> float | None:
         """Return temperature value (-10...50°C)."""
         return self.data.get("temperature")

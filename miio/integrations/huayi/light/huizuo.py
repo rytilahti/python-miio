@@ -159,7 +159,6 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
-    @setting(
     def fan_speed_level(self) -> int | None:
         """Return current Fan speed level."""
         if "fan_level" in self.data:
@@ -202,7 +201,6 @@ class HuizuoStatus(DeviceStatus):
         return None
 
     @property
-    @setting(
     def heat_level(self) -> int | None:
         """Return Heater's heat level."""
         if "heat_level" in self.data:

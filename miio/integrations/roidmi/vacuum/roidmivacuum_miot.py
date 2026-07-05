@@ -246,8 +246,6 @@ class RoidmiVacuumStatus(DeviceStatus):
             return f"Definition missing for error {self.error_code}"
 
     @property
-
-    @property
     @sensor("Charging State", icon="mdi:battery-charging")
     def charging_state(self) -> ChargingState:
         """Charging state (Charging/Discharging)"""

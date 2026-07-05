@@ -159,9 +159,11 @@ class AirPurifierStatus(DeviceStatus):
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
-    @sensor(
+
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> float | None:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
@@ -176,6 +178,7 @@ class AirPurifierStatus(DeviceStatus):
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
+
     @property
     @sensor("Sleep Mode", icon="mdi:sleep")
     def sleep_mode(self) -> SleepMode | None:
@@ -193,9 +196,14 @@ class AirPurifierStatus(DeviceStatus):
     def led(self) -> bool:
         """Return True if LED is on."""
         return self.data["led"] == "on"
-    @setting(
+
     @property
-    @setting("LED Brightness", setter_name="set_led_brightness", choices=LedBrightness, icon="mdi:brightness-6")
+    @setting(
+        "LED Brightness",
+        setter_name="set_led_brightness",
+        choices=LedBrightness,
+        icon="mdi:brightness-6",
+    )
     def led_brightness(self) -> LedBrightness | None:
         """Brightness of the LED."""
         if self.data["led_b"] is not None:
@@ -205,15 +213,18 @@ class AirPurifierStatus(DeviceStatus):
                 return None
 
         return None
-    @sensor(
+
     @property
-    @sensor("Illuminance", unit="lx", device_class="illuminance", icon="mdi:brightness-5")
+    @sensor(
+        "Illuminance", unit="lx", device_class="illuminance", icon="mdi:brightness-5"
+    )
     def illuminance(self) -> int | None:
         """Environment illuminance level in lux [0-200].
 
         Sensor value is updated only when device is turned on.
         """
         return self.data["bright"]
+
     @property
     @setting("Buzzer", setter_name="set_buzzer", icon="mdi:volume-high")
     def buzzer(self) -> bool | None:
@@ -272,27 +283,39 @@ class AirPurifierStatus(DeviceStatus):
     def motor_speed(self) -> int:
         """Speed of the motor."""
         return self.data["motor1_speed"]
+
     @property
     @sensor("Motor 2 Speed", unit="rpm", icon="mdi:fan")
     def motor2_speed(self) -> int | None:
         """Speed of the 2nd motor."""
         return self.data["motor2_speed"]
-    @setting(
+
     @property
-    @setting("Volume", setter_name="set_volume", unit="%", min_value=0, max_value=100, step=1, icon="mdi:volume-high")
+    @setting(
+        "Volume",
+        setter_name="set_volume",
+        unit="%",
+        min_value=0,
+        max_value=100,
+        step=1,
+        icon="mdi:volume-high",
+    )
     def volume(self) -> int | None:
         """Volume of sound notifications [0-100]."""
         return self.data["volume"]
+
     @property
     @sensor("Filter RFID Product ID", icon="mdi:barcode")
     def filter_rfid_product_id(self) -> str | None:
         """RFID product ID of installed filter."""
         return self.data["rfid_product_id"]
+
     @property
     @sensor("Filter RFID Tag", icon="mdi:barcode")
     def filter_rfid_tag(self) -> str | None:
         """RFID tag ID of installed filter."""
         return self.data["rfid_tag"]
+
     @property
     @sensor("Filter Type", icon="mdi:filter-outline")
     def filter_type(self) -> FilterType | None:
@@ -306,18 +329,22 @@ class AirPurifierStatus(DeviceStatus):
     def learn_mode(self) -> bool:
         """Return True if Learn Mode is enabled."""
         return self.data["act_sleep"] == "single"
+
     @property
     @sensor("Sleep Time", unit="s", icon="mdi:sleep")
     def sleep_time(self) -> int | None:
         return self.data["sleep_time"]
+
     @property
     @sensor("Sleep Mode Learn Count", icon="mdi:counter")
     def sleep_mode_learn_count(self) -> int | None:
         return self.data["sleep_data_num"]
+
     @property
     @setting("Extra Features", setter_name="set_extra_features", icon="mdi:star")
     def extra_features(self) -> int | None:
         return self.data["app_extra"]
+
     @property
     @sensor("Turbo Mode Supported", icon="mdi:rocket")
     def turbo_mode_supported(self) -> bool | None:
@@ -325,6 +352,7 @@ class AirPurifierStatus(DeviceStatus):
             return self.data["app_extra"] == 1
 
         return None
+
     @property
     @setting("Auto Detect", setter_name="set_auto_detect", icon="mdi:eye")
     def auto_detect(self) -> bool | None:
@@ -333,6 +361,7 @@ class AirPurifierStatus(DeviceStatus):
             return self.data["act_det"] == "on"
 
         return None
+
     @property
     @sensor("Button Pressed", icon="mdi:gesture-tap-button")
     def button_pressed(self) -> str | None:

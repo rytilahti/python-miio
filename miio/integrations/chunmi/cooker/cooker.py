@@ -508,6 +508,7 @@ class CookerStatus(DeviceStatus):
     def menu(self) -> int:
         """Selected recipe id."""
         return int(self.data["menu"], 16)
+
     @property
     @sensor("Stage", icon="mdi:pot-steam")
     def stage(self) -> CookingStage | None:
@@ -517,9 +518,11 @@ class CookerStatus(DeviceStatus):
             return CookingStage(stage)
 
         return None
-    @sensor(
+
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+    @sensor(
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> int | None:
         """Current temperature, if idle.
 
@@ -530,6 +533,7 @@ class CookerStatus(DeviceStatus):
             return int(value)
 
         return None
+
     @property
     @sensor("Start Time", icon="mdi:clock-start")
     def start_time(self) -> time | None:
@@ -549,6 +553,7 @@ class CookerStatus(DeviceStatus):
     def remaining(self) -> int:
         """Remaining minutes of the cooking process."""
         return int(self.data["t_func"])
+
     @property
     @sensor("Cooking Delayed", unit="min", icon="mdi:timer-sand")
     def cooking_delayed(self) -> int | None:
@@ -598,6 +603,7 @@ class CookerStatus(DeviceStatus):
         Can be compared with the menu property.
         """
         return int(self.data["favorite"], 16)
+
     @property
     @sensor("Custom", icon="mdi:tune")
     def custom(self) -> CookerCustomizations | None:

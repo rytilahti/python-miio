@@ -134,7 +134,8 @@ class HeaterStatus(DeviceStatus):
 
     @property
     @sensor(
-    @sensor("Delay Off Countdown", unit="s", icon="mdi:timer-sand", device_class="duration")
+        "Delay Off Countdown", unit="s", icon="mdi:timer-sand", device_class="duration"
+    )
     def delay_off_countdown(self) -> int | None:
         """Countdown until turning off in seconds."""
         if "poweroff_time" in self.data and self.data["poweroff_time"] is not None:

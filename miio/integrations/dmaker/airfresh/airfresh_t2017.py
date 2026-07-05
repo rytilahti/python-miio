@@ -208,7 +208,8 @@ class AirFreshStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting("PTC Level", setter_name="set_ptc_level", choices=PtcLevel, icon="mdi:radiator")
+        "PTC Level", setter_name="set_ptc_level", choices=PtcLevel, icon="mdi:radiator"
+    )
     def ptc_level(self) -> PtcLevel | None:
         """PTC level."""
         try:
@@ -241,7 +242,6 @@ class AirFreshStatus(DeviceStatus):
         return self.data["display"]
 
     @property
-    @setting(
     def display_orientation(self) -> DisplayOrientation | None:
         """Display orientation."""
         try:

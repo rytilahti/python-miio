@@ -49,7 +49,8 @@ class PhilipsBulbStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting("Brightness", setter_name="set_brightness", unit="%", icon="mdi:brightness-6")
+        "Brightness", setter_name="set_brightness", unit="%", icon="mdi:brightness-6"
+    )
     def brightness(self) -> int | None:
         if "bright" in self.data:
             return self.data["bright"]
@@ -59,7 +60,8 @@ class PhilipsBulbStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting("Color Temperature", setter_name="set_color_temperature", icon="mdi:palette")
+        "Color Temperature", setter_name="set_color_temperature", icon="mdi:palette"
+    )
     def color_temperature(self) -> int | None:
         if "cct" in self.data:
             return self.data["cct"]

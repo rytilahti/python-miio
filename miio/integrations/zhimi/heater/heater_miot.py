@@ -165,7 +165,8 @@ class HeaterMiotStatus(DeviceStatus):
 
     @property
     @sensor(
-    @sensor("Relative Humidity", unit="%", icon="mdi:water-percent", device_class="humidity")
+        "Relative Humidity", unit="%", icon="mdi:water-percent", device_class="humidity"
+    )
     def relative_humidity(self) -> int | None:
         """Current relative humidity."""
         return self.data.get("relative_humidity")

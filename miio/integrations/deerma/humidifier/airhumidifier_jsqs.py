@@ -106,7 +106,6 @@ class AirHumidifierJsqsStatus(DeviceStatus):
         return mode
 
     @property
-    @setting(
     def target_humidity(self) -> int | None:
         """Return target humidity."""
         return self.data.get("target_humidity")
@@ -157,7 +156,10 @@ class AirHumidifierJsqsStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting(name="Overwet Protect", setter_name="set_overwet_protect", icon="mdi:shield-check")
+        name="Overwet Protect",
+        setter_name="set_overwet_protect",
+        icon="mdi:shield-check",
+    )
     def overwet_protect(self) -> bool | None:
         """Return True if overwet mode is active."""
         return self.data.get("overwet_protect")

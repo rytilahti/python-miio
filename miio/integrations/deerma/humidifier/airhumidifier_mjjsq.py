@@ -132,7 +132,8 @@ class AirHumidifierStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting(name="Wet Protection", setter_name="set_wet_protection", icon="mdi:shield-check")
+        name="Wet Protection", setter_name="set_wet_protection", icon="mdi:shield-check"
+    )
     def wet_protection(self) -> bool | None:
         """True if wet protection is enabled."""
         if self.data["wet_and_protect"] is not None:

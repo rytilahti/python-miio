@@ -339,6 +339,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
     @sensor("Filter Life Level", unit="%", icon="mdi:filter-outline")
     def filter_life_level(self) -> str:
         return self.data["filter_life_level"]
+
     @property
     @sensor("Device Fault", icon="mdi:alert-circle")
     def device_fault(self) -> FaultStatus | None:
@@ -347,6 +348,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         except ValueError:
             _LOGGER.error("Unknown FaultStatus (%s)", self.data["device_fault"])
             return None
+
     @property
     @sensor("Charging State", icon="mdi:battery-charging")
     def charging_state(self) -> ChargingState | None:
@@ -355,6 +357,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         except ValueError:
             _LOGGER.error("Unknown ChargingStats (%s)", self.data["charging_state"])
             return None
+
     @property
     @sensor("Operating Mode", icon="mdi:robot-vacuum")
     def operating_mode(self) -> OperatingMode | None:
@@ -363,6 +366,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         except ValueError:
             _LOGGER.error("Unknown OperatingMode (%s)", self.data["operating_mode"])
             return None
+
     @property
     @sensor("Device Status", icon="mdi:robot-vacuum")
     def device_status(self) -> DeviceStatus | None:
@@ -459,14 +463,17 @@ class DreameVacuumStatus(DeviceStatusContainer):
         except ValueError:
             _LOGGER.error(f"Unknown CleaningMode ({cleaning_mode})")
             return None
+
     @property
     @sensor("Life Sieve", unit="%", icon="mdi:filter-outline")
     def life_sieve(self) -> str | None:
         return self.data.get("life_sieve")
+
     @property
     @sensor("Life Brush Side", unit="%", icon="mdi:brush")
     def life_brush_side(self) -> str | None:
         return self.data.get("life_brush_side")
+
     @property
     @sensor("Life Brush Main", unit="%", icon="mdi:brush")
     def life_brush_main(self) -> str | None:
@@ -475,7 +482,8 @@ class DreameVacuumStatus(DeviceStatusContainer):
     # TODO: get/set water flow for Dreame 1C
     @property
     @setting(
-    @setting("Water Flow", setter_name="set_waterflow", choices=WaterFlow, icon="mdi:water")
+        "Water Flow", setter_name="set_waterflow", choices=WaterFlow, icon="mdi:water"
+    )
     def water_flow(self) -> WaterFlow | None:
         try:
             water_flow = self.data["water_flow"]
@@ -486,6 +494,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         except ValueError:
             _LOGGER.error("Unknown WaterFlow (%s)", self.data["water_flow"])
             return None
+
     @property
     @sensor("Water Box Carriage Attached", icon="mdi:cup-water")
     def is_water_box_carriage_attached(self) -> bool | None:

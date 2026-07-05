@@ -91,7 +91,8 @@ class AirDehumidifierStatus(DeviceStatus):
 
     @property
     @sensor(
-    @sensor("Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer")
+        "Temperature", unit="°C", device_class="temperature", icon="mdi:thermometer"
+    )
     def temperature(self) -> float | None:
         """Current temperature, if available."""
         if "temp" in self.data and self.data["temp"] is not None:
@@ -123,7 +124,6 @@ class AirDehumidifierStatus(DeviceStatus):
         return self.data["child_lock"] == "on"
 
     @property
-    @setting(
     def target_humidity(self) -> int | None:
         """Target humiditiy.
 
@@ -134,7 +134,6 @@ class AirDehumidifierStatus(DeviceStatus):
         return None
 
     @property
-    @setting(
     def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         if "fan_speed" in self.data and self.data["fan_speed"] is not None:

@@ -64,7 +64,11 @@ class AirConditioningCompanionStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting("Mode", setter_name="send_command", icon="mdi:air-conditioner", choices=OperationMode)
+        "Mode",
+        setter_name="send_command",
+        icon="mdi:air-conditioner",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode | None:
         """Current operation mode."""
         try:
@@ -75,7 +79,12 @@ class AirConditioningCompanionStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting("Target Temperature", setter_name="send_command", unit="°C", icon="mdi:thermometer", device_class="temperature")
+        "Target Temperature",
+        setter_name="send_command",
+        unit="°C",
+        icon="mdi:thermometer",
+        device_class="temperature",
+    )
     def target_temperature(self) -> int | None:
         """Target temperature."""
         try:
@@ -95,7 +104,11 @@ class AirConditioningCompanionStatus(DeviceStatus):
 
     @property
     @setting(
-    @setting("Swing Mode", setter_name="send_command", icon="mdi:arrow-oscillating", choices=SwingMode)
+        "Swing Mode",
+        setter_name="send_command",
+        icon="mdi:arrow-oscillating",
+        choices=SwingMode,
+    )
     def swing_mode(self) -> SwingMode | None:
         """Current swing mode."""
         try:
