@@ -155,13 +155,13 @@ class AirPurifierStatus(DeviceStatus):
         return self.data["average_aqi"]
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity")
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float | None:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
@@ -206,7 +206,7 @@ class AirPurifierStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Illuminance", unit="lx", device_class="illuminance")
+    @sensor("Illuminance", unit="lx")
     def illuminance(self) -> int | None:
         """Environment illuminance level in lux [0-200].
 

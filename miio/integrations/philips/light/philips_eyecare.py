@@ -98,7 +98,6 @@ class PhilipsEyecareStatus(DeviceStatus):
     @sensor(
         "Delay Off Countdown",
         unit="min",
-        device_class="duration",
     )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""

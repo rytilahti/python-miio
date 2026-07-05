@@ -225,7 +225,7 @@ class RoidmiVacuumStatus(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Battery", unit="%", device_class="battery")
+    @sensor("Battery", unit="%")
     def battery(self) -> int:
         """Remaining battery in percentage."""
         return self.data["battery_level"]

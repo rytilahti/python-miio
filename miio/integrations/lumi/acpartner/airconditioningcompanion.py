@@ -98,7 +98,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         self.state = data["model_and_state"][1]
 
     @property
-    @sensor("Load Power", unit="W", device_class="power")
+    @sensor("Load Power", unit="W")
     def load_power(self) -> int:
         """Current power load of the air conditioner."""
         return int(self.data["model_and_state"][2])
@@ -196,7 +196,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    @sensor("Target Temperature", unit="°C", device_class="temperature")
+    @sensor("Target Temperature", unit="°C")
     def target_temperature(self) -> int | None:
         """Target temperature."""
         try:

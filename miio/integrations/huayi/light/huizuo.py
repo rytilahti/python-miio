@@ -142,7 +142,6 @@ class HuizuoStatus(DeviceStatus):
         setter_name="set_color_temp",
         min_value=3000,
         max_value=6400,
-        device_class="temperature",
     )
     def color_temp(self) -> int:
         """Return current color temperature."""

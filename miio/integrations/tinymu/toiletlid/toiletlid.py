@@ -68,7 +68,6 @@ class ToiletlidStatus(DeviceStatus):
     @sensor(
         "Filter Remaining Time",
         unit="d",
-        device_class="duration",
     )
     def filter_remaining_time(self) -> int:
         """Filter remaining life days."""

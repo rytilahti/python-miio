@@ -92,13 +92,13 @@ class AirHumidifierStatus(DeviceStatus):
         return mode
 
     @property
-    @sensor(name="Temperature", unit="C", device_class="temperature")
+    @sensor(name="Temperature", unit="C")
     def temperature(self) -> int:
         """Current temperature in degree celsius."""
         return self.data["temperature"]
 
     @property
-    @sensor(name="Humidity", unit="%", device_class="humidity")
+    @sensor(name="Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity in percent."""
         return self.data["humidity"]

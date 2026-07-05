@@ -151,7 +151,7 @@ class FanStatusZA5(DeviceStatus):
         return self.data["fan_speed"]
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity")
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Air humidity in percent."""
         return self.data["humidity"]
@@ -222,7 +222,7 @@ class FanStatusZA5(DeviceStatus):
         return self.data["swing_mode_angle"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> Any:
         """Air temperature (degree celsius)."""
         return self.data["temperature"]

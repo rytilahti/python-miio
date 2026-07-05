@@ -108,7 +108,7 @@ class AirQualityMonitorCGDN1Status(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity")
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Return humidity value (0...100%)."""
         return self.data["humidity"]
@@ -126,19 +126,19 @@ class AirQualityMonitorCGDN1Status(DeviceStatus):
         return self.data["pm10"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float:
         """Return temperature value (-30...100°C)."""
         return self.data["temperature"]
 
     @property
-    @sensor("CO2", unit="ppm", device_class="carbon_dioxide")
+    @sensor("CO2", unit="ppm")
     def co2(self) -> int:
         """Return co2 value (0...9999ppm)."""
         return self.data["co2"]
 
     @property
-    @sensor("Battery", unit="%", device_class="battery")
+    @sensor("Battery", unit="%")
     def battery(self) -> int:
         """Return battery level (0...100%)."""
         return self.data["battery"]

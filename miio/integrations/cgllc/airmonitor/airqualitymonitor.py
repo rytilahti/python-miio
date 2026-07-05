@@ -84,7 +84,7 @@ class AirQualityMonitorStatus(DeviceStatus):
         return self.data.get("aqi")
 
     @property
-    @sensor("Battery", unit="%", device_class="battery")
+    @sensor("Battery", unit="%")
     def battery(self) -> int | None:
         """Current battery level (0..100)."""
         return self.data.get("battery")
@@ -134,19 +134,19 @@ class AirQualityMonitorStatus(DeviceStatus):
         return self.data.get("co2e")
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity")
+    @sensor("Humidity", unit="%")
     def humidity(self) -> float | None:
         """Return humidity value (0...100%)."""
         return self.data.get("humidity")
 
     @property
-    @sensor("PM2.5", unit="μg/m³", device_class="pm25")
+    @sensor("PM2.5", unit="μg/m³")
     def pm25(self) -> float | None:
         """Return pm2.5 value (0...999μg/m³)."""
         return self.data.get("pm25")
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float | None:
         """Return temperature value (-10...50°C)."""
         return self.data.get("temperature")

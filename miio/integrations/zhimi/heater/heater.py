@@ -70,7 +70,7 @@ class HeaterStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity")
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int | None:
         """Current humidity."""
         if (
@@ -82,7 +82,7 @@ class HeaterStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
@@ -94,7 +94,6 @@ class HeaterStatus(DeviceStatus):
         setter_name="set_target_temperature",
         min_value=16,
         max_value=32,
-        device_class="temperature",
     )
     def target_temperature(self) -> int:
         """Target temperature."""
@@ -123,13 +122,13 @@ class HeaterStatus(DeviceStatus):
         return self.data["child_lock"] == "on"
 
     @property
-    @sensor("Use Time", unit="s", device_class="duration")
+    @sensor("Use Time", unit="s")
     def use_time(self) -> int:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
 
     @property
-    @sensor("Delay Off Countdown", unit="s", device_class="duration")
+    @sensor("Delay Off Countdown", unit="s")
     def delay_off_countdown(self) -> int | None:
         """Countdown until turning off in seconds."""
         if "poweroff_time" in self.data and self.data["poweroff_time"] is not None:

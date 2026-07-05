@@ -134,7 +134,7 @@ class AirFreshStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
-    @sensor("PM2.5", unit="μg/m³", device_class="pm25")
+    @sensor("PM2.5", unit="μg/m³")
     def pm25(self) -> int:
         """Fine particulate patter (PM2.5)."""
         return self.data["pm25"]
@@ -143,14 +143,13 @@ class AirFreshStatus(DeviceStatus):
     @sensor(
         "CO2",
         unit="ppm",
-        device_class="carbon_dioxide",
     )
     def co2(self) -> int:
         """Carbon dioxide."""
         return self.data["co2"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> int:
         """Current temperature in degree celsions."""
         return self.data["temperature_outside"]

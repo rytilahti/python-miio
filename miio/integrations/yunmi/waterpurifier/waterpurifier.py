@@ -88,7 +88,7 @@ class WaterPurifierStatus(DeviceStatus):
         return self.data["usage"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> str:
         return self.data["temperature"]
 

@@ -80,7 +80,6 @@ class DualControlModuleStatus(DeviceStatus):
     @setting(
         "Switch 1 Off Delay",
         setter_name="set_switch_off_delay",
-        device_class="duration",
         unit="s",
         min_value=-1,
         max_value=43200,
@@ -109,7 +108,6 @@ class DualControlModuleStatus(DeviceStatus):
     @setting(
         "Switch 2 Off Delay",
         setter_name="set_switch_off_delay",
-        device_class="duration",
         unit="s",
         min_value=-1,
         max_value=43200,

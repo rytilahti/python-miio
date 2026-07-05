@@ -96,7 +96,6 @@ class FanLeshowStatus(DeviceStatus):
     @setting(
         "Delay Off Countdown",
         setter_name="delay_off",
-        device_class="duration",
         unit="min",
         min_value=0,
         max_value=540,

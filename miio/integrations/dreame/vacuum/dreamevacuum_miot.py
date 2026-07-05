@@ -306,7 +306,7 @@ class DreameVacuumStatus(DeviceStatusContainer):
         self.model = model
 
     @property
-    @sensor("Battery Level", unit="%", device_class="battery")
+    @sensor("Battery Level", unit="%")
     def battery_level(self) -> str:
         return self.data["battery_level"]
 

@@ -64,7 +64,6 @@ class PhilipsRwreadStatus(DeviceStatus):
     @setting(
         "Delay Off Countdown",
         setter_name="delay_off",
-        device_class="duration",
         unit="s",
     )
     def delay_off_countdown(self) -> int:

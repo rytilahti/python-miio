@@ -224,7 +224,6 @@ class AirConditionerMiotStatus(DeviceStatus):
         min_value=16,
         max_value=31,
         step=1,
-        device_class="temperature",
     )
     def target_temperature(self) -> float:
         """Target temperature in Celsius."""
@@ -267,7 +266,7 @@ class AirConditionerMiotStatus(DeviceStatus):
         return self.data["vertical_swing"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float:
         """Current ambient temperature in Celsius."""
         return self.data["temperature"]
@@ -285,7 +284,7 @@ class AirConditionerMiotStatus(DeviceStatus):
         return self.data["led"]
 
     @property
-    @sensor("Electricity", unit="kWh", device_class="energy")
+    @sensor("Electricity", unit="kWh")
     def electricity(self) -> float:
         """Power consumption accumulation in kWh."""
         return self.data["electricity"]

@@ -56,7 +56,7 @@ class WalkingpadStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    @sensor("Walking Time", device_class="duration")
+    @sensor("Walking Time")
     def walking_time(self) -> timedelta:
         """Current walking duration in seconds."""
         return timedelta(seconds=int(self.data["time"]))

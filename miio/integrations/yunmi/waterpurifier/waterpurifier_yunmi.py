@@ -253,7 +253,7 @@ class WaterPurifierYunmiStatus(DeviceStatus):
         return self.data["rinse"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> int:
         """Current water temperature in Celsius."""
         return self.data["temperature"]

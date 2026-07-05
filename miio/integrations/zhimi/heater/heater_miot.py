@@ -140,26 +140,25 @@ class HeaterMiotStatus(DeviceStatus):
         setter_name="set_target_temperature",
         min_value=18,
         max_value=28,
-        device_class="temperature",
     )
     def target_temperature(self) -> int:
         """Target temperature."""
         return self.data["target_temperature"]
 
     @property
-    @sensor("Delay Off Countdown", unit="s", device_class="duration")
+    @sensor("Delay Off Countdown", unit="s")
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in seconds."""
         return self.data["countdown_time"]
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
 
     @property
-    @sensor("Relative Humidity", unit="%", device_class="humidity")
+    @sensor("Relative Humidity", unit="%")
     def relative_humidity(self) -> int | None:
         """Current relative humidity."""
         return self.data.get("relative_humidity")

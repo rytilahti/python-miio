@@ -63,7 +63,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         return self.power
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> int:
         return self.data["temperature"]
 
@@ -76,7 +76,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Load Power", unit="W", device_class="power")
+    @sensor("Load Power", unit="W")
     def load_power(self) -> float | None:
         """Current power load, if available."""
         if "load_power" in self.data and self.data["load_power"] is not None:

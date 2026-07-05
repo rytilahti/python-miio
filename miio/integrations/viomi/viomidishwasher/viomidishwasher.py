@@ -155,7 +155,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         return MachineStatus(self.data["wash_status"])
 
     @property
-    @sensor(name="Temperature", unit="C", device_class="temperature")
+    @sensor(name="Temperature", unit="C")
     def temperature(self) -> int:
         """Returns the temperature in degree Celsius as determined by the NTC
         thermistor."""

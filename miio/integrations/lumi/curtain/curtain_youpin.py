@@ -111,7 +111,7 @@ class CurtainStatus(DeviceStatus):
         return bool(self.data["night_tip_light"])
 
     @property
-    @sensor("Run Time", device_class="duration", unit="s")
+    @sensor("Run Time", unit="s")
     def run_time(self) -> int:
         """Run time of the motor."""
         return self.data["run_time"]

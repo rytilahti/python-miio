@@ -520,7 +520,7 @@ class CookerStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> int | None:
         """Current temperature, if idle.
 

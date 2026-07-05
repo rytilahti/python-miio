@@ -90,7 +90,7 @@ class WifiSpeakerStatus(DeviceStatus):
         return self.data["track_title"]
 
     @property
-    @sensor("Track Duration", device_class="duration")
+    @sensor("Track Duration")
     def track_duration(self) -> str:
         """Total duration of the current track."""
         return self.data["track_duration"]

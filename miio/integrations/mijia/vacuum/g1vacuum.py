@@ -160,7 +160,7 @@ class G1Status(DeviceStatus):
         self.data = data
 
     @property
-    @sensor("Battery", unit="%", device_class="battery")
+    @sensor("Battery", unit="%")
     def battery(self) -> int:
         """Battery Level."""
         return self.data["battery"]

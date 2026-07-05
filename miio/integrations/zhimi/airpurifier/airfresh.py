@@ -117,13 +117,13 @@ class AirFreshStatus(DeviceStatus):
         return self.data["average_aqi"]
 
     @property
-    @sensor("CO2", unit="ppm", device_class="carbon_dioxide")
+    @sensor("CO2", unit="ppm")
     def co2(self) -> int:
         """Carbon dioxide."""
         return self.data["co2"]
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity")
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
@@ -138,7 +138,7 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float | None:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
@@ -150,7 +150,7 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("NTC Temperature", unit="°C", device_class="temperature")
+    @sensor("NTC Temperature", unit="°C")
     def ntc_temperature(self) -> float | None:
         """Current ntc temperature, if available."""
         if self.data["ntcT"] is not None:

@@ -74,7 +74,6 @@ class PhilipsBulbStatus(DeviceStatus):
     @sensor(
         "Delay Off Countdown",
         unit="s",
-        device_class="duration",
     )
     def delay_off_countdown(self) -> int:
         return self.data["dv"]

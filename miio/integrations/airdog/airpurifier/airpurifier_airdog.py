@@ -98,7 +98,7 @@ class AirDogStatus(DeviceStatus):
         return self.data["clean"] == "y"
 
     @property
-    @sensor("PM2.5", unit="μg/m³", device_class="pm25")
+    @sensor("PM2.5", unit="μg/m³")
     def pm25(self) -> int:
         """Return particulate matter value (0...300μg/m³)."""
         return self.data["pm"]

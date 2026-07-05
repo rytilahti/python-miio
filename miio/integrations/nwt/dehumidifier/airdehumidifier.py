@@ -89,7 +89,7 @@ class AirDehumidifierStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
-    @sensor("Temperature", unit="°C", device_class="temperature")
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float | None:
         """Current temperature, if available."""
         if "temp" in self.data and self.data["temp"] is not None:
@@ -97,7 +97,7 @@ class AirDehumidifierStatus(DeviceStatus):
         return None
 
     @property
-    @sensor("Humidity", unit="%", device_class="humidity")
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]

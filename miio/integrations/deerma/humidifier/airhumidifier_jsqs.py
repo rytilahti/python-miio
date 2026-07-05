@@ -112,13 +112,13 @@ class AirHumidifierJsqsStatus(DeviceStatus):
     # Environment
 
     @property
-    @sensor(name="Relative Humidity", unit="%", device_class="humidity")
+    @sensor(name="Relative Humidity", unit="%")
     def relative_humidity(self) -> int | None:
         """Return current humidity."""
         return self.data.get("relative_humidity")
 
     @property
-    @sensor(name="Temperature", unit="C", device_class="temperature")
+    @sensor(name="Temperature", unit="C")
     def temperature(self) -> float | None:
         """Return current temperature, if available."""
         return self.data.get("temperature")
