@@ -31,8 +31,10 @@ _MAPPING = {
     "dry_after_off": {"siid": 7, "piid": 1},  # bool
     "dry_left_time": {"siid": 7, "piid": 2},  # [0, 2400] step 1, seconds
     "is_warming_up": {"siid": 7, "piid": 3},  # bool
-    # The spec also defines a Delay service (siid=8), but it is omitted here:
-    # the device does not appear to expose it (see tsunglung/XiaomiHumidifier).
+    # Delay (siid=8)
+    "delay": {"siid": 8, "piid": 1},  # bool
+    "delay_time": {"siid": 8, "piid": 2},  # [0, 720] step 1, minutes
+    "delay_remain_time": {"siid": 8, "piid": 3},  # [0, 720] step 1, minutes
 }
 
 SUPPORTED_MODELS = ["xiaomi.derh.lite"]
@@ -82,7 +84,10 @@ class AirDehumidifierMiotStatus(DeviceStatus):
             {'did': 'child_lock', 'siid': 6, 'piid': 1, 'code': 0, 'value': False},
             {'did': 'dry_after_off', 'siid': 7, 'piid': 1, 'code': 0, 'value': False},
             {'did': 'dry_left_time', 'siid': 7, 'piid': 2, 'code': 0, 'value': 0},
-            {'did': 'is_warming_up', 'siid': 7, 'piid': 3, 'code': 0, 'value': False}
+            {'did': 'is_warming_up', 'siid': 7, 'piid': 3, 'code': 0, 'value': False},
+            {'did': 'delay', 'siid': 8, 'piid': 1, 'code': 0, 'value': False},
+            {'did': 'delay_time', 'siid': 8, 'piid': 2, 'code': 0, 'value': 0},
+            {'did': 'delay_remain_time', 'siid': 8, 'piid': 3, 'code': 0, 'value': 0}
         ]
     """
 
@@ -220,6 +225,33 @@ class AirDehumidifierMiotStatus(DeviceStatus):
         """Return True if the device is warming up."""
         return self.data.get("is_warming_up")
 
+    # Delay
+
+    @property
+    @setting(name="Delayed Turn Off", setter_name="set_delay")
+    def delay(self) -> bool | None:
+        """Return True if delayed turn off is enabled."""
+        return self.data.get("delay")
+
+    @property
+    @setting(
+        name="Delay Time",
+        unit="min",
+        setter_name="set_delay_time",
+        min_value=0,
+        max_value=720,
+        step=1,
+    )
+    def delay_time(self) -> int | None:
+        """Return the configured delayed turn off time in minutes."""
+        return self.data.get("delay_time")
+
+    @property
+    @sensor(name="Delay Remaining Time", unit="min")
+    def delay_remain_time(self) -> int | None:
+        """Return remaining time until turn off in minutes."""
+        return self.data.get("delay_remain_time")
+
 
 class AirDehumidifierMiot(MiotDevice):
     """Main class representing the Xiaomi Smart Dehumidifier Lite (MIoT protocol)."""
@@ -240,7 +272,9 @@ class AirDehumidifierMiot(MiotDevice):
             "LED: {result.led}\n"
             "LED brightness: {result.led_brightness}\n"
             "Child lock: {result.child_lock}\n"
-            "Dry after off: {result.dry_after_off}\n",
+            "Dry after off: {result.dry_after_off}\n"
+            "Delayed turn off: {result.delay}\n"
+            "Delay time: {result.delay_time} min\n",
         )
     )
     def status(self) -> AirDehumidifierMiotStatus:
@@ -332,3 +366,27 @@ class AirDehumidifierMiot(MiotDevice):
     def set_dry_after_off(self, dry: bool):
         """Enable/disable drying after power off."""
         return self.set_property("dry_after_off", dry)
+
+    @command(
+        click.argument("delay", type=bool),
+        default_output=format_output(
+            lambda delay: (
+                "Turning on delayed turn off"
+                if delay
+                else "Turning off delayed turn off"
+            )
+        ),
+    )
+    def set_delay(self, delay: bool):
+        """Enable/disable delayed turn off."""
+        return self.set_property("delay", delay)
+
+    @command(
+        click.argument("minutes", type=int),
+        default_output=format_output("Setting delayed turn off to {minutes} minutes"),
+    )
+    def set_delay_time(self, minutes: int):
+        """Set the delayed turn off time in minutes."""
+        if minutes < 0 or minutes > 720:
+            raise ValueError(f"Invalid delay time: {minutes}. Must be between 0 and 720")
+        return self.set_property("delay_time", minutes)

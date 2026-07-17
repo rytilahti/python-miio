@@ -19,6 +19,9 @@ _INITIAL_STATE = {
     "dry_after_off": False,
     "dry_left_time": 0,
     "is_warming_up": False,
+    "delay": False,
+    "delay_time": 0,
+    "delay_remain_time": 0,
 }
 
 
@@ -35,6 +38,8 @@ class DummyAirDehumidifierMiot(DummyMiotDevice, AirDehumidifierMiot):
             "set_buzzer": lambda x: self._set_state("buzzer", x),
             "set_child_lock": lambda x: self._set_state("child_lock", x),
             "set_dry_after_off": lambda x: self._set_state("dry_after_off", x),
+            "set_delay": lambda x: self._set_state("delay", x),
+            "set_delay_time": lambda x: self._set_state("delay_time", x),
         }
         super().__init__(*args, **kwargs)
 
@@ -76,6 +81,9 @@ def test_status(dev):
     assert status.dry_after_off == _INITIAL_STATE["dry_after_off"]
     assert status.dry_left_time == _INITIAL_STATE["dry_left_time"]
     assert status.is_warming_up == _INITIAL_STATE["is_warming_up"]
+    assert status.delay == _INITIAL_STATE["delay"]
+    assert status.delay_time == _INITIAL_STATE["delay_time"]
+    assert status.delay_remain_time == _INITIAL_STATE["delay_remain_time"]
 
 
 def test_tank_full(dev):
@@ -170,3 +178,30 @@ def test_set_dry_after_off(dev):
 
     dev.set_dry_after_off(False)
     assert dry_after_off() is False
+
+
+def test_set_delay(dev):
+    def delay():
+        return dev.status().delay
+
+    dev.set_delay(True)
+    assert delay() is True
+
+    dev.set_delay(False)
+    assert delay() is False
+
+
+def test_set_delay_time(dev):
+    def delay_time():
+        return dev.status().delay_time
+
+    dev.set_delay_time(0)
+    assert delay_time() == 0
+    dev.set_delay_time(720)
+    assert delay_time() == 720
+
+    with pytest.raises(ValueError):
+        dev.set_delay_time(-1)
+
+    with pytest.raises(ValueError):
+        dev.set_delay_time(721)
