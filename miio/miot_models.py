@@ -254,6 +254,13 @@ class MiotProperty(MiotBaseModel):
     #       there must be a better way to do this..
     value: Any | None = None
 
+    @model_validator(mode="after")
+    def coerce_range_to_format_type(self) -> Self:
+        """Coerce range values to the property's numeric type."""
+        if self.range is not None and self.format in (int, float):
+            self.range = [self.format(v) for v in self.range]
+        return self
+
     @property
     def pretty_value(self):
         value = self.value

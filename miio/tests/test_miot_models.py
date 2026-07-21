@@ -391,19 +391,29 @@ def test_get_descriptor_ranged_property(read_only, expected):
         assert desc.constraint == PropertyConstraint.Range
 
 
-def test_get_descriptor_ranged_property_float_range():
-    """Test that float values in value-range are accepted."""
+@pytest.mark.parametrize(
+    ("format", "range_values", "expected_type"),
+    [
+        ("float", [-30, 100, 1e-05], float),
+        ("uint8", [0, 100, 1], int),
+    ],
+)
+def test_get_descriptor_ranged_property_type_coercion(
+    format, range_values, expected_type
+):
+    """Test that range values are coerced to the property's format type."""
     ranged_prop = load_fixture("ranged_property.json")
-    ranged_prop["format"] = "float"
-    ranged_prop["value-range"] = [-30, 100, 1e-05]
+    ranged_prop["format"] = format
+    ranged_prop["value-range"] = range_values
 
     prop = MiotProperty.model_validate(ranged_prop)
     desc = prop.get_descriptor()
 
     assert isinstance(desc, RangeDescriptor)
-    assert desc.min_value == -30
-    assert desc.max_value == 100
-    assert desc.step == 1e-05
+    assert all(type(v) is expected_type for v in prop.range)
+    assert desc.min_value == range_values[0]
+    assert desc.max_value == range_values[1]
+    assert desc.step == range_values[2]
 
 
 def test_get_descriptor_ranged_property_none_format():
