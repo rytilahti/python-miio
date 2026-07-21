@@ -91,8 +91,6 @@ class GenericMiot(MiotDevice):
             _LOGGER.debug("Renamed %s to %s", desc.name, name)
             desc.name = name
 
-        desc.extras.update(meta)
-
     def _create_action(self, act: MiotAction) -> ActionDescriptor | None:
         """Create action descriptor for miot action."""
         desc = act.get_descriptor()

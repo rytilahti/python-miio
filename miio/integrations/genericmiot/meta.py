@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import yaml
 
@@ -14,28 +14,10 @@ from miio.miot_models import MiotBaseModel
 _LOGGER = logging.getLogger(__name__)
 
 
-class _IncludeLoader(yaml.SafeLoader):
-    """YAML loader that supports !include directives for splitting metadata."""
-
-    def __init__(self, stream: Any) -> None:
-        self._root = Path(stream.name).parent
-        super().__init__(stream)
-
-    def include(self, node: yaml.Node) -> Any:
-        path = self._root / self.construct_scalar(node)
-        with path.open() as f:
-            return yaml.load(f, _IncludeLoader)
-
-
-_IncludeLoader.add_constructor("!include", _IncludeLoader.include)
-
-
 class MetaBase(BaseModel):
-    """Base metadata with description, icon, and device_class."""
+    """Base metadata with description."""
 
     description: str
-    icon: Optional[str] = None
-    device_class: Optional[str] = None
 
     class Config:
         extra = "forbid"
@@ -52,9 +34,9 @@ class PropertyMeta(MetaBase):
 class ServiceMeta(MetaBase):
     """Metadata for a service, containing per-action and per-property metadata."""
 
-    action: Optional[Dict[str, ActionMeta]] = None
-    property: Optional[Dict[str, PropertyMeta]] = None
-    event: Optional[Dict] = None
+    action: dict[str, ActionMeta] | None = None
+    property: dict[str, PropertyMeta] | None = None
+    event: dict | None = None
 
     class Config:
         extra = "forbid"
@@ -64,38 +46,47 @@ class Namespace(MetaBase):
     """A namespace (e.g. miot-spec-v2) containing service definitions."""
 
     fallback: Optional["Namespace"] = None
-    services: Optional[Dict[str, ServiceMeta]] = None
+    services: dict[str, ServiceMeta] | None = None
 
 
 class Metadata(BaseModel):
     """Loads and provides access to YAML metadata for genericmiot entities.
 
-    Metadata provides human-readable descriptions, icons, and device_class
-    attributes that override the often-Chinese or generic defaults from miotspec
-    files.
+    Metadata provides human-readable descriptions that override the often-Chinese
+    or generic defaults from miotspec files.
     """
 
-    namespaces: Dict[str, Namespace]
+    namespaces: dict[str, Namespace]
 
     @classmethod
-    def load(cls, file: Optional[Path] = None) -> "Metadata":
-        """Load metadata from the default extras.yaml or a custom file."""
+    def load(cls, file: Path | None = None) -> "Metadata":
+        """Load metadata from the default base.yaml or a custom file."""
         if file is None:
-            file = Path(__file__).resolve().parent / "metadata" / "extras.yaml"
+            file = Path(__file__).resolve().parent / "metadata" / "base.yaml"
 
         _LOGGER.debug("Loading metadata from %s", file)
         with file.open() as f:
-            data = yaml.load(f, _IncludeLoader)
+            data = yaml.safe_load(f)
+
+        for ns_name, ns_value in data["namespaces"].items():
+            if isinstance(ns_value, str):
+                ns_path = file.parent / ns_value
+                _LOGGER.debug("Loading namespace %s from %s", ns_name, ns_path)
+                with ns_path.open() as f:
+                    data["namespaces"][ns_name] = yaml.safe_load(f)
+
         return cls(**data)
 
-    def get_metadata(self, entity: MiotBaseModel) -> Optional[dict[str, str]]:
+    def get_metadata(self, entity: MiotBaseModel) -> dict[str, str] | None:
         """Look up metadata for a miot entity (property or action).
 
-        Returns a dict with description/icon/device_class keys, or None
-        if no metadata was found.
+        Returns a dict with a description key, or None if no metadata was found.
         """
         urn = entity.extras.get("urn")
         if urn is None:
+            return None
+
+        if entity.service is None:
             return None
 
         ns_name: str = urn.namespace
@@ -117,12 +108,12 @@ class Metadata(BaseModel):
             _LOGGER.debug("No metadata for service: %s", service_name)
             return None
 
-        type_dict: Optional[dict] = getattr(serv, type_, None)
+        type_dict: dict | None = getattr(serv, type_, None)
         if type_dict is None:
             _LOGGER.debug("No metadata type %s in service %s", type_, service_name)
             return None
 
-        meta: Optional[MetaBase] = type_dict.get(entity_name)
+        meta: MetaBase | None = type_dict.get(entity_name)
         if meta is None:
             _LOGGER.debug("No metadata for %s", full_name)
             return None
@@ -130,10 +121,6 @@ class Metadata(BaseModel):
         result: dict[str, str] = {}
         if meta.description:
             result["description"] = meta.description
-        if meta.icon:
-            result["icon"] = meta.icon
-        if meta.device_class:
-            result["device_class"] = meta.device_class
 
         _LOGGER.debug("Found metadata for %s: %s", full_name, result)
         return result
