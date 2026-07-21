@@ -3,16 +3,15 @@
 import asyncio
 import json
 import logging
+from typing import Any
 
 import click
-
-try:
-    from pydantic.v1 import BaseModel, Field, PrivateAttr
-except ImportError:
-    from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, GetCoreSchemaHandler, PrivateAttr
+from pydantic_core import core_schema as pydantic_core_schema
 from yaml import safe_load
 
 from miio import PushServer
+from miio.miot_models import MiotPythonType
 
 from .common import create_info_response, did_and_mac_for_model
 
@@ -21,11 +20,13 @@ _LOGGER = logging.getLogger(__name__)
 
 class Format(type):
     @classmethod
-    def __get_validators__(cls):
-        yield cls.convert_type
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> pydantic_core_schema.CoreSchema:
+        return pydantic_core_schema.no_info_plain_validator_function(cls.convert_type)
 
     @classmethod
-    def convert_type(cls, input: str):
+    def convert_type(cls, input: str) -> MiotPythonType:
         type_map = {
             "bool": bool,
             "int": int,
@@ -48,8 +49,7 @@ class MiioProperty(BaseModel):
     min: int | None = None
     max: int | None = None
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class MiioAction(BaseModel):
@@ -82,8 +82,7 @@ class SimulatedMiio(BaseModel):
     methods: list[MiioMethod] = Field(default=[])
     _model: str | None = PrivateAttr(default=None)
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class MiioSimulator:
@@ -156,7 +155,7 @@ async def main(dev):
 def miio_simulator(file, model):
     """Simulate miio device."""
     data = file.read()
-    dev = SimulatedMiio.parse_obj(safe_load(data))
+    dev = SimulatedMiio.model_validate(safe_load(data))
     _LOGGER.info("Available models: %s", dev.models)
     if model is not None:
         dev._model = model

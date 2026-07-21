@@ -3,11 +3,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import click
-
-try:
-    from pydantic.v1 import BaseModel, Field
-except ImportError:
-    from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 try:
     from rich import print as echo
@@ -59,7 +55,7 @@ class CloudDeviceInfo(BaseModel):
     is_online: bool = Field(alias="isOnline")
     rssi: int
 
-    _raw_data: dict = Field(repr=False)
+    _raw_data: dict = PrivateAttr(default=None)
 
     @property
     def is_child(self):
@@ -71,8 +67,7 @@ class CloudDeviceInfo(BaseModel):
         """Return the raw data."""
         return self._raw_data
 
-    class Config:
-        extra = "allow"
+    model_config = ConfigDict(extra="allow")
 
 
 class CloudInterface:
@@ -120,7 +115,7 @@ class CloudInterface:
         devs = {}
         for single_entry in data:
             single_entry["locale"] = locale
-            devinfo = CloudDeviceInfo.parse_obj(single_entry)
+            devinfo = CloudDeviceInfo.model_validate(single_entry)
             devinfo._raw_data = single_entry
             devs[f"{devinfo.did}_{locale}"] = devinfo
 
@@ -208,13 +203,9 @@ def cloud_list(ctx: click.Context, locale: str | None, raw: bool):
                 echo(f"\t\t\tDID: {c.did}")
                 echo(f"\t\t\tModel: {c.model}")
 
-        other_fields = dev.__fields_set__ - set(dev.__fields__.keys())
         echo("\tOther fields:")
-        for field in other_fields:
-            if field.startswith("_"):
-                continue
-
-            echo(f"\t\t{field}: {getattr(dev, field)}")
+        for field, value in (dev.model_extra or {}).items():
+            echo(f"\t\t{field}: {value}")
 
     if not devices:
         echo(f"Unable to find devices for locale {locale}")

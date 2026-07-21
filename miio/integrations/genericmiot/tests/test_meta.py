@@ -19,7 +19,7 @@ def _make_entity(
     namespace: str, type_: str, name: str, service_name: str
 ) -> MiotBaseModel:
     """Create a mock MiotBaseModel entity for metadata lookups."""
-    urn: URN = URN.validate(f"urn:{namespace}:{type_}:{name}:1:mock:1")
+    urn: URN = URN.model_validate(f"urn:{namespace}:{type_}:{name}:1:mock:1")
     service: Mock = Mock()
     service.name = service_name
     entity: Mock = Mock()
@@ -195,7 +195,7 @@ def test_load_explicit_file() -> None:
 def test_no_service_returns_none(meta: Metadata) -> None:
     entity: Mock = Mock(spec=MiotBaseModel)
     entity.extras = {
-        "urn": URN.validate("urn:miot-spec-v2:property:battery-level:1:mock:1")
+        "urn": URN.model_validate("urn:miot-spec-v2:property:battery-level:1:mock:1")
     }
     entity.service = None
     assert meta.get_metadata(entity) is None

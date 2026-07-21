@@ -2,11 +2,7 @@ import logging
 from pathlib import Path
 
 import yaml
-
-try:
-    from pydantic.v1 import BaseModel
-except ImportError:
-    from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from miio.miot_models import MiotBaseModel
 
@@ -19,8 +15,7 @@ class MetaBase(BaseModel):
 
     description: str
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class ActionMeta(MetaBase):
@@ -39,8 +34,7 @@ class ServiceMeta(MetaBase):
     property: dict[str, PropertyMeta] = {}
     event: dict = {}
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
     def get(self, type_: str, name: str) -> MetaBase | None:
         """Return metadata for the given type and name, or None if not found."""

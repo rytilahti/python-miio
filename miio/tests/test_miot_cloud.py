@@ -19,7 +19,7 @@ def load_fixture(filename: str) -> str:
 
 @pytest.fixture(scope="module")
 def miotspec_releases() -> ReleaseList:
-    return ReleaseList.parse_obj(load_fixture("micloud_miotspec_releases.json"))
+    return ReleaseList.model_validate(load_fixture("micloud_miotspec_releases.json"))
 
 
 def test_releaselist(miotspec_releases: ReleaseList):
