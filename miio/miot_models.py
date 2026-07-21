@@ -152,11 +152,6 @@ class MiotBaseModel(BaseModel):
         return self.name.replace(":", "_").replace("-", "_")
 
     @property
-    def full_name(self) -> str:
-        """Return full name including the namespace and type."""
-        return f"{self.urn.namespace}:{self.urn.type}:{self.name}"
-
-    @property
     @abstractmethod
     def unique_identifier(self) -> str:
         """Return unique identifier."""

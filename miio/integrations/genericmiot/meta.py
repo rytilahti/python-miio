@@ -35,24 +35,23 @@ class ServiceMeta(MetaBase):
     """Metadata for a service, containing per-action and per-property metadata."""
 
     description: str | None = None  # type: ignore[assignment]
-    action: dict[str, ActionMeta] | None = None
-    property: dict[str, PropertyMeta] | None = None
-    event: dict | None = None
+    action: dict[str, ActionMeta] = {}
+    property: dict[str, PropertyMeta] = {}
+    event: dict = {}
 
     class Config:
         extra = "forbid"
 
     def get(self, type_: str, name: str) -> MetaBase | None:
         """Return metadata for the given type and name, or None if not found."""
-        type_dict = getattr(self, type_, None)
-        return type_dict.get(name) if type_dict else None
+        return getattr(self, type_).get(name)
 
 
 class Namespace(MetaBase):
     """A namespace (e.g. miot-spec-v2) containing service definitions."""
 
     fallback: str | None = None
-    services: dict[str, ServiceMeta] | None = None
+    services: dict[str, ServiceMeta] = {}
 
 
 class Metadata(BaseModel):
@@ -87,12 +86,11 @@ class Metadata(BaseModel):
         self, ns: "Namespace", service_name: str, type_: str, entity_name: str
     ) -> MetaBase | None:
         """Look up metadata within a single namespace, following fallback if needed."""
-        if ns.services is not None:
-            for svc_name in (service_name, _ANY_SERVICE):
-                if (serv := ns.services.get(svc_name)) and (
-                    meta := serv.get(type_, entity_name)
-                ):
-                    return meta
+        for svc_name in (service_name, _ANY_SERVICE):
+            if (serv := ns.services.get(svc_name)) and (
+                meta := serv.get(type_, entity_name)
+            ):
+                return meta
 
         common = self.namespaces.get("common")
         fallback_ns = self.namespaces.get(ns.fallback or "common", common)
@@ -120,14 +118,22 @@ class Metadata(BaseModel):
         service_name: str = entity.service.name
         type_: str = urn.type
         entity_name: str = urn.name
-        full_name = f"{ns_name}:{service_name}:{type_}:{entity_name}"
 
         ns = self.namespaces.get(ns_name, self.namespaces["common"])
 
         meta = self._lookup_in_namespace(ns, service_name, type_, entity_name)
         if meta is None:
-            _LOGGER.debug("No metadata for %s", full_name)
+            _LOGGER.debug(
+                "No metadata for %s:%s:%s:%s", ns_name, service_name, type_, entity_name
+            )
             return None
 
-        _LOGGER.debug("Found metadata for %s: %s", full_name, meta)
+        _LOGGER.debug(
+            "Found metadata for %s:%s:%s:%s: %s",
+            ns_name,
+            service_name,
+            type_,
+            entity_name,
+            meta,
+        )
         return meta
