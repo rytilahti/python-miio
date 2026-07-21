@@ -157,7 +157,7 @@ class DeviceGroupMeta(type):
         return list(cls._mappings.keys()) or cls._supported_models
 
 
-class DeviceGroup(click.MultiCommand):
+class DeviceGroup(click.Group):
     class Command:
         def __init__(self, name, decorators, *, default_output=None, **kwargs):
             self.name = name
@@ -238,8 +238,8 @@ class DeviceGroup(click.MultiCommand):
         result_callback_pass_device=True,
         **attrs,
     ):
-        self.commands = getattr(device_class, "_device_group_commands", None)
-        if self.commands is None:
+        device_commands = getattr(device_class, "_device_group_commands", None)
+        if device_commands is None:
             raise RuntimeError(
                 "Class {} doesn't use DeviceGroupMeta meta class."
                 " It can't be used with DeviceGroup."
@@ -247,6 +247,10 @@ class DeviceGroup(click.MultiCommand):
 
         self.device_class = device_class
         self.device_pass = click.make_pass_decorator(device_class)
+
+        # Default to running status instead of showing help when called with no subcommand.
+        if no_args_is_help is None and "status" in device_commands:
+            no_args_is_help = False
 
         attrs.setdefault("params", self.DEFAULT_PARAMS)
         attrs.setdefault("callback", click.pass_context(self.group_callback))
@@ -262,6 +266,9 @@ class DeviceGroup(click.MultiCommand):
             result_callback=result_callback,
             **attrs,
         )
+
+        # Preserve our command dict, which click.Group resets in __init__
+        self.commands = device_commands
 
     def group_callback(self, ctx, *args, **kwargs):
         gco = ctx.find_object(GlobalContextObject)
@@ -281,6 +288,11 @@ class DeviceGroup(click.MultiCommand):
                 write_cache(ip, {"seq": ctx.obj.raw_id})
 
             ctx.call_on_close(_save_cache)
+
+    def invoke(self, ctx):
+        if not ctx._protected_args and not ctx.args and "status" in self.commands:
+            ctx._protected_args = ["status"]
+        return super().invoke(ctx)
 
     def command_callback(self, miio_command, miio_device, *args, **kwargs):
         return miio_command.call(miio_device, *args, **kwargs)
