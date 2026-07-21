@@ -1,9 +1,12 @@
+from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
 
+from miio.descriptors import AccessFlags, ActionDescriptor
 from miio.miot_models import URN, MiotBaseModel
 
+from ..genericmiot import GenericMiot
 from ..meta import MetaBase, Metadata
 
 
@@ -181,3 +184,55 @@ def test_dreamespec_falls_back_to_common(meta: Metadata) -> None:
     result = meta.get_metadata(entity)
     assert result is not None
     assert result.description == "Time cleaned"
+
+
+def test_load_explicit_file() -> None:
+    base = Path(__file__).resolve().parent.parent / "metadata" / "base.yaml"
+    meta = Metadata.load(file=base)
+    assert "miot-spec-v2" in meta.namespaces
+
+
+def test_no_service_returns_none(meta: Metadata) -> None:
+    entity: Mock = Mock(spec=MiotBaseModel)
+    entity.extras = {
+        "urn": URN.validate("urn:miot-spec-v2:property:battery-level:1:mock:1")
+    }
+    entity.service = None
+    assert meta.get_metadata(entity) is None
+
+
+@pytest.fixture
+def mock_meta() -> Mock:
+    return Mock(spec=Metadata)
+
+
+@pytest.fixture
+def device(mock_meta: Mock) -> GenericMiot:
+    dev = GenericMiot("127.0.0.1", "0" * 32)
+    dev._meta = mock_meta  # type: ignore[assignment]
+    return dev
+
+
+def test_enrich_no_metadata(device: GenericMiot, mock_meta: Mock) -> None:
+    mock_meta.get_metadata.return_value = None
+    desc = ActionDescriptor(id="test", name="raw-name", access=AccessFlags.Execute)
+    result = device._enrich_with_metadata(Mock(), desc)
+    assert result is desc
+
+
+def test_enrich_same_name(device: GenericMiot, mock_meta: Mock) -> None:
+    mock_meta.get_metadata.return_value = MetaBase(description="raw-name")
+    desc = ActionDescriptor(id="test", name="raw-name", access=AccessFlags.Execute)
+    result = device._enrich_with_metadata(Mock(), desc)
+    assert result is desc
+
+
+def test_enrich_applies_metadata(device: GenericMiot, mock_meta: Mock) -> None:
+    mock_meta.get_metadata.return_value = MetaBase(description="Friendly Name")
+    desc = ActionDescriptor(id="test", name="raw-name", access=AccessFlags.Execute)
+    result = device._enrich_with_metadata(Mock(), desc)
+
+    assert result is not desc
+    assert result.name == "Friendly Name"
+    assert result.extras["original"] is desc
+    assert result.extras["original"].name == "raw-name"
