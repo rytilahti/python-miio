@@ -70,6 +70,37 @@ DUMMY_SERVICE = """
 """
 
 
+@pytest.mark.parametrize(
+    "model_class",
+    [MiotEnumValue, MiotProperty, MiotAction, MiotEvent, MiotService],
+)
+def test_unknown_fields_warn(model_class, recwarn):
+    """Test that unknown fields trigger a warning."""
+    extra_field_json = {
+        MiotEnumValue: '{"value": 1, "description": "x", "unknown_field": true}',
+        MiotProperty: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:property:foo:00000001:dummy:1",'
+            ' "description": "X", "format": "bool", "access": ["read"], "unknown_field": true}'
+        ),
+        MiotAction: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:action:foo:00000001:dummy:1",'
+            ' "description": "X", "in": [], "out": [], "unknown_field": true}'
+        ),
+        MiotEvent: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:event:foo:00000001:dummy:1",'
+            ' "description": "X", "arguments": [], "unknown_field": true}'
+        ),
+        MiotService: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:service:foo:00000001:dummy:1",'
+            ' "description": "X", "unknown_field": true}'
+        ),
+    }
+    model_class.model_validate_json(extra_field_json[model_class])
+    assert len(recwarn) == 1
+    assert "unknown_field" in str(recwarn[0].message)
+    assert "please report" in str(recwarn[0].message)
+
+
 def test_enum():
     """Test that enum parsing works."""
     data = """
@@ -197,6 +228,36 @@ def test_urn(urn_string, unexpected):
     assert repr(urn) == f"<URN {urn_string} parent:None>"
 
 
+def test_urn_invalid_string():
+    """Test that a URN string without colons raises TypeError."""
+
+    class Wrapper(BaseModel):
+        urn: URN
+
+    with pytest.raises((TypeError, ValueError)):
+        Wrapper.model_validate_json('{"urn": "notavalidurn"}')
+
+
+def test_urn_from_dict():
+    """Test that URN can be parsed from a pre-built dict (non-string input path)."""
+
+    class Wrapper(BaseModel):
+        urn: URN
+
+    urn_dict = {
+        "namespace": "miot-spec-v2",
+        "type": "property",
+        "name": "on",
+        "internal_id": "00000006",
+        "model": "dummy",
+        "version": 1,
+        "unexpected": None,
+    }
+    wrapper = Wrapper.model_validate({"urn": urn_dict})
+    assert wrapper.urn.namespace == "miot-spec-v2"
+    assert wrapper.urn.name == "on"
+
+
 def test_service():
     data = """
     {
@@ -321,6 +382,15 @@ def test_get_descriptor_ranged_property(read_only, expected):
     assert desc.type == int
     if not read_only:
         assert desc.constraint == PropertyConstraint.Range
+
+
+def test_get_descriptor_ranged_property_none_format():
+    """Test that a ranged property with format=none raises ValueError."""
+    ranged_prop = load_fixture("ranged_property.json")
+    ranged_prop["format"] = "none"
+    prop = MiotProperty.model_validate(ranged_prop)
+    with pytest.raises(ValueError, match="non-None format"):
+        prop.get_descriptor()
 
 
 @pytest.mark.parametrize(
