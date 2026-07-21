@@ -244,7 +244,7 @@ class MiotProperty(MiotBaseModel):
     access: list[MiotAccess] = Field(default=[MiotAccess.Read])
     unit: str | None = None
 
-    range: list[int] | None = Field(default=None, alias="value-range")
+    range: list[float] | None = Field(default=None, alias="value-range")
     choices: list[MiotEnumValue] | None = Field(default=None, alias="value-list")
     gatt_access: list[Any] | None = Field(default=None, alias="gatt-access")
 

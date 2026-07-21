@@ -22,9 +22,9 @@ import attr
 class ValidSettingRange:
     """Describes a valid input range for a property."""
 
-    min_value: int
-    max_value: int
-    step: int = 1
+    min_value: float
+    max_value: float
+    step: float = 1
 
 
 class AccessFlags(Flag):
@@ -177,11 +177,11 @@ class RangeDescriptor(PropertyDescriptor):
     """
 
     #: Minimum value for the property.
-    min_value: int
+    min_value: float
     #: Maximum value for the property.
-    max_value: int
+    max_value: float
     #: Step size for the property.
-    step: int
+    step: float
     #: Name of the attribute in the device class that returns the range.
     #: If set, this will override the individual min/max/step values.
     range_attribute: str | None = attr.ib(default=None)
