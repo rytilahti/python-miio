@@ -1,0 +1,24 @@
+description: Common cross-service definitions
+services:
+  __ANY__:
+    property:
+      mac:
+        description: MAC Address
+      voltage:
+        description: Voltage
+      temperature:
+        description: Temperature
+      relative-humidity:
+        description: Relative humidity
+      co2-density:
+        description: CO2 density
+      pm2.5-density:
+        description: PM2.5 density
+      pm10-density:
+        description: PM10 density
+      brightness:
+        description: Brightness
+      cleaning-time:
+        description: Time cleaned
+      cleaning-area:
+        description: Area cleaned

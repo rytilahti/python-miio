@@ -1,3 +1,4 @@
 namespaces:
   miot-spec-v2: miotspec.yaml
   dreame-spec: dreamespec.yaml
+  common: common.yaml

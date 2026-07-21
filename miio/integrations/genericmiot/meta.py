@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -12,6 +11,7 @@ except ImportError:
 from miio.miot_models import MiotBaseModel
 
 _LOGGER = logging.getLogger(__name__)
+_ANY_SERVICE = "__ANY__"
 
 
 class MetaBase(BaseModel):
@@ -34,6 +34,7 @@ class PropertyMeta(MetaBase):
 class ServiceMeta(MetaBase):
     """Metadata for a service, containing per-action and per-property metadata."""
 
+    description: str | None = None  # type: ignore[assignment]
     action: dict[str, ActionMeta] | None = None
     property: dict[str, PropertyMeta] | None = None
     event: dict | None = None
@@ -45,7 +46,7 @@ class ServiceMeta(MetaBase):
 class Namespace(MetaBase):
     """A namespace (e.g. miot-spec-v2) containing service definitions."""
 
-    fallback: Optional["Namespace"] = None
+    fallback: str | None = None
     services: dict[str, ServiceMeta] | None = None
 
 
@@ -77,6 +78,30 @@ class Metadata(BaseModel):
 
         return cls(**data)
 
+    def _lookup_in_namespace(
+        self, ns: "Namespace", service_name: str, type_: str, entity_name: str
+    ) -> MetaBase | None:
+        """Look up metadata within a single namespace, following fallback if needed."""
+        if ns.services is not None:
+            for svc_name in (service_name, _ANY_SERVICE):
+                serv = ns.services.get(svc_name)
+                if serv is not None:
+                    type_dict: dict | None = getattr(serv, type_, None)
+                    if type_dict is not None:
+                        meta: MetaBase | None = type_dict.get(entity_name)
+                        if meta is not None:
+                            return meta
+
+        common = self.namespaces.get("common")
+        fallback_ns = self.namespaces.get(ns.fallback or "common", common)
+
+        if fallback_ns is not None and fallback_ns is not ns:
+            return self._lookup_in_namespace(
+                fallback_ns, service_name, type_, entity_name
+            )
+
+        return None
+
     def get_metadata(self, entity: MiotBaseModel) -> MetaBase | None:
         """Look up metadata for a miot entity (property or action).
 
@@ -95,25 +120,9 @@ class Metadata(BaseModel):
         entity_name: str = urn.name
         full_name = f"{ns_name}:{service_name}:{type_}:{entity_name}"
 
-        ns = self.namespaces.get(ns_name)
-        if ns is None:
-            _LOGGER.debug("No metadata namespace: %s", ns_name)
-            return None
+        ns = self.namespaces.get(ns_name, self.namespaces["common"])
 
-        if ns.services is None:
-            return None
-
-        serv = ns.services.get(service_name)
-        if serv is None:
-            _LOGGER.debug("No metadata for service: %s", service_name)
-            return None
-
-        type_dict: dict | None = getattr(serv, type_, None)
-        if type_dict is None:
-            _LOGGER.debug("No metadata type %s in service %s", type_, service_name)
-            return None
-
-        meta: MetaBase | None = type_dict.get(entity_name)
+        meta = self._lookup_in_namespace(ns, service_name, type_, entity_name)
         if meta is None:
             _LOGGER.debug("No metadata for %s", full_name)
             return None
