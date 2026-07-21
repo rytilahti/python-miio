@@ -20,7 +20,7 @@ from miio.miot_models import (
     MiotBaseModel,
     MiotEnumValue,
     MiotEvent,
-    MiotFormat,
+    MiotFormatType,
     MiotProperty,
     MiotService,
 )
@@ -108,7 +108,7 @@ def test_format(format, expected_type):
     class Wrapper(BaseModel):
         """Need to wrap as plain string is not valid json."""
 
-        format: MiotFormat
+        format: MiotFormatType
 
     data = f'{{"format": "{format}"}}'  # noqa: B028
     f = Wrapper.model_validate_json(data)

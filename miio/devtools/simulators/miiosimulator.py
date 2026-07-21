@@ -3,11 +3,10 @@
 import asyncio
 import json
 import logging
-from typing import Any
+from typing import Annotated, TypeAlias
 
 import click
-from pydantic import BaseModel, ConfigDict, Field, GetCoreSchemaHandler, PrivateAttr
-from pydantic_core import core_schema as pydantic_core_schema
+from pydantic import BaseModel, ConfigDict, Field, PlainValidator, PrivateAttr
 from yaml import safe_load
 
 from miio import PushServer
@@ -18,30 +17,25 @@ from .common import create_info_response, did_and_mac_for_model
 _LOGGER = logging.getLogger(__name__)
 
 
-class Format(type):
-    @classmethod
-    def __get_pydantic_core_schema__(
-        cls, source_type: Any, handler: GetCoreSchemaHandler
-    ) -> pydantic_core_schema.CoreSchema:
-        return pydantic_core_schema.no_info_plain_validator_function(cls.convert_type)
+def _convert_format_type(input: str) -> MiotPythonType:
+    type_map = {
+        "bool": bool,
+        "int": int,
+        "str_bool": str,
+        "str": str,
+        "float": float,
+    }
+    return type_map[input]
 
-    @classmethod
-    def convert_type(cls, input: str) -> MiotPythonType:
-        type_map = {
-            "bool": bool,
-            "int": int,
-            "str_bool": str,
-            "str": str,
-            "float": float,
-        }
-        return type_map[input]
+
+FormatType: TypeAlias = Annotated[MiotPythonType, PlainValidator(_convert_format_type)]
 
 
 class MiioProperty(BaseModel):
     """Single miio property."""
 
     name: str
-    type: Format
+    type: FormatType
     value: str | bool | int | None
     models: list[str] = Field(default=[])
     setter: str | None = None
