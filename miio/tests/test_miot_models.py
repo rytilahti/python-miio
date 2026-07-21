@@ -228,14 +228,21 @@ def test_urn(urn_string, unexpected):
     assert repr(urn) == f"<URN {urn_string} parent:None>"
 
 
-def test_urn_invalid_string():
-    """Test that a URN string without colons raises TypeError."""
+@pytest.mark.parametrize(
+    "invalid_value",
+    [
+        pytest.param("notavalidurn", id="string_without_colons"),
+        pytest.param(42, id="unexpected_type"),
+    ],
+)
+def test_urn_invalid_input(invalid_value):
+    """Test that invalid URN inputs raise an error."""
 
     class Wrapper(BaseModel):
         urn: URN
 
     with pytest.raises((TypeError, ValueError)):
-        Wrapper.model_validate_json('{"urn": "notavalidurn"}')
+        Wrapper.model_validate({"urn": invalid_value})
 
 
 def test_urn_from_dict():

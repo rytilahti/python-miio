@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import warnings
 from abc import abstractmethod
@@ -69,13 +71,15 @@ class URN(BaseModel):
     version: int
     unexpected: list[str] | None
 
-    parent_urn: "URN | None" = Field(None, repr=False)
+    parent_urn: URN | None = Field(None, repr=False)
 
     @model_validator(mode="before")
     @classmethod
     def validate_from_str(cls, v: Any) -> Any:
-        if not isinstance(v, str):
+        if isinstance(v, dict):
             return v
+        if not isinstance(v, str):
+            raise TypeError(f"expected str, got {type(v).__name__}")
         if ":" not in v:
             raise TypeError("invalid type")
         _, namespace, type_, name, id_, model, version, *unexpected = v.split(":")
@@ -125,14 +129,14 @@ class MiotBaseModel(BaseModel):
     description: str
 
     extras: dict = Field(default_factory=dict, repr=False)
-    service: "MiotService | None" = None  # backref to containing service
+    service: MiotService | None = None  # backref to containing service
 
     @model_validator(mode="after")
     def _warn_extra_fields(self) -> Self:
         _warn_unknown_fields(self)
         return self
 
-    def fill_from_parent(self, service: "MiotService"):
+    def fill_from_parent(self, service: MiotService):
         """Fill some information from the parent service."""
         # TODO: this could be done using a validator
         self.service = service
@@ -191,7 +195,7 @@ class MiotAction(MiotBaseModel):
             values["out"] = []
         return values
 
-    def fill_from_parent(self, service: "MiotService"):
+    def fill_from_parent(self, service: MiotService):
         """Overridden to convert inputs and outputs to property references."""
         super().fill_from_parent(service)
         self.inputs = [service.get_property_by_id(piid) for piid in self.inputs]
