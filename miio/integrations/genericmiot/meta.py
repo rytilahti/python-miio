@@ -42,6 +42,11 @@ class ServiceMeta(MetaBase):
     class Config:
         extra = "forbid"
 
+    def get(self, type_: str, name: str) -> MetaBase | None:
+        """Return metadata for the given type and name, or None if not found."""
+        type_dict = getattr(self, type_, None)
+        return type_dict.get(name) if type_dict else None
+
 
 class Namespace(MetaBase):
     """A namespace (e.g. miot-spec-v2) containing service definitions."""
@@ -84,13 +89,10 @@ class Metadata(BaseModel):
         """Look up metadata within a single namespace, following fallback if needed."""
         if ns.services is not None:
             for svc_name in (service_name, _ANY_SERVICE):
-                serv = ns.services.get(svc_name)
-                if serv is not None:
-                    type_dict: dict | None = getattr(serv, type_, None)
-                    if type_dict is not None:
-                        meta: MetaBase | None = type_dict.get(entity_name)
-                        if meta is not None:
-                            return meta
+                if (serv := ns.services.get(svc_name)) and (
+                    meta := serv.get(type_, entity_name)
+                ):
+                    return meta
 
         common = self.namespaces.get("common")
         fallback_ns = self.namespaces.get(ns.fallback or "common", common)
