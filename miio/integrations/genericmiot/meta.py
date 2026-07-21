@@ -77,10 +77,10 @@ class Metadata(BaseModel):
 
         return cls(**data)
 
-    def get_metadata(self, entity: MiotBaseModel) -> dict[str, str] | None:
+    def get_metadata(self, entity: MiotBaseModel) -> MetaBase | None:
         """Look up metadata for a miot entity (property or action).
 
-        Returns a dict with a description key, or None if no metadata was found.
+        Returns a MetaBase object, or None if no metadata was found.
         """
         urn = entity.extras.get("urn")
         if urn is None:
@@ -118,9 +118,5 @@ class Metadata(BaseModel):
             _LOGGER.debug("No metadata for %s", full_name)
             return None
 
-        result: dict[str, str] = {}
-        if meta.description:
-            result["description"] = meta.description
-
-        _LOGGER.debug("Found metadata for %s: %s", full_name, result)
-        return result
+        _LOGGER.debug("Found metadata for %s: %s", full_name, meta)
+        return meta

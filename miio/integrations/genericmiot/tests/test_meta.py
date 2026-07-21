@@ -4,7 +4,7 @@ import pytest
 
 from miio.miot_models import URN, MiotBaseModel
 
-from ..meta import Metadata
+from ..meta import MetaBase, Metadata
 
 
 @pytest.fixture(scope="module")
@@ -54,57 +54,57 @@ class TestMetadataLookup:
         entity: MiotBaseModel = _make_entity(
             "miot-spec-v2", "property", "battery-level", "battery"
         )
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is not None
-        assert result["description"] == "Battery level"
+        assert result.description == "Battery level"
 
     def test_action_found(self, meta: Metadata) -> None:
         entity: MiotBaseModel = _make_entity(
             "miot-spec-v2", "action", "start-sweep", "vacuum"
         )
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is not None
-        assert result["description"] == "Start cleaning"
+        assert result.description == "Start cleaning"
 
     def test_unknown_namespace(self, meta: Metadata) -> None:
         entity: MiotBaseModel = _make_entity(
             "nonexistent", "property", "battery-level", "battery"
         )
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is None
 
     def test_unknown_service(self, meta: Metadata) -> None:
         entity: MiotBaseModel = _make_entity(
             "miot-spec-v2", "property", "battery-level", "nonexistent"
         )
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is None
 
     def test_unknown_property(self, meta: Metadata) -> None:
         entity: MiotBaseModel = _make_entity(
             "miot-spec-v2", "property", "nonexistent", "battery"
         )
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is None
 
     def test_no_urn_in_extras(self, meta: Metadata) -> None:
         entity: Mock = Mock(spec=MiotBaseModel)
         entity.extras = {}
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is None
 
     def test_dreame_property(self, meta: Metadata) -> None:
         entity: MiotBaseModel = _make_entity(
             "dreame-spec", "property", "mop-mode", "vacuum-extend"
         )
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is not None
-        assert result["description"] == "Mop mode"
+        assert result.description == "Mop mode"
 
     def test_dreame_action(self, meta: Metadata) -> None:
         entity: MiotBaseModel = _make_entity(
             "dreame-spec", "action", "stop-clean", "vacuum-extend"
         )
-        result: dict[str, str] | None = meta.get_metadata(entity)
+        result: MetaBase | None = meta.get_metadata(entity)
         assert result is not None
-        assert result["description"] == "Stop cleaning"
+        assert result.description == "Stop cleaning"

@@ -86,10 +86,9 @@ class GenericMiot(MiotDevice):
         if meta is None:
             return
 
-        name = meta.pop("description", None)
-        if name is not None and name != desc.name:
-            _LOGGER.debug("Renamed %s to %s", desc.name, name)
-            desc.name = name
+        if meta.description != desc.name:
+            _LOGGER.debug("Renamed %s to %s", desc.name, meta.description)
+            desc.name = meta.description
 
     def _create_action(self, act: MiotAction) -> ActionDescriptor | None:
         """Create action descriptor for miot action."""
