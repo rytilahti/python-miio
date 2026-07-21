@@ -202,37 +202,34 @@ def test_no_service_returns_none(meta: Metadata) -> None:
 
 
 @pytest.fixture
-def mock_meta() -> Mock:
-    return Mock(spec=Metadata)
-
-
-@pytest.fixture
-def device(mock_meta: Mock) -> GenericMiot:
+def device(meta: Metadata) -> GenericMiot:
     dev = GenericMiot("127.0.0.1", "0" * 32)
-    dev._meta = mock_meta  # type: ignore[assignment]
+    dev._meta = meta
     return dev
 
 
-def test_enrich_no_metadata(device: GenericMiot, mock_meta: Mock) -> None:
-    mock_meta.get_metadata.return_value = None
-    desc = ActionDescriptor(id="test", name="raw-name", access=AccessFlags.Execute)
-    result = device._enrich_with_metadata(Mock(), desc)
+def test_enrich_no_metadata(device: GenericMiot) -> None:
+    entity = _make_entity("unknown-ns", "action", "nonexistent", "nonexistent")
+    desc = ActionDescriptor(id="test", name="nonexistent", access=AccessFlags.Execute)
+    result = device._enrich_with_metadata(entity, desc)
     assert result is desc
 
 
-def test_enrich_same_name(device: GenericMiot, mock_meta: Mock) -> None:
-    mock_meta.get_metadata.return_value = MetaBase(description="raw-name")
-    desc = ActionDescriptor(id="test", name="raw-name", access=AccessFlags.Execute)
-    result = device._enrich_with_metadata(Mock(), desc)
+def test_enrich_same_name(device: GenericMiot) -> None:
+    entity = _make_entity("miot-spec-v2", "action", "start-sweep", "vacuum")
+    desc = ActionDescriptor(
+        id="test", name="Start cleaning", access=AccessFlags.Execute
+    )
+    result = device._enrich_with_metadata(entity, desc)
     assert result is desc
 
 
-def test_enrich_applies_metadata(device: GenericMiot, mock_meta: Mock) -> None:
-    mock_meta.get_metadata.return_value = MetaBase(description="Friendly Name")
-    desc = ActionDescriptor(id="test", name="raw-name", access=AccessFlags.Execute)
-    result = device._enrich_with_metadata(Mock(), desc)
+def test_enrich_applies_metadata(device: GenericMiot) -> None:
+    entity = _make_entity("miot-spec-v2", "action", "start-sweep", "vacuum")
+    desc = ActionDescriptor(id="test", name="start-sweep", access=AccessFlags.Execute)
+    result = device._enrich_with_metadata(entity, desc)
 
     assert result is not desc
-    assert result.name == "Friendly Name"
+    assert result.name == "Start cleaning"
     assert result.extras["original"] is desc
-    assert result.extras["original"].name == "raw-name"
+    assert result.extras["original"].name == "start-sweep"
