@@ -299,6 +299,75 @@ class TestAirPurifierMB4(TestCase):
             self.device.set_led(True)
 
 
+_INITIAL_STATE_CPA5 = {
+    "power": True,
+    "fault": 0,
+    "mode": 0,
+    "aqi": 10,
+    "filter_life_remaining": 80,
+    "filter_hours_used": 682,
+    "filter_left_time": 309,
+    "led_brightness": 1,
+    "buzzer": False,
+    "child_lock": False,
+    "favorite_level": 10,
+    "motor_speed": 354,
+}
+
+
+class DummyAirPurifierMiotCPA5(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "xiaomi.airp.cpa5"
+        self.state = _INITIAL_STATE_CPA5
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture
+def airpurifierCPA5(request):
+    request.cls.device = DummyAirPurifierMiotCPA5()
+
+
+@pytest.mark.usefixtures("airpurifierCPA5")
+class TestAirPurifierCPA5(TestCase):
+    def test_status(self):
+        status = self.device.status()
+        assert status.is_on is _INITIAL_STATE_CPA5["power"]
+        assert status.aqi == _INITIAL_STATE_CPA5["aqi"]
+        assert status.average_aqi is None
+        assert status.humidity is None
+        assert status.temperature is None
+        assert status.fan_level is None
+        assert status.led is None
+        assert status.mode == OperationMode(_INITIAL_STATE_CPA5["mode"])
+        assert status.led_brightness == LedBrightness(
+            _INITIAL_STATE_CPA5["led_brightness"]
+        )
+        assert status.led_brightness_level is None
+        assert status.buzzer == _INITIAL_STATE_CPA5["buzzer"]
+        assert status.child_lock == _INITIAL_STATE_CPA5["child_lock"]
+        assert status.favorite_level == _INITIAL_STATE_CPA5["favorite_level"]
+        assert (
+            status.filter_life_remaining
+            == _INITIAL_STATE_CPA5["filter_life_remaining"]
+        )
+        assert status.filter_hours_used == _INITIAL_STATE_CPA5["filter_hours_used"]
+        assert status.filter_left_time == _INITIAL_STATE_CPA5["filter_left_time"]
+        assert status.motor_speed == _INITIAL_STATE_CPA5["motor_speed"]
+
+    def test_set_led_brightness(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led_brightness(LedBrightness.Bright)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led_brightness(LedBrightness.Dim)
+        assert led_brightness() == LedBrightness.Dim
+
+        self.device.set_led_brightness(LedBrightness.Off)
+        assert led_brightness() == LedBrightness.Off
+
+
 class DummyAirPurifierMiotVA2(DummyAirPurifierMiot):
     def __init__(self, *args, **kwargs):
         self._model = "zhimi.airp.va2"

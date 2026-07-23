@@ -225,6 +225,32 @@ _MAPPING_RMB1 = {
     "device-display-unit": {"siid": 14, "piid": 1},
 }
 
+# https://home.miot-spec.com/spec/xiaomi.airp.cpa5
+_MAPPING_CPA5 = {
+    # Air Purifier (siid=2)
+    "power": {"siid": 2, "piid": 1},
+    "fault": {"siid": 2, "piid": 2},
+    "mode": {"siid": 2, "piid": 3},
+    # Environment (siid=3) - no temperature/humidity sensor on this model
+    "aqi": {"siid": 3, "piid": 4},
+    # Filter (siid=4)
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Screen (siid=6)
+    "led_brightness": {"siid": 6, "piid": 2},
+    # Alarm (siid=7)
+    "buzzer": {"siid": 7, "piid": 1},
+    # Physical Control Locked (siid=8)
+    "child_lock": {"siid": 8, "piid": 1},
+    # Favorite level, lives under the "air-purifier-favorite" service (siid=9)
+    "favorite_level": {"siid": 9, "piid": 1},
+    # custom-service (siid=10)
+    "motor_speed": {"siid": 10, "piid": 1},
+    # AQI realtime refresh heartbeat (siid=11)
+    "aqi_realtime_update_duration": {"siid": 11, "piid": 1},
+}
+
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-za1:2
 _MAPPING_ZA1 = {
     # Air Purifier (siid=2)
@@ -281,6 +307,7 @@ _MAPPINGS = {
     "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
     "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
+    "xiaomi.airp.cpa5": _MAPPING_CPA5,  # Smart Pet Care Air Purifier
 }
 
 # Models requiring reversed led brightness value
@@ -290,6 +317,7 @@ REVERSED_LED_BRIGHTNESS = [
     "zhimi.airp.mb5a",
     "zhimi.airp.vb4",
     "zhimi.airp.rmb1",
+    "xiaomi.airp.cpa5",
 ]
 
 
