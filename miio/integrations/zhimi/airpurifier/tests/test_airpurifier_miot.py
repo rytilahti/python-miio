@@ -347,8 +347,7 @@ class TestAirPurifierCPA5(TestCase):
         assert status.child_lock == _INITIAL_STATE_CPA5["child_lock"]
         assert status.favorite_level == _INITIAL_STATE_CPA5["favorite_level"]
         assert (
-            status.filter_life_remaining
-            == _INITIAL_STATE_CPA5["filter_life_remaining"]
+            status.filter_life_remaining == _INITIAL_STATE_CPA5["filter_life_remaining"]
         )
         assert status.filter_hours_used == _INITIAL_STATE_CPA5["filter_hours_used"]
         assert status.filter_left_time == _INITIAL_STATE_CPA5["filter_left_time"]
