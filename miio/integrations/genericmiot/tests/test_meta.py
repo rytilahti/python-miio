@@ -5,7 +5,7 @@ import pytest
 import yaml
 
 from miio.descriptors import AccessFlags, ActionDescriptor
-from miio.miot_models import URN, MiotBaseModel
+from miio.miot_models import URN, MiotBaseModel, MiotService
 
 from ..genericmiot import GenericMiot
 from ..meta import ActionMeta, MetaBase, Metadata, Namespace, PropertyMeta, ServiceMeta
@@ -369,3 +369,163 @@ def test_multi_namespace_routing(tmp_path: Path, meta: Metadata) -> None:
 
     assert (tmp_path / "a.yaml").exists()
     assert (tmp_path / "b.yaml").exists()
+
+
+@pytest.fixture
+def battery_service() -> MiotService:
+    return MiotService.model_validate_json("""{
+        "iid": 2,
+        "description": "Battery",
+        "type": "urn:miot-spec-v2:service:battery:00000003:dummy:1",
+        "properties": [{
+            "iid": 1,
+            "type": "urn:miot-spec-v2:property:battery-level:00000014:dummy:1",
+            "description": "Battery Level",
+            "format": "uint8",
+            "access": ["read"]
+        }],
+        "actions": [],
+        "events": []
+    }""")
+
+
+@pytest.fixture
+def device_info_service() -> MiotService:
+    return MiotService.model_validate_json("""{
+        "iid": 1,
+        "description": "Device Information",
+        "type": "urn:miot-spec-v2:service:device-information:00000001:dummy:1",
+        "properties": [{
+            "iid": 1,
+            "type": "urn:miot-spec-v2:property:manufacturer:00000001:dummy:1",
+            "description": "Manufacturer",
+            "format": "string",
+            "access": ["read"]
+        }],
+        "actions": [],
+        "events": []
+    }""")
+
+
+def _device_model(services: list) -> Mock:
+    model = Mock()
+    model.services = services
+    return model
+
+
+@pytest.mark.parametrize(
+    ("meta_obj", "expected"),
+    [
+        (PropertyMeta(description="Battery level"), "Battery level"),
+        (PropertyMeta(description=None), "(no description)"),
+        (ServiceMeta(description="Battery"), "Battery"),
+        (ServiceMeta(description=None), "(no description)"),
+    ],
+)
+def test_str_representation(meta_obj, expected) -> None:
+    assert str(meta_obj) == expected
+
+
+def test_load_skips_missing_namespace_file(tmp_path: Path) -> None:
+    base = tmp_path / "base.yaml"
+    base.write_text(yaml.dump({"namespaces": {"miot-spec-v2": "nonexistent.yaml"}}))
+
+    meta = Metadata.load(file=base)
+
+    assert "miot-spec-v2" not in meta.namespaces
+
+
+def test_build_namespace_metadata_with_action(meta: Metadata) -> None:
+    entity = _make_entity("cgllc-spec", "action", "my-action", "settings")
+    entity.description = "My action"
+    entity.service.description = "Settings"  # type: ignore[union-attr]
+
+    ns = meta.build_namespace_metadata("cgllc-spec", {"settings": [entity]})
+
+    assert "my-action" in ns.services["settings"].action
+
+
+def test_register_namespace(tmp_path: Path, meta: Metadata) -> None:
+    base = tmp_path / "base.yaml"
+    base.write_text(yaml.dump({"namespaces": {}}))
+
+    assert meta.register_namespace("new-spec", "newspec.yaml", base) is True
+    assert meta.register_namespace("new-spec", "newspec.yaml", base) is False
+
+
+@pytest.mark.parametrize(
+    ("ns_name", "service", "type_", "name", "expected_desc"),
+    [
+        ("miot-spec-v2", "battery", "property", "battery-level", "Battery level"),
+        ("nonexistent-spec", "battery", "property", "battery-level", None),
+    ],
+)
+def test_lookup_in_namespace(
+    meta: Metadata, ns_name, service, type_, name, expected_desc
+) -> None:
+    result = meta.lookup_in_namespace(ns_name, service, type_, name)
+    if expected_desc is None:
+        assert result is None
+    else:
+        assert result is not None
+        assert result.description == expected_desc
+
+
+def test_collect_coverage_ok(meta: Metadata, battery_service: MiotService) -> None:
+    cov = meta.collect_coverage(_device_model([battery_service]))
+
+    assert cov.ok == 1
+    assert cov.total == 1
+    assert cov.missing == 0
+
+
+def test_collect_coverage_fallback(
+    meta: Metadata, battery_service: MiotService
+) -> None:
+    dreame_battery = battery_service.model_copy(deep=True)
+    dreame_battery.urn.namespace = "dreame-spec"
+    dreame_battery.properties[0].urn.namespace = "dreame-spec"
+    cov = meta.collect_coverage(_device_model([dreame_battery]))
+
+    assert cov.fb == 1
+    assert cov.missing == 0
+
+
+def test_collect_coverage_missing(meta: Metadata, battery_service: MiotService) -> None:
+    unknown_service = battery_service.model_copy(deep=True)
+    unknown_service.urn.namespace = "unknown-spec"
+    unknown_service.urn.name = "unknown-svc"
+    unknown_service.properties[0].urn.namespace = "unknown-spec"
+    unknown_service.properties[0].urn.name = "unknown-prop"
+    cov = meta.collect_coverage(_device_model([unknown_service]))
+
+    assert cov.missing == 1
+    assert "unknown-spec" in cov.missing_by_ns
+
+
+def test_collect_coverage_no_desc(meta: Metadata, battery_service: MiotService) -> None:
+    meta_no_desc = Metadata(
+        namespaces={
+            "miot-spec-v2": Namespace(
+                description="miot-spec-v2",
+                services={
+                    "battery": ServiceMeta(
+                        property={"battery-level": PropertyMeta(description=None)}
+                    )
+                },
+            )
+        }
+    )
+    cov = meta_no_desc.collect_coverage(_device_model([battery_service]))
+
+    assert cov.no_desc == 1
+    assert cov.ok == 0
+    assert cov.missing == 0
+
+
+def test_collect_coverage_skips_siid_1(
+    meta: Metadata, device_info_service: MiotService
+) -> None:
+    cov = meta.collect_coverage(_device_model([device_info_service]))
+
+    assert cov.total == 0
