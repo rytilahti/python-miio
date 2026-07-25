@@ -81,7 +81,6 @@ class Namespace(MetaBase):
             svc = self.services[svc_name]
             for name, prop in other_svc.property.items():
                 svc.property.setdefault(name, prop)
-
             for name, act in other_svc.action.items():
                 svc.action.setdefault(name, act)
 
@@ -119,6 +118,7 @@ class Metadata(BaseModel):
                     ns_data = yaml.safe_load(f)
                 ns_data["source_file"] = ns_value
                 data["namespaces"][ns_name] = ns_data
+
         for ns_name in missing:
             del data["namespaces"][ns_name]
 
@@ -129,6 +129,7 @@ class Metadata(BaseModel):
         ns = self.namespaces.get(ns_name)
         if ns and ns.source_file:
             return ns.source_file
+
         return f"{ns_name.replace('-', '')}.yaml"
 
     def _lookup_in_namespace(
@@ -140,6 +141,7 @@ class Metadata(BaseModel):
                 meta := serv.get(type_, entity_name)
             ):
                 return meta
+
         return None
 
     def build_namespace_metadata(
@@ -177,6 +179,7 @@ class Metadata(BaseModel):
         data = yaml.safe_load(base_file.read_text())
         if ns_name in data["namespaces"]:
             return False
+
         data["namespaces"][ns_name] = filename
         base_file.write_text(
             yaml.dump(
@@ -186,6 +189,7 @@ class Metadata(BaseModel):
                 allow_unicode=True,
             )
         )
+
         return True
 
     def write_namespace_metadata(self, ns_meta: "Namespace", path: Path) -> bool:
@@ -195,16 +199,19 @@ class Metadata(BaseModel):
             existing = Namespace.model_validate(yaml.safe_load(path.read_text()))
             existing.merge(ns_meta)
             ns_meta = existing
+
         data = ns_meta.model_dump(exclude_defaults=True)
         for svc in data.get("services", {}).values():
             for key in ("property", "action"):
                 if key in svc:
                     svc[key] = dict(sorted(svc[key].items()))
+
         path.write_text(
             yaml.dump(
                 data, default_flow_style=False, sort_keys=False, allow_unicode=True
             )
         )
+
         return created
 
     def lookup_in_namespace(
@@ -214,6 +221,7 @@ class Metadata(BaseModel):
         ns = self.namespaces.get(ns_name)
         if ns is None:
             return None
+
         return self._lookup_in_namespace(ns, service_name, type_, entity_name)
 
     def collect_coverage(self, device_model: DeviceModel) -> CoverageResult:

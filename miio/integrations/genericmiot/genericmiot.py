@@ -163,7 +163,6 @@ class GenericMiot(MiotDevice):
         _LOGGER.debug("Created %s actions", len(self._actions))
         for act in self._actions.values():
             _LOGGER.debug(f"\t{act}")
-
         _LOGGER.debug("Created %s properties", len(self._properties))
         for sensor in self._properties.values():
             _LOGGER.debug(f"\t{sensor}")
