@@ -4,22 +4,21 @@ services:
     description: Device settings
     property:
       auto-slideing-time:
-        description: Auto slideshow interval
+        description: Screensaver interval
       carbondioxide-led-th:
         description: CO2 LED threshold
       device-off:
         description: Auto power off
       device-off-new: {}
-      end-time:
-        description: End time
+      end-time: {}
       humi-led-th:
         description: Humidity LED threshold
       is-twelve-hours-sys:
-        description: 12-hour clock
+        description: Use 12-hour clock
       monitoring-frequency:
         description: Monitoring frequency
       page-sequence:
-        description: Display page order
+        description: Screensaver order
       pm-t-led-th: {}
       pm-tpf-led-th: {}
       pm-tpf-standard: {}
@@ -29,8 +28,7 @@ services:
         description: Screensaver timeout
       screensaver-type:
         description: Screensaver type
-      start-time:
-        description: Start time
+      start-time: {}
       temp-led-th:
         description: Temperature LED threshold
       tempature-unit:
@@ -41,20 +39,19 @@ services:
       reset-carbon-dioxide:
         description: Reset CO2 calibration
       set-autoslideingtime:
-        description: Set auto slideshow interval
+        description: Set screensaver interval
       set-co-two-led-th:
         description: Set CO2 LED threshold
       set-device-off:
         description: Set auto power off
       set-device-off-new: {}
-      set-end-time:
-        description: Set end time
+      set-end-time: {}
       set-frequency:
         description: Set monitoring frequency
       set-humi-led-th:
         description: Set humidity LED threshold
       set-page-sequence:
-        description: Set display page order
+        description: Set screensaver order
       set-pm-t-led-th: {}
       set-pm-tpf-led-th: {}
       set-pm-tpf-standard: {}
@@ -64,8 +61,7 @@ services:
         description: Set screensaver timeout
       set-screensaver-type:
         description: Set screensaver type
-      set-start-time:
-        description: Set start time
+      set-start-time: {}
       set-temp-led-th:
         description: Set temperature LED threshold
       set-temp-unit:
@@ -73,4 +69,4 @@ services:
       set-time-zone:
         description: Set timezone
       set-twelve-hours-sys:
-        description: Set 12-hour clock
+        description: Use 12-hour clock
