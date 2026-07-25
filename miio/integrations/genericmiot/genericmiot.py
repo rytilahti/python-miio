@@ -154,7 +154,7 @@ class GenericMiot(MiotDevice):
         """Create descriptors based on the miot model."""
         for serv in self._miot_model.services:
             if serv.siid == 1:
-                continue
+                continue  # Skip device details
 
             self._create_actions(serv)
             self._create_properties(serv)
