@@ -203,28 +203,19 @@ class Metadata(BaseModel):
         if entity.service is None:
             return None
 
-        ns_name: str = entity.urn.namespace
-        service_name: str = entity.service.name
-        type_: str = entity.urn.type
-        entity_name: str = entity.urn.name
+        ns_name = entity.urn.namespace
+        service_name = entity.service.name
 
         for try_name in dict.fromkeys([ns_name, "miot-spec-v2", "common"]):
             ns = self.namespaces.get(try_name)
             if ns is None:
                 continue
-            meta = self._lookup_in_namespace(ns, service_name, type_, entity_name)
+            meta = self._lookup_in_namespace(
+                ns, service_name, entity.urn.type, entity.urn.name
+            )
             if meta is not None:
-                _LOGGER.debug(
-                    "Found metadata for %s:%s:%s:%s in %s",
-                    ns_name,
-                    service_name,
-                    type_,
-                    entity_name,
-                    try_name,
-                )
+                _LOGGER.debug("Found metadata for %s in %s", entity, try_name)
                 return meta.model_copy(update={"source": try_name})
 
-        _LOGGER.debug(
-            "No metadata for %s:%s:%s:%s", ns_name, service_name, type_, entity_name
-        )
+        _LOGGER.debug("No metadata for %s", entity)
         return None
