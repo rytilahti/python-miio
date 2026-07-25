@@ -251,12 +251,6 @@ class GenericMiot(MiotDevice):
 
     @command(
         click.option(
-            "--generate-template",
-            is_flag=True,
-            default=False,
-            help="Print namespace metadata YAML for entities that need coverage.",
-        ),
-        click.option(
             "--output-dir",
             type=click.Path(file_okay=False),
             default=None,
@@ -264,7 +258,7 @@ class GenericMiot(MiotDevice):
         ),
         default_output=format_output("", ""),
     )
-    def metadata(self, generate_template: bool = False, output_dir: str | None = None):
+    def metadata(self, output_dir: str | None = None):
         """Show metadata coverage and optionally generate YAML templates for missing items."""
         if not self._initialized:
             self._initialize_descriptors()
@@ -290,22 +284,8 @@ class GenericMiot(MiotDevice):
                 click.echo("All entities are covered.")
             return
 
-        if not generate_template and output_dir is None:
-            click.echo(f"{cov.missing} items need namespace metadata.")
-            if click.confirm("Save namespace metadata?", default=False):
-                default_dir = str(Path(__file__).parent / "metadata")
-                output_dir = click.prompt("Output directory", default=default_dir)
-            else:
-                generate_template = True
-
         for ns_name, services in cov.missing_by_ns.items():
             ns_meta = self._meta.build_namespace_metadata(ns_name, services)
-            yaml_text = yaml.dump(
-                ns_meta.model_dump(exclude_defaults=True),
-                default_flow_style=False,
-                sort_keys=False,
-                allow_unicode=True,
-            )
             suggested = self._meta.suggested_filename(ns_name)
 
             if output_dir is not None:
@@ -318,7 +298,14 @@ class GenericMiot(MiotDevice):
                         click.echo(f"Registered in {base_file}")
             else:
                 click.echo(f"\n--- {ns_name} (save as {suggested}) ---")
-                click.echo(yaml_text)
+                click.echo(
+                    yaml.dump(
+                        ns_meta.model_dump(exclude_defaults=True),
+                        default_flow_style=False,
+                        sort_keys=False,
+                        allow_unicode=True,
+                    )
+                )
 
     @classmethod
     def get_device_group(cls):
