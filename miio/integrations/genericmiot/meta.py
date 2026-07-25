@@ -1,13 +1,26 @@
 import logging
+from collections import defaultdict
 from pathlib import Path
+from typing import NamedTuple
 
 import yaml
 from pydantic import BaseModel, ConfigDict
 
-from miio.miot_models import MiotBaseModel
+from miio.miot_models import DeviceModel, MiotBaseModel
 
 _LOGGER = logging.getLogger(__name__)
 _ANY_SERVICE = "__ANY__"
+
+
+class CoverageResult(NamedTuple):
+    """Aggregated metadata coverage for a device model."""
+
+    total: int
+    ok: int
+    fb: int
+    missing: int
+    no_desc: int
+    missing_by_ns: dict
 
 
 class MetaBase(BaseModel):
@@ -197,6 +210,38 @@ class Metadata(BaseModel):
         if ns is None:
             return None
         return self._lookup_in_namespace(ns, service_name, type_, entity_name)
+
+    def collect_coverage(self, device_model: DeviceModel) -> CoverageResult:
+        """Count metadata coverage for a device model and collect missing entities."""
+        missing_by_ns: dict = defaultdict(dict)
+        total = ok = fb = missing = no_desc = 0
+
+        for serv in device_model.services:
+            if serv.siid == 1:
+                continue
+            ns_name = serv.urn.namespace
+            for entity in [*serv.properties, *serv.actions]:
+                total += 1
+                direct = self.lookup_in_namespace(
+                    ns_name, serv.name, entity.urn.type, entity.urn.name
+                )
+                if direct:
+                    if direct.description is None:
+                        no_desc += 1
+                    else:
+                        ok += 1
+                    continue
+                fallback = self.get_metadata(entity)
+                if fallback:
+                    if fallback.description is None:
+                        no_desc += 1
+                    else:
+                        fb += 1
+                else:
+                    missing += 1
+                    missing_by_ns[ns_name].setdefault(serv.name, []).append(entity)
+
+        return CoverageResult(total, ok, fb, missing, no_desc, missing_by_ns)
 
     def get_metadata(self, entity: MiotBaseModel) -> MetaBase | None:
         """Look up metadata for a miot entity, returning it with source namespace set."""

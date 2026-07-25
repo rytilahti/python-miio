@@ -1,8 +1,7 @@
 import logging
-from collections import defaultdict
 from functools import partial
 from pathlib import Path
-from typing import NamedTuple, TypeVar
+from typing import TypeVar, cast
 
 import attr
 import click
@@ -26,15 +25,6 @@ from .status import GenericMiotStatus
 
 _LOGGER = logging.getLogger(__name__)
 _D = TypeVar("_D", ActionDescriptor, PropertyDescriptor)
-
-
-class _CoverageResult(NamedTuple):
-    total: int
-    ok: int
-    fb: int
-    missing: int
-    no_desc: int
-    missing_by_ns: dict
 
 
 class GenericMiot(MiotDevice):
@@ -194,61 +184,6 @@ class GenericMiot(MiotDevice):
             return self._miot_model.urn.type
         return None
 
-    def _collect_coverage(
-        self,
-        miot_model: DeviceModel,
-    ) -> _CoverageResult:
-        """Report per-entity metadata coverage for the device model."""
-        missing_by_ns: dict = defaultdict(dict)
-        total = ok = fb = missing = no_desc = 0
-
-        for serv in miot_model.services:
-            if serv.siid == 1:
-                continue
-
-            ns_name = serv.urn.namespace
-            click.echo(f"\n{serv}")
-
-            nd_lines: list[str] = []
-            for entity in [*serv.properties, *serv.actions]:
-                total += 1
-
-                direct = self._meta.lookup_in_namespace(
-                    ns_name, serv.name, entity.urn.type, entity.urn.name
-                )
-                if direct:
-                    if direct.description is None:
-                        no_desc += 1
-                        nd_lines.append(
-                            f"  [??] {entity!s:50}  (fill in description if known)"
-                        )
-                    else:
-                        ok += 1
-                        click.echo(f"  [ok] {entity!s:50} -> {direct}")
-                    continue
-
-                fallback = self._meta.get_metadata(entity)
-                if fallback:
-                    if fallback.description is None:
-                        no_desc += 1
-                        nd_lines.append(
-                            f"  [??] {entity!s:50}  (fill in description if known)"
-                        )
-                    else:
-                        fb += 1
-                        click.echo(
-                            f"  [fb] {entity!s:50} -> {fallback} ({fallback.source})"
-                        )
-                else:
-                    missing += 1
-                    click.echo(f"  [--] {entity!s:50} {entity.description!r}")
-                    missing_by_ns[ns_name].setdefault(serv.name, []).append(entity)
-
-            for line in nd_lines:
-                click.echo(line)
-
-        return _CoverageResult(total, ok, fb, missing, no_desc, missing_by_ns)
-
     @command(
         click.option(
             "--output-dir",
@@ -263,10 +198,42 @@ class GenericMiot(MiotDevice):
         if not self._initialized:
             self._initialize_descriptors()
 
-        if self._miot_model is None:
-            raise RuntimeError("Device model not initialized")
+        miot_model = cast(DeviceModel, self._miot_model)
 
-        cov = self._collect_coverage(self._miot_model)
+        for serv in miot_model.services:
+            if serv.siid == 1:
+                continue
+            click.echo(f"\n{serv}")
+            ns_name = serv.urn.namespace
+            nd_lines: list[str] = []
+            for entity in [*serv.properties, *serv.actions]:
+                direct = self._meta.lookup_in_namespace(
+                    ns_name, serv.name, entity.urn.type, entity.urn.name
+                )
+                if direct:
+                    if direct.description is None:
+                        nd_lines.append(
+                            f"  [??] {entity!s:50}  (fill in description if known)"
+                        )
+                    else:
+                        click.echo(f"  [ok] {entity!s:50} -> {direct}")
+                    continue
+                fallback = self._meta.get_metadata(entity)
+                if fallback:
+                    if fallback.description is None:
+                        nd_lines.append(
+                            f"  [??] {entity!s:50}  (fill in description if known)"
+                        )
+                    else:
+                        click.echo(
+                            f"  [fb] {entity!s:50} -> {fallback} ({fallback.source})"
+                        )
+                else:
+                    click.echo(f"  [--] {entity!s:50} {entity.description!r}")
+            for line in nd_lines:
+                click.echo(line)
+
+        cov = self._meta.collect_coverage(miot_model)
 
         click.echo(
             f"\nCoverage: {cov.ok} ok, {cov.fb} via fallback, "
