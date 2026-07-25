@@ -109,7 +109,7 @@ class Metadata(BaseModel):
         return cls(**data)
 
     def suggested_filename(self, ns_name: str) -> str:
-        """Return the filename to use for a namespace stub."""
+        """Return the filename for a namespace metadata file."""
         ns = self.namespaces.get(ns_name)
         if ns and ns.source_file:
             return ns.source_file
@@ -126,12 +126,12 @@ class Metadata(BaseModel):
                 return meta
         return None
 
-    def build_namespace_stub(
+    def build_namespace_metadata(
         self,
         ns_name: str,
         missing: dict[str, list[MiotBaseModel]],
     ) -> "Namespace":
-        """Build a stub Namespace for entities that lack metadata coverage."""
+        """Build a Namespace with template entries for entities that lack coverage."""
         services = {}
         for svc_name, entities in missing.items():
             props = {}
@@ -154,28 +154,30 @@ class Metadata(BaseModel):
             services=services,
         )
 
-    def register_namespace(self, ns_name: str, filename: str, base_file: Path) -> None:
+    def register_namespace(self, ns_name: str, filename: str, base_file: Path) -> bool:
         """Add a namespace entry to the index file if not already listed."""
         data = yaml.safe_load(base_file.read_text())
-        if ns_name not in data["namespaces"]:
-            data["namespaces"][ns_name] = filename
-            base_file.write_text(
-                yaml.dump(
-                    data,
-                    default_flow_style=False,
-                    sort_keys=False,
-                    allow_unicode=True,
-                )
+        if ns_name in data["namespaces"]:
+            return False
+        data["namespaces"][ns_name] = filename
+        base_file.write_text(
+            yaml.dump(
+                data,
+                default_flow_style=False,
+                sort_keys=False,
+                allow_unicode=True,
             )
+        )
+        return True
 
-    def write_namespace_stub(self, stub: "Namespace", path: Path) -> bool:
-        """Write a namespace stub to a file, merging into any existing content."""
+    def write_namespace_metadata(self, ns_meta: "Namespace", path: Path) -> bool:
+        """Write namespace metadata to a file, merging into any existing content."""
         created = not path.exists()
         if not created:
             existing = Namespace.model_validate(yaml.safe_load(path.read_text()))
-            existing.merge(stub)
-            stub = existing
-        data = stub.model_dump(exclude_defaults=True)
+            existing.merge(ns_meta)
+            ns_meta = existing
+        data = ns_meta.model_dump(exclude_defaults=True)
         for svc in data.get("services", {}).values():
             for key in ("property", "action"):
                 if key in svc:

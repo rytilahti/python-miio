@@ -2,6 +2,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 import pytest
+import yaml
 
 from miio.descriptors import AccessFlags, ActionDescriptor
 from miio.miot_models import URN, MiotBaseModel
@@ -293,3 +294,78 @@ def test_namespace_merge_adds_actions() -> None:
     )
     base.merge(stub)
     assert "reset" in base.services["settings"].action
+
+
+def test_suggested_filename_uses_source_file() -> None:
+    ns = Namespace(description="test", source_file="existing.yaml")
+    meta = Metadata(namespaces={"my-spec": ns})
+    assert meta.suggested_filename("my-spec") == "existing.yaml"
+
+
+def test_suggested_filename_generates_name() -> None:
+    meta = Metadata(namespaces={})
+    assert meta.suggested_filename("my-new-spec") == "mynewspec.yaml"
+
+
+def test_build_namespace_metadata(meta: Metadata) -> None:
+    entity = _make_entity("cgllc-spec", "property", "my-prop", "settings")
+    entity.description = "My property"
+    entity.service.description = "Settings"  # type: ignore[union-attr]
+
+    ns = meta.build_namespace_metadata("cgllc-spec", {"settings": [entity]})
+
+    assert "settings" in ns.services
+    assert "my-prop" in ns.services["settings"].property
+
+
+def test_write_namespace_metadata_creates_file(tmp_path: Path, meta: Metadata) -> None:
+    path = tmp_path / "test.yaml"
+    ns = Namespace(description="Test")
+    assert meta.write_namespace_metadata(ns, path) is True
+    assert path.exists()
+
+
+def test_write_namespace_metadata_merges_into_existing(
+    tmp_path: Path, meta: Metadata
+) -> None:
+    path = tmp_path / "test.yaml"
+    existing = Namespace(
+        description="Existing",
+        services={"env": ServiceMeta(property={"a": PropertyMeta(description="A")})},
+    )
+    path.write_text(yaml.dump(existing.model_dump(exclude_defaults=True)))
+
+    new_ns = Namespace(
+        description="New",
+        services={"env": ServiceMeta(property={"b": PropertyMeta(description="B")})},
+    )
+    assert meta.write_namespace_metadata(new_ns, path) is False
+
+    merged = Namespace.model_validate(yaml.safe_load(path.read_text()))
+    assert "a" in merged.services["env"].property
+    assert "b" in merged.services["env"].property
+
+
+def test_multi_namespace_routing(tmp_path: Path, meta: Metadata) -> None:
+    """Missing entities from different namespaces go to separate files."""
+    ns_a = Namespace(description="ns-a", source_file="a.yaml")
+    ns_b = Namespace(description="ns-b", source_file="b.yaml")
+    routing_meta = Metadata(namespaces={"spec-a": ns_a, "spec-b": ns_b})
+
+    entity_a = _make_entity("spec-a", "property", "prop", "svc")
+    entity_a.description = "Prop"
+    entity_a.service.description = "Svc"  # type: ignore[union-attr]
+
+    entity_b = _make_entity("spec-b", "property", "prop", "svc")
+    entity_b.description = "Prop"
+    entity_b.service.description = "Svc"  # type: ignore[union-attr]
+
+    missing_by_ns = {"spec-a": {"svc": [entity_a]}, "spec-b": {"svc": [entity_b]}}
+    for ns_name, services in missing_by_ns.items():
+        ns = routing_meta.build_namespace_metadata(ns_name, services)
+        routing_meta.write_namespace_metadata(
+            ns, tmp_path / routing_meta.suggested_filename(ns_name)
+        )
+
+    assert (tmp_path / "a.yaml").exists()
+    assert (tmp_path / "b.yaml").exists()
