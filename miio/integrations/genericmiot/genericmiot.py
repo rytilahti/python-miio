@@ -123,6 +123,7 @@ class GenericMiot(MiotDevice):
             if prop.access == [MiotAccess.Notify]:
                 _LOGGER.debug("Skipping notify-only property: %s", prop)
                 continue
+
             if not prop.access:
                 # some properties are defined only to be used as inputs or outputs for actions
                 _LOGGER.debug(
@@ -162,6 +163,7 @@ class GenericMiot(MiotDevice):
         _LOGGER.debug("Created %s actions", len(self._actions))
         for act in self._actions.values():
             _LOGGER.debug(f"\t{act}")
+
         _LOGGER.debug("Created %s properties", len(self._properties))
         for sensor in self._properties.values():
             _LOGGER.debug(f"\t{sensor}")
@@ -203,6 +205,7 @@ class GenericMiot(MiotDevice):
         for serv in miot_model.services:
             if serv.siid == 1:
                 continue
+
             click.echo(f"\n{serv}")
             ns_name = serv.urn.namespace
             nd_lines: list[str] = []
@@ -218,6 +221,7 @@ class GenericMiot(MiotDevice):
                     else:
                         click.echo(f"  [ok] {entity!s:50} -> {direct}")
                     continue
+
                 fallback = self._meta.get_metadata(entity)
                 if fallback:
                     if fallback.description is None:
@@ -230,6 +234,7 @@ class GenericMiot(MiotDevice):
                         )
                 else:
                     click.echo(f"  [--] {entity!s:50} {entity.description!r}")
+
             for line in nd_lines:
                 click.echo(line)
 

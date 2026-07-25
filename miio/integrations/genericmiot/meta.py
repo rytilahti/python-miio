@@ -77,9 +77,11 @@ class Namespace(MetaBase):
             if svc_name not in self.services:
                 self.services[svc_name] = other_svc
                 continue
+
             svc = self.services[svc_name]
             for name, prop in other_svc.property.items():
                 svc.property.setdefault(name, prop)
+
             for name, act in other_svc.action.items():
                 svc.action.setdefault(name, act)
 
@@ -111,6 +113,7 @@ class Metadata(BaseModel):
                     _LOGGER.warning("Namespace file not found, skipping: %s", ns_path)
                     missing.append(ns_name)
                     continue
+
                 _LOGGER.debug("Loading namespace %s from %s", ns_name, ns_path)
                 with ns_path.open() as f:
                     ns_data = yaml.safe_load(f)
@@ -156,12 +159,14 @@ class Metadata(BaseModel):
                     )
                 elif entity.urn.type == "action":
                     acts[entity.urn.name] = ActionMeta(description=entity.description)
+
             svc_desc = entities[0].service.description if entities[0].service else None
             services[svc_name] = ServiceMeta(
                 description=svc_desc,
                 property=props,
                 action=acts,
             )
+
         return Namespace(
             description=f"Metadata for {ns_name} namespace",
             services=services,
@@ -219,6 +224,7 @@ class Metadata(BaseModel):
         for serv in device_model.services:
             if serv.siid == 1:
                 continue
+
             ns_name = serv.urn.namespace
             for entity in [*serv.properties, *serv.actions]:
                 total += 1
@@ -231,6 +237,7 @@ class Metadata(BaseModel):
                     else:
                         ok += 1
                     continue
+
                 fallback = self.get_metadata(entity)
                 if fallback:
                     if fallback.description is None:
@@ -255,6 +262,7 @@ class Metadata(BaseModel):
             ns = self.namespaces.get(try_name)
             if ns is None:
                 continue
+
             meta = self._lookup_in_namespace(
                 ns, service_name, entity.urn.type, entity.urn.name
             )
