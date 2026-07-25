@@ -171,6 +171,9 @@ class MiotBaseModel(BaseModel):
         """
         return self.name.replace(":", "_").replace("-", "_")
 
+    def __str__(self) -> str:
+        return f"{self.urn.type}:{self.urn.name!r}"
+
     @property
     @abstractmethod
     def unique_identifier(self) -> str:
@@ -282,10 +285,10 @@ class MiotProperty(MiotBaseModel):
             "days": timedelta(days=1),
         }
 
-        unit = unit_map.get(self.unit)
+        unit = unit_map.get(self.unit, self.unit)
         if isinstance(unit, timedelta):
             value = value * unit
-        else:
+        elif unit:
             value = f"{value} {unit}"
 
         return value
@@ -479,6 +482,11 @@ class MiotService(BaseModel):
         currently meaning that ':' and '-' are replaced with '_'.
         """
         return self.urn.name.replace(":", "_").replace("-", "_")
+
+    def __str__(self) -> str:
+        return (
+            f"Service: {self.description} (siid={self.siid}, ns={self.urn.namespace})"
+        )
 
     model_config = ConfigDict(extra="allow")
 

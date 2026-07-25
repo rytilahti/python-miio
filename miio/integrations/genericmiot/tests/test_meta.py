@@ -7,7 +7,7 @@ from miio.descriptors import AccessFlags, ActionDescriptor
 from miio.miot_models import URN, MiotBaseModel
 
 from ..genericmiot import GenericMiot
-from ..meta import MetaBase, Metadata
+from ..meta import ActionMeta, MetaBase, Metadata, Namespace, PropertyMeta, ServiceMeta
 
 
 @pytest.fixture(scope="module")
@@ -23,7 +23,7 @@ def _make_entity(
     service: Mock = Mock()
     service.name = service_name
     entity: Mock = Mock()
-    entity.extras = {"urn": urn}
+    entity.urn = urn
     entity.service = service
     return entity
 
@@ -71,13 +71,35 @@ def test_action_found(meta: Metadata) -> None:
     assert result.description == "Start cleaning"
 
 
+def test_unknown_namespace_falls_back_to_miotspec(meta: Metadata) -> None:
+    entity: MiotBaseModel = _make_entity(
+        "unknown-spec", "property", "battery-level", "battery"
+    )
+    result = meta.get_metadata(entity)
+    assert result is not None
+    assert result.description == "Battery level"
+
+
 def test_unknown_namespace_falls_back_to_common(meta: Metadata) -> None:
     entity: MiotBaseModel = _make_entity(
         "unknown-spec", "property", "temperature", "environment"
     )
-    result: MetaBase | None = meta.get_metadata(entity)
+    result = meta.get_metadata(entity)
     assert result is not None
     assert result.description == "Temperature"
+
+
+def test_registered_namespace_without_fallback_reaches_miotspec(meta: Metadata) -> None:
+    meta_copy = Metadata(
+        namespaces={
+            **meta.namespaces,
+            "no-fallback-spec": Namespace(description="no fallback"),
+        }
+    )
+    entity = _make_entity("no-fallback-spec", "property", "battery-level", "battery")
+    result = meta_copy.get_metadata(entity)
+    assert result is not None
+    assert result.description == "Battery level"
 
 
 def test_unknown_service(meta: Metadata) -> None:
@@ -92,13 +114,6 @@ def test_unknown_property(meta: Metadata) -> None:
     entity: MiotBaseModel = _make_entity(
         "miot-spec-v2", "property", "nonexistent", "battery"
     )
-    result: MetaBase | None = meta.get_metadata(entity)
-    assert result is None
-
-
-def test_no_urn_in_extras(meta: Metadata) -> None:
-    entity: Mock = Mock(spec=MiotBaseModel)
-    entity.extras = {}
     result: MetaBase | None = meta.get_metadata(entity)
     assert result is None
 
@@ -119,34 +134,6 @@ def test_dreame_action(meta: Metadata) -> None:
     result: MetaBase | None = meta.get_metadata(entity)
     assert result is not None
     assert result.description == "Stop cleaning"
-
-
-def test_fallback_namespace() -> None:
-    fallback_ns = {
-        "description": "fallback",
-        "services": {
-            "vacuum": {
-                "description": "Vacuum service",
-                "property": {
-                    "status": {"description": "Status from fallback"},
-                },
-            }
-        },
-    }
-    primary_ns = {"description": "primary", "fallback": "fallback-ns"}
-    common_ns = {"description": "common"}
-    meta = Metadata(
-        namespaces={
-            "primary-ns": primary_ns,
-            "fallback-ns": fallback_ns,
-            "common": common_ns,
-        }
-    )
-
-    entity = _make_entity("primary-ns", "property", "status", "vacuum")
-    result = meta.get_metadata(entity)
-    assert result is not None
-    assert result.description == "Status from fallback"
 
 
 def test_implicit_common_fallback() -> None:
@@ -194,9 +181,7 @@ def test_load_explicit_file() -> None:
 
 def test_no_service_returns_none(meta: Metadata) -> None:
     entity: Mock = Mock(spec=MiotBaseModel)
-    entity.extras = {
-        "urn": URN.model_validate("urn:miot-spec-v2:property:battery-level:1:mock:1")
-    }
+    entity.urn = URN.model_validate("urn:miot-spec-v2:property:battery-level:1:mock:1")
     entity.service = None
     assert meta.get_metadata(entity) is None
 
@@ -233,3 +218,78 @@ def test_enrich_applies_metadata(device: GenericMiot) -> None:
     assert result.name == "Start cleaning"
     assert result.extras["original"] is desc
     assert result.extras["original"].name == "start-sweep"
+
+
+def test_namespace_merge_adds_new_service() -> None:
+    base = Namespace(description="base", services={})
+    stub = Namespace(
+        description="stub",
+        services={
+            "env": ServiceMeta(
+                property={"temperature": PropertyMeta(description="Temperature")}
+            )
+        },
+    )
+    base.merge(stub)
+    assert "env" in base.services
+    assert "temperature" in base.services["env"].property
+
+
+def test_namespace_merge_adds_to_existing_service() -> None:
+    base = Namespace(
+        description="base",
+        services={
+            "env": ServiceMeta(
+                property={"temperature": PropertyMeta(description="Temperature")}
+            )
+        },
+    )
+    stub = Namespace(
+        description="stub",
+        services={
+            "env": ServiceMeta(
+                property={"humidity": PropertyMeta(description="Humidity")}
+            )
+        },
+    )
+    base.merge(stub)
+    assert "temperature" in base.services["env"].property
+    assert "humidity" in base.services["env"].property
+
+
+def test_namespace_merge_preserves_existing_descriptions() -> None:
+    base = Namespace(
+        description="base",
+        services={
+            "env": ServiceMeta(
+                property={
+                    "temperature": PropertyMeta(description="My custom description")
+                }
+            )
+        },
+    )
+    stub = Namespace(
+        description="stub",
+        services={
+            "env": ServiceMeta(
+                property={"temperature": PropertyMeta(description="temperature")}
+            )
+        },
+    )
+    base.merge(stub)
+    assert (
+        base.services["env"].property["temperature"].description
+        == "My custom description"
+    )
+
+
+def test_namespace_merge_adds_actions() -> None:
+    base = Namespace(description="base", services={"settings": ServiceMeta()})
+    stub = Namespace(
+        description="stub",
+        services={
+            "settings": ServiceMeta(action={"reset": ActionMeta(description="Reset")})
+        },
+    )
+    base.merge(stub)
+    assert "reset" in base.services["settings"].action

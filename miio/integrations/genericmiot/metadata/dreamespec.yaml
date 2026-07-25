@@ -1,5 +1,4 @@
 description: Metadata for dreame-specific services
-fallback: miot-spec-v2
 services:
   vacuum-extend:
     description: Extended vacuum services for dreame
