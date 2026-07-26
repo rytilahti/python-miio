@@ -29,6 +29,8 @@ import time
 from collections.abc import Callable
 from typing import Any
 
+import requests
+
 from miio.exceptions import CloudException
 
 _LOGGER = logging.getLogger(__name__)
@@ -113,13 +115,6 @@ class QrCodeLogin:
         on_qr: Callable[[bytes, str], None] | None = None,
         scan_timeout: int | None = None,
     ) -> None:
-        try:
-            import requests
-        except ImportError as ex:  # pragma: no cover - requests is a dependency
-            raise CloudException(
-                "You need to install 'requests' to use the cloud interface"
-            ) from ex
-
         self._session = requests.Session()
         self._on_qr = on_qr or print_qr_to_terminal
         self._scan_timeout = scan_timeout
@@ -144,8 +139,6 @@ class QrCodeLogin:
 
     def login(self) -> bool:
         """Run the QR login. Blocks until the code is scanned or expires."""
-        import requests
-
         try:
             response = self._session.get(
                 LOGIN_URL,
@@ -181,8 +174,6 @@ class QrCodeLogin:
 
     def _long_poll(self, url: str, timeout: int) -> dict:
         """Wait for the user to approve the code in the Xiaomi Home app."""
-        import requests
-
         started = time.monotonic()
         while time.monotonic() - started < timeout:
             try:
@@ -197,8 +188,6 @@ class QrCodeLogin:
         raise CloudException("The QR code expired before it was scanned")
 
     def _service_token_for(self, location: str) -> str:
-        import requests
-
         try:
             response = self._session.get(
                 location,
@@ -252,8 +241,6 @@ class QrCodeLogin:
         return _rc4(base64.b64decode(signed_nonce), base64.b64decode(text))
 
     def _post(self, country: str, path: str, data: str) -> dict | None:
-        import requests
-
         if not (self._service_token and self._ssecurity):
             raise CloudException("Not logged in")
 
