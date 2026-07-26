@@ -18,6 +18,12 @@ _LOGGER = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from micloud import MiCloud  # noqa: F401
 
+LOGIN_CAPTCHA_HINT = (
+    "Login failed. Xiaomi serves a captcha on password logins for many "
+    "accounts, which micloud cannot answer. Try QR code login instead: "
+    "'miiocli cloud --qr list', or CloudInterface(use_qr=True)."
+)
+
 AVAILABLE_LOCALES = {
     "all": "All",
     "cn": "China",
@@ -71,11 +77,14 @@ class CloudDeviceInfo(BaseModel):
 
 
 class CloudInterface:
-    """Cloud interface using micloud library.
+    """Cloud interface for obtaining a list of devices and their tokens.
 
-    You can use this to obtain a list of devices and their tokens.
     The :meth:`get_devices` takes the locale string (e.g., 'us') as an argument,
     defaulting to all known locales (accessible through :meth:`available_locales`).
+
+    Two login methods are available. Password login uses the ``micloud``
+    library. QR code login is implemented locally and works when Xiaomi serves a
+    captcha on password login, which it currently does for many accounts.
 
     Example::
 
@@ -83,18 +92,48 @@ class CloudInterface:
         devs = ci.get_devices()
         for did, dev in devs.items():
             print(dev)
+
+    Or, without a password::
+
+        ci = CloudInterface(use_qr=True)
+        devs = ci.get_devices(locale="de")
     """
 
-    def __init__(self, username, password):
+    def __init__(self, username=None, password=None, use_qr=False, on_qr=None):
+        """Initialize the interface.
+
+        :param username: account name, for password login.
+        :param password: account password, for password login.
+        :param use_qr: authenticate by QR code instead, needing no password.
+        :param on_qr: called with ``(png_bytes, login_url)`` when using QR
+            login. Defaults to writing the image to a temporary file.
+        """
+        if not use_qr and not (username and password):
+            raise CloudException(
+                "Either username and password, or use_qr=True, is required"
+            )
+
         self.username = username
         self.password = password
-        self._micloud = None
+        self.use_qr = use_qr
+        self._on_qr = on_qr
+        self._backend = None
 
     def _login(self):
-        if self._micloud is not None:
+        if self._backend is not None:
             _LOGGER.debug("Already logged in, skipping login")
             return
 
+        self._backend = self._qr_backend() if self.use_qr else self._micloud_backend()
+
+    def _qr_backend(self):
+        from miio.cloud_qr import QrCodeLogin
+
+        backend = QrCodeLogin(on_qr=self._on_qr)
+        backend.login()
+        return backend
+
+    def _micloud_backend(self):
         try:
             from micloud import MiCloud  # noqa: F811
             from micloud.micloudexception import MiCloudAccessDenied
@@ -103,12 +142,14 @@ class CloudInterface:
                 "You need to install 'micloud' package to use cloud interface"
             ) from ex
 
-        self._micloud: MiCloud = MiCloud(username=self.username, password=self.password)
+        backend: MiCloud = MiCloud(username=self.username, password=self.password)
         try:  # login() can either return False or raise an exception on failure
-            if not self._micloud.login():
-                raise CloudException("Login failed")
+            if not backend.login():
+                raise CloudException(LOGIN_CAPTCHA_HINT)
         except MiCloudAccessDenied as ex:
-            raise CloudException("Login failed") from ex
+            raise CloudException(LOGIN_CAPTCHA_HINT) from ex
+
+        return backend
 
     def _parse_device_list(self, data, locale):
         """Parse device list response from micloud."""
@@ -139,7 +180,7 @@ class CloudInterface:
         self._login()
         if locale is not None and locale != "all":
             return self._parse_device_list(
-                self._micloud.get_devices(country=locale), locale=locale
+                self._backend.get_devices(country=locale), locale=locale
             )
 
         all_devices: dict[str, CloudDeviceInfo] = {}
@@ -153,18 +194,34 @@ class CloudInterface:
 
 
 @click.group(invoke_without_command=True)
-@click.option("--username", prompt=True)
-@click.option("--password", prompt=True, hide_input=True)
+@click.option("--username", default=None, help="Account name for password login.")
+@click.option("--password", default=None, help="Account password.")
+@click.option(
+    "--qr",
+    "use_qr",
+    is_flag=True,
+    default=False,
+    help="Log in by scanning a QR code in the Xiaomi Home app, with no password. "
+    "Use this if password login fails with a captcha.",
+)
 @click.pass_context
-def cloud(ctx: click.Context, username, password):
+def cloud(ctx: click.Context, username, password, use_qr):
     """Cloud commands."""
-    try:
-        import micloud  # noqa: F401
-    except ImportError as ex:
-        _LOGGER.error("micloud is not installed, no cloud access available")
-        raise CloudException("install micloud for cloud access") from ex
+    if use_qr:
+        ctx.obj = CloudInterface(use_qr=True)
+    else:
+        try:
+            import micloud  # noqa: F401
+        except ImportError as ex:
+            _LOGGER.error("micloud is not installed, no cloud access available")
+            raise CloudException("install micloud for cloud access") from ex
 
-    ctx.obj = CloudInterface(username=username, password=password)
+        if not username:
+            username = click.prompt("Username")
+        if not password:
+            password = click.prompt("Password", hide_input=True)
+        ctx.obj = CloudInterface(username=username, password=password)
+
     if ctx.invoked_subcommand is None:
         ctx.invoke(cloud_list)
 
