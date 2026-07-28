@@ -18,6 +18,7 @@ from .exceptions import (
     DeviceError,
     DeviceException,
     InvalidTokenException,
+    PayloadDecodeException,
     RecoverableError,
 )
 from .protocol import Message
@@ -247,6 +248,11 @@ class MiIOProtocol:
             header = m.header.value
             payload = m.data.value
 
+            if not isinstance(payload, dict):
+                raise PayloadDecodeException(
+                    f"Unexpected device response type {type(payload)}: {payload!r}"
+                )
+
             self.__id = payload["id"]
             self._device_ts = header["ts"]  # type: ignore  # ts uses timeadapter
 
@@ -302,6 +308,14 @@ class MiIOProtocol:
 
             _LOGGER.error("Got error when receiving: %s", ex)
             raise DeviceException("Unable to recover failed command") from ex
+
+        except DeviceException:
+            raise
+
+        except Exception as ex:
+            raise DeviceException(
+                f"Unexpected error when communicating with device: {ex}"
+            ) from ex
 
     @property
     def _id(self) -> int:

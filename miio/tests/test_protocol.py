@@ -1,8 +1,15 @@
 import binascii
+from datetime import UTC, datetime
 
 import pytest
+from pytest_mock import MockerFixture
 
-from miio.exceptions import DeviceError, PayloadDecodeException, RecoverableError
+from miio.exceptions import (
+    DeviceError,
+    DeviceException,
+    PayloadDecodeException,
+    RecoverableError,
+)
 
 from .. import Utils
 from ..miioprotocol import MiIOProtocol
@@ -22,7 +29,7 @@ def token() -> bytes:
     return bytes.fromhex(32 * "0")
 
 
-def build_msg(data, token):
+def build_msg(data: bytes, token: bytes) -> bytes:
     encrypted_data = Utils.encrypt(data, token)
 
     # header
@@ -169,3 +176,72 @@ def test_decode_json_raises_for_invalid_json(token):
     serialized_msg = build_msg(b'{"id": 123456,,"otu_stat":0', token)
     with pytest.raises(PayloadDecodeException):
         Message.parse(serialized_msg, **ctx)
+
+
+def build_msg_with_wrong_token(token: bytes) -> bytes:
+    """Build a valid miIO message whose payload was encrypted with a different token.
+
+    The checksum is recomputed for our token so it passes validation, but the
+    encrypted content cannot be decrypted, causing EncryptionAdapter to return
+    raw bytes instead of a dict.
+    """
+    other_token = bytes.fromhex(32 * "1")
+    encrypted_data = Utils.encrypt(b'{"id": 1, "result": "ok"}', other_token)
+
+    magic = binascii.unhexlify(b"2131")
+    length = (32 + len(encrypted_data)).to_bytes(2, byteorder="big")
+    unknown = binascii.unhexlify(b"00000000")
+    did = binascii.unhexlify(b"01234567")
+    epoch = binascii.unhexlify(b"00000000")
+    checksum = Utils.md5(
+        magic + length + unknown + did + epoch + token + encrypted_data
+    )
+    return magic + length + unknown + did + epoch + checksum + encrypted_data
+
+
+def test_undecryptable_payload_parsed_as_bytes(token: bytes) -> None:
+    """Message.parse returns bytes when the payload cannot be decrypted."""
+    raw = build_msg_with_wrong_token(token)
+    parsed = Message.parse(raw, token=token)
+    assert isinstance(parsed.data.value, bytes)
+
+
+def _make_proto(token: bytes) -> MiIOProtocol:
+    """Return a pre-discovered MiIOProtocol ready to call send()."""
+    proto = MiIOProtocol(ip="127.0.0.1", token=token.hex())
+    proto._discovered = True
+    proto._device_ts = datetime.now(tz=UTC)
+    proto._device_id = b"\x00" * 4
+    return proto
+
+
+def test_send_raises_payload_decode_exception_on_undecryptable_payload(
+    token: bytes, mocker: MockerFixture
+) -> None:
+    """send() raises PayloadDecodeException when the payload cannot be decrypted."""
+    raw_response = build_msg_with_wrong_token(token)
+    proto = _make_proto(token)
+
+    mock_sock = mocker.MagicMock()
+    mock_sock.recvfrom.return_value = (raw_response, ("127.0.0.1", 54321))
+    mocker.patch("socket.socket", return_value=mock_sock)
+
+    with pytest.raises(PayloadDecodeException):
+        proto.send("dummy_cmd", retry_count=0)
+
+
+def test_send_wraps_unexpected_exceptions_in_device_exception(
+    token: bytes, mocker: MockerFixture
+) -> None:
+    """Unexpected exceptions from Message.parse are wrapped in DeviceException."""
+    proto = _make_proto(token)
+    mock_sock = mocker.MagicMock()
+    mock_sock.recvfrom.return_value = (b"rawdata", ("127.0.0.1", 54321))
+    mocker.patch("socket.socket", return_value=mock_sock)
+    mocker.patch(
+        "miio.miioprotocol.Message.parse",
+        side_effect=RuntimeError("completely unexpected"),
+    )
+
+    with pytest.raises(DeviceException):
+        proto.send("dummy_cmd", retry_count=0)
