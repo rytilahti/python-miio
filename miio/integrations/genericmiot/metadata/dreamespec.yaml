@@ -1,0 +1,67 @@
+description: Metadata for dreame-specific services
+services:
+  vacuum-extend:
+    description: Extended vacuum services for dreame
+    action:
+      stop-clean:
+        description: Stop cleaning
+      position:
+        description: Locate robot
+    property:
+      work-mode:
+        description: Work mode
+      mop-mode:
+        description: Mop mode
+      waterbox-status:
+        description: Water box attached
+      cleaning-mode:
+        description: Cleaning mode
+      cleaning-time:
+        description: Cleaned time
+      cleaning-area:
+        description: Cleaned area
+      serial-number:
+        description: Serial number
+      faults:
+        description: Error status
+
+  do-not-disturb:
+    description: DnD for dreame
+    property:
+      enable:
+        description: DnD enabled
+      start-time:
+        description: DnD start
+      end-time:
+        description: DnD end
+
+  audio:
+    description: Audio service for dreame
+    action:
+      position:
+        description: Find device
+      play-sound:
+        description: Test sound level
+    property:
+      volume:
+        description: Volume
+      voice-packet-id:
+        description: Voice package id
+
+  clean-logs:
+    description: Cleaning logs for dreame
+    property:
+      first-clean-time:
+        description: First cleaned
+      total-clean-time:
+        description: Total cleaning time
+      total-clean-times:
+        description: Total cleaning count
+      total-clean-area:
+        description: Total cleaned area
+
+  time:
+    description: Time information for dreame
+    property:
+      time-zone:
+        description: Timezone

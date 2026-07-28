@@ -1,0 +1,79 @@
+description: Metadata for miot-spec-v2 namespace
+services:
+  battery:
+    description: Battery service
+    action:
+      start-charge:
+        description: Go charging
+    property:
+      charging-state:
+        description: Charging status
+      battery-level:
+        description: Battery level
+
+  filter:
+    description: Filter service
+    action:
+      reset-filter-life:
+        description: Reset filter life
+    property:
+      filter-life-level:
+        description: Filter life level
+      filter-left-time:
+        description: Filter time left
+
+  brush-cleaner:
+    description: Brush service
+    action:
+      reset-brush-life:
+        description: Reset brush life level
+    property:
+      brush-life-level:
+        description: Brush life level
+      brush-left-time:
+        description: Brush time left
+
+  identify:
+    description: Find device service
+    action:
+      identify:
+        description: Find device
+
+  light:
+    description: Light service
+    action:
+      toggle:
+        description: Toggle
+      brightness-down:
+        description: Decrease brightness
+      brightness-up:
+        description: Increase brightness
+    property:
+      brightness:
+        description: Brightness
+
+  vacuum:
+    description: Vacuum service
+    action:
+      start-sweep:
+        description: Start cleaning
+      stop-sweeping:
+        description: Stop cleaning
+      start-mop:
+        description: Start mopping
+      start-sweep-mop:
+        description: Start cleaning and mopping
+      start-charge:
+        description: Return home
+
+    property:
+      status:
+        description: Status
+      fault:
+        description: Error
+      mode:
+        description: Fan speed
+      cleaning-time:
+        description: Time cleaned
+      cleaning-area:
+        description: Area cleaned

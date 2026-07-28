@@ -4,11 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
-
-try:
-    from pydantic.v1 import BaseModel
-except ImportError:
-    from pydantic import BaseModel
+from pydantic import BaseModel
 
 from miio.descriptors import (
     AccessFlags,
@@ -24,7 +20,7 @@ from miio.miot_models import (
     MiotBaseModel,
     MiotEnumValue,
     MiotEvent,
-    MiotFormat,
+    MiotFormatType,
     MiotProperty,
     MiotService,
 )
@@ -74,6 +70,37 @@ DUMMY_SERVICE = """
 """
 
 
+@pytest.mark.parametrize(
+    "model_class",
+    [MiotEnumValue, MiotProperty, MiotAction, MiotEvent, MiotService],
+)
+def test_unknown_fields_warn(model_class, recwarn):
+    """Test that unknown fields trigger a warning."""
+    extra_field_json = {
+        MiotEnumValue: '{"value": 1, "description": "x", "unknown_field": true}',
+        MiotProperty: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:property:foo:00000001:dummy:1",'
+            ' "description": "X", "format": "bool", "access": ["read"], "unknown_field": true}'
+        ),
+        MiotAction: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:action:foo:00000001:dummy:1",'
+            ' "description": "X", "in": [], "out": [], "unknown_field": true}'
+        ),
+        MiotEvent: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:event:foo:00000001:dummy:1",'
+            ' "description": "X", "arguments": [], "unknown_field": true}'
+        ),
+        MiotService: (
+            '{"iid": 1, "type": "urn:miot-spec-v2:service:foo:00000001:dummy:1",'
+            ' "description": "X", "unknown_field": true}'
+        ),
+    }
+    model_class.model_validate_json(extra_field_json[model_class])
+    assert len(recwarn) == 1
+    assert "unknown_field" in str(recwarn[0].message)
+    assert "please report" in str(recwarn[0].message)
+
+
 def test_enum():
     """Test that enum parsing works."""
     data = """
@@ -81,7 +108,7 @@ def test_enum():
         "value": 1,
         "description": "dummy"
     }"""
-    en = MiotEnumValue.parse_raw(data)
+    en = MiotEnumValue.model_validate_json(data)
     assert en.value == 1
     assert en.description == "dummy"
 
@@ -89,7 +116,7 @@ def test_enum():
 def test_enum_missing_description():
     """Test that missing description gets replaced by the value."""
     data = '{"value": 1, "description": ""}'
-    en = MiotEnumValue.parse_raw(data)
+    en = MiotEnumValue.model_validate_json(data)
     assert en.value == 1
     assert en.description == "1"
 
@@ -112,10 +139,10 @@ def test_format(format, expected_type):
     class Wrapper(BaseModel):
         """Need to wrap as plain string is not valid json."""
 
-        format: MiotFormat
+        format: MiotFormatType
 
     data = f'{{"format": "{format}"}}'  # noqa: B028
-    f = Wrapper.parse_raw(data)
+    f = Wrapper.model_validate_json(data)
     assert f.format == expected_type
 
 
@@ -129,7 +156,7 @@ def test_action():
         "in": [],
         "out": []
     }"""
-    act = MiotAction.parse_raw(simple_action)
+    act = MiotAction.model_validate_json(simple_action)
     assert act.aiid == 1
     assert act.urn.type == "action"
     assert act.description == "Description"
@@ -149,7 +176,7 @@ def test_action_with_nulls():
         "in": null,
         "out": null
     }"""
-    act = MiotAction.parse_raw(simple_action)
+    act = MiotAction.model_validate_json(simple_action)
     assert act.aiid == 1
     assert act.urn.type == "action"
     assert act.description == "Description"
@@ -186,7 +213,7 @@ def test_urn(urn_string, unexpected):
 
         urn: URN
 
-    wrapper = Wrapper.parse_raw(example_urn)
+    wrapper = Wrapper.model_validate_json(example_urn)
     urn = wrapper.urn
     assert urn.namespace == "namespace"
     assert urn.type == "type"
@@ -201,6 +228,43 @@ def test_urn(urn_string, unexpected):
     assert repr(urn) == f"<URN {urn_string} parent:None>"
 
 
+@pytest.mark.parametrize(
+    "invalid_value",
+    [
+        pytest.param("notavalidurn", id="string_without_colons"),
+        pytest.param(42, id="unexpected_type"),
+    ],
+)
+def test_urn_invalid_input(invalid_value):
+    """Test that invalid URN inputs raise an error."""
+
+    class Wrapper(BaseModel):
+        urn: URN
+
+    with pytest.raises((TypeError, ValueError)):
+        Wrapper.model_validate({"urn": invalid_value})
+
+
+def test_urn_from_dict():
+    """Test that URN can be parsed from a pre-built dict (non-string input path)."""
+
+    class Wrapper(BaseModel):
+        urn: URN
+
+    urn_dict = {
+        "namespace": "miot-spec-v2",
+        "type": "property",
+        "name": "on",
+        "internal_id": "00000006",
+        "model": "dummy",
+        "version": 1,
+        "unexpected": None,
+    }
+    wrapper = Wrapper.model_validate({"urn": urn_dict})
+    assert wrapper.urn.namespace == "miot-spec-v2"
+    assert wrapper.urn.name == "on"
+
+
 def test_service():
     data = """
     {
@@ -209,7 +273,7 @@ def test_service():
         "type": "urn:miot-spec-v2:service:device-information:00000001:dummy:1"
     }
     """
-    serv = MiotService.parse_raw(data)
+    serv = MiotService.model_validate_json(data)
     assert serv.siid == 1
     assert serv.urn.type == "service"
     assert serv.actions == []
@@ -220,7 +284,7 @@ def test_service():
 @pytest.mark.parametrize("entity_type", ["actions", "properties", "events"])
 def test_service_back_references(entity_type):
     """Check that backrefs are created correctly for properties, actions, and events."""
-    serv = MiotService.parse_raw(DUMMY_SERVICE)
+    serv = MiotService.model_validate_json(DUMMY_SERVICE)
     assert serv.siid == 1
     assert serv.urn.type == "service"
 
@@ -234,7 +298,7 @@ def test_service_back_references(entity_type):
 @pytest.mark.parametrize("entity_type", ["actions", "properties", "events"])
 def test_entity_names(entity_type):
     """Check that entity name consists of service name and entity's plain name."""
-    serv = MiotService.parse_raw(DUMMY_SERVICE)
+    serv = MiotService.model_validate_json(DUMMY_SERVICE)
 
     entities = getattr(serv, entity_type)
     assert len(entities) == 1
@@ -256,7 +320,7 @@ def test_entity_names(entity_type):
 
 def test_event():
     data = '{"iid": 1, "type": "urn:spect:event:example_event:00000001:dummymodel:1", "description": "dummy", "arguments": []}'
-    ev = MiotEvent.parse_raw(data)
+    ev = MiotEvent.model_validate_json(data)
     assert ev.eiid == 1
     assert ev.urn.type == "event"
     assert ev.description == "dummy"
@@ -275,7 +339,7 @@ def test_property():
         ]
     }
     """
-    prop: MiotProperty = MiotProperty.parse_raw(data)
+    prop: MiotProperty = MiotProperty.model_validate_json(data)
     assert prop.piid == 1
     assert prop.urn.type == "property"
     assert prop.format == str
@@ -298,7 +362,7 @@ def test_get_descriptor_bool_property(read_only, access):
     if read_only:
         boolean_prop["access"].remove("write")
 
-    prop = MiotProperty.parse_obj(boolean_prop)
+    prop = MiotProperty.model_validate(boolean_prop)
     desc = prop.get_descriptor()
 
     assert desc.type == bool
@@ -318,13 +382,47 @@ def test_get_descriptor_ranged_property(read_only, expected):
     if read_only:
         ranged_prop["access"].remove("write")
 
-    prop = MiotProperty.parse_obj(ranged_prop)
+    prop = MiotProperty.model_validate(ranged_prop)
     desc = prop.get_descriptor()
 
     assert isinstance(desc, expected)
     assert desc.type == int
     if not read_only:
         assert desc.constraint == PropertyConstraint.Range
+
+
+@pytest.mark.parametrize(
+    ("format", "range_values", "expected_type"),
+    [
+        ("float", [-30, 100, 1e-05], float),
+        ("uint8", [0, 100, 1], int),
+    ],
+)
+def test_get_descriptor_ranged_property_type_coercion(
+    format, range_values, expected_type
+):
+    """Test that range values are coerced to the property's format type."""
+    ranged_prop = load_fixture("ranged_property.json")
+    ranged_prop["format"] = format
+    ranged_prop["value-range"] = range_values
+
+    prop = MiotProperty.model_validate(ranged_prop)
+    desc = prop.get_descriptor()
+
+    assert isinstance(desc, RangeDescriptor)
+    assert all(type(v) is expected_type for v in prop.range)
+    assert desc.min_value == range_values[0]
+    assert desc.max_value == range_values[1]
+    assert desc.step == range_values[2]
+
+
+def test_get_descriptor_ranged_property_none_format():
+    """Test that a ranged property with format=none raises ValueError."""
+    ranged_prop = load_fixture("ranged_property.json")
+    ranged_prop["format"] = "none"
+    prop = MiotProperty.model_validate(ranged_prop)
+    with pytest.raises(ValueError, match="non-None format"):
+        prop.get_descriptor()
 
 
 @pytest.mark.parametrize(
@@ -337,7 +435,7 @@ def test_get_descriptor_enum_property(read_only, expected):
     if read_only:
         enum_prop["access"].remove("write")
 
-    prop = MiotProperty.parse_obj(enum_prop)
+    prop = MiotProperty.model_validate(enum_prop)
     desc = prop.get_descriptor()
 
     assert isinstance(desc, expected)
@@ -358,7 +456,7 @@ def test_property_pretty_value():
 )
 def test_unique_identifier(collection, id_var):
     """Test unique identifier for properties, actions, and events."""
-    serv = MiotService.parse_raw(DUMMY_SERVICE)
+    serv = MiotService.model_validate_json(DUMMY_SERVICE)
     elem: MiotBaseModel = getattr(serv, collection)
     first = elem[0]
     assert (

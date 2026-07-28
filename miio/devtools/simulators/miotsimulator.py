@@ -3,13 +3,11 @@ import json
 import logging
 import random
 from collections import defaultdict
+from typing import Any
 
 import click
+from pydantic import ConfigDict, Field, ValidationInfo, field_validator
 
-try:
-    from pydantic.v1 import Field, validator
-except ImportError:
-    from pydantic import Field, validator
 from miio import PushServer
 from miio.miot_cloud import MiotCloud
 from miio.miot_models import DeviceModel, MiotAccess, MiotProperty, MiotService
@@ -55,14 +53,16 @@ class SimulatedMiotProperty(MiotProperty):
 
     current_value: int | str | bool = Field(default=UNSET)
 
-    @validator("current_value", pre=True, always=True)
-    def verify_value(cls, v, values):
+    @field_validator("current_value", mode="before")
+    @classmethod
+    def verify_value(cls, v: Any, info: ValidationInfo) -> int | str | bool:
         """This verifies that the type of the value conforms with the mapping
         definition.
 
         This will also create random values for the mapping when the device is
         initialized.
         """
+        values = info.data
         if v == UNSET:
             return create_random(values)
         if MiotAccess.Write not in values["access"]:
@@ -83,9 +83,7 @@ class SimulatedMiotProperty(MiotProperty):
 
         return casted_value
 
-    class Config:
-        validate_assignment = True
-        smart_union = True  # try all types before coercing
+    model_config = ConfigDict(validate_assignment=True, extra="forbid")
 
 
 class SimulatedMiotService(MiotService):
@@ -265,7 +263,7 @@ def miot_simulator(file, model):
     """Simulate miot device."""
     if file is not None:
         data = file.read()
-        dev = SimulatedDeviceModel.parse_raw(data)
+        dev = SimulatedDeviceModel.model_validate_json(data)
     else:
         cloud = MiotCloud()
         try:
@@ -274,7 +272,7 @@ def miot_simulator(file, model):
             _LOGGER.error(f"Unable to get schema: {ex}")
             return
         try:
-            dev = SimulatedDeviceModel.parse_obj(schema)
+            dev = SimulatedDeviceModel.model_validate(schema)
         except Exception as ex:
             # this is far from optimal, but considering this is a developer tool it can be fixed later
             fn = f"/tmp/pythonmiio_unparseable_{model}.json"  # noqa: S108

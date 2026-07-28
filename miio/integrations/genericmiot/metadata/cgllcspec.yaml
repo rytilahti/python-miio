@@ -1,0 +1,72 @@
+description: Metadata for cgllc-spec namespace
+services:
+  settings:
+    description: Device settings
+    property:
+      auto-slideing-time:
+        description: Screensaver interval
+      carbondioxide-led-th:
+        description: CO2 LED threshold
+      device-off:
+        description: Auto power off
+      device-off-new: {}
+      end-time: {}
+      humi-led-th:
+        description: Humidity LED threshold
+      is-twelve-hours-sys:
+        description: Use 12-hour clock
+      monitoring-frequency:
+        description: Monitoring frequency
+      page-sequence:
+        description: Screensaver order
+      pm-t-led-th: {}
+      pm-tpf-led-th: {}
+      pm-tpf-standard: {}
+      screen-off:
+        description: Screen off timeout
+      screensaver-time:
+        description: Screensaver timeout
+      screensaver-type:
+        description: Screensaver type
+      start-time: {}
+      temp-led-th:
+        description: Temperature LED threshold
+      tempature-unit:
+        description: Temperature unit
+      time-zone:
+        description: Timezone
+    action:
+      reset-carbon-dioxide:
+        description: Reset CO2 calibration
+      set-autoslideingtime:
+        description: Set screensaver interval
+      set-co-two-led-th:
+        description: Set CO2 LED threshold
+      set-device-off:
+        description: Set auto power off
+      set-device-off-new: {}
+      set-end-time: {}
+      set-frequency:
+        description: Set monitoring frequency
+      set-humi-led-th:
+        description: Set humidity LED threshold
+      set-page-sequence:
+        description: Set screensaver order
+      set-pm-t-led-th: {}
+      set-pm-tpf-led-th: {}
+      set-pm-tpf-standard: {}
+      set-screen-off:
+        description: Set screen off timeout
+      set-screensaver-time:
+        description: Set screensaver timeout
+      set-screensaver-type:
+        description: Set screensaver type
+      set-start-time: {}
+      set-temp-led-th:
+        description: Set temperature LED threshold
+      set-temp-unit:
+        description: Set temperature unit
+      set-time-zone:
+        description: Set timezone
+      set-twelve-hours-sys:
+        description: Use 12-hour clock

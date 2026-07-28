@@ -1,13 +1,20 @@
+from __future__ import annotations
+
 import logging
+import warnings
 from abc import abstractmethod
 from datetime import timedelta
 from enum import Enum
-from typing import Any, Optional
+from typing import Annotated, Any, Self, TypeAlias
 
-try:
-    from pydantic.v1 import BaseModel, Field, PrivateAttr, root_validator
-except ImportError:
-    from pydantic import BaseModel, Field, PrivateAttr, root_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    PlainValidator,
+    PrivateAttr,
+    model_validator,
+)
 
 from .descriptors import (
     AccessFlags,
@@ -18,6 +25,35 @@ from .descriptors import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+MiotPythonType: TypeAlias = type[int] | type[bool] | type[str] | type[float] | None
+
+
+def _convert_miot_type(input: str) -> MiotPythonType:
+    if input.startswith("uint") or input.startswith("int"):
+        return int
+    type_map = {
+        "bool": bool,
+        "string": str,
+        "float": float,
+        "none": None,
+    }
+    return type_map[input]
+
+
+MiotFormatType: TypeAlias = Annotated[
+    MiotPythonType, PlainValidator(_convert_miot_type)
+]
+
+
+def _warn_unknown_fields(model: BaseModel) -> None:
+    """Warn once per unique unknown-field combination encountered in a miot model."""
+    if model.model_extra:
+        warnings.warn(
+            f"Unknown fields in {type(model).__name__}: {list(model.model_extra.keys())} - "
+            "please report at https://github.com/rytilahti/python-miio/issues",
+            stacklevel=3,
+        )
 
 
 class URN(BaseModel):
@@ -35,28 +71,27 @@ class URN(BaseModel):
     version: int
     unexpected: list[str] | None
 
-    parent_urn: Optional["URN"] = Field(None, repr=False)
+    parent_urn: URN | None = Field(None, repr=False)
 
+    @model_validator(mode="before")
     @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not isinstance(v, str) or ":" not in v:
+    def validate_from_str(cls, v: Any) -> Any:
+        if isinstance(v, dict):
+            return v
+        if not isinstance(v, str):
+            raise TypeError(f"expected str, got {type(v).__name__}")
+        if ":" not in v:
             raise TypeError("invalid type")
-
-        _, namespace, type, name, id_, model, version, *unexpected = v.split(":")
-
-        return cls(
-            namespace=namespace,
-            type=type,
-            name=name,
-            internal_id=id_,
-            model=model,
-            version=version,
-            unexpected=unexpected if unexpected else None,
-        )
+        _, namespace, type_, name, id_, model, version, *unexpected = v.split(":")
+        return {
+            "namespace": namespace,
+            "type": type_,
+            "name": name,
+            "internal_id": id_,
+            "model": model,
+            "version": version,
+            "unexpected": unexpected if unexpected else None,
+        }
 
     @property
     def urn_string(self) -> str:
@@ -70,41 +105,21 @@ class URN(BaseModel):
         return f"<URN {self.urn_string} parent:{self.parent_urn}>"
 
 
-class MiotFormat(type):
-    """Custom type to convert textual presentation to python type."""
-
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.convert_type
-
-    @classmethod
-    def convert_type(cls, input: str):
-        if input.startswith("uint") or input.startswith("int"):
-            return int
-        type_map = {
-            "bool": bool,
-            "string": str,
-            "float": float,
-            "none": None,
-        }
-        return type_map[input]
-
-
 class MiotEnumValue(BaseModel):
     """Enum value for miot."""
 
     description: str
     value: int
 
-    @root_validator
-    def description_from_value(cls, values):
+    @model_validator(mode="after")
+    def description_from_value(self) -> Self:
         """If description is empty, use the value instead."""
-        if not values["description"]:
-            values["description"] = str(values["value"])
-        return values
+        if not self.description:
+            self.description = str(self.value)
+        _warn_unknown_fields(self)
+        return self
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="allow")
 
 
 class MiotBaseModel(BaseModel):
@@ -114,9 +129,14 @@ class MiotBaseModel(BaseModel):
     description: str
 
     extras: dict = Field(default_factory=dict, repr=False)
-    service: Optional["MiotService"] = None  # backref to containing service
+    service: MiotService | None = None  # backref to containing service
 
-    def fill_from_parent(self, service: "MiotService"):
+    @model_validator(mode="after")
+    def _warn_extra_fields(self) -> Self:
+        _warn_unknown_fields(self)
+        return self
+
+    def fill_from_parent(self, service: MiotService):
         """Fill some information from the parent service."""
         # TODO: this could be done using a validator
         self.service = service
@@ -151,6 +171,9 @@ class MiotBaseModel(BaseModel):
         """
         return self.name.replace(":", "_").replace("-", "_")
 
+    def __str__(self) -> str:
+        return f"{self.urn.type}:{self.urn.name!r}"
+
     @property
     @abstractmethod
     def unique_identifier(self) -> str:
@@ -165,8 +188,9 @@ class MiotAction(MiotBaseModel):
     inputs: Any = Field(alias="in")
     outputs: Any = Field(alias="out")
 
-    @root_validator(pre=True)
-    def default_null_to_empty(cls, values):
+    @model_validator(mode="before")
+    @classmethod
+    def default_null_to_empty(cls, values: Any) -> Any:
         """Coerce null values for in&out to empty lists."""
         if values["in"] is None:
             values["in"] = []
@@ -174,7 +198,7 @@ class MiotAction(MiotBaseModel):
             values["out"] = []
         return values
 
-    def fill_from_parent(self, service: "MiotService"):
+    def fill_from_parent(self, service: MiotService):
         """Overridden to convert inputs and outputs to property references."""
         super().fill_from_parent(service)
         self.inputs = [service.get_property_by_id(piid) for piid in self.inputs]
@@ -205,8 +229,7 @@ class MiotAction(MiotBaseModel):
         """Return unique identifier."""
         return f"{self.normalized_name}_{self.siid}_{self.aiid}"
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="allow")
 
 
 class MiotAccess(Enum):
@@ -220,19 +243,26 @@ class MiotProperty(MiotBaseModel):
 
     piid: int = Field(alias="iid")
 
-    format: MiotFormat
-    access: list[MiotAccess] = Field(default=["read"])
+    format: MiotFormatType
+    access: list[MiotAccess] = Field(default=[MiotAccess.Read])
     unit: str | None = None
 
-    range: list[int] | None = Field(alias="value-range")
-    choices: list[MiotEnumValue] | None = Field(alias="value-list")
-    gatt_access: list[Any] | None = Field(alias="gatt-access")
+    range: list[float] | None = Field(default=None, alias="value-range")
+    choices: list[MiotEnumValue] | None = Field(default=None, alias="value-list")
+    gatt_access: list[Any] | None = Field(default=None, alias="gatt-access")
 
     source: int | None = None
 
     # TODO: currently just used to pass the data for miiocli
     #       there must be a better way to do this..
     value: Any | None = None
+
+    @model_validator(mode="after")
+    def coerce_range_to_format_type(self) -> Self:
+        """Coerce range values to the property's numeric type."""
+        if self.range is not None and self.format in (int, float):
+            self.range = [self.format(v) for v in self.range]
+        return self
 
     @property
     def pretty_value(self):
@@ -244,7 +274,7 @@ class MiotProperty(MiotBaseModel):
             current = f"{selected} (value: {value})"
             return current
 
-        if self.format == bool:
+        if self.format is bool:
             return bool(value)
 
         unit_map = {
@@ -255,10 +285,10 @@ class MiotProperty(MiotBaseModel):
             "days": timedelta(days=1),
         }
 
-        unit = unit_map.get(self.unit)
+        unit = unit_map.get(self.unit, self.unit)
         if isinstance(unit, timedelta):
             value = value * unit
-        else:
+        elif unit:
             value = f"{value} {unit}"
 
         return value
@@ -356,6 +386,8 @@ class MiotProperty(MiotBaseModel):
         """Create a descriptor for range-based property."""
         if self.range is None:
             raise ValueError("Range is None")
+        if self.format is None:
+            raise ValueError("Range descriptor requires a non-None format type")
         desc = RangeDescriptor(
             id=self.unique_identifier,
             name=self.description,
@@ -387,8 +419,7 @@ class MiotProperty(MiotBaseModel):
         """Return unique identifier."""
         return f"{self.normalized_name}_{self.siid}_{self.piid}"
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="allow")
 
 
 class MiotEvent(MiotBaseModel):
@@ -402,8 +433,7 @@ class MiotEvent(MiotBaseModel):
         """Return unique identifier."""
         return f"{self.normalized_name}_{self.siid}_{self.eiid}"
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="allow")
 
 
 class MiotService(BaseModel):
@@ -420,13 +450,8 @@ class MiotService(BaseModel):
     _property_by_id: dict[int, MiotProperty] = PrivateAttr(default_factory=dict)
     _action_by_id: dict[int, MiotAction] = PrivateAttr(default_factory=dict)
 
-    def __init__(self, *args, **kwargs):
-        """Initialize a service.
-
-        Overridden to propagate the service to the children.
-        """
-        super().__init__(*args, **kwargs)
-
+    def model_post_init(self, __context: Any) -> None:
+        _warn_unknown_fields(self)
         for prop in self.properties:
             self._property_by_id[prop.piid] = prop
             prop.fill_from_parent(self)
@@ -458,8 +483,12 @@ class MiotService(BaseModel):
         """
         return self.urn.name.replace(":", "_").replace("-", "_")
 
-    class Config:
-        extra = "forbid"
+    def __str__(self) -> str:
+        return (
+            f"Service: {self.description} (siid={self.siid}, ns={self.urn.namespace})"
+        )
+
+    model_config = ConfigDict(extra="allow")
 
 
 class DeviceModel(BaseModel):
@@ -478,12 +507,8 @@ class DeviceModel(BaseModel):
         default_factory=dict
     )
 
-    def __init__(self, *args, **kwargs):
-        """Presentation of a miot device model scehma.
-
-        Overridden to implement internal (siid, piid) mapping.
-        """
-        super().__init__(*args, **kwargs)
+    def model_post_init(self, __context: Any) -> None:
+        _warn_unknown_fields(self)
         for serv in self.services:
             self._services_by_id[serv.siid] = serv
             self._properties_by_name[serv.name] = dict()
@@ -509,5 +534,4 @@ class DeviceModel(BaseModel):
         """Return the property model for given siid, piid."""
         return self._properties_by_id[siid][piid]
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="allow")
