@@ -388,5 +388,7 @@ class AirDehumidifierMiot(MiotDevice):
     def set_delay_time(self, minutes: int):
         """Set the delayed turn off time in minutes."""
         if minutes < 0 or minutes > 720:
-            raise ValueError(f"Invalid delay time: {minutes}. Must be between 0 and 720")
+            raise ValueError(
+                f"Invalid delay time: {minutes}. Must be between 0 and 720"
+            )
         return self.set_property("delay_time", minutes)

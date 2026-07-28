@@ -63,6 +63,7 @@ def test_off(dev):
 
     dev.off()
     assert dev.status().is_on is False
+    assert dev.status().power == "off"
 
 
 def test_status(dev):
@@ -90,6 +91,24 @@ def test_tank_full(dev):
     dev.set_property("fault", FaultStatus.WaterFull.value)
     assert dev.status().fault is FaultStatus.WaterFull
     assert dev.status().tank_full is True
+
+
+def test_invalid_fault_falls_back(dev):
+    dev.set_property("fault", 99)
+    assert dev.status().fault is FaultStatus.NoFaults
+
+
+def test_invalid_mode_falls_back(dev):
+    dev.set_property("mode", 99)
+    assert dev.status().mode is OperationMode.Smart
+
+
+def test_led_brightness_none_and_invalid(dev):
+    dev.set_property("led_brightness", None)
+    assert dev.status().led_brightness is None
+
+    dev.set_property("led_brightness", 99)
+    assert dev.status().led_brightness is None
 
 
 def test_set_target_humidity(dev):
