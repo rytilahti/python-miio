@@ -334,7 +334,8 @@ class AirPurifierMiotStatus(DeviceStatus):
             {'did': 'average_aqi', 'siid': 13, 'piid': 2, 'code': 0, 'value': 2},
             {'did': 'filter_rfid_tag', 'siid': 14, 'piid': 1, 'code': 0, 'value': '81:6b:3f:32:84:4b:4'},
             {'did': 'filter_rfid_product_id', 'siid': 14, 'piid': 3, 'code': 0, 'value': '0:0:31:31'},
-            {'did': 'app_extra', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0}
+            {'did': 'app_extra', 'siid': 15, 'piid': 1, 'code': 0, 'value': 0},
+            {'did': 'aqi_realtime_update_duration', 'siid': 13, 'piid': 9, 'code': 0, 'value': 0}
         ]
     """
 
@@ -520,6 +521,11 @@ class AirPurifierMiotStatus(DeviceStatus):
         """Return True if gesture control is on."""
         return self.data.get("gestures")
 
+    @property
+    def aqi_realtime_update_duration(self) -> Optional[int]:
+        """Return the aqi_realtime_update_duration in use."""
+        return self.data.get("aqi_realtime_update_duration")
+
 
 class AirPurifierMiot(MiotDevice):
     """Main class representing the air purifier which uses MIoT protocol."""
@@ -555,24 +561,30 @@ class AirPurifierMiot(MiotDevice):
             "Motor speed: {result.motor_speed} rpm\n"
             "Filter RFID product id: {result.filter_rfid_product_id}\n"
             "Filter RFID tag: {result.filter_rfid_tag}\n"
-            "Filter type: {result.filter_type}\n",
+            "Filter type: {result.filter_type}\n"
+            "AQI Update Duration: {result.aqi_realtime_update_duration}\n",
         )
     )
     def status(self) -> AirPurifierMiotStatus:
         """Retrieve properties."""
-        # Some devices update the aqi information only every 30min.
-        # This forces the device to poll the sensor for 5 seconds,
-        # so that we get always the most recent values. See #1281.
-        if self.model == "zhimi.airpurifier.mb3":
-            self.set_property("aqi_realtime_update_duration", 5)
-
-        return AirPurifierMiotStatus(
+        status = AirPurifierMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
                 for prop in self.get_properties_for_mapping()
             },
             self.model,
         )
+        if (
+            self.model == "zhimi.airpurifier.mb3"
+            and not status.aqi_realtime_update_duration
+        ):
+            # Some devices update the aqi information only every 30min.
+            # This forces the device to poll the sensor for 5 seconds,
+            # so that we get always the most recent values. See #1281.
+            self.set_aqi_realtime_update_duration(5)
+            status.data["aqi_realtime_update_duration"] = 5
+
+        return status
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -763,3 +775,20 @@ class AirPurifierMiot(MiotDevice):
             raise ValueError(f"Invalid brightness level: {level}")
 
         return self.set_property("led_brightness_level", level)
+
+    @command(
+        click.argument("duration", type=int),
+        default_output=format_output(
+            "Setting AQI Realtime update duration to {duration}"
+        ),
+    )
+    def set_aqi_realtime_update_duration(self, duration: int):
+        """Set the AQI Realtime update duration."""
+        if "aqi_realtime_update_duration" not in self._get_mapping():
+            raise UnsupportedFeatureException(
+                "Unsupported aqi_realtime_update_duration for model '%s'" % self.model
+            )
+
+        if duration < 0:
+            raise ValueError("Invalid aqi realtime update duration: %s" % duration)
+        return self.set_property("aqi_realtime_update_duration", duration)

@@ -31,7 +31,9 @@ _INITIAL_STATE = {
     "filter_rfid_product_id": "0:0:41:30",
     "filter_rfid_tag": "10:20:30:40:50:60:7",
     "button_pressed": "power",
+    "aqi_realtime_update_duration": 0,
 }
+
 
 _INITIAL_STATE_MB4 = {
     "power": True,
@@ -91,6 +93,9 @@ class DummyAirPurifierMiot(DummyMiotDevice, AirPurifierMiot):
             ),
             "set_act_det": lambda x: self._set_state("act_det", x),
             "set_app_extra": lambda x: self._set_state("app_extra", x),
+            "set_aqi_realtime_update_duration": lambda x: self._set_state(
+                "aqi_realtime_update_duration", x
+            ),
         }
         super().__init__(*args, **kwargs)
 
@@ -234,6 +239,44 @@ class TestAirPurifier(TestCase):
     def test_set_anion(self):
         with pytest.raises(UnsupportedFeatureException):
             self.device.set_anion(True)
+
+
+class DummyAirPurifierMiotMB3(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "zhimi.airpurifier.mb3"
+        super().__init__(*args, **kwargs)
+
+
+@pytest.fixture(scope="function")
+def airpurifierMB3(request):
+    request.cls.device = DummyAirPurifierMiotMB3()
+
+
+@pytest.mark.usefixtures("airpurifierMB3")
+class TestAirPurifierMB3(TestCase):
+    def test_status(self):
+        default_adjusted_value = 5
+        specific_value = 10
+        status = self.device.status()
+        assert _INITIAL_STATE["aqi_realtime_update_duration"] == 0
+        assert status.aqi_realtime_update_duration == default_adjusted_value
+
+        # Set a specific value
+
+        self.device.set_aqi_realtime_update_duration(specific_value)
+
+        # Check that we do not override a specific set value
+        status = self.device.status()
+
+        assert status.aqi_realtime_update_duration == specific_value
+
+    def test_set_aqi_realtime_update_duration_negative_value(self):
+        with pytest.raises(ValueError):
+            self.device.set_aqi_realtime_update_duration(-1)
+
+    def test_set_aqi_realtime_update_duration(self):
+        self.device.set_aqi_realtime_update_duration(12)
+        assert self.device.status().aqi_realtime_update_duration == 12
 
 
 class DummyAirPurifierMiotMB4(DummyAirPurifierMiot):
