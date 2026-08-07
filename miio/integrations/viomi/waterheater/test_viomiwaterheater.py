@@ -6,6 +6,7 @@ from miio.tests.dummies import DummyDevice
 
 from .viomiwaterheater import (
     MODEL_WATERHEATER_E1,
+    SUPPORTED_MODELS,
     OperationMode,
     OperationStatus,
     ViomiWaterHeater,
@@ -101,3 +102,26 @@ def test_set_service_time(viomiwaterheater: DummyViomiWaterHeater):
 
     with pytest.raises(ViomiWaterHeaterException):
         viomiwaterheater.set_service_time(10, 25)
+
+
+def test_set_bacteriostatic_mode(viomiwaterheater: DummyViomiWaterHeater, monkeypatch):
+    # Test valid call
+    viomiwaterheater.set_bacteriostatic_mode()
+    assert viomiwaterheater.state["targetTemp"] == 80
+
+    # Test thermostatic mode exception
+    viomiwaterheater.state["modeType"] = OperationMode.Thermostatic.value
+    with pytest.raises(
+        ViomiWaterHeaterException,
+        match="Bacteriostatic operational mode is not supported in Thermostatic mode.",
+    ):
+        viomiwaterheater.set_bacteriostatic_mode()
+
+    # Test unsupported bacteriostatic mode
+    monkeypatch.setitem(
+        SUPPORTED_MODELS[MODEL_WATERHEATER_E1], "bacteriostatic_mode", False
+    )
+    with pytest.raises(
+        ViomiWaterHeaterException, match="Bacteriostatic mode is not supported."
+    ):
+        viomiwaterheater.set_bacteriostatic_mode()
