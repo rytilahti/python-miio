@@ -81,6 +81,7 @@ from miio.integrations.shuii.humidifier import AirHumidifierJsq
 from miio.integrations.tinymu.toiletlid import Toiletlid
 from miio.integrations.viomi.vacuum import ViomiVacuum
 from miio.integrations.viomi.viomidishwasher import ViomiDishwasher
+from miio.integrations.viomi.waterheater import ViomiWaterHeater
 from miio.integrations.xiaomi.aircondition.airconditioner_miot import AirConditionerMiot
 from miio.integrations.xiaomi.repeater.wifirepeater import WifiRepeater
 from miio.integrations.xiaomi.wifispeaker.wifispeaker import WifiSpeaker
