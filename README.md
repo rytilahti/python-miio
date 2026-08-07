@@ -285,6 +285,7 @@ integration, this library supports also the following devices:
 * Xiaomi Mi Smart Space Heater
 * Xiaomiyoupin Curtain Controller (Wi-Fi) (lumi.curtain.hagl05)
 * Xiaomi Dishwasher (viomi.dishwasher.m02)
+* Viomi Water Heater 1A (60L) (viomi.waterheater.e1)
 * Xiaomi Xiaomi Mi Smart Space Heater S (zhimi.heater.mc2)
 * Xiaomi Xiaomi Mi Smart Space Heater 1S (zhimi.heater.za2)
 * Yeelight Dual Control Module (yeelink.switch.sw1)
