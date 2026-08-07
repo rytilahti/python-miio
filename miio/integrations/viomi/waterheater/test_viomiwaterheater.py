@@ -58,6 +58,7 @@ def test_status(viomiwaterheater: DummyViomiWaterHeater):
     assert status.hot_water_volume == 60
     assert status.cleaning_required is False
     assert status.mode == OperationMode.Heating
+    assert status.bacteriostatic_mode_active is False
     assert status.service_time_start == time(7)
     assert status.service_time_end == time(12)
 

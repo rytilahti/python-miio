@@ -132,6 +132,12 @@ class ViomiWaterHeaterStatus(DeviceStatus):
         return self.data["needClean"] != 0
 
     @property
+    @sensor(name="Bacteriostatic Mode Active")
+    def bacteriostatic_mode_active(self) -> bool:
+        """True if bacteriostatic mode (target temp == 80) is active."""
+        return self.target_temperature == 80
+
+    @property
     @setting(
         name="Mode",
         setter_name="set_mode",
