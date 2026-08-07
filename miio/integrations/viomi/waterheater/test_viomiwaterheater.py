@@ -1,7 +1,9 @@
 from datetime import time
+
 import pytest
 
 from miio.tests.dummies import DummyDevice
+
 from .viomiwaterheater import (
     MODEL_WATERHEATER_E1,
     OperationMode,

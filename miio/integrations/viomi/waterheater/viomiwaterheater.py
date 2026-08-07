@@ -1,3 +1,7 @@
+"""VIOMI Internet electric water heater 1A (60L)
+https://home.miot-spec.com/spec/viomi.waterheater.e1
+"""
+
 import enum
 import logging
 from datetime import time
@@ -12,9 +16,6 @@ from miio.exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
 
-"""VIOMI Internet electric water heater 1A (60L)
-https://home.miot-spec.com/spec/viomi.waterheater.e1
-"""
 MODEL_WATERHEATER_E1 = "viomi.waterheater.e1"
 AVAILABLE_PROPERTIES_E1 = [
     "washStatus",
@@ -180,7 +181,7 @@ class ViomiWaterHeater(Device):
         )["available_properties"]
         values = self.get_properties(properties, max_properties=1)
 
-        return ViomiWaterHeaterStatus(dict(zip(properties, values)))
+        return ViomiWaterHeaterStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -235,14 +236,10 @@ class ViomiWaterHeater(Device):
         click.argument("time_start", type=int),
         click.argument("time_end", type=int),
         default_output=format_output(
-            lambda time_start, time_end: "Setting up the Booking mode operational interval from: %02d:00 "
-            % time_start
-            + "to: %02d:00 " % time_end
-            + "(duration: %s hours)."
-            % (
-                time_end - time_start
-                if time_end - time_start > 0
-                else time_end - time_start + 24
+            lambda time_start, time_end: (
+                f"Setting up the Booking mode operational interval from: {time_start:02d}:00 "
+                f"to: {time_end:02d}:00 (duration: "
+                f"{time_end - time_start if time_end - time_start > 0 else time_end - time_start + 24} hours)."
             )
         ),
     )
