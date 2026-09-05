@@ -5,7 +5,7 @@ import logging
 from typing import List, Optional, Union
 
 import click
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic.v1 import BaseModel, Field, PrivateAttr
 from yaml import safe_load
 
 from miio import PushServer

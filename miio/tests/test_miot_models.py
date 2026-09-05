@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
-from pydantic import BaseModel
+from pydantic.v1 import BaseModel
 
 from miio.descriptors import (
     AccessFlags,
