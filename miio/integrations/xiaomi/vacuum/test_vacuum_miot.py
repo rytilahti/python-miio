@@ -91,7 +91,7 @@ class DummyXiaomiVacuumE101GBEmptyRoomInfo(DummyXiaomiVacuumE101GB):
         self.state = [{"did": k, "value": v, "code": 0} for k, v in self.state.items()]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def dummy_xiaomi_vacuum(request):
     request.cls.device = DummyXiaomiVacuumE101GB()
 
