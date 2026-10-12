@@ -8,6 +8,7 @@ import binascii
 import codecs
 import logging
 import socket
+from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from pprint import pformat as pf
 from typing import Any
@@ -18,6 +19,7 @@ from .exceptions import (
     DeviceError,
     DeviceException,
     InvalidTokenException,
+    PayloadDecodeException,
     RecoverableError,
 )
 from .protocol import Message
@@ -246,6 +248,11 @@ class MiIOProtocol:
 
             header = m.header.value
             payload = m.data.value
+
+            if not isinstance(payload, Mapping):
+                raise PayloadDecodeException(
+                    "Unable to parse message payload: expected an object"
+                )
 
             self.__id = payload["id"]
             self._device_ts = header["ts"]  # type: ignore  # ts uses timeadapter

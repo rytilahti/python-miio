@@ -1,4 +1,5 @@
 import binascii
+from unittest.mock import patch
 
 import pytest
 
@@ -169,3 +170,41 @@ def test_decode_json_raises_for_invalid_json(token):
     serialized_msg = build_msg(b'{"id": 123456,,"otu_stat":0', token)
     with pytest.raises(PayloadDecodeException):
         Message.parse(serialized_msg, **ctx)
+
+
+@pytest.mark.parametrize("payload", [b"[]", b"null", b'"not-an-object"'])
+def test_send_raises_payload_decode_for_non_object_payload(payload, token):
+    """Valid JSON values must not escape as a TypeError."""
+    proto = MiIOProtocol("127.0.0.1")
+    proto._discovered = True
+    proto._device_id = b"\x01\x02\x03\x04"
+    response = build_msg(payload, token)
+
+    with (
+        patch.object(proto, "_create_request", return_value={"id": 1}),
+        patch("socket.socket") as mock_socket,
+    ):
+        mock_socket.return_value.recvfrom.return_value = (
+            response,
+            ("127.0.0.1", 54321),
+        )
+        with pytest.raises(PayloadDecodeException, match="expected an object"):
+            proto.send("test", retry_count=0)
+
+
+def test_send_accepts_mapping_payload(token):
+    """Object responses continue through the normal result handling path."""
+    proto = MiIOProtocol("127.0.0.1")
+    proto._discovered = True
+    proto._device_id = b"\x01\x02\x03\x04"
+    response = build_msg(b'{"id": 7, "result": ["ok"]}', token)
+
+    with (
+        patch.object(proto, "_create_request", return_value={"id": 1}),
+        patch("socket.socket") as mock_socket,
+    ):
+        mock_socket.return_value.recvfrom.return_value = (
+            response,
+            ("127.0.0.1", 54321),
+        )
+        assert proto.send("test", retry_count=0) == ["ok"]
