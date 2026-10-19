@@ -29,6 +29,7 @@ who have helped to extend this to cover not only the vacuum cleaner.
 
     Home <self>
     discovery
+    cloud_free_provisioning
     troubleshooting
     contributing
     simulator
