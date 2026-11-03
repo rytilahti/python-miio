@@ -42,6 +42,17 @@ def test_recorded_status(dev, replies):
     dev.send = Mock(side_effect=respond)
     status = dev.status()
     assert status.is_on is True
+    assert status.fault == 0
+    assert status.fan_level == 0
+    assert status.anion is True
+    assert status.uv is True
+    assert status.air_quality == 0
+    assert status.filter_life_remaining == 100
+    assert status.filter_left_time == 8636
+    assert status.filter_hours_used == 4
+    assert status.screen is True
+    assert status.buzzer is False
+    assert status.child_lock is False
     assert status.mode is OperationMode.Auto
     assert status.favorite_level == 9
     assert status.aqi == 3
@@ -112,6 +123,10 @@ def test_command_encoding(dev, method, value, key, pair, wire):
         ("set_favorite_level", True),
         ("set_fan_level", 3),
         ("set_screen", 1),
+        ("set_anion", 1),
+        ("set_uv", "true"),
+        ("set_buzzer", 0),
+        ("set_child_lock", None),
     ],
 )
 def test_invalid_commands_do_not_send(dev, method, value):
@@ -126,6 +141,8 @@ def test_invalid_commands_do_not_send(dev, method, value):
     [
         None,
         [],
+        ["ok"],
+        [{"siid": 99, "piid": 1, "code": 0}],
         [{"siid": 2, "piid": 1, "code": -4004}],
         [{"siid": 2, "piid": 3, "code": 0}],
     ],
