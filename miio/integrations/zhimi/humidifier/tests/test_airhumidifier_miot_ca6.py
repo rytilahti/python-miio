@@ -197,3 +197,28 @@ def test_op_status(dev):
 
     dev.set_property("status", OperationStatusCA6.Clean)
     assert op_status() == OperationStatusCA6.Clean
+
+
+@pytest.mark.parametrize("humidity", [30.0, 45.0, 60.0])
+def test_integral_float_target_is_sent_as_integer(dev, mocker, humidity):
+    setter = mocker.patch.object(dev, "set_property")
+    dev.set_target_humidity(humidity)
+    setter.assert_called_once_with("target_humidity", int(humidity))
+    assert type(setter.call_args.args[1]) is int
+
+
+@pytest.mark.parametrize("humidity", [45.5, float("nan"), float("inf"), True, "45"])
+def test_invalid_target_never_reaches_device(dev, mocker, humidity):
+    setter = mocker.patch.object(dev, "set_property")
+    with pytest.raises(ValueError):
+        dev.set_target_humidity(humidity)
+    setter.assert_not_called()
+
+
+def test_ca4_mode_cannot_silently_select_ca6_favorite(dev, mocker):
+    from ..airhumidifier_miot import OperationMode
+
+    setter = mocker.patch.object(dev, "set_property")
+    with pytest.raises(ValueError):
+        dev.set_mode(OperationMode.Auto)
+    setter.assert_not_called()
