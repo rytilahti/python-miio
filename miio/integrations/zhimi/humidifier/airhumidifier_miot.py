@@ -707,11 +707,16 @@ class AirHumidifierMiotCA6(MiotDevice):
         click.argument("humidity", type=int),
         default_output=format_output("Setting target humidity {humidity}%"),
     )
-    def set_target_humidity(self, humidity: int):
+    def set_target_humidity(self, humidity: int | float):
         """Set target humidity."""
-        if humidity < 30 or humidity > 60:
+        if (
+            isinstance(humidity, bool)
+            or not isinstance(humidity, (int, float))
+            or not 30 <= humidity <= 60
+            or humidity != int(humidity)
+        ):
             raise ValueError(
-                f"Invalid target humidity: {humidity}. Must be between 30 and 60"
+                f"Invalid target humidity: {humidity}. Must be an integer between 30 and 60"
             )
         # HA sends humidity in float, e.g. 45.0
         # ca6 does accept only int values, e.g. 45
@@ -721,8 +726,10 @@ class AirHumidifierMiotCA6(MiotDevice):
         click.argument("mode", type=EnumType(OperationModeCA6)),
         default_output=format_output("Setting mode to '{mode.value}'"),
     )
-    def set_mode(self, mode: OperationMode):
-        """Set working mode."""
+    def set_mode(self, mode: OperationModeCA6):
+        """Set working mode using the CA6-specific values."""
+        if not isinstance(mode, OperationModeCA6):
+            raise ValueError("Mode must be an OperationModeCA6")
         return self.set_property("mode", mode.value)
 
     @command(
