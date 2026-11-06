@@ -25,7 +25,7 @@ class SingleFileHandler(BaseHTTPRequestHandler):
         self.raw_requestline = self.rfile.readline()
 
         if not self.parse_request():
-            _LOGGER.error("unable to parse request: %s" % self.raw_requestline)
+            _LOGGER.error(f"unable to parse request: {self.raw_requestline}")
             return
 
         self.send_response(200)
@@ -58,7 +58,7 @@ class OneShotServer:
         with open(file, "rb") as f:
             self.payload = f.read()
             self.server.payload = self.payload
-            self.md5 = hashlib.md5(self.payload).hexdigest()  # nosec
+            self.md5 = hashlib.md5(self.payload).hexdigest()  # noqa: S324
             _LOGGER.info(f"Using local {file} (md5: {self.md5})")
 
     @staticmethod
@@ -74,15 +74,15 @@ class OneShotServer:
         ifaces_without_lo = [
             x for x in netifaces.interfaces() if not x.startswith("lo")
         ]
-        _LOGGER.debug("available interfaces: %s" % ifaces_without_lo)
+        _LOGGER.debug(f"available interfaces: {ifaces_without_lo}")
 
         for iface in ifaces_without_lo:
             addresses = netifaces.ifaddresses(iface)
             if netifaces.AF_INET not in addresses:
-                _LOGGER.debug("%s has no ipv4 addresses, skipping" % iface)
+                _LOGGER.debug(f"{iface} has no ipv4 addresses, skipping")
                 continue
             for entry in addresses[netifaces.AF_INET]:
-                _LOGGER.debug("Got addr: %s" % entry["addr"])
+                _LOGGER.debug("Got addr: {}".format(entry["addr"]))
                 return entry["addr"]
 
     def url(self, ip=None):
@@ -104,5 +104,5 @@ class OneShotServer:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    upd = OneShotServer("/tmp/test")  # nosec
+    upd = OneShotServer("/tmp/test")  # noqa: S108
     upd.serve_once()

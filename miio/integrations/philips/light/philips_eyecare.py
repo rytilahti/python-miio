@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,16 +21,25 @@ class PhilipsEyecareStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        "Brightness",
+        unit="%",
+        setter_name="set_brightness",
+        min_value=1,
+        max_value=100,
+    )
     def brightness(self) -> int:
         """Current brightness of the primary light."""
         return self.data["bright"]
@@ -45,6 +55,13 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["ambstatus"] == "on"
 
     @property
+    @setting(
+        "Ambient Brightness",
+        unit="%",
+        setter_name="set_ambient_brightness",
+        min_value=1,
+        max_value=100,
+    )
     def ambient_brightness(self) -> int:
         """Brightness of the ambient light."""
         return self.data["ambvalue"]
@@ -55,6 +72,12 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["eyecare"] == "on"
 
     @property
+    @setting(
+        "Scene",
+        setter_name="set_scene",
+        min_value=1,
+        max_value=4,
+    )
     def scene(self) -> int:
         """Current fixed scene."""
         return self.data["scene_num"]
@@ -65,6 +88,10 @@ class PhilipsEyecareStatus(DeviceStatus):
         return self.data["bls"] == "on"
 
     @property
+    @sensor(
+        "Delay Off Countdown",
+        unit="min",
+    )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""
         return self.data["dvalue"]
@@ -104,7 +131,9 @@ class PhilipsEyecare(Device):
         ]
         values = self.get_properties(properties)
 
-        return PhilipsEyecareStatus(defaultdict(lambda: None, zip(properties, values)))
+        return PhilipsEyecareStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -133,7 +162,7 @@ class PhilipsEyecare(Device):
     def set_brightness(self, level: int):
         """Set brightness level of the primary light."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.send("set_bright", [level])
 
@@ -144,7 +173,7 @@ class PhilipsEyecare(Device):
     def set_scene(self, number: int):
         """Set one of the fixed eyecare user scenes."""
         if number < 1 or number > 4:
-            raise ValueError("Invalid fixed scene number: %s" % number)
+            raise ValueError(f"Invalid fixed scene number: {number}")
 
         return self.send("set_user_scene", [number])
 
@@ -156,7 +185,7 @@ class PhilipsEyecare(Device):
         """Set delay off minutes."""
 
         if minutes < 0:
-            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError(f"Invalid value for a delayed turn off: {minutes}")
 
         return self.send("delay_off", [minutes])
 
@@ -197,6 +226,6 @@ class PhilipsEyecare(Device):
     def set_ambient_brightness(self, level: int):
         """Set the brightness of the ambient light."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid ambient brightness: %s" % level)
+            raise ValueError(f"Invalid ambient brightness: {level}")
 
         return self.send("set_amb_bright", [level])

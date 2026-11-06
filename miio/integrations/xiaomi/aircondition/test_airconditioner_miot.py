@@ -60,7 +60,7 @@ class DummyAirConditionerMiot(DummyMiotDevice, AirConditionerMiot):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def airconditionermiot(request):
     request.cls.device = DummyAirConditionerMiot()
 

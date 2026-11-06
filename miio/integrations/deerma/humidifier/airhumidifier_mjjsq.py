@@ -1,12 +1,13 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ class AirHumidifierStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor(name="Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["OnOff_State"] == 1 else "off"
@@ -65,6 +67,11 @@ class AirHumidifierStatus(DeviceStatus):
         return self.power == "on"
 
     @property
+    @setting(
+        name="Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Operation mode.
 
@@ -73,42 +80,56 @@ class AirHumidifierStatus(DeviceStatus):
         return OperationMode(self.data["Humidifier_Gear"])
 
     @property
+    @sensor(name="Temperature", unit="C")
     def temperature(self) -> int:
         """Current temperature in degree celsius."""
         return self.data["TemperatureValue"]
 
     @property
+    @sensor(name="Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity in percent."""
         return self.data["Humidity_Value"]
 
     @property
+    @setting(name="Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["TipSound_State"] == 1
 
     @property
+    @setting(name="LED", setter_name="set_led")
     def led(self) -> bool:
         """True if LED is turned on."""
         return self.data["Led_State"] == 1
 
     @property
+    @setting(
+        name="Target Humidity",
+        setter_name="set_target_humidity",
+        unit="%",
+        min_value=0,
+        max_value=99,
+    )
     def target_humidity(self) -> int:
         """Target humiditiy in percent."""
         return self.data["HumiSet_Value"]
 
     @property
+    @sensor(name="No Water")
     def no_water(self) -> bool:
         """True if the water tank is empty."""
         return self.data["waterstatus"] == 0
 
     @property
+    @sensor(name="Water Tank Detached")
     def water_tank_detached(self) -> bool:
         """True if the water tank is detached."""
         return self.data["watertankstatus"] == 0
 
     @property
-    def wet_protection(self) -> Optional[bool]:
+    @setting(name="Wet Protection", setter_name="set_wet_protection")
+    def wet_protection(self) -> bool | None:
         """True if wet protection is enabled."""
         if self.data["wet_and_protect"] is not None:
             return self.data["wet_and_protect"] == 1
@@ -116,7 +137,8 @@ class AirHumidifierStatus(DeviceStatus):
         return None
 
     @property
-    def use_time(self) -> Optional[int]:
+    @sensor(name="Use Time", unit="s")
+    def use_time(self) -> int | None:
         """How long the device has been active in seconds.
 
         Not supported by the device, so we return none here.
@@ -152,7 +174,9 @@ class AirHumidifierMjjsq(Device):
         )
         values = self.get_properties(properties, max_properties=1)
 
-        return AirHumidifierStatus(defaultdict(lambda: None, zip(properties, values)))
+        return AirHumidifierStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -199,7 +223,7 @@ class AirHumidifierMjjsq(Device):
     def set_target_humidity(self, humidity: int):
         """Set the target humidity in percent."""
         if humidity < 0 or humidity > 99:
-            raise ValueError("Invalid target humidity: %s" % humidity)
+            raise ValueError(f"Invalid target humidity: {humidity}")
 
         return self.send("Set_HumiValue", [humidity])
 

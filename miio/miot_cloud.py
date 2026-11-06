@@ -2,18 +2,13 @@
 
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from operator import attrgetter
 from pathlib import Path
-from typing import Optional
 
 import platformdirs
 from micloud.miotspec import MiotSpec
-
-try:
-    from pydantic.v1 import BaseModel, Field
-except ImportError:
-    from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field
 
 from miio import CloudException
 from miio.miot_models import DeviceModel
@@ -25,7 +20,7 @@ class ReleaseInfo(BaseModel):
     """Information about individual miotspec release."""
 
     model: str
-    status: Optional[str]  # only available on full listing
+    status: str | None = None  # only available on full listing
     type: str
     version: int
 
@@ -73,25 +68,25 @@ class MiotCloud:
         cache_file = self._cache_dir / MiotCloud.MODEL_MAPPING_FILE
         try:
             mapping = self._file_from_cache(cache_file)
-            return ReleaseList.parse_obj(mapping)
+            return ReleaseList.model_validate(mapping)
         except FileNotFoundError:
             _LOGGER.debug("Did not found non-stale %s, trying to fetch", cache_file)
 
         specs = MiotSpec.get_specs()
         self._write_to_cache(cache_file, specs)
 
-        return ReleaseList.parse_obj(specs)
+        return ReleaseList.model_validate(specs)
 
     def get_device_model(self, model: str) -> DeviceModel:
         """Get device model for model name."""
         file = self._cache_dir / f"{model}.json"
         try:
             spec = self._file_from_cache(file)
-            return DeviceModel.parse_obj(spec)
+            return DeviceModel.model_validate(spec)
         except FileNotFoundError:
-            _LOGGER.debug("Unable to find schema file %s, going to fetch" % file)
+            _LOGGER.debug(f"Unable to find schema file {file}, going to fetch")
 
-        return DeviceModel.parse_obj(self.get_model_schema(model))
+        return DeviceModel.model_validate(self.get_model_schema(model))
 
     def get_model_schema(self, model: str) -> dict:
         """Get the preferred schema for the model."""
@@ -120,8 +115,8 @@ class MiotCloud:
         def _valid_cache():
             expiration = timedelta(hours=cache_hours)
             if datetime.fromtimestamp(
-                file.stat().st_mtime, tz=timezone.utc
-            ) + expiration > datetime.now(tz=timezone.utc):
+                file.stat().st_mtime, tz=UTC
+            ) + expiration > datetime.now(tz=UTC):
                 return True
 
             return False
@@ -130,4 +125,4 @@ class MiotCloud:
             _LOGGER.debug("Cache hit, returning contents of %s", file)
             return json.loads(file.read_text())
 
-        raise FileNotFoundError("Cache file %s not found or it is stale" % file)
+        raise FileNotFoundError(f"Cache file {file} not found or it is stale")

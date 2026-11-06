@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,41 +26,72 @@ class CeilStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        "Brightness",
+        setter_name="set_brightness",
+        unit="%",
+        min_value=1,
+        max_value=100,
+        step=1,
+    )
     def brightness(self) -> int:
         """Current brightness."""
         return self.data["bright"]
 
     @property
+    @setting(
+        "Scene",
+        setter_name="set_scene",
+        min_value=1,
+        max_value=4,
+        step=1,
+    )
     def scene(self) -> int:
         """Current fixed scene (brightness & colortemp)."""
         return self.data["snm"]
 
     @property
+    @setting(
+        "Delay Off Countdown",
+        setter_name="delay_off",
+        unit="s",
+    )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in seconds."""
         return self.data["dv"]
 
     @property
+    @setting(
+        "Color Temperature",
+        setter_name="set_color_temperature",
+        min_value=1,
+        max_value=100,
+        step=1,
+    )
     def color_temperature(self) -> int:
         """Current color temperature."""
         return self.data["cct"]
 
     @property
+    @sensor("Smart Night Light")
     def smart_night_light(self) -> bool:
         """Smart night mode state."""
         return self.data["bl"] == 1
 
     @property
+    @sensor("Automatic Color Temperature")
     def automatic_color_temperature(self) -> bool:
         """Automatic color temperature state."""
         return self.data["ac"] == 1
@@ -90,7 +122,9 @@ class Ceil(Device):
         properties = ["power", "bright", "cct", "snm", "dv", "bl", "ac"]
         values = self.get_properties(properties)
 
-        return CeilStatus(defaultdict(lambda: None, zip(properties, values)))
+        return CeilStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -109,7 +143,7 @@ class Ceil(Device):
     def set_brightness(self, level: int):
         """Set brightness level."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.send("set_bright", [level])
 
@@ -120,7 +154,7 @@ class Ceil(Device):
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid color temperature: %s" % level)
+            raise ValueError(f"Invalid color temperature: {level}")
 
         return self.send("set_cct", [level])
 
@@ -134,10 +168,10 @@ class Ceil(Device):
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         if cct < 1 or cct > 100:
-            raise ValueError("Invalid color temperature: %s" % cct)
+            raise ValueError(f"Invalid color temperature: {cct}")
 
         return self.send("set_bricct", [brightness, cct])
 
@@ -149,7 +183,7 @@ class Ceil(Device):
         """Turn off delay in seconds."""
 
         if seconds < 1:
-            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError(f"Invalid value for a delayed turn off: {seconds}")
 
         return self.send("delay_off", [seconds])
 
@@ -160,7 +194,7 @@ class Ceil(Device):
     def set_scene(self, number: int):
         """Set a fixed scene (1-4)."""
         if number < 1 or number > 4:
-            raise ValueError("Invalid fixed scene number: %s" % number)
+            raise ValueError(f"Invalid fixed scene number: {number}")
 
         return self.send("apply_fixed_scene", [number])
 

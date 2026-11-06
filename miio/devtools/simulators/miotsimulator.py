@@ -3,14 +3,11 @@ import json
 import logging
 import random
 from collections import defaultdict
-from typing import Union
+from typing import Any
 
 import click
+from pydantic import ConfigDict, Field, ValidationInfo, field_validator
 
-try:
-    from pydantic.v1 import Field, validator
-except ImportError:
-    from pydantic import Field, validator
 from miio import PushServer
 from miio.miot_cloud import MiotCloud
 from miio.miot_models import DeviceModel, MiotAccess, MiotProperty, MiotService
@@ -31,18 +28,18 @@ def create_random(values):
 
     if values["choices"] is not None:
         choices = values["choices"]
-        choice = choices[random.randint(0, len(choices) - 1)]  # nosec
+        choice = choices[random.randint(0, len(choices) - 1)]  # noqa: S311
         _LOGGER.debug("Got enum %r for %s", choice, piid)
         return choice.value
 
     if values["range"] is not None:
         range = values["range"]
-        value = random.randint(range[0], range[1])  # nosec
+        value = random.randint(range[0], range[1])  # noqa: S311
         _LOGGER.debug("Got value %r from %s for piid %s", value, range, piid)
         return value
 
     if values["format"] == bool:
-        value = bool(random.randint(0, 1))  # nosec
+        value = bool(random.randint(0, 1))  # noqa: S311
         _LOGGER.debug("Got bool %r for piid %s", value, piid)
         return value
 
@@ -54,16 +51,18 @@ class SimulatedMiotProperty(MiotProperty):
     * Validates inputs for set_properties
     """
 
-    current_value: Union[int, str, bool] = Field(default=UNSET)
+    current_value: int | str | bool = Field(default=UNSET)
 
-    @validator("current_value", pre=True, always=True)
-    def verify_value(cls, v, values):
+    @field_validator("current_value", mode="before")
+    @classmethod
+    def verify_value(cls, v: Any, info: ValidationInfo) -> int | str | bool:
         """This verifies that the type of the value conforms with the mapping
         definition.
 
         This will also create random values for the mapping when the device is
         initialized.
         """
+        values = info.data
         if v == UNSET:
             return create_random(values)
         if MiotAccess.Write not in values["access"]:
@@ -84,9 +83,7 @@ class SimulatedMiotProperty(MiotProperty):
 
         return casted_value
 
-    class Config:
-        validate_assignment = True
-        smart_union = True  # try all types before coercing
+    model_config = ConfigDict(validate_assignment=True, extra="forbid")
 
 
 class SimulatedMiotService(MiotService):
@@ -207,8 +204,7 @@ class MiotSimulator:
         action_inputs = action.inputs
         if len(inputs) != len(action_inputs):
             raise ValueError(
-                "Invalid parameter count, was expecting %s params, got %s"
-                % (len(inputs), len(action_inputs))
+                f"Invalid parameter count, was expecting {len(inputs)} params, got {len(action_inputs)}"
             )
 
         for idx, param in enumerate(inputs):
@@ -217,30 +213,26 @@ class MiotSimulator:
             if wanted_input.choices:
                 if not isinstance(param, int):
                     raise TypeError(
-                        "Param #%s: enum value expects an integer %s, got %s"
-                        % (idx, wanted_input, param)
+                        f"Param #{idx}: enum value expects an integer {wanted_input}, got {param}"
                     )
                 for choice in wanted_input.choices:
                     if param == choice.value:
                         break
                 else:
                     raise ValueError(
-                        "Param #%s: invalid value '%s' for %s"
-                        % (idx, param, wanted_input.choices)
+                        f"Param #{idx}: invalid value '{param}' for {wanted_input.choices}"
                     )
 
             elif wanted_input.range:
                 if not isinstance(param, int):
                     raise TypeError(
-                        "Param #%s: ranged value expects an integer %s, got %s"
-                        % (idx, wanted_input, param)
+                        f"Param #{idx}: ranged value expects an integer {wanted_input}, got {param}"
                     )
 
                 min, max, step = wanted_input.range
                 if param < min or param > max:
                     raise ValueError(
-                        "Param #%s: value '%s' out of range [%s, %s]"
-                        % (idx, param, min, max)
+                        f"Param #{idx}: value '{param}' out of range [{min}, {max}]"
                     )
 
             elif wanted_input.format == str and not isinstance(param, str):
@@ -271,25 +263,25 @@ def miot_simulator(file, model):
     """Simulate miot device."""
     if file is not None:
         data = file.read()
-        dev = SimulatedDeviceModel.parse_raw(data)
+        dev = SimulatedDeviceModel.model_validate_json(data)
     else:
         cloud = MiotCloud()
         try:
             schema = cloud.get_model_schema(model)
         except Exception as ex:
-            _LOGGER.error("Unable to get schema: %s" % ex)
+            _LOGGER.error(f"Unable to get schema: {ex}")
             return
         try:
-            dev = SimulatedDeviceModel.parse_obj(schema)
+            dev = SimulatedDeviceModel.model_validate(schema)
         except Exception as ex:
             # this is far from optimal, but considering this is a developer tool it can be fixed later
-            fn = f"/tmp/pythonmiio_unparseable_{model}.json"  # nosec
+            fn = f"/tmp/pythonmiio_unparseable_{model}.json"  # noqa: S108
             with open(fn, "w") as f:
                 json.dump(schema, f, indent=4)
             _LOGGER.error("Unable to parse the schema, see %s: %s", fn, ex)
             return
 
     loop = asyncio.get_event_loop()
-    random.seed(1)  # nosec
+    random.seed(1)  # noqa: S311
     loop.run_until_complete(main(dev, model=model))
     loop.run_forever()

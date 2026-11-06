@@ -1,3 +1,4 @@
+import inspect
 import math
 
 import pytest
@@ -160,6 +161,27 @@ def test_init_signature(cls, mocker):
     # as some arguments are passed by inheriting classes using kwargs
     total_args = len(parent_init.call_args.args) + len(parent_init.call_args.kwargs)
     assert total_args == 8
+
+
+@pytest.mark.parametrize("cls", DEVICE_CLASSES)
+def test_model_is_keyword_only(cls: type) -> None:
+    """Ensure 'model' is keyword-only in all Device subclasses.
+
+    The base Device class defines model as keyword-only (after *). Subclasses
+    that make it positional break Liskov substitution and can cause subtle bugs
+    when classes are used interchangeably via DeviceFactory.
+    """
+    sig: inspect.Signature = inspect.signature(cls.__init__)
+    params: dict[str, inspect.Parameter] = dict(sig.parameters)
+
+    if "model" not in params:
+        return
+
+    param: inspect.Parameter = params["model"]
+    assert param.kind == inspect.Parameter.KEYWORD_ONLY, (
+        f"{cls.__name__}.__init__ has 'model' as positional parameter, "
+        f"it should be keyword-only (after *)"
+    )
 
 
 @pytest.mark.parametrize("cls", DEVICE_CLASSES)

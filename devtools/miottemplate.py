@@ -94,9 +94,7 @@ def _print(file):
 @cli.command()
 def download_mapping():
     """Download model<->urn mapping."""
-    click.echo(
-        "Downloading and saving model<->urn mapping to %s" % MIOTSPEC_MAPPING.name
-    )
+    click.echo(f"Downloading and saving model<->urn mapping to {MIOTSPEC_MAPPING.name}")
     url = "http://miot-spec.org/miot-spec-v2/instances?status=all"
     res = requests.get(url, timeout=5)
 
@@ -132,8 +130,7 @@ def download(ctx, urn, model):
 
         if not MIOTSPEC_MAPPING.exists():
             click.echo(
-                "miotspec mapping doesn't exist, downloading to %s"
-                % MIOTSPEC_MAPPING.name
+                f"miotspec mapping doesn't exist, downloading to {MIOTSPEC_MAPPING.name}"
             )
             ctx.invoke(download_mapping)
 
@@ -141,7 +138,7 @@ def download(ctx, urn, model):
         model = mapping.info_for_model(model)
 
     url = f"https://miot-spec.org/miot-spec-v2/instance?type={model.type}"
-    click.echo("Going to download %s" % url)
+    click.echo(f"Going to download {url}")
     content = requests.get(url, timeout=5)
     save_to = model.filename
     click.echo(f"Saving data to {save_to}")

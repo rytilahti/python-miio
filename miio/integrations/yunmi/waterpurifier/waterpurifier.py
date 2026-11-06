@@ -3,6 +3,7 @@ from typing import Any
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,78 +15,96 @@ class WaterPurifierStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         return self.data["power"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         return self.power == "on"
 
     @property
+    @sensor("Mode")
     def mode(self) -> str:
         """Current operation mode."""
         return self.data["mode"]
 
     @property
+    @sensor("TDS", unit="ppm")
     def tds(self) -> str:
         return self.data["tds"]
 
     @property
+    @sensor("Filter Life Remaining", unit="%")
     def filter_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["filter1_life"]
 
     @property
+    @sensor("Filter State")
     def filter_state(self) -> str:
         return self.data["filter1_state"]
 
     @property
+    @sensor("Filter 2 Life Remaining", unit="%")
     def filter2_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["filter_life"]
 
     @property
+    @sensor("Filter 2 State")
     def filter2_state(self) -> str:
         return self.data["filter_state"]
 
     @property
+    @sensor("Life")
     def life(self) -> str:
         return self.data["life"]
 
     @property
+    @sensor("State")
     def state(self) -> str:
         return self.data["state"]
 
     @property
+    @sensor("Level")
     def level(self) -> str:
         return self.data["level"]
 
     @property
+    @sensor("Volume")
     def volume(self) -> str:
         return self.data["volume"]
 
     @property
+    @sensor("Filter")
     def filter(self) -> str:
         return self.data["filter"]
 
     @property
+    @sensor("Usage")
     def usage(self) -> str:
         return self.data["usage"]
 
     @property
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> str:
         return self.data["temperature"]
 
     @property
+    @sensor("UV Filter Life Remaining", unit="%")
     def uv_filter_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["uv_life"]
 
     @property
+    @sensor("UV Filter State")
     def uv_filter_state(self) -> str:
         return self.data["uv_state"]
 
     @property
+    @sensor("Valve")
     def valve(self) -> str:
         return self.data["elecval_state"]
 
@@ -145,7 +164,7 @@ class WaterPurifier(Device):
         _props_per_request = 1
         values = self.get_properties(properties, max_properties=_props_per_request)
 
-        return WaterPurifierStatus(dict(zip(properties, values)))
+        return WaterPurifierStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):

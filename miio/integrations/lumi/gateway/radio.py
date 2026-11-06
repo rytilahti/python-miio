@@ -68,9 +68,9 @@ class Radio(GatewayDevice):
     def get_music_info(self):
         """Unknown."""
         info = self._gateway.send("get_music_info")
-        click.echo("info: %s" % info)
+        click.echo(f"info: {info}")
         free_space = self._gateway.send("get_music_free_space")
-        click.echo("free space: %s" % free_space)
+        click.echo(f"free space: {free_space}")
 
     def get_mute(self):
         """mute of what?"""

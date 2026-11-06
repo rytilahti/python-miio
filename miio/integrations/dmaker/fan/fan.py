@@ -1,10 +1,11 @@
 import enum
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 
 class MoveDirection(enum.Enum):
@@ -49,51 +50,77 @@ class FanStatusP5(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] else "off"
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.data["power"]
 
     @property
+    @setting(
+        "Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Operation mode."""
         return OperationMode(self.data["mode"])
 
     @property
+    @setting(
+        "Speed",
+        unit="%",
+        setter_name="set_speed",
+        min_value=0,
+        max_value=100,
+    )
     def speed(self) -> int:
         """Speed of the motor."""
         return self.data["speed"]
 
     @property
+    @setting("Oscillate", setter_name="set_oscillate")
     def oscillate(self) -> bool:
         """True if oscillation is enabled."""
         return self.data["roll_enable"]
 
     @property
+    @setting(
+        "Angle",
+        unit="°",
+        setter_name="set_angle",
+        min_value=30,
+        max_value=140,
+    )
     def angle(self) -> int:
         """Oscillation angle."""
         return self.data["roll_angle"]
 
     @property
+    @sensor("Delay Off Countdown", unit="s")
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in seconds."""
         return self.data["time_off"]
 
     @property
+    @setting("LED", setter_name="set_led")
     def led(self) -> bool:
         """True if LED is turned on, if available."""
         return self.data["light"]
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["beep_sound"]
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"]
@@ -106,12 +133,13 @@ class FanP5(Device):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
+        *,
         model: str = MODEL_FAN_P5,
     ) -> None:
         super().__init__(
@@ -137,7 +165,7 @@ class FanP5(Device):
         properties = AVAILABLE_PROPERTIES[self.model]
         values = self.get_properties(properties, max_properties=15)
 
-        return FanStatusP5(dict(zip(properties, values)))
+        return FanStatusP5(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -164,7 +192,7 @@ class FanP5(Device):
     def set_speed(self, speed: int):
         """Set speed."""
         if speed < 0 or speed > 100:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("s_speed", [speed])
 
@@ -243,7 +271,7 @@ class FanP5(Device):
         """Set delay off minutes."""
 
         if minutes < 0:
-            raise ValueError("Invalid value for a delayed turn off: %s" % minutes)
+            raise ValueError(f"Invalid value for a delayed turn off: {minutes}")
 
         return self.send("s_t_off", [minutes])
 

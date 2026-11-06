@@ -8,7 +8,7 @@ _LOGGER = logging.getLogger(__name__)
 logging.basicConfig(level="INFO")
 
 gateway_ip = "192.168.1.IP"
-token = "TokenTokenToken"  # nosec
+token = "TokenTokenToken"  # noqa: S105
 button_sid = "lumi.123456789abcdef"
 
 

@@ -1,9 +1,9 @@
 import asyncio
 import logging
 import socket
+from collections.abc import Callable
 from json import dumps
 from random import randint
-from typing import Callable, Optional, Union
 
 from ..device import Device
 from ..protocol import Utils
@@ -17,7 +17,7 @@ FAKE_DEVICE_ID = "120009025"
 FAKE_DEVICE_MODEL = "chuangmi.plug.v3"
 
 PushServerCallback = Callable[[str, str, str], None]
-MethodDict = dict[str, Union[dict, Callable]]
+MethodDict = dict[str, dict | Callable]
 
 
 def calculated_token_enc(token):
@@ -58,7 +58,7 @@ class PushServer:
         """Initialize the class."""
         self._device_ip = device_ip
 
-        self._address = "0.0.0.0"  # nosec
+        self._address = "0.0.0.0"  # noqa: S104
         self._server_ip = None
 
         self._device_id = device_id if device_id is not None else int(FAKE_DEVICE_ID)
@@ -96,7 +96,7 @@ class PushServer:
         self._listen_couroutine = None
         self._loop = None
 
-    def add_method(self, name: str, response: Union[dict, Callable]):
+    def add_method(self, name: str, response: dict | Callable):
         """Add a method to server.
 
         The response can be either a callable or a dictionary to send back as response.
@@ -145,7 +145,7 @@ class PushServer:
 
     async def subscribe_event(
         self, device: Device, event_info: EventInfo
-    ) -> Optional[str]:
+    ) -> str | None:
         """Subscribe to a event such that the device will start pushing data for that
         event."""
         if device.ip not in self._registered_devices:
@@ -234,7 +234,7 @@ class PushServer:
             sock=udp_socket,
         )
 
-    def _construct_event(  # nosec
+    def _construct_event(
         self,
         event_id: str,
         info: EventInfo,
@@ -253,7 +253,7 @@ class PushServer:
         command = f"{self.server_model}.{info.action}:{source_id}"
         key = f"event.{info.source_model}.{info.event}"
         message_id = 0
-        magic_number = randint(1590161094, 1642025774)  # nosec, min/max taken from packet captures, unknown use
+        magic_number = randint(1590161094, 1642025774)  # noqa: S311  # min/max taken from packet captures, unknown use
 
         if len(command) > 49:
             _LOGGER.error(

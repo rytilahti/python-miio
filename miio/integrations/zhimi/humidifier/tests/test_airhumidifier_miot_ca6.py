@@ -44,9 +44,9 @@ class DummyAirHumidifierMiotCA6(DummyMiotDevice, AirHumidifierMiotCA6):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture()
+@pytest.fixture
 def dev(request):
-    yield DummyAirHumidifierMiotCA6()
+    return DummyAirHumidifierMiotCA6()
 
 
 def test_on(dev):
@@ -176,7 +176,7 @@ def test_set_clean_mode(dev):
     assert clean_mode() is False
 
 
-@pytest.mark.parametrize("given,expected", [(0, 0), (1, 50), (2, 100)])
+@pytest.mark.parametrize(("given", "expected"), [(0, 0), (1, 50), (2, 100)])
 def test_water_level(dev, given, expected):
     dev.set_property("water_level", given)
     assert dev.status().water_level == expected

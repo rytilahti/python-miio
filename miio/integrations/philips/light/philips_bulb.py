@@ -1,11 +1,12 @@
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ class PhilipsBulbStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         return self.data["power"]
 
@@ -45,7 +47,8 @@ class PhilipsBulbStatus(DeviceStatus):
         return self.power == "on"
 
     @property
-    def brightness(self) -> Optional[int]:
+    @setting("Brightness", setter_name="set_brightness", unit="%")
+    def brightness(self) -> int | None:
         if "bright" in self.data:
             return self.data["bright"]
         if "bri" in self.data:
@@ -53,18 +56,24 @@ class PhilipsBulbStatus(DeviceStatus):
         return None
 
     @property
-    def color_temperature(self) -> Optional[int]:
+    @setting("Color Temperature", setter_name="set_color_temperature")
+    def color_temperature(self) -> int | None:
         if "cct" in self.data:
             return self.data["cct"]
         return None
 
     @property
-    def scene(self) -> Optional[int]:
+    @setting("Scene", setter_name="set_scene")
+    def scene(self) -> int | None:
         if "snm" in self.data:
             return self.data["snm"]
         return None
 
     @property
+    @sensor(
+        "Delay Off Countdown",
+        unit="s",
+    )
     def delay_off_countdown(self) -> int:
         return self.data["dv"]
 
@@ -92,7 +101,9 @@ class PhilipsWhiteBulb(Device):
         )
         values = self.get_properties(properties)
 
-        return PhilipsBulbStatus(defaultdict(lambda: None, zip(properties, values)))
+        return PhilipsBulbStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -111,7 +122,7 @@ class PhilipsWhiteBulb(Device):
     def set_brightness(self, level: int):
         """Set brightness level."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.send("set_bright", [level])
 
@@ -123,7 +134,7 @@ class PhilipsWhiteBulb(Device):
         """Set delay off seconds."""
 
         if seconds < 1:
-            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError(f"Invalid value for a delayed turn off: {seconds}")
 
         return self.send("delay_off", [seconds])
 
@@ -140,7 +151,7 @@ class PhilipsBulb(PhilipsWhiteBulb):
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid color temperature: %s" % level)
+            raise ValueError(f"Invalid color temperature: {level}")
 
         return self.send("set_cct", [level])
 
@@ -154,10 +165,10 @@ class PhilipsBulb(PhilipsWhiteBulb):
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         if cct < 1 or cct > 100:
-            raise ValueError("Invalid color temperature: %s" % cct)
+            raise ValueError(f"Invalid color temperature: {cct}")
 
         return self.send("set_bricct", [brightness, cct])
 
@@ -168,6 +179,6 @@ class PhilipsBulb(PhilipsWhiteBulb):
     def set_scene(self, number: int):
         """Set scene number."""
         if number < 1 or number > 4:
-            raise ValueError("Invalid fixed scene number: %s" % number)
+            raise ValueError(f"Invalid fixed scene number: {number}")
 
         return self.send("apply_fixed_scene", [number])

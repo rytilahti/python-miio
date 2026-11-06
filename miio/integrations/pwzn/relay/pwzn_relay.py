@@ -1,11 +1,12 @@
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,13 +71,15 @@ class PwznRelayStatus(DeviceStatus):
         self.data = data
 
     @property
-    def relay_state(self) -> Optional[int]:
+    @sensor("Relay State")
+    def relay_state(self) -> int | None:
         """Current relay state."""
         if "relay_status" in self.data:
             return self.data["relay_status"]
         return None
 
     @property
+    @sensor("Relay Names")
     def relay_names(self) -> dict[int, str]:
         def _extract_index_from_key(name) -> int:
             """extract the index from the variable."""
@@ -89,7 +92,8 @@ class PwznRelayStatus(DeviceStatus):
         }
 
     @property
-    def on_count(self) -> Optional[int]:
+    @sensor("Active Relay Count")
+    def on_count(self) -> int | None:
         """Number of on relay."""
         if "on_count" in self.data:
             return self.data["on_count"]
@@ -110,7 +114,9 @@ class PwznRelay(Device):
         ).copy()
         values = self.get_properties(properties)
 
-        return PwznRelayStatus(defaultdict(lambda: None, zip(properties, values)))
+        return PwznRelayStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(
         click.argument("number", type=int),

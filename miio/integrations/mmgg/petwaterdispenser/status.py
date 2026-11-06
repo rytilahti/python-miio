@@ -2,6 +2,7 @@ import enum
 from datetime import timedelta
 from typing import Any
 
+from miio.devicestatus import sensor, setting
 from miio.miot_device import DeviceStatus
 
 
@@ -34,6 +35,7 @@ class PetWaterDispenserStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor(name="Sponge Filter Left Days")
     def sponge_filter_left_days(self) -> timedelta:
         """Filter life time remaining in days."""
         return timedelta(days=self.data["filter_left_time"])
@@ -44,26 +46,35 @@ class PetWaterDispenserStatus(DeviceStatus):
         return self.data["on"]
 
     @property
+    @setting(
+        name="Mode",
+        setter_name="set_mode",
+        choices=OperatingMode,
+    )
     def mode(self) -> OperatingMode:
         """OperatingMode."""
         return OperatingMode(self.data["mode"])
 
     @property
+    @setting(name="LED", setter_name="set_led")
     def is_led_on(self) -> bool:
         """True if enabled."""
         return self.data["indicator_light"]
 
     @property
+    @sensor(name="Cotton Left Days")
     def cotton_left_days(self) -> timedelta:
         """Cotton filter life time remaining in days."""
         return timedelta(days=self.data["cotton_left_time"])
 
     @property
+    @sensor(name="Before Cleaning Days")
     def before_cleaning_days(self) -> timedelta:
         """Days before cleaning."""
         return timedelta(days=self.data["remain_clean_time"])
 
     @property
+    @sensor(name="No Water")
     def is_no_water(self) -> bool:
         """True if there is no water left."""
         if self.data["no_water_flag"]:
@@ -71,31 +82,42 @@ class PetWaterDispenserStatus(DeviceStatus):
         return True
 
     @property
+    @sensor(name="No Water Duration")
     def no_water_minutes(self) -> timedelta:
         """Minutes without water."""
         return timedelta(minutes=self.data["no_water_time"])
 
     @property
+    @sensor(name="Pump Blocked")
     def is_pump_blocked(self) -> bool:
         """True if pump is blocked."""
         return self.data["pump_block_flag"]
 
     @property
+    @sensor(name="Lid Up")
     def is_lid_up(self) -> bool:
         """True if lid is up."""
         return self.data["lid_up_flag"]
 
     @property
+    @setting(
+        name="Timezone",
+        setter_name="set_timezone",
+        min_value=-12,
+        max_value=12,
+    )
     def timezone(self) -> int:
         """Timezone from -12 to +12."""
         return self.data["timezone"]
 
     @property
+    @setting(name="Location", setter_name="set_location")
     def location(self) -> str:
         """Device location string."""
         return self.data["location"]
 
     @property
+    @sensor(name="Error Detected")
     def is_error_detected(self) -> bool:
         """True if fault detected."""
         return self.data["fault"] > 0

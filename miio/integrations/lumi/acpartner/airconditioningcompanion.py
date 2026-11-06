@@ -1,11 +1,11 @@
 import enum
 import logging
-from typing import Optional
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -98,12 +98,14 @@ class AirConditioningCompanionStatus(DeviceStatus):
         self.state = data["model_and_state"][1]
 
     @property
+    @sensor("Load Power", unit="W")
     def load_power(self) -> int:
         """Current power load of the air conditioner."""
         return int(self.data["model_and_state"][2])
 
     @property
-    def power_socket(self) -> Optional[str]:
+    @sensor("Power Socket")
+    def power_socket(self) -> str | None:
         """Current socket power state."""
         if "power_socket" in self.data and self.data["power_socket"] is not None:
             return self.data["power_socket"]
@@ -111,21 +113,25 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Air Condition Model")
     def air_condition_model(self) -> bytes:
         """Model of the air conditioner."""
         return bytes.fromhex(self.model)
 
     @property
+    @sensor("Model Format")
     def model_format(self) -> int:
         """Version number of the model format."""
         return self.air_condition_model[0]
 
     @property
+    @sensor("Device Type")
     def device_type(self) -> int:
         """Device type identifier."""
         return self.air_condition_model[1]
 
     @property
+    @sensor("Air Condition Brand")
     def air_condition_brand(self) -> int:
         """Brand of the air conditioner.
 
@@ -134,6 +140,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return int(self.air_condition_model[2:4].hex(), 16)
 
     @property
+    @sensor("Air Condition Remote")
     def air_condition_remote(self) -> int:
         """Remote id.
 
@@ -149,6 +156,7 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return int(self.air_condition_model[4:8].hex(), 16)
 
     @property
+    @sensor("State Format")
     def state_format(self) -> int:
         """Version number of the state format.
 
@@ -157,16 +165,19 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return int(self.air_condition_model[8])
 
     @property
+    @sensor("Air Condition Configuration")
     def air_condition_configuration(self) -> int:
         return self.state[2:10]
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Current power state."""
         return "on" if int(self.state[2:3]) == Power.On.value else "off"
 
     @property
-    def led(self) -> Optional[bool]:
+    @sensor("LED")
+    def led(self) -> bool | None:
         """Current LED state."""
         state = self.state[8:9]
         if state == Led.On.value:
@@ -179,12 +190,14 @@ class AirConditioningCompanionStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
-    def target_temperature(self) -> Optional[int]:
+    @sensor("Target Temperature", unit="°C")
+    def target_temperature(self) -> int | None:
         """Target temperature."""
         try:
             return int(self.state[6:8], 16)
@@ -192,7 +205,8 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def swing_mode(self) -> Optional[SwingMode]:
+    @sensor("Swing Mode")
+    def swing_mode(self) -> SwingMode | None:
         """Current swing mode."""
         try:
             mode = self.state[5:6]
@@ -201,7 +215,8 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def fan_speed(self) -> Optional[FanSpeed]:
+    @sensor("Fan Speed")
+    def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         try:
             speed = int(self.state[4:5])
@@ -210,7 +225,8 @@ class AirConditioningCompanionStatus(DeviceStatus):
             return None
 
     @property
-    def mode(self) -> Optional[OperationMode]:
+    @sensor("Mode")
+    def mode(self) -> OperationMode | None:
         """Current operation mode."""
         try:
             mode = int(self.state[3:4])
@@ -226,12 +242,13 @@ class AirConditioningCompanion(Device):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
+        *,
         model: str = MODEL_ACPARTNER_V2,
     ) -> None:
         super().__init__(
@@ -310,16 +327,20 @@ class AirConditioningCompanion(Device):
         """
         try:
             model_bytes = bytes.fromhex(model)
-        except ValueError:
-            raise ValueError("Invalid model. A hexadecimal string must be provided")
+        except ValueError as ex:
+            raise ValueError(
+                "Invalid model. A hexadecimal string must be provided"
+            ) from ex
 
         try:
             code_bytes = bytes.fromhex(code)
-        except ValueError:
-            raise ValueError("Invalid code. A hexadecimal string must be provided")
+        except ValueError as ex:
+            raise ValueError(
+                "Invalid code. A hexadecimal string must be provided"
+            ) from ex
 
         if slot < 0 or slot > 134:
-            raise ValueError("Invalid slot: %s" % slot)
+            raise ValueError(f"Invalid slot: {slot}")
 
         slot_bytes = bytes([121 + slot])
 
@@ -412,8 +433,8 @@ class AirConditioningCompanion(Device):
 class AirConditioningCompanionV3(AirConditioningCompanion):
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,

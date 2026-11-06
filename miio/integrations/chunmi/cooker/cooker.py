@@ -3,12 +3,12 @@ import logging
 import string
 from collections import defaultdict
 from datetime import time
-from typing import Optional
 
 import click
 
 from miio.click_common import command, format_output
 from miio.device import Device, DeviceStatus
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,10 +126,12 @@ class TemperatureHistory(DeviceStatus):
             self.data = []
 
     @property
+    @sensor("Temperatures", unit="°C")
     def temperatures(self) -> list[int]:
         return self.data
 
     @property
+    @sensor("Raw")
     def raw(self) -> str:
         return "".join([f"{value:02x}" for value in self.data])
 
@@ -165,26 +167,32 @@ class CookerCustomizations(DeviceStatus):
         self.custom = [int(custom[i : i + 2], 16) for i in range(0, len(custom), 2)]
 
     @property
+    @sensor("Jingzhu Appointment")
     def jingzhu_appointment(self) -> time:
         return time(hour=self.custom[0], minute=self.custom[1])
 
     @property
+    @sensor("Kuaizhu Appointment")
     def kuaizhu_appointment(self) -> time:
         return time(hour=self.custom[2], minute=self.custom[3])
 
     @property
+    @sensor("Zhuzhou Appointment")
     def zhuzhou_appointment(self) -> time:
         return time(hour=self.custom[4], minute=self.custom[5])
 
     @property
+    @sensor("Zhuzhou Cooking")
     def zhuzhou_cooking(self) -> time:
         return time(hour=self.custom[6], minute=self.custom[7])
 
     @property
+    @sensor("Favorite Appointment")
     def favorite_appointment(self) -> time:
         return time(hour=self.custom[8], minute=self.custom[9])
 
     @property
+    @sensor("Favorite Cooking")
     def favorite_cooking(self) -> time:
         return time(hour=self.custom[10], minute=self.custom[11])
 
@@ -208,6 +216,7 @@ class CookingStage(DeviceStatus):
         self.stage = stage
 
     @property
+    @sensor("State")
     def state(self) -> int:
         """
 
@@ -218,14 +227,17 @@ class CookingStage(DeviceStatus):
         return int(self.stage[0:2], 16)
 
     @property
+    @sensor("Rice ID")
     def rice_id(self) -> int:
         return int(self.stage[2:6], 16)
 
     @property
+    @sensor("Taste")
     def taste(self) -> int:
         return int(self.stage[6:8], 16)
 
     @property
+    @sensor("Taste Phase")
     def taste_phase(self) -> int:
         phase = int(self.taste / 33)
 
@@ -234,6 +246,7 @@ class CookingStage(DeviceStatus):
         return phase
 
     @property
+    @sensor("Name")
     def name(self) -> str:
         try:
             return COOKING_STAGES[self.state]["name"]
@@ -241,6 +254,7 @@ class CookingStage(DeviceStatus):
             return "Unknown stage"
 
     @property
+    @sensor("Description")
     def description(self) -> str:
         try:
             return COOKING_STAGES[self.state]["description"]
@@ -248,12 +262,13 @@ class CookingStage(DeviceStatus):
             return ""
 
     @property
+    @sensor("Raw")
     def raw(self) -> str:
         return self.stage
 
 
 class InteractionTimeouts(DeviceStatus):
-    def __init__(self, timeouts: Optional[str] = None):
+    def __init__(self, timeouts: str | None = None):
         """Example timeouts: 05040f, 05060f.
 
         Data structure:
@@ -270,6 +285,7 @@ class InteractionTimeouts(DeviceStatus):
             ]
 
     @property
+    @sensor("LED Off Timeout", unit="s")
     def led_off(self) -> int:
         return self.timeouts[0]
 
@@ -278,6 +294,7 @@ class InteractionTimeouts(DeviceStatus):
         self.timeouts[0] = delay
 
     @property
+    @sensor("Lid Open Timeout", unit="s")
     def lid_open(self) -> int:
         return self.timeouts[1]
 
@@ -286,6 +303,7 @@ class InteractionTimeouts(DeviceStatus):
         self.timeouts[1] = timeout
 
     @property
+    @sensor("Lid Open Warning Timeout", unit="s")
     def lid_open_warning(self) -> int:
         return self.timeouts[2]
 
@@ -298,7 +316,7 @@ class InteractionTimeouts(DeviceStatus):
 
 
 class CookerSettings(DeviceStatus):
-    def __init__(self, settings: Optional[str] = None):
+    def __init__(self, settings: str | None = None):
         """Example settings: 1407, 0607, 0207.
 
         Data structure:
@@ -325,6 +343,7 @@ class CookerSettings(DeviceStatus):
             ]
 
     @property
+    @sensor("Pressure Supported")
     def pressure_supported(self) -> bool:
         return self._settings[0] & 1 != 0
 
@@ -336,6 +355,7 @@ class CookerSettings(DeviceStatus):
             self._settings[0] &= 254
 
     @property
+    @sensor("LED On")
     def led_on(self) -> bool:
         return self._settings[0] & 2 != 0
 
@@ -347,6 +367,7 @@ class CookerSettings(DeviceStatus):
             self._settings[0] &= 253
 
     @property
+    @sensor("Auto Keep Warm")
     def auto_keep_warm(self) -> bool:
         return self._settings[0] & 4 != 0
 
@@ -358,6 +379,7 @@ class CookerSettings(DeviceStatus):
             self._settings[0] &= 251
 
     @property
+    @sensor("Lid Open Warning")
     def lid_open_warning(self) -> bool:
         return self._settings[0] & 8 != 0
 
@@ -369,6 +391,7 @@ class CookerSettings(DeviceStatus):
             self._settings[0] &= 247
 
     @property
+    @sensor("Lid Open Warning Delayed")
     def lid_open_warning_delayed(self) -> bool:
         return self._settings[0] & 16 != 0
 
@@ -380,6 +403,7 @@ class CookerSettings(DeviceStatus):
             self._settings[0] &= 239
 
     @property
+    @sensor("Jingzhu Auto Keep Warm")
     def jingzhu_auto_keep_warm(self) -> bool:
         return self._settings[1] & 1 != 0
 
@@ -391,6 +415,7 @@ class CookerSettings(DeviceStatus):
             self._settings[1] &= 254
 
     @property
+    @sensor("Kuaizhu Auto Keep Warm")
     def kuaizhu_auto_keep_warm(self) -> bool:
         return self._settings[1] & 2 != 0
 
@@ -402,6 +427,7 @@ class CookerSettings(DeviceStatus):
             self._settings[1] &= 253
 
     @property
+    @sensor("Zhuzhou Auto Keep Warm")
     def zhuzhou_auto_keep_warm(self) -> bool:
         return self._settings[1] & 4 != 0
 
@@ -413,6 +439,7 @@ class CookerSettings(DeviceStatus):
             self._settings[1] &= 251
 
     @property
+    @sensor("Favorite Auto Keep Warm")
     def favorite_auto_keep_warm(self) -> bool:
         return self._settings[1] & 8 != 0
 
@@ -471,17 +498,20 @@ class CookerStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Mode")
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["func"])
 
     @property
+    @sensor("Menu")
     def menu(self) -> int:
         """Selected recipe id."""
         return int(self.data["menu"], 16)
 
     @property
-    def stage(self) -> Optional[CookingStage]:
+    @sensor("Stage")
+    def stage(self) -> CookingStage | None:
         """Current stage if cooking."""
         stage = self.data["stage"]
         if len(stage) == 10:
@@ -490,7 +520,8 @@ class CookerStatus(DeviceStatus):
         return None
 
     @property
-    def temperature(self) -> Optional[int]:
+    @sensor("Temperature", unit="°C")
+    def temperature(self) -> int | None:
         """Current temperature, if idle.
 
         Example values: *29*, 031e0b23, 031e0b23031e
@@ -502,7 +533,8 @@ class CookerStatus(DeviceStatus):
         return None
 
     @property
-    def start_time(self) -> Optional[time]:
+    @sensor("Start Time")
+    def start_time(self) -> time | None:
         """Start time of cooking?
 
         The property "temp" is used for different purposes. Example values: 29,
@@ -515,12 +547,14 @@ class CookerStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Remaining", unit="min")
     def remaining(self) -> int:
         """Remaining minutes of the cooking process."""
         return int(self.data["t_func"])
 
     @property
-    def cooking_delayed(self) -> Optional[int]:
+    @sensor("Cooking Delayed", unit="min")
+    def cooking_delayed(self) -> int | None:
         """Wait n minutes before cooking / scheduled cooking."""
         delay = int(self.data["t_precook"])
 
@@ -530,31 +564,37 @@ class CookerStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Duration", unit="min")
     def duration(self) -> int:
         """Duration of the cooking process."""
         return int(self.data["t_cook"])
 
     @property
+    @sensor("Cooker Settings")
     def cooker_settings(self) -> CookerSettings:
         """Settings of the cooker."""
         return CookerSettings(self.data["setting"])
 
     @property
+    @sensor("Interaction Timeouts")
     def interaction_timeouts(self) -> InteractionTimeouts:
         """Interaction timeouts."""
         return InteractionTimeouts(self.data["delay"])
 
     @property
+    @sensor("Hardware Version")
     def hardware_version(self) -> int:
         """Hardware version."""
         return int(self.data["version"][0:4], 16)
 
     @property
+    @sensor("Firmware Version")
     def firmware_version(self) -> int:
         """Firmware version."""
         return int(self.data["version"][4:8], 16)
 
     @property
+    @sensor("Favorite")
     def favorite(self) -> int:
         """Favored recipe id.
 
@@ -563,7 +603,8 @@ class CookerStatus(DeviceStatus):
         return int(self.data["favorite"], 16)
 
     @property
-    def custom(self) -> Optional[CookerCustomizations]:
+    @sensor("Custom")
+    def custom(self) -> CookerCustomizations | None:
         custom = self.data["custom"]
 
         if len(custom) > 31:
@@ -630,7 +671,9 @@ class Cooker(Device):
                 values_count,
             )
 
-        return CookerStatus(defaultdict(lambda: None, zip(properties, values)))
+        return CookerStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(
         click.argument("profile", type=str),
@@ -639,7 +682,7 @@ class Cooker(Device):
     def start(self, profile: str):
         """Start cooking a profile."""
         if not self._validate_profile(profile):
-            raise ValueError("Invalid cooking profile: %s" % profile)
+            raise ValueError(f"Invalid cooking profile: {profile}")
 
         self.send("set_start", [profile])
 
@@ -686,7 +729,7 @@ class Cooker(Device):
     def set_menu(self, profile: str):
         """Select one of the default(?) cooking profiles."""
         if not self._validate_profile(profile):
-            raise ValueError("Invalid cooking profile: %s" % profile)
+            raise ValueError(f"Invalid cooking profile: {profile}")
 
         self.send("set_menu", [profile])
 

@@ -1,6 +1,6 @@
 import base64
 import re
-from typing import Callable
+from collections.abc import Callable
 
 import click
 from construct import (
@@ -170,7 +170,9 @@ class ChuangmiIr(Device):
             play_method = self.play_pronto
 
         try:
-            converted_command_args = [t(v) for v, t in zip(command_args, arg_types)]
+            converted_command_args = [
+                t(v) for v, t in zip(command_args, arg_types, strict=False)
+            ]
         except Exception as ex:
             raise ValueError("Invalid command arguments") from ex
 

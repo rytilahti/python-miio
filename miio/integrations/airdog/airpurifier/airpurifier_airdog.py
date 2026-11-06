@@ -1,12 +1,13 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,16 +49,23 @@ class AirDogStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        "Mode",
+        setter_name="set_mode_and_speed",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Operation mode.
 
@@ -66,27 +74,38 @@ class AirDogStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
+    @setting(
+        "Speed",
+        setter_name="set_mode_and_speed",
+        min_value=1,
+        max_value=5,
+        step=1,
+    )
     def speed(self) -> int:
         """Current speed level."""
         return self.data["speed"]
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["lock"] == "lock"
 
     @property
+    @sensor("Clean Filters")
     def clean_filters(self) -> bool:
         """True if the display shows "-C-" and the filter must be cleaned."""
         return self.data["clean"] == "y"
 
     @property
+    @sensor("PM2.5", unit="μg/m³")
     def pm25(self) -> int:
         """Return particulate matter value (0...300μg/m³)."""
         return self.data["pm"]
 
     @property
-    def hcho(self) -> Optional[int]:
+    @sensor("Formaldehyde")
+    def hcho(self) -> int | None:
         """Return formaldehyde value."""
         if self.data["hcho"] is not None:
             return self.data["hcho"]
@@ -119,7 +138,9 @@ class AirDogX3(Device):
         )
         values = self.get_properties(properties, max_properties=10)
 
-        return AirDogStatus(defaultdict(lambda: None, zip(properties, values)))
+        return AirDogStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -153,7 +174,7 @@ class AirDogX3(Device):
             max_speed = 5
 
         if speed < 1 or speed > max_speed:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("set_wind", [OperationModeMapping[mode.name].value, speed])
 

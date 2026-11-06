@@ -1,11 +1,12 @@
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceException, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 from miio.utils import deprecated
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,6 +46,7 @@ class ChuangmiPlugStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> bool:
         """Current power state."""
         if "on" in self.data:
@@ -60,18 +62,20 @@ class ChuangmiPlugStatus(DeviceStatus):
         return self.power
 
     @property
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> int:
         return self.data["temperature"]
 
     @property
-    def usb_power(self) -> Optional[bool]:
+    def usb_power(self) -> bool | None:
         """True if USB is on."""
         if "usb_on" in self.data and self.data["usb_on"] is not None:
             return self.data["usb_on"]
         return None
 
     @property
-    def load_power(self) -> Optional[float]:
+    @sensor("Load Power", unit="W")
+    def load_power(self) -> float | None:
         """Current power load, if available."""
         if "load_power" in self.data and self.data["load_power"] is not None:
             return float(self.data["load_power"])
@@ -79,12 +83,13 @@ class ChuangmiPlugStatus(DeviceStatus):
 
     @property  # type: ignore
     @deprecated("Use led()")
-    def wifi_led(self) -> Optional[bool]:
+    def wifi_led(self) -> bool | None:
         """True if the wifi led is turned on."""
         return self.led
 
     @property
-    def led(self) -> Optional[bool]:
+    @setting("LED", setter_name="set_led")
+    def led(self) -> bool | None:
         """True if the wifi led is turned on."""
         if "wifi_led" in self.data and self.data["wifi_led"] is not None:
             return self.data["wifi_led"] == "on"
@@ -119,7 +124,9 @@ class ChuangmiPlug(Device):
                 properties.append("load_power")
                 values.append(load_power[0] * 0.01)
 
-        return ChuangmiPlugStatus(defaultdict(lambda: None, zip(properties, values)))
+        return ChuangmiPlugStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):

@@ -1,12 +1,13 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -92,37 +93,44 @@ class AirFreshStatus(DeviceStatus):
         self.model = model
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.power == "on"
 
     @property
+    @sensor("AQI", unit="μg/m³")
     def aqi(self) -> int:
         """Air quality index."""
         return self.data["aqi"]
 
     @property
+    @sensor("Average AQI", unit="μg/m³")
     def average_aqi(self) -> int:
         """Average of the air quality index."""
         return self.data["average_aqi"]
 
     @property
+    @sensor("CO2", unit="ppm")
     def co2(self) -> int:
         """Carbon dioxide."""
         return self.data["co2"]
 
     @property
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
 
     @property
-    def ptc(self) -> Optional[bool]:
+    @setting("PTC", setter_name="set_ptc")
+    def ptc(self) -> bool | None:
         """Return True if PTC is on."""
         if self.data["ptc_state"] is not None:
             return self.data["ptc_state"] == "on"
@@ -130,7 +138,8 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    def temperature(self) -> Optional[float]:
+    @sensor("Temperature", unit="°C")
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         if self.data["temp_dec"] is not None:
             if self.model == MODEL_AIRFRESH_VA4:
@@ -141,7 +150,8 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    def ntc_temperature(self) -> Optional[float]:
+    @sensor("NTC Temperature", unit="°C")
+    def ntc_temperature(self) -> float | None:
         """Current ntc temperature, if available."""
         if self.data["ntcT"] is not None:
             return self.data["ntcT"]
@@ -149,17 +159,20 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
+    @setting("Mode", setter_name="set_mode", choices=OperationMode)
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
 
     @property
+    @setting("LED", setter_name="set_led")
     def led(self) -> bool:
         """Return True if LED is on."""
         return self.data["led"] == "on"
 
     @property
-    def led_brightness(self) -> Optional[LedBrightness]:
+    @setting("LED Brightness", setter_name="set_led_brightness", choices=LedBrightness)
+    def led_brightness(self) -> LedBrightness | None:
         """Brightness of the LED."""
         if self.data["led_level"] is not None:
             try:
@@ -173,7 +186,8 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
-    def buzzer(self) -> Optional[bool]:
+    @setting("Buzzer", setter_name="set_buzzer")
+    def buzzer(self) -> bool | None:
         """Return True if buzzer is on."""
         if self.data["buzzer"] is not None:
             return self.data["buzzer"] == "on"
@@ -181,32 +195,38 @@ class AirFreshStatus(DeviceStatus):
         return None
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
+    @sensor("Filter Life Remaining", unit="%")
     def filter_life_remaining(self) -> int:
         """Time until the filter should be changed."""
         return self.data["filter_life"]
 
     @property
+    @sensor("Filter Hours Used", unit="h")
     def filter_hours_used(self) -> int:
         """How long the filter has been in use."""
         return self.data["f1_hour_used"]
 
     @property
+    @sensor("Use Time", unit="s")
     def use_time(self) -> int:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
 
     @property
+    @sensor("Motor Speed", unit="rpm")
     def motor_speed(self) -> int:
         """Speed of the motor."""
         return self.data["motor1_speed"]
 
     @property
-    def extra_features(self) -> Optional[int]:
+    @setting("Extra Features", setter_name="set_extra_features")
+    def extra_features(self) -> int | None:
         return self.data["app_extra"]
 
 
@@ -246,7 +266,7 @@ class AirFresh(Device):
         values = self.get_properties(properties, max_properties=15)
 
         return AirFreshStatus(
-            defaultdict(lambda: None, zip(properties, values)), self.model
+            defaultdict(lambda: None, zip(properties, values, strict=False)), self.model
         )
 
     @command(default_output=format_output("Powering on"))
@@ -321,7 +341,7 @@ class AirFresh(Device):
     def set_extra_features(self, value: int):
         """Storage register to enable extra features at the app."""
         if value < 0:
-            raise ValueError("Invalid app extra value: %s" % value)
+            raise ValueError(f"Invalid app extra value: {value}")
 
         return self.send("set_app_extra", [value])
 

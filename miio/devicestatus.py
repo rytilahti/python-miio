@@ -1,9 +1,9 @@
 import inspect
 import logging
 import warnings
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from enum import Enum
-from typing import Callable, Optional, Union, get_args, get_origin, get_type_hints
+from typing import Union, get_args, get_origin, get_type_hints
 
 import attr
 
@@ -27,8 +27,8 @@ class _StatusMeta(type):
         cls = super().__new__(metacls, name, bases, namespace)
 
         cls._descriptors: DescriptorCollection[PropertyDescriptor] = {}
-        cls._parent: Optional["DeviceStatus"] = None
-        cls._embedded: dict[str, "DeviceStatus"] = {}
+        cls._parent: DeviceStatus | None = None
+        cls._embedded: dict[str, DeviceStatus] = {}
 
         for n in namespace:
             prop = getattr(namespace[n], "fget", None)
@@ -149,7 +149,7 @@ class DeviceStatus(metaclass=_StatusMeta):
         return getattr(self._embedded[embed], prop)
 
 
-def _get_qualified_name(func, id_: Optional[Union[str, StandardIdentifier]]):
+def _get_qualified_name(func, id_: str | StandardIdentifier | None):
     """Return qualified name for a descriptor identifier."""
     if id_ is not None and isinstance(id_, StandardIdentifier):
         return str(id_.value)
@@ -168,8 +168,8 @@ def _sensor_type_for_return_type(func):
 def sensor(
     name: str,
     *,
-    id: Optional[Union[str, StandardIdentifier]] = None,
-    unit: Optional[str] = None,
+    id: str | StandardIdentifier | None = None,
+    unit: str | None = None,
     **kwargs,
 ):
     """Syntactic sugar to create SensorDescriptor objects.
@@ -205,16 +205,16 @@ def sensor(
 def setting(
     name: str,
     *,
-    id: Optional[Union[str, StandardIdentifier]] = None,
-    setter: Optional[Callable] = None,
-    setter_name: Optional[str] = None,
-    unit: Optional[str] = None,
-    min_value: Optional[int] = None,
-    max_value: Optional[int] = None,
-    step: Optional[int] = None,
-    range_attribute: Optional[str] = None,
-    choices: Optional[type[Enum]] = None,
-    choices_attribute: Optional[str] = None,
+    id: str | StandardIdentifier | None = None,
+    setter: Callable | None = None,
+    setter_name: str | None = None,
+    unit: str | None = None,
+    min_value: int | None = None,
+    max_value: int | None = None,
+    step: int | None = None,
+    range_attribute: str | None = None,
+    choices: type[Enum] | None = None,
+    choices_attribute: str | None = None,
     **kwargs,
 ):
     """Syntactic sugar to create SettingDescriptor objects.
@@ -272,7 +272,7 @@ def setting(
     return decorator_setting
 
 
-def action(name: str, *, id: Optional[Union[str, StandardIdentifier]] = None, **kwargs):
+def action(name: str, *, id: str | StandardIdentifier | None = None, **kwargs):
     """Syntactic sugar to create ActionDescriptor objects.
 
     The information can be used by users of the library to programmatically find out what

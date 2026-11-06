@@ -196,3 +196,15 @@ autodoc_inherit_docstrings = True
 autodoc_default_options = {"inherited-members": True}
 
 myst_heading_anchors = 2
+
+
+def skip_unhelpful_inherited_int_methods(app, what, name, obj, skip, options):
+    """Skip inherited int helpers that add noisy autodoc warnings on Enum classes."""
+    if name in {"from_bytes", "to_bytes"}:
+        return True
+    return None
+
+
+def setup(app):
+    """Configure Sphinx hooks for this project."""
+    app.connect("autodoc-skip-member", skip_unhelpful_inherited_int_methods)

@@ -1,4 +1,4 @@
-<h2 align="center">python-miio</h2>
+# python-miio
 
 [![Chat](https://img.shields.io/matrix/python-miio-chat:matrix.org)](https://matrix.to/#/#python-miio-chat:matrix.org)
 [![PyPI

@@ -2,12 +2,13 @@ import enum
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio.click_common import EnumType, command, format_output
 from miio.device import Device, DeviceStatus
+from miio.devicestatus import sensor, setting
 from miio.exceptions import DeviceException
 
 _LOGGER = logging.getLogger(__name__)
@@ -103,6 +104,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         self.data = data
 
     @property
+    @setting(name="Child Lock", setter_name="child_lock")
     def child_lock(self) -> bool:
         """Returns the child lock status of the device."""
         value = self.data["child_lock"]
@@ -112,6 +114,11 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid child lock status.")
 
     @property
+    @setting(
+        name="Program",
+        setter_name="start",
+        choices=Program,
+    )
     def program(self) -> Program:
         """Returns the current selected program of the device."""
         program = self.data["program"]
@@ -122,12 +129,14 @@ class ViomiDishwasherStatus(DeviceStatus):
             return Program.Unknown
 
     @property
+    @sensor(name="Door Open")
     def door_open(self) -> bool:
         """Returns True if the door is open."""
 
         return bool(self.data["run_status"] & (1 << 7))
 
     @property
+    @sensor(name="System Status Raw")
     def system_status_raw(self) -> int:
         """Returns the raw status number of the device.
 
@@ -139,12 +148,14 @@ class ViomiDishwasherStatus(DeviceStatus):
         return self.data["run_status"]
 
     @property
+    @sensor(name="Status")
     def status(self) -> MachineStatus:
         """Returns the machine status of the device."""
 
         return MachineStatus(self.data["wash_status"])
 
     @property
+    @sensor(name="Temperature", unit="C")
     def temperature(self) -> int:
         """Returns the temperature in degree Celsius as determined by the NTC
         thermistor."""
@@ -162,6 +173,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid power status.")
 
     @property
+    @sensor(name="Time Left")
     def time_left(self) -> timedelta:
         """Returns the timedelta in seconds of time left of the current program.
 
@@ -174,7 +186,8 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid integer for time_left.")
 
     @property
-    def schedule(self) -> Optional[datetime]:
+    @sensor(name="Schedule")
+    def schedule(self) -> datetime | None:
         """Returns a datetime when the scheduled program should be finished.
 
         Will always be 0 if nothing is scheduled.
@@ -189,6 +202,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         )
 
     @property
+    @setting(name="Air Refresh Interval", setter_name="airrefresh")
     def air_refresh_interval(self) -> int:
         """Returns an integer on how often the air in the device should be refreshed.
 
@@ -203,6 +217,7 @@ class ViomiDishwasherStatus(DeviceStatus):
         raise DeviceException(f"{value} is not a valid integer for freshdry_interval.")
 
     @property
+    @sensor(name="Program Progress")
     def program_progress(self) -> ProgramStatus:
         """Returns the program status of the running program."""
         value = self.data["wash_process"]
@@ -213,6 +228,7 @@ class ViomiDishwasherStatus(DeviceStatus):
             return ProgramStatus.Unknown
 
     @property
+    @sensor(name="Errors")
     def errors(self) -> list[SystemStatus]:
         """Returns list of errors if detected in the system."""
 
@@ -273,7 +289,9 @@ class ViomiDishwasher(Device):
 
         values = self.get_properties(properties, max_properties=1)
 
-        return ViomiDishwasherStatus(defaultdict(lambda: None, zip(properties, values)))
+        return ViomiDishwasherStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     # FIXME: Change these to use the ViomiDishwasherStatus once we can query multiple properties at once (or cache?).
     def _is_on(self) -> bool:
@@ -371,7 +389,7 @@ class ViomiDishwasher(Device):
     @command(
         click.argument("program", type=EnumType(Program), required=False),
     )
-    def start(self, program: Optional[Program]) -> str:
+    def start(self, program: Program | None) -> str:
         """Start a program (with optional program or current)."""
 
         if program:

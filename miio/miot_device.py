@@ -1,8 +1,6 @@
 import logging
-import sys
-from enum import Enum
-from functools import partial
-from typing import Any, Optional, Union
+from enum import Enum, member
+from typing import Any
 
 import click
 
@@ -10,13 +8,9 @@ from .click_common import EnumType, LiteralParamType, command
 from .device import Device, DeviceStatus  # noqa: F401
 from .exceptions import DeviceException
 
-if sys.version_info >= (3, 11):
-    from enum import member
-
 _LOGGER = logging.getLogger(__name__)
 
 
-# partial is required here for str2bool, see https://stackoverflow.com/a/40339397
 class MiotValueType(Enum):
     def _str2bool(x):
         """Helper to convert string to boolean."""
@@ -24,12 +18,7 @@ class MiotValueType(Enum):
 
     Int = int
     Float = float
-
-    if sys.version_info >= (3, 11):
-        Bool = member(partial(_str2bool))
-    else:
-        Bool = partial(_str2bool)
-
+    Bool = member(_str2bool)
     Str = str
 
 
@@ -71,15 +60,15 @@ class MiotDevice(Device):
 
     def __init__(
         self,
-        ip: Optional[str] = None,
-        token: Optional[str] = None,
+        ip: str | None = None,
+        token: str | None = None,
         start_id: int = 0,
         debug: int = 0,
         lazy_discover: bool = True,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         *,
-        model: Optional[str] = None,
-        mapping: Optional[MiotMapping] = None,
+        model: str | None = None,
+        mapping: MiotMapping | None = None,
     ):
         """Overloaded to accept keyword-only `mapping` parameter."""
         super().__init__(
@@ -162,10 +151,10 @@ class MiotDevice(Device):
         self,
         siid: int,
         piid: int,
-        value: Union[int, float, str, bool],
+        value: int | float | str | bool,
         *,
-        value_type: Optional[Any] = None,
-        name: Optional[str] = None,
+        value_type: Any | None = None,
+        name: str | None = None,
     ):
         """Set a single property (siid/piid) to given value.
 

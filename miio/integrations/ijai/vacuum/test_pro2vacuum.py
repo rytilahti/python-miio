@@ -46,7 +46,7 @@ class DummyPRO2Vacuum(DummyMiotDevice, Pro2Vacuum):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def dummypro2vacuum(request):
     request.cls.device = DummyPRO2Vacuum()
 

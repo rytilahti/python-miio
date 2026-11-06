@@ -11,6 +11,7 @@ import click
 
 from miio.click_common import EnumType, command, format_output
 from miio.device import Device, DeviceStatus
+from miio.devicestatus import sensor
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -126,6 +127,7 @@ class CameraStatus(DeviceStatus):
         return self.data["wdr"] == "on"
 
     @property
+    @sensor(name="Track")
     def track(self) -> bool:
         """Tracking status."""
         return self.data["track"] == "on"
@@ -136,21 +138,25 @@ class CameraStatus(DeviceStatus):
         return self.data["watermark"] == "on"
 
     @property
+    @sensor(name="SD Card Status")
     def sdcard_status(self) -> int:
         """SD card status."""
         return self.data["sdcard_status"]
 
     @property
+    @sensor(name="Max Client")
     def max_client(self) -> int:
         """Unknown."""
         return self.data["max_client"]
 
     @property
+    @sensor(name="Night Mode")
     def night_mode(self) -> int:
         """Night mode."""
         return self.data["night_mode"]
 
     @property
+    @sensor(name="Mini Level")
     def mini_level(self) -> int:
         """Unknown."""
         return self.data["mini_level"]
@@ -200,7 +206,7 @@ class ChuangmiCamera(Device):
 
         values = self.get_properties(properties)
 
-        return CameraStatus(dict(zip(properties, values)))
+        return CameraStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Power on"))
     def on(self):

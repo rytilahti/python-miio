@@ -46,7 +46,7 @@ def test_descriptors_from_status_object(dummy_device):
 
 
 @pytest.mark.parametrize(
-    "cls, params",
+    ("cls", "params"),
     [
         pytest.param(ActionDescriptor, {"method": lambda _: _}, id="action"),
         pytest.param(PropertyDescriptor, {"status_attribute": "foo"}),

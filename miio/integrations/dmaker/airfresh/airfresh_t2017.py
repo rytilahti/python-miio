@@ -1,12 +1,13 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -115,72 +116,94 @@ class AirFreshStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] else "off"
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """Return True if device is on."""
         return self.data["power"]
 
     @property
+    @setting("Mode", setter_name="set_mode", choices=OperationMode)
     def mode(self) -> OperationMode:
         """Current operation mode."""
         return OperationMode(self.data["mode"])
 
     @property
+    @sensor("PM2.5", unit="μg/m³")
     def pm25(self) -> int:
         """Fine particulate patter (PM2.5)."""
         return self.data["pm25"]
 
     @property
+    @sensor(
+        "CO2",
+        unit="ppm",
+    )
     def co2(self) -> int:
         """Carbon dioxide."""
         return self.data["co2"]
 
     @property
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> int:
         """Current temperature in degree celsions."""
         return self.data["temperature_outside"]
 
     @property
+    @setting(
+        "Favorite Speed",
+        setter_name="set_favorite_speed",
+        min_value=0,
+        max_value=150,
+    )
     def favorite_speed(self) -> int:
         """Favorite speed."""
         return self.data["favourite_speed"]
 
     @property
+    @sensor("Control Speed")
     def control_speed(self) -> int:
         """Control speed."""
         return self.data["control_speed"]
 
     @property
-    def dust_filter_life_remaining(self) -> Optional[int]:
+    @sensor("Dust Filter Life Remaining", unit="%")
+    def dust_filter_life_remaining(self) -> int | None:
         """Remaining dust filter life in percent."""
         return self.data.get("filter_intermediate", self.data.get("filter_rate"))
 
     @property
-    def dust_filter_life_remaining_days(self) -> Optional[int]:
+    @sensor("Dust Filter Life Remaining Days", unit="days")
+    def dust_filter_life_remaining_days(self) -> int | None:
         """Remaining dust filter life in days."""
         return self.data.get("filter_inter_day", self.data.get("filter_day"))
 
     @property
-    def upper_filter_life_remaining(self) -> Optional[int]:
+    @sensor("Upper Filter Life Remaining", unit="%")
+    def upper_filter_life_remaining(self) -> int | None:
         """Remaining upper filter life in percent."""
         return self.data.get("filter_efficient")
 
     @property
-    def upper_filter_life_remaining_days(self) -> Optional[int]:
+    @sensor("Upper Filter Life Remaining Days", unit="days")
+    def upper_filter_life_remaining_days(self) -> int | None:
         """Remaining upper filter life in days."""
         return self.data.get("filter_effi_day")
 
     @property
+    @setting("PTC", setter_name="set_ptc")
     def ptc(self) -> bool:
         """Return True if PTC is on."""
         return self.data["ptc_on"]
 
     @property
-    def ptc_level(self) -> Optional[PtcLevel]:
+    @setting("PTC Level", setter_name="set_ptc_level", choices=PtcLevel)
+    def ptc_level(self) -> PtcLevel | None:
         """PTC level."""
         try:
             return PtcLevel(self.data["ptc_level"])
@@ -188,27 +211,31 @@ class AirFreshStatus(DeviceStatus):
             return None
 
     @property
+    @sensor("PTC Status")
     def ptc_status(self) -> bool:
         """Return true if PTC status is on."""
         return self.data["ptc_status"]
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"]
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """Return True if sound is on."""
         return self.data["sound"]
 
     @property
+    @setting("Display", setter_name="set_display")
     def display(self) -> bool:
         """Return True if the display is on."""
         return self.data["display"]
 
     @property
-    def display_orientation(self) -> Optional[DisplayOrientation]:
+    def display_orientation(self) -> DisplayOrientation | None:
         """Display orientation."""
         try:
             return DisplayOrientation(self.data["screen_direction"])
@@ -248,7 +275,9 @@ class AirFreshA1(Device):
         )
         values = self.get_properties(properties, max_properties=15)
 
-        return AirFreshStatus(defaultdict(lambda: None, zip(properties, values)))
+        return AirFreshStatus(
+            defaultdict(lambda: None, zip(properties, values, strict=False))
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -320,7 +349,7 @@ class AirFreshA1(Device):
     def set_favorite_speed(self, speed: int):
         """Sets the fan speed in favorite mode."""
         if speed < 0 or speed > 150:
-            raise ValueError("Invalid favorite speed: %s" % speed)
+            raise ValueError(f"Invalid favorite speed: {speed}")
 
         return self.send("set_favourite_speed", [speed])
 
@@ -387,7 +416,7 @@ class AirFreshT2017(AirFreshA1):
     def set_favorite_speed(self, speed: int):
         """Sets the fan speed in favorite mode."""
         if speed < 60 or speed > 300:
-            raise ValueError("Invalid favorite speed: %s" % speed)
+            raise ValueError(f"Invalid favorite speed: {speed}")
 
         return self.send("set_favourite_speed", [speed])
 

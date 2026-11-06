@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass, field
 from operator import attrgetter
-from typing import Any, Optional
+from typing import Any
 
 from dataclasses_json import DataClassJsonMixin, config
 
@@ -78,14 +78,14 @@ class Property(DataClassJsonMixin):
     format: str
     access: list[str]
 
-    value_list: Optional[list[dict[str, Any]]] = field(
+    value_list: list[dict[str, Any]] | None = field(
         default_factory=list, metadata=config(field_name="value-list")
     )  # type: ignore
-    value_range: Optional[list[int]] = field(
+    value_range: list[int] | None = field(
         default=None, metadata=config(field_name="value-range")
     )
 
-    unit: Optional[str] = None
+    unit: str | None = None
 
     def __repr__(self):
         return f"piid: {self.iid} ({self.description}): ({self.format}, unit: {self.unit}) (acc: {self.access})"

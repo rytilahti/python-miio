@@ -1,7 +1,7 @@
 """Xiaomi Gateway subdevice base class."""
 
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import attr
 import click
@@ -36,7 +36,7 @@ class SubDevice:
         self,
         gw: "Gateway",
         dev_info: SubDeviceInfo,
-        model_info: Optional[dict] = None,
+        model_info: dict | None = None,
     ) -> None:
         self._gw = gw
         self.sid = dev_info.sid
@@ -67,16 +67,7 @@ class SubDevice:
         self._registered_callbacks: dict[str, GatewayCallback] = {}
 
     def __repr__(self):
-        return "<Subdevice {}: {}, model: {}, zigbee: {}, fw: {}, bat: {}, vol: {}, props: {}>".format(
-            self.device_type,
-            self.sid,
-            self.model,
-            self.zigbee_model,
-            self.firmware_version,
-            self.get_battery(),
-            self.get_voltage(),
-            self.status,
-        )
+        return f"<Subdevice {self.device_type}: {self.sid}, model: {self.model}, zigbee: {self.zigbee_model}, fw: {self.firmware_version}, bat: {self.get_battery()}, vol: {self.get_voltage()}, props: {self.status}>"
 
     @property
     def status(self):
@@ -135,8 +126,7 @@ class SubDevice:
             except Exception as ex:
                 raise DeviceException(
                     "One or more unexpected results while "
-                    "fetching properties %s: %s on model %s"
-                    % (self.get_prop_exp_dict, values, self.model)
+                    f"fetching properties {self.get_prop_exp_dict}: {values} on model {self.model}"
                 ) from ex
 
     @command()
@@ -146,8 +136,7 @@ class SubDevice:
             return self._gw.send(command, [self.sid])
         except Exception as ex:
             raise DeviceException(
-                "Got an exception while sending command %s on model %s"
-                % (command, self.model)
+                f"Got an exception while sending command {command} on model {self.model}"
             ) from ex
 
     @command()
@@ -158,8 +147,7 @@ class SubDevice:
         except Exception as ex:
             raise DeviceException(
                 "Got an exception while sending "
-                "command '%s' with arguments '%s' on model %s"
-                % (command, str(arguments), self.model)
+                f"command '{command}' with arguments '{str(arguments)}' on model {self.model}"
             ) from ex
 
     @command(click.argument("property"))
@@ -169,8 +157,7 @@ class SubDevice:
             response = self._gw.send("get_device_prop", [self.sid, property])
         except Exception as ex:
             raise DeviceException(
-                "Got an exception while fetching property %s on model %s"
-                % (property, self.model)
+                f"Got an exception while fetching property {property} on model {self.model}"
             ) from ex
 
         if not response:
@@ -189,14 +176,12 @@ class SubDevice:
             ).pop()
         except Exception as ex:
             raise DeviceException(
-                "Got an exception while fetching properties %s on model %s"
-                % (properties, self.model)
+                f"Got an exception while fetching properties {properties} on model {self.model}"
             ) from ex
 
         if len(list(properties)) != len(response):
             raise DeviceException(
-                "unexpected result while fetching properties %s: %s on model %s"
-                % (properties, response, self.model)
+                f"unexpected result while fetching properties {properties}: {response} on model {self.model}"
             )
 
         return response
@@ -208,8 +193,7 @@ class SubDevice:
             return self._gw.send("set_device_prop", {"sid": self.sid, property: value})
         except Exception as ex:
             raise DeviceException(
-                "Got an exception while setting propertie %s to value %s on model %s"
-                % (property, str(value), self.model)
+                f"Got an exception while setting propertie {property} to value {str(value)} on model {self.model}"
             ) from ex
 
     @command()
@@ -218,7 +202,7 @@ class SubDevice:
         return self.send("remove_device")
 
     @command()
-    def get_battery(self) -> Optional[int]:
+    def get_battery(self) -> int | None:
         """Update the battery level, if available."""
         if not self._battery_powered:
             _LOGGER.debug(
@@ -237,7 +221,7 @@ class SubDevice:
         return self._battery
 
     @command()
-    def get_voltage(self) -> Optional[float]:
+    def get_voltage(self) -> float | None:
         """Update the battery voltage, if available."""
         if not self._battery_powered:
             _LOGGER.debug(
@@ -256,7 +240,7 @@ class SubDevice:
         return self._voltage
 
     @command()
-    def get_firmware_version(self) -> Optional[int]:
+    def get_firmware_version(self) -> int | None:
         """Returns firmware version."""
         try:
             self._fw_ver = self.get_property("fw_ver").pop()

@@ -101,12 +101,12 @@ class DummyDreameF9VacuumMiot(DummyMiotDevice, DreameVacuum):
         super().__init__(*args, **kwargs)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def dummydreame1cvacuum(request):
     request.cls.device = DummyDreame1CVacuumMiot()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def dummydreamef9vacuum(request):
     request.cls.device = DummyDreameF9VacuumMiot()
 

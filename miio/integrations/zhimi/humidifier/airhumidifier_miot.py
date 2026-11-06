@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -160,7 +160,7 @@ class AirHumidifierMiotCommonStatus(DeviceStatus):
         device_class="switch",
         entity_category="config",
     )
-    def dry(self) -> Optional[bool]:
+    def dry(self) -> bool | None:
         """Return True if dry mode is on."""
         if self.data["dry"] is not None:
             return self.data["dry"]
@@ -188,7 +188,7 @@ class AirHumidifierMiotCommonStatus(DeviceStatus):
 
     @property
     @sensor("Temperature", unit="°C", device_class="temperature")
-    def temperature(self) -> Optional[float]:
+    def temperature(self) -> float | None:
         """Return current temperature, if available."""
         if self.data["temperature"] is not None:
             return round(self.data["temperature"], 1)
@@ -204,7 +204,7 @@ class AirHumidifierMiotCommonStatus(DeviceStatus):
         device_class="switch",
         entity_category="config",
     )
-    def buzzer(self) -> Optional[bool]:
+    def buzzer(self) -> bool | None:
         """Return True if buzzer is on."""
         if self.data["buzzer"] is not None:
             return self.data["buzzer"]
@@ -220,7 +220,7 @@ class AirHumidifierMiotCommonStatus(DeviceStatus):
         choices=LedBrightness,
         entity_category="config",
     )
-    def led_brightness(self) -> Optional[LedBrightness]:
+    def led_brightness(self) -> LedBrightness | None:
         """Return brightness of the LED."""
 
         if self.data["led_brightness"] is not None:
@@ -319,7 +319,7 @@ class AirHumidifierMiotStatus(AirHumidifierMiotCommonStatus):
         icon="mdi:water-check",
         entity_category="diagnostic",
     )
-    def water_level(self) -> Optional[int]:
+    def water_level(self) -> int | None:
         """Return current water level in percent.
 
         If water tank is full, raw water_level value is 120. If water tank is
@@ -388,7 +388,7 @@ class AirHumidifierMiotStatus(AirHumidifierMiotCommonStatus):
 
     @property
     @sensor("Temperature", unit="°F", device_class="temperature")
-    def fahrenheit(self) -> Optional[float]:
+    def fahrenheit(self) -> float | None:
         """Return current temperature in fahrenheit, if available."""
         if self.data["fahrenheit"] is not None:
             return round(self.data["fahrenheit"], 1)
@@ -466,8 +466,7 @@ class AirHumidifierMiot(MiotDevice):
         """Set motor speed."""
         if rpm < 200 or rpm > 2000 or rpm % 10 != 0:
             raise ValueError(
-                "Invalid motor speed: %s. Must be between 200 and 2000 and divisible by 10"
-                % rpm
+                f"Invalid motor speed: {rpm}. Must be between 200 and 2000 and divisible by 10"
             )
         return self.set_property("speed_level", rpm)
 
@@ -479,7 +478,7 @@ class AirHumidifierMiot(MiotDevice):
         """Set target humidity."""
         if humidity < 30 or humidity > 80:
             raise ValueError(
-                "Invalid target humidity: %s. Must be between 30 and 80" % humidity
+                f"Invalid target humidity: {humidity}. Must be between 30 and 80"
             )
         return self.set_property("target_humidity", humidity)
 
@@ -599,7 +598,7 @@ class AirHumidifierMiotCA6Status(AirHumidifierMiotCommonStatus):
         icon="mdi:water-check",
         entity_category="diagnostic",
     )
-    def water_level(self) -> Optional[int]:
+    def water_level(self) -> int | None:
         """Return current water level (empty/min, normal, full/max).
 
         0 - empty/min,  1 - normal, 2 - full/max
@@ -712,7 +711,7 @@ class AirHumidifierMiotCA6(MiotDevice):
         """Set target humidity."""
         if humidity < 30 or humidity > 60:
             raise ValueError(
-                "Invalid target humidity: %s. Must be between 30 and 60" % humidity
+                f"Invalid target humidity: {humidity}. Must be between 30 and 60"
             )
         # HA sends humidity in float, e.g. 45.0
         # ca6 does accept only int values, e.g. 45

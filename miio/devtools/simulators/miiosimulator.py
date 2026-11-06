@@ -3,54 +3,47 @@
 import asyncio
 import json
 import logging
-from typing import Optional, Union
+from typing import Annotated, TypeAlias
 
 import click
-
-try:
-    from pydantic.v1 import BaseModel, Field, PrivateAttr
-except ImportError:
-    from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PlainValidator, PrivateAttr
 from yaml import safe_load
 
 from miio import PushServer
+from miio.miot_models import MiotPythonType
 
 from .common import create_info_response, did_and_mac_for_model
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class Format(type):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.convert_type
+def _convert_format_type(input: str) -> MiotPythonType:
+    type_map = {
+        "bool": bool,
+        "int": int,
+        "str_bool": str,
+        "str": str,
+        "float": float,
+    }
+    return type_map[input]
 
-    @classmethod
-    def convert_type(cls, input: str):
-        type_map = {
-            "bool": bool,
-            "int": int,
-            "str_bool": str,
-            "str": str,
-            "float": float,
-        }
-        return type_map[input]
+
+FormatType: TypeAlias = Annotated[MiotPythonType, PlainValidator(_convert_format_type)]
 
 
 class MiioProperty(BaseModel):
     """Single miio property."""
 
     name: str
-    type: Format
-    value: Optional[Union[str, bool, int]]
+    type: FormatType
+    value: str | bool | int | None
     models: list[str] = Field(default=[])
-    setter: Optional[str] = None
-    description: Optional[str] = None
-    min: Optional[int] = None
-    max: Optional[int] = None
+    setter: str | None = None
+    description: str | None = None
+    min: int | None = None
+    max: int | None = None
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class MiioAction(BaseModel):
@@ -61,30 +54,29 @@ class MiioMethod(BaseModel):
     """Simulated method."""
 
     name: str
-    result: Optional[list] = None
-    result_json: Optional[str] = None
+    result: list | None = None
+    result_json: str | None = None
 
 
 class MiioModel(BaseModel):
     """Model information."""
 
     model: str
-    name: Optional[str] = "unknown name"
+    name: str | None = "unknown name"
 
 
 class SimulatedMiio(BaseModel):
     """Simulated device model for miio devices."""
 
-    name: Optional[str] = Field(default="Unnamed integration")
+    name: str | None = Field(default="Unnamed integration")
     models: list[MiioModel]
     type: str
     properties: list[MiioProperty] = Field(default=[])
     actions: list[MiioAction] = Field(default=[])
     methods: list[MiioMethod] = Field(default=[])
-    _model: Optional[str] = PrivateAttr(default=None)
+    _model: str | None = PrivateAttr(default=None)
 
-    class Config:
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")
 
 
 class MiioSimulator:
@@ -157,7 +149,7 @@ async def main(dev):
 def miio_simulator(file, model):
     """Simulate miio device."""
     data = file.read()
-    dev = SimulatedMiio.parse_obj(safe_load(data))
+    dev = SimulatedMiio.model_validate(safe_load(data))
     _LOGGER.info("Available models: %s", dev.models)
     if model is not None:
         dev._model = model

@@ -1,13 +1,9 @@
 import json
 import logging
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import click
-
-try:
-    from pydantic.v1 import BaseModel, Field
-except ImportError:
-    from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 try:
     from rich import print as echo
@@ -59,7 +55,7 @@ class CloudDeviceInfo(BaseModel):
     is_online: bool = Field(alias="isOnline")
     rssi: int
 
-    _raw_data: dict = Field(repr=False)
+    _raw_data: dict = PrivateAttr(default=None)
 
     @property
     def is_child(self):
@@ -71,8 +67,7 @@ class CloudDeviceInfo(BaseModel):
         """Return the raw data."""
         return self._raw_data
 
-    class Config:
-        extra = "allow"
+    model_config = ConfigDict(extra="allow")
 
 
 class CloudInterface:
@@ -103,10 +98,10 @@ class CloudInterface:
         try:
             from micloud import MiCloud  # noqa: F811
             from micloud.micloudexception import MiCloudAccessDenied
-        except ImportError:
+        except ImportError as ex:
             raise CloudException(
                 "You need to install 'micloud' package to use cloud interface"
-            )
+            ) from ex
 
         self._micloud: MiCloud = MiCloud(username=self.username, password=self.password)
         try:  # login() can either return False or raise an exception on failure
@@ -120,7 +115,7 @@ class CloudInterface:
         devs = {}
         for single_entry in data:
             single_entry["locale"] = locale
-            devinfo = CloudDeviceInfo.parse_obj(single_entry)
+            devinfo = CloudDeviceInfo.model_validate(single_entry)
             devinfo._raw_data = single_entry
             devs[f"{devinfo.did}_{locale}"] = devinfo
 
@@ -134,7 +129,7 @@ class CloudInterface:
         """
         return AVAILABLE_LOCALES
 
-    def get_devices(self, locale: Optional[str] = None) -> dict[str, CloudDeviceInfo]:
+    def get_devices(self, locale: str | None = None) -> dict[str, CloudDeviceInfo]:
         """Return a list of available devices keyed with a device id.
 
         If no locale is given, all known locales are browsed. If a device id is already
@@ -165,9 +160,9 @@ def cloud(ctx: click.Context, username, password):
     """Cloud commands."""
     try:
         import micloud  # noqa: F401
-    except ImportError:
+    except ImportError as ex:
         _LOGGER.error("micloud is not installed, no cloud access available")
-        raise CloudException("install micloud for cloud access")
+        raise CloudException("install micloud for cloud access") from ex
 
     ctx.obj = CloudInterface(username=username, password=password)
     if ctx.invoked_subcommand is None:
@@ -178,7 +173,7 @@ def cloud(ctx: click.Context, username, password):
 @click.pass_context
 @click.option("--locale", prompt=True, type=click.Choice(AVAILABLE_LOCALES.keys()))
 @click.option("--raw", is_flag=True, default=False)
-def cloud_list(ctx: click.Context, locale: Optional[str], raw: bool):
+def cloud_list(ctx: click.Context, locale: str | None, raw: bool):
     """List devices connected to the cloud account."""
 
     ci = ctx.obj
@@ -208,13 +203,9 @@ def cloud_list(ctx: click.Context, locale: Optional[str], raw: bool):
                 echo(f"\t\t\tDID: {c.did}")
                 echo(f"\t\t\tModel: {c.model}")
 
-        other_fields = dev.__fields_set__ - set(dev.__fields__.keys())
         echo("\tOther fields:")
-        for field in other_fields:
-            if field.startswith("_"):
-                continue
-
-            echo(f"\t\t{field}: {getattr(dev, field)}")
+        for field, value in (dev.model_extra or {}).items():
+            echo(f"\t\t{field}: {value}")
 
     if not devices:
         echo(f"Unable to find devices for locale {locale}")

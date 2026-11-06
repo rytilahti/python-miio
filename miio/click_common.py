@@ -8,11 +8,13 @@ import ipaddress
 import json
 import logging
 import re
+from collections.abc import Callable
 from functools import partial, wraps
-from typing import Any, Callable, ClassVar, Optional, Union
+from typing import Any, ClassVar
 
 import click
 
+from .device_cache import read_cache, write_cache
 from .exceptions import DeviceError
 
 try:
@@ -30,7 +32,7 @@ def validate_ip(ctx, param, value):
         ipaddress.ip_address(value)
         return value
     except ValueError as ex:
-        raise click.BadParameter("Invalid IP: %s" % ex)
+        raise click.BadParameter(f"Invalid IP: {ex}") from ex
 
 
 def validate_token(ctx, param, value):
@@ -38,7 +40,7 @@ def validate_token(ctx, param, value):
         return None
     token_len = len(value)
     if token_len != 32:
-        raise click.BadParameter("Token length != 32 chars: %s" % token_len)
+        raise click.BadParameter(f"Token length != 32 chars: {token_len}")
     return value
 
 
@@ -101,11 +103,11 @@ class LiteralParamType(click.ParamType):
         try:
             return ast.literal_eval(value)
         except ValueError:
-            self.fail("%s is not a valid literal" % value, param, ctx)
+            self.fail(f"{value} is not a valid literal", param, ctx)
 
 
 class GlobalContextObject:
-    def __init__(self, debug: int = 0, output: Optional[Callable] = None):
+    def __init__(self, debug: int = 0, output: Callable | None = None):
         self.debug = debug
         self.output = output
 
@@ -155,7 +157,7 @@ class DeviceGroupMeta(type):
         return list(cls._mappings.keys()) or cls._supported_models
 
 
-class DeviceGroup(click.MultiCommand):
+class DeviceGroup(click.Group):
     class Command:
         def __init__(self, name, decorators, *, default_output=None, **kwargs):
             self.name = name
@@ -236,8 +238,8 @@ class DeviceGroup(click.MultiCommand):
         result_callback_pass_device=True,
         **attrs,
     ):
-        self.commands = getattr(device_class, "_device_group_commands", None)
-        if self.commands is None:
+        device_commands = getattr(device_class, "_device_group_commands", None)
+        if device_commands is None:
             raise RuntimeError(
                 "Class {} doesn't use DeviceGroupMeta meta class."
                 " It can't be used with DeviceGroup."
@@ -246,6 +248,10 @@ class DeviceGroup(click.MultiCommand):
         self.device_class = device_class
         self.device_pass = click.make_pass_decorator(device_class)
 
+        # Default to running status instead of showing help when called with no subcommand.
+        if no_args_is_help is None and "status" in device_commands:
+            no_args_is_help = False
+
         attrs.setdefault("params", self.DEFAULT_PARAMS)
         attrs.setdefault("callback", click.pass_context(self.group_callback))
         if result_callback_pass_device and callable(result_callback):
@@ -253,26 +259,47 @@ class DeviceGroup(click.MultiCommand):
 
         super().__init__(
             name or device_class.__name__.lower(),
-            invoke_without_command,
-            no_args_is_help,
-            subcommand_metavar,
-            chain,
-            result_callback,
+            invoke_without_command=invoke_without_command,
+            no_args_is_help=no_args_is_help,
+            subcommand_metavar=subcommand_metavar,
+            chain=chain,
+            result_callback=result_callback,
             **attrs,
         )
+
+        # Preserve our command dict, which click.Group resets in __init__
+        self.commands = device_commands
 
     def group_callback(self, ctx, *args, **kwargs):
         gco = ctx.find_object(GlobalContextObject)
         if gco:
             kwargs["debug"] = gco.debug
+
+        ip = kwargs.get("ip")
+        if ip:
+            cached = read_cache(ip)
+            kwargs.setdefault("start_id", cached["seq"])
+
         ctx.obj = self.device_class(*args, **kwargs)
+
+        if ip:
+
+            def _save_cache() -> None:
+                write_cache(ip, {"seq": ctx.obj.raw_id})
+
+            ctx.call_on_close(_save_cache)
+
+    def invoke(self, ctx):
+        if not ctx._protected_args and not ctx.args and "status" in self.commands:
+            ctx._protected_args = ["status"]
+        return super().invoke(ctx)
 
     def command_callback(self, miio_command, miio_device, *args, **kwargs):
         return miio_command.call(miio_device, *args, **kwargs)
 
     def get_command(self, ctx, cmd_name):
         if cmd_name not in self.commands:
-            ctx.fail("Unknown command (%s)" % cmd_name)
+            ctx.fail(f"Unknown command ({cmd_name})")
 
         cmd = self.commands[cmd_name]
         return self.commands[cmd_name].wrap(
@@ -290,8 +317,8 @@ def command(*decorators, name=None, default_output=None, **kwargs):
 
 
 def format_output(
-    msg_fmt: Union[str, Callable] = "",
-    result_msg_fmt: Union[str, Callable] = "{result}",
+    msg_fmt: str | Callable = "",
+    result_msg_fmt: str | Callable = "{result}",
 ):
     def decorator(func):
         @wraps(func)

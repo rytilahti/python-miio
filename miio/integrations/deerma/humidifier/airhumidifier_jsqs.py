@@ -1,10 +1,11 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 from miio.miot_device import DeviceStatus, MiotDevice
 
 _LOGGER = logging.getLogger(__name__)
@@ -74,16 +75,23 @@ class AirHumidifierJsqsStatus(DeviceStatus):
         return self.data["power"]
 
     @property
+    @sensor(name="Power")
     def power(self) -> str:
         """Return power state."""
         return "on" if self.is_on else "off"
 
     @property
+    @sensor(name="Error")
     def error(self) -> int:
         """Return error state."""
         return self.data["fault"]
 
     @property
+    @setting(
+        name="Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Return current operation mode."""
 
@@ -96,50 +104,57 @@ class AirHumidifierJsqsStatus(DeviceStatus):
         return mode
 
     @property
-    def target_humidity(self) -> Optional[int]:
+    def target_humidity(self) -> int | None:
         """Return target humidity."""
         return self.data.get("target_humidity")
 
     # Environment
 
     @property
-    def relative_humidity(self) -> Optional[int]:
+    @sensor(name="Relative Humidity", unit="%")
+    def relative_humidity(self) -> int | None:
         """Return current humidity."""
         return self.data.get("relative_humidity")
 
     @property
-    def temperature(self) -> Optional[float]:
+    @sensor(name="Temperature", unit="C")
+    def temperature(self) -> float | None:
         """Return current temperature, if available."""
         return self.data.get("temperature")
 
     # Alarm
 
     @property
-    def buzzer(self) -> Optional[bool]:
+    @setting(name="Buzzer", setter_name="set_buzzer")
+    def buzzer(self) -> bool | None:
         """Return True if buzzer is on."""
         return self.data.get("buzzer")
 
     # Indicator Light
 
     @property
-    def led_light(self) -> Optional[bool]:
+    @setting(name="LED Light", setter_name="set_light")
+    def led_light(self) -> bool | None:
         """Return status of the LED."""
         return self.data.get("led_light")
 
     # Other
 
     @property
-    def tank_filed(self) -> Optional[bool]:
+    @sensor(name="Tank Filed")
+    def tank_filed(self) -> bool | None:
         """Return the tank filed."""
         return self.data.get("tank_filed")
 
     @property
-    def water_shortage_fault(self) -> Optional[bool]:
+    @sensor(name="Water Shortage Fault")
+    def water_shortage_fault(self) -> bool | None:
         """Return water shortage fault."""
         return self.data.get("water_shortage_fault")
 
     @property
-    def overwet_protect(self) -> Optional[bool]:
+    @setting(name="Overwet Protect", setter_name="set_overwet_protect")
+    def overwet_protect(self) -> bool | None:
         """Return True if overwet mode is active."""
         return self.data.get("overwet_protect")
 
@@ -192,7 +207,7 @@ class AirHumidifierJsqs(MiotDevice):
         """Set target humidity."""
         if humidity < 40 or humidity > 80:
             raise ValueError(
-                "Invalid target humidity: %s. Must be between 40 and 80" % humidity
+                f"Invalid target humidity: {humidity}. Must be between 40 and 80"
             )
         return self.set_property("target_humidity", humidity)
 

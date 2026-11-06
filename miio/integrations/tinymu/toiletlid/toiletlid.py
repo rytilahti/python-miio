@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -41,30 +42,43 @@ class ToiletlidStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Work State")
     def work_state(self) -> int:
         """Device state code."""
         return self.data["work_state"]
 
     @property
+    @sensor("Work Mode")
     def work_mode(self) -> ToiletlidOperatingMode:
         """Device working mode."""
         return ToiletlidOperatingMode((self.work_state - 1) // 16)
 
     @property
+    @sensor("Power")
     def is_on(self) -> bool:
         return self.work_state != 1
 
     @property
+    @sensor("Filter Life Remaining")
     def filter_use_percentage(self) -> str:
         """Filter percentage of remaining life."""
         return "{}%".format(self.data["filter_use_flux"])
 
     @property
+    @sensor(
+        "Filter Remaining Time",
+        unit="d",
+    )
     def filter_remaining_time(self) -> int:
         """Filter remaining life days."""
         return self.data["filter_use_time"]
 
     @property
+    @setting(
+        "Ambient Light",
+        setter_name="set_ambient_light",
+        choices=AmbientLightColor,
+    )
     def ambient_light(self) -> str:
         """Ambient light color."""
         return self.data["ambient_light"]
@@ -94,7 +108,9 @@ class Toiletlid(Device):
         values = self.get_properties(properties)
 
         color = self.get_ambient_light()
-        return ToiletlidStatus(dict(zip(properties, values), ambient_light=color))
+        return ToiletlidStatus(
+            dict(zip(properties, values, strict=False), ambient_light=color)
+        )
 
     @command(default_output=format_output("Nozzle clean"))
     def nozzle_clean(self):

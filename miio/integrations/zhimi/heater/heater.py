@@ -1,11 +1,12 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,17 +58,20 @@ class HeaterStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.power == "on"
 
     @property
-    def humidity(self) -> Optional[int]:
+    @sensor("Humidity", unit="%")
+    def humidity(self) -> int | None:
         """Current humidity."""
         if (
             "relative_humidity" in self.data
@@ -78,37 +82,54 @@ class HeaterStatus(DeviceStatus):
         return None
 
     @property
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> float:
         """Current temperature."""
         return self.data["temperature"]
 
     @property
+    @setting(
+        "Target Temperature",
+        unit="°C",
+        setter_name="set_target_temperature",
+        min_value=16,
+        max_value=32,
+    )
     def target_temperature(self) -> int:
         """Target temperature."""
         return self.data["target_temperature"]
 
     @property
+    @setting(
+        "Brightness",
+        setter_name="set_brightness",
+        choices=Brightness,
+    )
     def brightness(self) -> Brightness:
         """Display brightness."""
         return Brightness(self.data["brightness"])
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] in ["on", 1, 2]
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
+    @sensor("Use Time", unit="s")
     def use_time(self) -> int:
         """How long the device has been active in seconds."""
         return self.data["use_time"]
 
     @property
-    def delay_off_countdown(self) -> Optional[int]:
+    @sensor("Delay Off Countdown", unit="s")
+    def delay_off_countdown(self) -> int | None:
         """Countdown until turning off in seconds."""
         if "poweroff_time" in self.data and self.data["poweroff_time"] is not None:
             return self.data["poweroff_time"]
@@ -153,7 +174,7 @@ class Heater(Device):
 
         values = self.get_properties(properties, max_properties=_props_per_request)
 
-        return HeaterStatus(dict(zip(properties, values)))
+        return HeaterStatus(dict(zip(properties, values, strict=False)))
 
     @command(default_output=format_output("Powering on"))
     def on(self):
@@ -177,7 +198,7 @@ class Heater(Device):
             self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
         )["temperature_range"]
         if not min_temp <= temperature <= max_temp:
-            raise ValueError("Invalid target temperature: %s" % temperature)
+            raise ValueError(f"Invalid target temperature: {temperature}")
 
         return self.send("set_target_temperature", [temperature])
 
@@ -227,7 +248,7 @@ class Heater(Device):
             self.model, SUPPORTED_MODELS[MODEL_HEATER_ZA1]
         )["delay_off_range"]
         if not min_delay <= seconds <= max_delay:
-            raise ValueError("Invalid delay time: %s" % seconds)
+            raise ValueError(f"Invalid delay time: {seconds}")
 
         if self.model == MODEL_HEATER_ZA1:
             return self.send("set_poweroff_time", [seconds])

@@ -6,6 +6,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 from miio.utils import int_to_rgb
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,6 +24,7 @@ class PhilipsMoonlightStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor(name="Power")
     def power(self) -> str:
         return self.data["pow"]
 
@@ -31,23 +33,44 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.power == "on"
 
     @property
+    @setting(
+        name="Brightness",
+        setter_name="set_brightness",
+        unit="%",
+        min_value=1,
+        max_value=100,
+    )
     def brightness(self) -> int:
         return self.data["bri"]
 
     @property
+    @setting(
+        name="Color Temperature",
+        setter_name="set_color_temperature",
+        min_value=1,
+        max_value=100,
+    )
     def color_temperature(self) -> int:
         return self.data["cct"]
 
     @property
+    @setting(name="RGB", setter_name="set_rgb")
     def rgb(self) -> tuple[int, int, int]:
         """Return color in RGB."""
         return int_to_rgb(int(self.data["rgb"]))
 
     @property
+    @setting(
+        name="Scene",
+        setter_name="set_scene",
+        min_value=1,
+        max_value=6,
+    )
     def scene(self) -> int:
         return self.data["snm"]
 
     @property
+    @sensor(name="Sleep Assistant")
     def sleep_assistant(self) -> int:
         """Example values:
 
@@ -59,24 +82,29 @@ class PhilipsMoonlightStatus(DeviceStatus):
         return self.data["sta"]
 
     @property
+    @sensor(name="Sleep Off Time", unit="s")
     def sleep_off_time(self) -> int:
         return self.data["spr"]
 
     @property
+    @sensor(name="Total Assistant Sleep Time", unit="s")
     def total_assistant_sleep_time(self) -> int:
         return self.data["spt"]
 
     @property
+    @sensor(name="Brand Sleep")
     def brand_sleep(self) -> bool:
         # sp_sleep_open?
         return self.data["ms"] == 1
 
     @property
+    @sensor(name="Brand")
     def brand(self) -> bool:
         # sp_xm_bracelet?
         return self.data["mb"] == 1
 
     @property
+    @sensor(name="Wake Up Time")
     def wake_up_time(self) -> list[int]:
         # Example: [weekdays?, hour, minute]
         return self.data["wkp"]
@@ -141,7 +169,7 @@ class PhilipsMoonlight(Device):
         values = self.get_properties(properties)
 
         return PhilipsMoonlightStatus(
-            defaultdict(lambda: None, zip(properties, values))
+            defaultdict(lambda: None, zip(properties, values, strict=False))
         )
 
     @command(default_output=format_output("Powering on"))
@@ -162,7 +190,7 @@ class PhilipsMoonlight(Device):
         """Set color in RGB."""
         for color in rgb:
             if color < 0 or color > 255:
-                raise ValueError("Invalid color: %s" % color)
+                raise ValueError(f"Invalid color: {color}")
 
         return self.send("set_rgb", [*rgb])
 
@@ -173,7 +201,7 @@ class PhilipsMoonlight(Device):
     def set_brightness(self, level: int):
         """Set brightness level."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid brightness: %s" % level)
+            raise ValueError(f"Invalid brightness: {level}")
 
         return self.send("set_bright", [level])
 
@@ -184,7 +212,7 @@ class PhilipsMoonlight(Device):
     def set_color_temperature(self, level: int):
         """Set Correlated Color Temperature."""
         if level < 1 or level > 100:
-            raise ValueError("Invalid color temperature: %s" % level)
+            raise ValueError(f"Invalid color temperature: {level}")
 
         return self.send("set_cct", [level])
 
@@ -198,10 +226,10 @@ class PhilipsMoonlight(Device):
     def set_brightness_and_color_temperature(self, brightness: int, cct: int):
         """Set brightness level and the correlated color temperature."""
         if brightness < 1 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         if cct < 1 or cct > 100:
-            raise ValueError("Invalid color temperature: %s" % cct)
+            raise ValueError(f"Invalid color temperature: {cct}")
 
         return self.send("set_bricct", [brightness, cct])
 
@@ -215,11 +243,11 @@ class PhilipsMoonlight(Device):
     def set_brightness_and_rgb(self, brightness: int, rgb: tuple[int, int, int]):
         """Set brightness level and the color."""
         if brightness < 1 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         for color in rgb:
             if color < 0 or color > 255:
-                raise ValueError("Invalid color: %s" % color)
+                raise ValueError(f"Invalid color: {color}")
 
         return self.send("set_brirgb", [*rgb, brightness])
 
@@ -230,7 +258,7 @@ class PhilipsMoonlight(Device):
     def set_scene(self, number: int):
         """Set scene number."""
         if number < 1 or number > 6:
-            raise ValueError("Invalid fixed scene number: %s" % number)
+            raise ValueError(f"Invalid fixed scene number: {number}")
 
         if number == 6:
             return self.send("go_night")

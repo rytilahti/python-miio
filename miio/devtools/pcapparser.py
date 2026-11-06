@@ -51,7 +51,7 @@ def read_payloads_from_file(file, tokens: list[str]):
             try:
                 decrypted = Message.parse(data, token=bytes.fromhex(token))
                 break
-            except BaseException:  # noqa: B036
+            except BaseException:  # noqa: B036, S112
                 continue
 
         if decrypted is None:

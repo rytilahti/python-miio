@@ -6,6 +6,7 @@ import click
 
 from miio import DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -73,46 +74,75 @@ class CurtainStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Status")
     def status(self) -> Status:
         """Device status."""
         return Status(self.data["status"])
 
     @property
+    @setting("Manual Enabled", setter_name="set_manual_enabled")
     def is_manual_enabled(self) -> bool:
         """True if manual controls are enabled."""
         return bool(self.data["is_manual_enabled"])
 
     @property
+    @setting(
+        "Polarity",
+        setter_name="set_polarity",
+        choices=Polarity,
+    )
     def polarity(self) -> Polarity:
         """Motor rotation polarity."""
         return Polarity(self.data["polarity"])
 
     @property
+    @setting(
+        "Position Limited",
+        setter_name="set_position_limit",
+    )
     def is_position_limited(self) -> bool:
         """Position limit."""
         return bool(self.data["is_position_limited"])
 
     @property
+    @setting("Night Tip Light", setter_name="set_night_tip_light")
     def night_tip_light(self) -> bool:
         """Night tip light status."""
         return bool(self.data["night_tip_light"])
 
     @property
+    @sensor("Run Time", unit="s")
     def run_time(self) -> int:
         """Run time of the motor."""
         return self.data["run_time"]
 
     @property
+    @sensor("Current Position", unit="%")
     def current_position(self) -> int:
         """Current curtain position."""
         return self.data["current_position"]
 
     @property
+    @setting(
+        "Target Position",
+        setter_name="set_target_position",
+        unit="%",
+        min_value=0,
+        max_value=100,
+        step=1,
+    )
     def target_position(self) -> int:
         """Target curtain position."""
         return self.data["target_position"]
 
     @property
+    @setting(
+        "Adjust Value",
+        setter_name="set_adjust_value",
+        min_value=-100,
+        max_value=100,
+        step=1,
+    )
     def adjust_value(self) -> int:
         """Adjust value."""
         return self.data["adjust_value"]
@@ -163,7 +193,7 @@ class CurtainMiot(MiotDevice):
         """Set target position."""
         if target_position < 0 or target_position > 100:
             raise ValueError(
-                "Value must be between [0, 100] value, was %s" % target_position
+                f"Value must be between [0, 100] value, was {target_position}"
             )
         return self.set_property("target_position", target_position)
 
@@ -207,6 +237,6 @@ class CurtainMiot(MiotDevice):
         """Adjust to preferred position."""
         if adjust_value < -100 or adjust_value > 100:
             raise ValueError(
-                "Value must be between [-100, 100] value, was %s" % adjust_value
+                f"Value must be between [-100, 100] value, was {adjust_value}"
             )
         return self.set_property("adjust_value", adjust_value)

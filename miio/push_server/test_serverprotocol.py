@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 
 from miio import Message
@@ -16,17 +18,20 @@ DUMMY_TOKEN = bytes.fromhex("0" * 32)
 
 
 @pytest.fixture
-def protocol(mocker, event_loop) -> ServerProtocol:
+def protocol(mocker) -> ServerProtocol:
+    loop = asyncio.new_event_loop()
     server = mocker.Mock()
 
     # Mock server id
     type(server).device_id = mocker.PropertyMock(return_value=DEVICE_ID)
     socket = mocker.Mock()
 
-    proto = ServerProtocol(event_loop, socket, server)
+    proto = ServerProtocol(loop, socket, server)
     proto.transport = mocker.Mock()
 
     yield proto
+
+    loop.close()
 
 
 def test_send_ping_ack(protocol: ServerProtocol, mocker):
@@ -114,7 +119,7 @@ def test_datagram_with_known_method(protocol: ServerProtocol, mocker):
 
 
 @pytest.mark.parametrize(
-    "method,err_code", [("unknown_method", ERR_UNSUPPORTED), (None, ERR_INVALID)]
+    ("method", "err_code"), [("unknown_method", ERR_UNSUPPORTED), (None, ERR_INVALID)]
 )
 def test_datagram_with_unknown_method(
     method, err_code, protocol: ServerProtocol, mocker

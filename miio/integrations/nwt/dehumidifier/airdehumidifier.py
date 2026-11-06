@@ -1,12 +1,13 @@
 import enum
 import logging
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceError, DeviceException, DeviceInfo, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,16 +64,23 @@ class AirDehumidifierStatus(DeviceStatus):
         self.device_info = device_info
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["on_off"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is turned on."""
         return self.power == "on"
 
     @property
+    @setting(
+        "Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Operation mode.
 
@@ -81,34 +89,39 @@ class AirDehumidifierStatus(DeviceStatus):
         return OperationMode(self.data["mode"])
 
     @property
-    def temperature(self) -> Optional[float]:
+    @sensor("Temperature", unit="°C")
+    def temperature(self) -> float | None:
         """Current temperature, if available."""
         if "temp" in self.data and self.data["temp"] is not None:
             return self.data["temp"]
         return None
 
     @property
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity."""
         return self.data["humidity"]
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] == "on"
 
     @property
+    @setting("LED", setter_name="set_led")
     def led(self) -> bool:
         """LED brightness if available."""
         return self.data["led"] == "on"
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == "on"
 
     @property
-    def target_humidity(self) -> Optional[int]:
+    def target_humidity(self) -> int | None:
         """Target humiditiy.
 
         Can be either 40, 50, 60 percent.
@@ -118,33 +131,38 @@ class AirDehumidifierStatus(DeviceStatus):
         return None
 
     @property
-    def fan_speed(self) -> Optional[FanSpeed]:
+    def fan_speed(self) -> FanSpeed | None:
         """Current fan speed."""
         if "fan_speed" in self.data and self.data["fan_speed"] is not None:
             return FanSpeed(self.data["fan_speed"])
         return None
 
     @property
+    @sensor("Tank Full")
     def tank_full(self) -> bool:
         """The remaining amount of water in percent."""
         return self.data["tank_full"] == "on"
 
     @property
+    @sensor("Compressor Status")
     def compressor_status(self) -> bool:
         """Compressor status."""
         return self.data["compressor_status"] == "on"
 
     @property
+    @sensor("Defrost Status")
     def defrost_status(self) -> bool:
         """Defrost status."""
         return self.data["defrost_status"] == "on"
 
     @property
+    @sensor("Fan St")
     def fan_st(self) -> int:
         """Fan st."""
         return self.data["fan_st"]
 
     @property
+    @sensor("Alarm")
     def alarm(self) -> str:
         """Alarm."""
         return self.data["alarm"]
@@ -184,7 +202,8 @@ class AirDehumidifier(Device):
         values = self.get_properties(properties, max_properties=1)
 
         return AirDehumidifierStatus(
-            defaultdict(lambda: None, zip(properties, values)), self.info()
+            defaultdict(lambda: None, zip(properties, values, strict=False)),
+            self.info(),
         )
 
     @command(default_output=format_output("Powering on"))
@@ -274,6 +293,6 @@ class AirDehumidifier(Device):
     def set_target_humidity(self, humidity: int):
         """Set the auto target humidity."""
         if humidity not in [40, 50, 60]:
-            raise ValueError("Invalid auto target humidity: %s" % humidity)
+            raise ValueError(f"Invalid auto target humidity: {humidity}")
 
         return self.send("set_auto", [humidity])

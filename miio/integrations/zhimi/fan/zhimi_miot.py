@@ -5,6 +5,7 @@ import click
 
 from miio import DeviceException, DeviceStatus, MiotDevice
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 from miio.utils import deprecated
 
 
@@ -82,16 +83,19 @@ class FanStatusZA5(DeviceStatus):
         self.data = data
 
     @property
+    @setting("Ionizer", setter_name="set_ionizer")
     def ionizer(self) -> bool:
         """True if negative ions generation is enabled."""
         return self.data["anion"]
 
     @property
+    @sensor("Battery Supported")
     def battery_supported(self) -> bool:
         """True if battery is supported."""
         return self.data["battery_supported"]
 
     @property
+    @sensor("Buttons Pressed")
     def buttons_pressed(self) -> str:
         """What buttons on the fan are pressed now."""
         code = self.data["buttons_pressed"]
@@ -104,16 +108,25 @@ class FanStatusZA5(DeviceStatus):
         return "Unknown"
 
     @property
+    @setting("Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"]
 
     @property
+    @setting("Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """True if child lock if on."""
         return self.data["child_lock"]
 
     @property
+    @setting(
+        "Fan Level",
+        setter_name="set_fan_speed",
+        min_value=1,
+        max_value=4,
+        step=1,
+    )
     def fan_level(self) -> int:
         """Fan level (1-4)."""
         return self.data["fan_level"]
@@ -125,61 +138,91 @@ class FanStatusZA5(DeviceStatus):
         return self.speed
 
     @property
+    @setting(
+        "Speed",
+        setter_name="set_speed",
+        min_value=1,
+        max_value=100,
+        step=1,
+        unit="%",
+    )
     def speed(self) -> int:
         """Fan speed (1-100)."""
         return self.data["fan_speed"]
 
     @property
+    @sensor("Humidity", unit="%")
     def humidity(self) -> int:
         """Air humidity in percent."""
         return self.data["humidity"]
 
     @property
+    @setting(
+        "LED Brightness",
+        setter_name="set_led_brightness",
+        min_value=0,
+        max_value=100,
+        step=1,
+        unit="%",
+    )
     def led_brightness(self) -> int:
         """LED brightness (1-100)."""
         return self.data["light"]
 
     @property
+    @setting("Mode", setter_name="set_mode", choices=OperationMode)
     def mode(self) -> OperationMode:
         """Operation mode (normal or nature)."""
         return OperationMode[OperationModeFanZA5(self.data["mode"]).name]
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] else "off"
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.data["power"]
 
     @property
+    @setting(
+        "Delay Off Countdown",
+        setter_name="delay_off",
+        unit="s",
+    )
     def delay_off_countdown(self) -> int:
         """Countdown until turning off in minutes."""
         return self.data["power_off_time"]
 
     @property
+    @sensor("Power Supply Attached")
     def powersupply_attached(self) -> bool:
         """True is power supply is attached."""
         return self.data["powersupply_attached"]
 
     @property
+    @sensor("Speed RPM", unit="rpm")
     def speed_rpm(self) -> int:
         """Fan rotations per minute."""
         return self.data["speed_rpm"]
 
     @property
+    @setting("Oscillate", setter_name="set_oscillate")
     def oscillate(self) -> bool:
         """True if oscillation is enabled."""
         return self.data["swing_mode"]
 
     @property
+    @setting("Angle", setter_name="set_angle")
     def angle(self) -> int:
         """Oscillation angle."""
         return self.data["swing_mode_angle"]
 
     @property
+    @sensor("Temperature", unit="°C")
     def temperature(self) -> Any:
         """Air temperature (degree celsius)."""
         return self.data["temperature"]
@@ -246,7 +289,7 @@ class FanZA5(MiotDevice):
     def set_speed(self, speed: int):
         """Set fan speed."""
         if speed < 1 or speed > 100:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.set_property("fan_speed", speed)
 
@@ -303,7 +346,7 @@ class FanZA5(MiotDevice):
     def set_led_brightness(self, brightness: int):
         """Set LED brightness."""
         if brightness < 0 or brightness > 100:
-            raise ValueError("Invalid brightness: %s" % brightness)
+            raise ValueError(f"Invalid brightness: {brightness}")
 
         return self.set_property("light", brightness)
 
@@ -323,7 +366,7 @@ class FanZA5(MiotDevice):
         """Set delay off seconds."""
 
         if seconds < 0 or seconds > 10 * 60 * 60:
-            raise ValueError("Invalid value for a delayed turn off: %s" % seconds)
+            raise ValueError(f"Invalid value for a delayed turn off: {seconds}")
 
         return self.set_property("power_off_time", seconds)
 

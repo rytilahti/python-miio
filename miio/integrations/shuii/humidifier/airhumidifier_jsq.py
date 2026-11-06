@@ -1,11 +1,12 @@
 import enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,6 +60,7 @@ class AirHumidifierStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor(name="Power")
     def power(self) -> str:
         """Power state."""
         return "on" if self.data["power"] == 1 else "off"
@@ -69,6 +71,11 @@ class AirHumidifierStatus(DeviceStatus):
         return self.power == "on"
 
     @property
+    @setting(
+        name="Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Operation mode.
 
@@ -84,21 +91,29 @@ class AirHumidifierStatus(DeviceStatus):
         return mode
 
     @property
+    @sensor(name="Temperature", unit="C")
     def temperature(self) -> int:
         """Current temperature in degree celsius."""
         return self.data["temperature"]
 
     @property
+    @sensor(name="Humidity", unit="%")
     def humidity(self) -> int:
         """Current humidity in percent."""
         return self.data["humidity"]
 
     @property
+    @setting(name="Buzzer", setter_name="set_buzzer")
     def buzzer(self) -> bool:
         """True if buzzer is turned on."""
         return self.data["buzzer"] == 1
 
     @property
+    @setting(
+        name="LED Brightness",
+        setter_name="set_led_brightness",
+        choices=LedBrightness,
+    )
     def led_brightness(self) -> LedBrightness:
         """Buttons illumination Brightness level."""
         try:
@@ -110,27 +125,32 @@ class AirHumidifierStatus(DeviceStatus):
         return brightness
 
     @property
+    @setting(name="LED", setter_name="set_led")
     def led(self) -> bool:
         """True if LED is turned on."""
         return self.led_brightness is not LedBrightness.Off
 
     @property
+    @setting(name="Child Lock", setter_name="set_child_lock")
     def child_lock(self) -> bool:
         """Return True if child lock is on."""
         return self.data["child_lock"] == 1
 
     @property
+    @sensor(name="No Water")
     def no_water(self) -> bool:
         """True if the water tank is empty."""
         return self.data["no_water"] == 1
 
     @property
+    @sensor(name="Lid Opened")
     def lid_opened(self) -> bool:
         """True if the water tank is detached."""
         return self.data["lid_opened"] == 1
 
     @property
-    def use_time(self) -> Optional[int]:
+    @sensor(name="Use Time", unit="s")
+    def use_time(self) -> int | None:
         """How long the device has been active in seconds.
 
         Not supported by the device, so we return none here.
@@ -188,7 +208,9 @@ class AirHumidifierJsq(Device):
                 values,
             )
 
-        return AirHumidifierStatus({k: v for k, v in zip(properties, values)})
+        return AirHumidifierStatus(
+            {k: v for k, v in zip(properties, values, strict=False)}
+        )
 
     @command(default_output=format_output("Powering on"))
     def on(self):

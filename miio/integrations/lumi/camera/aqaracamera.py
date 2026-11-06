@@ -17,6 +17,7 @@ import click
 
 from miio import Device, DeviceStatus
 from miio.click_common import command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,16 +76,19 @@ class CameraStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Type")
     def type(self) -> str:
         """TODO: Type of the camera? Name?"""
         return self.data["app_type"]
 
     @property
+    @sensor("Video Status")
     def video_status(self) -> bool:
         """Video state."""
         return bool(self.data["video_state"])
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if device is currently on."""
         return self.video_status == 1
@@ -95,6 +99,10 @@ class CameraStatus(DeviceStatus):
         return bool(self.data["md_status"])
 
     @property
+    @setting(
+        "Motion Detection Sensitivity",
+        setter_name="md_sensitivity",
+    )
     def md_sensitivity(self):
         """Motion detection sensitivity."""
         return self.data["mdsensitivity"]
@@ -115,6 +123,7 @@ class CameraStatus(DeviceStatus):
         return self.data["flip_state"]
 
     @property
+    @sensor("Camera Offsets")
     def offsets(self) -> CameraOffset:
         """Camera offset information."""
         return CameraOffset(
@@ -124,6 +133,7 @@ class CameraStatus(DeviceStatus):
         )
 
     @property
+    @sensor("Channel ID")
     def channel_id(self) -> int:
         """TODO: Zigbee channel?"""
         return self.data["channel_id"]
@@ -134,16 +144,19 @@ class CameraStatus(DeviceStatus):
         return self.data["fullstop"] != 0
 
     @property
+    @sensor("P2P ID")
     def p2p_id(self) -> str:
         """P2P ID for video and audio."""
         return self.data["p2p_id"]
 
     @property
+    @sensor("AV ID")
     def av_id(self) -> str:
         """TODO: What is this? ID for the cloud?"""
         return self.data["avID"]
 
     @property
+    @sensor("AV Password")
     def av_password(self) -> str:
         """TODO: What is this? Password for the cloud?"""
         return self.data["avPass"]
@@ -209,7 +222,7 @@ class AqaraCamera(Device):
     def md_sensitivity(self, sensitivity):
         """Get or set the motion detection sensitivity."""
         if sensitivity:
-            click.echo("Setting MD sensitivity to %s" % sensitivity)
+            click.echo(f"Setting MD sensitivity to {sensitivity}")
             return self.send("set_mdsensitivity", [sensitivity])[0] == "ok"
         else:
             return self.send("get_mdsensitivity")
@@ -251,7 +264,7 @@ class AqaraCamera(Device):
     def pair(self, timeout: int):
         """Start (or stop with "0") pairing."""
         if timeout < 0:
-            raise ValueError("Invalid timeout: %s" % timeout)
+            raise ValueError(f"Invalid timeout: {timeout}")
 
         return self.send("start_zigbee_join", [timeout])
 
@@ -288,7 +301,7 @@ class AqaraCamera(Device):
     def set_alarm_volume(self, volume):
         """Set alarm volume."""
         if volume < 0 or volume > 100:
-            raise ValueError("Volume has to be [0,100], was %s" % volume)
+            raise ValueError(f"Volume has to be [0,100], was {volume}")
         return self.send("set_alarming_volume", [volume])[0] == "ok"
 
     @command(click.argument("sound_id", type=str, required=False, default=None))
@@ -306,7 +319,7 @@ class AqaraCamera(Device):
 
             return sound_status
 
-        click.echo("Setting alarm sound to %s" % sound_id)
+        click.echo(f"Setting alarm sound to {sound_id}")
         return self.send("set_default_music", [0, sound_id])[0] == "ok"
 
     @command(default_output=format_output("Arming"))

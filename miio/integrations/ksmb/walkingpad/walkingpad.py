@@ -7,6 +7,7 @@ import click
 
 from miio import Device, DeviceException, DeviceStatus
 from miio.click_common import EnumType, command, format_output
+from miio.devicestatus import sensor, setting
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,51 +44,81 @@ class WalkingpadStatus(DeviceStatus):
         self.data = data
 
     @property
+    @sensor("Power")
     def power(self) -> str:
         """Power state."""
         return self.data["power"]
 
     @property
+    @sensor("Is On")
     def is_on(self) -> bool:
         """True if the device is turned on."""
         return self.power == "on"
 
     @property
+    @sensor("Walking Time")
     def walking_time(self) -> timedelta:
         """Current walking duration in seconds."""
         return timedelta(seconds=int(self.data["time"]))
 
     @property
+    @setting(
+        "Speed",
+        unit="km/h",
+        setter_name="set_speed",
+        min_value=0,
+        max_value=6,
+    )
     def speed(self) -> float:
         """Current speed."""
         return float(self.data["sp"])
 
     @property
+    @setting(
+        "Start Speed",
+        unit="km/h",
+        setter_name="set_start_speed",
+        min_value=0,
+        max_value=6,
+    )
     def start_speed(self) -> float:
         """Current start speed."""
         return self.data["start_speed"]
 
     @property
+    @setting(
+        "Mode",
+        setter_name="set_mode",
+        choices=OperationMode,
+    )
     def mode(self) -> OperationMode:
         """Current mode."""
         return OperationMode(self.data["mode"])
 
     @property
+    @setting(
+        "Sensitivity",
+        setter_name="set_sensitivity",
+        choices=OperationSensitivity,
+    )
     def sensitivity(self) -> OperationSensitivity:
         """Current sensitivity."""
         return OperationSensitivity(self.data["sensitivity"])
 
     @property
+    @sensor("Step Count")
     def step_count(self) -> int:
         """Current steps."""
         return int(self.data["step"])
 
     @property
+    @sensor("Distance", unit="m")
     def distance(self) -> int:
         """Current distance in meters."""
         return int(self.data["dist"])
 
     @property
+    @sensor("Calories", unit="cal")
     def calories(self) -> int:
         """Current calories burnt."""
         return int(self.data["cal"])
@@ -121,7 +152,9 @@ class Walkingpad(Device):
         properties_additional = ["power", "mode", "start_speed", "sensitivity"]
         values_additional = self.get_properties(properties_additional, max_properties=1)
 
-        additional_props = dict(zip(properties_additional, values_additional))
+        additional_props = dict(
+            zip(properties_additional, values_additional, strict=False)
+        )
         data.update(additional_props)
 
         return WalkingpadStatus(data)
@@ -194,7 +227,7 @@ class Walkingpad(Device):
         """Set mode (auto/manual)."""
 
         if not isinstance(mode, OperationMode):
-            raise ValueError("Invalid mode: %s" % mode)
+            raise ValueError(f"Invalid mode: {mode}")
 
         return self.send("set_mode", [mode.value])
 
@@ -210,10 +243,10 @@ class Walkingpad(Device):
             raise DeviceException("Cannot set the speed, device is turned off")
 
         if not isinstance(speed, float):
-            raise TypeError("Invalid speed: %s" % speed)
+            raise TypeError(f"Invalid speed: {speed}")
 
         if speed < 0 or speed > 6:
-            raise ValueError("Invalid speed: %s" % speed)
+            raise ValueError(f"Invalid speed: {speed}")
 
         return self.send("set_speed", [speed])
 
@@ -229,10 +262,10 @@ class Walkingpad(Device):
             raise DeviceException("Cannot set the start speed, device is turned off")
 
         if not isinstance(speed, float):
-            raise TypeError("Invalid start speed: %s" % speed)
+            raise TypeError(f"Invalid start speed: {speed}")
 
         if speed < 0 or speed > 6:
-            raise ValueError("Invalid start speed: %s" % speed)
+            raise ValueError(f"Invalid start speed: {speed}")
 
         return self.send("set_start_speed", [speed])
 
@@ -244,7 +277,7 @@ class Walkingpad(Device):
         """Set sensitivity."""
 
         if not isinstance(sensitivity, OperationSensitivity):
-            raise TypeError("Invalid mode: %s" % sensitivity)
+            raise TypeError(f"Invalid mode: {sensitivity}")
 
         return self.send("set_sensitivity", [sensitivity.value])
 
