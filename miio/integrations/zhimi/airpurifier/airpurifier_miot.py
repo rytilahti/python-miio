@@ -105,6 +105,33 @@ _MAPPING_VA2 = {
     "led_brightness": {"siid": 13, "piid": 2},
 }
 
+
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-cpa4:1
+_MAPPING_CPA4 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "mode": {"siid": 2, "piid": 4},
+    "fan_level": {"siid": 2, "piid": 5},
+    # Environment
+    "aqi": {"siid": 3, "piid": 4},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    "favorite_rpm": {"siid": 9, "piid": 3},
+    "favorite_level": {"siid": 9, "piid": 11},
+    # aqi
+    "aqi_realtime_update_duration": {"siid": 11, "piid": 4},
+    # Screen
+    "led_brightness": {"siid": 13, "piid": 2},
+}
+
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-vb4:1
 _MAPPING_VB4 = {
     # Air Purifier
@@ -277,6 +304,7 @@ _MAPPINGS = {
     "zhimi.airp.mb5a": _MAPPING_VA2,  # airpurifier 4
     "zhimi.airp.va2": _MAPPING_VA2,  # airpurifier 4 pro
     "zhimi.airp.vb4": _MAPPING_VB4,  # airpurifier 4 pro
+    "zhimi.airp.cpa4": _MAPPING_CPA4,  # airpurifier 4 compact
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
     "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
@@ -289,6 +317,7 @@ REVERSED_LED_BRIGHTNESS = [
     "zhimi.airp.mb5",
     "zhimi.airp.mb5a",
     "zhimi.airp.vb4",
+    "zhimi.airp.cpa4",
     "zhimi.airp.rmb1",
 ]
 
@@ -342,6 +371,7 @@ class AirPurifierMiotStatus(DeviceStatus):
         self.filter_type_util = FilterTypeUtil()
         self.data = data
         self.model = model
+
 
     @property
     def is_on(self) -> bool:
@@ -558,6 +588,18 @@ class AirPurifierMiot(MiotDevice):
             "Filter type: {result.filter_type}\n",
         )
     )
+
+    def _initialize_descriptors(self) -> None:
+        """Initialize device descriptors.
+
+        Overridden to collect descriptors also from the update helper.
+        """
+        if self._initialized:
+            return
+
+        res = self.status()
+        self._descriptors.descriptors_from_object(res)
+
     def status(self) -> AirPurifierMiotStatus:
         """Retrieve properties."""
         # Some devices update the aqi information only every 30min.
@@ -566,10 +608,20 @@ class AirPurifierMiot(MiotDevice):
         if self.model == "zhimi.airpurifier.mb3":
             self.set_property("aqi_realtime_update_duration", 5)
 
+        # Some devices can't handle more than x parameters per 
+        # request. Default is 15. cpa4 works at 4 but when doing 
+        # multiple requests, the second one encountered an issue.
+        # All is OK with 3.
+        _props_per_request = 15
+        _LOGGER.debug("Model: %s", self.model)
+        if self.model == "zhimi.airp.cpa4":
+            _props_per_request = 3
+
+        _LOGGER.debug("Properties per request: %i", _props_per_request)
         return AirPurifierMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping()
+                for prop in self.get_properties_for_mapping(max_properties=_props_per_request)
             },
             self.model,
         )
