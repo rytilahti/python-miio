@@ -225,6 +225,30 @@ _MAPPING_RMB1 = {
     "device-display-unit": {"siid": 14, "piid": 1},
 }
 
+# https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-cpa4:1
+# The device reports itself as xiaomi.airp.cpa4 over miIO, the cloud lists it as zhimi.airp.cpa4.
+_MAPPING_CPA4 = {
+    # Air Purifier
+    "power": {"siid": 2, "piid": 1},
+    "fault": {"siid": 2, "piid": 2},
+    "mode": {"siid": 2, "piid": 4},
+    # Environment
+    "aqi": {"siid": 3, "piid": 4},
+    # Filter
+    "filter_life_remaining": {"siid": 4, "piid": 1},
+    "filter_hours_used": {"siid": 4, "piid": 3},
+    "filter_left_time": {"siid": 4, "piid": 4},
+    # Alarm
+    "buzzer": {"siid": 6, "piid": 1},
+    # Physical Control Locked
+    "child_lock": {"siid": 8, "piid": 1},
+    # custom-service
+    "motor_speed": {"siid": 9, "piid": 1},
+    "favorite_level": {"siid": 9, "piid": 11},
+    # Screen
+    "led_brightness": {"siid": 13, "piid": 2},
+}
+
 # https://miot-spec.org/miot-spec-v2/instance?type=urn:miot-spec-v2:device:air-purifier:0000A007:zhimi-za1:2
 _MAPPING_ZA1 = {
     # Air Purifier (siid=2)
@@ -280,6 +304,7 @@ _MAPPINGS = {
     "zhimi.airpurifier.rma1": _MAPPING_RMA1,  # airpurifier 4 lite
     "zhimi.airpurifier.rma2": _MAPPING_RMA2,  # airpurifier 4 lite
     "zhimi.airp.rmb1": _MAPPING_RMB1,  # airpurifier 4 lite
+    "xiaomi.airp.cpa4": _MAPPING_CPA4,  # airpurifier 4 compact
     "zhimi.airpurifier.za1": _MAPPING_ZA1,  # smartmi air purifier
 }
 
@@ -290,6 +315,7 @@ REVERSED_LED_BRIGHTNESS = [
     "zhimi.airp.mb5a",
     "zhimi.airp.vb4",
     "zhimi.airp.rmb1",
+    "xiaomi.airp.cpa4",
 ]
 
 
@@ -566,10 +592,19 @@ class AirPurifierMiot(MiotDevice):
         if self.model == "zhimi.airpurifier.mb3":
             self.set_property("aqi_realtime_update_duration", 5)
 
+        # A single request is limited to 15 properties by default.
+        # The 4 Compact beeps and drops off the network when asked for
+        # more than three properties at once, see #1550.
+        _props_per_request = 15
+        if self.model == "xiaomi.airp.cpa4":
+            _props_per_request = 3
+
         return AirPurifierMiotStatus(
             {
                 prop["did"]: prop["value"] if prop["code"] == 0 else None
-                for prop in self.get_properties_for_mapping()
+                for prop in self.get_properties_for_mapping(
+                    max_properties=_props_per_request
+                )
             },
             self.model,
         )

@@ -69,6 +69,22 @@ _INITIAL_STATE_VA2 = {
     "button_pressed": "power",
 }
 
+# Values read from a Xiaomi Smart Air Purifier 4 Compact, firmware 2.2.10_0021
+_INITIAL_STATE_CPA4 = {
+    "power": True,
+    "fault": 0,
+    "mode": 0,
+    "aqi": 13,
+    "filter_life_remaining": 100,
+    "filter_hours_used": 1,
+    "filter_left_time": 291,
+    "buzzer": True,
+    "child_lock": False,
+    "motor_speed": 416,
+    "favorite_level": 14,
+    "led_brightness": 2,
+}
+
 
 class DummyAirPurifierMiot(DummyMiotDevice, AirPurifierMiot):
     def __init__(self, *args, **kwargs):
@@ -373,3 +389,99 @@ class TestAirPurifierVA2(TestCase):
 
         self.device.set_anion(False)
         assert anion() is False
+
+
+class DummyAirPurifierMiotCPA4(DummyAirPurifierMiot):
+    def __init__(self, *args, **kwargs):
+        self._model = "xiaomi.airp.cpa4"
+        self.state = _INITIAL_STATE_CPA4
+        self.max_properties_requested = None
+        super().__init__(*args, **kwargs)
+
+    def get_properties_for_mapping(self, *, max_properties=15):
+        self.max_properties_requested = max_properties
+        return super().get_properties_for_mapping(max_properties=max_properties)
+
+
+@pytest.fixture
+def airpurifierCPA4(request):
+    request.cls.device = DummyAirPurifierMiotCPA4()
+
+
+@pytest.mark.usefixtures("airpurifierCPA4")
+class TestAirPurifierCPA4(TestCase):
+    def test_status(self):
+        status = self.device.status()
+        assert status.is_on is _INITIAL_STATE_CPA4["power"]
+        assert status.aqi == _INITIAL_STATE_CPA4["aqi"]
+        assert status.average_aqi is None
+        assert status.humidity is None
+        assert status.temperature is None
+        assert status.pm10_density is None
+        assert status.fan_level is None
+        assert status.mode == OperationMode(_INITIAL_STATE_CPA4["mode"])
+        assert status.led is None
+        # the screen reports 2 for the brightest setting
+        assert status.led_brightness == LedBrightness.Bright
+        assert status.led_brightness_level is None
+        assert status.buzzer == _INITIAL_STATE_CPA4["buzzer"]
+        assert status.child_lock == _INITIAL_STATE_CPA4["child_lock"]
+        assert status.favorite_level == _INITIAL_STATE_CPA4["favorite_level"]
+        assert status.favorite_rpm is None
+        assert (
+            status.filter_life_remaining == _INITIAL_STATE_CPA4["filter_life_remaining"]
+        )
+        assert status.filter_hours_used == _INITIAL_STATE_CPA4["filter_hours_used"]
+        assert status.filter_left_time == _INITIAL_STATE_CPA4["filter_left_time"]
+        assert status.use_time is None
+        assert status.purify_volume is None
+        assert status.motor_speed == _INITIAL_STATE_CPA4["motor_speed"]
+        assert status.filter_rfid_product_id is None
+        assert status.filter_type is None
+        assert status.anion is None
+
+    def test_status_requests_at_most_three_properties_at_once(self):
+        self.device.status()
+        assert self.device.max_properties_requested == 3
+
+    def test_set_led_brightness(self):
+        def led_brightness():
+            return self.device.status().led_brightness
+
+        self.device.set_led_brightness(LedBrightness.Bright)
+        assert led_brightness() == LedBrightness.Bright
+
+        self.device.set_led_brightness(LedBrightness.Dim)
+        assert led_brightness() == LedBrightness.Dim
+
+        self.device.set_led_brightness(LedBrightness.Off)
+        assert led_brightness() == LedBrightness.Off
+        assert self.device.status().data["led_brightness"] == 0
+
+    def test_set_favorite_level(self):
+        def favorite_level():
+            return self.device.status().favorite_level
+
+        self.device.set_favorite_level(0)
+        assert favorite_level() == 0
+        self.device.set_favorite_level(14)
+        assert favorite_level() == 14
+
+        with pytest.raises(ValueError):
+            self.device.set_favorite_level(15)
+
+    def test_set_fan_level(self):
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_fan_level(1)
+
+    def test_set_favorite_rpm(self):
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_favorite_rpm(1000)
+
+    def test_set_led(self):
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_led(True)
+
+    def test_set_anion(self):
+        with pytest.raises(UnsupportedFeatureException):
+            self.device.set_anion(True)
