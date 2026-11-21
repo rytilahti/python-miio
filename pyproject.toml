@@ -49,6 +49,7 @@ docs = ["sphinx", "sphinx_click", "sphinxcontrib-apidoc", "sphinx_rtd_theme>=1.3
 updater = ["netifaces>=0,<1"]
 backup_extract = ["android_backup>=0,<1"]
 crcmod = ["crcmod>=1.7,<2"]
+ble = ["bleak>=0.22"]
 
 [dependency-groups]
 dev = [
