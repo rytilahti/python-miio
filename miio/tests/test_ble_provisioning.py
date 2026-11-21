@@ -11,6 +11,7 @@ from miio.ble_provisioning import (
     CHAR_CONTROL,
     CHAR_DATA,
     CHAR_STATUS,
+    MI_SERVICE_UUID,
     OP_DEV_INFO_GET,
     OP_REG_SUCCESS,
     PKG_DEV_INFO,
@@ -174,3 +175,306 @@ async def test_provision_reports_router_error():
     config = WifiConfig(ssid="Net", password="wrong", uid=42, country_domain="us")
     with pytest.raises(BleProvisioningException):
         await provision_client(device, config, wait=5)
+
+
+class ScriptedClient:
+    """Bare client: records what the app writes, the test pushes device packets."""
+
+    def __init__(self):
+        self.callbacks = {}
+        self.written = []
+
+    async def start_notify(self, uuid, callback):
+        self.callbacks[uuid] = callback
+
+    async def write_gatt_char(self, uuid, data, response=False):
+        self.written.append((uuid, bytes(data)))
+        if self.on_write:
+            self.on_write(uuid, bytes(data))
+
+    on_write = None
+
+    def push(self, uuid, payload):
+        self.callbacks[uuid](None, bytearray(payload))
+
+
+async def started_channel(timeout=1.0):
+    from miio.ble_provisioning import _Channel
+
+    client = ScriptedClient()
+    channel = _Channel(client, timeout=timeout)
+    await channel.start()
+    return client, channel
+
+
+def test_parse_mibeacon_without_mac_and_capability():
+    beacon = parse_mibeacon(bytes.fromhex("0058ea4300"))
+    assert beacon.mac is None
+    assert beacon.capability is None
+    assert beacon.bond_ability is None
+    assert not beacon.awaiting_combo_setup
+
+
+def test_wifi_config_optional_fields():
+    plain = WifiConfig(ssid="a", password="b", uid=None, country_domain="us")
+    assert WifiConfigField.Uid not in parse_tlv(plain.to_tlv())
+    with_key = WifiConfig(
+        ssid="a", password="b", uid=1, country_domain="us", bind_key="xyz"
+    )
+    assert parse_tlv(with_key.to_tlv())[WifiConfigField.BindKey] == b"xyz"
+    with pytest.raises(ValueError):
+        WifiConfig(ssid="x" * 300, password="b", uid=1, country_domain="us").to_tlv()
+
+
+@pytest.mark.asyncio
+async def test_channel_single_packet_and_control_frames():
+    client, channel = await started_channel()
+    client.push(CHAR_DATA, bytes.fromhex("00000200") + b"payload")
+    assert await channel.receive() == (0, b"payload")
+    assert client.written[-1] == (CHAR_DATA, bytes.fromhex("00000300"))
+
+    client.push(CHAR_DATA, transfer_start(PKG_PUBKEY, 2))
+    client.push(
+        CHAR_DATA, bytes.fromhex("0000ffff")
+    )  # control packet in between, ignored
+    for frame in split_frames(bytes(range(20))):
+        client.push(CHAR_DATA, frame)
+    assert await channel.receive() == (PKG_PUBKEY, bytes(range(20)))
+
+
+@pytest.mark.asyncio
+async def test_channel_errors():
+    client, channel = await started_channel(timeout=0.05)
+    with pytest.raises(BleProvisioningException):
+        await channel.receive()  # nothing arrives
+    client.push(CHAR_DATA, b"\x05\x00junk")
+    with pytest.raises(BleProvisioningException):
+        await channel.receive()
+
+    client.on_write = lambda uuid, data: (
+        data[:3] == b"\0\0\0" and client.push(CHAR_DATA, bytes.fromhex("00000104"))
+    )
+    with pytest.raises(BleProvisioningException):
+        await channel.send(PKG_PUBKEY, bytes(40))  # device not ready
+
+
+@pytest.mark.asyncio
+async def test_channel_resends_requested_frames():
+    client, channel = await started_channel()
+    answers = [ACK_READY, bytes.fromhex("000001050200"), ACK_SUCCESS]
+
+    def on_write(uuid, data):
+        if data[:3] == b"\0\0\0":
+            client.push(CHAR_DATA, answers.pop(0))
+        elif (
+            data[:2] == b"\x03\x00"
+        ):  # after the last frame: ask for frame 2, then accept
+            client.push(CHAR_DATA, answers.pop(0))
+        elif data[:2] == b"\x02\x00" and not answers[1:]:
+            client.push(CHAR_DATA, answers.pop(0))
+
+    client.on_write = on_write
+    await channel.send(PKG_PUBKEY, bytes(40))
+    sent = [data[:2] for _, data in client.written]
+    assert sent.count(b"\x02\x00") == 2
+
+    client.on_write = lambda uuid, data: (
+        data[:3] == b"\0\0\0"
+        and client.push(CHAR_DATA, ACK_READY)
+        or (data[:2] == b"\x01\x00" and client.push(CHAR_DATA, b"\x00\x00\x01\x04"))
+    )
+    with pytest.raises(BleProvisioningException):
+        await channel.send(PKG_PUBKEY, bytes(10))  # transfer rejected
+
+
+@pytest.mark.asyncio
+async def test_status_notifications():
+    client, channel = await started_channel()
+    seen = []
+    channel.on_status = seen.append
+    for payload in (b"", b"\x01", b"\x01", b"\x03"):
+        client.push(CHAR_STATUS, payload)
+    assert seen == [1, 3]
+    assert channel.status == [1, 1, 3]
+
+
+@pytest.mark.asyncio
+async def test_provision_rejects_bad_device_key():
+    device = FakeDevice()
+
+    def bad_key(pkg_type, payload):
+        if pkg_type == PKG_PUBKEY:
+            device.start_sending(PKG_DEV_INFO, bytes(64))
+        else:
+            FakeDevice.handle(device, pkg_type, payload)
+
+    device.handle = bad_key
+    config = WifiConfig(ssid="Net", password="secret", uid=42, country_domain="us")
+    with pytest.raises(BleProvisioningException):
+        await provision_client(device, config, wait=1)
+
+
+@pytest.mark.asyncio
+async def test_provision_without_final_status():
+    device = FakeDevice(final_status=7)  # unknown code: no failure, no cloud
+    config = WifiConfig(ssid="Net", password="secret", uid=42, country_domain="zz")
+    result = await provision_client(device, config, wait=0.6)
+    assert result.status is None
+
+
+class FakeBleak:
+    """Stand-in for the bleak module."""
+
+    def __init__(self, device):
+        outer = self
+
+        class Scanner:
+            def __init__(self, detection_callback):
+                self.callback = detection_callback
+
+            async def __aenter__(self):
+                found = type("D", (), {"address": "ADDR", "name": "MIBLE_BL602"})()
+                adv = type(
+                    "A",
+                    (),
+                    {
+                        "service_data": {
+                            MI_SERVICE_UUID: bytes.fromhex(
+                                "3058ea4300665544332211" + "1d"
+                            )
+                        },
+                        "local_name": None,
+                        "rssi": -50,
+                    },
+                )()
+                self.callback(found, adv)
+                self.callback(found, type("A", (), {"service_data": {}})())
+                return self
+
+            async def __aexit__(self, *exc):
+                return False
+
+        class Client:
+            def __init__(self, address, timeout):
+                outer.connected_to = address
+
+            async def __aenter__(self):
+                return device
+
+            async def __aexit__(self, *exc):
+                return False
+
+        self.BleakScanner = Scanner
+        self.BleakClient = Client
+
+
+@pytest.fixture
+def fake_bleak(monkeypatch):
+    import sys
+
+    fake = FakeBleak(FakeDevice())
+    monkeypatch.setitem(sys.modules, "bleak", fake)
+    return fake
+
+
+@pytest.mark.asyncio
+async def test_scan_and_provision_with_bleak(fake_bleak):
+    from miio.ble_provisioning import provision, scan
+
+    found = await scan(timeout=0)
+    assert list(found) == ["ADDR"]
+    assert found["ADDR"][2].awaiting_combo_setup
+    config = WifiConfig(ssid="Net", password="secret", uid=42, country_domain="us")
+    result = await provision("ADDR", config, wait=5)
+    assert fake_bleak.connected_to == "ADDR"
+    assert result.status == ProvisioningStatus.CloudConnected
+
+
+def test_local_tz(monkeypatch):
+    import os
+
+    from miio.ble_provisioning import _local_tz
+
+    monkeypatch.setattr(os.path, "realpath", lambda p: "/usr/share/zoneinfo/Asia/Tokyo")
+    assert _local_tz() == "Asia/Tokyo"
+    monkeypatch.setattr(os.path, "realpath", lambda p: "/etc/localtime")
+    assert _local_tz() == "UTC"
+
+    def broken(path):
+        raise OSError
+
+    monkeypatch.setattr(os.path, "realpath", broken)
+    assert _local_tz() == "UTC"
+
+
+def test_cli(monkeypatch):
+    from click.testing import CliRunner
+
+    import miio.ble_provisioning as bp
+
+    beacon = parse_mibeacon(bytes.fromhex("3058ea4300665544332211" + "1d"))
+    other = parse_mibeacon(bytes.fromhex("3059ea4300665544332211" + "1d"))
+
+    async def fake_scan(timeout=12.0):
+        return {"A": ("MIBLE_BL602", -50, beacon), "B": (None, -70, other)}
+
+    async def fake_provision(address, config, *, wait=60.0, on_status=None):
+        on_status(ProvisioningStatus.Connecting)
+        on_status(99)
+        return bp.ProvisioningResult(
+            did="123", status=ProvisioningStatus.CloudConnected
+        )
+
+    monkeypatch.setattr(bp, "scan", fake_scan)
+    monkeypatch.setattr(bp, "provision", fake_provision)
+    runner = CliRunner()
+
+    out = runner.invoke(bp.ble, ["scan"]).output
+    assert "A  MIBLE_BL602" in out
+    assert "B " not in out
+    assert "B  -" in runner.invoke(bp.ble, ["scan", "--all"]).output
+
+    args = [
+        "provision",
+        "--ssid",
+        "Net",
+        "--password",
+        "pw",
+        "--uid",
+        "1",
+        "--region",
+        "us",
+    ]
+    res = runner.invoke(bp.ble, args)
+    assert res.exit_code == 0, res.output
+    assert "Device status: Connecting" in res.output
+    assert "Device status: 99" in res.output
+    assert "Device 123: CloudConnected" in res.output
+
+    res = runner.invoke(bp.ble, [*args, "--mac", "00:00:00:00:00:00"])
+    assert res.exit_code != 0
+    assert "0 devices in setup mode" in res.output
+
+    async def nothing(address, config, *, wait=60.0, on_status=None):
+        return bp.ProvisioningResult(did="5", status=None)
+
+    monkeypatch.setattr(bp, "provision", nothing)
+    res = runner.invoke(bp.ble, [*args, "--address", "X"])
+    assert "Device 5: unknown" in res.output
+
+
+@pytest.mark.asyncio
+async def test_provision_device_reports_no_status():
+    device = FakeDevice()
+
+    def silent(pkg_type, payload):
+        if pkg_type == PKG_WIFI_CONFIG:
+            device.config = parse_tlv(decrypt(device.keys, payload))
+        else:
+            FakeDevice.handle(device, pkg_type, payload)
+
+    device.handle = silent
+    config = WifiConfig(ssid="Net", password="secret", uid=42, country_domain="us")
+    result = await provision_client(device, config, wait=0.6)
+    assert result.status is None
+    assert device.config[WifiConfigField.Ssid] == b"Net"
