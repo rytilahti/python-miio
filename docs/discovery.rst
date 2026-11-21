@@ -81,6 +81,31 @@ Alternatively, you can try one of the :ref:`legacy ways to obtain the tokens<leg
 You can also access this functionality programatically using :class:`miio.cloud.CloudInterface`.
 
 
+.. _ble_provisioning:
+
+Provisioning devices over Bluetooth
+===================================
+
+Newer devices built on combo (Wi-Fi + BLE) modules, such as the BL602 advertised as ``MIBLE_BL602``,
+do not open a setup access point after a Wi-Fi reset, so :meth:`miio.Device.configure_wifi` cannot reach them.
+``miiocli ble`` sends the Wi-Fi settings over Bluetooth instead.
+It needs the optional ``bleak`` dependency (``pip install python-miio[ble]``).
+
+.. code-block:: console
+
+    miiocli ble scan
+    miiocli ble provision --ssid MyNetwork --uid 1234567890 --region us
+
+``--uid`` is the numeric id of your own Xiaomi account: the device binds itself to that account,
+and the tested firmware ignores configurations without it.
+The token is not sent over Bluetooth, so fetch it afterwards with ``miiocli cloud list``.
+To keep the device local, block its internet access once you have the token;
+local control keeps working.
+
+The flow was verified on ``xiaomi.derh.lite``. Other combo devices are likely to work the same way,
+reports are welcome.
+
+
 Environment variables for command-line tools
 ============================================
 

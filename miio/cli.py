@@ -12,6 +12,7 @@ from miio.click_common import (
 )
 from miio.miioprotocol import MiIOProtocol
 
+from .ble_provisioning import ble
 from .cloud import cloud
 from .devicefactory import factory
 from .devtools import devtools
@@ -73,6 +74,7 @@ def discover(mdns, handshake, network, timeout):
 
 
 cli.add_command(discover)
+cli.add_command(ble)
 cli.add_command(cloud)
 cli.add_command(devtools)
 cli.add_command(factory)
