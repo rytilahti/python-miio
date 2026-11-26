@@ -1,0 +1,149 @@
+[
+  {
+    "did": "power",
+    "siid": 2,
+    "piid": 1,
+    "code": 0,
+    "value": true
+  },
+  {
+    "did": "fault",
+    "siid": 2,
+    "piid": 2,
+    "code": 0,
+    "value": 0
+  },
+  {
+    "did": "mode",
+    "siid": 2,
+    "piid": 3,
+    "code": 0,
+    "value": 0
+  },
+  {
+    "did": "fan_level",
+    "siid": 2,
+    "piid": 4,
+    "code": 0,
+    "value": 0
+  },
+  {
+    "did": "anion",
+    "siid": 2,
+    "piid": 5,
+    "code": 0,
+    "value": true
+  },
+  {
+    "did": "uv",
+    "siid": 2,
+    "piid": 6,
+    "code": 0,
+    "value": true
+  },
+  {
+    "did": "humidity",
+    "siid": 3,
+    "piid": 1,
+    "code": 0,
+    "value": 42
+  },
+  {
+    "did": "temperature",
+    "siid": 3,
+    "piid": 2,
+    "code": 0,
+    "value": 22.5
+  },
+  {
+    "did": "air_quality",
+    "siid": 3,
+    "piid": 3,
+    "code": 0,
+    "value": 0
+  },
+  {
+    "did": "aqi",
+    "siid": 3,
+    "piid": 4,
+    "code": 0,
+    "value": 3
+  },
+  {
+    "did": "pm1",
+    "siid": 3,
+    "piid": 9,
+    "code": 0,
+    "value": 1
+  },
+  {
+    "did": "filter_life_remaining",
+    "siid": 4,
+    "piid": 1,
+    "code": 0,
+    "value": 100
+  },
+  {
+    "did": "filter_left_time",
+    "siid": 4,
+    "piid": 2,
+    "code": 0,
+    "value": 8636
+  },
+  {
+    "did": "filter_hours_used",
+    "siid": 4,
+    "piid": 3,
+    "code": 0,
+    "value": 4
+  },
+  {
+    "did": "screen",
+    "siid": 6,
+    "piid": 1,
+    "code": 0,
+    "value": true
+  },
+  {
+    "did": "screen_brightness",
+    "siid": 6,
+    "piid": 2,
+    "code": 0,
+    "value": 2
+  },
+  {
+    "did": "buzzer",
+    "siid": 7,
+    "piid": 1,
+    "code": 0,
+    "value": false
+  },
+  {
+    "did": "child_lock",
+    "siid": 8,
+    "piid": 1,
+    "code": 0,
+    "value": false
+  },
+  {
+    "did": "favorite_level",
+    "siid": 9,
+    "piid": 1,
+    "code": 0,
+    "value": 9
+  },
+  {
+    "did": "motor_target_speed",
+    "siid": 13,
+    "piid": 3,
+    "code": 0,
+    "value": 400
+  },
+  {
+    "did": "motor_speed",
+    "siid": 13,
+    "piid": 4,
+    "code": 0,
+    "value": 404
+  }
+]
